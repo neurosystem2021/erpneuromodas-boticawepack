@@ -175,7 +175,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto} - ${data.ProductoTalla}</b>
+        <b>${data.Producto} - ${data.ProductoCategoria} - ${data.ProductoMarca} - ${data.ProductoTalla}</b>
       `
     },
     setNuevoPrecioContado (index) {
