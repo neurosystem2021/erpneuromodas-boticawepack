@@ -20,14 +20,17 @@
 </template>
 
 <script>
+import config from '@/store/config.js'
+
 export default {
   mounted() {
-    this.axios.get('http://boticav1.local/api/index.php/proveedores/count').then((response) => {
+    this.axios.get(API + 'proveedores/count').then((response) => {
       this.totalRows = response.data.total
     })
   },
   data() {
     return {
+      API: config.API,
       items: [],
       isBusy: false,
       fields: [ 'Proveedor', 'Direccion' ],
@@ -41,7 +44,7 @@ export default {
         console.log(ctx)
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let promise = this.axios.get('http://boticav1.local/api/index.php/proveedores?limit='+ctx.perPage+'&page='+ctx.currentPage)
+        let promise = this.axios.get(API + 'proveedores?limit='+ctx.perPage+'&page='+ctx.currentPage)
 
         return promise.then((result) => {
           this.items = result.data

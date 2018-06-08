@@ -12,7 +12,7 @@
                     <b-form-group>
                       <label>Tipo de Movimiento:</label>
                       <autocomplete
-                        url="http://boticav1.local/api/index.php/movimientos/tipos"
+                        :url="API + 'movimientos/tipos'"
                         anchor="TipoMovimiento"
                         label="writer"
                         placeholder=""
@@ -125,7 +125,7 @@
                     <b-form-group>
                       <label>Moneda:</label>
                       <autocomplete
-                        url="http://boticav1.local/api/index.php/monedas"
+                        :url="API + 'monedas'"
                         initValue="PEN"
                         anchor="Moneda"
                         label="writer"
@@ -184,10 +184,12 @@ import ProductosCarrito from '@/components/ProductosCarrito'
 //import ProveedoresTabla from 'components/ProveedoresTabla'
 import ProveedoresForm from '@/components/ProveedoresForm'
 import { mapState, mapActions } from 'vuex'
+import config from '@/store/config.js'
 
 export default {
   data () {
     return {
+      API: config.API,
       ultimoMovimiento: '',
       movimiento: this.initMovimiento()
     }
@@ -268,7 +270,7 @@ export default {
       this.buscarAlmacenes(value)
     },
     guardarMovimiento () {
-      this.axios.post('http://boticav1.local/api/index.php/movimientos', {
+      this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos
       })

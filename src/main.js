@@ -19,7 +19,6 @@ import '../static/styles.css'
 
 Vue.config.productionTip = false
 
-Vue.component('autocomplete', Autocomplete)
 Vue.use(VueAxios, axios)
 Vue.use(Toasted, {
   theme: "bubble",
@@ -29,6 +28,22 @@ Vue.use(Toasted, {
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
+
+// Componentes 
+Vue.component('autocomplete', Autocomplete)
+Vue.component('editable',{
+  template:'<div contenteditable="true" @input="update"></div>',
+  props:['content'],
+  mounted:function(){
+    this.$el.innerText = this.content;
+  },
+  methods:{
+    update:function(event){
+      this.$emit('update',event.target.innerText);
+    }
+  }
+})
+
 
 Vue.filter('redondear', (value) => {
   return parseFloat(value || 0).toFixed(2)

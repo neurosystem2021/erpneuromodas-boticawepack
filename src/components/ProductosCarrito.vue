@@ -17,7 +17,7 @@
           </autocomplete>
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form></producto-form>
+            <producto-form :showButton="true"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>

@@ -44,6 +44,7 @@
   </div>
 </template>
 <script>
+import config from '@/store/config.js'
 export default {
   mounted() {
     
@@ -51,6 +52,7 @@ export default {
   },
   data() {
     return {
+      API: config.API,
       show: false,
       proveedor: {
         Proveedor: '',
@@ -63,7 +65,7 @@ export default {
   },
   methods: {
     consultarRUC() {
-      this.axios.get('http://boticav1.local/api/index.php/consultarRUC', {
+      this.axios.get(this.API + 'consultarRUC', {
           params: {
             type: 'RUC',
             numero: this.proveedor.Ruc
@@ -73,13 +75,13 @@ export default {
           this.proveedor.Proveedor = data.RazonSocial
           this.proveedor.Direccion = data.Direccion
       })
-      .catch(function (error) {
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')        
+      .catch((error) => {
+          this.$toasted.show('No se encontró el RUC')        
           console.log(error)
       })
     },
     guardarProveedor() {
-      this.axios.post('http://boticav1.local/api/index.php/proveedores', this.proveedor)
+      this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
         this.$toasted.show('Proveedor guardado correctamente')
         this.$refs.proveedorForm.hide()
