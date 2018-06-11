@@ -6,6 +6,7 @@
         <b-input-group>
           <autocomplete
             :options="filtrados"
+            ref="autocompleteProducto"
             url="#"
             :onShouldRenderChild="renderChild"
             :onShouldGetData="getData"
@@ -56,13 +57,13 @@
             placeholder="Flete"></b-form-input>
         </template>-->
         
-        <template slot="lote" slot-scope="data">
+        <!--<template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
             type="text"
             min="0"
             placeholder="Lote"></b-form-input>
-        </template>
+        </template>-->
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].nuevoPrecioContado"
@@ -113,6 +114,7 @@ export default {
       producto: {},
       fields: [
         { key: 'Producto' }, 
+        { key: 'ProductoModelo', label: 'Modelo' }, 
         { key: 'ProductoMarca', label: 'Marca' },
         { key: 'ProductoTalla', label: 'Talla' },
         { key: 'Genero' },
@@ -121,7 +123,7 @@ export default {
         { key: 'subtotal', label: 'SubTotal', variant: 'success' },
         { key: 'igv', label: 'IGV' },
         // { key: 'flete', label: 'FLETE' },
-        { key: 'lote', label: 'Lote' },
+        // { key: 'lote', label: 'Lote' },
         { key: 'precioVenta', label: 'Precio venta' },
         { key: 'total', label: 'Total', variant: 'danger' },
         { key: 'acciones', label: ''}
@@ -163,7 +165,7 @@ export default {
       eliminar: 'eliminarProducto'
     }),
     setProducto (obj) {
-      //this.producto = obj
+      this.$refs.autocompleteProducto.setValue('')
       obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0

@@ -12,11 +12,13 @@
                     <b-form-group>
                       <label>Tipo de Movimiento:</label>
                       <autocomplete
+                        ref="inputMovimiento"
                         :url="API + 'movimientos/tipos'"
                         anchor="TipoMovimiento"
                         label="writer"
                         placeholder=""
                         :on-select="setTipoMovimiento"
+                        :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
                     </b-form-group>
@@ -26,13 +28,15 @@
                       <label>Proveedor:</label>
                       <b-input-group>
                         <autocomplete
+                          ref="inputProveedor"
                           :options="proveedoresFiltrados"
                           url="#"
                           :onShouldGetData="getProveedores"
-                          anchor="Proveedor"
+                          anchor="ProveedorRuc"
                           label="writer"
                           placeholder=""
                           :on-select="setProveedor"
+                          :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
                           :classes="{input: 'form-control'}">
                         </autocomplete>
 
@@ -51,6 +55,7 @@
                       <label>Periodo Tributario:</label>
                       <b-form-input v-model="movimiento.FechaPeriodoTributario"
                         type="text"
+                        readonly="readonly"
                         placeholder="Periodo Tributario"></b-form-input>
                     </b-form-group>
                   </b-col>
@@ -288,6 +293,10 @@ export default {
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
+    },
+    focusAutocomplete (ref) {
+      this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
     }
   },
   components: {

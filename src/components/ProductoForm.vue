@@ -2,7 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-modal id="modalProducto" title="Nuevo Producto" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" id="modalProducto" title="Nuevo Producto" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -15,6 +15,7 @@
                 label="writer"
                 :placeholder="producto.categoria.ProductoCategoria"
                 :on-select="setCategoria"
+                :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
@@ -32,6 +33,7 @@
                 label="writer"
                 :placeholder.sync="producto.marca.ProductoMarca"
                 :on-select="setMarca"
+                :onFocus="focusAutocomplete.bind(null, 'inputMarca')"                
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
@@ -44,7 +46,7 @@
             <b-form-input v-model="producto.Producto"
               type="text"
               :value="producto.Producto"
-              placeholder="Producto"></b-form-input>
+              ></b-form-input>
           </b-form-group>
           <b-form-group>
             <label>Genero:</label>            
@@ -54,7 +56,7 @@
             <label>Botapie:</label>
             <b-form-input v-model="producto.Botapie"
               type="text"
-              placeholder="Botapie"></b-form-input>
+              ></b-form-input>
           </b-form-group>
         </b-col>
         <b-col md="6">
@@ -80,7 +82,8 @@
                 anchor="ProductoModelo"
                 label="writer"
                 :placeholder.sync="producto.modelo.ProductoModelo"
-                :on-select="setModelo"              
+                :on-select="setModelo"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
@@ -92,7 +95,7 @@
             <label>Colores:</label>
             <b-form-input v-model="producto.Color"
               type="text"
-              placeholder="Colores"></b-form-input>
+              ></b-form-input>
           </b-form-group>
           <b-form-group>
             <label>Talla:</label>
@@ -102,7 +105,8 @@
               anchor="ProductoTalla"
               label="writer"
               :placeholder.sync="producto.talla.ProductoTalla"
-              :on-select="setTalla"              
+              :on-select="setTalla"
+              :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
@@ -110,7 +114,7 @@
             <label>Porcentaje Utilidad:</label>
             <b-form-input v-model="producto.PorcentajeUtilidad"
               type="number"
-              placeholder="Porcentaje Utilidad"></b-form-input>
+              ></b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
@@ -235,6 +239,10 @@ export default {
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
+    },
+    focusAutocomplete (ref) {
+      this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
     }
   },
   components: {
