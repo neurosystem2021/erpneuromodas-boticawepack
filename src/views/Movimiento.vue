@@ -35,6 +35,7 @@
                           anchor="ProveedorRuc"
                           label="writer"
                           placeholder=""
+                          :onInput="(val) => newRuc = val"                          
                           :on-select="setProveedor"
                           :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
                           :classes="{input: 'form-control'}">
@@ -42,7 +43,7 @@
 
                         <b-input-group-append>
                           <!--<proveedores-tabla></proveedores-tabla>-->
-                          <proveedores-form></proveedores-form>
+                          <proveedores-form :ruc="newRuc"></proveedores-form>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
@@ -194,6 +195,7 @@ import config from '@/store/config.js'
 export default {
   data () {
     return {
+      newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
       movimiento: this.initMovimiento()
@@ -275,15 +277,16 @@ export default {
       this.buscarAlmacenes(value)
     },
     guardarMovimiento () {
+      console.log(this.productos);
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos
       })
       .then((response) => {
-        console.log(response)
         if (response.data.error) {
           this.$toasted.show(response.data.error)
         } else {
+          console.log(response)
           this.ultimoMovimiento = response.data.hash
           this.movimiento = this.initMovimiento()
           this.limpiar()

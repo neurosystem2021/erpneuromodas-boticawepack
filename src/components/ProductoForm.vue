@@ -2,7 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-modal :no-close-on-esc="true" id="modalProducto" title="Nuevo Producto" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -19,10 +19,19 @@
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
-                <categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>
+                <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
+                <!--<categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>-->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
+          <b-form-group>
+            <label>Artículo:</label>
+            <b-form-input v-model="producto.Producto"
+              type="text"
+              :value="producto.Producto"
+              ></b-form-input>
+          </b-form-group>
+
           <b-form-group>
             <label>Marca:</label>
             <b-input-group>
@@ -37,27 +46,40 @@
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
-                <marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>
+                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Producto:</label>
-            <b-form-input v-model="producto.Producto"
-              type="text"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
-          <b-form-group>
-            <label>Genero:</label>            
-            <b-form-select v-model="producto.Genero" :options="generos" />
-          </b-form-group>
-          <b-form-group>
-            <label>Botapie:</label>
-            <b-form-input v-model="producto.Botapie"
+            <label>Modelo:</label>
+            <b-form-input v-model="producto.ProductoModelo"
               type="text"
               ></b-form-input>
+            <!-- <b-input-group>
+              <autocomplete
+                :url="API + 'modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.modelo.ProductoModelo"
+                :on-select="setModelo"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+              <b-input-group-append>
+                <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
+              </b-input-group-append>
+            </b-input-group> -->
           </b-form-group>
+          <b-form-group>
+            <label>Colores:</label>
+            <b-form-input v-model="producto.Color"
+              type="text"
+              ></b-form-input>
+          </b-form-group>
+          
+          
         </b-col>
         <b-col md="6">
           <b-form-group>
@@ -73,30 +95,7 @@
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
-          <b-form-group>
-            <label>Modelo:</label>
-            <b-input-group>
-              <autocomplete
-                :url="API + 'modelos'"
-                ref="inputModelo"
-                anchor="ProductoModelo"
-                label="writer"
-                :placeholder.sync="producto.modelo.ProductoModelo"
-                :on-select="setModelo"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
-                :classes="{input: 'form-control'}">
-              </autocomplete>
-              <b-input-group-append>
-                <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group>
-            <label>Colores:</label>
-            <b-form-input v-model="producto.Color"
-              type="text"
-              ></b-form-input>
-          </b-form-group>
+          
           <b-form-group>
             <label>Talla:</label>
             <autocomplete
@@ -111,6 +110,16 @@
             </autocomplete>
           </b-form-group>
           <b-form-group>
+            <label>Genero:</label>            
+            <b-form-select v-model="producto.Genero" :options="generos" />
+          </b-form-group>
+          <b-form-group>
+            <label>Botapie:</label>
+            <b-form-input v-model="producto.Botapie"
+              type="text"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input v-model="producto.PorcentajeUtilidad"
               type="number"
@@ -119,6 +128,9 @@
         </b-col>
       </b-row>
       <div slot="modal-footer" >
+        <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
+          Limpiar
+        </b-btn>
         <b-btn  variant="primary" @click="guardarProducto">
            Guardar
          </b-btn>
@@ -133,11 +145,12 @@
 import config from '@/store/config.js'
 import CategoriaForm from '@/components/CategoriaForm'
 import MarcaForm from '@/components/MarcaForm'
-import ModeloForm from '@/components/ModeloForm'
+// import ModeloForm from '@/components/ModeloForm'
 
 export default {
   data () {
     return {
+      title: 'Nuevo Producto',
       API: config.API,
       show: false, 
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
@@ -150,6 +163,7 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     productoUpdate (newVal) {
+      this.title = 'Editar Producto'
       this.producto.categoria = {
         IdProductoCategoria: newVal.IdProductoCategoria,
         ProductoCategoria: newVal.ProductoCategoria
@@ -161,16 +175,16 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('')
-      this.$refs.inputModelo.setValue('')
+      // this.$refs.inputModelo.setValue('')
       this.$refs.inputTalla.setValue('')
       this.producto.medicion = {
         IdProductoMedicion: newVal.IdProductoMedicion,
         ProductoMedicion: newVal.ProductoMedicion
       }
-      this.producto.modelo = {
+      /* this.producto.modelo = {
         IdProductoModelo: newVal.IdProductoModelo,
         ProductoModelo: newVal.ProductoModelo
-      }
+      } */
       this.producto.talla = {
         IdProductoTalla: newVal.IdProductoTalla,
         ProductoTalla: newVal.ProductoTalla
@@ -182,6 +196,7 @@ export default {
       this.producto.Color = newVal.Color
       this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
       this.producto.CodigoBarra = newVal.CodigoBarra
+      this.producto.ProductoModelo = newVal.ProductoModelo
     }
   },
   methods: {
@@ -196,12 +211,20 @@ export default {
       this.producto.marca = obj
       this.$refs.inputMarca.setValue(obj.ProductoMarca)
     },
-    setModelo (obj) {
+    /* setModelo (obj) {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
-    },
+    }, */
     setTalla (obj) {
       this.producto.talla = obj
+    },
+    clearForm () {
+      this.$refs.inputCategoria.setValue('')
+      this.$refs.inputMarca.setValue('')
+      this.$refs.inputMedicion.setValue('')
+      this.$refs.inputTalla.setValue('')
+
+      this.initForm()
     },
     initForm () {
       this.producto = {
@@ -209,8 +232,8 @@ export default {
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
-        IdProductoModelo: null,
-        // IdProductoBotapie: null,
+        // IdProductoModelo: null,
+        IdProductoBotapie: null,
         IdProductoTalla: '',
         Producto: '',
         CodigoBarra: '',
@@ -220,7 +243,7 @@ export default {
         Genero: '',
         categoria: {},
         marca: {},
-        modelo: {},
+        // modelo: {},
         talla: {},
         medicion: {
           IdProductoMedicion:6,
@@ -232,21 +255,69 @@ export default {
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         this.$toasted.show('Producto guardado correctamente')
-        this.initForm()
+        if (this.cbGuardar) {
+          this.cbGuardar(response.data.insertId)
+        }
+
+        // this.initForm()
+        this.producto.talla = {}
+        this.$refs.inputTalla.setValue('')
+
         this.$refs.productoForm.hide()
-        this.cbGuardar()
       })
       .catch((error) => {
+        console.log(error)
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
     },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
+    },
+    crearCategoria () {
+      if (this.$refs.inputCategoria.type) {
+        let categoria = {}
+        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase()
+
+        this.axios.post(this.API + 'categorias', categoria)
+        .then((response) => {
+          this.$toasted.show('Categoría guardada correctamente')
+          this.setCategoria({
+            IdProductoCategoria: response.data.insertId,
+            ProductoCategoria: response.data.ProductoCategoria
+          })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
+      
+    },
+    crearMarca () {
+      if (this.$refs.inputMarca.type) {
+        let marca = {}
+        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase()
+  
+        this.axios.post(this.API + 'marcas', marca)
+        .then((response) => {
+          this.$toasted.show('Marca guardada correctamente')
+          this.setMarca({
+            IdProductoMarca: response.data.insertId,
+            ProductoMarca: response.data.ProductoMarca
+          })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
     }
   },
+  computed : {
+  },
   components: {
-    CategoriaForm, MarcaForm, ModeloForm
+    CategoriaForm, MarcaForm
   }
 }
 </script>

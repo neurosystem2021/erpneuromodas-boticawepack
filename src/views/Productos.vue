@@ -15,7 +15,7 @@
           </b-col>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Mostrar" class="mb-0">
-              <b-form-select :options="pageOptions" v-model="perPage" />
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
             </b-form-group>
           </b-col>
 
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15 ],
+      pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
       sortBy: 'IdProducto',
       sortDesc: false,
@@ -89,10 +89,10 @@ export default {
   },
   methods: {
       rowClick (item, index) {
-          this.productoSelect = item
-          this.$refs.productoForm.show = true;
-          //this.$refs.productoForm.producto.IdProducto = 'a'
-          //console.log(this.$refs.productoForm.$refs.productoForm)
+        this.productoSelect = item
+        this.$refs.productoForm.show = true;
+        //this.$refs.productoForm.producto.IdProducto = 'a'
+        //console.log(this.$refs.productoForm.$refs.productoForm)
       },
       actualizarTabla() {
         this.$refs.tablaProductos.refresh()

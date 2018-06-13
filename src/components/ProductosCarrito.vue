@@ -18,7 +18,7 @@
           </autocomplete>
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="true"></producto-form>
+            <producto-form :showButton="true" :cbGuardar="add"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -166,11 +166,11 @@ export default {
     }),
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
-      obj.FLETE = 0
+      //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
-      obj.IdLote = 0
-      obj.TieneIgv = 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
       obj.nuevoPrecioContado = 0
       this.add(obj)
       // Vue.set(this.productos, obj.IdProducto, obj)

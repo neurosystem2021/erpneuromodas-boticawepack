@@ -27,7 +27,13 @@ const mutations = {
 
 const actions = {
   agregarProducto ({ commit }, producto) {
-    commit('AGREGAR_PRODUCTO', producto)
+    if(typeof producto === 'object') {
+      commit('AGREGAR_PRODUCTO', producto)
+    } else {
+      axios.get(API + 'productos/id/' + producto).then((response) => {
+        commit('AGREGAR_PRODUCTO', response.data)        
+      })
+    }
   },
   eliminarProducto ({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)
@@ -38,7 +44,6 @@ const actions = {
     })
   },
   limpiarCarrito ({ commit }) {
-    console.log('asd')
     commit('LIMPIAR_CART')
   }
 }

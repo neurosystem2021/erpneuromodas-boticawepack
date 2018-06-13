@@ -2,15 +2,14 @@
   <div>
     <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-modal id="modal1" title="Tabla" size="lg" ref="proveedorForm" v-model="show">
+    <b-modal id="modal1" title="Nuevo Proveedor" size="lg" ref="proveedorForm" v-model="show" @shown="shownProveedorForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
             <label>RUC:</label>
             <b-input-group>
               <b-form-input 
-                v-model="proveedor.Ruc"
-                placeholder="Número RUC"></b-form-input>
+                v-model="proveedor.Ruc"></b-form-input>
               <b-input-group-append>
                 <b-btn variant="info" @click="consultarRUC">Buscar RUC</b-btn>
               </b-input-group-append>
@@ -20,15 +19,13 @@
             <label>Nombre del Proveedor:</label>
             <b-form-input 
               v-model="proveedor.Proveedor"
-              type="text"
-              placeholder="Nombre del Proveedor"></b-form-input>
+              type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
             <label>Dirección:</label>
             <b-form-input 
               v-model="proveedor.Direccion"
-              type="text"
-              placeholder="Dirección"></b-form-input>
+              type="text"></b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
@@ -46,10 +43,6 @@
 <script>
 import config from '@/store/config.js'
 export default {
-  mounted() {
-    
-
-  },
   data() {
     return {
       API: config.API,
@@ -63,7 +56,13 @@ export default {
       }
     }
   },
+  props: ['newRuc'],
   methods: {
+    shownProveedorForm () {
+      this.proveedor.Ruc = this.$parent.$parent.newRuc
+      this.proveedor.Direccion = ''
+      this.proveedor.Proveedor = ''
+    },
     consultarRUC() {
       this.axios.get(this.API + 'consultarRUC', {
           params: {
