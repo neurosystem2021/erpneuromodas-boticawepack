@@ -16,7 +16,7 @@
                 :placeholder="producto.categoria.ProductoCategoria"
                 :on-select="setCategoria"
                 :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"
-                :classes="{input: 'form-control'}">
+                :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
                 <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
@@ -28,6 +28,7 @@
             <label>Artículo:</label>
             <b-form-input v-model="producto.Producto"
               type="text"
+              @input="(val) => producto.Producto = val.toUpperCase()"
               :value="producto.Producto"
               ></b-form-input>
           </b-form-group>
@@ -43,7 +44,7 @@
                 :placeholder.sync="producto.marca.ProductoMarca"
                 :on-select="setMarca"
                 :onFocus="focusAutocomplete.bind(null, 'inputMarca')"                
-                :classes="{input: 'form-control'}">
+                :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
                 <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
@@ -55,6 +56,7 @@
             <label>Modelo:</label>
             <b-form-input v-model="producto.ProductoModelo"
               type="text"
+              @input="(val) => producto.ProductoModelo = val.toUpperCase()"              
               ></b-form-input>
             <!-- <b-input-group>
               <autocomplete
@@ -76,6 +78,7 @@
             <label>Colores:</label>
             <b-form-input v-model="producto.Color"
               type="text"
+              @input="(val) => producto.Color = val.toUpperCase()"              
               ></b-form-input>
           </b-form-group>
           
@@ -98,16 +101,22 @@
           
           <b-form-group>
             <label>Talla:</label>
-            <autocomplete
-              :url="API + 'tallas'"
-              ref="inputTalla"
-              anchor="ProductoTalla"
-              label="writer"
-              :placeholder.sync="producto.talla.ProductoTalla"
-              :on-select="setTalla"
-              :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
-              :classes="{input: 'form-control'}">
-            </autocomplete>
+            <b-input-group>
+              <autocomplete
+                :url="API + 'tallas'"
+                ref="inputTalla"
+                anchor="ProductoTalla"
+                label="writer"
+                :placeholder.sync="producto.talla.ProductoTalla"
+                :on-select="setTalla"
+                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <b-form-group>
             <label>Genero:</label>            
@@ -117,6 +126,7 @@
             <label>Botapie:</label>
             <b-form-input v-model="producto.Botapie"
               type="text"
+              @input="(val) => producto.Botapie = val.toUpperCase()"              
               ></b-form-input>
           </b-form-group>
           <b-form-group>
@@ -217,6 +227,7 @@ export default {
     }, */
     setTalla (obj) {
       this.producto.talla = obj
+      this.$refs.inputTalla.setValue(obj.ProductoTalla)
     },
     clearForm () {
       this.$refs.inputCategoria.setValue('')
@@ -305,6 +316,25 @@ export default {
           this.setMarca({
             IdProductoMarca: response.data.insertId,
             ProductoMarca: response.data.ProductoMarca
+          })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
+    },
+    crearTalla () {
+      if (this.$refs.inputTalla.type) {
+        let talla = {}
+        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
+  
+        this.axios.post(this.API + 'tallas', talla)
+        .then((response) => {
+          this.$toasted.show('Talla guardada correctamente')
+          this.setTalla({
+            IdProductoTalla: response.data.insertId,
+            ProductoTalla: response.data.ProductoTalla
           })
         })
         .catch((error) => {

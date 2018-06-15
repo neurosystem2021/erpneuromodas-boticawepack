@@ -115,7 +115,7 @@
               </b-col>
               <b-col md="4">
                 <b-row>
-                  <b-col>
+                  <b-col md="4">
                     <b-form-group>
                       <label>Serie:</label>                    
                       <b-form-input v-model="movimiento.Serie"
@@ -141,13 +141,15 @@
                       </autocomplete>
                     </b-form-group>
                   </b-col>
-                  <b-col>
+                  <b-col md="8">
                     <b-form-group>
                       <label>Fecha Contable:</label>
                       <b-form-input
                         v-model="movimiento.MovimientoFecha"
-                        type="date"
+                        type="datetime-local"
+                        step="1"
                         placeholder="Fecha Contable"></b-form-input>
+
                     </b-form-group>
                     <b-form-group>
                       <label>Fecha Stock:</label>
@@ -193,6 +195,8 @@ import { mapState, mapActions } from 'vuex'
 import config from '@/store/config.js'
 
 export default {
+  mounted () {
+  },
   data () {
     return {
       newRuc: '',
@@ -223,7 +227,7 @@ export default {
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
-        MovimientoFecha: this.$moment().format("YYYY-MM-DD"),
+        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDTH:mm:ss") : this.$moment().format("YYYY-MM-DD H:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },

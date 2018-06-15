@@ -11,11 +11,16 @@ import axios from 'axios';
 import VueAxios from 'vue-axios'
 import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
+import { detect } from 'detect-browser';
+
+const browser = detect();
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
+
+Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
 
