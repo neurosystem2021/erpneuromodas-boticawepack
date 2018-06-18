@@ -170,7 +170,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito></productos-carrito>
+              <productos-carrito ref="carrito"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -281,7 +281,22 @@ export default {
       this.buscarAlmacenes(value)
     },
     guardarMovimiento () {
-      console.log(this.productos);
+      let faltaLlenar = false
+
+      this.productos.forEach((prod, index) => {
+        if (prod.total <= 0) {
+          faltaLlenar = true
+          //this.productos[index].class =  'danger'
+          //console.log(this.$refs.carrito.$refs.tablaCarrito.$el)
+          //this.$refs.table.refresh();
+          this.$toasted.show('Falta llenar cantidad / precio')
+        }
+      })
+
+      if (faltaLlenar) {
+        return;
+      }
+
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos

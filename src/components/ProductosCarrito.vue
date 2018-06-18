@@ -22,7 +22,7 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <b-table small responsive  striped hover :items="productos" :fields="fields">
+      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -69,6 +69,9 @@
             v-model="productos[data.index].nuevoPrecioContado"
             type="text"
             placeholder="Precio Venta"></b-form-input>
+            <b-form-text>
+              <strike> {{ productos[data.index].normalPrecioContado }} </strike>
+            </b-form-text>
         </template>
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -181,8 +184,11 @@ export default {
       `
     },
     setNuevoPrecioContado (index) {
-      let nuevoPrecio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-      nuevoPrecio = this.$options.filters.redondear(nuevoPrecio)
+      let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
+      let normalPrecio = this.$options.filters.redondear(precio)
+      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+      
+      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 

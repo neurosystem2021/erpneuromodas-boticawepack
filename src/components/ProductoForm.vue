@@ -28,7 +28,7 @@
             <label>Artículo:</label>
             <b-form-input v-model="producto.Producto"
               type="text"
-              @input="(val) => producto.Producto = val.toUpperCase()"
+              @input="(val) => producto.Producto = val && val.toUpperCase()"
               :value="producto.Producto"
               ></b-form-input>
           </b-form-group>
@@ -55,8 +55,9 @@
           <b-form-group>
             <label>Modelo:</label>
             <b-form-input v-model="producto.ProductoModelo"
+              class="upper"
               type="text"
-              @input="(val) => producto.ProductoModelo = val.toUpperCase()"              
+              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
               ></b-form-input>
             <!-- <b-input-group>
               <autocomplete
@@ -78,7 +79,7 @@
             <label>Colores:</label>
             <b-form-input v-model="producto.Color"
               type="text"
-              @input="(val) => producto.Color = val.toUpperCase()"              
+              @input="(val) => producto.Color = val && val.toUpperCase()"              
               ></b-form-input>
           </b-form-group>
           
@@ -126,18 +127,56 @@
             <label>Botapie:</label>
             <b-form-input v-model="producto.Botapie"
               type="text"
-              @input="(val) => producto.Botapie = val.toUpperCase()"              
+              @input="(val) => producto.Botapie = val && val.toUpperCase()"              
               ></b-form-input>
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input v-model="producto.PorcentajeUtilidad"
+              @input.native="actualizarPrecioContado"
               type="number"
               ></b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
+
+      <hr v-if="producto.IdProducto" />
+      <b-row v-if="producto.IdProducto">
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio de Costo:</label>
+            <b-form-input
+              v-model="producto.PrecioCosto"
+              readonly="readonly"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio de Venta:</label>
+            <b-form-input v-model="producto.PrecioContado"
+              type="number"
+              ></b-form-input>
+              <b-form-text v-if="producto.precioContadoNormal">
+                Original - {{ producto.precioContadoNormal | redondear }}
+              </b-form-text>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <div slot="modal-footer" >
+        <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
+          <b-input-group>
+            <b-form-input
+              v-model="cantidadCodigoBarra"
+              type="number"
+              style="width:80px;"
+            ></b-form-input>
+            <b-input-group-append>
+              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+            </b-input-group-append>
+          </b-input-group>
+        </div>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
@@ -160,6 +199,7 @@ import MarcaForm from '@/components/MarcaForm'
 export default {
   data () {
     return {
+      cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
       show: false, 
@@ -207,9 +247,20 @@ export default {
       this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
       this.producto.CodigoBarra = newVal.CodigoBarra
       this.producto.ProductoModelo = newVal.ProductoModelo
+      this.producto.PrecioCosto = newVal.PrecioCosto
+      this.producto.PrecioContado = newVal.PrecioContado
     }
   },
   methods: {
+    actualizarPrecioContado () {
+      var precioCosto = this.producto.PrecioCosto
+      var utilidad = this.producto.PorcentajeUtilidad
+      var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+
+      this.producto.precioContadoNormal = nuevoPrecioContado
+      this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+
+    },
     setCategoria (obj) {
       this.producto.categoria = obj
       this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
@@ -250,6 +301,7 @@ export default {
         CodigoBarra: '',
         Color: '',
         PorcentajeUtilidad: '',
+        PrecioContado: '',
         Botapie: '',
         Genero: '',
         categoria: {},
@@ -265,9 +317,14 @@ export default {
     guardarProducto() {
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
-        this.$toasted.show('Producto guardado correctamente')
+        //console.log(response);exit();
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
+        }
+        if (response.data.error) {
+          this.$toasted.show(response.data.error + ' ' + 'Se añadirá el producto existente...')
+        } else {
+          this.$toasted.show('Producto guardado correctamente')
         }
 
         // this.initForm()
