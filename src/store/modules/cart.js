@@ -22,6 +22,16 @@ const mutations = {
   },
   LIMPIAR_CART (state) {
     state.productos = []
+  },
+  APLICAR_DESCUENTO (state, descuento) {
+    let cantidadTotal = 0
+    state.productos.forEach((prod, index) => {
+      cantidadTotal += parseFloat(prod.cantidad)
+    })
+    state.productos = state.productos.map(prod => {
+      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
+      return prod
+    })
   }
 }
 
@@ -45,6 +55,9 @@ const actions = {
   },
   limpiarCarrito ({ commit }) {
     commit('LIMPIAR_CART')
+  },
+  aplicarDescuentoGeneral ({ commit }, descuento) {
+    commit('APLICAR_DESCUENTO', descuento)
   }
 }
 

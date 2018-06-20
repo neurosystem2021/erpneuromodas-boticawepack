@@ -28,6 +28,7 @@
             v-model="productos[data.index].cantidad"
             type="number"
             min="0"
+            @input="(val) => $emit('onInputCantidad', val)"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -73,6 +74,17 @@
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
+
+        <template slot="descuento" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].descuento"
+            type="number"
+            min="0"
+            :value="0"></b-form-input>
+            <b-form-text>
+            </b-form-text>
+        </template>
+
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
         </template>
@@ -81,25 +93,37 @@
         </template>
       </b-table>
     </b-col>
-    <b-col md="12">
-      <b-row align-h="end">
-        <b-col md="2">
-          <b>SubTotal</b>
-          {{ sumatoriaSubTotal  }}
-        </b-col>
-        <b-col md="2">
-          <b>IGV</b>
-          {{ sumatoriaIgv }}
-        </b-col>
-        <!--<b-col md="2">
-          <b>FLETE</b>
-          
-        </b-col>-->
-        <b-col md="2">
-          <b>TOTAL</b>
-          {{ sumatoriaTotal }}
-        </b-col>
-      </b-row>
+    <b-col md="3">
+      <slot name="operaciones"></slot>
+    </b-col>
+    <b-col md="4">
+      <slot name="metodopago"></slot>
+    </b-col>
+    <b-col md="3" offset-md="2">
+          <table class="table b-table border table-footer">
+            <tbody>
+              <tr v-if="sumatoriaDescuento > 0">
+                <td class="table-success">SubTotal</td>
+                <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
+              </tr>
+              <tr v-if="sumatoriaDescuento > 0">
+                <td class="table-danger">Descuento</td>
+                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
+              </tr>
+              <tr>
+                <td><b>SubTotal</b></td>
+                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+              </tr>
+              <tr v-if="sumatoriaIgv > 0">
+                <td><b>IGV</b></td>
+                <td class="table-danger">{{ sumatoriaIgv }}</td>
+              </tr>
+              <tr>
+                <td><b>TOTAL</b></td>
+                <td class="table-danger">{{ sumatoriaTotal }}</td>
+              </tr>
+            </tbody>
+          </table>
     </b-col>
     <br><br>
   </b-row>
@@ -119,6 +143,7 @@ export default {
     }
   },
   props: {
+    igvTotal: Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -158,9 +183,16 @@ export default {
     }),
     sumatoriaSubTotal () {
       let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.subtotal)
-      })
+      if (this.igvTotal) {
+        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+      } else {
+        this.productos.map((value) => {
+          sumatoria += parseFloat(value.subtotal)
+          if (value.descuento) {
+            sumatoria -= value.descuento
+          }
+        })
+      }
       return this.$options.filters.redondear(sumatoria)
     },
     sumatoriaTotal () {
@@ -172,8 +204,20 @@ export default {
     },
     sumatoriaIgv () {
       let sumatoria = 0
+      if (this.igvTotal) {
+        sumatoria = this.sumatoriaTotal
+        sumatoria = sumatoria * 0.18
+      } else {
+        this.productos.map((value) => {
+          sumatoria += parseFloat(value.igv)
+        })
+      }
+      return this.$options.filters.redondear(sumatoria)
+    },
+    sumatoriaDescuento () {
+      let sumatoria = 0
       this.productos.map((value) => {
-        sumatoria += parseFloat(value.igv)
+        sumatoria += parseFloat(value.descuento || 0)
       })
       return this.$options.filters.redondear(sumatoria)
     }
@@ -191,11 +235,12 @@ export default {
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
+      obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
       this.add(obj)
 
-      // this.$emit('onSetProducto', this.productos)
+      this.$emit('onAddProducto', obj)
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
@@ -214,6 +259,7 @@ export default {
       // return nuevoPrecio 
     },
     getSubtotal(index) {
+      
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
@@ -238,6 +284,9 @@ export default {
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv)
       }
+      if (this.productos[index].descuento) {
+        total -= parseFloat(this.productos[index].descuento)
+      }
 
       total =  this.$options.filters.redondear(total)
       Vue.set(this.productos[index], 'total', total)
@@ -249,6 +298,7 @@ export default {
     },
     quitarProducto (index) {
       this.eliminar(index)
+      this.$emit('onRemoveProducto', index)
       this.$toasted.show('Producto quitado del listado')
     }
   },
