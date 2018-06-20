@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import Movimiento from '@/views/Movimiento.vue'
 import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
-
+import Ventas from '@/views/Ventas.vue'
 
 Vue.use(Router)
 
@@ -25,6 +25,11 @@ export default new Router({
       path: '/almacen',
       name: 'Almacen',
       component: Almacen
+    },
+    {
+      path: '/ventas',
+      name: 'Ventas',
+      component: Ventas
     }
   ]
 })

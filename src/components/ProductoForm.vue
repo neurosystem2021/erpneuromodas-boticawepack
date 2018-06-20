@@ -124,7 +124,7 @@
             <b-form-select v-model="producto.Genero" :options="generos" />
           </b-form-group>
           <b-form-group>
-            <label>Botapie:</label>
+            <label>Botapie/Manga:</label>
             <b-form-input v-model="producto.Botapie"
               type="text"
               @input="(val) => producto.Botapie = val && val.toUpperCase()"              
@@ -213,7 +213,7 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     productoUpdate (newVal) {
-      this.title = 'Editar Producto'
+      this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
       this.producto.categoria = {
         IdProductoCategoria: newVal.IdProductoCategoria,
         ProductoCategoria: newVal.ProductoCategoria
@@ -239,7 +239,7 @@ export default {
         IdProductoTalla: newVal.IdProductoTalla,
         ProductoTalla: newVal.ProductoTalla
       }
-      this.producto.Producto = newVal.Producto
+      this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
       this.producto.IdProducto = newVal.IdProducto
       this.producto.Genero = newVal.Genero
       this.producto.Botapie = newVal.Botapie
@@ -322,7 +322,7 @@ export default {
           this.cbGuardar(response.data.insertId)
         }
         if (response.data.error) {
-          this.$toasted.show(response.data.error + ' ' + 'Se añadirá el producto existente...')
+          this.$toasted.show('Producto insertado correctamente - ' + response.data.codigoBarra)
         } else {
           this.$toasted.show('Producto guardado correctamente')
         }

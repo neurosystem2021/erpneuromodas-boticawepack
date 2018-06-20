@@ -18,7 +18,7 @@
           </autocomplete>
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="true" :cbGuardar="add"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="add"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -115,23 +115,40 @@ export default {
   data () {
     return {
       producto: {},
-      fields: [
-        { key: 'Producto' }, 
-        { key: 'ProductoModelo', label: 'Modelo' }, 
-        { key: 'ProductoMarca', label: 'Marca' },
-        { key: 'ProductoTalla', label: 'Talla' },
-        { key: 'Genero' },
-        { key: 'cantidad' },
-        { key: 'precio', label: 'P/U' },
-        { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-        { key: 'igv', label: 'IGV' },
-        // { key: 'flete', label: 'FLETE' },
-        // { key: 'lote', label: 'Lote' },
-        { key: 'precioVenta', label: 'Precio venta' },
-        { key: 'total', label: 'Total', variant: 'danger' },
-        { key: 'acciones', label: ''}
-      ],
       items: []
+    }
+  },
+  props: {
+    onSetProducto: {
+      type: Function,
+      default (obj) {
+        return obj
+      }
+    },
+    showButton: {
+      default: true,
+      type: Boolean
+    },
+    fields: {
+      default () {
+        return [
+          { key: 'Producto' }, 
+          { key: 'ProductoModelo', label: 'Modelo' }, 
+          { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoTalla', label: 'Talla' },
+          { key: 'Genero' },
+          { key: 'cantidad' },
+          { key: 'precio', label: 'P/U' },
+          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
+          { key: 'igv', label: 'IGV' },
+          // { key: 'flete', label: 'FLETE' },
+          // { key: 'lote', label: 'Lote' },
+          { key: 'precioVenta', label: 'Precio venta' },
+          { key: 'total', label: 'Total', variant: 'danger' },
+          { key: 'acciones', label: ''}
+        ]
+      },
+      type: Array
     }
   },
   computed: {
@@ -175,7 +192,10 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj)
       this.add(obj)
+
+      // this.$emit('onSetProducto', this.productos)
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
@@ -229,6 +249,7 @@ export default {
     },
     quitarProducto (index) {
       this.eliminar(index)
+      this.$toasted.show('Producto quitado del listado')
     }
   },
   components: {

@@ -119,6 +119,7 @@
                     <b-form-group>
                       <label>Serie:</label>                    
                       <b-form-input v-model="movimiento.Serie"
+                        @input="cargarNumero"
                         type="text"
                         placeholder=""></b-form-input>
                     </b-form-group>
@@ -218,6 +219,21 @@ export default {
       buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito'
     }),
+    cargarNumero () {
+      this.axios.get(this.API + 'movimientos/numero', {
+        params: {
+          serie: this.movimiento.Serie,
+          idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo
+        }
+      })
+      .then((response) => {
+        Vue.set(this.movimiento, 'Numero', response.data.NuevoNumero || '0001')
+      })
+      .catch((error) => {
+        console.log(error)
+        // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
     initMovimiento () {
       let currentMonth = this.$moment().month() + 1
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
@@ -261,6 +277,8 @@ export default {
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
       }
       this.movimiento.movimientoTipo = obj
+
+      this.cargarNumero()
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
@@ -305,10 +323,11 @@ export default {
         if (response.data.error) {
           this.$toasted.show(response.data.error)
         } else {
-          console.log(response)
           this.ultimoMovimiento = response.data.hash
           this.movimiento = this.initMovimiento()
           this.limpiar()
+          this.$refs.inputMovimiento.setValue('')
+          this.$refs.inputProveedor.setValue('')
           this.$toasted.show('Movimiento guardado correctamente ')          
         }
       })
