@@ -143,14 +143,30 @@
                                                     ></b-form-input>
                                                 </b-input-group>
                                                 <b-form-text>
-                                                    Si aplica este descuento, los puntos del cliente se mantendrán intactos. Este descuento es independiente.
+                                                    Descuento general a toda la venta.
                                                 </b-form-text>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b-form-checkbox 
+                                                    id="checkbox1"
+                                                    v-model="venta.EsCredito"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Venta a credito
+                                                </b-form-checkbox>
+                                                <b-form-input 
+                                                    v-if="venta.EsCredito"
+                                                    v-model="venta.FechaCredito"
+                                                    type="date">
+                                                </b-form-input>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </template>    
-                            <template slot="metodopago">
+                            <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
                                         <tr>
@@ -160,13 +176,14 @@
                                             <td>Efectivo</td>
                                             <td>
                                                 <b-form-input
-                                                    min="0"
+                                                    v-model="venta.pago.efectivo.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
                                             </td>
                                             <td>
                                                 <b-form-input
+                                                    v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     type="number"
                                                     placeholder="S/."
@@ -177,6 +194,7 @@
                                             <td>Visa</td>
                                             <td>
                                                 <b-form-input
+                                                    v-model="venta.pago.visa.descripcion"
                                                     min="0"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -184,6 +202,7 @@
                                             </td>
                                             <td>
                                                 <b-form-input
+                                                    v-model="venta.pago.visa.monto"
                                                     min="0"
                                                     type="number"
                                                     placeholder="S/."
@@ -194,6 +213,7 @@
                                             <td>Mastercard</td>
                                             <td>
                                                 <b-form-input
+                                                    v-model="venta.pago.mastercard.descripcion"
                                                     min="0"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -201,6 +221,7 @@
                                             </td>
                                             <td>
                                                 <b-form-input
+                                                    v-model="venta.pago.mastercard.monto"
                                                     min="0"
                                                     type="number"
                                                     placeholder="S/."
@@ -213,12 +234,20 @@
                         </productos-carrito>
                     </b-col>
                 </b-row>
+                <b-row align-h="center" class="text-center">
+                    <b-col cols="4">
+                        <br />
+                        <b-button :disabled="inProgress" variant="success" size="lg" @click="guardarVenta">Efectuar Venta</b-button>
+                        <br />
+                        <br />
+                    </b-col>
+                </b-row>
             </b-container>
         </b-form>
     </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 
@@ -228,10 +257,11 @@ export default {
     },
     mounted () {
         this.getNumeroVenta()
-        setInterval(this.updateTime, 1000)
+        //setInterval(this.updateTime, 1000)
     },
     data () {
         return {
+            inProgress: false,
             API: config.API,
             puntosAplicados: 0,
             descuentoPuntos: {},
@@ -255,6 +285,17 @@ export default {
             }
         }
     },
+    watch: {
+        totalCart (newVal) {
+             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+        }
+    },
+    computed: {
+        ...mapState({
+            productos: state => state.cart.productos,
+            totalCart: state => state.cart.totalCart
+        })
+    },
     methods: {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
@@ -265,6 +306,7 @@ export default {
         },
         initForm () {
             this.venta = {
+                EsCredito: 0,
                 Serie: '',
                 Numero: '',
                 cliente: {},
@@ -282,7 +324,13 @@ export default {
                     PuntoVenta: 'CAJA1'
                 },
                 vendedor: {},
-                FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+                FechaCredito: this.$moment().format("YYYY-MM-DD"),
+                FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+                pago: {
+                    efectivo: { IdMetodoPago: 1, monto: 0 },
+                    visa: { IdMetodoPago: 2, monto: 0 },
+                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                }
             }
         },
         setTipoVenta (obj) {
@@ -313,6 +361,7 @@ export default {
             return obj
         },
         actualizarDescuento () {
+            this.$refs.carrito
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -358,6 +407,37 @@ export default {
         },
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
+        },
+        guardarVenta () {
+            this.inProgress = true
+            let totalPagos = 0
+            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += parseFloat(this.venta.pago.visa.monto)
+            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+
+            if (!this.venta.EsCredito) {
+                if (this.totalCart != totalPagos) {
+                    this.$toasted.show('Los pagos no coinciden con la venta')
+                    this.inProgress = false            
+                    return                
+                }
+            }
+            // los pagos no no cubren la venta
+
+            this.venta.productos = this.productos
+            this.venta.puntosAplicados = this.puntosAplicados || 0
+            this.venta.totalCart = this.totalCart || 0
+            this.axios.post(this.API + 'ventas', this.venta)
+            .then((response) => {
+                this.$toasted.show('Venta realizada con exito')                
+                console.log(response)
+                this.inProgress = false
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.inProgress = false
+            })
         }
     },
     components: {

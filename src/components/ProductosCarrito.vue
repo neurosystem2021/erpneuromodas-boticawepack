@@ -200,6 +200,8 @@ export default {
       this.productos.map((value) => {
         sumatoria += parseFloat(value.total)
       })
+      
+      this.actualizarTotal(sumatoria)
       return this.$options.filters.redondear(sumatoria)
     },
     sumatoriaIgv () {
@@ -226,7 +228,8 @@ export default {
     ...mapActions({
       add: 'agregarProducto',
       buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto'
+      eliminar: 'eliminarProducto',
+      actualizarTotal: 'actualizarTotalCart'
     }),
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')

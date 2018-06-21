@@ -15,9 +15,9 @@ const mutations = {
 }
 
 const actions = {
-  cargarProductos ({ commit }) {
+  /*cargarProductos ({ commit }) {
     axios.get(API + 'productos?limit'
-  },
+  },*/
   agregarProducto ({ commit }, producto) {
     commit('AGREGAR_PRODUCTO', producto)
   },

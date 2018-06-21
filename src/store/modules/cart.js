@@ -4,7 +4,8 @@ import axios from 'axios'
 
 const state = {
   productos: [],
-  productosFiltrados: []
+  productosFiltrados: [],
+  totalCart: 0
 }
 
 const mutations = {
@@ -32,6 +33,9 @@ const mutations = {
       prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
       return prod
     })
+  },
+  ACTUALIZAR_TOTAL (state, total) {
+    state.totalCart = total
   }
 }
 
@@ -58,6 +62,9 @@ const actions = {
   },
   aplicarDescuentoGeneral ({ commit }, descuento) {
     commit('APLICAR_DESCUENTO', descuento)
+  },
+  actualizarTotalCart ({ commit }, total) {
+    commit('ACTUALIZAR_TOTAL', total)
   }
 }
 
