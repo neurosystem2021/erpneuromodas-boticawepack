@@ -56,6 +56,10 @@ Vue.filter('redondear', (value) => {
 Vue.filter('redondeoMayor', (value) => {
   return Math.ceil(value || 0)
 })
+Vue.filter('redondeoMenor', (value) => {
+  return Math.floor(value || 0)
+})
+
 
 window.Vue = Vue
 

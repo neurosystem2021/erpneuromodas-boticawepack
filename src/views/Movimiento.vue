@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="onSubmit" @reset="onReset" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" validated>
         <b-container class="bv-example-row">
           <b-row>
               <b-col md="8">
@@ -12,6 +12,7 @@
                     <b-form-group>
                       <label>Tipo de Movimiento:</label>
                       <autocomplete
+                        required="required"
                         ref="inputMovimiento"
                         :url="API + 'movimientos/tipos'"
                         anchor="TipoMovimiento"
@@ -28,6 +29,7 @@
                       <label>Proveedor:</label>
                       <b-input-group>
                         <autocomplete
+                          required="required"
                           ref="inputProveedor"
                           :options="proveedoresFiltrados"
                           url="#"
@@ -119,6 +121,7 @@
                     <b-form-group>
                       <label>Serie:</label>                    
                       <b-form-input v-model="movimiento.Serie"
+                        required="required"
                         @input="cargarNumero"
                         type="text"
                         placeholder=""></b-form-input>
@@ -126,6 +129,7 @@
                     <b-form-group>
                       <label>Número:</label>                    
                       <b-form-input v-model="movimiento.Numero"
+                        required="required"
                         type="text"
                         placeholder=""></b-form-input>
                     </b-form-group>
@@ -176,7 +180,7 @@
           </b-row>
           <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="guardarMovimiento">Guardar</b-button>
+              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
               <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
             </b-col>
           </b-row>
@@ -200,6 +204,7 @@ export default {
   },
   data () {
     return {
+      inProgress: false,
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
@@ -250,10 +255,6 @@ export default {
         movimientoTipo: {}
       }
     },
-    onSubmit (evt) {
-      evt.preventDefault();
-      alert(JSON.stringify(this.form));
-    },
     onReset (evt) {
       evt.preventDefault();
       /* Reset our form values */
@@ -298,9 +299,17 @@ export default {
     getAlmacenes (value) {
       this.buscarAlmacenes(value)
     },
-    guardarMovimiento () {
-      let faltaLlenar = false
+    guardarMovimiento (evt) {
+      evt.preventDefault();
+      this.inProgress = true
 
+      if(!this.productos.length) {
+          this.$toasted.show('No ha seleccionado ningun producto')
+          this.inProgress = false            
+          return          
+      }
+
+      let faltaLlenar = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
@@ -312,6 +321,7 @@ export default {
       })
 
       if (faltaLlenar) {
+        this.inProgress = false
         return;
       }
 
@@ -330,9 +340,11 @@ export default {
           this.$refs.inputProveedor.setValue('')
           this.$toasted.show('Movimiento guardado correctamente ')          
         }
+        this.inProgress = false
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        this.inProgress = false
       })
     },
     focusAutocomplete (ref) {

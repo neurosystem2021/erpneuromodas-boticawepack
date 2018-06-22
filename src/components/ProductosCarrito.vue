@@ -36,6 +36,7 @@
             v-model="productos[data.index].precio"
             type="number"
             min="0"
+            step="0.01"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -68,7 +69,9 @@
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].nuevoPrecioContado"
-            type="text"
+            type="number"
+            min="0"
+            step="0.01"
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -80,6 +83,7 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
+            step="0.01"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>

@@ -1,9 +1,18 @@
 <template>
     <div>
         <Menu v-if="false"></Menu>
+
         <br />
-        <b-form>
-            <b-container class="bv-example-row">
+        <b-container class="bv-example-row">
+            <div>
+                <div class="float-right">
+                    <b-button-group size="sm">
+                        <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
+                    </b-button-group>
+                </div>
+            </div>
+            <br /><br />
+            <b-form @submit="guardarVenta">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -11,10 +20,11 @@
                                 <b-form-group>
                                     <label>Tipo de Venta:</label>
                                     <autocomplete
+                                        required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA"
+                                        initValue="TICKET"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -27,6 +37,7 @@
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
+                                        required="required"
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
@@ -43,6 +54,7 @@
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
+                                        required="required"
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
@@ -58,16 +70,24 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
-                                    <autocomplete
-                                        ref="inputCliente"
-                                        :url="API + 'clientes'"
-                                        anchor="ClienteDniRuc"
-                                        label="writer"
-                                        placeholder=""
-                                        :on-select="setCliente" 
-                                        :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                                        :classes="{input: 'form-control'}">
-                                    </autocomplete>
+                                    <b-input-group>
+                                        <autocomplete
+                                            required="required"
+                                            ref="inputCliente"
+                                            :url="API + 'clientes'"
+                                            anchor="ClienteDniRuc"
+                                            label="writer"
+                                            placeholder=""
+                                            :onInput="(val) => newDniRuc = val"
+                                            :on-select="setCliente" 
+                                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                                            :classes="{input: 'form-control'}">
+                                        </autocomplete>
+                                        <b-input-group-append>
+                                            <!--<proveedores-tabla></proveedores-tabla>-->
+                                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                        </b-input-group-append>
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -75,7 +95,7 @@
                     <b-col md="3">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
-                                {{ venta.cliente.Puntos || 0 }}
+                                {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
                             </div>
                             Puntos del cliente
                         </b-form-group>
@@ -102,6 +122,7 @@
                         <b-form-group>
                             <label>Vendedor:</label>
                             <autocomplete
+                                required="required"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
@@ -235,21 +256,25 @@
                     </b-col>
                 </b-row>
                 <b-row align-h="center" class="text-center">
-                    <b-col cols="4">
+                    <b-col cols="8">
                         <br />
-                        <b-button :disabled="inProgress" variant="success" size="lg" @click="guardarVenta">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
                 </b-row>
-            </b-container>
-        </b-form>
+            </b-form>
+        </b-container>
     </div>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'
 import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
+import ClientesForm from '@/components/ClientesForm'
+import ConfigVenta from '@/components/ConfigVenta'
+
 
 export default {
     beforeMount () {
@@ -261,6 +286,8 @@ export default {
     },
     data () {
         return {
+            newDniRuc: '',
+            ultimaVenta: '',
             inProgress: false,
             API: config.API,
             puntosAplicados: 0,
@@ -299,6 +326,7 @@ export default {
     methods: {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
+            limpiarCart: 'limpiarCarrito'
         }),
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
@@ -311,9 +339,9 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 2,
-                    TipoDoc: 'BOLETA',
-                    LimitItems: 8
+                    IdTipoDoc: 3,
+                    TipoDoc: 'TICKET',
+                    LimitItems: 0
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -353,6 +381,7 @@ export default {
             this.venta.vendedor = obj
         },
         setCliente (obj) {
+            this.$refs.inputCliente.setValue(obj.Cliente)
             this.venta.cliente = obj
         },
         onSetProducto (obj) {
@@ -408,7 +437,9 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
-        guardarVenta () {
+        guardarVenta (evt) {
+            evt.preventDefault();
+
             this.inProgress = true
             let totalPagos = 0
             totalPagos += parseFloat(this.venta.pago.efectivo.monto)
@@ -422,26 +453,45 @@ export default {
                     return                
                 }
             }
-            // los pagos no no cubren la venta
+
+            if(!this.productos.length) {
+                this.$toasted.show('No hay productos para vender')
+                this.inProgress = false            
+                return          
+            }
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')                
-                console.log(response)
+                this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
+                this.ultimaVenta = response.data.insertId
+                this.initForm()
+                this.limpiarCart()
+                this.getNumeroVenta()
+                this.$refs.inputCliente.setValue('')
+                this.$refs.inputVendedor.setValue('')
+
+
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
+        },
+        eliminarCliente () {
+            this.$refs.inputCliente.setValue('')
+            this.venta.cliente = {}
         }
     },
     components: {
-        ProductosCarrito
+        ProductosCarrito,
+        ClientesForm,
+        ConfigVenta
     }
 }
 </script>

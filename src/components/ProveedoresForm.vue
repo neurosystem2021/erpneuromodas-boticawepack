@@ -70,6 +70,7 @@ export default {
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
+          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
           var data = response.data.result
           this.proveedor.Proveedor = data.RazonSocial
           this.proveedor.Direccion = data.Direccion
