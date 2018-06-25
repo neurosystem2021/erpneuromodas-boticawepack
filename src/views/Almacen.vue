@@ -2,22 +2,163 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
+          <b-col md="4"  offset-md="8" class="my-1">
+            <b-row>
+              <b-col md="6" class="text-center">
+                <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                <br />
+              </b-col>
+              <b-col md="6">
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="6">
+            <b-row>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Categoría:</label>
+                  <autocomplete
+                    :url="API + 'categorias'"
+                    ref="inputCategoria"
+                    anchor="ProductoCategoria"
+                    label="writer"
+                    :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
+                    :onInput="val => generateFilter('categoria', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Producto:</label>
+                  <autocomplete
+                    :url="API + 'productos'"
+                    ref="inputProducto"
+                    anchor="Producto"
+                    label="writer"
+                    :on-select="val => generateFilter('producto', val.Producto)"                    
+                    :onInput="val => generateFilter('producto', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Marca:</label>
+                  <autocomplete
+                    :url="API + 'marcas'"
+                    ref="inputMarca"
+                    anchor="ProductoMarca"
+                    label="writer"
+                    :on-select="val => generateFilter('marca', val.ProductoMarca)"
+                    :onInput="val => generateFilter('marca', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>  
+              <b-col md="3">
+                <b-form-group>
+                  <label>Modelo:</label>
+                  <autocomplete
+                    :url="API + 'productos/modelos'"
+                    ref="inputModelo"
+                    anchor="ProductoModelo"
+                    label="writer"
+                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
+                    :onInput="val => generateFilter('modelo', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="6">
+            <b-row>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Color:</label>
+                  <autocomplete
+                    :url="API + 'productos/colores'"
+                    ref="inputColor"
+                    anchor="Color"
+                    label="writer"
+                    :on-select="val => generateFilter('color', val.Color)"
+                    :onInput="val => generateFilter('color', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>  
+              <b-col md="3">
+                <b-form-group>
+                  <label>Talla:</label>
+                  <autocomplete
+                    :url="API + 'tallas'"
+                    ref="inputTalla"
+                    anchor="ProductoTalla"
+                    label="writer"
+                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
+                    :onInput="val => generateFilter('talla', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col> 
+              <b-col md="3">
+                <b-form-group>
+                  <label>Genero:</label>
+                  <autocomplete
+                    :url="API + 'productos/generos'"
+                    ref="inputGenero"
+                    anchor="Genero"
+                    label="writer"
+                    :on-select="val => generateFilter('genero', val.Genero)"
+                    :onInput="val => generateFilter('genero', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Botapie/Manga:</label>
+                  <autocomplete
+                    :url="API + 'productos/botapies'"
+                    ref="inputBotapie"
+                    anchor="Botapie"
+                    label="writer"
+                    :on-select="val => generateFilter('botapie', val.Botapie)"
+                    :onInput="val => generateFilter('botapie', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col> 
+            </b-row>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12" class="my-1">
+            <table class="table border b-table table-footer table-sm table-detalle">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio de compra</th>
+                  <th>Precio de venta</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ productoSelect.Producto }}</td>
+                  <td>{{ productoSelect.PrecioCosto }}</td>
+                  <td>{{ productoSelect.PrecioContado }}</td>
+                  <td>{{ productoSelect.stock }}</td>
+                </tr>
+              </tbody>
+            </table>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Mostrar" class="mb-0">
-              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-            </b-form-group>
-          </b-col>
+          
 
           <b-table small
             ref="tablaProductos"
@@ -39,11 +180,10 @@
                 </b-col>
             </b-row>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
+              <b-button variant="success" size="lg" @click="exportarProductos">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -53,7 +193,6 @@
 
 <script>
 import config from '@/store/config.js'
-import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
@@ -64,23 +203,26 @@ export default {
   data() {
     return {
       API: config.API,
+      idAlmacen: 1,
       pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: null,
+      filters: {},
+      filter: '',
       sortBy: 'IdProducto',
       sortDesc: false,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'IdProducto', label: 'ID', sortable: true },
-            { key: 'Producto', sortable: true },
+            { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'Color', sortable: true },
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
             { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true }
+            { key: 'Botapie', sortable: true },
+            { key: 'stock', sortable: false }
       ],
       totalRows: 50,
       perPage: 10,
@@ -90,22 +232,15 @@ export default {
   methods: {
       rowClick (item, index) {
         this.productoSelect = item
-        this.$refs.productoForm.show = true;
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
       },
       actualizarTabla() {
         this.$refs.tablaProductos.refresh()
       },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
-
-      },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'productos/stock?idAlmacen=' + this.idAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        console.log(url)
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
@@ -121,14 +256,48 @@ export default {
           // Returning an empty array, allows table to correctly handle busy state in case of error
           return []
         })
+      },
+      limpiarFiltros () {
+        this.filter = ''
+        this.$refs.inputCategoria.setValue('')
+        this.$refs.inputProducto.setValue('')
+        this.$refs.inputMarca.setValue('')
+        this.$refs.inputModelo.setValue('')
+        this.$refs.inputColor.setValue('')
+        this.$refs.inputTalla.setValue('')
+        this.$refs.inputGenero.setValue('')
+        this.$refs.inputBotapie.setValue('')
+      },
+      generateFilter (key, value) {
+        this.filters[key] = value
+        
+        let filter = ''
+        for (var key in this.filters) {
+          filter += '&filter[' + key + ']=' + this.filters[key]
+        }
+
+        this.filter = filter
+      },
+      exportarProductos () {
+
       }
   },
   components: {
-      ProductoForm
   }
 }
 </script>
 
-<style>
-
+<style scope>
+.table-detalle th {
+  color: #fff;
+  background-color: #6c757d; 
+}
+.table-detalle tbody td {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2980b9;
+}
+.table-detalle thead th:first-child {
+  max-width: 300px;
+}
 </style>

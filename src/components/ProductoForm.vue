@@ -213,42 +213,44 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     productoUpdate (newVal) {
-      this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
-      this.producto.categoria = {
-        IdProductoCategoria: newVal.IdProductoCategoria,
-        ProductoCategoria: newVal.ProductoCategoria
+      if (newVal.IdProducto) {
+        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+        this.producto.categoria = {
+          IdProductoCategoria: newVal.IdProductoCategoria,
+          ProductoCategoria: newVal.ProductoCategoria
+        }
+        this.producto.marca = {
+          IdProductoMarca: newVal.IdProductoMarca,
+          ProductoMarca: newVal.ProductoMarca
+        }
+        this.$refs.inputCategoria.setValue('')
+        this.$refs.inputMarca.setValue('')
+        this.$refs.inputMedicion.setValue('')
+        // this.$refs.inputModelo.setValue('')
+        this.$refs.inputTalla.setValue('')
+        this.producto.medicion = {
+          IdProductoMedicion: newVal.IdProductoMedicion,
+          ProductoMedicion: newVal.ProductoMedicion
+        }
+        /* this.producto.modelo = {
+          IdProductoModelo: newVal.IdProductoModelo,
+          ProductoModelo: newVal.ProductoModelo
+        } */
+        this.producto.talla = {
+          IdProductoTalla: newVal.IdProductoTalla,
+          ProductoTalla: newVal.ProductoTalla
+        }
+        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        this.producto.IdProducto = newVal.IdProducto
+        this.producto.Genero = newVal.Genero
+        this.producto.Botapie = newVal.Botapie
+        this.producto.Color = newVal.Color
+        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
+        this.producto.CodigoBarra = newVal.CodigoBarra
+        this.producto.ProductoModelo = newVal.ProductoModelo
+        this.producto.PrecioCosto = newVal.PrecioCosto
+        this.producto.PrecioContado = newVal.PrecioContado
       }
-      this.producto.marca = {
-        IdProductoMarca: newVal.IdProductoMarca,
-        ProductoMarca: newVal.ProductoMarca
-      }
-      this.$refs.inputCategoria.setValue('')
-      this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('')
-      // this.$refs.inputModelo.setValue('')
-      this.$refs.inputTalla.setValue('')
-      this.producto.medicion = {
-        IdProductoMedicion: newVal.IdProductoMedicion,
-        ProductoMedicion: newVal.ProductoMedicion
-      }
-      /* this.producto.modelo = {
-        IdProductoModelo: newVal.IdProductoModelo,
-        ProductoModelo: newVal.ProductoModelo
-      } */
-      this.producto.talla = {
-        IdProductoTalla: newVal.IdProductoTalla,
-        ProductoTalla: newVal.ProductoTalla
-      }
-      this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-      this.producto.IdProducto = newVal.IdProducto
-      this.producto.Genero = newVal.Genero
-      this.producto.Botapie = newVal.Botapie
-      this.producto.Color = newVal.Color
-      this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-      this.producto.CodigoBarra = newVal.CodigoBarra
-      this.producto.ProductoModelo = newVal.ProductoModelo
-      this.producto.PrecioCosto = newVal.PrecioCosto
-      this.producto.PrecioContado = newVal.PrecioContado
     }
   },
   methods: {
