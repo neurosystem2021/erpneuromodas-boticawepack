@@ -2,13 +2,24 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="4"  offset-md="8" class="my-1">
+          <b-col md="6"  offset-md="6" class="my-1">
             <b-row>
-              <b-col md="6" class="text-center">
+              <b-col md="4">
+                <b-form-group label="Tipo de Muestra">
+                  <b-form-checkbox-group button-variant="primary" buttons v-model="tipoStock" 
+                    name="butons1" 
+                    :options="[
+                      {text: 'Stock > 0', value: 'mayor'},
+                      {text: 'Stock <= 0', value: 'menor'}
+                    ]"
+                    @input="val => generateFilter('stock', val)"></b-form-checkbox-group>
+                </b-form-group>
+              </b-col>
+              <b-col md="4" class="text-center">
                 <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 <br />
               </b-col>
-              <b-col md="6">
+              <b-col md="4">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-col>
             </b-row>
@@ -168,7 +179,8 @@
             striped
             hover
             @row-clicked="rowClick"
-            id="my-table" 
+            @row-dblclicked="rowDblClick"
+            id="tabla-productos" 
             :busy.sync="isBusy" 
             :items="myProvider" 
             :fields="fields"
@@ -188,11 +200,17 @@
         </b-row>
         <br /><br />
       </b-container>
+
+      <b-modal id="kardex" size="xl" v-model="showKardex" title="Kardex de producto">
+        <b-alert show variant="warning">{{ titleKardex }}</b-alert>
+        <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+      </b-modal>
   </div>
 </template>
 
 <script>
 import config from '@/store/config.js'
+import ProductoKardex from '@/components/ProductoKardex'
 
 export default {
   mounted() {
@@ -203,6 +221,8 @@ export default {
   data() {
     return {
       API: config.API,
+      tipoStock: [],
+      showKardex: false,
       idAlmacen: 1,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -210,6 +230,7 @@ export default {
       sortBy: 'IdProducto',
       sortDesc: false,
       productoSelect: {},
+      kardexSelect: [],
       items: [],
       isBusy: false,
       fields: [
@@ -229,9 +250,36 @@ export default {
       currentPage: 1
     }
   },
+  computed: {
+    titleKardex () {
+      return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo + ' / ' + this.productoSelect.Color
+      this.productoSelect.ProductoTalla 
+    }
+  },
   methods: {
-      rowClick (item, index) {
+      rowClick (item, index, e) {
+        let rows = this.$refs.tablaProductos.$el.rows
+        Object.keys(rows).forEach(function (key) {
+          rows[key].classList.remove('table-info')
+        });
+
+        e.target.parentNode.classList.add('table-info')
+
         this.productoSelect = item
+      },
+      rowDblClick (item) {
+        this.productoSelect = item
+        this.showKardex = true
+
+        this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+            params: {
+                idAlmacen: this.idAlmacen,
+                fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+            }
+        }).then((response) => {
+            this.kardexSelect = response.data
+        })
       },
       actualizarTabla() {
         this.$refs.tablaProductos.refresh()
@@ -258,6 +306,7 @@ export default {
         })
       },
       limpiarFiltros () {
+        this.tipoStock = []
         this.filter = ''
         this.$refs.inputCategoria.setValue('')
         this.$refs.inputProducto.setValue('')
@@ -283,11 +332,15 @@ export default {
       }
   },
   components: {
+    ProductoKardex
   }
 }
 </script>
 
 <style scope>
+#tabla-productos tr {
+  cursor: pointer;
+}
 .table-detalle th {
   color: #fff;
   background-color: #6c757d; 
@@ -299,5 +352,10 @@ export default {
 }
 .table-detalle thead th:first-child {
   max-width: 300px;
+}
+@media (min-width: 992px) {
+    .modal-xl {
+        max-width: 1200px;
+    }
 }
 </style>
