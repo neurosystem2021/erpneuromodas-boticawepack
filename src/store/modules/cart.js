@@ -40,7 +40,7 @@ const mutations = {
   OBTENER_STOCK (state, items) {
     state.productos = state.productos.map((prod) => {
       let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
-      prod.stock = items[index].stock
+      prod.stock = items[index] && items[index].stock
       return prod
     })
     //state.productos[index].stock = item.stock
@@ -49,12 +49,19 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, producto) {
+  agregarProducto ({ commit }, [producto, cb]) {
     if(typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
+      if (cb) cb(producto)
     } else {
       axios.get(API + 'productos/id/' + producto).then((response) => {
-        commit('AGREGAR_PRODUCTO', response.data)        
+        if (response.data) {
+          let obj = response.data
+          obj.cantidad = 1
+          obj.precio = obj.PrecioContado || 0
+          commit('AGREGAR_PRODUCTO', obj)
+          if (cb) cb(obj)   
+        }
       })
     }
   },

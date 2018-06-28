@@ -15,9 +15,14 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
+          <input v-model="loadCode"
+                  @keydown.enter.prevent="loadBarcode"
+                  type="text"
+                  class="form-control"
+                  placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="add"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -147,12 +152,16 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
+    this.alterarBuscadorProductos()
   },
   data () {
     return {
       API: config.API,
+      loadCode: '',
+      pasteCode: false,
       producto: {},
-      items: []
+      items: [],
+      handleKeyDown: false
     }
   },
   props: {
@@ -244,6 +253,45 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    loadBarcode (e) {
+      e.preventDefault()
+      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+
+      if (idProducto) {
+        this.add([idProducto, (obj) => {
+          this.$emit('onAddProducto')
+          this.loadCode = ''
+        }])
+      }
+    },
+    alterarBuscadorProductos() {
+      this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
+
+      this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
+        console.log('paste')
+        this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
+      }
+
+      this.$refs.autocompleteProducto.handleKeyDown = (e) =>{
+        let key = e.keyCode;
+
+        if (key == 13) {
+          if(this.pasteCode) {
+            e.preventDefault()
+            let idProducto = this.pasteCode.substring(2, this.pasteCode.length -2);
+            this.add([idProducto, () => {
+              this.$emit('onAddProducto')
+            }])
+          } else {
+            e.preventDefault()
+            this.handleKeyDown(e) 
+          }   
+        } else {
+          this.handleKeyDown(e)
+        }
+        this.pasteCode = false
+      }
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -258,9 +306,10 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
-      this.add(obj)
+      this.add([obj, () => {
+        this.$emit('onAddProducto', obj)
+      }])
 
-      this.$emit('onAddProducto', obj)
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
