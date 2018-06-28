@@ -29,7 +29,7 @@
                       {text: 'Stock > 0', value: 'mayor'},
                       {text: 'Stock <= 0', value: 'menor'}
                     ]"
-                    @input="val => generateFilter('stock', val)"></b-form-radio-group>
+                    @change="val => generateFilter('stock', val)"></b-form-radio-group>
                 </b-form-group>
               </b-col>
               <b-col md="3">
@@ -58,6 +58,7 @@
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
+                    :onInput="(val) => !val ? generateFilter('categoria', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -85,6 +86,7 @@
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
+                    :onInput="(val) => !val ? generateFilter('marca', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -98,6 +100,7 @@
                     anchor="ProductoModelo"
                     label="writer"
                     :on-select="val => generateFilter('modelo', val.ProductoModelo)"
+                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -115,6 +118,7 @@
                     anchor="Color"
                     label="writer"
                     :on-select="val => generateFilter('color', val.Color)"
+                    :onInput="(val) => !val ? generateFilter('color', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -128,6 +132,7 @@
                     anchor="ProductoTalla"
                     label="writer"
                     :on-select="val => generateFilter('talla', val.ProductoTalla)"
+                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -141,6 +146,7 @@
                     anchor="Genero"
                     label="writer"
                     :on-select="val => generateFilter('genero', val.Genero)"
+                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -154,6 +160,7 @@
                     anchor="Botapie"
                     label="writer"
                     :on-select="val => generateFilter('botapie', val.Botapie)"
+                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -177,7 +184,7 @@
                   <td>{{ productoSelect.Producto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioContado }}</td>
-                  <td class="text-center table-info">{{ productoSelect.stock }}</td>
+                  <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -198,7 +205,15 @@
               :items="myProvider" 
               :fields="fields"
               :per-page="perPage"
-              :current-page="currentPage"></b-table>
+              :current-page="currentPage">
+
+                <template slot="stock" slot-scope="data">
+                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                    {{ getStock(data.item.IdProducto) }}
+                  </div>
+                </template>
+
+              </b-table>
           </b-col>
           <b-row>
               <b-col md="6" class="my-1">
@@ -209,7 +224,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -235,6 +250,7 @@ export default {
   data() {
     return {
       API: config.API,
+      APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
       almacen: {
@@ -249,6 +265,7 @@ export default {
       productoSelect: {},
       kardexSelect: [],
       items: [],
+      itemsStock: [],
       isBusy: false,
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
@@ -260,11 +277,50 @@ export default {
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
             { key: 'Genero', sortable: true },
             { key: 'Botapie', sortable: true },
-            { key: 'stock', sortable: false, variant: 'danger', class:'text-center'}
+            { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
+    }
+  },
+  watch: {
+    items (items) {
+      //Vue.set(this.$refs.tablaProductos, 'localItems', [])
+      //console.log(this.$refs.tablaProductos.localItems)
+      //this.myProvider(false)
+
+       this.axios.get(this.API + 'productos/stock', {
+          params: {
+            idProductos: items.map((item) => item.IdProducto),
+            idAlmacen: this.almacen.IdAlmacen
+          }
+        }).then((response) => {
+         // console.log(response.data)
+             this.itemsStock = response.data
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+
+
+      /*console.log(items[0].hasOwnProperty('stock'))
+      if (!items[0].hasOwnProperty('stock')) {
+      //console.log(items)
+        // ejecutar solo cuando los productos no tengan stock
+        this.axios.get(this.API + 'productos/stock', {
+          params: {
+            idProductos: items.map((item) => item.IdProducto),
+            idAlmacen: this.almacen.IdAlmacen
+          }
+        }).then((response) => {
+         // console.log(response.data)
+             this.items = []
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      }*/
     }
   },
   computed: {
@@ -275,6 +331,10 @@ export default {
     }
   },
   methods: {
+    getStock (idProducto) {
+      let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
+      return this.itemsStock[index] && this.itemsStock[index].stock
+    },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -316,7 +376,7 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = this.API + 'productos/stock?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
@@ -335,6 +395,7 @@ export default {
       })
     },
     limpiarFiltros () {
+      this.APISTOCK = 'productos'
       this.tipoStock = ''
       this.filters = {}
       this.filter = ''
@@ -349,6 +410,7 @@ export default {
 
       this.productoSelect = {}
       this.limpiarClassRows()
+      console.log(this.filter)
     },
     generateFilter (key, value) {
       this.filters[key] = value
@@ -356,8 +418,14 @@ export default {
       let filter = ''
       for (var key in this.filters) {
         filter += '&filter[' + key + ']=' + this.filters[key]
+        
+        if(key == 'stock') {
+          // si la consulta se hace al stock jalar de otro endpoint
+          this.APISTOCK = 'productos/stock'
+        }
       }
 
+      
       this.filter = filter
     },
     exportarProductos () {
