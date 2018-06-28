@@ -138,7 +138,7 @@
                     <b-col> 
                         <productos-carrito 
                             @onInputCantidad="actualizarDescuento"
-                            @onAddProducto="actualizarDescuento"
+                            @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             ref="carrito" 
@@ -297,6 +297,7 @@ export default {
             venta: {},
             carrito: {
                 fields: [
+                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -304,9 +305,9 @@ export default {
                     { key: 'Genero' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success' }, 
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger' },
+                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
             }
@@ -326,7 +327,8 @@ export default {
     methods: {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
-            limpiarCart: 'limpiarCarrito'
+            limpiarCart: 'limpiarCarrito',
+            obtenerStok: 'obtenerStock'
         }),
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
@@ -372,6 +374,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
@@ -389,8 +392,13 @@ export default {
             obj.precio = obj.PrecioContado || 0
             return obj
         },
+        onAddProducto (obj) {
+            this.actualizarDescuento()
+            this.obtenerStok({
+                IdAlmacen: this.venta.almacen.IdAlmacen
+            })
+        },
         actualizarDescuento () {
-            this.$refs.carrito
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }

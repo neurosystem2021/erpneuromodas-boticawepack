@@ -31,9 +31,7 @@
                         <autocomplete
                           required="required"
                           ref="inputProveedor"
-                          :options="proveedoresFiltrados"
-                          url="#"
-                          :onShouldGetData="getProveedores"
+                          :url="API + 'proveedores'"
                           anchor="ProveedorRuc"
                           label="writer"
                           placeholder=""
@@ -67,14 +65,15 @@
                       v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
                       <label>Almacen Origen:</label>
                       <autocomplete
-                        :options="almacenes"
+                        ref="inputAlmacenOrigen"
+                        required="required"
                         initValue="VENTA"
-                        url="#"
-                        :onShouldGetData="getAlmacenes"
+                        :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
-                        placeholder="Almacen Origen"
+                        placeholder=""
                         :on-select="setAlmacenOrigen"
+                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
                     </b-form-group>
@@ -84,14 +83,15 @@
                       v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
                       <label>Almacen Destino:</label>
                       <autocomplete
-                        :options="almacenes"
+                        ref="inputAlmacenDestino"
+                        required="required"
                         initValue="VENTA"
-                        url="#"
-                        :onShouldGetData="getAlmacenes"
+                        :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
-                        placeholder="Almacen Destino"
+                        placeholder=""
                         :on-select="setAlmacenDestino"
+                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
                     </b-form-group>
@@ -252,7 +252,9 @@ export default {
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
-        movimientoTipo: {}
+        movimientoTipo: {},
+        almacenOrigen: { IdAlmacen: -1 },
+        almacenDestino: { IdAlmacen: -1 }
       }
     },
     onReset (evt) {
@@ -348,7 +350,7 @@ export default {
       })
     },
     focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
+      //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     }
   },

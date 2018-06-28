@@ -1,26 +1,47 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid class="bv-example-row">
         <b-row>
-          <b-col md="6"  offset-md="6" class="my-1">
+          <b-col md="7"  offset-md="5" class="my-1">
             <b-row>
-              <b-col md="4">
+              <b-col md="3">
+                <b-form-group>
+                  <label>Almacen:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      initValue="VENTA"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
                 <b-form-group label="Tipo de Muestra">
-                  <b-form-checkbox-group button-variant="primary" buttons v-model="tipoStock" 
+                  <b-form-radio-group button-variant="primary" buttons v-model="tipoStock" 
                     name="butons1" 
                     :options="[
                       {text: 'Stock > 0', value: 'mayor'},
                       {text: 'Stock <= 0', value: 'menor'}
                     ]"
-                    @input="val => generateFilter('stock', val)"></b-form-checkbox-group>
+                    @input="val => generateFilter('stock', val)"></b-form-radio-group>
                 </b-form-group>
               </b-col>
-              <b-col md="4" class="text-center">
-                <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+              <b-col md="3">
+                <b-form-group label="Limpiar Filtros">
+                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                </b-form-group>
                 <br />
               </b-col>
-              <b-col md="4">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+              <b-col md="3">
+                <b-form-group label="Mostrar">
+                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                </b-form-group>
               </b-col>
             </b-row>
           </b-col>
@@ -37,7 +58,6 @@
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
-                    :onInput="val => generateFilter('categoria', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -65,7 +85,6 @@
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
-                    :onInput="val => generateFilter('marca', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -79,7 +98,6 @@
                     anchor="ProductoModelo"
                     label="writer"
                     :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="val => generateFilter('modelo', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -97,7 +115,6 @@
                     anchor="Color"
                     label="writer"
                     :on-select="val => generateFilter('color', val.Color)"
-                    :onInput="val => generateFilter('color', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -111,7 +128,6 @@
                     anchor="ProductoTalla"
                     label="writer"
                     :on-select="val => generateFilter('talla', val.ProductoTalla)"
-                    :onInput="val => generateFilter('talla', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -125,7 +141,6 @@
                     anchor="Genero"
                     label="writer"
                     :on-select="val => generateFilter('genero', val.Genero)"
-                    :onInput="val => generateFilter('genero', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -139,7 +154,6 @@
                     anchor="Botapie"
                     label="writer"
                     :on-select="val => generateFilter('botapie', val.Botapie)"
-                    :onInput="val => generateFilter('botapie', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -153,55 +167,55 @@
               <thead>
                 <tr>
                   <th>Producto</th>
-                  <th>Precio de compra</th>
-                  <th>Precio de venta</th>
-                  <th>Stock</th>
+                  <th class="text-center">Precio de compra</th>
+                  <th class="text-center">Precio de venta</th>
+                  <th class="text-center">Stock</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>{{ productoSelect.Producto }}</td>
-                  <td>{{ productoSelect.PrecioCosto }}</td>
-                  <td>{{ productoSelect.PrecioContado }}</td>
-                  <td>{{ productoSelect.stock }}</td>
+                  <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
+                  <td class="text-center">{{ productoSelect.PrecioContado }}</td>
+                  <td class="text-center table-info">{{ productoSelect.stock }}</td>
                 </tr>
               </tbody>
             </table>
-            <br />
           </b-col>
           
-
-          <b-table small
-            ref="tablaProductos"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            @row-clicked="rowClick"
-            @row-dblclicked="rowDblClick"
-            id="tabla-productos" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage"></b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
+          <b-col md="12">
+            <b-table small
+              ref="tablaProductos"
+              :filter="filter"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              striped
+              hover
+              @row-clicked="rowClick"
+              @row-dblclicked="rowDblClick"
+              id="tabla-productos" 
+              :busy.sync="isBusy" 
+              :items="myProvider" 
+              :fields="fields"
+              :per-page="perPage"
+              :current-page="currentPage"></b-table>
+          </b-col>
+          <b-row>
+              <b-col md="6" class="my-1">
+                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+          </b-row>
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="exportarProductos">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
       </b-container>
 
-      <b-modal id="kardex" size="xl" v-model="showKardex" title="Kardex de producto">
+      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
       </b-modal>
@@ -221,9 +235,12 @@ export default {
   data() {
     return {
       API: config.API,
-      tipoStock: [],
+      tipoStock: '',
       showKardex: false,
-      idAlmacen: 1,
+      almacen: {
+        IdAlmacen: 1,
+        Almacen: 'VENTA'
+      },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
       filter: '',
@@ -243,7 +260,7 @@ export default {
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
             { key: 'Genero', sortable: true },
             { key: 'Botapie', sortable: true },
-            { key: 'stock', sortable: false }
+            { key: 'stock', sortable: false, variant: 'danger', class:'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -258,78 +275,94 @@ export default {
     }
   },
   methods: {
-      rowClick (item, index, e) {
-        let rows = this.$refs.tablaProductos.$el.rows
-        Object.keys(rows).forEach(function (key) {
-          rows[key].classList.remove('table-info')
-        });
+    focusAutocomplete (ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
+    },
+    limpiarClassRows () {
+      let rows = this.$refs.tablaProductos.$el.rows
+      Object.keys(rows).forEach(function (key) {
+        rows[key].classList.remove('table-info')
+      });
+    },
+    setAlmacen (obj) {
+      this.almacen = obj
+      this.limpiarFiltros()
+      console.log(this.filter)
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
+    rowClick (item, index, e) {
+      this.limpiarClassRows()
+      e.target.parentNode.classList.add('table-info')
 
-        e.target.parentNode.classList.add('table-info')
+      this.productoSelect = item
+    },
+    rowDblClick (item) {
+      this.productoSelect = item
+      this.showKardex = true
 
-        this.productoSelect = item
-      },
-      rowDblClick (item) {
-        this.productoSelect = item
-        this.showKardex = true
+      this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+          }
+      }).then((response) => {
+          this.kardexSelect = response.data
+      })
+    },
+    actualizarTabla() {
+      this.$refs.tablaProductos.refresh()
+    },
+    myProvider (ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url = this.API + 'productos/stock?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      console.log(url)
+      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      let promise = this.axios.get( url )
 
-        this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
-            params: {
-                idAlmacen: this.idAlmacen,
-                fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
-            }
-        }).then((response) => {
-            this.kardexSelect = response.data
-        })
-      },
-      actualizarTabla() {
-        this.$refs.tablaProductos.refresh()
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'productos/stock?idAlmacen=' + this.idAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        console.log(url)
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+      return promise.then((result) => {
+        this.items = result.data
+        //this.totalRows = this.items.length
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        return(this.items)
+      }).catch(error => {
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        // Returning an empty array, allows table to correctly handle busy state in case of error
+        return []
+      })
+    },
+    limpiarFiltros () {
+      this.tipoStock = ''
+      this.filters = {}
+      this.filter = ''
+      this.$refs.inputCategoria.setValue('')
+      this.$refs.inputProducto.setValue('')
+      this.$refs.inputMarca.setValue('')
+      this.$refs.inputModelo.setValue('')
+      this.$refs.inputColor.setValue('')
+      this.$refs.inputTalla.setValue('')
+      this.$refs.inputGenero.setValue('')
+      this.$refs.inputBotapie.setValue('')
 
-        return promise.then((result) => {
-          this.items = result.data
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      },
-      limpiarFiltros () {
-        this.tipoStock = []
-        this.filter = ''
-        this.$refs.inputCategoria.setValue('')
-        this.$refs.inputProducto.setValue('')
-        this.$refs.inputMarca.setValue('')
-        this.$refs.inputModelo.setValue('')
-        this.$refs.inputColor.setValue('')
-        this.$refs.inputTalla.setValue('')
-        this.$refs.inputGenero.setValue('')
-        this.$refs.inputBotapie.setValue('')
-      },
-      generateFilter (key, value) {
-        this.filters[key] = value
-        
-        let filter = ''
-        for (var key in this.filters) {
-          filter += '&filter[' + key + ']=' + this.filters[key]
-        }
-
-        this.filter = filter
-      },
-      exportarProductos () {
-
+      this.productoSelect = {}
+      this.limpiarClassRows()
+    },
+    generateFilter (key, value) {
+      this.filters[key] = value
+      
+      let filter = ''
+      for (var key in this.filters) {
+        filter += '&filter[' + key + ']=' + this.filters[key]
       }
+
+      this.filter = filter
+    },
+    exportarProductos () {
+
+    }
   },
   components: {
     ProductoKardex
@@ -340,6 +373,9 @@ export default {
 <style scope>
 #tabla-productos tr {
   cursor: pointer;
+}
+.table-detalle {
+  height: 80px;
 }
 .table-detalle th {
   color: #fff;
@@ -354,7 +390,7 @@ export default {
   max-width: 300px;
 }
 @media (min-width: 992px) {
-    .modal-xl {
+    .modal-xl .modal-dialog {
         max-width: 1200px;
     }
 }

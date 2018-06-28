@@ -36,6 +36,15 @@ const mutations = {
   },
   ACTUALIZAR_TOTAL (state, total) {
     state.totalCart = total
+  },
+  OBTENER_STOCK (state, items) {
+    state.productos = state.productos.map((prod) => {
+      let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
+      prod.stock = items[index].stock
+      return prod
+    })
+    //state.productos[index].stock = item.stock
+    // Vue.set(state.productos[index], 'stock', item.stock)
   }
 }
 
@@ -65,6 +74,19 @@ const actions = {
   },
   actualizarTotalCart ({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
+  },
+  obtenerStock({ commit, state }, obj) {
+    axios.get(API + 'productos/stock', {
+      params: {
+        idProductos: state.productos.map(prod => prod.IdProducto),
+        idAlmacen: obj.IdAlmacen
+      }
+    }).then((response) => {
+        commit('OBTENER_STOCK', response.data)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
   }
 }
 

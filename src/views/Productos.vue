@@ -72,7 +72,7 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-            { key: 'IdProducto', label: 'ID', sortable: true },
+            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },

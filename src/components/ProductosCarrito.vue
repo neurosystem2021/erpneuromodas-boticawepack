@@ -5,15 +5,14 @@
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
-            :options="filtrados"
             ref="autocompleteProducto"
-            url="#"
+            :url="API + 'productos'"
             :onShouldRenderChild="renderChild"
-            :onShouldGetData="getData"
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
           <b-input-group-append>
@@ -95,6 +94,14 @@
         <template slot="acciones" slot-scope="data">
           <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
         </template>
+
+        <template slot="show_details" slot-scope="row">
+           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+        </template>
+        <template slot="row-details" slot-scope="row">
+
+        </template>
+
       </b-table>
     </b-col>
     <b-col md="3">
@@ -136,12 +143,14 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
+import config from '@/store/config.js'
 
 export default {
   mounted() {
   },
   data () {
     return {
+      API: config.API,
       producto: {},
       items: []
     }
@@ -235,6 +244,10 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    focusAutocomplete (ref) {
+      this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
+    },  
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -252,7 +265,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto} - ${data.ProductoCategoria} - ${data.ProductoMarca} - ${data.ProductoTalla}</b>
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
       `
     },
     setNuevoPrecioContado (index) {
