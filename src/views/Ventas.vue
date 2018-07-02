@@ -141,6 +141,7 @@
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
+                            :setPrecio="true"
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"

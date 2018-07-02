@@ -6,6 +6,9 @@ import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 
+// Reportes
+import ReporteVentas from '@/views/reportes/ventas.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -30,6 +33,11 @@ export default new Router({
       path: '/ventas',
       name: 'Ventas',
       component: Ventas
+    },
+    {
+      path: '/reportes/ventas',
+      name: 'ReporteVentas',
+      component: ReporteVentas
     }
   ]
 })

@@ -51,6 +51,7 @@
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
             :value="1"
+            @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
@@ -72,6 +73,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
+            style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -152,7 +154,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.alterarBuscadorProductos()
+    // this.alterarBuscadorProductos()
   },
   data () {
     return {
@@ -165,6 +167,7 @@ export default {
     }
   },
   props: {
+    setPrecio: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -259,12 +262,17 @@ export default {
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
-          this.$emit('onAddProducto')
+          if (obj) {
+            this.$emit('onAddProducto')
+            this.$toasted.show('Producto añadido correctamente')
+          } else {
+            this.$toasted.show('No se encontró ningun producto')
+          }
           this.loadCode = ''
-        }])
+        }, this.setPrecio])
       }
     },
-    alterarBuscadorProductos() {
+    /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
 
       this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
@@ -291,7 +299,7 @@ export default {
         }
         this.pasteCode = false
       }
-    },
+    },*/
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -318,7 +326,17 @@ export default {
       `
     },
     setNuevoPrecioContado (index) {
-      let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
+
+      // Añadir IGV si check IGV
+      let precio = parseFloat(this.productos[index].precio)
+      if(this.productos[index].TieneIgv) {
+        precio += (precio * 0.18)
+      }
+
+      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
+
+
       let normalPrecio = this.$options.filters.redondear(precio)
       let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
       

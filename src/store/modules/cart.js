@@ -49,7 +49,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb]) {
+  agregarProducto ({ commit }, [producto, cb, setPrecio]) {
     if(typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
@@ -57,10 +57,21 @@ const actions = {
       axios.get(API + 'productos/id/' + producto).then((response) => {
         if (response.data) {
           let obj = response.data
-          obj.cantidad = 1
-          obj.precio = obj.PrecioContado || 0
+
+          if(setPrecio) {
+            obj.cantidad = 1
+            obj.precio = obj.PrecioContado || 0
+          } else {
+            obj.cantidad = 0
+            obj.precio = 0
+          }
+          obj.descuento = 0
+          obj.nuevoPrecioContado = 0
+        
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
+        } else {
+          if (cb) cb(false)          
         }
       })
     }
