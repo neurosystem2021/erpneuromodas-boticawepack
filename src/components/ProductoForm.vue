@@ -2,6 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
+    <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
@@ -9,6 +10,7 @@
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
+                required="required"
                 :url="API + 'categorias'"
                 ref="inputCategoria"
                 anchor="ProductoCategoria"
@@ -27,6 +29,7 @@
           <b-form-group>
             <label>Artículo:</label>
             <b-form-input v-model="producto.Producto"
+              required="required"
               type="text"
               @input="(val) => producto.Producto = val && val.toUpperCase()"
               :value="producto.Producto"
@@ -37,6 +40,7 @@
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
+                required="required"
                 :url="API + 'marcas'"
                 ref="inputMarca"
                 anchor="ProductoMarca"
@@ -54,11 +58,26 @@
           </b-form-group>
           <b-form-group>
             <label>Modelo:</label>
-            <b-form-input v-model="producto.ProductoModelo"
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'productos/modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.ProductoModelo"
+                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
+                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+            <!--<b-form-input v-model="producto.ProductoModelo"
+              required="required"
               class="upper"
               type="text"
               @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
-              ></b-form-input>
+              ></b-form-input>-->
             <!-- <b-input-group>
               <autocomplete
                 :url="API + 'modelos'"
@@ -77,10 +96,22 @@
           </b-form-group>
           <b-form-group>
             <label>Colores:</label>
-            <b-form-input v-model="producto.Color"
+            <autocomplete
+                required="required"
+                :url="API + 'productos/colores'"
+                ref="inputColor"
+                anchor="Color"
+                label="writer"
+                :placeholder.sync="producto.Color"
+                :on-select="val => producto.Color = val.Color && val.Color.toUpperCase()"
+                :onInput="val => producto.Color = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Color"
               type="text"
               @input="(val) => producto.Color = val && val.toUpperCase()"              
-              ></b-form-input>
+              ></b-form-input>-->
           </b-form-group>
           
           
@@ -89,6 +120,7 @@
           <b-form-group>
             <label>Medición:</label>
             <autocomplete
+              required="required"
               :url="API + 'mediciones'"
               ref="inputMedicion"
               initValue="UNIDAD"
@@ -104,6 +136,7 @@
             <label>Talla:</label>
             <b-input-group>
               <autocomplete
+                required="required"
                 :url="API + 'tallas'"
                 ref="inputTalla"
                 anchor="ProductoTalla"
@@ -121,18 +154,32 @@
           </b-form-group>
           <b-form-group>
             <label>Genero:</label>            
-            <b-form-select v-model="producto.Genero" :options="generos" />
+            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
           </b-form-group>
           <b-form-group>
             <label>Botapie/Manga:</label>
-            <b-form-input v-model="producto.Botapie"
+            <autocomplete
+                required="required"
+                :url="API + 'productos/botapies'"
+                ref="inputBotapie"
+                anchor="Botapie"
+                label="writer"
+                :placeholder.sync="producto.Botapie"
+                :on-select="val => producto.Botapie = val.Botapie && val.Botapie.toUpperCase()"
+                :onInput="val => producto.Botapie = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Botapie"
               type="text"
               @input="(val) => producto.Botapie = val && val.toUpperCase()"              
-              ></b-form-input>
+              ></b-form-input>-->
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input v-model="producto.PorcentajeUtilidad"
+            <b-form-input 
+              required="required"
+              v-model="producto.PorcentajeUtilidad"
               @input.native="actualizarPrecioContado"
               type="number"
               ></b-form-input>
@@ -180,7 +227,7 @@
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
-        <b-btn  variant="primary" @click="guardarProducto">
+        <b-btn  variant="primary" type="submit">
            Guardar
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
@@ -188,6 +235,7 @@
          </b-btn>
        </div>
     </b-modal>
+    </b-form>
   </div>
 </template>
 <script>
@@ -316,7 +364,9 @@ export default {
         }
       }
     },
-    guardarProducto() {
+    guardarProducto(e) {
+      e.preventDefault();
+
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         //console.log(response);exit();
@@ -341,7 +391,7 @@ export default {
       })
     },
     focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
+      // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
     crearCategoria () {

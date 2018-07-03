@@ -54,14 +54,14 @@
                         :url="API + 'usuarios'"
                         anchor="NombreUsuario"
                         label="writer"
-                        :on-select="val => generateFilter('vendedor', val.Usuario)" 
+                        :on-select="setVendedor" 
                         :onInput="(val) => !val ? generateFilter('vendedor', val) : false"
                         :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                 </b-form-group>
                 <div class="total-ventas">
-                  S/. 45.00
+                  S/ {{ ventasAcumuladas || '0.00' }}
                 </div>
               </b-col>
             </b-row>
@@ -143,13 +143,14 @@ export default {
   data() {
     return {
       API: config.API,
-      fechaInicio: this.$moment().format("YYYY-MM-DD"),
+      fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       declarado: 1,
       filters: { },
       filter: '',
       sortBy: 'FechaDoc',
       sortDesc: false,
+      ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1,
         Almacen: 'VENTA'
@@ -161,6 +162,7 @@ export default {
       showVenta: false,
       isBusy: false,
       fields: [
+            { key: 'idDocVenta', label: 'ID', sortable: true },
             { key: 'FechaDoc', label: 'Fecha', sortable: true },
             { key: 'TipoDoc', label: 'Documento', sortable: true},
             { key: 'Serie', label: 'Serie', sortable: true },
@@ -179,7 +181,23 @@ export default {
   },
   methods: {
     setVendedor (obj) {
+      this.currentPage = 1
       this.vendedor = obj
+      this.generateFilter('vendedor', obj.Usuario)
+  
+    },
+    getVentasAcumuladas() {
+      if(this.vendedor) {
+        this.axios.get(this.API + 'ventas/usuario', {
+         params: {
+           usuario: this.vendedor.Usuario,
+           fechaInicio: this.fechaInicio,
+           fechaFin: this.fechaFin
+         }
+       }).then((response) => {
+         this.ventasAcumuladas = response.data.total
+       })
+      }
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
@@ -241,6 +259,7 @@ console.log(url)
         filter += '&filter[' + key + ']=' + this.filters[key]
       }
       this.filter = filter
+      this.getVentasAcumuladas()
     },
     exportarProductos () {
 
@@ -254,9 +273,12 @@ console.log(url)
 
 <style scope>
 .total-ventas {
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
   background-color: #ff7675;
   padding: 10px;
-  font-size: 45px;
+  font-size: 40px;
 }
 #tabla-productos tr {
   cursor: pointer;

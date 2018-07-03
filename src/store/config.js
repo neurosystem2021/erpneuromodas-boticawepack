@@ -1,3 +1,3 @@
 module.exports =  {
-    API: 'http://boticav1.local/api/index.php/'
+    API: 'http://ventas.neurosystemperu.com/api/index.php/'
 }

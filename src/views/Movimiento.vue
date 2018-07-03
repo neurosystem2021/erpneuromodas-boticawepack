@@ -59,6 +59,7 @@
                         readonly="readonly"
                         placeholder="Periodo Tributario"></b-form-input>
                     </b-form-group>
+                    
                   </b-col>
                   <b-col md="3">
                     <b-form-group
@@ -112,7 +113,18 @@
                   </b-col>
                 </b-row>
 
-                
+                <b-row>
+                  <b-col md="6">
+                    <b-form-group>
+                      <b-form-checkbox id="alterar-productos"
+                        v-model="movimiento.alterarProductos"
+                        :value="1"
+                        :unchecked-value="0">
+                        Alterar precio productos
+                      </b-form-checkbox>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
             
               </b-col>
               <b-col md="4">
@@ -244,6 +256,7 @@ export default {
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
       return {
         EsCredito: 0,
+        alterarProductos: 1,
         FechaVenCredito: '',
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
@@ -315,14 +328,11 @@ export default {
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
-          //this.productos[index].class =  'danger'
-          //console.log(this.$refs.carrito.$refs.tablaCarrito.$el)
-          //this.$refs.table.refresh();
-          this.$toasted.show('Falta llenar cantidad / precio')
         }
       })
 
-      if (faltaLlenar) {
+      if (faltaLlenar && this.movimiento.alterarProductos) {
+        this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
         return;
       }

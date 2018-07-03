@@ -296,7 +296,7 @@ export default {
             idAlmacen: this.almacen.IdAlmacen
           }
         }).then((response) => {
-         // console.log(response.data)
+         console.log(response)
              this.itemsStock = response.data
         })
         .catch((error) => {
