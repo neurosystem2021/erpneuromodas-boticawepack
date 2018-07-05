@@ -168,6 +168,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -269,7 +270,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, this.setPrecio])
+        }, { setPrecio: this.setPrecio }])
       }
     },
     /*alterarBuscadorProductos() {

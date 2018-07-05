@@ -139,11 +139,15 @@ export default {
     }).then((response) => {
       this.totalRows = response.data.total
     })
+
+    this.getVentasAcumuladas()
   },
   data() {
     return {
       API: config.API,
-      fechaInicio: this.$moment().format("YYYY") + '-01-01',
+      vendedor: '',
+      // fechaInicio: this.$moment().format("YYYY") + '-01-01',
+      fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       declarado: 1,
       filters: { },
@@ -187,7 +191,7 @@ export default {
   
     },
     getVentasAcumuladas() {
-      if(this.vendedor) {
+      if(this.filters.vendedor) {
         this.axios.get(this.API + 'ventas/usuario', {
          params: {
            usuario: this.vendedor.Usuario,
@@ -197,6 +201,15 @@ export default {
        }).then((response) => {
          this.ventasAcumuladas = response.data.total
        })
+      } else {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
       }
     },
     focusAutocomplete (ref) {

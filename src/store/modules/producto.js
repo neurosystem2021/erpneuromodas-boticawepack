@@ -18,7 +18,7 @@ const actions = {
   /*cargarProductos ({ commit }) {
     axios.get(API + 'productos?limit'
   },*/
-  agregarProducto ({ commit }, producto) {
+  agregarProducto22 ({ commit }, producto) {
     commit('AGREGAR_PRODUCTO', producto)
   },
   eliminarProducto ({ commit }, producto) {

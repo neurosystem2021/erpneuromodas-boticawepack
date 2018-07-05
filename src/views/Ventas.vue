@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen"></pre-orden-lista>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
                 </div>
@@ -275,6 +278,7 @@ import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
+import PreOrdenLista from '@/components/PreOrdenLista.vue'
 
 
 export default {
@@ -500,7 +504,8 @@ export default {
     components: {
         ProductosCarrito,
         ClientesForm,
-        ConfigVenta
+        ConfigVenta,
+        PreOrdenLista
     }
 }
 </script>
