@@ -261,6 +261,7 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     productoUpdate (newVal) {
+      console.log(newVal)
       if (newVal.IdProducto) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -271,15 +272,28 @@ export default {
           IdProductoMarca: newVal.IdProductoMarca,
           ProductoMarca: newVal.ProductoMarca
         }
-        this.$refs.inputCategoria.setValue('')
-        this.$refs.inputMarca.setValue('')
-        this.$refs.inputMedicion.setValue('')
-        // this.$refs.inputModelo.setValue('')
-        this.$refs.inputTalla.setValue('')
         this.producto.medicion = {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
+       
+       // this.$refs.inputCategoria.setValue('')
+        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
+       
+       // this.$refs.inputMarca.setValue('')
+        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
+
+       // this.$refs.inputMedicion.setValue('')
+        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+        
+        // this.$refs.inputModelo.setValue('')
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+
+        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+        
+        this.$refs.inputColor.setValue(newVal.Color)
+        this.$refs.inputBotapie.setValue(newVal.Botapie)
+        
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
@@ -298,6 +312,11 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+
+      } else {
+
+        this.title = 'Nuevo Producto'
+        this.clearForm()
       }
     }
   },
@@ -333,8 +352,11 @@ export default {
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('')
+      this.$refs.inputMedicion.setValue('UNIDAD')
       this.$refs.inputTalla.setValue('')
+      this.$refs.inputModelo.setValue('')
+      this.$refs.inputColor.setValue('')
+      this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },

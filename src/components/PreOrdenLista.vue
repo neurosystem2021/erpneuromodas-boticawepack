@@ -69,6 +69,7 @@ import { mapActions } from 'vuex'
                 obtenerStok: 'obtenerStock'
             }),
             selectPreOrden (item) {
+                console.log(item)
                 this.axios.get(this.API + 'preorden/detalle', {
                     params: {
                         idPreOrden: item.IdPreOrden
@@ -78,7 +79,12 @@ import { mapActions } from 'vuex'
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
                         }, { setPrecio: true, cantidad: item.Cantidad } ])
+
+                        this.filter = ''
+                        this.show = false
                     })
+
+                    this.$emit('onSelectPreOrden', item.IdCliente)
                 })
                 //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
             },

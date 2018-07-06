@@ -7,7 +7,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen"></pre-orden-lista>
+                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
@@ -389,8 +389,21 @@ export default {
             this.venta.vendedor = obj
         },
         setCliente (obj) {
-            this.$refs.inputCliente.setValue(obj.Cliente)
-            this.venta.cliente = obj
+            if (typeof obj === 'object') {
+                this.$refs.inputCliente.setValue(obj.Cliente)
+                this.venta.cliente = obj
+            } else {
+                this.axios.get(this.API + 'cliente', {
+                    params: { idCliente: obj }
+                })
+                .then((response) => {
+                    this.$refs.inputCliente.setValue(response.data.Cliente)
+                    this.venta.cliente = response.data
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            }
         },
         onSetProducto (obj) {
             obj.cantidad = 1

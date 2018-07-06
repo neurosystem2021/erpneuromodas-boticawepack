@@ -165,7 +165,8 @@
                         v-model="movimiento.MovimientoFecha"
                         type="datetime-local"
                         step="1"
-                        placeholder="Fecha Contable"></b-form-input>
+                        placeholder="Fecha Contable"
+                        disabled="disabled"></b-form-input>
 
                     </b-form-group>
                     <b-form-group>
@@ -173,7 +174,8 @@
                       <b-form-input
                         v-model="movimiento.FechaStock"
                         type="date"
-                        placeholder="Fecha Stock"></b-form-input>
+                        placeholder="Fecha Stock"
+                        disabled="disabled"></b-form-input>
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
@@ -261,7 +263,7 @@ export default {
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
-        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDTH:mm:ss") : this.$moment().format("YYYY-MM-DD H:mm:ss"),
+        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
