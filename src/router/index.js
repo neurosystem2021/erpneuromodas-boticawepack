@@ -5,6 +5,7 @@ import Movimiento from '@/views/Movimiento.vue'
 import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
+import VentasFacturacion from '@/views/VentasFacturacion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/ventas.vue'
@@ -38,6 +39,11 @@ export default new Router({
       path: '/reportes/ventas',
       name: 'ReporteVentas',
       component: ReporteVentas
+    },
+    {
+      path: '/facturacion',
+      name: 'VentasFacturacion',
+      component: VentasFacturacion
     }
   ]
 })

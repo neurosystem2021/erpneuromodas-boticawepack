@@ -1,0 +1,377 @@
+<template>
+  <div>
+      <b-container class="bv-example-row">
+          
+
+        <b-row>
+          <b-col md="10" class="my-1">
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <label>Almacen:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      initValue="VENTA"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+                <b-form-group>
+                  <label>Fecha Inicio:</label>
+                  <b-form-input v-model="fechaInicio"
+                    type="date"
+                    placeholder=""
+                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <!--<b-form-group label="Mostrar">
+                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                </b-form-group>-->
+                <b-form-group label="Limpiar Filtros">
+                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                </b-form-group>
+                <b-form-group>
+                  <label>Fecha Fin:</label>
+                  <b-form-input v-model="fechaFin"
+                    type="date"
+                    placeholder=""
+                    @input="val => generateFilter('fechaFin', val) "></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <div class="total-ventas">
+                  S/ {{ ventasAcumuladas || '0.00' }}
+                </div>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="2" class="my-1">
+            <b-row>
+              <b-col md="12">
+                
+                
+                <br />
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+        <b-row>
+
+          
+          <b-col md="12">
+            <b-table small
+              ref="tablaVentas"
+              :filter="filter"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              striped
+              hover
+              @row-clicked="rowClick"
+              id="tabla-ventas" 
+              :busy.sync="isBusy" 
+              :items="myProvider" 
+              :fields="fields"
+              :per-page="perPage"
+              :current-page="currentPage">
+
+                <template slot="detalles" slot-scope="row">
+                  <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+                    {{ row.detailsShowing ? '-' : '+'}}
+                  </b-button>
+                </template>
+
+                <template slot="row-details" slot-scope="row">
+
+                  <b-card>
+                    <b-row class="mb-2">
+                  <table class="table b-table table-sm prod-detalle">
+                    <thead>
+                      <tr>
+                        <th>Codigo</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
+                        <td>{{ item.CodigoBarra }}</td>
+                        <td>{{ item.Producto }}</td>
+                        <td>{{ item.Cantidad }}</td>
+                        <td>{{ item.Precio }}</td>
+                        <td>{{ item.Descuento }}</td>
+                        <td>{{ item.Subtotal }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                    </b-row>
+                  </b-card>
+                </template>
+
+                <template slot="stock" slot-scope="data">
+                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                    {{ getStock(data.item.IdProducto) }}
+                  </div>
+                </template>
+
+              </b-table>
+          </b-col>
+          <!--<b-row>
+              <b-col md="6" class="my-1">
+                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+          </b-row>-->
+        </b-row>
+        <br />
+        <b-row align-h="center" class="text-center">
+            <b-col cols="4">
+              <b-button variant="success" size="lg" @click="emitirElectronico">Emitir Facturas Electronicas</b-button>
+            </b-col>
+        </b-row>
+        <br /><br />
+      </b-container>
+
+      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showVenta" title="Kardex de producto">
+        <b-alert show variant="warning">titulo</b-alert>
+        <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
+      </b-modal>
+  </div>
+</template>
+
+<script>
+import config from '@/store/config.js'
+import ProductoKardex from '@/components/ProductoKardex'
+
+export default {
+  mounted() {
+    this.axios.get(this.API + 'ventas/count', {
+      params: { idAlmacen: this.almacen.IdAlmacen }
+    }).then((response) => {
+      this.totalRows = response.data.total
+    })
+
+    this.getVentasAcumuladas()
+  },
+  data() {
+    return {
+      API: config.API,
+      vendedor: '',
+      // fechaInicio: this.$moment().format("YYYY") + '-01-01',
+      fechaInicio: this.$moment().format("YYYY-MM-DD"),
+      fechaFin: this.$moment().format("YYYY-MM-DD"),
+      filters: { },
+      filter: '',
+      sortBy: 'FechaDoc',
+      sortDesc: false,
+      ventasAcumuladas: 0,
+      almacen: {
+        IdAlmacen: 1,
+        Almacen: 'VENTA'
+      },
+      pageOptions: [ 5, 10, 15, 50, 100 ],
+      ventaSelect: {},
+      ventaDetalleSelect: [],
+      items: [],
+      itemsDetalle: [],
+      showVenta: false,
+      isBusy: false,
+      fields: [
+            { key: 'detalles', label: '' },
+            { key: 'idDocVenta', label: 'ID', sortable: true },
+            { key: 'FechaDoc', label: 'Fecha', sortable: true },
+            { key: 'TipoDoc', label: 'Documento', sortable: true},
+            { key: 'Serie', label: 'Serie', sortable: true },
+            { key: 'Numero', sortable: true },
+            { key: 'Cliente', sortable: true },
+            { key: 'Anulado', label: 'Anulado', sortable: true },
+            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
+            { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+      ],
+      totalRows: 50,
+      perPage: 10,
+      currentPage: 1
+    }
+  },
+  watch: {
+    items (items) {
+      if (items.length){
+        this.axios.get(this.API + 'ventas/detalle', {
+           params: {
+             idDocVentas: items.map((item) => item.idDocVenta),
+           }
+         }).then((response) => {
+              this.itemsDetalle = response.data
+              this.items.map((item) => {
+                item.productos = this.getDetalles(item.idDocVenta)
+                return item
+              })
+         })
+         .catch((error) => {
+           console.log(error)
+         })
+      }
+    }
+  },
+  computed: {
+  },
+  methods: {
+    async emitirElectronico () {
+      for (let item of this.items) {
+        await this.axios.post(this.API + 'emitirelectronico', {
+          docVenta: item
+        }).then((response) => {
+          console.log(response.data)
+          console.log('item...' + item.idDocVenta)
+        })
+      }
+    },
+    getDetalles (idDocVenta) {
+      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+      //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
+      //this.items[index].productos = detalles
+      return detalles
+    },
+    getVentasAcumuladas() {
+      if(this.filters.vendedor) {
+        this.axios.get(this.API + 'ventas/usuario', {
+         params: {
+           usuario: this.vendedor.Usuario,
+           fechaInicio: this.fechaInicio,
+           fechaFin: this.fechaFin
+         }
+       }).then((response) => {
+         this.ventasAcumuladas = response.data.total
+       })
+      } else {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
+      }
+    },
+    focusAutocomplete (ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
+    },
+    setAlmacen (obj) {
+      this.almacen = obj
+      this.limpiarFiltros()
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+    },
+    rowClick (item) {
+      this.ventaSelect = item
+      this.showKardex = true
+
+      this.axios.get(this.API + 'productos/kardex/' + 10 + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+          }
+      }).then((response) => {
+          this.ventaDetalleSelect = response.data
+      })
+    },
+    actualizarTabla() {
+      this.$refs.tablaVentas.refresh()
+    },
+    myProvider (ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      
+      let url = this.API + 'ventas?idTipoDoc[]=1&idTipoDoc[]=2&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+console.log(url)
+      let promise = this.axios.get( url )
+
+      return promise.then((result) => {
+        this.items = result.data
+        //this.totalRows = this.items.length
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        return(this.items)
+      }).catch(error => {
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        // Returning an empty array, allows table to correctly handle busy state in case of error
+        return []
+      })
+    },
+    limpiarFiltros () {
+      this.filters = {}
+      this.filter = ''
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
+      this.fechaFin = this.$moment().format("YYYY-MM-DD")
+      //this.$refs.inputVendedor.setValue('')
+    },
+    generateFilter (key, value) {
+      this.filters[key] = value
+
+      let filter = ''
+      for (var key in this.filters) {
+        filter += '&filter[' + key + ']=' + this.filters[key]
+      }
+      this.filter = filter
+      this.getVentasAcumuladas()
+    },
+    exportarProductos () {
+
+    }
+  },
+  components: {
+    ProductoKardex
+  }
+}
+</script>
+
+<style scope>
+.total-ventas {
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+  background-color: #ff7675;
+  padding: 10px;
+  font-size: 40px;
+}
+#tabla-productos tr {
+  cursor: pointer;
+}
+.table-detalle {
+  height: 80px;
+}
+.table-detalle th {
+  color: #fff;
+  background-color: #6c757d; 
+}
+.table-detalle tbody td {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2980b9;
+}
+.table-detalle thead th:first-child {
+  max-width: 300px;
+}
+@media (min-width: 992px) {
+    .modal-xl .modal-dialog {
+        max-width: 1200px;
+    }
+}
+.prod-detalle {
+  margin: 0 30px;
+}
+.prod-detalle th, .prod-detalle td{
+  background-color: #ffffff;
+}
+</style>
