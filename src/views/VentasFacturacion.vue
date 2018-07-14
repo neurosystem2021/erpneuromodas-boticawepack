@@ -34,6 +34,8 @@
                 <!--<b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>-->
+                
+
                 <b-form-group label="Limpiar Filtros">
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
@@ -46,9 +48,15 @@
                 </b-form-group>
               </b-col>
               <b-col md="4">
-                <div class="total-ventas">
+                <!--<div class="total-ventas">
                   S/ {{ ventasAcumuladas || '0.00' }}
-                </div>
+                </div>-->
+                <b-form-group label="Tipo Documento">
+                  <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="$refs.tablaVentas.refresh()" />
+                </b-form-group>
+                <b-form-group label="Estado">
+                  <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
+                </b-form-group>
               </b-col>
             </b-row>
           </b-col>
@@ -73,7 +81,6 @@
               :sort-desc.sync="sortDesc"
               striped
               hover
-              @row-clicked="rowClick"
               id="tabla-ventas" 
               :busy.sync="isBusy" 
               :items="myProvider" 
@@ -99,7 +106,9 @@
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Descuento</th>
-                        <th>Subtotal</th>
+                        <th v-if="row.item.TieneIgv">Subtotal</th>
+                        <th v-if="row.item.TieneIgv">IGV</th>
+                        <th>Total</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -109,6 +118,12 @@
                         <td>{{ item.Cantidad }}</td>
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
+                        <td v-if="row.item.TieneIgv">
+                          {{ item.Subtotal / 1.18 | redondear }}
+                        </td>
+                        <td v-if="row.item.TieneIgv">
+                          {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
+                        </td>
                         <td>{{ item.Subtotal }}</td>
                       </tr>
                     </tbody>
@@ -117,10 +132,9 @@
                   </b-card>
                 </template>
 
-                <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
-                  </div>
+                <template slot="estado" slot-scope="data">
+                  <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                  <img v-b-tooltip.hover  :title="data.item.Msj_sunat" v-if="estadoVenta == 2" src="/static/success.png" width="32" height="32"/>
                 </template>
 
               </b-table>
@@ -134,7 +148,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="emitirElectronico">Emitir Facturas Electronicas</b-button>
+              <b-button v-if="estadoVenta != 2" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Facturas Electronicas</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -159,11 +173,28 @@ export default {
       this.totalRows = response.data.total
     })
 
+    this.axios.get(this.API + 'ventas/tiposelectronicos')
+      .then((response) => {
+        response.data.forEach(element => {
+          this.optionsTipoDoc.push({ value: element.IdTipoDoc, text: element.TipoDoc })  
+        })
+      })
+
     this.getVentasAcumuladas()
   },
   data() {
     return {
       API: config.API,
+      loading: false,
+      tipoDoc: {
+        IdTipoDoc: 1
+      },
+      estadoVenta: 1,
+      optionsEstado: [
+        { value: '1', text: 'PENDIENTE'},
+        { value: '2', text: 'EMITIDOS' }
+      ],
+      optionsTipoDoc: [],
       vendedor: '',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
@@ -195,10 +226,12 @@ export default {
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'estado', sortable: false, class: 'text-center' }
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      itemsStatus: {}
     }
   },
   watch: {
@@ -224,13 +257,43 @@ export default {
   computed: {
   },
   methods: {
+    getStatus (idDocVenta) {
+      let obj = this.itemsStatus[idDocVenta] || {}
+
+      if (obj.Estado) {
+        obj.image = obj.Estado == 2 ? 'success.png' : 'error.png'
+      }
+      
+      return obj
+    },
     async emitirElectronico () {
-      for (let item of this.items) {
-        await this.axios.post(this.API + 'emitirelectronico', {
-          docVenta: item
-        }).then((response) => {
+      this.loading = true
+      let arr = []
+      
+      if (this.tipoDoc.IdTipoDoc == 1) {
+        for (let item of this.items) {    
+          if (item.Estado == 1) {
+              arr.push(await this.axios.post(this.API + 'emitirelectronico', {
+                docVenta: item
+              }).then((response) => {
+                console.log(response.data)
+                Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+              }))
+          }
+        }
+        Promise.all(arr).then(values => {
+          this.loading = false
+        })
+      }
+
+      if (this.tipoDoc.IdTipoDoc == 2) {
+        this.axios.post(this.API + 'emitirelectronicoboleta', {
+          boletas: this.items
+        }).then( response => {
           console.log(response.data)
-          console.log('item...' + item.idDocVenta)
+          this.items.forEach(item => {
+            Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+          })
         })
       }
     },
@@ -271,19 +334,6 @@ export default {
       this.limpiarFiltros()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
-    rowClick (item) {
-      this.ventaSelect = item
-      this.showKardex = true
-
-      this.axios.get(this.API + 'productos/kardex/' + 10 + '?limit=0', {
-          params: {
-              idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
-          }
-      }).then((response) => {
-          this.ventaDetalleSelect = response.data
-      })
-    },
     actualizarTabla() {
       this.$refs.tablaVentas.refresh()
     },
@@ -291,7 +341,7 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       
-      let url = this.API + 'ventas?idTipoDoc[]=1&idTipoDoc[]=2&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?anulado=0&estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )

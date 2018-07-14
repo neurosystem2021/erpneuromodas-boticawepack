@@ -493,10 +493,14 @@ export default {
             .then((response) => {
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
+                this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
+                this.$refs.inputTipoVenta.setValue('TICKET')
+                this.$refs.inputAlmacen.setValue('VENTA')
+                this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
 

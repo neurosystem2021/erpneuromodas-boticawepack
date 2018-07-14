@@ -2,9 +2,18 @@
   <div>
       <b-container fluid class="bv-example-row">
         <b-row>
-          <b-col md="7"  offset-md="5" class="my-1">
+          <b-col md="12"  class="my-1">
             <b-row>
-              <b-col md="3">
+              <b-col md="2">
+
+              </b-col>
+              <b-col md="2">
+                <div class="suma-stock text-center">
+                  <b>Stock General</b>
+                  <div> {{ sumaStock }} </div>
+                </div>
+              </b-col>
+              <b-col md="2">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -21,7 +30,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group label="Tipo de Muestra">
                   <b-form-radio-group button-variant="primary" buttons v-model="tipoStock" 
                     name="butons1" 
@@ -32,13 +41,13 @@
                     @change="val => generateFilter('stock', val)"></b-form-radio-group>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group label="Limpiar Filtros">
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
                 <br />
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
@@ -250,6 +259,7 @@ export default {
   data() {
     return {
       API: config.API,
+      sumaStock: '...',
       APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
@@ -303,6 +313,9 @@ export default {
           console.log(error)
         })
 
+        // Cargar la sumatoria
+        console.log('asdasd')
+        this.getSumaStock()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -331,6 +344,14 @@ export default {
     }
   },
   methods: {
+    getSumaStock () {
+      console.log(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
+        .then( response => {
+          console.log(response)
+          this.sumaStock = response.data[0].sumaStock
+        })
+    },
     getStock (idProducto) {
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
       return this.itemsStock[index] && this.itemsStock[index].stock
@@ -456,6 +477,14 @@ export default {
 }
 .table-detalle thead th:first-child {
   max-width: 300px;
+}
+.suma-stock {
+  background: #a6ccd2;
+    color: #fff;
+}
+.suma-stock div {
+  font-size: 32px;
+  font-weight: bold;
 }
 @media (min-width: 992px) {
     .modal-xl .modal-dialog {
