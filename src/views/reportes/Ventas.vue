@@ -29,21 +29,46 @@
                 </b-form-group>
               </b-col>
               <b-col md="4">
-                <b-form-group label="Declarado">
-                  <b-form-radio-group id="btnradios1"
-                      buttons
-                      v-model="declarado"
-                      :options="[{ text: 'SI', value: 1 }, { text: 'NO', value: 0 }]"
-                      @input="val => generateFilter('declarado', val) "
-                      name="radiosBtnDefault" />
-                </b-form-group>
-                <b-form-group>
-                  <label>Fecha Fin:</label>
-                  <b-form-input v-model="fechaFin"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaFin', val) "></b-form-input>
-                </b-form-group>
+                <b-row>
+                  <b-col md="6">
+                    <b-form-group>
+                        <label>Tipo de Venta:</label>
+                        <autocomplete
+                            required="required"
+                            ref="inputTipoVenta"
+                            :url="API + 'ventas/tipos'"
+                            anchor="TipoDoc"
+                            label="writer"
+                            placeholder=""
+                            :on-select="setTipoVenta" 
+                            :onInput="(val) => !val ? setTipoVenta() : false"
+                            :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-form-group>
+                  </b-col>
+                  <b-col md="6">
+                    <b-form-group label="Declarado">
+                      <b-form-radio-group id="btnradios1"
+                          buttons
+                          v-model="declarado"
+                          :options="[{ text: 'SI', value: 1 }, { text: 'NO', value: 0 }]"
+                          @input="val => generateFilter('declarado', val) "
+                          name="radiosBtnDefault" />
+                    </b-form-group>
+                  </b-col>
+                  <b-col md="12">
+                    <b-form-group>
+                      <label>Fecha Fin:</label>
+                      <b-form-input v-model="fechaFin"
+                        type="date"
+                        placeholder=""
+                        @input="val => generateFilter('fechaFin', val) "></b-form-input>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+                
+                
               </b-col>
               <b-col md="4">
                 <b-form-group>
@@ -159,6 +184,8 @@ export default {
         IdAlmacen: 1,
         Almacen: 'VENTA'
       },
+      tipoDoc: {
+      },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
       ventaDetalleSelect: [],
@@ -184,6 +211,11 @@ export default {
   computed: {
   },
   methods: {
+    setTipoVenta (obj) {
+        this.tipoDoc = obj || {}
+        this.getVentasAcumuladas()
+        this.$refs.tablaVentas.refresh()
+    },
     setVendedor (obj) {
       this.currentPage = 1
       this.vendedor = obj
@@ -196,7 +228,8 @@ export default {
          params: {
            usuario: this.vendedor.Usuario,
            fechaInicio: this.fechaInicio,
-           fechaFin: this.fechaFin
+           fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
          }
        }).then((response) => {
          this.ventasAcumuladas = response.data.total
@@ -205,7 +238,8 @@ export default {
         this.axios.get(this.API + 'ventas/total', {
           params: {
             fechaInicio: this.fechaInicio,
-            fechaFin: this.fechaFin
+            fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
           }
         }).then((response) => {
           this.ventasAcumuladas = response.data.total
@@ -240,8 +274,11 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      
-      let url = this.API + 'ventas?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let tipoDocFilter = ''
+      if (this.tipoDoc.IdTipoDoc) {
+        tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
+      }
+      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
@@ -263,6 +300,8 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
+      document.location.reload()
+     //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
       this.filters[key] = value

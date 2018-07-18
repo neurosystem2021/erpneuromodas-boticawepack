@@ -22,12 +22,20 @@
                       :classes="{input: 'form-control'}">
                   </autocomplete>
                 </b-form-group>
-                <b-form-group>
+                <b-form-group v-show="!isBoleta">
                   <label>Fecha Inicio:</label>
                   <b-form-input v-model="fechaInicio"
                     type="date"
                     placeholder=""
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+                </b-form-group>
+                <b-form-group v-show="isBoleta">
+                  <label>Fecha Referencia:</label>
+                  <b-form-input
+                    v-model="fechaReferencia"
+                    type="date"
+                    placeholder=""
+                    @input="setFechaReferencia"></b-form-input>
                 </b-form-group>
               </b-col>
               <b-col md="4">
@@ -39,7 +47,7 @@
                 <b-form-group label="Limpiar Filtros">
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
-                <b-form-group>
+                <b-form-group v-show="!isBoleta">
                   <label>Fecha Fin:</label>
                   <b-form-input v-model="fechaFin"
                     type="date"
@@ -51,9 +59,26 @@
                 <!--<div class="total-ventas">
                   S/ {{ ventasAcumuladas || '0.00' }}
                 </div>-->
-                <b-form-group label="Tipo Documento">
-                  <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="$refs.tablaVentas.refresh()" />
-                </b-form-group>
+                <!--<b-form-group label="Tipo Documento">
+                <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="selectTipoDoc" />
+                </b-form-group>-->
+                  <b-form-group>
+                      <label>Tipo de Venta:</label>
+                      <autocomplete
+                          required="required"
+                          ref="inputTipoVenta"
+                          :url="API + 'ventas/tipos'"
+                          initValue="FACTURA ELEC."
+                          anchor="TipoDoc"
+                          label="writer"
+                          placeholder=""
+                          :on-select="setTipoDoc" 
+                          :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                  </b-form-group>
+
+                
                 <b-form-group label="Estado">
                   <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
                 </b-form-group>
@@ -119,10 +144,10 @@
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal / 1.18 | redondear }}
+                          {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }}
                         </td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
+                          {{ item.Subtotal * 0.18 | redondear}}
                         </td>
                         <td>{{ item.Subtotal }}</td>
                       </tr>
@@ -133,8 +158,13 @@
                 </template>
 
                 <template slot="estado" slot-scope="data">
-                  <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
-                  <img v-b-tooltip.hover  :title="data.item.Msj_sunat" v-if="estadoVenta == 2" src="/static/success.png" width="32" height="32"/>
+                  <div style="display:flex;">
+                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="/static/success.png" width="32" height="32"/>
+                      <img v-b-tooltip.hover  :title="(data.item.CodSunat == '01') ? data.item.Msj_sunat : 'Documento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
+                      &nbsp;&nbsp;
+                      <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                  </div>
                 </template>
 
               </b-table>
@@ -148,7 +178,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button v-if="estadoVenta != 2" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Facturas Electronicas</b-button>
+              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -173,12 +203,12 @@ export default {
       this.totalRows = response.data.total
     })
 
-    this.axios.get(this.API + 'ventas/tiposelectronicos')
+    /*this.axios.get(this.API + 'ventas/tiposelectronicos')
       .then((response) => {
         response.data.forEach(element => {
           this.optionsTipoDoc.push({ value: element.IdTipoDoc, text: element.TipoDoc })  
         })
-      })
+      })*/
 
     this.getVentasAcumuladas()
   },
@@ -187,18 +217,21 @@ export default {
       API: config.API,
       loading: false,
       tipoDoc: {
-        IdTipoDoc: 1
+        IdTipoDoc: 1,
+        CodSunat: '01'
       },
       estadoVenta: 1,
       optionsEstado: [
         { value: '1', text: 'PENDIENTE'},
-        { value: '2', text: 'EMITIDOS' }
+        { value: '2', text: 'EMITIDOS' },
+        { value: '0', text: 'ANULADOS' }
       ],
-      optionsTipoDoc: [],
+      // optionsTipoDoc: [],
       vendedor: '',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
+      fechaReferencia: this.$moment().format("YYYY-MM-DD"),
       filters: { },
       filter: '',
       sortBy: 'FechaDoc',
@@ -231,10 +264,15 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      itemsStatus: {}
+      itemsStatus: {},
+      isBoleta: false
     }
   },
   watch: {
+    estadoVenta (id)  {
+     // this.$refs.imgSuccess
+     // this.$refs.tablaVentas.refresh()
+    },
     items (items) {
       if (items.length){
         this.axios.get(this.API + 'ventas/detalle', {
@@ -257,6 +295,26 @@ export default {
   computed: {
   },
   methods: {
+    setFechaReferencia (value) {
+      //this.fechaReferencia = ''
+      this.fechaInicio = value
+      this.fechaFin = value
+    },
+    setTipoDoc (obj) {
+      console.log(obj)
+      this.tipoDoc = obj
+      if (this.tipoDoc.CodSunat == 3) {
+        this.isBoleta = true
+        this.fechaInicio = this.fechaReferencia
+        this.fechaFin = this.fechaReferencia
+      } else {
+        this.isBoleta = false
+      }
+
+      Vue.nextTick(() => {
+        this.$refs.tablaVentas.refresh()
+      })
+    },
     getStatus (idDocVenta) {
       let obj = this.itemsStatus[idDocVenta] || {}
 
@@ -270,7 +328,7 @@ export default {
       this.loading = true
       let arr = []
       
-      if (this.tipoDoc.IdTipoDoc == 1) {
+      if (this.tipoDoc.CodSunat == '01') { // Factura
         for (let item of this.items) {    
           if (item.Estado == 1) {
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
@@ -286,16 +344,53 @@ export default {
         })
       }
 
-      if (this.tipoDoc.IdTipoDoc == 2) {
+      if (this.tipoDoc.CodSunat == '03') { // Boleta
         this.axios.post(this.API + 'emitirelectronicoboleta', {
-          boletas: this.items
+          boletas: this.items,
+          fechaReferencia: this.fechaReferencia,
+          codSunat: this.tipoDoc.CodSunat
         }).then( response => {
-          console.log(response.data)
           this.items.forEach(item => {
             Vue.set(this.itemsStatus, item.idDocVenta, response.data)
           })
+          this.loading = false
         })
       }
+    },
+    eliminarElectronico (venta) {
+      let r = confirm('¿Desea Anular la venta?')
+      if (r == true) {
+        
+        if (this.tipoDoc.CodSunat == '01') { // Factura
+          let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
+          if (desc) {  
+            this.axios.post(this.API + 'bajaelectronico', {
+              facturas: [venta],
+              descripcion: desc,
+              codSunat: this.tipoDoc.CodSunat
+              // fechaReferencia: this.fechaReferencia
+            }).then(res => {
+              console.log(res)
+              this.$refs.tablaVentas.refresh()
+              //mensaje success
+            })
+          }
+        }
+
+        if (this.tipoDoc.CodSunat == '03') { // Boleta
+          this.axios.post(this.API + 'emitirelectronicoboleta', {
+            boletas: [venta],
+            statu: 3, // Statu 3 = dar de baja / 1 = emitir
+            codSunat: this.tipoDoc.CodSunat,
+            fechaReferencia: this.fechaReferencia
+          }).then(res => {
+            console.log(res)
+            this.$refs.tablaVentas.refresh()
+          })
+        }
+
+      }      
+
     },
     getDetalles (idDocVenta) {
       let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)

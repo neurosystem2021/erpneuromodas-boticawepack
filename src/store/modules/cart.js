@@ -10,8 +10,17 @@ const state = {
 
 const mutations = {
   AGREGAR_PRODUCTO ({ productos }, item) {
-    if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-      productos.push(item)
+    if (item.setSuma) {
+      let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+      if (index < 0) {
+        productos.push(item)
+      } else {
+        productos[index].cantidad += 1
+      }
+    } else {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+        productos.push(item)
+      }
     }
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
@@ -52,9 +61,11 @@ const actions = {
   agregarProducto ({ commit }, [producto, cb, obje]) {
     let setPrecio = false
     let cantidad = false
+    let setSuma = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
+      setSuma = obje.setSuma
     }
 
     if(typeof producto === 'object') {
@@ -77,13 +88,17 @@ const actions = {
             obj.cantidad = cantidad
           }
 
+          if (setSuma) {
+            obj.setSuma = true
+          }
+
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {
-          if (cb) cb(false)          
+          if (cb) cb(false)
         }
       })
     }

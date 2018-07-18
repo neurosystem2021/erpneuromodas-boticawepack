@@ -271,7 +271,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio }])
+        }, { setPrecio: this.setPrecio,  setSuma: true }])
       }
     },
     /*alterarBuscadorProductos() {
