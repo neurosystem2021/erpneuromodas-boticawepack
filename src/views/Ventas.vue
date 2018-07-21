@@ -86,6 +86,11 @@
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
+                                        <input v-model="dni"
+                                            @keydown.enter.prevent="loadClienteBarcode"
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="Codigo de Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
@@ -291,6 +296,7 @@ export default {
     },
     data () {
         return {
+            dni: '',
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
@@ -335,6 +341,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteBarcode (e) {
+            e.preventDefault()
+            let dni = this.dni;
+
+            if (dni) {
+                this.setCliente(false, dni)
+            }
+        },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
@@ -388,17 +402,32 @@ export default {
         setVendedor (obj) {
             this.venta.vendedor = obj
         },
-        setCliente (obj) {
+        setCliente (obj, dni = false) {
+            let params = {}
+            if (dni) {
+                params = {
+                    dni: dni
+                }
+            }else {
+                params = {
+                    idCliente: obj
+                }
+            }
+
             if (typeof obj === 'object') {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
             } else {
                 this.axios.get(this.API + 'cliente', {
-                    params: { idCliente: obj }
+                    params: params
                 })
                 .then((response) => {
-                    this.$refs.inputCliente.setValue(response.data.Cliente)
-                    this.venta.cliente = response.data
+                    if (response.data) {
+                        this.$refs.inputCliente.setValue(response.data.Cliente)
+                        this.venta.cliente = response.data
+                    } else {
+                        this.$toasted.show('No se encontro al cliente')
+                    }
                 })
                 .catch((error) => {
                     console.log(error)

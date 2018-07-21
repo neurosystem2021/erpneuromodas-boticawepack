@@ -22,13 +22,19 @@
                       :classes="{input: 'form-control'}">
                   </autocomplete>
                 </b-form-group>
-                <b-form-group v-show="!isBoleta">
-                  <label>Fecha Inicio:</label>
-                  <b-form-input v-model="fechaInicio"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
-                </b-form-group>
+                
+                
+              </b-col>
+              <b-col md="4">
+                <!--<b-form-group label="Mostrar">
+                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                </b-form-group>-->
+                
+
+                <!--<b-form-group label="Limpiar Filtros">
+                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                </b-form-group>-->
+                
                 <b-form-group v-show="isBoleta">
                   <label>Fecha Referencia:</label>
                   <b-form-input
@@ -37,16 +43,15 @@
                     placeholder=""
                     @input="setFechaReferencia"></b-form-input>
                 </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <!--<b-form-group label="Mostrar">
-                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group>-->
                 
-
-                <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                <b-form-group v-show="!isBoleta">
+                  <label>Fecha Inicio:</label>
+                  <b-form-input v-model="fechaInicio"
+                    type="date"
+                    placeholder=""
+                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
                 </b-form-group>
+
                 <b-form-group v-show="!isBoleta">
                   <label>Fecha Fin:</label>
                   <b-form-input v-model="fechaFin"
@@ -161,8 +166,8 @@
                   <div style="display:flex;">
                       <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
                       <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="/static/success.png" width="32" height="32"/>
-                      <img v-b-tooltip.hover  :title="(data.item.CodSunat == '01') ? data.item.Msj_sunat : 'Documento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
                       &nbsp;&nbsp;
+                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
                   </div>
                 </template>
@@ -328,8 +333,8 @@ export default {
       this.loading = true
       let arr = []
       
-      if (this.tipoDoc.CodSunat == '01') { // Factura
-        for (let item of this.items) {    
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura
+        for (let item of this.items) {
           if (item.Estado == 1) {
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
@@ -340,22 +345,24 @@ export default {
           }
         }
         Promise.all(arr).then(values => {
+
           this.loading = false
         })
       }
 
-      if (this.tipoDoc.CodSunat == '03') { // Boleta
+      /*if (this.tipoDoc.CodSunat == '030') { // Boleta emitir resumen diario
         this.axios.post(this.API + 'emitirelectronicoboleta', {
           boletas: this.items,
           fechaReferencia: this.fechaReferencia,
           codSunat: this.tipoDoc.CodSunat
         }).then( response => {
+          console.log(response.data)
           this.items.forEach(item => {
             Vue.set(this.itemsStatus, item.idDocVenta, response.data)
           })
           this.loading = false
         })
-      }
+      }*/
     },
     eliminarElectronico (venta) {
       let r = confirm('¿Desea Anular la venta?')
@@ -371,6 +378,7 @@ export default {
               // fechaReferencia: this.fechaReferencia
             }).then(res => {
               console.log(res)
+              this.$toasted.show('Factura Anulada')
               this.$refs.tablaVentas.refresh()
               //mensaje success
             })
@@ -385,10 +393,10 @@ export default {
             fechaReferencia: this.fechaReferencia
           }).then(res => {
             console.log(res)
+            this.$toasted.show('Boleta Anulada')
             this.$refs.tablaVentas.refresh()
           })
         }
-
       }      
 
     },

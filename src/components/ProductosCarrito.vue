@@ -31,6 +31,7 @@
           <b-form-input
             v-model="productos[data.index].cantidad"
             type="number"
+            style="width: 75px"
             min="0"
             @input="(val) => $emit('onInputCantidad', val)"
             placeholder="Cantidad"></b-form-input>
@@ -39,6 +40,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
+            style="width: 75px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -183,11 +185,14 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'Producto' }, 
-          { key: 'ProductoModelo', label: 'Modelo' }, 
+          { key: 'ProductoCategoria', label: 'Categoria'},
+          { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoModelo', label: 'Modelo' }, 
+          { key: 'Color', label: 'Color' }, 
           { key: 'ProductoTalla', label: 'Talla' },
           { key: 'Genero' },
+          { key: 'Botapie' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },

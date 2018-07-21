@@ -5,7 +5,10 @@
           <b-col md="12"  class="my-1">
             <b-row>
               <b-col md="2">
-
+                <div class="suma-stock text-center">
+                  <b>Stock Valorizado</b>
+                  <div> S/. {{ sumaValorizado }} </div>
+                </div>
               </b-col>
               <b-col md="2">
                 <div class="suma-stock text-center">
@@ -260,6 +263,7 @@ export default {
     return {
       API: config.API,
       sumaStock: '...',
+      sumaValorizado: '...',
       APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
@@ -316,6 +320,7 @@ export default {
         // Cargar la sumatoria
         console.log('asdasd')
         this.getSumaStock()
+        this.getSumaValorizado()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -344,8 +349,13 @@ export default {
     }
   },
   methods: {
+    getSumaValorizado () {
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
+        .then( response => {
+          this.sumaValorizado = (response.data[0].sumaValorizado).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        })
+    },
     getSumaStock () {
-      console.log(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
           console.log(response)

@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container class="bv-example-row">
           <b-row>
               <b-col md="8">
@@ -238,6 +238,9 @@ export default {
       buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito'
     }),
+    afe (e) {
+return false
+    },
     cargarNumero () {
       this.axios.get(this.API + 'movimientos/numero', {
         params: {
@@ -319,6 +322,12 @@ export default {
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
+
+      if (!this.movimiento.proveedor.IdProveedor) {
+        this.$toasted.show('Por favor seleccione un proveedor')        
+        this.inProgress = false            
+        return
+      }
 
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
