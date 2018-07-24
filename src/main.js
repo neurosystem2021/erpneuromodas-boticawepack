@@ -59,6 +59,9 @@ Vue.filter('redondeoMayor', (value) => {
 Vue.filter('redondeoMenor', (value) => {
   return Math.floor(value || 0)
 })
+Vue.filter('moneda', value => {
+  return parseFloat(value || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+})
 
 
 window.Vue = Vue

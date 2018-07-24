@@ -8,7 +8,8 @@ import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 
 // Reportes
-import ReporteVentas from '@/views/reportes/ventas.vue'
+import ReporteVentas from '@/views/reportes/Ventas.vue'
+import CierreCaja from '@/views/reportes/CierreCaja.vue'
 
 Vue.use(Router)
 
@@ -39,6 +40,11 @@ export default new Router({
       path: '/reportes/ventas',
       name: 'ReporteVentas',
       component: ReporteVentas
+    },
+    {
+      path: '/reportes/cierrecaja',
+      name: 'CierreCaja',
+      component: CierreCaja
     },
     {
       path: '/facturacion',

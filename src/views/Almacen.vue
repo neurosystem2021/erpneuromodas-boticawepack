@@ -7,7 +7,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock Valorizado</b>
-                  <div> S/. {{ sumaValorizado }} </div>
+                  <div> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -352,7 +352,7 @@ export default {
     getSumaValorizado () {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
-          this.sumaValorizado = (response.data[0].sumaValorizado).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+          this.sumaValorizado = (response.data[0].sumaValorizado);
         })
     },
     getSumaStock () {
