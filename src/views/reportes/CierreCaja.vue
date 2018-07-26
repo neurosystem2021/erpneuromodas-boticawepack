@@ -1,10 +1,28 @@
 <template>
   <div>
+    <br>
     <b-container class="bv-example-row">
+      <div>
+          <div class="float-right no-print">
+            <b-button-group size="sm" v-if="!this.$route.params.id">
+              <b-form-select v-model="turno" :options="turnos" />
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+            </b-button-group>
+            <b-button-group size="sm">
+              <cierres-caja></cierres-caja>
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+            </b-button-group>
+          </div>
+      </div>
+      <br class="no-print" /><br class="no-print" />
+
       <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center">#4664336</h6>
-      <h6 class="text-center">Fecha de Cierre: 4664336</h6>
-      
+      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
@@ -182,22 +200,34 @@
 </template>
 <script>
 import config from '@/store/config.js'
+import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.getVentas()
-    this.getIngresos()
-    this.getSalidas()
+    this.loadData()
+    if (this.$route.params.id) {
+      this.getCierre(this.$route.params.id)
+    }
   },
   data () {
     return {
       API: config.API,
       ventas: [],
       ingresos: [],
-      salidas: []
+      salidas: [],
+      turno: null,
+      turnos: [
+        { value: null, text: 'Seleccione un Turno' },
+        { value: 1, text: 'Mañana' },
+        { value: 2, text: 'Tarde' }
+      ],
+      cierre: {}
     }
   },
   computed: {
+    getFechaCierre () {
+      //return this.$route.params.id ? 
+    },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
     },
@@ -265,37 +295,87 @@ export default {
     }
   },
   methods: {
+    imprimir () {
+      window.print();
+    },
+    loadData () {
+      this.getVentas()
+      this.getIngresos()
+      this.getSalidas()
+    },
+    cerrarCaja () {
+      if (!this.turno) {
+        this.$toasted.show('Seleccione un Turno')
+        return
+      }
+      let r = confirm('¿Está seguro de cerrar la caja?')
+      if (r) {
+        this.axios.post(this.API + 'cierrecaja', {
+          idTurno: this.turno,
+          user: sessionStorage.getItem("User")
+        }).then(res => {
+          this.loadData()
+          this.$toasted.show('¡Caja cerrada!')
+          console.log(res)
+        })
+      }
+    },
+
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     getVentas () {
-      this.axios.get(this.API + 'cierrecaja')
-        .then(res => {
-          this.ventas = res.data
-        }).catch(err => {
-          console.log(err)
-        })
+      this.axios.get(this.API + 'cierrecaja/ventas', {
+        params: {
+          idCierre: this.$route.params.id
+        }
+      })
+      .then(res => {
+        this.ventas = res.data
+      }).catch(err => {
+        console.log(err)
+      })
     },
     getIngresos () {
-      this.axios.get(this.API + 'cierrecaja/ingresos')
-        .then(res => {
-          this.ingresos = res.data
-        }).catch(err => {
-          console.log(err)
-        })
+      this.axios.get(this.API + 'cierrecaja/ingresos',{
+        params: {
+          idCierre: this.$route.params.id
+        }
+      })
+      .then(res => {
+        this.ingresos = res.data
+      }).catch(err => {
+        console.log(err)
+      })
     },
     getSalidas () {
-      this.axios.get(this.API + 'cierrecaja/salidas')
-        .then(res => {
-          this.salidas = res.data
-        }).catch(err => {
-          console.log(err)
-        })
+      this.axios.get(this.API + 'cierrecaja/salidas', {
+        params: {
+          idCierre: this.$route.params.id
+        }
+      })
+      .then(res => {
+        this.salidas = res.data
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    getCierre(id) {
+      this.axios.get(this.API + 'cierrecaja', {
+        params: {
+          idCierre: id
+        }
+      }).then(res =>{
+        this.cierre = res.data[0]
+      })
     }
+  },
+  components: {
+    CierresCaja
   }
 }
 </script>
-<style>
+<style scoped>
 th {
   background-color: #f1f1f1;
 }
@@ -306,11 +386,16 @@ th {
   background-color: #ffd4d3;  
 }
 .anulado td{
-  font-style: italic;
+  /*font-style: italic;*/
   text-decoration: line-through;
 }
 .credito {
   background: #f9f9f9;
   padding: 10px;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
 }
 </style>

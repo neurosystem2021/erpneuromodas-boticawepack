@@ -47,6 +47,11 @@ export default new Router({
       component: CierreCaja
     },
     {
+      path: '/reportes/cierrecaja/:id',
+      name: 'CierreCajaId',
+      component: CierreCaja
+    },
+    {
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
