@@ -211,6 +211,14 @@
           </b-form-group>
         </b-col>
       </b-row>
+
+      <hr />
+      <b-row>
+        <b-col>
+          <producto-form-det :id-producto="producto.IdProducto" v-if="showProductoDet && show" ref="productoDet"></producto-form-det>
+        </b-col>
+      </b-row>
+
       <div slot="modal-footer" >
         <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
           <b-input-group>
@@ -245,17 +253,20 @@
 import config from '@/store/config.js'
 import CategoriaForm from '@/components/CategoriaForm'
 import MarcaForm from '@/components/MarcaForm'
+import ProductoFormDet from '@/components/ProductoFormDet'
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
   data () {
     return {
+      showProductoDet: false,
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
       show: false, 
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
-      producto: {}
+      producto: {},
+      productosDet: []
     }
   },
   beforeMount () {
@@ -264,7 +275,6 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     productoUpdate (newVal) {
-      console.log(newVal)
       if (newVal.IdProducto) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -403,9 +413,13 @@ export default {
     guardarProducto(e) {
       e.preventDefault();
 
+      // Agregar producto DET
+      if (this.showProductoDet) {
+        this.producto.productosDet = this.$refs.productoDet.productos
+      }
+
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
-        //console.log(response);exit();
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
         }
@@ -492,7 +506,7 @@ export default {
   computed : {
   },
   components: {
-    CategoriaForm, MarcaForm
+    CategoriaForm, MarcaForm, ProductoFormDet
   }
 }
 </script>
