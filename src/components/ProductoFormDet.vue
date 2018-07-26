@@ -56,7 +56,6 @@ export default {
         this.axios.get(this.API + 'productosdet', {
           params: {idProducto: this.idProducto}
         }).then(res => {
-          console.log(res)
           this.productos = res.data
         }).catch(err => {
           console.log(err)
@@ -69,8 +68,8 @@ export default {
       `
     },
     addProducto (data) {
-      let index = this.productos.findIndex(el => el.IdProducto == data.IdProducto)
-      if (index < 0) {
+      let index = this.productos.findIndex(el => el.IdProductoDet == data.IdProducto)
+      if (index < 0 && this.idProducto !== data.IdProducto ) {
         data.IdProductoDet = data.IdProducto
         this.productos.push(data)
       }
