@@ -68,12 +68,13 @@
                 anchor="ProductoPresentacion"
                 label="writer"
                 :placeholder.sync="producto.ProductoPresentacion"
-                :on-select="val => producto.Presentacion = val.ProductoPresentacion && val.ProductoPresentacion.toUpperCase()"
+                :on-select="val => producto.ProductoPresentacion = val.ProductoPresentacion && val.ProductoPresentacion.toUpperCase()"
                 :onInput="val => producto.ProductoPresentacion = val && val.toUpperCase()"
                 :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
           </b-form-group>
+
           
           
         </b-col>
@@ -110,6 +111,17 @@
               type="number"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Activar SubProductos:</label>
+            <b-form-checkbox
+                     v-model="producto.EsPadre"
+                     value="1"
+                     unchecked-value="0"
+                     @input="checkIsHijo">
+              Seleccione esta opción si el producto contiene mas productos
+            </b-form-checkbox>
+          </b-form-group>
+          
         </b-col>
       </b-row>
 
@@ -200,7 +212,8 @@ export default {
   },
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
-    productoUpdate (newVal) {
+    show (val) {
+      let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -244,6 +257,11 @@ export default {
         }*/
         this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.IdProducto = newVal.IdProducto
+
+        this.producto.EsPadre = newVal.EsPadre
+        Vue.nextTick(() => {
+           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+        })
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
@@ -316,6 +334,7 @@ export default {
     },
     initForm () {
       this.producto = {
+        EsPadre: 0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
@@ -348,6 +367,7 @@ export default {
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
+      // console.log(JSON.stringify(this.producto))
 
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
@@ -431,6 +451,24 @@ export default {
           console.log(error)
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
+      }
+    },
+    checkIsHijo (val) {
+      if (val && this.producto.IdProducto) {
+        this.axios.get(this.API + 'productos/eshijo', {params: {
+          idProducto: this.producto.IdProducto
+        }})
+        .then(res => {
+          let esHijo = res.data.esHijo
+          if(esHijo) {
+            this.$toasted.show('Este producto no puede contener productos ya que es un producto hijo')
+            this.producto.EsPadre = false      
+          }else {
+            this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+          }
+        })
+      } else {
+        if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
       }
     }
   },

@@ -84,11 +84,8 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true }
+            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
+            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

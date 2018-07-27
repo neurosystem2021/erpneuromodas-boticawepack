@@ -311,10 +311,10 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
-                    { key: 'ProductoModelo', label: 'Modelo' }, 
+                    { key: 'ProductoCategoria', label: 'Categoría' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoTalla', label: 'Talla' },
-                    { key: 'Genero' },
+                    { key: 'ProductoPresentacion', label: 'Present.' },
+                    { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 

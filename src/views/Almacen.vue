@@ -105,14 +105,14 @@
               </b-col>  
               <b-col md="3">
                 <b-form-group>
-                  <label>Modelo:</label>
+                  <label>Presentación:</label>
                   <autocomplete
-                    :url="API + 'productos/modelos'"
-                    ref="inputModelo"
-                    anchor="ProductoModelo"
+                    :url="API + 'productos/presentaciones'"
+                    ref="inputPresentacion"
+                    anchor="ProductoPresentacion"
                     label="writer"
-                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
+                    :on-select="val => generateFilter('presentacion', val.ProductoPresentacion)"
+                    :onInput="(val) => !val ? generateFilter('presentacion', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -123,56 +123,14 @@
             <b-row>
               <b-col md="3">
                 <b-form-group>
-                  <label>Color:</label>
+                  <label>Medición:</label>
                   <autocomplete
-                    :url="API + 'productos/colores'"
-                    ref="inputColor"
-                    anchor="Color"
+                    :url="API + 'mediciones'"
+                    ref="inputMedicion"
+                    anchor="ProductoMedicion"
                     label="writer"
-                    :on-select="val => generateFilter('color', val.Color)"
-                    :onInput="(val) => !val ? generateFilter('color', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>  
-              <b-col md="3">
-                <b-form-group>
-                  <label>Talla:</label>
-                  <autocomplete
-                    :url="API + 'tallas'"
-                    ref="inputTalla"
-                    anchor="ProductoTalla"
-                    label="writer"
-                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
-                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col> 
-              <b-col md="3">
-                <b-form-group>
-                  <label>Genero:</label>
-                  <autocomplete
-                    :url="API + 'productos/generos'"
-                    ref="inputGenero"
-                    anchor="Genero"
-                    label="writer"
-                    :on-select="val => generateFilter('genero', val.Genero)"
-                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group>
-                  <label>Botapie/Manga:</label>
-                  <autocomplete
-                    :url="API + 'productos/botapies'"
-                    ref="inputBotapie"
-                    anchor="Botapie"
-                    label="writer"
-                    :on-select="val => generateFilter('botapie', val.Botapie)"
-                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
+                    :on-select="val => generateFilter('medicion', val.Genero)"
+                    :onInput="(val) => !val ? generateFilter('medicion', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -223,6 +181,7 @@
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
                     {{ getStock(data.item.IdProducto) }}
                   </div>
+                  <img v-if="getStock(data.item.IdProducto) === undefined" src="/static/box.png" style="width: 24px" />
                 </template>
 
               </b-table>
@@ -286,11 +245,8 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true },
+            { key: 'ProductoPresentacion', label: 'Present.', sortable: true },
+            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -318,7 +274,6 @@ export default {
         })
 
         // Cargar la sumatoria
-        console.log('asdasd')
         this.getSumaStock()
         this.getSumaValorizado()
 
@@ -344,8 +299,7 @@ export default {
   computed: {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo + ' / ' + this.productoSelect.Color
-      this.productoSelect.ProductoTalla 
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoPresentacion + ' / ' + this.productoSelect.ProductoMedicion 
     }
   },
   methods: {
@@ -433,7 +387,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputModelo.setValue('')
+      this.$refs.inputPresentacion.setValue('')
       this.$refs.inputColor.setValue('')
       this.$refs.inputTalla.setValue('')
       this.$refs.inputGenero.setValue('')

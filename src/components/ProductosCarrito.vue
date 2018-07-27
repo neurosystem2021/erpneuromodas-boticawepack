@@ -111,6 +111,10 @@
 
         </template>
 
+        <template slot="stock" slot-scope="data">
+          <img v-if="data.item.EsPadre" src="/static/box.png" style="width: 24px" />
+          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+        </template>
       </b-table>
     </b-col>
     <b-col md="3">
@@ -188,11 +192,8 @@ export default {
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
+          { key: 'ProductoPresentacion', label: 'Present.' }, 
+          { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -329,7 +330,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
       `
     },
     setNuevoPrecioContado (index) {
