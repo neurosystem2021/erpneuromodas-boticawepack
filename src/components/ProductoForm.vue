@@ -292,6 +292,8 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
+
+        this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
