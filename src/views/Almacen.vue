@@ -44,12 +44,22 @@
                     @change="val => generateFilter('stock', val)"></b-form-radio-group>
                 </b-form-group>
               </b-col>
-              <b-col md="2">
-                <b-form-group label="Limpiar Filtros">
+              <b-col md="1">
+                <b-form-group label="Limpiar ">
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
                 <br />
               </b-col>
+              <!--<b-col md="1">
+                <b-form-group label="Stock Mínimo">
+                  <b-form-checkbox id="stock"
+                     @change="val => generateFilter('minimo', val)"
+                     :value="1"
+                     :unchecked-value="0">
+
+                  </b-form-checkbox>
+                </b-form-group>
+              </b-col>-->
               <b-col md="2">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -266,7 +276,6 @@ export default {
             idAlmacen: this.almacen.IdAlmacen
           }
         }).then((response) => {
-         console.log(response)
              this.itemsStock = response.data
         })
         .catch((error) => {
@@ -312,7 +321,6 @@ export default {
     getSumaStock () {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
-          console.log(response)
           this.sumaStock = response.data[0].sumaStock
         })
     },
@@ -404,7 +412,7 @@ export default {
       for (var key in this.filters) {
         filter += '&filter[' + key + ']=' + this.filters[key]
         
-        if(key == 'stock') {
+        if(key == 'stock' || key == 'minimo') {
           // si la consulta se hace al stock jalar de otro endpoint
           this.APISTOCK = 'productos/stock'
         }
