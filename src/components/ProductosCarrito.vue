@@ -189,6 +189,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'CodigoBarra', label: 'Código'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
@@ -266,7 +267,7 @@ export default {
     }),
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+      let idProducto = this.loadCode;
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
@@ -277,7 +278,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
       }
     },
     /*alterarBuscadorProductos() {

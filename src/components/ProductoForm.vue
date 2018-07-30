@@ -9,6 +9,7 @@
           <b-form-group>
             <label>Código barra:</label>
             <b-form-input 
+              ref="inputCodigoBarra"
               required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
@@ -61,6 +62,7 @@
           <b-form-group>
             <label>Artículo:</label>
             <b-form-input v-model="producto.Producto"
+              ref="inputProducto"
               required="required"
               type="text"
               @input="(val) => producto.Producto = val && val.toUpperCase()"
@@ -253,7 +255,9 @@ export default {
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        
+        // this.$refs.inputProducto.$el.disabled = true
+        this.$refs.inputCodigoBarra.$el.disabled = true
+
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
         
