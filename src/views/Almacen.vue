@@ -50,7 +50,7 @@
                 </b-form-group>
                 <br />
               </b-col>
-              <!--<b-col md="1">
+              <b-col md="1">
                 <b-form-group label="Stock Mínimo">
                   <b-form-checkbox id="stock"
                      @change="val => generateFilter('minimo', val)"
@@ -59,7 +59,7 @@
 
                   </b-form-checkbox>
                 </b-form-group>
-              </b-col>-->
+              </b-col>
               <b-col md="2">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -396,10 +396,10 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputPresentacion.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputGenero.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      // this.$refs.inputColor.setValue('')
+      // this.$refs.inputTalla.setValue('')
+      // this.$refs.inputGenero.setValue('')
+      // this.$refs.inputBotapie.setValue('')
 
       this.productoSelect = {}
       this.limpiarClassRows()

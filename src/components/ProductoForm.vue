@@ -7,6 +7,16 @@
       <b-row>
         <b-col md="6">
           <b-form-group>
+            <label>Código barra:</label>
+            <b-form-input 
+              required="required"
+              v-model="producto.CodigoBarra"
+              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -103,9 +113,9 @@
               type="number"
               ></b-form-input>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input 
+            <b-form-input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
@@ -115,8 +125,8 @@
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
-                     value="1"
-                     unchecked-value="0"
+                     :value="1"
+                     :unchecked-value="0"
                      @input="checkIsHijo">
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
@@ -255,7 +265,8 @@ export default {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
         }*/
-        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
 
         this.producto.EsPadre = newVal.EsPadre
@@ -375,7 +386,8 @@ export default {
           this.cbGuardar(response.data.insertId)
         }
         if (response.data.error) {
-          this.$toasted.show('Producto insertado correctamente - ' + response.data.codigoBarra)
+          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
+          return
         } else {
           this.$toasted.show('Producto guardado correctamente')
         }

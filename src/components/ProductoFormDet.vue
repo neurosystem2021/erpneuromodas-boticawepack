@@ -65,7 +65,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.IdProducto} - ${data.Producto}</b>
+        <b>${data.IdProducto} - ${data.Producto} - ${data.CodigoBarra}</b>
       `
     },
     addProducto (data) {
