@@ -4,9 +4,9 @@
           
 
         <b-row>
-          <b-col md="10" class="my-1">
+          <b-col md="12" class="my-1">
             <b-row>
-              <b-col md="4">
+              <b-col md="2">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -68,7 +68,7 @@
                 <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="selectTipoDoc" />
                 </b-form-group>-->
                   <b-form-group>
-                      <label>Tipo de Venta:</label>
+                      <label>Tipo Comprobante:</label>
                       <autocomplete
                           required="required"
                           ref="inputTipoVenta"
@@ -84,17 +84,12 @@
                   </b-form-group>
 
                 
-                <b-form-group label="Estado">
+                
+              </b-col>
+              <b-col md="2">
+                  <b-form-group label="Estado">
                   <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
                 </b-form-group>
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col md="2" class="my-1">
-            <b-row>
-              <b-col md="12">
-                
-                
                 <br />
               </b-col>
             </b-row>
@@ -169,6 +164,14 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                  
+                      &nbsp;&nbsp;
+
+                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="this.loading" variant="primary" size="sm" >Nota Credito</b-button>
+                      <b-popover :target="'popover-nota' + data.index" title="Emitir Nota Credito" placement="top">
+                        <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" />
+                        <b-button @click="emitirNotaCredito(data.item)" variant="primary" size="sm">Emitir</b-button>
+                      </b-popover>
                   </div>
                 </template>
 
@@ -270,7 +273,20 @@ export default {
       perPage: 10,
       currentPage: 1,
       itemsStatus: {},
-      isBoleta: false
+      isBoleta: false,
+      itemsMotivoNota: [
+        { value: null, text: '-- SELECCIONE EL MOTIVO --' },
+        { value: '01', text: 'ANULACION DE LA OPERACION' },
+        { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+        { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+        { value: '04', text: 'DESCUENTO GLOBAL' },
+        { value: '05', text: 'DESCUENTO POR ITEM' },
+        { value: '06', text: 'DEVOLUCION TOTAL' },
+        { value: '07', text: 'DEVOLUCION POR ITEM' },
+        { value: '08', text: 'BONIFICACION' },
+        { value: '09', text: 'DISMINUCION EN EL VALOR' },
+      ],
+      notaIdMotivo: null
     }
   },
   watch: {
@@ -329,13 +345,34 @@ export default {
       
       return obj
     },
-    async emitirElectronico () {
+    emitirNotaCredito (doc) {
+      
+
+      doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
+      doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
+      doc.notaIdMotivo = this.notaIdMotivo
+      doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
+
+      doc.CodSunat = '07' // codsunat 07 es nota de credito 
+      //this.axios.post
+//console.log(JSON.stringify(doc))
+      
+      this.axios.post(this.API + 'emitirelectronico', { 
+        docVenta: doc 
+      }).then(res => {
+        console.log(res)
+        this.notaIdMotivo = null
+      })
+
+
+    },
+    async emitirElectronico (doc) {
       this.loading = true
       let arr = []
       
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
-          if (item.Estado == 1) {
+          if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
@@ -348,6 +385,10 @@ export default {
 
           this.loading = false
         })
+      }
+
+      if (this.tipoDoc.CodSunat == '07') { // Nota de credito
+        
       }
 
       /*if (this.tipoDoc.CodSunat == '030') { // Boleta emitir resumen diario
