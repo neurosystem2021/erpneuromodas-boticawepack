@@ -329,7 +329,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca}
       `
     },
     setNuevoPrecioContado (index) {

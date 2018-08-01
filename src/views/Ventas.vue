@@ -310,11 +310,11 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
-                    { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoTalla', label: 'Talla' },
-                    { key: 'Genero' },
+                    { key: 'ProductoFormaFarmaceutica', label: 'Laboratorio' }, 
+                    { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
