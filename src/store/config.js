@@ -1,3 +1,3 @@
 module.exports =  {
-    API: 'http://boticav1.local/api/index.php/'
+    API: process.env.API
 }

@@ -353,7 +353,7 @@ export default {
       doc.notaIdMotivo = this.notaIdMotivo
       doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
 
-      doc.CodSunat = '07' // codsunat 07 es nota de credito 
+      doc.CodSunat = '08' // codsunat 07 es nota de credito  / 08 nota de debito
       //this.axios.post
 //console.log(JSON.stringify(doc))
       
