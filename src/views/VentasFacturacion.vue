@@ -168,7 +168,7 @@
                       &nbsp;&nbsp;
 
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="this.loading" variant="primary" size="sm" >Nota Credito</b-button>
-                      <b-popover :target="'popover-nota' + data.index" title="Emitir Nota Credito" placement="top">
+                      <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" />
                         <b-button @click="emitirNotaCredito(data.item)" variant="primary" size="sm">Emitir</b-button>
                       </b-popover>
@@ -219,6 +219,7 @@ export default {
       })*/
 
     this.getVentasAcumuladas()
+    this.loadFirstAlmacen()
   },
   data() {
     return {
@@ -246,8 +247,7 @@ export default {
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'VENTA'
+        IdAlmacen: 1
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -316,6 +316,13 @@ export default {
   computed: {
   },
   methods: {
+    loadFirstAlmacen (cb) {
+      this.axios.get(this.API + 'almacenes/primero')
+        .then(res => {
+          this.$refs.inputAlmacen.setValue(res.data.Almacen)
+          this.setAlmacen(res.data)
+        })
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -377,7 +384,16 @@ export default {
                 docVenta: item
               }).then((response) => {
                 console.log(response.data)
+                if(response.data.Estado == 1) {
+                  this.$toasted.error(response.data.msj_sunat)                  
+                } else {
+                  this.$toasted.success(response.data.msj_sunat)
+                  // ocultar el documento emitido
+                  let serie = response.data.txtNRO_COMPROBANTE.split('-')[0]
+                  let numero = response.data.txtNRO_COMPROBANTE.split('-')[1]
+                }
                 Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
               }))
           }
         }
