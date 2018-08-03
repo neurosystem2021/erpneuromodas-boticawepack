@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="show">
     <b-form-group>
-      <label>Agregar Productos:</label>
+      <label>Agrega Subproductos:</label>
       <b-input-group>
         <autocomplete
           :url="API + 'productos'"
@@ -45,6 +45,7 @@ export default {
   },
   data () {
     return {
+      show: false,
       API: config.API,
       productos: []
     }
@@ -64,15 +65,40 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.IdProducto} - ${data.Producto}</b>
+        <b>${data.IdProducto} - ${data.Producto} - ${data.CodigoBarra}</b>
       `
     },
     addProducto (data) {
       let index = this.productos.findIndex(el => el.IdProductoDet == data.IdProducto)
-      if (index < 0 && this.idProducto !== data.IdProducto ) {
+
+      if (index >= 0) {
+        this.$toasted.show('El producto ya está agregado')
+        return
+      }
+
+      if (this.idProducto == data.IdProducto) {
+        this.$toasted.show('No puede agregar el mismo producto que esta editando')
+        return
+      }
+
+      this.axios.get(this.API + 'productos/espadre', {params: {
+        idProducto: data.IdProducto
+      }}).then(res => {
+        let esPadre = res.data.esPadre
+        if  (esPadre) {
+          this.$toasted.show('No puede agregar un producto padre')
+        } else {
+          data.IdProductoDet = data.IdProducto
+          this.productos.push(data)
+        }
+      })
+
+      /*if (index < 0 && this.idProducto !== data.IdProducto && !data.EsPadre ) {
         data.IdProductoDet = data.IdProducto
         this.productos.push(data)
-      }
+      } else {
+        this.$toasted.show('no puede agregar este producto')
+      }*/
     },
     quitarProducto (prod) {
       let index = this.productos.findIndex(el => el.IdProductoDet == prod.IdProductoDet)

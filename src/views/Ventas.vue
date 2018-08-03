@@ -316,10 +316,9 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
-                    { key: 'ProductoModelo', label: 'Modelo' }, 
+                    { key: 'ProductoCategoria', label: 'Categoría' },
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoTalla', label: 'Talla' },
-                    { key: 'Genero' },
+                    { key: 'ProductoMedicion', label: 'Medicion' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -575,6 +574,7 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
+                console.log(response)
                 this.$toasted.show('Venta realizada con exito')
                 this.ultimaVenta = response.data.insertId
                 this.limpiarDespuesVenta()

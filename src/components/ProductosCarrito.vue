@@ -188,11 +188,7 @@ export default {
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
+          { key: 'ProductoMedicion', label: 'Medicion' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -329,7 +325,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
       `
     },
     setNuevoPrecioContado (index) {

@@ -69,7 +69,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -113,7 +113,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
-              <b-col md="3">
+              <!--<b-col md="3">
                 <b-form-group>
                   <label>Modelo:</label>
                   <autocomplete
@@ -126,69 +126,10 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>
+              </b-col>-->
             </b-row>
           </b-col>
-          <b-col md="6">
-            <b-row>
-              <b-col md="3">
-                <b-form-group>
-                  <label>Color:</label>
-                  <autocomplete
-                    :url="API + 'productos/colores'"
-                    ref="inputColor"
-                    anchor="Color"
-                    label="writer"
-                    :on-select="val => generateFilter('color', val.Color)"
-                    :onInput="(val) => !val ? generateFilter('color', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>  
-              <b-col md="3">
-                <b-form-group>
-                  <label>Talla:</label>
-                  <autocomplete
-                    :url="API + 'tallas'"
-                    ref="inputTalla"
-                    anchor="ProductoTalla"
-                    label="writer"
-                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
-                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col> 
-              <b-col md="3">
-                <b-form-group>
-                  <label>Genero:</label>
-                  <autocomplete
-                    :url="API + 'productos/generos'"
-                    ref="inputGenero"
-                    anchor="Genero"
-                    label="writer"
-                    :on-select="val => generateFilter('genero', val.Genero)"
-                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group>
-                  <label>Botapie/Manga:</label>
-                  <autocomplete
-                    :url="API + 'productos/botapies'"
-                    ref="inputBotapie"
-                    anchor="Botapie"
-                    label="writer"
-                    :on-select="val => generateFilter('botapie', val.Botapie)"
-                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col> 
-            </b-row>
-          </b-col>
+          
         </b-row>
         <b-row>
           <b-col md="12" class="my-1">
@@ -296,11 +237,6 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -353,8 +289,7 @@ export default {
   computed: {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo + ' / ' + this.productoSelect.Color
-      this.productoSelect.ProductoTalla 
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo 
     }
   },
   methods: {
@@ -442,10 +377,6 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputGenero.setValue('')
-      this.$refs.inputBotapie.setValue('')
 
       this.productoSelect = {}
       this.limpiarClassRows()
