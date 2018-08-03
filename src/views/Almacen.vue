@@ -24,7 +24,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue=""
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -206,6 +206,8 @@ import ProductoKardex from '@/components/ProductoKardex'
 
 export default {
   mounted() {
+    this.loadFirstAlmacen()
+
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
@@ -219,8 +221,7 @@ export default {
       tipoStock: '',
       showKardex: false,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'VENTA'
+        IdAlmacen: 1
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -293,6 +294,14 @@ export default {
     }
   },
   methods: {
+    loadFirstAlmacen () {
+      this.axios.get(this.API + 'almacenes/primero')
+        .then(res => {
+          this.$refs.inputAlmacen.setValue(res.data.Almacen)
+          this.setAlmacen(res.data)
+          //this.almacen = res.data
+        })
+    },
     getSumaValorizado () {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
@@ -376,8 +385,6 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputModelo.setValue('')
-
       this.productoSelect = {}
       this.limpiarClassRows()
       console.log(this.filter)

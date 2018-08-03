@@ -12,7 +12,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue=""
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -181,8 +181,7 @@ export default {
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'VENTA'
+        IdAlmacen: 1
       },
       tipoDoc: {
       },

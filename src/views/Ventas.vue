@@ -47,7 +47,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="VENTA"
+                                        initValue=""
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -346,6 +346,13 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadFirstAlmacen () {
+            this.axios.get(this.API + 'almacenes/primero')
+                .then(res => {
+                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    this.venta.almacen = res.data
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
@@ -370,8 +377,7 @@ export default {
                     LimitItems: 0
                 },
                 almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'VENTA'
+                    IdAlmacen: 1
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
@@ -386,6 +392,8 @@ export default {
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 }
             }
+
+            this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
