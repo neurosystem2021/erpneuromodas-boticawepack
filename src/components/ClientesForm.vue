@@ -104,7 +104,7 @@ export default {
                 } else {
                     this.cliente.Cliente = data.RazonSocial
                     this.cliente.Direccion = data.Direccion
-                    this.cliente.Telefono = data.Telefono
+                    // this.cliente.Telefono = data.Telefono
                 }
             } else {
                 this.$toasted.show('No se encontró el Usuario')                
