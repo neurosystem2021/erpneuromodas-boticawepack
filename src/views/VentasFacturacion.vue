@@ -169,8 +169,12 @@
 
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="this.loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
-                        <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" />
-                        <b-button @click="emitirNotaCredito(data.item)" variant="primary" size="sm">Emitir</b-button>
+                        <form @submit.prevent="emitirNotaCredito(data.item)" >
+                          <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
+                          <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
+                          <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
+                          <b-button type="submit" variant="primary" size="sm">Emitir</b-button>
+                        </form>
                       </b-popover>
                   </div>
                 </template>
@@ -278,15 +282,16 @@ export default {
         { value: null, text: '-- SELECCIONE EL MOTIVO --' },
         { value: '01', text: 'ANULACION DE LA OPERACION' },
         { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
-        { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+        /*{ value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
         { value: '04', text: 'DESCUENTO GLOBAL' },
         { value: '05', text: 'DESCUENTO POR ITEM' },
         { value: '06', text: 'DEVOLUCION TOTAL' },
         { value: '07', text: 'DEVOLUCION POR ITEM' },
         { value: '08', text: 'BONIFICACION' },
-        { value: '09', text: 'DISMINUCION EN EL VALOR' },
+        { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
       ],
-      notaIdMotivo: null
+      notaIdMotivo: null,
+      notaCredito: {}
     }
   },
   watch: {
@@ -352,31 +357,39 @@ export default {
       
       return obj
     },
-    emitirNotaCredito (doc) {
-      
+    emitirNotaCredito (item) {
+      let doc = Object.assign({}, item);
 
       doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
       doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
       doc.notaIdMotivo = this.notaIdMotivo
       doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
 
-      doc.CodSunat = '08' // codsunat 07 es nota de credito  / 08 nota de debito
+      doc.CodSunat = '07' // codsunat 07 es nota de credito  / 08 nota de debito
+      doc.Serie = this.notaCredito.serie
+      doc.Numero = this.notaCredito.numero
       //this.axios.post
-//console.log(JSON.stringify(doc))
+      console.log(JSON.stringify(doc))
       
       this.axios.post(this.API + 'emitirelectronico', { 
         docVenta: doc 
       }).then(res => {
         console.log(res)
+        this.$toasted.success(res.data.msj_sunat, { duration: 7000 })
         this.notaIdMotivo = null
       })
 
 
     },
     async emitirElectronico (doc) {
+      if(!this.items.length) {
+        this.$toasted.show('No hay documentos para emitir');
+        return
+      }
+
       this.loading = true
       let arr = []
-      
+
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
@@ -389,8 +402,9 @@ export default {
                 } else {
                   this.$toasted.success(response.data.msj_sunat)
                   // ocultar el documento emitido
-                  let serie = response.data.txtNRO_COMPROBANTE.split('-')[0]
-                  let numero = response.data.txtNRO_COMPROBANTE.split('-')[1]
+                  Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                  let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                  let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
                 }
                 Vue.set(this.itemsStatus, item.idDocVenta, response.data)
 
