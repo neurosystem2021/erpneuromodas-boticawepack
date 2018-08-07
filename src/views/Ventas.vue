@@ -234,13 +234,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
+                                                    class="form-control"
                                                     v-model="venta.pago.visa.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -253,13 +255,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
+                                                    class="form-control"
                                                     v-model="venta.pago.mastercard.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                />
                                             </td>
                                         </tr>
                                     </tbody>
