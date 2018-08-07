@@ -74,6 +74,28 @@
           
         </b-col>
         <b-col md="6">
+
+          <b-form-group>
+            <label>Modelo:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.modelo.ProductoModelo"
+                :on-select="setModelo"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearModelo"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          
           <b-form-group>
             <label>Medición:</label>
             <autocomplete
@@ -234,7 +256,7 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
@@ -243,10 +265,10 @@ export default {
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
         
-        /* this.producto.modelo = {
+        this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
-        } */
+        }
         /*this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
@@ -265,7 +287,7 @@ export default {
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
-        //this.producto.ProductoModelo = newVal.ProductoModelo
+        this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
 
@@ -310,10 +332,10 @@ export default {
       this.producto.marca = obj
       this.$refs.inputMarca.setValue(obj.ProductoMarca)
     },
-    /* setModelo (obj) {
+    setModelo (obj) {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
-    }, */
+    },
     /*setTalla (obj) {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
@@ -336,7 +358,7 @@ export default {
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
-        // IdProductoModelo: null,
+        IdProductoModelo: null,
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
         Producto: '',
@@ -349,7 +371,7 @@ export default {
         // Genero: '',
         categoria: {},
         marca: {},
-        // modelo: {},
+        modelo: {},
         //talla: {},
         medicion: {
           IdProductoMedicion:6,
@@ -364,7 +386,7 @@ export default {
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
-      // console.log(JSON.stringify(this.producto))
+        // console.log(JSON.stringify(this.producto))
 
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
@@ -425,6 +447,25 @@ export default {
           this.setMarca({
             IdProductoMarca: response.data.insertId,
             ProductoMarca: response.data.ProductoMarca
+          })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
+    },
+    crearModelo () {
+      if (this.$refs.inputModelo.type) {
+        let modelo = {}
+        modelo.ProductoModelo = this.$refs.inputModelo.type.toUpperCase()
+  
+        this.axios.post(this.API + 'modelos', modelo)
+        .then((response) => {
+          this.$toasted.show('Modelo guardado correctamente')
+          this.setModelo({
+            IdProductoModelo: response.data.insertId,
+            ProductoModelo: response.data.ProductoModelo
           })
         })
         .catch((error) => {
