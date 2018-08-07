@@ -148,6 +148,7 @@
                     <b-form-group>
                       <label>Moneda:</label>
                       <autocomplete
+                        ref="inputMoneda"
                         :url="API + 'monedas'"
                         initValue="PEN"
                         anchor="Moneda"
@@ -311,7 +312,9 @@ return false
       this.movimiento.almacenDestino = obj
     },
     setMoneda (obj) {
+      console.log(obj)
       this.movimiento.Moneda = obj.Moneda
+      this.movimiento.TipoCambio = obj.TipoCambio
     },
     getProveedores (value) {
       this.buscarProveedores(value)
@@ -361,6 +364,7 @@ return false
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
+          this.$refs.inputMoneda.setValue('PEN')
           this.$toasted.show('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
