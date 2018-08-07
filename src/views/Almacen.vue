@@ -113,11 +113,11 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
-              <!--<b-col md="3">
+              <b-col md="3">
                 <b-form-group>
                   <label>Modelo:</label>
                   <autocomplete
-                    :url="API + 'productos/modelos'"
+                    :url="API + 'modelos'"
                     ref="inputModelo"
                     anchor="ProductoModelo"
                     label="writer"
@@ -126,7 +126,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>-->
+              </b-col>
             </b-row>
           </b-col>
           
@@ -238,6 +238,7 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
