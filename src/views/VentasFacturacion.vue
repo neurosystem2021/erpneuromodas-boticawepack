@@ -159,10 +159,10 @@
 
                 <template slot="estado" slot-scope="data">
                   <div style="display:flex;">
-                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
-                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="/static/success.png" width="32" height="32"/>
+                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
                       &nbsp;&nbsp;
-                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
+                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
                   
                       &nbsp;&nbsp;
@@ -393,10 +393,11 @@ export default {
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
+          console.log(JSON.stringify(item))
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
-                console.log(response.data)
+                console.log(response)
                 if(response.data.Estado == 1) {
                   this.$toasted.error(response.data.msj_sunat)                  
                 } else {
