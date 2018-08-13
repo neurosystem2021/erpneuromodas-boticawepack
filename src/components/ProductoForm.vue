@@ -182,9 +182,9 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-        <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
-          Eliminar
-        </b-btn>-->
+       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+          Anular
+        </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
@@ -298,17 +298,23 @@ export default {
     }
   },
   methods: {
-    /*eliminarProducto (producto) {
+    eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
-      let r = confirm('¿Esta seguro de eliminar este producto?')
+      let r = confirm('¿Esta seguro de Anular este producto?')
       if (r) {
         this.axios.post(this.API + 'productos/delete', {
           id: producto.IdProducto
         }).then(res => {
-          console.log(res.data)
+          if (res.data.updated) {
+            this.$toasted.success('El producto con código ' + res.data.IdProducto + ' ha sido anulado')
+            if (this.cbGuardar) {
+              this.cbGuardar()
+            }
+            this.$refs.productoForm.hide()
+          }
         })
       }
-    },*/
+    },
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
       var utilidad = this.producto.PorcentajeUtilidad
