@@ -4,9 +4,9 @@
           
 
         <b-row>
-          <b-col md="10" class="my-1">
+          <b-col md="12" class="my-1">
             <b-row>
-              <b-col md="4">
+              <b-col md="2">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -14,7 +14,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue=""
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -68,12 +68,12 @@
                 <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="selectTipoDoc" />
                 </b-form-group>-->
                   <b-form-group>
-                      <label>Tipo de Venta:</label>
+                      <label>Tipo Comprobante:</label>
                       <autocomplete
                           required="required"
                           ref="inputTipoVenta"
                           :url="API + 'ventas/tipos'"
-                          initValue="FACTURA ELEC."
+                          initValue=""
                           anchor="TipoDoc"
                           label="writer"
                           placeholder=""
@@ -84,17 +84,12 @@
                   </b-form-group>
 
                 
-                <b-form-group label="Estado">
+                
+              </b-col>
+              <b-col md="2">
+                  <b-form-group label="Estado">
                   <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
                 </b-form-group>
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col md="2" class="my-1">
-            <b-row>
-              <b-col md="12">
-                
-                
                 <br />
               </b-col>
             </b-row>
@@ -164,11 +159,23 @@
 
                 <template slot="estado" slot-scope="data">
                   <div style="display:flex;">
-                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
-                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="/static/success.png" width="32" height="32"/>
+                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
                       &nbsp;&nbsp;
-                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
-                      <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
+                      <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                  
+                      &nbsp;&nbsp;
+
+                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
+                      <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
+                        <form @submit.prevent="emitirNotaCredito(data.item)" >
+                          <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
+                          <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
+                          <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
+                          <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
+                        </form>
+                      </b-popover>
                   </div>
                 </template>
 
@@ -216,6 +223,7 @@ export default {
       })*/
 
     this.getVentasAcumuladas()
+    this.loadFirstAlmacen()
   },
   data() {
     return {
@@ -243,8 +251,7 @@ export default {
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'VENTA'
+        IdAlmacen: 1
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -270,7 +277,21 @@ export default {
       perPage: 10,
       currentPage: 1,
       itemsStatus: {},
-      isBoleta: false
+      isBoleta: false,
+      itemsMotivoNota: [
+        { value: null, text: '-- SELECCIONE EL MOTIVO --' },
+        { value: '01', text: 'ANULACION DE LA OPERACION' },
+        { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+        /*{ value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+        { value: '04', text: 'DESCUENTO GLOBAL' },
+        { value: '05', text: 'DESCUENTO POR ITEM' },
+        { value: '06', text: 'DEVOLUCION TOTAL' },
+        { value: '07', text: 'DEVOLUCION POR ITEM' },
+        { value: '08', text: 'BONIFICACION' },
+        { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
+      ],
+      notaIdMotivo: null,
+      notaCredito: {}
     }
   },
   watch: {
@@ -300,6 +321,13 @@ export default {
   computed: {
   },
   methods: {
+    loadFirstAlmacen (cb) {
+      this.axios.get(this.API + 'almacenes/primero')
+        .then(res => {
+          this.$refs.inputAlmacen.setValue(res.data.Almacen)
+          this.setAlmacen(res.data)
+        })
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -329,18 +357,59 @@ export default {
       
       return obj
     },
-    async emitirElectronico () {
+    emitirNotaCredito (item) {
+      let doc = Object.assign({}, item);
+      this.loading = true
+      doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
+      doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
+      doc.notaIdMotivo = this.notaIdMotivo
+      doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
+
+      doc.CodSunat = '07' // codsunat 07 es nota de credito  / 08 nota de debito
+      doc.Serie = this.notaCredito.serie
+      doc.Numero = this.notaCredito.numero
+      //this.axios.post
+      console.log(JSON.stringify(doc))
+      
+      this.axios.post(this.API + 'emitirelectronico', { 
+        docVenta: doc 
+      }).then(res => {
+        console.log(res)
+        this.$toasted.success(res.data.msj_sunat, { duration: 7000 })
+        this.notaIdMotivo = null
+        this.loading = false
+      })
+
+
+    },
+    async emitirElectronico (doc) {
+      if(!this.items.length) {
+        this.$toasted.show('No hay documentos para emitir');
+        return
+      }
+
       this.loading = true
       let arr = []
-      
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura
+
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
-          if (item.Estado == 1) {
+          if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
+          console.log(JSON.stringify(item))
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
-                console.log(response.data)
+                console.log(response)
+                if(response.data.Estado == 1) {
+                  this.$toasted.error(response.data.msj_sunat)                  
+                } else {
+                  this.$toasted.success(response.data.msj_sunat)
+                  // ocultar el documento emitido
+                  Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                  let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                  let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+                }
                 Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
               }))
           }
         }
@@ -348,6 +417,10 @@ export default {
 
           this.loading = false
         })
+      }
+
+      if (this.tipoDoc.CodSunat == '07') { // Nota de credito
+        
       }
 
       /*if (this.tipoDoc.CodSunat == '030') { // Boleta emitir resumen diario
@@ -367,6 +440,7 @@ export default {
     eliminarElectronico (venta) {
       let r = confirm('¿Desea Anular la venta?')
       if (r == true) {
+        this.loading = true
         
         if (this.tipoDoc.CodSunat == '01') { // Factura
           let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
@@ -380,6 +454,7 @@ export default {
               console.log(res)
               this.$toasted.show('Factura Anulada')
               this.$refs.tablaVentas.refresh()
+              this.loading = false
               //mensaje success
             })
           }
@@ -395,6 +470,7 @@ export default {
             console.log(res)
             this.$toasted.show('Boleta Anulada')
             this.$refs.tablaVentas.refresh()
+            this.loading = false
           })
         }
       }      

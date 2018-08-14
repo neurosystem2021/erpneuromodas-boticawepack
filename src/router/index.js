@@ -9,6 +9,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
+import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 
 Vue.use(Router)
@@ -50,6 +51,11 @@ export default new Router({
       path: '/reportes/cierrecaja/:id',
       name: 'CierreCajaId',
       component: CierreCaja
+    },
+    {
+      path: '/reportes/stockminimo',
+      name: 'StockMinimo',
+      component: StockMinimo
     },
     {
       path: '/facturacion',
