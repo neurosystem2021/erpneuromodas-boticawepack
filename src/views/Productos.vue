@@ -2,7 +2,23 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
+          <b-col md="4" class="my-1">
+            <b-form-group>
+              <autocomplete
+                  required="required"
+                  ref="inputAlmacen"
+                  :url="API + 'almacenes'"
+                  anchor="Almacen"
+                  initValue=""
+                  label="writer"
+                  placeholder=""
+                  :on-select="setAlmacen" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+          </b-col>
+          <b-col md="4" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -13,10 +29,9 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="4" class="my-1">
             <b-row>
             <b-col md="8">
-
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
@@ -68,6 +83,8 @@ export default {
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
+    
+    this.loadFirstAlmacen()
   },
   data() {
     return {
@@ -86,13 +103,33 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
+            { key: 'stock', label: 'Stock', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      almacen: {
+        IdAlmacen: 1
+      }
     }
   },
   methods: {
+      loadFirstAlmacen () {
+        this.axios.get(this.API + 'almacenes/primero')
+          .then(res => {
+            this.$refs.inputAlmacen.setValue(res.data.Almacen)
+            this.setAlmacen(res.data)
+            //this.almacen = res.data
+          })
+      },
+      setAlmacen (obj) {
+        this.almacen = obj
+        Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+      },
+      focusAutocomplete (ref) {
+        // this.$refs[ref].type = ""
+        this.$refs[ref].handleDoubleClick()
+      },
       rowClick (item, index) {
         this.productoSelect = item
         this.$refs.productoForm.show = true;
@@ -110,7 +147,7 @@ export default {
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+ '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
