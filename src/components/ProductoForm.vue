@@ -154,6 +154,7 @@
             <label>Precio de Venta:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -318,11 +319,19 @@ export default {
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
       var utilidad = this.producto.PorcentajeUtilidad
-      var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+      // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
 
       this.producto.precioContadoNormal = nuevoPrecioContado
-      this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      this.producto.PrecioContado = this.$options.filters.redondear(nuevoPrecioContado, 1)
 
+    },
+    actualizarPorcentajeUtilidad () {
+      var precioContado = this.producto.PrecioContado
+      var precioCosto = this.producto.PrecioCosto
+
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
