@@ -342,12 +342,14 @@ export default {
         precio += (precio * 0.18)
       }
 
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      precio = precio / (1 - (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
 
       let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+      //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+      let nuevoPrecio = this.$options.filters.redondear(precio, 1)
       
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
