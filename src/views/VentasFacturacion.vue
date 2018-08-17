@@ -14,7 +14,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue=""
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -73,7 +73,7 @@
                           required="required"
                           ref="inputTipoVenta"
                           :url="API + 'ventas/tipos'"
-                          initValue="FACTURA ELEC."
+                          initValue=""
                           anchor="TipoDoc"
                           label="writer"
                           placeholder=""
@@ -159,18 +159,22 @@
 
                 <template slot="estado" slot-scope="data">
                   <div style="display:flex;">
-                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'/static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
-                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="/static/success.png" width="32" height="32"/>
+                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
                       &nbsp;&nbsp;
-                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="/static/cancel.png" height="32"/>
+                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
                   
                       &nbsp;&nbsp;
 
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="this.loading" variant="primary" size="sm" >Nota Credito</b-button>
-                      <b-popover :target="'popover-nota' + data.index" title="Emitir Nota Credito" placement="top">
-                        <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" />
-                        <b-button @click="emitirNotaCredito(data.item)" variant="primary" size="sm">Emitir</b-button>
+                      <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
+                        <form @submit.prevent="emitirNotaCredito(data.item)" >
+                          <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
+                          <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
+                          <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
+                          <b-button type="submit" variant="primary" size="sm">Emitir</b-button>
+                        </form>
                       </b-popover>
                   </div>
                 </template>
@@ -219,6 +223,7 @@ export default {
       })*/
 
     this.getVentasAcumuladas()
+    this.loadFirstAlmacen()
   },
   data() {
     return {
@@ -246,8 +251,7 @@ export default {
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'VENTA'
+        IdAlmacen: 1
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -278,15 +282,16 @@ export default {
         { value: null, text: '-- SELECCIONE EL MOTIVO --' },
         { value: '01', text: 'ANULACION DE LA OPERACION' },
         { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
-        { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+        /*{ value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
         { value: '04', text: 'DESCUENTO GLOBAL' },
         { value: '05', text: 'DESCUENTO POR ITEM' },
         { value: '06', text: 'DEVOLUCION TOTAL' },
         { value: '07', text: 'DEVOLUCION POR ITEM' },
         { value: '08', text: 'BONIFICACION' },
-        { value: '09', text: 'DISMINUCION EN EL VALOR' },
+        { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
       ],
-      notaIdMotivo: null
+      notaIdMotivo: null,
+      notaCredito: {}
     }
   },
   watch: {
@@ -316,6 +321,13 @@ export default {
   computed: {
   },
   methods: {
+    loadFirstAlmacen (cb) {
+      this.axios.get(this.API + 'almacenes/primero')
+        .then(res => {
+          this.$refs.inputAlmacen.setValue(res.data.Almacen)
+          this.setAlmacen(res.data)
+        })
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -345,39 +357,63 @@ export default {
       
       return obj
     },
-    emitirNotaCredito (doc) {
-      
+    emitirNotaCredito (item) {
+      let doc = Object.assign({}, item);
 
       doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
       doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
       doc.notaIdMotivo = this.notaIdMotivo
       doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
 
-      doc.CodSunat = '07' // codsunat 07 es nota de credito 
+      doc.CodSunat = '07' // codsunat 07 es nota de credito  / 08 nota de debito
+      doc.Serie = this.notaCredito.serie
+      doc.Numero = this.notaCredito.numero
       //this.axios.post
-//console.log(JSON.stringify(doc))
+      console.log(JSON.stringify(doc))
       
       this.axios.post(this.API + 'emitirelectronico', { 
         docVenta: doc 
       }).then(res => {
         console.log(res)
+        this.$toasted.success(res.data.msj_sunat, { duration: 7000 })
         this.notaIdMotivo = null
       })
 
 
     },
     async emitirElectronico (doc) {
+      if(!this.items.length) {
+        this.$toasted.show('No hay documentos para emitir');
+        return
+      }
+
       this.loading = true
       let arr = []
-      
+
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
+             
+              item.productos = item.productos.map(prod => {
+                prod.Precio = prod.Precio.toFixed(2)
+                prod.Subtotal = prod.Subtotal.toFixed(2)
+                return prod
+              })
+
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
-                console.log(response.data)
+                if(response.data.Estado == 1) {
+                  this.$toasted.error(response.data.msj_sunat)                  
+                } else {
+                  this.$toasted.success(response.data.msj_sunat)
+                  // ocultar el documento emitido
+                  Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                  let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                  let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+                }
                 Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
               }))
           }
         }
