@@ -55,7 +55,14 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+              <template slot="stock" slot-scope="data">
+                <div class="text-center" :class="{ 'table-danger' : data.item.stock <= (data.item.StockMinimo || 0) }">{{data.item.stock}}</div>
+              </template>
+              <template slot="PrecioContado" slot-scope="data">
+                $ {{ (data.item.PrecioContado / 3.3) | redondear }}
+              </template>
+            </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -104,6 +111,8 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
+            { key: 'PrecioContado', label: 'Precio Contado', sortable: true },
+            { key: 'PrecioCosto', label: 'Precio Costo', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
@@ -171,6 +180,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+  .table-danger {
+    background: #e74c3c !important;
+    color: #ffffff;
+  }
 </style>
