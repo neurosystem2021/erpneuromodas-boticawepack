@@ -137,8 +137,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto" />
-      <b-row v-if="producto.IdProducto">
+      <hr v-if="producto.IdProducto || producto.EsPadre" />
+      <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -166,7 +166,12 @@
       <hr />
       <b-row>
         <b-col>
-          <producto-form-det :id-producto="producto.IdProducto" v-if="showProductoDet && show" ref="productoDet"></producto-form-det>
+          <producto-form-det 
+            @onUpdateProductos="calcularPreciosPaquete"
+            :id-producto="producto.IdProducto" 
+            v-if="showProductoDet && show" 
+            ref="productoDet"
+            ></producto-form-det>
         </b-col>
       </b-row>
 
@@ -299,6 +304,22 @@ export default {
     }
   },
   methods: {
+    calcularPreciosPaquete (prodDetalles) {
+      let sumatoriaCosto = 0
+      let sumatoriaContado = 0
+      prodDetalles.forEach(prod => {
+        if (prod.Cantidad) {
+          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
+          sumatoriaContado += prod.PrecioContado * prod.Cantidad
+        }
+      });
+      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
+      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado)
+      
+      Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
+      Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
+      this.actualizarPorcentajeUtilidad()
+    },
     eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de Anular este producto?')

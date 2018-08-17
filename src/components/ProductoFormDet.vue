@@ -29,7 +29,7 @@
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProductoDet }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" v-model="prod.Cantidad" required /></td>
+          <td><input type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -52,6 +52,9 @@ export default {
   },
   props: ['idProducto'],
   methods: {
+    emitUpdate () {
+      this.$emit('onUpdateProductos', this.productos)
+    },
     getProductosDet () {
       if (this.idProducto) {
         this.axios.get(this.API + 'productosdet', {
@@ -90,6 +93,7 @@ export default {
         } else {
           data.IdProductoDet = data.IdProducto
           this.productos.push(data)
+          this.emitUpdate()
         }
       })
 
@@ -103,6 +107,7 @@ export default {
     quitarProducto (prod) {
       let index = this.productos.findIndex(el => el.IdProductoDet == prod.IdProductoDet)
       this.productos.splice(index, 1)
+      this.emitUpdate()
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
