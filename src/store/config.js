@@ -1,3 +1,3 @@
 module.exports =  {
-    API: '/api/index.php/'
+    API: process.env.API
 }

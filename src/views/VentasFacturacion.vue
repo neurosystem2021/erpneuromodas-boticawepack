@@ -149,7 +149,7 @@
                         <td v-if="row.item.TieneIgv">
                           {{ item.Subtotal * 0.18 | redondear}}
                         </td>
-                        <td>{{ item.Subtotal }}</td>
+                        <td>{{ item.Subtotal | redondear }}</td>
                       </tr>
                     </tbody>
                   </table>

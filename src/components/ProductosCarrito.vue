@@ -146,6 +146,18 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
+              <tr>
+                <td  colspan="2">
+                  <label>pagó con:</label>
+                  <b-form-input
+                    type="text"
+                    placeholder="Pagó con"
+                    v-model="pagocon"
+                    @input="asignarVuelto"></b-form-input><br>
+                  <label>Vuelto:</label>
+                  <b>S/  {{ vuelto | redondear }}</b>
+                </td>
+              </tr>
             </tbody>
           </table>
     </b-col>
@@ -169,7 +181,14 @@ export default {
       pasteCode: false,
       producto: {},
       items: [],
-      handleKeyDown: false
+      handleKeyDown: false,
+      vuelto: 0,
+      pagocon: 0
+    }
+  },
+  watch: {
+    sumatoriaTotal (sum) {
+      this.asignarVuelto()
     }
   },
   props: {
@@ -265,6 +284,9 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    asignarVuelto () {
+      this.vuelto = this.pagocon - this.sumatoriaTotal
+    },
     loadBarcode (e) {
       e.preventDefault()
       let idProducto = this.loadCode;
