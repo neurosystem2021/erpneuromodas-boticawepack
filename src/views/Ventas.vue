@@ -101,24 +101,26 @@
                         </b-row>
                     </b-col>
                     <b-col md="3">
-                        <b-form-group class="text-center" v-if="venta.cliente.Cliente">
-                            <div class="puntos">
-                                {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
-                            </div>
-                            Puntos del cliente
-                        </b-form-group>
-                        <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
-                            <b-form-input
-                                v-model="puntosAplicados"
-                                min="0"
-                                :max="venta.cliente.Puntos"
-                                @input="aplicarPuntos"
-                                type="number"
-                            ></b-form-input>
-                        </b-input-group>
-                        <b-form-text v-if="descuentoPuntos.ValorPunto">
-                           1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
-                        </b-form-text>
+                        <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
+                            <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                                <div class="puntos">
+                                    {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
+                                </div>
+                                Puntos del cliente
+                            </b-form-group>
+                            <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
+                                <b-form-input
+                                    v-model="puntosAplicados"
+                                    min="0"
+                                    :max="venta.cliente.Puntos"
+                                    @input="aplicarPuntos"
+                                    type="number"
+                                ></b-form-input>
+                            </b-input-group>
+                            <b-form-text v-if="descuentoPuntos.ValorPunto">
+                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
+                            </b-form-text>
+                        </div>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
