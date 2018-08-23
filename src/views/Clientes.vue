@@ -47,7 +47,7 @@
                 </b-col>
             </b-row>
         </b-row>
-        <producto-form ref="clienteForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+        <cliente-form ref="clienteForm" :clienteSelect="clienteSelect" @onAddCliente="actualizarTabla"></cliente-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
@@ -61,7 +61,7 @@
 
 <script>
 import config from '@/store/config.js'
-import ClienteForm from '@/components/ClientesSForm'
+import ClienteForm from '@/components/ClientesFormEdit'
 
 export default {
   mounted() {
@@ -76,19 +76,15 @@ export default {
       filter: null,
       sortBy: 'IdCliente',
       sortDesc: false,
-      productoSelect: {},
+      clienteSelect: {},
       items: [],
       isBusy: false,
       fields: [
             { key: 'Cliente', sortable: true },
             { key: 'DniRuc', sortable: true },
-            { key: 'Direccion', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true }
+            { key: 'Direccion', sortable: true },
+            { key: 'Puntos', sortable: true },
+            { key: 'EsVIP', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
@@ -97,23 +93,23 @@ export default {
   },
   methods: {
       rowClick (item, index) {
-        this.productoSelect = item
-        this.$refs.productoForm.show = true;
+        this.clienteSelect = item
+        this.$refs.clienteForm.show = true;
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
       actualizarTabla() {
-        this.$refs.tablaProductos.refresh()
+        this.$refs.tablaClientes.refresh()
       },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+      nuevoCliente () {
+          this.clienteSelect = {}
+          this.$refs.clienteForm.show = true
 
       },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'clientes?limit='+ctx.perPage+'&page='+ctx.currentPage+'&q='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
@@ -132,7 +128,7 @@ export default {
       }
   },
   components: {
-      ProductoForm
+      ClienteForm
   }
 }
 </script>
