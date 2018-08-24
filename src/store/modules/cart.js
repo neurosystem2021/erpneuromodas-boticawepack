@@ -5,6 +5,7 @@ import axios from 'axios'
 const state = {
   productos: [],
   productosFiltrados: [],
+  productosPrestados: [],
   totalCart: 0
 }
 
@@ -32,6 +33,7 @@ const mutations = {
   },
   LIMPIAR_CART (state) {
     state.productos = []
+    state.productosPrestados = []
   },
   APLICAR_DESCUENTO (state, descuento) {
     let cantidadTotal = 0
@@ -54,6 +56,16 @@ const mutations = {
     })
     //state.productos[index].stock = item.stock
     // Vue.set(state.productos[index], 'stock', item.stock)
+  },
+  AGREGAR_PRODUCTO_PRESTADO (state, item) {
+    let index = state.productosPrestados.findIndex(prod => prod.IdProducto == item.IdProducto)
+    if (index < 0) {
+      state.productosPrestados.push(item)
+    }
+  },
+  QUITAR_PRODUCTO_PRESTADO (state, item) {
+    let index = state.productosPrestados.findIndex(prod => prod.IdProducto === item.IdProducto)
+    state.productosPrestados.splice(index, 1)
   }
 }
 
@@ -132,6 +144,12 @@ const actions = {
     .catch((error) => {
       console.log(error)
     })
+  },
+  agregarProductoPrestado ({ commit }, obj) {
+    commit('AGREGAR_PRODUCTO_PRESTADO', obj)
+  },
+  eliminarProductoPrestado ({ commit }, item) {
+    commit('QUITAR_PRODUCTO_PRESTADO', item)
   }
 }
 

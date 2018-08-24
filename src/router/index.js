@@ -6,6 +6,7 @@ import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
+import Prestamos from '@/views/Prestamos.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -22,6 +23,11 @@ export default new Router({
       path: '/',
       name: 'Movimiento',
       component: Movimiento
+    },
+    {
+      path: '/prestamos',
+      name: 'Prestamos',
+      component: Prestamos
     },
     {
       path: '/productos',

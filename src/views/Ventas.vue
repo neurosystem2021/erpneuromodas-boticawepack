@@ -156,8 +156,9 @@
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"
-                            :onSetProducto="onSetProducto">
-
+                            :onSetProducto="onSetProducto"
+                            :esVenta="true">
+    
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
@@ -269,6 +270,8 @@
                                     </tbody>
                                 </table>
                             </template>
+
+
                         </productos-carrito>
                     </b-col>
                 </b-row>
@@ -318,6 +321,7 @@ export default {
             venta: {},
             carrito: {
                 fields: [
+                    { key: 'prestamo', label: 'Prestamo', class:'text-center'  },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' },
@@ -341,6 +345,7 @@ export default {
     computed: {
         ...mapState({
             productos: state => state.cart.productos,
+            productosPrestados: state => state.cart.productosPrestados,
             totalCart: state => state.cart.totalCart
         })
     },
@@ -582,6 +587,7 @@ export default {
             }
 
             this.venta.productos = this.productos
+            this.venta.productosPrestados= this.productosPrestados
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.axios.post(this.API + 'ventas', this.venta)

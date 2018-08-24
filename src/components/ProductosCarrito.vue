@@ -27,6 +27,11 @@
         </b-input-group>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+
+        <template slot="prestamo" slot-scope="data" v-if="esVenta">
+          <b-button variant="warning" size="sm" @click="agregarProductoPrestado(data.item, data.index)">❤</b-button>
+        </template>
+
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -116,10 +121,26 @@
     <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
-    <b-col md="4">
+    <b-col md="3">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2">
+    <b-col md="3">
+      <table class="table tabla-prestados">
+        <thead>
+          <tr>
+            <th>Productos Prestados</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in productosPrestados" :key="index">
+            <td><b>{{ item.cantidad }} - </b>{{ item.Producto }}</td>
+            <td><b-button variant="danger" size="sm" @click="eliminarPrestado(item)">X</b-button></td>
+          </tr>
+        </tbody>
+      </table>
+    </b-col>
+    <b-col md="3">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -170,7 +191,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    esVenta: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -206,6 +227,7 @@ export default {
   computed: {
     ...mapState({
       productos: state => state.cart.productos,
+      productosPrestados: state => state.cart.productosPrestados,
       filtrados: state => state.cart.productosFiltrados
     }),
     sumatoriaSubTotal () {
@@ -257,8 +279,18 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      addPrestado: 'agregarProductoPrestado',
+      eliminarPrestado: 'eliminarProductoPrestado'
     }),
+    agregarProductoPrestado (producto, index) {
+      if (producto.cantidad > 0) {
+        this.addPrestado(producto)
+        this.eliminar(index)
+      } else {
+        this.$toasted.show('Asigne una cantidad al producto')
+      }
+    },
     loadBarcode (e) {
       e.preventDefault()
       let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
@@ -398,5 +430,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.tabla-prestados thead {
+  text-align: center;
+}
+.tabla-prestados td {
+  font-size: .8em;
+  padding: 10px;
+}
 </style>
