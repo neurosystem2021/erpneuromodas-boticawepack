@@ -105,6 +105,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.show = false
                     this.$toasted.show('Productos actualizados correctamente')
+                    this.limpiar();
                     this.$emit('update')
                 })
             }
