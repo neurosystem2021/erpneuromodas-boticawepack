@@ -62,7 +62,7 @@
                 </b-col>
             </b-row>
         </b-row>
-       <producto-devolver ref="productoDevolver"></producto-devolver>
+       <producto-devolver ref="productoDevolver" @update="$refs.tablaProductos.refresh()"></producto-devolver>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">

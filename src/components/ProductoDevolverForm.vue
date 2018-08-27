@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-form @submit="guardarConfigVenta">    
+        <b-form @submit="guardarDevueltos">    
             <b-modal id="modalConfigVenta" 
                 title="Devolver Producto Prestado" 
                 size="md" v-model="show"
@@ -38,9 +38,19 @@
                     </b-col>
 
                     <b-col md="12">
-                        <table>
-                            <thead></thead>
-                            <tbody></tbody>
+                        <br />
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="text-center"><td>Código</td><td>Producto</td><td>Prestados</td><td>Devolver</td></tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in prestados" :key="index" class="text-center">
+                                    <td>{{ item.CodigoBarra }}</td>
+                                    <td>{{ item.Producto }}</td>
+                                    <td>{{ item.Prestados }}</td>
+                                    <td><input type="number" class="form-control" v-model="item.devueltos" /></td>
+                                </tr>
+                            </tbody>
                         </table>
                     </b-col>
                 </b-row>
@@ -62,7 +72,6 @@ import config from '@/store/config.js'
 
     export default {
         mounted () {
-            this.obtenerDescuento()
         },
         data () {
             return {
@@ -85,35 +94,18 @@ import config from '@/store/config.js'
                     this.prestados = response.data
                 })
             },
-            obtenerDescuento () {
-                this.axios.get(this.API + 'ventas/descuento')
-                .then((response) => {
-                    this.porCada = response.data.PorCada,
-                    this.puntos = response.data.Puntos,
-                    this.valorPunto = response.data.ValorPunto
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
+            limpiar() {
+                this.prestados = []
+                this.serie = ''
+                this.numero = ''
             },
-            guardarConfigVenta (evt) {
+            guardarDevueltos (evt) {
                 evt.preventDefault()
-
-                this.axios.post(this.API + 'ventas/descuento', {
-                    porCada: this.porCada,
-                    puntos: this.puntos,
-                    valorPunto: this.valorPunto
-                })
+                this.axios.post(this.API + 'productos/devueltos', { devueltos: this.prestados})
                 .then((response) => {
-                    this.$emit('onUpdateConfig', response.data)
-                    this.obtenerDescuento()
-                    this.$toasted.show('Se actualizó la configuración')
                     this.show = false
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    this.$toasted.show('Productos actualizados correctamente')
+                    this.$emit('update')
                 })
             }
         }
