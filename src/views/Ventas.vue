@@ -321,6 +321,8 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoFormaFarmaceutica', label: 'Laboratorio' }, 
                     { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
+                    { key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
