@@ -70,6 +70,10 @@
             </b-col>
         </b-row>
         <br /><br />
+        <b-modal size="lg" modal-class="modal-md" v-model="showPrestados" title="Lista Detallada">
+          <b-alert show variant="warning">{{ productoSelect.Producto }}</b-alert>
+          <productos-prestados :producto="productoSelect"></productos-prestados>
+        </b-modal>
       </b-container>
   </div>
 </template>
@@ -77,6 +81,7 @@
 <script>
 import config from '@/store/config.js'
 import ProductoDevolver from '@/components/ProductoDevolverForm'
+import ProductosPrestados from '@/components/ProductosPrestados'
 
 export default {
   mounted() {
@@ -89,6 +94,7 @@ export default {
   data() {
     return {
       API: config.API,
+      showPrestados: false,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
       sortBy: 'Gen_Producto.IdProducto',
@@ -131,6 +137,7 @@ export default {
       },
       rowClick (item, index) {
         this.productoSelect = item
+        this.showPrestados = true
         // this.$refs.productoForm.show = true;
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
@@ -166,7 +173,8 @@ export default {
       }
   },
   components: {
-    ProductoDevolver
+    ProductoDevolver,
+    ProductosPrestados
   }
 }
 </script>
