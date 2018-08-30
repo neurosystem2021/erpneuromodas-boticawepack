@@ -75,7 +75,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -107,7 +107,7 @@
               </b-col>
               <b-col md="3">
                 <b-form-group>
-                  <label>Marca:</label>
+                  <label>Laboratorio:</label>
                   <autocomplete
                     :url="API + 'marcas'"
                     ref="inputMarca"
@@ -120,7 +120,7 @@
                 </b-form-group>
               </b-col>  
               <b-col md="3">
-                <b-form-group>
+                <!--<b-form-group>
                   <label>Modelo:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
@@ -131,14 +131,14 @@
                     :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col>
             </b-row>
           </b-col>
           <b-col md="6">
             <b-row>
               <b-col md="3">
-                <b-form-group>
+                <!--<b-form-group>
                   <label>Color:</label>
                   <autocomplete
                     :url="API + 'productos/colores'"
@@ -149,10 +149,10 @@
                     :onInput="(val) => !val ? generateFilter('color', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col>  
               <b-col md="3">
-                <b-form-group>
+                <!--<b-form-group>
                   <label>Talla:</label>
                   <autocomplete
                     :url="API + 'tallas'"
@@ -163,10 +163,10 @@
                     :onInput="(val) => !val ? generateFilter('talla', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col> 
               <b-col md="3">
-                <b-form-group>
+                <!--<b-form-group>
                   <label>Genero:</label>
                   <autocomplete
                     :url="API + 'productos/generos'"
@@ -177,10 +177,10 @@
                     :onInput="(val) => !val ? generateFilter('genero', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col>
               <b-col md="3">
-                <b-form-group>
+                <!--<b-form-group>
                   <label>Botapie/Manga:</label>
                   <autocomplete
                     :url="API + 'productos/botapies'"
@@ -191,7 +191,7 @@
                     :onInput="(val) => !val ? generateFilter('botapie', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col> 
             </b-row>
           </b-col>
@@ -302,12 +302,8 @@ export default {
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true },
+            { key: 'ProductoMarca', label: 'Laboratorio', sortable: true },
+            { key: 'ProductoFormaFarmaceutica', label: 'Forma Farmacéutica', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -361,8 +357,7 @@ export default {
   computed: {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo + ' / ' + this.productoSelect.Color
-      this.productoSelect.ProductoTalla 
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
     }
   },
   methods: {
