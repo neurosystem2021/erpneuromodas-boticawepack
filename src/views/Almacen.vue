@@ -304,6 +304,7 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Laboratorio', sortable: true },
             { key: 'ProductoFormaFarmaceutica', label: 'Forma Farmacéutica', sortable: true },
+            { key: 'ControlaStock', label: 'Controla Stock', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
