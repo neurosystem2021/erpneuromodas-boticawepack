@@ -77,7 +77,7 @@ import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
+    this.axios.get(this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&filter[minimo]=1&count=1').then((response) => {
       this.totalRows = response.data.total
     })
   },
@@ -86,7 +86,7 @@ export default {
       API: config.API,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
-      sortBy: 'IdProducto',
+      sortBy: 'Gen_Producto.IdProducto',
       sortDesc: false,
       items: [],
       isBusy: false,
