@@ -347,6 +347,13 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadFirstAlmacen () {
+            this.axios.get(this.API + 'almacenes/primero')
+                .then(res => {
+                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    this.venta.almacen = res.data
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
