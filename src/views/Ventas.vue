@@ -20,7 +20,7 @@
             <br /><br />
             <b-form @submit="guardarVenta">
                 <b-row>
-                    <b-col md="7">
+                    <b-col md="5">
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
@@ -123,26 +123,44 @@
                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="4" >
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group>
-                            <label>Vendedor:</label>
-                            <autocomplete
-                                required="required"
-                                ref="inputVendedor"
-                                :url="API + 'usuarios'"
-                                anchor="NombreUsuario"
-                                label="writer"
-                                :on-select="setVendedor" 
-                                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                        </b-form-group>
+                        <b-row>
+                            <b-col md="6">
+                                <b-form-group>
+                                    <label>Vendedor:</label>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputVendedor"
+                                        :url="API + 'usuarios'"
+                                        anchor="NombreUsuario"
+                                        label="writer"
+                                        :on-select="setVendedor" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="6">
+                                <b-form-group>
+                                    <label>Repartidor:</label>
+                                    <autocomplete
+                                        ref="inputRepartidor"
+                                        :url="API + 'repartidores'"
+                                        anchor="Repartidor"
+                                        label="writer"
+                                        :on-select="setRepartidor" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputRepartidor')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -393,6 +411,7 @@ export default {
                     PuntoVenta: 'CAJA1'
                 },
                 vendedor: {},
+                repartidor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -423,6 +442,9 @@ export default {
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
+        },
+        setRepartidor (obj) {
+            this.venta.repartidor = obj
         },
         setCliente (obj, dni = false) {
             let params = {}
@@ -525,6 +547,7 @@ export default {
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
+            this.$refs.inputRepartidor.setValue('')
         },
         guardarProforma () {
 
@@ -586,10 +609,17 @@ export default {
                 return          
             }
 
+            if(this.totalCart <= 0) {
+                this.$toasted.show('El total no puede ser cero')
+                this.inProgress = false            
+                return 
+            }
+
             this.venta.productos = this.productos
             this.venta.productosPrestados= this.productosPrestados
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)

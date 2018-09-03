@@ -165,7 +165,7 @@
               </tr>
               <tr>
                 <td  colspan="2">
-                  <label>pagó con:</label>
+                  <label>paga con:</label>
                   <b-form-input
                     type="text"
                     placeholder="Pagó con"
