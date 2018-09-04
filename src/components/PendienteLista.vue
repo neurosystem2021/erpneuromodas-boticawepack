@@ -14,6 +14,7 @@
                     <b-table 
                         v-if="show"
                         id="table-pendientes" 
+                        ref="tablaPendientes"
                         striped hover 
                         :busy.sync="isBusy" 
                         :filter="filter"
@@ -36,7 +37,7 @@
                       </template>
 
                       <template slot="pagar" slot-scope="data">
-                        <b-button variant="primary" target="_blank">Pagar</b-button>
+                        <b-button variant="primary" target="_blank" @click="pagarVentaPendiente(data.item.idDocVenta)">Pagar</b-button>
                       </template>
 
                     </b-table>
@@ -81,7 +82,7 @@ import config from '@/store/config.js'
                 isBusy: false,
                 fields: [ 
                     { key: 'idDocVenta', label: 'Id' }, 
-                    { key: 'FechaReg', label: 'Fecha' }, 
+                    { key: 'FechaReg', label: 'Fecha Venta' }, 
                     { key: 'Serie', label: 'Serie' }, 
                     { key: 'Numero', label: 'Numero' },
                     { key: 'Cliente', label: 'Cliente' },
@@ -97,6 +98,19 @@ import config from '@/store/config.js'
             }
         },
         methods: {
+            pagarVentaPendiente(idDocVenta) {
+                let r = confirm('Esta seguro de pagar la venta pendiente?')
+                if (r == true) {
+                    this.axios.post(this.API + 'ventas/pendientes/pago', {
+                        idDocVenta: idDocVenta
+                    }).then(response => {
+                        this.$toasted.show('Venta pagada correctamente!')
+                        this.$refs.tablaPendientes.refresh()
+                    }).catch((error) => {
+                        console.log(error)
+                    })
+                }
+            },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true

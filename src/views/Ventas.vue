@@ -2,7 +2,7 @@
     <div>
         <Menu v-if="false"></Menu>
 
-        <br />
+
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
@@ -134,7 +134,7 @@
                             {{ venta.FechaDoc }}
                         </b-form-group>
                         <b-row>
-                            <b-col md="6">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Vendedor:</label>
                                     <autocomplete
@@ -149,10 +149,11 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="6">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Repartidor:</label>
                                     <autocomplete
+                                        :required="true"
                                         ref="inputRepartidor"
                                         :url="API + 'repartidores'"
                                         anchor="Repartidor"
@@ -161,6 +162,20 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputRepartidor')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="4">
+                                <b-form-group label="Es delivery:">
+                                    <b-form-radio-group id="delivery"
+                                        button-variant="outline-primary"
+                                        v-model="esDelivery"
+                                        buttons
+                                        :options="[
+                                        { text: 'SI', value: 1 },
+                                        { text: 'NO', value: 0 }
+                                        ]"
+                                        @input="setDelivery"
+                                        name="delivery" />
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -331,6 +346,7 @@ export default {
     },
     data () {
         return {
+            esDelivery: 1,
             dni: '',
             newDniRuc: '',
             ultimaVenta: '',
@@ -377,6 +393,17 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        setDelivery(esDelivery) {
+            if (!esDelivery) {
+                this.$refs.inputRepartidor.setValue('');
+                this.venta.repartidor = {}
+                this.$refs.inputRepartidor.$refs.input.disabled = true
+                this.$refs.inputRepartidor.$refs.input.required = false
+            } else { 
+                this.$refs.inputRepartidor.$refs.input.disabled = false
+                this.$refs.inputRepartidor.$refs.input.required = true                          
+            }
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -654,7 +681,10 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
+.form-group {
+    margin-bottom: .5rem;
+}
 .puntos {
     font-size: 52px;
 }
