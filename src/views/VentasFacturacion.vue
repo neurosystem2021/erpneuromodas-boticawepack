@@ -520,13 +520,22 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       
-      let url = this.API + 'ventas?anulado=0&estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
-        this.items = result.data
+        
+        //this.items = result.data
+        this.items = result.data.map(el => {
+          if (el.Anulado === 1) {
+            el._rowVariant = 'warning'
+          }
+
+          return el
+        })
+
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false
         // this.isBusy = false
