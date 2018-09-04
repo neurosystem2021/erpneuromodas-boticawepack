@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <pendiente-lista></pendiente-lista>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -315,6 +318,7 @@ import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import PendienteLista from '@/components/PendienteLista.vue'
 
 
 export default {
@@ -645,7 +649,8 @@ export default {
         ClientesForm,
         ConfigVenta,
         PreOrdenLista,
-        Proformas
+        Proformas,
+        PendienteLista
     }
 }
 </script>
