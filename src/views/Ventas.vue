@@ -81,12 +81,12 @@
                                     <label>Cliente:</label>
                                     <b-input-group>
                                         <autocomplete
-                                            required="required"
                                             ref="inputCliente"
                                             :url="API + 'clientes'"
                                             anchor="ClienteDniRuc"
                                             label="writer"
                                             placeholder=""
+                                            initValue="--"
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
@@ -94,6 +94,7 @@
                                         </autocomplete>
                                         <input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
+                                            ref="inputDni"
                                             type="text"
                                             class="form-control"
                                             placeholder="Codigo de Barra" />
@@ -102,6 +103,11 @@
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                         </b-input-group-append>
                                     </b-input-group>
+                                    <b-form-input
+                                        v-model="direccionTemp"
+                                        type="text"
+                                        placeholder="Dirección del Cliente"
+                                        @input="setDireccion"></b-form-input>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -346,6 +352,7 @@ export default {
     },
     data () {
         return {
+            direccionTemp: '',
             esDelivery: 1,
             dni: '',
             newDniRuc: '',
@@ -393,6 +400,15 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        setDireccion(direccion) {
+            if (direccion) {
+                this.$refs.inputCliente.$refs.input.disabled = true
+                this.$refs.inputDni.disabled = true
+            } else {
+                this.$refs.inputCliente.$refs.input.disabled = false
+                this.$refs.inputDni.disabled = false               
+            }
+        },
         setDelivery(esDelivery) {
             if (!esDelivery) {
                 this.$refs.inputRepartidor.setValue('');
@@ -425,10 +441,13 @@ export default {
         },
         initForm () {
             this.venta = {
+                direccionTemp: '',
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
-                cliente: {},
+                cliente: {
+                    IdCliente: 0
+                },
                 tipoVenta: {
                     IdTipoDoc: 3,
                     TipoDoc: 'TICKET',
@@ -576,9 +595,14 @@ export default {
             this.$refs.inputTipoVenta.setValue('TICKET')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
-            this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
             this.$refs.inputRepartidor.setValue('')
+            this.$refs.inputCliente.setValue('--')
+
+            this.$refs.inputCliente.$refs.input.disabled = false
+            this.$refs.inputDni.disabled = false 
+            this.direccionTemp = ''
+
         },
         guardarProforma () {
 
@@ -647,10 +671,12 @@ export default {
             }
 
             this.venta.productos = this.productos
+            this.venta.direccionTemp = this.direccionTemp
             this.venta.productosPrestados= this.productosPrestados
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            console.log(this.venta)
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)

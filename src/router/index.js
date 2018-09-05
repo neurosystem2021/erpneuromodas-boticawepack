@@ -13,6 +13,7 @@ import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import ReporteEntregas from '@/views/reportes/Entregas.vue'
 
 Vue.use(Router)
 
@@ -48,6 +49,11 @@ export default new Router({
       path: '/reportes/ventas',
       name: 'ReporteVentas',
       component: ReporteVentas
+    },
+    {
+      path: '/reportes/entregas',
+      name: 'ReporteEntregas',
+      component: ReporteEntregas
     },
     {
       path: '/reportes/cierrecaja',
