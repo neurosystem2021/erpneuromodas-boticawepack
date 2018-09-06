@@ -15,7 +15,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta">
+            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -526,6 +526,12 @@ export default {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
                 return          
+            }
+
+            if (this.totalCart <= 0) {
+                this.$toasted.show('La venta en S/. 0.00 no está permitido')
+                this.inProgress = false            
+                return 
             }
 
             this.venta.productos = this.productos

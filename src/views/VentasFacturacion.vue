@@ -189,7 +189,8 @@
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
-            <b-col cols="4">
+            <b-col cols="12">
+              <b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
@@ -436,6 +437,28 @@ export default {
           this.loading = false
         })
       }*/
+    },
+    async emitirElectronicoResumen (doc) {
+      if(!this.items.length) {
+        this.$toasted.show('No hay documentos para emitir');
+        return
+      }
+
+      this.loading = true
+
+      if (this.tipoDoc.CodSunat == '03') { // Boleta emitir resumen diario
+        this.axios.post(this.API + 'emitirelectronicoboleta', {
+          boletas: this.items,
+          fechaReferencia: this.fechaReferencia,
+          codSunat: this.tipoDoc.CodSunat
+        }).then( response => {
+          console.log(response.data)
+          this.items.forEach(item => {
+            Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+          })
+          this.loading = false
+        })
+      }
     },
     eliminarElectronico (venta) {
       let r = confirm('¿Desea Anular la venta?')
