@@ -164,7 +164,7 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                  
+                      
                       &nbsp;&nbsp;
 
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
@@ -177,6 +177,18 @@
                         </form>
                       </b-popover>
                   </div>
+                </template>
+
+                <template slot="consulta" slot-scope="data">
+                  <div >
+                    <div style="width: 150px;">
+                      <img id="captcha" style="width: 80px; float:left;" v-if="imgCaptcha" src="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/captcha?accion=image&nmagic=0" />
+                      <input style="width: 60px;" class="form-control" type="text" v-model="captcha"/>
+                    </div>
+                    <b-button :disabled="loading" variant="warning" size="sm"
+                      @click="consultaElectronico(data.item)">Consulta SUNAT</b-button>
+                  </div>
+                  
                 </template>
 
               </b-table>
@@ -229,6 +241,8 @@ export default {
   data() {
     return {
       API: config.API,
+      imgCaptcha: true,
+      captcha: '',
       loading: false,
       tipoDoc: {
         IdTipoDoc: 1,
@@ -272,7 +286,8 @@ export default {
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
-            { key: 'estado', sortable: false, class: 'text-center' }
+            { key: 'estado', sortable: false, class: 'text-center' },
+            { key: 'consulta', class: 'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -589,6 +604,27 @@ console.log(url)
     },
     exportarProductos () {
 
+    },
+    consultaElectronico (doc) {
+      console.log(doc)
+      let tipocomprobante = ''
+      let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
+      console.log(fecha)
+
+      if (doc.CodSunat == '03') {
+        tipocomprobante = '06'
+      }
+      if (doc.CodSunat == '01') {
+        tipocomprobante = '03'
+      }
+
+      this.imgCaptcha = false
+      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20603429126&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha)
+      
+      this.$nextTick(() => {
+        this.imgCaptcha = true
+        this.captcha = ''
+      })
     }
   },
   components: {
