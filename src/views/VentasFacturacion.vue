@@ -72,7 +72,7 @@
                       <autocomplete
                           required="required"
                           ref="inputTipoVenta"
-                          :url="API + 'ventas/tipos'"
+                          :url="API + 'ventas/tipos/electronicos'"
                           initValue=""
                           anchor="TipoDoc"
                           label="writer"
