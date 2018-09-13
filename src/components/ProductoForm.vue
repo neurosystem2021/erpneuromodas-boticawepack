@@ -112,6 +112,8 @@
               v-model="producto.PorcentajeUtilidad"
               @input.native="actualizarPrecioContado"
               type="number"
+              min="0"
+              step="0.0001"
               ></b-form-input>
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">

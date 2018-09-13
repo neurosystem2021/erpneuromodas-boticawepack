@@ -608,6 +608,7 @@ console.log(url)
     consultaElectronico (doc) {
       console.log(doc)
       let tipocomprobante = ''
+      let cantidad=''
       let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
       console.log(fecha)
 
@@ -615,16 +616,21 @@ console.log(url)
         tipocomprobante = '06'
       }
       if (doc.CodSunat == '01') {
+        cantidad = doc.Total
         tipocomprobante = '03'
       }
 
       this.imgCaptcha = false
-      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20603429126&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha)
+      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20603429126&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
       
-      this.$nextTick(() => {
+      /*this.$nextTick(() => {
         this.imgCaptcha = true
         this.captcha = ''
-      })
+      })*/
+      setTimeout(() => {
+        this.imgCaptcha = true
+        this.captcha = ''
+      }, 1000)
     }
   },
   components: {
