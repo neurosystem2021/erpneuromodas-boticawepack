@@ -47,19 +47,32 @@
 										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
 									</b-popover>
 
-									<b-button v-b-modal.carrito variant="primary" size="sm">+</b-button>
+									<b-button v-if="hab.IdPreOrden" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
 								</div>
 						</b-card>
 					</b-col>
 				</b-row>
       </b-container>
 
-		<b-modal id="carrito" title="Cesta de compras">
-			<pre-orden-form-det 
-				:id-preorden="1" 
-				ref="productoDet"
-				></pre-orden-form-det>
-		</b-modal>
+		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
+			<b-modal v-model="show" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
+				<b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b>
+				<br>
+				<br>
+				<pre-orden-form-det v-if="show"
+					:id-preorden="selectProducto.IdPreOrden" 
+					ref="preOrdenProductos"
+					></pre-orden-form-det>
+				<div slot="modal-footer" >
+					<b-btn  variant="success" type="submit">
+					Guardar
+					</b-btn>
+					<b-btn  variant="secondary" @click="show=false">
+					Cerrar
+					</b-btn>
+				</div>
+			</b-modal>
+		</b-form>
     </div>
 </template>
 <script>
@@ -67,19 +80,35 @@ import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 
 export default {
-  mounted () {
+  	mounted () {
 		this.getHabitaciones()
 	},
 	data () {
 		return {
 			API: config.API,
+			show: false,
 			habitaciones: [],
 			selectCliente: {},
-
+			selectProducto: {},
 			fechaReserva: this.$moment().format("YYYY-MM-DD")
 		}
 	},
 	methods: {
+		guardarProductos() {
+			console.log(this.$refs.preOrdenProductos.productos)
+			this.axios.post(this.API + 'preorden/detalle', {
+				IdPreOrden: this.selectProducto.IdPreOrden,
+				IdHabitacion: this.selectProducto.IdPreOrden,
+				productos: this.$refs.preOrdenProductos.productos
+			}).then(res => {
+				this.$toasted.success('Guardado correctamente')
+				this.show = false
+			})
+		},
+		openCarrito(hab) {
+			this.selectProducto = hab
+			this.$refs.modalCarrito.show()
+		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones').then(res => {
 				this.habitaciones = res.data

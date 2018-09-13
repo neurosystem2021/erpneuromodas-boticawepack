@@ -29,7 +29,7 @@
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td><input required type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -41,6 +41,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+    
     this.getProductos()
   },
   data () {
@@ -55,10 +56,11 @@ export default {
       this.$emit('onUpdateProductos', this.productos)
     },
     getProductos () {
-      if (this.idPreOrden) {
+      if (this.idPreorden) {
         this.axios.get(this.API + 'preorden/detalle', {
-          params: {idPreOrden: this.idPreOrden}
+          params: {idPreOrden: this.idPreorden}
         }).then(res => {
+          console.log(res)
           this.productos = res.data
         }).catch(err => {
           console.log(err)
