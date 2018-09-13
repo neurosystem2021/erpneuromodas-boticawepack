@@ -74,7 +74,6 @@
           <b-form-group>
             <label>Presentación:</label>
             <autocomplete
-                required="required"
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
                 anchor="ProductoPresentacion"
@@ -132,6 +131,20 @@
                      @input="checkIsHijo">
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
+            <label>Activar Habitación:</label>
+            <b-form-checkbox
+                     v-model="producto.EsHabitacion"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Seleccione esta opción si es una habitación
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="producto.EsHabitacion">
+            <label>Piso Habitación:</label>
+            <b-form-select required="required" v-model="producto.Piso" :options="[1,2,3,4,5,6,7,8,9,10]" class="mb-3" />
           </b-form-group>
           
         </b-col>
@@ -293,6 +306,9 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.EsHabitacion = newVal.EsHabitacion
+        this.producto.Piso = newVal.Piso
+        console.log(newVal)
 
       } else {
 
@@ -389,6 +405,8 @@ export default {
       this.producto = {
         EsPadre: 0,
         Anulado: 0,
+        EsHabitacion: 0,
+        Piso: 1,
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
