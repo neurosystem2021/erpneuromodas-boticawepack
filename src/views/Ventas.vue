@@ -318,8 +318,8 @@ export default {
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoPresentacion', label: 'Present.' },
-                    { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'FechaAlquiler', label: 'Fecha Alquiler' },
+                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 

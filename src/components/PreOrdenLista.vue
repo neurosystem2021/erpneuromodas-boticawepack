@@ -48,6 +48,13 @@ import { mapActions } from 'vuex'
             this.axios.get(this.API + 'preorden/count').then((response) => {
                 this.totalRows = response.data.total
             })
+
+            if(this.$route.query.idPreOrden && this.$route.query.idCliente) {
+                this.selectPreOrden({
+                    IdPreOrden: this.$route.query.idPreOrden,
+                    IdCliente: this.$route.query.idCliente
+                })
+            }
         },
         data () {
             return {
@@ -69,7 +76,6 @@ import { mapActions } from 'vuex'
                 obtenerStok: 'obtenerStock'
             }),
             selectPreOrden (item) {
-                console.log(item)
                 this.axios.get(this.API + 'preorden/detalle', {
                     params: {
                         idPreOrden: item.IdPreOrden

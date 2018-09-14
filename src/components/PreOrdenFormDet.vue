@@ -26,11 +26,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(prod, index) in productos" :key="index">
+        <tr v-for="(prod, index) in productos" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input required type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
-          <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
+          <td><input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" /></td>
+          <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
     </table>
@@ -50,7 +50,7 @@ export default {
       productos: []
     }
   },
-  props: ['idPreorden'],
+  props: ['idPreorden', 'idProducto'],
   methods: {
     emitUpdate () {
       this.$emit('onUpdateProductos', this.productos)
@@ -60,8 +60,12 @@ export default {
         this.axios.get(this.API + 'preorden/detalle', {
           params: {idPreOrden: this.idPreorden}
         }).then(res => {
-          console.log(res)
-          this.productos = res.data
+          this.productos = res.data.map(item => {
+            if (item.IdProducto === this.idProducto) {
+              item.isDisabled = true
+            }
+            return item
+          })
         }).catch(err => {
           console.log(err)
         })
@@ -101,6 +105,5 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
 </style>

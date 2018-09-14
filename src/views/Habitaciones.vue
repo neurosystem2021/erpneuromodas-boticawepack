@@ -2,11 +2,16 @@
     <div>
       <b-container class="bv-example-row">
         <b-row>
-					<b-col md="3" v-for="(hab, index) in habitaciones" :key="index">
+					<b-col class="habitacion" md="3" v-for="(hab, index) in habitaciones" :key="index">
 						<b-card :bg-variant="getVariant(hab)"
 										text-variant="white"
 										class="text-center">
+										
 								<h1>{{ hab.Producto }}</h1>
+								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
+									<li><b>{{ hab.Cliente }}</b> </li>
+									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
+								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
 				
@@ -60,10 +65,16 @@
 				<br>
 				<br>
 				<pre-orden-form-det v-if="show"
-					:id-preorden="selectProducto.IdPreOrden" 
+					:id-preorden="selectProducto.IdPreOrden"
+					:id-producto="selectProducto.IdProducto"
 					ref="preOrdenProductos"
 					></pre-orden-form-det>
 				<div slot="modal-footer" >
+					<div style="left: 1rem;position: absolute;">
+						<b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
+						Pagar Ahora
+						</b-btn>
+					</div>
 					<b-btn  variant="success" type="submit">
 					Guardar
 					</b-btn>
@@ -95,10 +106,9 @@ export default {
 	},
 	methods: {
 		guardarProductos() {
-			console.log(this.$refs.preOrdenProductos.productos)
 			this.axios.post(this.API + 'preorden/detalle', {
 				IdPreOrden: this.selectProducto.IdPreOrden,
-				IdHabitacion: this.selectProducto.IdPreOrden,
+				IdHabitacion: this.selectProducto.IdProducto,
 				productos: this.$refs.preOrdenProductos.productos
 			}).then(res => {
 				this.$toasted.success('Guardado correctamente')
@@ -131,7 +141,7 @@ export default {
 			})
 		},
 		liberarHab(hab) {
-			let r = confirm('¿Está seguro que desea liberar la habitación?')
+			let r = confirm('¿Está seguro que desea liberar la habitación? Asegurese de haber realizado la venta')
 
 			if (r) {
 				this.axios.post(this.API + 'habitaciones/liberar', {
@@ -166,6 +176,9 @@ export default {
 		limpiarPopover() {
 			//this.cliente = {}
 			//this.$refs.inputCliente.setValue('')
+		},
+		formatFecha(fecha) {
+			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
 		}
 	},
 	components: {
@@ -177,6 +190,14 @@ export default {
 .card-footer {
 	padding-left: 0;
 	padding-right: 0;
+}
+.habitacion {
+	margin-bottom: 10px;
+}
+.detalle {
+	list-style: none;
+    padding: 0;
+	text-align: left;
 }
 </style>
 
