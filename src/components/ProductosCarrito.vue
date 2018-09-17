@@ -6,7 +6,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -173,6 +173,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    idAlmacen: Number,
 
     igvTotal: Boolean,
     onSetProducto: {
@@ -215,6 +216,12 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      }
+      return this.API + 'productos'
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -331,8 +338,15 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        return `
+          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
+        `
+      }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca}
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} /
+         V. Estratégica: ${data.VentaEstrategica}
       `
     },
     setNuevoPrecioContado (index) {
@@ -405,5 +419,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.stock {
+  background: red;
+}
 </style>
