@@ -9,13 +9,14 @@
           <b-form-group>
             <label>Código barra:</label>
             <b-form-input 
+              disabled
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
@@ -71,7 +72,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <!--<b-form-group>
             <label>Presentación:</label>
             <autocomplete
                 required="required"
@@ -85,7 +86,7 @@
                 :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
-          </b-form-group>
+          </b-form-group>-->
 
           
           
@@ -260,7 +261,7 @@ export default {
         
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+        //this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
@@ -381,7 +382,7 @@ export default {
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      //this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 

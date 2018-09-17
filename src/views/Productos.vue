@@ -85,7 +85,7 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'PorcentajeUtilidad', label: 'Porcentaje Utilidad', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
