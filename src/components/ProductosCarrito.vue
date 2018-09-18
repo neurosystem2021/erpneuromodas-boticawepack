@@ -275,7 +275,7 @@ export default {
     }),
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+      let idProducto = this.loadCode.substring(this.loadCode.length -2);
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
