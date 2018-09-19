@@ -4,7 +4,6 @@
         <b-row>
 					<b-col class="habitacion" md="3" v-for="(hab, index) in habitaciones" :key="index">
 						<b-card :bg-variant="getVariant(hab)"
-										text-variant="white"
 										class="text-center">
 										
 								<h1>{{ hab.Producto }}</h1>
@@ -38,19 +37,50 @@
 									<b-btn :id="'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
 									<b-popover :target="'popover-alquilar' + index" title="Alquilar Habitación" ref="popover">
 										<label>Seleccione un cliente:</label>
-										<autocomplete
-												required="required"
-												:ref="'inputCliente2' + index"
-												:url="API + 'clientes'"
-												anchor="ClienteDniRuc"
-												label="writer"
-												placeholder=""
-												:on-select="setCliente" 
-												:onFocus="focusAutocomplete.bind(null, 'inputCliente2' + index)"
-												:classes="{input: 'form-control'}">
-										</autocomplete>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente2' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													:on-select="setCliente" 
+													:onFocus="focusAutocomplete.bind(null, 'inputCliente2' + index)"
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form @onAddCliente="setCliente"></clientes-form>
+											</b-input-group-append>
+										</b-input-group>
+										<br>
 										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
 									</b-popover>
+
+									<!--<b-btn v-b-modal="'modal' + index" variant="danger" size="sm">Alquilar</b-btn>
+									<b-modal :id="'modal' + index" title="Alquilar Habitación">
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente2' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													:on-select="setCliente" 
+													:onFocus="focusAutocomplete.bind(null, 'inputCliente2' + index)"
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<clientes-form :index="index" @onAddCliente="setCliente"></clientes-form>
+											</b-input-group-append>
+										</b-input-group>
+										<div slot="modal-footer">
+											<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
+										</div>
+									</b-modal>
+									-->
 
 									<b-button v-if="hab.IdPreOrden" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
 								</div>
@@ -89,6 +119,7 @@
 <script>
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
+import ClientesForm from '@/components/ClientesForm'
 
 export default {
   	mounted () {
@@ -98,6 +129,7 @@ export default {
 		return {
 			API: config.API,
 			show: false,
+			showPopover: false,
 			habitaciones: [],
 			selectCliente: {},
 			selectProducto: {},
@@ -182,7 +214,8 @@ export default {
 		}
 	},
 	components: {
-		PreOrdenFormDet
+		PreOrdenFormDet,
+		ClientesForm
 	}
 }
 </script>

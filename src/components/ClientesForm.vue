@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn @click="show = true" variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-form @submit="guardarCliente" ref="form">    
+    <b-modal title="Nuevo Cliente" size="lg" ref="clienteForm" v-if="show" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -65,6 +65,9 @@
 <script>
 import config from '@/store/config.js'
 export default {
+  mounted () {
+    document.body.appendChild(this.$refs.form)
+  },
   data() {
     return {
       API: config.API,
@@ -78,9 +81,12 @@ export default {
       }
     }
   },
-  props: ['newDniRuc'],
+  props: ['newDniRuc', 'index'],
+  computed: {
+  },
   methods: {
     shownClienteForm () {
+      console.log('show')
       this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
