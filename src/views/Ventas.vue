@@ -1,5 +1,7 @@
 <template>
     <div>
+        <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
+
         <Menu v-if="false"></Menu>
 
         <br />
@@ -7,7 +9,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
+                        <pre-orden-lista 
+                            v-show="!this.$route.query.idPreOrden"
+                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
@@ -392,7 +396,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                IdPreOrden: this.$route.query.idPreOrden || ''
             }
         },
         setTipoVenta (obj) {
@@ -416,6 +421,7 @@ export default {
             this.venta.vendedor = obj
         },
         setCliente (obj, dni = false) {
+            
             let params = {}
             if (dni) {
                 params = {
@@ -540,6 +546,10 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
+
+                // limpiar preorden seleccionado
+                this.$router.replace('/ventas')
+
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
@@ -552,7 +562,6 @@ export default {
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
@@ -575,7 +584,10 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
+.alert {
+    margin-bottom: 0;
+}
 .puntos {
     font-size: 52px;
 }

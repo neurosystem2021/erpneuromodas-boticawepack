@@ -3,7 +3,7 @@
     <b-btn @click="show = true" variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente" ref="form">    
-    <b-modal title="Nuevo Cliente" size="lg" ref="clienteForm" v-if="show" v-model="show" @shown="shownClienteForm">
+    <b-modal class="modal-cliente" no-close-on-backdrop title="Nuevo Cliente" size="lg" ref="clienteForm" v-if="show" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -49,7 +49,40 @@
                 type="email"></b-form-input>
             </b-form-group>
           </b-col>
+          <b-col>
+            <b-form-group>
+                <label>Nacionalidad:</label>
+                <b-form-input 
+                v-model="cliente.Nacionalidad"
+                type="text"></b-form-input>
+            </b-form-group>
+          </b-col>
       </b-row>
+      <b-row>
+          <b-col>
+            <b-form-group>
+                <label>Sexo:</label>
+                <b-form-select required="required" v-model="cliente.Sexo" :options="['M', 'F']" class="mb-3" />
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group>
+                <label>Ocupación:</label>
+                <b-form-input 
+                v-model="cliente.Ocupacion"
+                type="text"></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group>
+                <label>Fecha Nacimiento:</label>
+                <b-form-input 
+                v-model="cliente.FechaNacimiento"
+                type="date"></b-form-input>
+            </b-form-group>
+          </b-col>
+      </b-row>
+      
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
            Guardar
@@ -77,7 +110,11 @@ export default {
         DniRuc: '',
         Direccion: '',
         Telefono: '',
-        Email: ''
+        Email: '',
+        Sexo: '',
+        Ocupacion:'',
+        FechaNacimiento: '',
+        Nacionalidad: ''
       }
     }
   },
@@ -92,6 +129,10 @@ export default {
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
+      this.cliente.Sexo = ''
+      this.cliente.Ocupacion = ''
+      this.cliente.FechaNacimiento = ''
+      this.cliente.Nacionalidad = ''
     },
     consultarDNIRUC () {
         let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
@@ -138,6 +179,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
+
 
 </style>

@@ -51,37 +51,33 @@
 											</autocomplete>
 											<b-input-group-append>
 												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form @onAddCliente="setCliente"></clientes-form>
+												<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 											</b-input-group-append>
+										</b-input-group>
+										<br />
+										<label>Lugar Procedencia:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.LugarProcedencia"
+												type="text"
+												placeholder="Lugar Procedencia"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Medio de transporte:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.MedioTransporte"
+												type="text"
+												placeholder="Medio de transporte"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Próximo destino:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.ProximoDestino"
+												type="text"
+												placeholder="Próximo destino"></b-form-input>
 										</b-input-group>
 										<br>
 										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
 									</b-popover>
-
-									<!--<b-btn v-b-modal="'modal' + index" variant="danger" size="sm">Alquilar</b-btn>
-									<b-modal :id="'modal' + index" title="Alquilar Habitación">
-										<b-input-group>
-											<autocomplete
-													required="required"
-													:ref="'inputCliente2' + index"
-													:url="API + 'clientes'"
-													anchor="ClienteDniRuc"
-													label="writer"
-													placeholder=""
-													:on-select="setCliente" 
-													:onFocus="focusAutocomplete.bind(null, 'inputCliente2' + index)"
-													:classes="{input: 'form-control'}">
-											</autocomplete>
-											<b-input-group-append>
-												<clientes-form :index="index" @onAddCliente="setCliente"></clientes-form>
-											</b-input-group-append>
-										</b-input-group>
-										<div slot="modal-footer">
-											<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
-										</div>
-									</b-modal>
-									-->
-
 									<b-button v-if="hab.IdPreOrden" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
 								</div>
 						</b-card>
@@ -133,6 +129,7 @@ export default {
 			habitaciones: [],
 			selectCliente: {},
 			selectProducto: {},
+			selectIndex : '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD")
 		}
 	},
@@ -191,7 +188,8 @@ export default {
 			if (r) {
 				this.axios.post(this.API + 'habitaciones/alquilar', {
 					IdProducto: hab.IdProducto,
-					IdCliente: this.selectCliente.IdCliente
+					IdCliente: this.selectCliente.IdCliente,
+					cliente: this.selectCliente
 				}).then(res => {
 					this.getHabitaciones()
 					this.limpiarPopover()
@@ -199,7 +197,13 @@ export default {
 				})
 			}
 		},
-		setCliente(obj) {
+		setCliente(obj, index) {
+			if (index >= 0) {
+				console.log(this.$refs)
+				console.log(index)
+				console.log('inputCliente2' + index)
+				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
+			}
 			this.selectCliente = obj
 		},
 		focusAutocomplete (ref) {
