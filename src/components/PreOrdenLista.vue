@@ -89,7 +89,7 @@ import { mapActions } from 'vuex'
                         this.filter = ''
                         this.show = false
                     })
-
+                    this.$emit('onPreOrden', item)
                     this.$emit('onSelectPreOrden', item.IdCliente)
                 })
                 //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])

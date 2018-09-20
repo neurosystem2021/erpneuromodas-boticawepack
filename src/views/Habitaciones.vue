@@ -1,31 +1,36 @@
 <template>
     <div>
       <b-container class="bv-example-row">
-        <b-row>
-					<b-col class="habitacion" md="3" v-for="(hab, index) in habitaciones" :key="index">
+		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
+			<div v-if="getHabitacionesPiso(pi).length">
+			  <br>
+			  	<b-alert show class="text-center"><b>PISO {{ pi }}</b></b-alert>
+			  <br>
+			</div>
+        	<b-row>
+
+					<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
 						<b-card :bg-variant="getVariant(hab)"
 										class="text-center">
 										
-								<h1>{{ hab.Producto }}</h1>
+								<h5>{{ hab.Producto }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
-				
-									<b-btn :id="'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>	
-									<b-popover :target="'popover-reservar' + index" title="Reservar Habitación" ref="popover">
+									<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>	
+									<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
 										<label>Seleccione un cliente:</label>
 										<autocomplete
 												required="required"
-												:ref="'inputCliente' + index"
+												:ref="'inputCliente1' + index"
 												:url="API + 'clientes'"
 												anchor="ClienteDniRuc"
 												label="writer"
 												placeholder=""
 												:on-select="setCliente" 
-												:onFocus="focusAutocomplete.bind(null, 'inputCliente' + index)"
 												:classes="{input: 'form-control'}">
 										</autocomplete>
 										<label for="inputLive">Fecha Reserva:</label>
@@ -33,9 +38,8 @@
 											type="date"></b-form-input>
 										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
 									</b-popover>
-
-									<b-btn :id="'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
-									<b-popover :target="'popover-alquilar' + index" title="Alquilar Habitación" ref="popover">
+									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
+									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Alquilar Habitación">
 										<label>Seleccione un cliente:</label>
 										<b-input-group>
 											<autocomplete
@@ -46,7 +50,6 @@
 													label="writer"
 													placeholder=""
 													:on-select="setCliente" 
-													:onFocus="focusAutocomplete.bind(null, 'inputCliente2' + index)"
 													:classes="{input: 'form-control'}">
 											</autocomplete>
 											<b-input-group-append>
@@ -82,7 +85,9 @@
 								</div>
 						</b-card>
 					</b-col>
-				</b-row>
+
+		</b-row>
+		  </div>
       </b-container>
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
@@ -125,15 +130,21 @@ export default {
 		return {
 			API: config.API,
 			show: false,
-			showPopover: false,
+			showPopover: true,
 			habitaciones: [],
 			selectCliente: {},
 			selectProducto: {},
-			selectIndex : '',
-			fechaReserva: this.$moment().format("YYYY-MM-DD")
+			fechaReserva: this.$moment().format("YYYY-MM-DD"),
+			pisos: [1, 2, 3, 4, 5],
+			// habitacionesPiso: []
 		}
 	},
 	methods: {
+		getHabitacionesPiso (piso) {
+			return this.habitaciones.filter(hab => {
+				return hab.Piso === piso
+			})
+		},
 		guardarProductos() {
 			this.axios.post(this.API + 'preorden/detalle', {
 				IdPreOrden: this.selectProducto.IdPreOrden,
@@ -151,6 +162,9 @@ export default {
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones').then(res => {
 				this.habitaciones = res.data
+				/* this.pisos.forEach(piso => {
+					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
+				}) */
 			})
 		},
 		getVariant(hab) {
@@ -159,6 +173,10 @@ export default {
 			return 'success'
 		},
 		reservarHab(hab) {
+			if (!this.selectCliente.Cliente) {
+				this.$toasted.error('Seleccione un cliente.');
+			}
+			
 			this.axios.post(this.API + 'habitaciones/reservar', {
 				IdProducto: hab.IdProducto,
 				IdCliente: this.selectCliente.IdCliente,
@@ -166,7 +184,12 @@ export default {
 			}).then(res => {
 				this.getHabitaciones()
 				this.limpiarPopover()
-				this.$toasted.success('La Habitación: ' + hab.Producto + ' ha sido reservada');				
+				this.limpiarDespues()
+				this.$toasted.success('La Habitación: ' + hab.Producto + ' ha sido reservada');
+				this.showPopover = false
+				this.$nextTick(() => {
+					this.showPopover = true
+				})		
 			})
 		},
 		liberarHab(hab) {
@@ -179,10 +202,18 @@ export default {
 					this.getHabitaciones()
 					this.limpiarPopover()
 					this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
+					this.showPopover = false
+					this.$nextTick(() => {
+						this.showPopover = true
+					})
 				})
 			}
 		},
 		alquilarHab(hab) {
+			if (!this.selectCliente.Cliente) {
+				this.$toasted.error('Seleccione un cliente.');
+			}
+
 			let r = confirm('¿Está seguro que desea alquilar la habitación?')
 
 			if (r) {
@@ -193,7 +224,12 @@ export default {
 				}).then(res => {
 					this.getHabitaciones()
 					this.limpiarPopover()
+					this.limpiarDespues()
 					this.$toasted.success('La Habitación: ' + hab.Producto + ' ha sido alquilada')
+					this.showPopover = false
+					this.$nextTick(() => {
+						this.showPopover = true
+					})
 				})
 			}
 		},
@@ -206,12 +242,16 @@ export default {
 			}
 			this.selectCliente = obj
 		},
-		focusAutocomplete (ref) {
+		/*focusAutocomplete (ref) {
 			this.$refs[ref][0].handleDoubleClick()
-		},
+		},*/
 		limpiarPopover() {
 			//this.cliente = {}
 			//this.$refs.inputCliente.setValue('')
+		},
+		limpiarDespues() {
+			this.selectCliente = {}
+			this.selectProducto = {}
 		},
 		formatFecha(fecha) {
 			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
@@ -224,6 +264,10 @@ export default {
 }
 </script>
 <style scoped>
+h5 {
+	font-size: 1.2rem;
+	color: #ffffff;
+}
 .card-footer {
 	padding-left: 0;
 	padding-right: 0;
@@ -235,6 +279,8 @@ export default {
 	list-style: none;
     padding: 0;
 	text-align: left;
+	font-size: 0.8rem;
+	color: #363636;
 }
 </style>
 

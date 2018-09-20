@@ -11,7 +11,8 @@
                     <b-button-group size="sm">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
-                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
+                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
+                            @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
@@ -318,11 +319,10 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto' }, 
-                    { key: 'ProductoCategoria', label: 'Categoría' }, 
-                    { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'FechaAlquiler', label: 'Fecha Alquiler' },
+                    { key: 'Producto' },
+                    { key: 'Descripcion', label: 'Descripción'},
+                    { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+                    { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -351,6 +351,12 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        selectPreOrden (orden) {
+            this.venta.IdPreOrden = this.venta.IdPreOrden || []
+            if (Array.isArray(this.venta.IdPreOrden) ) {
+                this.venta.IdPreOrden.push(orden)
+            }
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -549,7 +555,6 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false

@@ -97,6 +97,29 @@
             </b-form-text>
         </template>
 
+        <template slot="FechaAlquiler" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].FechaAlquilerInicio"
+            type="date"
+            placeholder="Fecha Fin"
+            :value="formatFecha(data.item.FechaAlquiler)"></b-form-input>
+        </template>
+
+        <template slot="FechaAlquilerFin" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].FechaAlquilerFin"
+            type="date"
+            placeholder="Fecha Fin"
+            :value="$moment().format('YYYY-MM-DD')"></b-form-input>
+        </template>
+
+        <template slot="Descripcion" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].Descripcion"
+            type="text"
+            placeholder="Descripción"></b-form-input>
+        </template>        
+
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
         </template>
@@ -420,7 +443,15 @@ export default {
       this.eliminar(index)
       this.$emit('onRemoveProducto', index)
       this.$toasted.show('Producto quitado del listado')
-    }
+    },
+
+    formatFecha(fecha) {
+      if (fecha) {
+			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+      } else {
+        return ''
+      }
+		}
   },
   components: {
     ProductoForm

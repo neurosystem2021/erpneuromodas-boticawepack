@@ -62,7 +62,7 @@
           <b-col>
             <b-form-group>
                 <label>Sexo:</label>
-                <b-form-select required="required" v-model="cliente.Sexo" :options="['M', 'F']" class="mb-3" />
+                <b-form-select v-model="cliente.Sexo" :options="['M', 'F']" class="mb-3" />
             </b-form-group>
           </b-col>
           <b-col>
