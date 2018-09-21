@@ -26,7 +26,7 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -342,6 +342,7 @@ export default {
         return `
           <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
+          / F. Vencimiento..
         `
       }
       return `
@@ -419,8 +420,8 @@ export default {
 }
 </script>
 
-<style scoped>
-.stock {
-  background: red;
+<style>
+.tabla-carrito .table-sm td  {
+  font-size: .8rem!important;
 }
 </style>
