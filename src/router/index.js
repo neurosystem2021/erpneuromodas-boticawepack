@@ -12,6 +12,7 @@ import Habitaciones from '@/views/Habitaciones.vue'
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
+import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 
 Vue.use(Router)
 
@@ -62,6 +63,11 @@ export default new Router({
       path: '/reportes/stockminimo',
       name: 'StockMinimo',
       component: StockMinimo
+    },
+    {
+      path: '/reportes/huespedes',
+      name: 'RegistroHuespedes',
+      component: RegistroHuespedes
     },
     {
       path: '/facturacion',
