@@ -1,30 +1,81 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="4" class="my-1">
+      <b-container class="container-huespedes">
+        <b-row class="no-print">
+          <b-col md="3" class="my-1">
             <b-form-group>
-                  <label>Fecha:</label>
+                  <label>Fecha Registro Inicio:</label>
 							
               <b-input-group>
-                <b-form-input type="date" @input="currentPage = 1" />
+                <b-form-input type="date" v-model="fechaRegistroInicio" />
               </b-input-group>
             </b-form-group>
-            <br />
+            
+          </b-col>
+          <b-col md="3" >
+            <b-form-group>
+                  <label>Fecha Registro Fin:</label>
+							
+              <b-input-group>
+                <b-form-input type="date" v-model="fechaRegistroFin" />
+              </b-input-group>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="3" >
+            <b-form-group>
+              <label>Buscar:</label>
+              <b-input-group>
+                <b-btn variant="success" @click="getRegistroHuespedes">Buscar</b-btn>
+              </b-input-group>
+            </b-form-group>
           </b-col>
 
         </b-row>
+        <div class="registro">
           <h1 class="text-center" >Registro de Huéspedes</h1>
         <b-row>
-          <table>
+          <table class="table b-table table-striped table-hover">
             <thead>
-              <tr><th>asd</th></tr>
+              <tr>
+                <th>Apellidos y Nombres</th>
+                <th>Sexo</th>
+                <th>Ocupacion</th>
+                <th>F. Nacimiento</th>
+                <th>Nacionalidad</th>
+                <th>Documento de Identidad</th>
+                <th>Direccion</th>
+                <th>Fecha de Ingreso</th>
+                <th>Lugar de Procedencia</th>
+                <th>Medio de Transporte</th>
+                <th>Próximo Destino</th>
+                <th>Fecha de salida</th>
+                <th>Tipo</th>
+                <th>Tarifa</th>
+
+              </tr>
             </thead>
             <tbody>
-              <tr><td>asd</td></tr>
+              <tr v-for="(item, index) in huespedes" :key="index">
+                <td>{{ item.Cliente }}</td>
+                <td>{{ item.Sexo }}</td>
+                <td>{{ item.Ocupacion }}</td>
+                <td>{{ item.FechaNacimiento }}</td>
+                <td>{{ item.Nacionalidad }}</td>
+                <td>{{ item.DniRuc }}</td>
+                <td>{{ item.Direccion }}</td>
+                <td>{{ item.FechaAlquilerInicio }}</td>
+                <td>{{ item.LugarProcedencia }}</td>
+                <td>{{ item.MedioTransporte }}</td>
+                <td>{{ item.ProximoDestino }}</td>
+                <td>{{ item.FechaAlquilerFin }}</td>
+                <td>{{ item.ProductoMarca }}</td>
+                <td>{{ item.Tarifa }}</td>
+              </tr>
             </tbody>
           </table>
         </b-row>
+        </div>
         <br /><br />
       </b-container>
   </div>
@@ -32,35 +83,17 @@
 
 <script>
 import config from '@/store/config.js'
-import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&filter[minimo]=1&count=1').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.getRegistroHuespedes()
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: null,
-      sortBy: 'Gen_Producto.IdProducto',
-      sortDesc: false,
-      items: [],
-      isBusy: false,
-      fields: [
-            { key: 'IdProducto', label: 'ID', sortable: true },
-            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
-            { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'stock', label: 'Stock', sortable: true },
-      ],
-      totalRows: 50,
-      perPage: 10,
-			currentPage: 1,
+      huespedes: [],
+      fechaRegistroInicio: this.$moment().format("YYYY-MM-DD"),
+      fechaRegistroFin: this.$moment().format("YYYY-MM-DD"),
 			almacen: {
 				IdAlmacen: 1
 			}
@@ -75,33 +108,30 @@ export default {
 			this.almacen = obj
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
-		myProvider (ctx) {
-			// Here we don't set isBusy prop, so busy state will be handled by table itself
-			// this.isBusy = true
-			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-			url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-			let promise = this.axios.get( url )
-
-			return promise.then((result) => {
-				this.items = result.data
-				//this.totalRows = this.items.length
-				// Here we could override the busy state, setting isBusy to false
-				// this.isBusy = false
-				return(this.items)
-			}).catch(error => {
-				// Here we could override the busy state, setting isBusy to false
-				// this.isBusy = false
-				// Returning an empty array, allows table to correctly handle busy state in case of error
-				return []
-			})
-		}
+    getRegistroHuespedes () {
+      this.axios.get(this.API + 'reporte/habitaciones?idAlmacen='+this.almacen.IdAlmacen+'&fechaInicio='+this.fechaRegistroInicio+'&fechaFin='+this.fechaRegistroFin).then((response) => {
+        this.huespedes = response.data
+      })
+    }
   },
   components: {
-      ProductoForm
   }
 }
 </script>
 
-<style>
-
+<style scoped>
+  .container-huespedes {
+    max-width: 100%;
+    padding:  0 2rem;
+  }
+  .registro {
+    font-size: .8rem;
+  }
+  @media print
+  {    
+    .no-print, .no-print *
+    {
+      display: none !important;
+    }
+  }
 </style>

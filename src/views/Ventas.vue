@@ -352,10 +352,10 @@ export default {
             obtenerStok: 'obtenerStock'
         }),
         selectPreOrden (orden) {
-            this.venta.IdPreOrden = this.venta.IdPreOrden || []
-            if (Array.isArray(this.venta.IdPreOrden) ) {
+           // this.venta.IdPreOrden = this.venta.IdPreOrden || []
+           // if (Array.isArray(this.venta.IdPreOrden) ) {
                 this.venta.IdPreOrden.push(orden)
-            }
+            //}
         },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
@@ -403,7 +403,7 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                IdPreOrden: this.$route.query.idPreOrden || ''
+                IdPreOrden: []
             }
         },
         setTipoVenta (obj) {
