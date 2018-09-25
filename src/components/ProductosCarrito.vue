@@ -25,6 +25,8 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+          <b-badge variant="danger">Productos Vencidos</b-badge>
+          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
@@ -339,10 +341,36 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
+        let style = 'ss'
+
+        // cambiar color los vencidos
+        var dt = new Date()
+        var anio = dt.getFullYear()
+        var mes =  dt.getMonth() + 1
+        var dia = dt.getDate()
+        var fechaVen = new Date(data.FechaVen).getTime()
+        
+        var hoy = anio + "-" + mes + "-" + dia
+        hoy = new Date(hoy).getTime()
+        var en4meses = anio + '-' + (mes + 4) + '-' + dia
+        en4meses = new Date(en4meses).getTime()
+
+        if(fechaVen < hoy && data.stock > 0) {
+          style = 'danger'
+        }
+
+        // cambiar color los que faltan 4 meses por vencer
+        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+          style = 'ambar'
+        }
+
+
         return `
+        <div class="${style}">
           <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento..
+          / F. Vencimiento: ${data.FechaVen}
+        </div>
         `
       }
       return `
@@ -421,7 +449,16 @@ export default {
 </script>
 
 <style>
+.danger {
+  background-color:#ff7675;
+  color: #ffffff;
+}
+.ambar {
+  background-color: #feca57;
+  color: #ffffff;
+}
 .tabla-carrito .table-sm td  {
   font-size: .8rem!important;
 }
 </style>
+
