@@ -34,7 +34,10 @@
             style="width: 75px"
             min="0"
             step="0.001"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+              $emit('onInputCantidad', val)
+              productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -46,6 +49,8 @@
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
+          <small v-show="productos[data.index].PrecioDocena">Por 12 -> S/{{productos[data.index].PrecioDocena}}</small><br>
+          <small v-show="productos[data.index].PrecioCentena">Por 100 -> S/{{productos[data.index].PrecioCentena}}</small>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}

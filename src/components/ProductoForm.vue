@@ -142,7 +142,7 @@
 
       <hr v-if="producto.IdProducto || producto.EsPadre" />
       <b-row v-if="producto.IdProducto || producto.EsPadre">
-        <b-col md="6">
+        <b-col md="3">
           <b-form-group>
             <label>Precio de Costo:</label>
             <b-form-input
@@ -152,7 +152,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="3">
           <b-form-group>
             <label>Precio de Venta:</label>
             <b-form-input v-model="producto.PrecioContado"
@@ -162,6 +162,26 @@
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
+          </b-form-group>
+        </b-col>
+        <b-col md="3">
+          <b-form-group>
+            <label>Precio por 12:</label>
+            <b-form-input
+              v-model="producto.PrecioDocena"
+              type="number"
+              step="0.01"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="3">
+          <b-form-group>
+            <label>Precio por 100:</label>
+            <b-form-input
+              v-model="producto.PrecioCentena"
+              type="number"
+              step="0.01"
+              ></b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
@@ -296,6 +316,8 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.PrecioDocena = newVal.PrecioDocena
+        this.producto.PrecioCentena = newVal.PrecioCentena
 
       } else {
 

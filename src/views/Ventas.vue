@@ -322,7 +322,7 @@ export default {
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoPresentacion', label: 'Present.' },
+                    /*{ key: 'PrecioDocena', label: 'Present.' },*/
                     { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
