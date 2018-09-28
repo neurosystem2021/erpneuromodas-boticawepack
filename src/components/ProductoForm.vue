@@ -147,7 +147,6 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               ></b-form-input>
           </b-form-group>
