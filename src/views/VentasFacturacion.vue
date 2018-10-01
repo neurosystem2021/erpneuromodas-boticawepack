@@ -153,6 +153,8 @@
                       </tr>
                     </tbody>
                   </table>
+
+                      <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
                     </b-row>
                   </b-card>
                 </template>
@@ -604,6 +606,15 @@ console.log(url)
     },
     exportarProductos () {
 
+    },
+    moverAEmitidos (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
     },
     consultaElectronico (doc) {
       console.log(doc)
