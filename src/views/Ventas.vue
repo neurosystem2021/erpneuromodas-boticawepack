@@ -7,11 +7,15 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
+                    
                 </div>
             </div>
             <br /><br />
@@ -290,6 +294,7 @@ import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
+import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 
 
@@ -299,6 +304,7 @@ export default {
     },
     mounted () {
         this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -381,7 +387,7 @@ export default {
                     IdDocVentaPuntoVenta: 1,
                     PuntoVenta: 'CAJA1'
                 },
-                vendedor: {},
+                vendedor: this.venta.vendedor || {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -407,6 +413,19 @@ export default {
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.getNumeroVenta()
+        },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -540,7 +559,7 @@ export default {
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
+                // this.$refs.inputVendedor.setValue('')
 
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
@@ -560,6 +579,7 @@ export default {
         ProductosCarrito,
         ClientesForm,
         ConfigVenta,
+        PagoDeuda,
         PreOrdenLista
     }
 }
