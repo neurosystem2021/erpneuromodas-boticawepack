@@ -18,7 +18,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta">
+            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -30,7 +30,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="TICKET"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -351,6 +351,13 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadFirstAlmacen () {
+            this.axios.get(this.API + 'almacenes/primero')
+                .then(res => {
+                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    this.venta.almacen = res.data
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
@@ -370,8 +377,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'TICKET',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0
                 },
                 almacen: {
@@ -577,11 +584,22 @@ export default {
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.show('Venta realizada con exito')
+                this.inProgress = false
+                this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
-                this.limpiarDespuesVenta()
+                this.initForm()
+                this.limpiarCart()
+                this.getNumeroVenta()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputAlmacen.setValue('VENTA')
+                this.$refs.inputPuntoVenta.setValue('CAJA1')
+                this.$refs.inputCliente.setValue('')
+                this.$refs.inputVendedor.setValue('')
+                //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
