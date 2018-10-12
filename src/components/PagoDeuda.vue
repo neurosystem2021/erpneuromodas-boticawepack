@@ -10,7 +10,7 @@
                 headerTextVariant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">
-
+                
                 <b-row class="mb-1">
                     <b-col><label for="input-cliente">Cliente:</label>
                         <b-input-group>
@@ -98,15 +98,41 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <br>
+                        <div class="float-right">
+                            <b-btn size="sm" variant="success" type="submit">
+                                Guardar
+                            </b-btn>
+                            <b-btn size="sm" variant="secondary" @click="show=false">
+                                Cerrar
+                            </b-btn>
+                        </div>
+                        <hr>
+                        <br><br>
+                        <table class="table b-table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha Pago</th>
+                                    <th>Concepto</th>
+                                    <th>Importe</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(pago, index) in pagos" :key="index">
+                                    <td>{{ pago.IdCajaBanco }}</td>
+                                    <td>{{ pago.FechaDoc }}</td>
+                                    <td>{{ pago.Concepto }}</td>
+                                    <td>{{ pago.Importe }}</td>
+                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </b-col>
                 </b-row>
                 <div slot="modal-footer" >
-                    <b-btn size="sm" variant="success" type="submit">
-                        Guardar
-                    </b-btn>
-                    <b-btn size="sm" variant="secondary" @click="show=false">
-                        Cerrar
-                    </b-btn>
+                    
                 </div>
             
             </b-modal>
@@ -125,6 +151,7 @@ import config from '@/store/config.js'
             return {
                 API: config.API,
                 documentos: [],
+                pagos: [],
                 cajaBanco: {},
                 vendedor: {},
                 show: false
@@ -134,6 +161,7 @@ import config from '@/store/config.js'
             initForm () {
                 this.vendedor = {}
                 this.documentos = []
+                this.pagos = []
                 this.cajaBanco = {
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
@@ -169,6 +197,19 @@ import config from '@/store/config.js'
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
+
+                this.cargarPagos(cliente)
+            },
+            cargarPagos (cliente) {
+                let usuario = sessionStorage.getItem('User')
+                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
+                .then((response) => {
+                   this.pagos = response.data
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
             },
             guardarPago (evt) {
                 evt.preventDefault()
@@ -189,9 +230,11 @@ import config from '@/store/config.js'
                     vendedor: this.vendedor
                 })
                 .then((response) => {
+                    console.log(response.data)
                     this.$toasted.show('Se pagó la deuda del cliente.')
                     this.show = false
                     this.initForm()
+                    window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {
                     console.log(error)

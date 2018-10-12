@@ -18,7 +18,7 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col cols="6">
+          <b-col cols="7">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
@@ -33,12 +33,83 @@
             </b-button-group>
           </b-col>
       </b-row>
-      <br class="no-print" /><br class="no-print" />
+      <br class="no-print" /> 
 
-      <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h3 class="text-center">Cierre de Caja</h3> 
+      <h4 class="si-print">Cierre de Caja </h4>
+      <hr>
+      <div v-if="cierre.FechaCierre">Fecha:  <b>{{ cierre.FechaCierre }}</b></div>
+      <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</b></div>
+      <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      <br>
       <b-row>
+        <b-col cols="4">
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ (granTotal + totalVentasCredito) | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Credito S/.</td>
+              <td>{{ totalVentasCredito | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Contado S/.</td>
+              <td>{{ granTotal | moneda }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Visa S/.</td>
+              <td>{{ totalVentasVisa | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Mastercard S/.</td>
+              <td>{{ totalVentasMastercard | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Pagos de Creditos S/.</td>
+              <td>{{ totalIngresos | moneda }} </td>
+            </tr>
+          </tbody>
+        </table>
+        </b-col>
+      </b-row>
+
+      <b-row  class="no-print">
+        <b-col>
+          <table class="table b-table table-sm table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>TipoDoc</th>
+                <th>Serie</th>
+                <th>Numero</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(venta, index) in ventas" :key="index">
+                <td>{{ venta.FechaDoc }}</td>
+                <td>{{ venta.TipoDoc }}</td>
+                <td>{{ venta.Serie }}</td>
+                <td>{{ venta.Numero }}</td>
+                <td>{{ venta.Total | moneda }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </b-col>
+      </b-row>
+      
+
+      <!--<b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -204,12 +275,12 @@
             </tfoot>
           </table>
         </b-col>
-      </b-row>
+      </b-row>-->
       
 
       <br>
 
-      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -446,9 +517,15 @@ th {
   background: #f9f9f9;
   padding: 10px;
 }
+.si-print {
+  display: none;
+}
 @media print {
   .no-print {
     display: none;
+  }
+  .si-print {
+    display: block;
   }
 }
 </style>
