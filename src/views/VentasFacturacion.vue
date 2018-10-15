@@ -72,8 +72,8 @@
                       <autocomplete
                           required="required"
                           ref="inputTipoVenta"
-                          :url="API + 'ventas/tipos'"
-                          initValue="FACTURA ELEC."
+                          :url="API + 'ventas/tipos/electronicos'"
+                          initValue=""
                           anchor="TipoDoc"
                           label="writer"
                           placeholder=""
@@ -149,7 +149,7 @@
                         <td v-if="row.item.TieneIgv">
                           {{ item.Subtotal * 0.18 | redondear}}
                         </td>
-                        <td>{{ item.Subtotal }}</td>
+                        <td>{{ item.Subtotal | redondear }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -163,20 +163,32 @@
                       <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
-                      <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                  
+                      <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                      
                       &nbsp;&nbsp;
 
-                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="this.loading" variant="primary" size="sm" >Nota Credito</b-button>
+                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <form @submit.prevent="emitirNotaCredito(data.item)" >
                           <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
                           <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
                           <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
-                          <b-button type="submit" variant="primary" size="sm">Emitir</b-button>
+                          <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
                         </form>
                       </b-popover>
                   </div>
+                </template>
+
+                <template slot="consulta" slot-scope="data">
+                  <div >
+                    <div style="width: 150px;">
+                      <img id="captcha" style="width: 80px; float:left;" v-if="imgCaptcha" src="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/captcha?accion=image&nmagic=0" />
+                      <input style="width: 60px;" class="form-control" type="text" v-model="captcha"/>
+                    </div>
+                    <b-button :disabled="loading" variant="warning" size="sm"
+                      @click="consultaElectronico(data.item)">Consulta SUNAT</b-button>
+                  </div>
+                  
                 </template>
 
               </b-table>
@@ -189,7 +201,8 @@
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
-            <b-col cols="4">
+            <b-col cols="12">
+              <b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
@@ -228,6 +241,8 @@ export default {
   data() {
     return {
       API: config.API,
+      imgCaptcha: true,
+      captcha: '',
       loading: false,
       tipoDoc: {
         IdTipoDoc: 1,
@@ -271,7 +286,8 @@ export default {
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
-            { key: 'estado', sortable: false, class: 'text-center' }
+            { key: 'estado', sortable: false, class: 'text-center' },
+            { key: 'consulta', class: 'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -359,7 +375,7 @@ export default {
     },
     emitirNotaCredito (item) {
       let doc = Object.assign({}, item);
-
+      this.loading = true
       doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
       doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
       doc.notaIdMotivo = this.notaIdMotivo
@@ -377,6 +393,7 @@ export default {
         console.log(res)
         this.$toasted.success(res.data.msj_sunat, { duration: 7000 })
         this.notaIdMotivo = null
+        this.loading = false
       })
 
 
@@ -393,13 +410,7 @@ export default {
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
-          
-            item.productos = item.productos.map(prod => {
-              prod.Precio = prod.Precio.toFixed(2)
-              prod.Subtotal = prod.Subtotal.toFixed(2)
-              return prod
-            })
-              
+          console.log(JSON.stringify(item))
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
@@ -442,9 +453,32 @@ export default {
         })
       }*/
     },
+    async emitirElectronicoResumen (doc) {
+      if(!this.items.length) {
+        this.$toasted.show('No hay documentos para emitir');
+        return
+      }
+
+      this.loading = true
+
+      if (this.tipoDoc.CodSunat == '03') { // Boleta emitir resumen diario
+        this.axios.post(this.API + 'emitirelectronicoboleta', {
+          boletas: this.items,
+          fechaReferencia: this.fechaReferencia,
+          codSunat: this.tipoDoc.CodSunat
+        }).then( response => {
+          console.log(response.data)
+          this.items.forEach(item => {
+            Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+          })
+          this.loading = false
+        })
+      }
+    },
     eliminarElectronico (venta) {
-      let r = confirm('¿Desea Anular la venta?')
+      let r = confirm('ï¿½Desea Anular la venta?')
       if (r == true) {
+        this.loading = true
         
         if (this.tipoDoc.CodSunat == '01') { // Factura
           let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
@@ -458,6 +492,7 @@ export default {
               console.log(res)
               this.$toasted.show('Factura Anulada')
               this.$refs.tablaVentas.refresh()
+              this.loading = false
               //mensaje success
             })
           }
@@ -473,6 +508,7 @@ export default {
             console.log(res)
             this.$toasted.show('Boleta Anulada')
             this.$refs.tablaVentas.refresh()
+            this.loading = false
           })
         }
       }      
@@ -522,13 +558,22 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       
-      let url = this.API + 'ventas?anulado=0&estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?estado=' + this.estadoVenta + '&esElectronico=1&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
-        this.items = result.data
+        
+        //this.items = result.data
+        this.items = result.data.map(el => {
+          if (el.Anulado === 1) {
+            el._rowVariant = 'warning'
+          }
+
+          return el
+        })
+
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false
         // this.isBusy = false
@@ -559,6 +604,33 @@ console.log(url)
     },
     exportarProductos () {
 
+    },
+    consultaElectronico (doc) {
+      console.log(doc)
+      let tipocomprobante = ''
+      let cantidad=''
+      let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
+      console.log(fecha)
+
+      if (doc.CodSunat == '03') {
+        tipocomprobante = '06'
+      }
+      if (doc.CodSunat == '01') {
+        cantidad = doc.Total
+        tipocomprobante = '03'
+      }
+
+      this.imgCaptcha = false
+      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20602905242&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
+      
+      /*this.$nextTick(() => {
+        this.imgCaptcha = true
+        this.captcha = ''
+      })*/
+      setTimeout(() => {
+        this.imgCaptcha = true
+        this.captcha = ''
+      }, 1000)
     }
   },
   components: {
