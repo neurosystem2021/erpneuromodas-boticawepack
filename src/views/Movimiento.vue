@@ -164,10 +164,9 @@
                       <label>Fecha Contable:</label>
                       <b-form-input
                         v-model="movimiento.MovimientoFecha"
-                        type="datetime-local"
+                        type="date"
                         step="1"
-                        placeholder="Fecha Contable"
-                        disabled="disabled"></b-form-input>
+                        placeholder="Fecha Contable"></b-form-input>
 
                     </b-form-group>
                     <b-form-group>
@@ -269,8 +268,8 @@ export default {
         FechaVenCredito: '',
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
-        // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
-        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
+        MovimientoFecha: this.$moment().format("YYYY-MM-DD"),
+        // MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },

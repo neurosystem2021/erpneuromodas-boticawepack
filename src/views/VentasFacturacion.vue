@@ -393,7 +393,13 @@ export default {
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
-          console.log(JSON.stringify(item))
+          
+            item.productos = item.productos.map(prod => {
+              prod.Precio = prod.Precio.toFixed(2)
+              prod.Subtotal = prod.Subtotal.toFixed(2)
+              return prod
+            })
+              
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
@@ -437,7 +443,7 @@ export default {
       }*/
     },
     eliminarElectronico (venta) {
-      let r = confirm('Â¿Desea Anular la venta?')
+      let r = confirm('¿Desea Anular la venta?')
       if (r == true) {
         
         if (this.tipoDoc.CodSunat == '01') { // Factura
