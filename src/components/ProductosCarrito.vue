@@ -25,8 +25,8 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
-          <b-badge variant="danger">Productos Vencidos</b-badge>
-          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
+          <!--<b-badge variant="danger">Productos Vencidos</b-badge>
+          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>-->
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
@@ -37,7 +37,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -247,8 +247,8 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
-        // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria * 0.18
+        // sumatoria = sumatoria - (sumatoria/1.18)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)
@@ -364,8 +364,7 @@ export default {
         return `
         <div class="${style}">
           <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento: ${data.FechaVen}
+          <b>${data.Producto}</b> / ${data.ProductoMarca} 
         </div>
         `
       }

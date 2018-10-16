@@ -379,6 +379,8 @@ export default {
             this.$refs[ref].handleDoubleClick()
         },
         initForm () {
+            this.descuentoGeneral = 0
+            
             this.venta = {
                 EsCredito: 0,
                 Serie: '',
@@ -541,7 +543,7 @@ export default {
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
-            this.$refs.inputVendedor.setValue('')
+            // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
 
