@@ -7,14 +7,18 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <proformas></proformas>
+                        <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
+                        <proformas></proformas>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
+                    
                 </div>
             </div>
             <br /><br />
@@ -104,24 +108,26 @@
                         </b-row>
                     </b-col>
                     <b-col md="3">
-                        <b-form-group class="text-center" v-if="venta.cliente.Cliente">
-                            <div class="puntos">
-                                {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
-                            </div>
-                            Puntos del cliente
-                        </b-form-group>
-                        <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
-                            <b-form-input
-                                v-model="puntosAplicados"
-                                min="0"
-                                :max="venta.cliente.Puntos"
-                                @input="aplicarPuntos"
-                                type="number"
-                            ></b-form-input>
-                        </b-input-group>
-                        <b-form-text v-if="descuentoPuntos.ValorPunto">
-                           1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
-                        </b-form-text>
+                        <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
+                            <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                                <div class="puntos">
+                                    {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
+                                </div>
+                                Puntos del cliente
+                            </b-form-group>
+                            <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
+                                <b-form-input
+                                    v-model="puntosAplicados"
+                                    min="0"
+                                    :max="venta.cliente.Puntos"
+                                    @input="aplicarPuntos"
+                                    type="number"
+                                ></b-form-input>
+                            </b-input-group>
+                            <b-form-text v-if="descuentoPuntos.ValorPunto">
+                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
+                            </b-form-text>
+                        </div>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
@@ -156,6 +162,7 @@
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -183,7 +190,6 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox 
-                                                    id="checkbox1"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -292,6 +298,7 @@ import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
+import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 
@@ -302,6 +309,7 @@ export default {
     },
     mounted () {
         this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -319,6 +327,7 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' },
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -387,7 +396,7 @@ export default {
                     IdDocVentaPuntoVenta: 1,
                     PuntoVenta: 'CAJA1'
                 },
-                vendedor: {},
+                vendedor: this.venta.vendedor || {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -415,6 +424,19 @@ export default {
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.getNumeroVenta()
+        },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -608,8 +630,9 @@ export default {
         ProductosCarrito,
         ClientesForm,
         ConfigVenta,
-        PreOrdenLista,
-        Proformas
+        Proformas,
+        PagoDeuda,
+        PreOrdenLista
     }
 }
 </script>

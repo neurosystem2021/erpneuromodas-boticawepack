@@ -50,6 +50,16 @@
             </b-form-group>
           </b-col>
       </b-row>
+      <b-row>
+        <b-col>
+          <b-form-checkbox id="checkbox1"
+                     v-model="cliente.EsVIP"
+                     :value="1"
+                     :unchecked-value="0">
+            Marcar si es un cliente VIP
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
            Guardar
