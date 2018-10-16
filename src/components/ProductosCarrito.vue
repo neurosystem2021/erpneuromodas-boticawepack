@@ -6,7 +6,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -25,15 +25,20 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+          <b-badge variant="danger">Productos Vencidos</b-badge>
+          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+              $emit('onInputCantidad', val)
+              productos[data.index].precio = (val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -42,7 +47,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.01"
+            step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -170,6 +175,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    idAlmacen: Number,
 
     igvTotal: Boolean,
     onSetProducto: {
@@ -208,6 +214,12 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      }
+      return this.API + 'productos'
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -261,7 +273,7 @@ export default {
     }),
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+      let idProducto = this.loadCode.substring(this.loadCode.length -2);
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
@@ -324,6 +336,39 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        let style = 'ss'
+
+        // cambiar color los vencidos
+        var dt = new Date()
+        var anio = dt.getFullYear()
+        var mes =  dt.getMonth() + 1
+        var dia = dt.getDate()
+        var fechaVen = new Date(data.FechaVen).getTime()
+        
+        var hoy = anio + "-" + mes + "-" + dia
+        hoy = new Date(hoy).getTime()
+        var en4meses = anio + '-' + (mes + 4) + '-' + dia
+        en4meses = new Date(en4meses).getTime()
+
+        if(fechaVen < hoy && data.stock > 0) {
+          style = 'danger'
+        }
+
+        // cambiar color los que faltan 4 meses por vencer
+        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+          style = 'ambar'
+        }
+
+
+        return `
+        <div class="${style}">
+          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
+          / F. Vencimiento: ${data.FechaVen}
+        </div>
+        `
+      }
       return `
         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
       `
@@ -399,4 +444,16 @@ export default {
 </script>
 
 <style>
+.danger {
+  background-color:#ff7675;
+  color: #ffffff;
+}
+.ambar {
+  background-color: #feca57;
+  color: #ffffff;
+}
+.tabla-carrito .table-sm td  {
+  font-size: .8rem!important;
+}
 </style>
+

@@ -4,7 +4,7 @@
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 
-                title="Configurar Venta" 
+                title="Configurar Venta ( Solo para clientes VIP )" 
                 size="md" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
@@ -25,7 +25,7 @@
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
-                    <b-col><label for="input-porcada">El cliente gana:</label></b-col>
+                    <b-col><label for="input-porcada">El cliente VIP gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
                         <b-form-input v-model="puntos"
