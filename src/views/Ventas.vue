@@ -32,7 +32,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="BOLETA/IGV ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -562,7 +562,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
