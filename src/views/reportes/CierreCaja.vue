@@ -47,8 +47,16 @@
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
+              <td>Total Pago S/.</td>
+              <td>{{ granTotal | moneda }}</td>
+            </tr>
+          </tbody>
+        </table>          
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
               <td>Salida S/.</td>
-              <td>{{ (granTotal + totalVentasCredito) | moneda }} </td>
+              <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
             </tr>
             <tr>
               <td>Credito S/.</td>
@@ -56,7 +64,7 @@
             </tr>
             <tr>
               <td>Contado S/.</td>
-              <td>{{ granTotal | moneda }} </td>
+              <td>{{ granTotalSinPagoCliente | moneda }} </td>
             </tr>
           </tbody>
         </table>
@@ -319,6 +327,9 @@ export default {
     },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+    },
+    granTotalSinPagoCliente () {
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
