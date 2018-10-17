@@ -160,7 +160,7 @@ export default {
 			this.$refs.modalCarrito.show()
 		},
 		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones').then(res => {
+			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
 				this.habitaciones = res.data
 				/* this.pisos.forEach(piso => {
 					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
