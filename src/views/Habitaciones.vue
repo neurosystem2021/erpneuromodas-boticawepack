@@ -14,6 +14,7 @@
 										class="text-center">
 										
 								<h5>{{ hab.Producto }}</h5>
+								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
