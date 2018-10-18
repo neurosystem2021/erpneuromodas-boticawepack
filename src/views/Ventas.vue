@@ -321,8 +321,8 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+                    /*{ key: 'FechaAlquiler', label: 'Fecha Inicio' },
+                    { key: 'FechaAlquilerFin', label: 'Fecha Fin'},*/
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
