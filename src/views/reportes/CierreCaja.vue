@@ -349,7 +349,6 @@ export default {
     totalIngresos () {
       let total = 0
       this.ingresos.forEach(ingreso => {
-      console.log(ingreso)
         if (!ingreso.Anulado) total += ingreso.Importe
       });
       return total 
@@ -408,10 +407,8 @@ export default {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
-            console.log(response)
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            console.log(this.$refs.inputVendedor.$refs.input)
             this.$refs.inputVendedor.$refs.input.disabled = true
         })
         .catch((error) => {
