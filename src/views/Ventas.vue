@@ -19,7 +19,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta">
+            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -31,7 +31,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="TICKET"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -356,6 +356,13 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadFirstAlmacen () {
+            this.axios.get(this.API + 'almacenes/primero')
+                .then(res => {
+                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    this.venta.almacen = res.data
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
@@ -375,8 +382,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'TICKET',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0
                 },
                 almacen: {
@@ -396,6 +403,8 @@ export default {
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 }
             }
+
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -555,7 +564,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('TICKET')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')

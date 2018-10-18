@@ -38,7 +38,7 @@
       <h3 class="text-center">Cierre de Caja</h3> 
       <h4 class="si-print">Cierre de Caja </h4>
       <hr>
-      <div v-if="cierre.FechaCierre">Fecha:  <b>{{ cierre.FechaCierre }}</b></div>
+      <div v-if="cierre.FechaCierre">Fecha Fin:  <b>{{ cierre.FechaCierre }}</b></div>
       <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</b></div>
       <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <br>
@@ -101,6 +101,7 @@
                 <th>Serie</th>
                 <th>Numero</th>
                 <th>Total</th>
+                <th>Condición Venta</th>
               </tr>
             </thead>
             <tbody>
@@ -110,7 +111,14 @@
                 <td>{{ venta.Serie }}</td>
                 <td>{{ venta.Numero }}</td>
                 <td>{{ venta.Total | moneda }}</td>
+                <td>{{ estadoVenta(venta) }}</td>
               </tr>
+              <!--<tr v-for="(item, index) in ingresos" :key="index">
+                <td>{{ item.FechaDoc }}</td>
+                <td>RECIBO</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>-->
             </tbody>
           </table>
         </b-col>
@@ -341,6 +349,7 @@ export default {
     totalIngresos () {
       let total = 0
       this.ingresos.forEach(ingreso => {
+      console.log(ingreso)
         if (!ingreso.Anulado) total += ingreso.Importe
       });
       return total 
@@ -444,7 +453,7 @@ export default {
         this.$refs[ref].handleDoubleClick()
     },
     estadoVenta (venta) {
-      return venta.Anulado ? 'ANULADO' : 'APLICADO'
+      return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
     },
     getVentas () {
       let params = {
@@ -503,7 +512,16 @@ export default {
       }).then(res =>{
         this.cierre = res.data[0]
       })
-    }
+    },
+    /*getPenultimoCierre(id) {
+      this.axios.get(this.API + 'cierrecaja/penultimo', {
+        params: {
+          idCierre: id
+        }
+      }).then(res =>{
+        this.cierre = res.data[0]
+      })
+    }*/
   },
   components: {
     CierresCaja
