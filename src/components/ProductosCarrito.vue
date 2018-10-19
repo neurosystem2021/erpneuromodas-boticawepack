@@ -259,7 +259,8 @@ export default {
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal / 1.18
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.subtotal)
@@ -283,8 +284,8 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
-        sumatoria = sumatoria * 0.18
-        //sumatoria = sumatoria - (sumatoria/1.18)
+        //sumatoria = sumatoria * 0.18
+        sumatoria = sumatoria - (sumatoria/1.18)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)

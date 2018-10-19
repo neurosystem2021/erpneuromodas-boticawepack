@@ -38,6 +38,7 @@
           <table class="table b-table table-striped table-hover">
             <thead>
               <tr>
+                <th>Habitación</th>
                 <th>Apellidos y Nombres</th>
                 <th>Sexo</th>
                 <th>Ocupacion</th>
@@ -57,6 +58,7 @@
             </thead>
             <tbody>
               <tr v-for="(item, index) in huespedes" :key="index">
+                <td>{{ item.Producto }}</td>
                 <td>{{ item.Cliente }}</td>
                 <td>{{ item.Sexo }}</td>
                 <td>{{ item.Ocupacion }}</td>

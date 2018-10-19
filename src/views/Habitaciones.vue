@@ -14,6 +14,7 @@
 										class="text-center">
 										
 								<h5>{{ hab.Producto }}</h5>
+								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
@@ -160,7 +161,7 @@ export default {
 			this.$refs.modalCarrito.show()
 		},
 		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones').then(res => {
+			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
 				this.habitaciones = res.data
 				/* this.pisos.forEach(piso => {
 					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
