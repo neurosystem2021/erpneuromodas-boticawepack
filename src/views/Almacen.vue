@@ -331,7 +331,6 @@ export default {
         })
 
         // Cargar la sumatoria
-        console.log('asdasd')
         this.getSumaStock()
         this.getSumaValorizado()
         this.getSumaValorizadoSin()
@@ -395,6 +394,7 @@ export default {
       });
     },
     setAlmacen (obj) {
+      console.log(obj)
       this.almacen = obj
       this.limpiarFiltros()
       console.log(this.filter)
@@ -451,11 +451,11 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputGenero.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      // this.$refs.inputModelo.setValue('')
+      // this.$refs.inputColor.setValue('')
+      // this.$refs.inputTalla.setValue('')
+      // this.$refs.inputGenero.setValue('')
+      // this.$refs.inputBotapie.setValue('')
 
       this.productoSelect = {}
       this.limpiarClassRows()
