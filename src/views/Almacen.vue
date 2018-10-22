@@ -30,7 +30,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -286,7 +286,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'PRINCIPAL'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},

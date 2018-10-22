@@ -301,7 +301,7 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         /* this.loadFirstAlmacen()
@@ -394,12 +394,12 @@ export default {
                     LimitItems: 0
                 },
                 almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'VENTA'
+                    // IdAlmacen: 1,
+                    // Almacen: 'VENTA'
                 },
                 puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    // IdDocVentaPuntoVenta: 1,
+                    // PuntoVenta: 'CAJA1'
                 },
                 vendedor: this.venta.vendedor || {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -437,6 +437,7 @@ export default {
             this.axios.get(this.API + 'puntoventa/id/' + id)
             .then(res => {
                 this.setPuntoVenta(res.data)
+                this.getNumeroVenta()
             })
         },
         setPuntoVenta (obj) {
@@ -456,6 +457,7 @@ export default {
                 // bloquear ambos inputs
                 this.$refs.inputAlmacen.$refs.input.disabled = true
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
             })
             .catch((error) => {
                 console.log(error)
@@ -589,10 +591,10 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
+                this.getVendedor()
+                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                // this.$refs.inputAlmacen.setValue('VENTA')
+                // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
