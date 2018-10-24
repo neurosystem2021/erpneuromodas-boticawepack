@@ -277,7 +277,7 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
                         <br />
                     </b-col>
@@ -583,6 +583,7 @@ export default {
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.show('Venta realizada con exito')
