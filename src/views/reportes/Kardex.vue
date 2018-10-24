@@ -58,10 +58,10 @@
               </b-form-group>
             </b-col>
             <b-col md="3" class="my-1">
-              <br>
-              <b-button variant="success" size="sm" @click="verKardex">Kardex</b-button>
-              <b-button variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
-              <b-button variant="success" size="sm" :href="hrefXls">Exportar</b-button>
+              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
+              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
+              <hr>
+              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
             </b-col>
           </b-row>
 
@@ -129,7 +129,13 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/kardexsimple?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+      let tipoKardex = 'kardexsimple'
+
+      if (this.esValorizado) {
+        tipoKardex = 'kardexvalorizado'
+      }
+
+      return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
     },
     kardexSaldo () {
       let saldo = 0
