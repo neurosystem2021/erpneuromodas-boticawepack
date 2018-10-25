@@ -32,7 +32,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA/IGV ELEC."
+                                        initValue="FACTURA/IGV ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -383,8 +383,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 8,
+                    TipoDoc: 'FACTURA/IGV ELEC.',
                     LimitItems: 0
                 },
                 almacen: {
@@ -562,7 +562,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
+                this.$refs.inputTipoVenta.setValue('FACTURA/IGV ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
