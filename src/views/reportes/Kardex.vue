@@ -148,6 +148,9 @@ export default {
             saldoCostoTotal = saldoCostoTotal + (item.IngresoCantidad * item.IngresoPrecio)
             saldoCostoUnitario = saldoCostoTotal / saldo
           } else {
+            // la salida Precio es el ultimo costo unitario de saldo
+            item.SalidaPrecio = saldoCostoUnitario
+            
             saldoCostoTotal = saldo * item.SalidaPrecio
             saldoCostoUnitario = item.SalidaPrecio
           }
