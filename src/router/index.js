@@ -11,6 +11,7 @@ import Clientes from '@/views/Clientes.vue'
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
+import Kardex from '@/views/reportes/Kardex.vue'
 
 Vue.use(Router)
 
@@ -56,6 +57,11 @@ export default new Router({
       path: '/reportes/cierrecaja/:id',
       name: 'CierreCajaId',
       component: CierreCaja
+    },
+    {
+      path: '/reportes/kardex',
+      name: 'Kardex',
+      component: Kardex
     },
     {
       path: '/facturacion',
