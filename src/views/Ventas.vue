@@ -73,7 +73,9 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+                                    
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -94,6 +96,7 @@
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                            
                                         </b-input-group-append>
                                     </b-input-group>
                                 </b-form-group>
@@ -571,7 +574,7 @@ export default {
         ProductosCarrito,
         ClientesForm,
         ConfigVenta,
-        PreOrdenLista
+        PreOrdenLista,
     }
 }
 </script>

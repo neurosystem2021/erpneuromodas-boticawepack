@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -78,14 +78,27 @@ export default {
       }
     }
   },
-  props: ['newDniRuc'],
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  /*watch: {
+    show (val) {
+      console.log(this.editCliente)
+      if (this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
+    }
+  },*/
   methods: {
     shownClienteForm () {
-      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
+*/
+      if (this.editCliente && this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
     },
     consultarDNIRUC () {
         let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
