@@ -274,6 +274,11 @@ export default {
   },
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
+    show (val) {
+      if (!val) {
+        console.log('close')
+      }
+    },
     productoUpdate (newVal) {
       if (newVal.IdProducto) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
@@ -412,6 +417,22 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      // filtro si esta ingresado correctamente
+      if (this.$refs.inputCategoria.$refs.input.value.toLowerCase() != this.producto.categoria.ProductoCategoria.toLowerCase()) {
+        this.$toasted.show('Falta seleccionar o guardar la Categoría.')
+        return;
+      }
+
+      if (this.$refs.inputMarca.$refs.input.value.toLowerCase() != this.producto.marca.ProductoMarca.toLowerCase()) {
+        this.$toasted.show('Falta seleccionar o guardar la Marca.')
+        return;
+      }
+
+      if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
+        this.$toasted.show('Falta seleccionar o guardar la Talla.')
+        return;
+      }
 
       // Agregar producto DET
       if (this.showProductoDet) {
