@@ -33,7 +33,9 @@
           <b-form-input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 105px"
+            readonly=""
+            step="0.0001"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -45,14 +47,22 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 105px"
+            readonly=""
             min="0"
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <b-form-input
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            @input="val => setSubtotal(data.index, val)"></b-form-input> 
+           <b>{{ getSubtotal(data.index) }}</b>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -392,6 +402,14 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
     },
+    setSubtotal(index, val) {
+      let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 4)
+      //let cantidad=2
+      // Vue.set(this.productos[index], 'subtotal', val)
+      Vue.set(this.productos[index], 'cantidad', cantidad)
+      //this.getSubtotal(index)
+    },
+
     getSubtotal(index) {
       
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
