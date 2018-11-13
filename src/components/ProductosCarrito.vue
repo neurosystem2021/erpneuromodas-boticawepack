@@ -346,6 +346,12 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      
+      if (obj.ControlaStock && obj.stock <= 0) {
+        this.$toasted.show('No esta permitido la venta sin stock!')
+        return;
+      }
+
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
@@ -386,6 +392,9 @@ export default {
           style = 'ambar'
         }
 
+        if (!data.ControlaStock) {
+          data.stock = '---'
+        }
 
         return `
         <div class="${style}">

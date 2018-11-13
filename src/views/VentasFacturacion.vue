@@ -319,6 +319,7 @@ export default {
       if (items.length){
         this.axios.get(this.API + 'ventas/detalle', {
            params: {
+             idAlmacen: this.almacen.IdAlmacen,
              idDocVentas: items.map((item) => item.idDocVenta),
            }
          }).then((response) => {
