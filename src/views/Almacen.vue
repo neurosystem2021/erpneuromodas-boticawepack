@@ -105,7 +105,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <!--<b-col md="3">
                 <b-form-group>
                   <label>Laboratorio:</label>
                   <autocomplete
@@ -118,7 +118,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>  
+              </b-col>  -->
               <b-col md="3">
                 <!--<b-form-group>
                   <label>Modelo:</label>
@@ -241,11 +241,12 @@ export default {
       itemsStock: [],
       isBusy: false,
       fields: [
+            { key: 'IdProducto', label: 'ID' },
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
+            /*{ key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo', sortable: true },*/
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -332,7 +333,7 @@ export default {
     },
     getStock (idProducto) {
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
+      return this.itemsStock[index] && this.$options.filters.redondear(this.itemsStock[index].stock)
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""

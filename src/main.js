@@ -50,8 +50,8 @@ Vue.component('editable',{
 })
 
 
-Vue.filter('redondear', (value) => {
-  return parseFloat(value || 0).toFixed(2)
+Vue.filter('redondear', (value, length) => {
+  return parseFloat(value || 0).toFixed(length || 2)
 })
 Vue.filter('redondeoMayor', (value) => {
   return Math.ceil(value || 0)

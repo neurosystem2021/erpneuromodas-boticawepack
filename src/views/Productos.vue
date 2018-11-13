@@ -57,11 +57,11 @@
             :per-page="perPage"
             :current-page="currentPage">
               <template slot="stock" slot-scope="data">
-                <div class="text-center" :class="{ 'table-danger' : data.item.stock <= (data.item.StockMinimo || 0) }">{{data.item.stock}}</div>
+                <div class="text-center" :class="{ 'table-danger' : data.item.stock <= (data.item.StockMinimo || 0) }">{{$options.filters.redondear(data.item.stock, 4)}}</div>
               </template>
-              <template slot="PrecioContado" slot-scope="data">
+              <!--<template slot="PrecioContado" slot-scope="data">
                 $ {{ (data.item.PrecioContado / 3.3) | redondear }}
-              </template>
+              </template>-->
             </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
@@ -108,7 +108,7 @@ export default {
             { key: 'CodigoBarra', label: 'Codigo', sortable: true },
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            // { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
             { key: 'PrecioContado', label: 'Precio Contado', sortable: true },

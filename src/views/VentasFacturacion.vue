@@ -144,15 +144,18 @@
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }}
+                          <!-- {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }} -->
+                          {{ (item.Subtotal / 1.18) | redondear }} 
                         </td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal * 0.18 | redondear}}
+                          {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
                       </tr>
                     </tbody>
                   </table>
+                   <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                  
                     </b-row>
                   </b-card>
                 </template>
@@ -605,6 +608,15 @@ console.log(url)
     exportarProductos () {
 
     },
+    moverAEmitidos (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
     consultaElectronico (doc) {
       console.log(doc)
       let tipocomprobante = ''
@@ -621,7 +633,7 @@ console.log(url)
       }
 
       this.imgCaptcha = false
-      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20602905242&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
+      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20573267274&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
       
       /*this.$nextTick(() => {
         this.imgCaptcha = true

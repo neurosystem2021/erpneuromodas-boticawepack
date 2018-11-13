@@ -29,6 +29,10 @@
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>-->
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        
+        <template slot="stock" slot-scope="data">
+          {{ $options.filters.redondear(data.item.stock, 4) }}
+        </template>
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -233,7 +237,8 @@ export default {
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal / 1.18
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.subtotal)
@@ -257,8 +262,8 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
-        sumatoria = sumatoria * 0.18
-        // sumatoria = sumatoria - (sumatoria/1.18)
+        // sumatoria = sumatoria * 0.18
+        sumatoria = sumatoria - (sumatoria/1.18)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)
@@ -403,7 +408,7 @@ export default {
       // return nuevoPrecio 
     },
     setSubtotal(index, val) {
-      let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 4)
+      let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 5)
       //let cantidad=2
       // Vue.set(this.productos[index], 'subtotal', val)
       Vue.set(this.productos[index], 'cantidad', cantidad)

@@ -38,7 +38,7 @@
             </b-input-group>
           </b-form-group>
 
-           <b-form-group>
+           <!--<b-form-group>
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
@@ -53,14 +53,14 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
+                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>    -->            
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
-              </b-input-group-append>
+              <!--</b-input-group-append>
             </b-input-group>
-          </b-form-group>
+          </b-form-group>-->
           
           <b-form-group>
-            <label>Artículo:</label>
+            <label>Producto:</label>
             <b-form-input v-model="producto.Producto"
               ref="inputProducto"
               required="required"
@@ -75,7 +75,7 @@
         </b-col>
         <b-col md="6">
 
-          <b-form-group>
+          <!--<b-form-group>
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
@@ -90,11 +90,11 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearModelo"><b>Guardar</b></b-btn>                
+                <b-btn variant="primary" @click="crearModelo"><b>Guardar</b></b-btn>         -->       
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
-              </b-input-group-append>
+              <!--</b-input-group-append>
             </b-input-group>
-          </b-form-group>
+          </b-form-group>-->
           
           <b-form-group>
             <label>Medición:</label>
@@ -102,7 +102,7 @@
               required="required"
               :url="API + 'mediciones'"
               ref="inputMedicion"
-              initValue="UNIDAD"
+              initValue="GALONES"
               anchor="ProductoMedicion"
               label="writer"
               :placeholder.sync="producto.medicion.ProductoMedicion"
@@ -349,7 +349,7 @@ export default {
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('UNIDAD')
+      this.$refs.inputMedicion.setValue('GALONES')
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
@@ -381,7 +381,7 @@ export default {
         //talla: {},
         medicion: {
           IdProductoMedicion:6,
-          ProductoMedicion:"UNIDAD"
+          ProductoMedicion:"GALONES"
         }
       }
     },
