@@ -144,10 +144,11 @@
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }}
+                          <!-- {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }} -->
+                          {{ (item.Subtotal / 1.18) | redondear }}
                         </td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal * 0.18 | redondear}}
+                          {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
                       </tr>
