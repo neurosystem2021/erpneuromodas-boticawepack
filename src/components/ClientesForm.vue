@@ -25,9 +25,21 @@
                 type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
-            <label>Dirección:</label>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -73,6 +85,8 @@ export default {
         Cliente: '',
         DniRuc: '',
         Direccion: '',
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
         Email: ''
       }

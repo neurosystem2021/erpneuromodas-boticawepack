@@ -97,6 +97,12 @@
                                             
                                         </b-input-group-append>
                                     </b-input-group>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
+
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -313,6 +319,7 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
@@ -401,7 +408,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                CampoDireccion: 'Direccion'
             }
 
             this.descuentoGeneral = 0
