@@ -44,7 +44,6 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -61,7 +60,6 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="CAJA1"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -156,6 +154,7 @@
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -183,7 +182,6 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox 
-                                                    id="checkbox1"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -299,7 +297,8 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        // this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -357,6 +356,13 @@ export default {
                     this.venta.almacen = res.data
                 })
         },
+        loadFirstPuntoVenta () {
+            this.axios.get(this.API + 'puntoventa/primero')
+                .then(res => {
+                    this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta)
+                    this.setPuntoVenta(res.data)
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
@@ -381,14 +387,14 @@ export default {
                     LimitItems: 0
                 },
                 almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'VENTA'
+                    // IdAlmacen: 1,
+                    // Almacen: 'VENTA'
                 },
                 puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    // IdDocVentaPuntoVenta: 1,
+                    // PuntoVenta: 'CAJA1'
                 },
-                vendedor: {},
+                vendedor: this.venta.vendedor || {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -397,6 +403,8 @@ export default {
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 }
             }
+
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -407,13 +415,47 @@ export default {
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+                this.getNumeroVenta()
+            })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -549,12 +591,12 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
+                this.getVendedor()
+                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                // this.$refs.inputAlmacen.setValue('VENTA')
+                // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
+                // this.$refs.inputVendedor.setValue('')
 
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
