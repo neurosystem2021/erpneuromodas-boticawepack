@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Cargar Pre Orden</b-button>
+        <b-button @click="cargarPreOrden" variant="outline-success">Cargar Pre Orden</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
@@ -14,13 +14,18 @@
                     <b-table 
                         id="my-table" 
                         striped hover 
+                        ref="tablaPreOrden"
                         :busy.sync="isBusy" 
                         :filter="filter"
                         :items="myProvider" 
                         @row-clicked="selectPreOrden"
                         :fields="fields"
                         :per-page="perPage"
-                        :current-page="currentPage"></b-table>
+                        :current-page="currentPage">
+                        <template slot="eliminar" slot-scope="data">
+                            <button class="btn btn-danger" type="button" @click.stop="eliminarPreOrden(data.item)">Eliminar</button>
+                        </template>
+                    </b-table>
                     <b-row>
                     <b-col md="6" class="my-1">
                         <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -56,7 +61,7 @@ import { mapActions } from 'vuex'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc' ],
+                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc', 'eliminar' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -68,8 +73,23 @@ import { mapActions } from 'vuex'
                 add: 'agregarProducto',
                 obtenerStok: 'obtenerStock'
             }),
+            cargarPreOrden () {
+                this.show = true
+                this.$refs.tablaPreOrden.refresh()
+            },
+            eliminarPreOrden (data) {
+                var r = confirm('Está Seguro que desea eliminar la Pre Orden?');
+                if (r) {
+                    // axios post
+                    this.axios.post(this.API + 'preorden/delete', {
+                        idPreOrden: data.IdPreOrden
+                    })
+                    .then((response) => {
+                        this.$refs.tablaPreOrden.refresh()
+                    })
+                }
+            },
             selectPreOrden (item) {
-                console.log(item)
                 this.axios.get(this.API + 'preorden/detalle', {
                     params: {
                         idPreOrden: item.IdPreOrden

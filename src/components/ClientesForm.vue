@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -25,9 +25,21 @@
                 type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
-            <label>Dirección:</label>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -73,19 +85,34 @@ export default {
         Cliente: '',
         DniRuc: '',
         Direccion: '',
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
         Email: ''
       }
     }
   },
-  props: ['newDniRuc'],
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  /*watch: {
+    show (val) {
+      console.log(this.editCliente)
+      if (this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
+    }
+  },*/
   methods: {
     shownClienteForm () {
-      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
+*/
+      if (this.editCliente && this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
     },
     consultarDNIRUC () {
         let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
