@@ -38,14 +38,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo }}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -67,14 +67,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa }}</td>
+              <td>S/. {{ item.Visa | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -97,14 +97,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard }}</td>
+              <td>S/. {{ item.Mastercard | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -124,14 +124,14 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total }}</td>
+              <td>S/. {{ item.Total | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -152,14 +152,14 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos }}</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -177,14 +177,14 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas }}</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
