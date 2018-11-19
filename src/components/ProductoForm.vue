@@ -38,7 +38,7 @@
             </b-input-group>
           </b-form-group>
 
-           <!--<b-form-group>
+           <b-form-group>
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
@@ -53,11 +53,11 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>    -->            
+                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>             
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
-              <!--</b-input-group-append>
+              </b-input-group-append>
             </b-input-group>
-          </b-form-group>-->
+          </b-form-group>
           
           <b-form-group>
             <label>Producto:</label>
