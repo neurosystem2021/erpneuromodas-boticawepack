@@ -155,7 +155,7 @@
                   </table>
 
                   <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
-
+                  <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
                     </b-row>
                   </b-card>
                 </template>
@@ -612,6 +612,15 @@ console.log(url)
     moverAEmitidos (doc) {
       this.loading = true
       this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
+    cambiarAAnonimo (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'cambiaraanonimo', {
         idDocVenta: doc.idDocVenta
       }).then( response => {
         this.$refs.tablaVentas.refresh()
