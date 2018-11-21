@@ -12,6 +12,7 @@ import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import Formato from '@/views/reportes/formato.vue'
 
 Vue.use(Router)
@@ -63,6 +64,11 @@ export default new Router({
       path: '/reportes/kardex',
       name: 'Kardex',
       component: Kardex
+    },
+    {
+      path: '/reportes/articulosmovimientos',
+      name: 'Articulosmovimientos',
+      component: Articulosmovimientos
     },
     {
       path: '/reportes/formato',

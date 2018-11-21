@@ -234,7 +234,10 @@
                     {{ getStock(data.item.IdProducto) }}
                   </div>
                 </template>
-
+                <template slot="Producto" slot-scope="data">
+                  <div>{{data.item.Producto | quitarcodigo}}</div>
+                </template>
+                
               </b-table>
           </b-col>
           <b-row>

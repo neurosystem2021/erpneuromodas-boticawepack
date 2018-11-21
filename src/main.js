@@ -65,7 +65,9 @@ Vue.filter('moneda', (value, simbolo) => {
   }
   return parseFloat(value || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
 })
-
+Vue.filter('quitarcodigo', (value) => {
+  return value.substring(0, value.lastIndexOf('-'));
+})
 
 window.Vue = Vue
 
