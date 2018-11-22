@@ -256,7 +256,7 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
@@ -265,10 +265,10 @@ export default {
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
         
-        this.producto.modelo = {
+        /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
-        }
+        }*/
         /*this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
@@ -287,7 +287,7 @@ export default {
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
-        this.producto.ProductoModelo = newVal.ProductoModelo
+        // this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
 
