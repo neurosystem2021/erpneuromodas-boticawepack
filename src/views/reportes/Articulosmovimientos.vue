@@ -107,7 +107,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     verArticulos () {
-      this.axios.get(this.API + 'productos/masvendidos?limit=0', {
+      this.axios.get(this.API + 'productos/masrotacion?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
               fechaDesde: this.fechaDesde,
