@@ -87,7 +87,7 @@
               </b-col>
               <b-col md="3">
                 <b-form-group>
-                  <label>Producto:</label>
+                  <label>Artículo:</label>
                   <autocomplete
                     :url="API + 'productos'"
                     ref="inputProducto"
@@ -297,7 +297,7 @@ export default {
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'Producto', sortable: true },
+            { key: 'Producto', label: 'Artículo', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'Color', sortable: true },

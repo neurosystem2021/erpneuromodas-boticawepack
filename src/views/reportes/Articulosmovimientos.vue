@@ -60,7 +60,7 @@
               <tbody>
                 <tr v-for="(prod, i) in productos" :key="i">
                   <td>{{ prod.CodigoBarra }}</td>
-                  <td>{{ prod.Producto + ' ' + prod.ProductoCategoria + ' ' + prod.ProductoMarca }}</td>
+                  <td>{{ prod.Producto | quitarcodigo }} - {{prod.ProductoCategoria + ' - ' + prod.ProductoMarca }}</td>
                   <td>{{ prod.ProductoMedicion }}</td>
                   <td>{{ prod.TotalVentas }}</td>
                   <td>{{ prod.TotalCompras }}</td>
