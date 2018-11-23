@@ -77,7 +77,17 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
+                            <b-col md="4">
+                                <b-form-group>
+                                    <label>Nº PLACA:</label>
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            required
+                                            class="form-control"
+                                            placeholder="Nº Placa" />
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="8">
                                 <b-form-group>
                                     <label>Cliente:</label>
                                     <b-input-group>
@@ -93,11 +103,11 @@
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
-                                        <input v-model="dni"
+                                        <!--<input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
                                             class="form-control"
-                                            placeholder="Codigo de Barra" />
+                                            placeholder="Codigo de Barra" />-->
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
@@ -105,6 +115,7 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
+                            
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -384,6 +395,7 @@ export default {
             this.venta = {
                 EsCredito: 0,
                 Serie: '',
+                Placa: '',
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
@@ -433,7 +445,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.$refs.inputVendedor.$refs.input.disabled = true
             })
             .catch((error) => {
                 console.log(error)
@@ -544,6 +556,7 @@ export default {
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
             // this.$refs.inputVendedor.setValue('')
+            this.$refs.carrito.pagocon = ''
         },
         guardarProforma () {
 
@@ -608,6 +621,7 @@ export default {
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)
