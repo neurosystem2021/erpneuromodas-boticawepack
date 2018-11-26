@@ -11,7 +11,7 @@
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
-            :on-select="setProducto"
+            :on-select="abrirCalcularM2"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
@@ -162,6 +162,19 @@
           </table>
     </b-col>
     <br><br>
+    
+     <b-modal size="sm" ref="modalCalcularM2" hide-footer title="Calcular M2">
+      <div class="d-block text-center">
+        <label>Metros Cuadrados (M²):</label>
+        <b-form-input
+            type="number"
+            placeholder="M²"
+            @change="val => calcularm2(val, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo )"></b-form-input><br>
+        <hr />
+        {{ mensajeM2 }}
+      </div>
+      <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
+    </b-modal>
   </b-row>
 </template>
 
@@ -183,7 +196,9 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      productoSelect: {},
+      mensajeM2: ''
     }
   },
   watch: {
@@ -336,6 +351,74 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
+    abrirCalcularM2 (obj) {
+      this.$refs.modalCalcularM2.show()
+      this.productoSelect = obj
+      
+    },
+    calcularm2 (m2, rendimiento = 0, ancho = 0, largo = 0, productoDetCantidad = 0) {
+      console.log('cambio')
+      rendimiento = (rendimiento == '0' ) ? false : rendimiento;
+      ancho = (ancho == '0' ) ? false : ancho;
+      largo = (largo == '0' ) ? false : largo;
+
+      if ((!rendimiento && !ancho) || (!rendimiento && !largo)) {
+        alert('El producto no cuenta con un rendimiento en M2, un ancho o largo establecido');
+        return;
+      }
+
+      var cantidad = 0
+      var mensaje = 0
+      console.log(rendimiento)
+      if(rendimiento && rendimiento != '0') {
+        cantidad = (m2 / rendimiento).toFixed(1);
+        cantidad = Math.ceil(cantidad)
+        mensaje = "Total de cajas requeridas: " + cantidad
+      } else {
+        console.log(ancho)
+        console.log(largo)
+        cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
+        cantidad = Math.ceil(cantidad)
+        mensaje = "Total de unidades requeridas: " + cantidad
+      }
+
+      if (cantidad > 0) {
+        /*mensajeAdicional = ''
+        if (productoDetCantidad) {
+          if (cantidad > productoDetCantidad) {
+            var cajas = Math.floor(cantidad / productoDetCantidad);
+            var unidades = cantidad%productoDetCantidad;
+            mensajeAdicional += '(Cajas: ' + cajas;
+            if (unidades > 0) {
+              mensajeAdicional += ', Unidades: ' + unidades + ')';
+            }else {
+              mensajeAdicional += ')';
+            }
+          }
+        } */
+        this.mensajeM2 = mensaje;
+        this.productoSelect.cantidad = cantidad
+      }
+
+    },
+    seleccionarCalcularM2 () {
+      this.$refs.modalCalcularM2.hide()
+
+      this.$refs.autocompleteProducto.setValue('')
+      
+      this.productoSelect.precio = 0
+      this.productoSelect.cantidad = this.productoSelect.cantidad || 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      this.productoSelect.descuento = 0
+      this.productoSelect.nuevoPrecioContado = 0
+      this.productoSelect = this.onSetProducto(this.productoSelect)
+      this.add([this.productoSelect, () => {
+        this.$emit('onAddProducto', this.productoSelect)
+      }])
+
+      this.setProducto(this.productoSelect)
+    },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
