@@ -163,15 +163,18 @@
     </b-col>
     <br><br>
     
-     <b-modal size="sm" ref="modalCalcularM2" hide-footer title="Calcular M2">
+     <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular M2">
       <div class="d-block text-center">
+        <b>{{ productoSelect.Producto }}</b>
+        <hr />
         <label>Metros Cuadrados (M²):</label>
         <b-form-input
             type="number"
+            ref="inputM2"
             placeholder="M²"
-            @change="val => calcularm2(val, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo )"></b-form-input><br>
+            @input="val => calcularm2(val, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo, productoSelect.ProductoDetCantidad )"></b-form-input><br>
         <hr />
-        {{ mensajeM2 }}
+        <p v-html="mensajeM2"></p>
       </div>
       <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
     </b-modal>
@@ -198,7 +201,8 @@ export default {
       vuelto: 0,
       pagocon: 0,
       productoSelect: {},
-      mensajeM2: ''
+      mensajeM2: '',
+      M2: ''
     }
   },
   watch: {
@@ -352,12 +356,14 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     abrirCalcularM2 (obj) {
+      this.setProducto(obj)
       this.$refs.modalCalcularM2.show()
       this.productoSelect = obj
-      
+      this.productoSelect.cantidad = 1
+      this.mensajeM2 = ''
+      this.$refs.inputM2.$refs.input.value = ''
     },
     calcularm2 (m2, rendimiento = 0, ancho = 0, largo = 0, productoDetCantidad = 0) {
-      console.log('cambio')
       rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       ancho = (ancho == '0' ) ? false : ancho;
       largo = (largo == '0' ) ? false : largo;
@@ -369,21 +375,21 @@ export default {
 
       var cantidad = 0
       var mensaje = 0
-      console.log(rendimiento)
+      // console.log(rendimiento)
       if(rendimiento && rendimiento != '0') {
         cantidad = (m2 / rendimiento).toFixed(1);
         cantidad = Math.ceil(cantidad)
         mensaje = "Total de cajas requeridas: " + cantidad
       } else {
-        console.log(ancho)
-        console.log(largo)
+        // console.log(ancho)
+        // console.log(largo)
         cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
         cantidad = Math.ceil(cantidad)
         mensaje = "Total de unidades requeridas: " + cantidad
       }
 
       if (cantidad > 0) {
-        /*mensajeAdicional = ''
+        var mensajeAdicional = ''
         if (productoDetCantidad) {
           if (cantidad > productoDetCantidad) {
             var cajas = Math.floor(cantidad / productoDetCantidad);
@@ -395,29 +401,23 @@ export default {
               mensajeAdicional += ')';
             }
           }
-        } */
+        } 
         this.mensajeM2 = mensaje;
+        this.mensajeM2 += " <br /> " + mensajeAdicional
         this.productoSelect.cantidad = cantidad
+      }
+      
+      if(!m2) {
+        this.mensajeM2 = ''
+        this.productoSelect.cantidad = 1
       }
 
     },
     seleccionarCalcularM2 () {
       this.$refs.modalCalcularM2.hide()
-
-      this.$refs.autocompleteProducto.setValue('')
       
-      this.productoSelect.precio = 0
-      this.productoSelect.cantidad = this.productoSelect.cantidad || 0
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
-      this.productoSelect.descuento = 0
-      this.productoSelect.nuevoPrecioContado = 0
-      this.productoSelect = this.onSetProducto(this.productoSelect)
-      this.add([this.productoSelect, () => {
-        this.$emit('onAddProducto', this.productoSelect)
-      }])
-
-      this.setProducto(this.productoSelect)
+      this.productoSelect.cantidad = this.productoSelect.cantidad || 1
+      // this.setProducto(this.productoSelect)
     },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')

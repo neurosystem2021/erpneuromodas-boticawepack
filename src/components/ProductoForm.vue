@@ -71,7 +71,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <!--<b-form-group>
             <label>Presentación:</label>
             <autocomplete
                 required="required"
@@ -85,7 +85,7 @@
                 :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
-          </b-form-group>
+          </b-form-group>-->
 
           
           
@@ -138,6 +138,40 @@
           
         </b-col>
       </b-row>
+
+      <b-row class="rendimiento">
+        <b-col md="4">
+          <b-form-group>
+            <label>Rendimiento (M²):</label>
+            <b-form-input
+              v-model="producto.Rendimiento"
+              type="number"
+              :readonly="!producto.EsPadre"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+            <label>Ancho (cm):</label>
+            <b-form-input
+              v-model="producto.Ancho"
+              type="number"
+              :readonly="!!producto.EsPadre"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+            <label>Largo (cm):</label>
+            <b-form-input
+              v-model="producto.Largo"
+              type="number"
+              :readonly="!!producto.EsPadre"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
+
 
       <hr v-if="producto.IdProducto || producto.EsPadre" />
       <b-row v-if="producto.IdProducto || producto.EsPadre">
@@ -260,7 +294,7 @@ export default {
         
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+        // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
@@ -292,9 +326,12 @@ export default {
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
         //this.producto.ProductoModelo = newVal.ProductoModelo
-        this.producto.ProductoPresentacion = newVal.ProductoPresentacion
+        // this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.Rendimiento = newVal.Rendimiento
+        this.producto.Ancho = newVal.Ancho
+        this.producto.Largo = newVal.Largo
 
       } else {
 
@@ -381,7 +418,7 @@ export default {
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      // this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
@@ -401,6 +438,9 @@ export default {
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: '',
+        Rendimiento: '',
+        Ancho: '',
+        Largo: '',
         StockMinimo: 0,
         PrecioContado: '',
         // Botapie: '',
@@ -535,6 +575,11 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
+
+.rendimiento {
+  background-color: #e1f7d5;
+  padding: 5px;
+}
 
 </style>
