@@ -4,13 +4,13 @@
         <b-row>
           <b-col md="12"  class="my-1">
             <b-row>
-              <b-col md="2">
+              <b-col md="2" v-if="(idPerfil == 1)">
                 <div class="suma-stock text-center">
                   <b>Stock <br> Valorizado</b>
                   <div> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
-              <b-col md="2">
+              <b-col md="2" v-if="(idPerfil == 1)">
                 <div class="suma-stock text-center">
                   <b>Stock Valorizado<br> Sin Utilidad</b>
                   <div> S/. {{ sumaValorizadoSin | moneda }} </div>
@@ -308,7 +308,8 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      idPerfil: sessionStorage.getItem('idPerfil')
     }
   },
   watch: {

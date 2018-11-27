@@ -173,6 +173,7 @@
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
+                                                        :readonly="(idPerfil == 3) ? true : false"
                                                         @input="aplicarDescuentoGeneral"
                                                         type="number"
                                                     ></b-form-input>
@@ -336,7 +337,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            idPerfil: sessionStorage.getItem('idPerfil')
         }
     },
     watch: {

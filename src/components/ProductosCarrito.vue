@@ -48,6 +48,7 @@
             style="width: 75px"
             min="0"
             step="0.00001"
+            :readonly="(idPerfil == 2 || idPerfil == 3) ? true : false"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -184,7 +185,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      idPerfil: sessionStorage.getItem('idPerfil')
     }
   },
   watch: {
