@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <proformas></proformas>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -27,7 +30,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="BOLETA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -279,6 +282,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
+                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -296,7 +300,7 @@ import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
-
+import Proformas from '@/components/ProformaLista.vue'
 
 export default {
     beforeMount () {
@@ -389,8 +393,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 2,
+                    TipoDoc: 'BOLETA',
                     LimitItems: 0
                 },
                 almacen: {
@@ -452,7 +456,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -558,6 +562,46 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
+        guardarProforma () {
+
+            if(!this.productos.length) {
+                this.$toasted.show('No hay productos para crear la proforma')
+                this.inProgress = false            
+                return          
+            }
+
+            if(!this.venta.cliente.IdCliente) {
+                this.$toasted.show('Debe seleccionar un cliente')
+                this.inProgress = false
+                return
+            }
+
+            if(!this.venta.vendedor.Usuario) {
+                this.$toasted.show('Debe seleccionar un vendedor')
+                this.inProgress = false
+                return
+            }
+
+            this.venta.productos = this.productos
+            
+            this.axios.post(this.API + 'proformas', this.venta)
+            .then((response) => {
+                console.log(response)
+                this.$toasted.show('Proforma Guardada con exito')
+
+                this.initForm()
+                this.limpiarCart()
+                this.getVendedor()
+                this.$refs.inputCliente.setValue('')
+
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.inProgress = false
+            })
+        },
         guardarVenta (evt) {
             evt.preventDefault();
 
@@ -625,6 +669,7 @@ export default {
         ClientesForm,
         ConfigVenta,
         PreOrdenLista,
+        Proformas
     }
 }
 </script>
