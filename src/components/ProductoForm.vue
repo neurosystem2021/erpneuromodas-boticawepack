@@ -184,6 +184,14 @@
               type="number"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Stock Minimo:</label>
+            <b-form-input   
+              required="required"
+              v-model="producto.StockMinimo"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
         </b-col>
       </b-row>
 
@@ -326,6 +334,7 @@ export default {
         this.producto.Botapie = newVal.Botapie
         this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
+        this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
@@ -408,6 +417,7 @@ export default {
         CodigoBarra: '',
         Color: '',
         PorcentajeUtilidad: '',
+        StockMinimo: 0,
         PrecioContado: '',
         Botapie: '',
         Genero: '',
