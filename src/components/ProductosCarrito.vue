@@ -357,7 +357,9 @@ export default {
     },  
     abrirCalcularM2 (obj) {
       this.setProducto(obj)
-      this.$refs.modalCalcularM2.show()
+      if (obj.Rendimiento || obj.Ancho || obj.Largo) {
+        this.$refs.modalCalcularM2.show()
+      }
       this.productoSelect = obj
       this.productoSelect.cantidad = 1
       this.mensajeM2 = ''
