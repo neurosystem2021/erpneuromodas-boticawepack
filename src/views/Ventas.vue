@@ -168,11 +168,12 @@
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <b-input-group prepend="S/" append="Descuento">
+                                                <b-input-group prepend="%" append="Descuento">
                                                     <b-form-input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
+                                                        max="100"
                                                         :readonly="(idPerfil == 3) ? true : false"
                                                         @input="aplicarDescuentoGeneral"
                                                         type="number"
@@ -528,6 +529,7 @@ export default {
 
             this.axios.get(this.API + 'ventas/descuento/' + this.puntosAplicados)
             .then((response) => {
+                // aqui dxdiag
                 this.descuentoPuntos = response.data
                 this.aplicarDescuento(response.data.descuento)
             })
