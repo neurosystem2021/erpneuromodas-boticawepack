@@ -532,6 +532,7 @@ export default {
                 // aqui dxdiag
                 // console.log(response.data.descuento)
                 // console.log(this.totalCart)
+                console.log(this.$refs.carrito.sumatoriaSubTotal + this.$refs.carrito.sumatoriaDescuento)
                 var porcentaje = (response.data.descuento * 100) / this.totalCart
                 this.descuentoPuntos = response.data
                 //this.aplicarDescuento(response.data.descuento)
