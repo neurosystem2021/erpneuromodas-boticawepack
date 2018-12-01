@@ -530,8 +530,12 @@ export default {
             this.axios.get(this.API + 'ventas/descuento/' + this.puntosAplicados)
             .then((response) => {
                 // aqui dxdiag
+                // console.log(response.data.descuento)
+                // console.log(this.totalCart)
+                var porcentaje = (response.data.descuento * 100) / this.totalCart
                 this.descuentoPuntos = response.data
-                this.aplicarDescuento(response.data.descuento)
+                //this.aplicarDescuento(response.data.descuento)
+                this.aplicarDescuento(porcentaje)
             })
             .catch((error) => {
                 console.log(error)
