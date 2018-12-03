@@ -112,7 +112,6 @@ export default {
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
             { key: 'PrecioContado', label: 'Precio Contado', sortable: true },
-            { key: 'PrecioCosto', label: 'Precio Costo', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

@@ -45,7 +45,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 110px"
             min="0"
             step="0.00001"
             placeholder="Precio"
