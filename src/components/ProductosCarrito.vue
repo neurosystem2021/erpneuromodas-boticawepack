@@ -45,7 +45,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 110px"
             min="0"
             step="0.00001"
             :readonly="(idPerfil == 2 || idPerfil == 3) ? true : false"
@@ -459,6 +459,12 @@ export default {
       }
       if (this.productos[index].descuento) {
         total -= parseFloat(this.productos[index].descuento)
+      }
+
+      if (total <= 0) {
+        alert('El total de un producto no puede ser menor o igual a 0')
+        Vue.set(this.productos[index], 'descuento', 0)
+        return
       }
 
       total =  this.$options.filters.redondear(total)
