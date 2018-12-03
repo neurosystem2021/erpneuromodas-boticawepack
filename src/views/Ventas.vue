@@ -589,6 +589,14 @@ export default {
                 return          
             }
 
+            // check if factura DNI
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if(!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
+            }
+
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0

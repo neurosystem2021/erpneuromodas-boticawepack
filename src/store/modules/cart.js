@@ -40,7 +40,7 @@ const mutations = {
     })
     state.productos = state.productos.map(prod => {
       // prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
-      prod.descuento = ((descuento / 100) * prod.precio).toFixed(2)
+      prod.descuento = ((descuento / 100) * (prod.precio*prod.cantidad)).toFixed(2)
       return prod
     })
   },
