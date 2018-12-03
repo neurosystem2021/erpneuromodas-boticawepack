@@ -44,7 +44,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 120px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -95,6 +95,7 @@
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
+            style="width:100px"
             type="number"
             min="0"
             step="0.01"

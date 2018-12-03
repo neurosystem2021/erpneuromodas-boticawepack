@@ -103,7 +103,7 @@ export default {
   },*/
   methods: {
     shownClienteForm () {
-      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
