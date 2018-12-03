@@ -529,14 +529,14 @@ export default {
 
             this.axios.get(this.API + 'ventas/descuento/' + this.puntosAplicados)
             .then((response) => {
-                // aqui dxdiag
-                // console.log(response.data.descuento)
-                // console.log(this.totalCart)
-                console.log(this.$refs.carrito.sumatoriaSubTotal + this.$refs.carrito.sumatoriaDescuento)
-                var porcentaje = (response.data.descuento * 100) / this.totalCart
-                this.descuentoPuntos = response.data
-                //this.aplicarDescuento(response.data.descuento)
-                this.aplicarDescuento(porcentaje)
+                this.$nextTick(() => {
+                    var subTotal = parseFloat(this.$refs.carrito.sumatoriaSubTotal) + parseFloat(this.$refs.carrito.sumatoriaDescuento)
+                    var porcentaje = (response.data.descuento * 100) / subTotal
+                    this.descuentoPuntos = response.data
+                    //this.aplicarDescuento(response.data.descuento)
+                    this.aplicarDescuento(porcentaje)
+                })
+
             })
             .catch((error) => {
                 console.log(error)

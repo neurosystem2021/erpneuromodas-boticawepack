@@ -134,11 +134,11 @@
               </tr>
               <tr v-if="sumatoriaDescuento > 0">
                 <td class="table-danger">Descuento</td>
-                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
+                <td class="table-danger">- {{ sumatoriaDescuento }}</td>
               </tr>
               <tr>
                 <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+                <td class="table-danger">{{ sumatoriaSubTotal }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
                 <td><b>IGV</b></td>
