@@ -333,6 +333,7 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     /*{ key: 'PrecioDocena', label: 'Present.' },*/
                     { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'precioMayor', label: 'Pre. Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
