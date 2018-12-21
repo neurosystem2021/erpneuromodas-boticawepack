@@ -29,6 +29,16 @@
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="stock" slot-scope="data">
+          <div v-if="!data.item.ControlaStock" >
+            {{productosCaja[data.item.IdProducto].stock}}
+          </div>
+          <div v-if="data.item.ControlaStock" >
+            {{ data.item.stock }}
+          </div>
+          
+        </template>
+        
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -171,6 +181,7 @@
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
+import axios from 'axios'
 
 export default {
   mounted() {
@@ -182,6 +193,7 @@ export default {
       loadCode: '',
       pasteCode: false,
       producto: {},
+      productosCaja: {},
       items: [],
       handleKeyDown: false,
       vuelto: 0,
@@ -343,6 +355,22 @@ export default {
         this.pasteCode = false
       }
     },*/
+    obtenerStockCaja(prod) {
+     axios.get(this.API + 'productos/stock/caja', {
+        params: {
+          idProducto: prod.IdProducto,
+          idAlmacen: this.idAlmacen
+        }
+      }).then((response) => {
+        console.log(response.data)
+        Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
+        //console.log(response.data.stock)
+          //return response.data.stock
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -353,6 +381,8 @@ export default {
         this.$toasted.show('No esta permitido la venta sin stock!')
         return;
       }
+
+      this.obtenerStockCaja(obj)
 
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
