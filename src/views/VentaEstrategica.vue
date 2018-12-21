@@ -34,7 +34,7 @@
                 </autocomplete>
               </b-form-group>
             </b-col>
-            <b-col md="2" class="my-1">
+            <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Fecha Inicio:</label>
                 <b-form-input
@@ -44,7 +44,7 @@
                   placeholder="Fecha Inicio"></b-form-input>
               </b-form-group>
             </b-col>
-            <b-col md="2" class="my-1">
+            <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Fecha Fin:</label>
                 <b-form-input
@@ -54,7 +54,7 @@
                   placeholder="Fecha Fin"></b-form-input>
               </b-form-group>
             </b-col>
-            <b-col md="3" class="my-1">
+            <b-col md="2" class="my-1">
                 <br>
               <b-button variant="success" size="sm" @click="verVentasEstrategicas">Generar</b-button>
             </b-col>
@@ -63,8 +63,8 @@
           <b-row class="text-center">
             <b-alert show variant="primary">
              <h4> Hola {{ vendedor.NombreUsuario }}.</h4>
-              El total por venta estratégica es de:
-              <h4></h4>
+              El total por venta estratégica es de: <br><br>
+              <h4>S/. {{ total | moneda}}</h4>
             </b-alert>
           </b-row>
         </b-container>
@@ -83,7 +83,8 @@ export default {
       almacen: {},
       fechaDesde: this.$moment().format("YYYY-MM-01"),
       fechaHasta: this.$moment().format("YYYY-MM-DD"),
-      vendedor: {}
+      vendedor: {},
+      total: 0
     }
   },
   methods: {
@@ -96,6 +97,7 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
       this.$refs.inputAlmacen.setValue(obj.Almacen)
+      this.verVentasEstrategicas()
     },
     getUsuario () {
         let usuario = sessionStorage.getItem('User')
@@ -129,7 +131,7 @@ export default {
         }
       })
       .then((response) => {
-          console.log(response.data)
+          this.total = response.data.total
       })
       .catch((error) => {
           console.log(error)
