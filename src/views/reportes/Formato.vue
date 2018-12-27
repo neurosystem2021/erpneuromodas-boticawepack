@@ -6,7 +6,7 @@
             <b-col md="2" class="my-1">
               <b-form-group>
                 <label>Almacen:</label>
-                <autocomplete
+                <autocomplete                  
                     required="required"
                     ref="inputAlmacen"
                     :url="API + 'almacenes'"
@@ -23,6 +23,7 @@
               <b-form-group>
                 <label>Año:</label>
                 <b-form-input
+                  :disabled="desactivado"
                   v-model="kardex.anio"
                   type="text"
                   step="1"
@@ -53,11 +54,16 @@
               <!--<b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
               --><hr>
-              <b-button :disabled="!kardex.anio" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
+              <b-button :disabled="!kardex.anio || desactivado" variant="primary" size="sm" @click="generarExcel">Generar</b-button>
+              <b-button :disabled="!kardex.anio || desactivado" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
             </b-col>
           </b-row>
 
           <b-row>
+            <b-col md="12" class="my-1">
+              <b-progress :value="progress" :max="cantidadProductos" show-progress variant="success" animated></b-progress>
+            </b-col>
+
             <!--<table class="table b-table table-striped table-hover table-sm">
               <thead>
                 <tr>
@@ -105,11 +111,19 @@ import config from '@/store/config.js'
 export default {
   mounted () {
     this.loadFirstAlmacen()
+    this.loadProductos()
   },
   data () {
     return {
       API: config.API,
       producto: {},
+      productos: [],
+      page: 1,
+      limit: 100,
+      desactivado: false,
+      cantidadProductos: 0,
+      progress: 0,
+      prodGenerados: [],
       almacen: {},
       esValorizado: false,
       kardex: {
@@ -122,7 +136,7 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/formato37?idAlmacen=' + this.almacen.IdAlmacen + '&anio='+this.kardex.anio;
+      return '/api/index.php/reporte/formato37/exportar' + '?anio=' + this.kardex.anio;
     },
     kardexSaldo () {
       let saldo = 0
@@ -179,6 +193,47 @@ export default {
     }
   },
   methods: {
+    generarExcel () {
+      // console.log(this.page);return;
+      this.desactivado = true
+      //this.productos.forEach(async (el) => {
+        this.axios.post(this.API + 'reporte/formato37', {
+          row: (this.page-2) * this.limit,
+          idAlmacen: this.almacen.IdAlmacen,
+          anio: this.kardex.anio,
+          idProductos: this.productos.map((el) => el.IdProducto)
+        })
+          .then(res => {
+            this.progress = this.limit*(this.page-1)
+            this.progress = this.progress > this.cantidadProductos ? this.cantidadProductos : this.progress
+            setTimeout(() => {
+                this.loadProductos(() => {
+                  this.generarExcel()
+                })
+            }, 2000);
+            //this.prodGenerados.push(el)
+          })
+      //})
+    },
+    loadProductos (cb) {
+      this.axios.get(this.API + 'productos/count')
+        .then(res => {
+          this.cantidadProductos = res.data.total
+        })
+
+      this.axios.get(this.API + 'productos?controlaStock=1&limit=' + this.limit + '&page='+ this.page)
+        .then(res => {
+          if(res.data.length) {
+            this.productos = res.data
+            this.page += 1
+            if (cb) cb()
+          } else {
+            this.$toasted.success('Reporte generado correctamente, ahora puede exportarlo')
+            this.progress = this.cantidadProductos
+            this.desactivado = false
+          }
+        })
+    },
     loadFirstAlmacen () {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
