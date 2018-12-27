@@ -40,7 +40,9 @@
             step="0.001"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+              if (tipo != 'mov') {
+                productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+              }
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -202,6 +204,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    tipo: String,
 
     igvTotal: Boolean,
     onSetProducto: {
