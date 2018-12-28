@@ -156,6 +156,7 @@
                   </table>
 
                   <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                  <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
                     </b-row>
                   </b-card>
                 </template>
@@ -167,7 +168,8 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                      
+                      &nbsp;&nbsp;
+                      <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
 
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
@@ -347,6 +349,17 @@ export default {
           this.setAlmacen(res.data)
         })
     },
+    regenerarPDF (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+      this.axios.post(this.API + 'generarpdfelectronico', { 
+        docVenta: doc 
+      }).then(res => {
+        console.log(res)
+        this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
+        this.loading = false
+      })
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -424,8 +437,8 @@ export default {
                   this.$toasted.success(response.data.msj_sunat)
                   // ocultar el documento emitido
                   Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
-                  let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
-                  let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+                  // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                  // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
                 }
                 Vue.set(this.itemsStatus, item.idDocVenta, response.data)
 
@@ -611,6 +624,15 @@ console.log(url)
     moverAEmitidos (doc) {
       this.loading = true
       this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
+    cambiarAAnonimo (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'cambiaraanonimo', {
         idDocVenta: doc.idDocVenta
       }).then( response => {
         this.$refs.tablaVentas.refresh()
