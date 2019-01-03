@@ -273,7 +273,8 @@ export default {
        this.axios.get(this.API + 'productos/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
+            idAlmacen: this.almacen.IdAlmacen,
+            limit: this.perPage
           }
         }).then((response) => {
              this.itemsStock = response.data
