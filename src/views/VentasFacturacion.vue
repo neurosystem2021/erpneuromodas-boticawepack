@@ -155,7 +155,7 @@
                     </tbody>
                   </table>
                    <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
-                  
+                  <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
                     </b-row>
                   </b-card>
                 </template>
@@ -346,6 +346,17 @@ export default {
           this.$refs.inputAlmacen.setValue(res.data.Almacen)
           this.setAlmacen(res.data)
         })
+    },
+    regenerarPDF (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+      this.axios.post(this.API + 'generarpdfelectronico', { 
+        docVenta: doc 
+      }).then(res => {
+        console.log(res)
+        this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
+        this.loading = false
+      })
     },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
@@ -611,6 +622,15 @@ console.log(url)
     moverAEmitidos (doc) {
       this.loading = true
       this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
+    cambiarAAnonimo (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'cambiaraanonimo', {
         idDocVenta: doc.idDocVenta
       }).then( response => {
         this.$refs.tablaVentas.refresh()
