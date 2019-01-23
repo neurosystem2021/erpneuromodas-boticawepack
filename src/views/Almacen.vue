@@ -249,7 +249,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="hrefExcel" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -271,10 +271,13 @@ export default {
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
+
+    this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen
   },
   data() {
     return {
       API: config.API,
+      hrefExcel: '',
       sumaStock: '...',
       sumaValorizado: '...',
       APISTOCK: 'productos',
@@ -419,9 +422,11 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
+      
+      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
+      console.log(this.hrefExcel);
 
       return promise.then((result) => {
         this.items = result.data
