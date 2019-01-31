@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA SERIE 2"
+                                        initValue="TICKET NO VALIDO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -327,6 +327,7 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
+                    { key: 'Color', label: 'Color'},
                     { key: 'Genero' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -381,8 +382,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 9,
-                    TipoDoc: 'BOLETA SERIE 2',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'TICKET NO VALIDO',
                     LimitItems: 8
                 },
                 almacen: {
@@ -598,7 +599,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA SERIE 2')
+                this.$refs.inputTipoVenta.setValue('TICKET NO VALIDO')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
