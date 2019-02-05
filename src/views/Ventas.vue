@@ -21,7 +21,7 @@
             <br /><br />
             <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
-                    <b-col md="7">
+                    <b-col md="6">
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
@@ -36,6 +36,21 @@
                                         placeholder=""
                                         :on-select="setTipoVenta" 
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Doc. Referencia:</label>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRef"
+                                        :url="API + 'ventas/lista'"
+                                        anchor="NroComprobante"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRef" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
@@ -54,6 +69,10 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Motivo :</label>
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -124,7 +143,7 @@
                             </b-form-text>
                         </div>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="3" >
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -312,6 +331,7 @@ export default {
     data () {
         return {
             dni: '',
+            isNota: false,
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
@@ -321,6 +341,19 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            itemsMotivoNota: [
+                { value: null, text: '-- SELECCIONE EL MOTIVO --' },
+                { value: '01', text: 'ANULACION DE LA OPERACION' },
+                { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+                { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+                { value: '04', text: 'DESCUENTO GLOBAL' },
+                { value: '05', text: 'DESCUENTO POR ITEM' },
+                { value: '06', text: 'DEVOLUCION TOTAL' },
+                { value: '07', text: 'DEVOLUCION POR ITEM' },
+                { value: '08', text: 'BONIFICACION' },
+                { value: '09', text: 'DISMINUCION EN EL VALOR' },
+                { value: '10', text: 'OTROS CONCEPTOS' }
+            ],
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
@@ -411,19 +444,42 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                NroComprobanteModifica: '',
+                CodSunatModifica: '',
+                NotaIdMotivo: '',
+                NotaDescMotivo: ''
             }
 
             this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
+            this.isNota = false
+            this.venta.NroComprobanteModifica = ''
+            this.venta.CodSunatModifica = ''
+            this.venta.NotaIdMotivo = ''
+            this.venta.NotaDescMotivo = ''
+
+            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                this.isNota = true
+            }
+
             if (obj.TieneIgv) {
                 this.tieneIgv = true
             } else {
                 this.tieneIgv = false
             }
+
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
+        },
+        setDocRef (obj) {
+            this.venta.CodSunatModifica = obj.CodSunat
+            this.venta.NroComprobanteModifica = obj.NroComprobante
+
+            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
+            }
         },
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
@@ -589,6 +645,22 @@ export default {
                 return          
             }
 
+            if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+                    this.inProgress = false
+                    return 
+                }
+
+                if(!this.venta.NotaIdMotivo) {
+                    this.$toasted.show('Debe seleccionar un Motivo')
+                    this.inProgress = false
+                    return 
+                }
+
+                this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
+            }
+
             // check if factura DNI
             var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
             if(!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
@@ -601,6 +673,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            // console.log(this.venta);return;
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.show('Venta realizada con exito')
