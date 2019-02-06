@@ -313,7 +313,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
       }
     },
     /*alterarBuscadorProductos() {
@@ -360,7 +360,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      }, { setPrecioCosto: this.tipo == 'mov' ? true : false }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
