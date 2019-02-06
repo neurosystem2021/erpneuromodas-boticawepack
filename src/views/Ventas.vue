@@ -72,7 +72,7 @@
                                 </b-form-group>
                                 <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
-                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -459,6 +459,8 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
+            
+            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
 
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
@@ -480,6 +482,20 @@ export default {
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
             }
+
+            this.axios.get(this.API + 'ventas/solonumero', {
+                params: {
+                    serie: this.venta.Serie,
+                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+                }
+            })
+            .then((response) => {
+                this.venta.Numero = response.data.numero
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
@@ -683,7 +699,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
-                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
