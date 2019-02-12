@@ -314,7 +314,7 @@ export default {
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
-            tieneIgv: true,
+            tieneIgv: false,
             venta: {},
             carrito: {
                 fields: [
@@ -557,7 +557,7 @@ export default {
                 this.$router.replace('/ventas')
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
-                this.tieneIgv = true
+                this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
