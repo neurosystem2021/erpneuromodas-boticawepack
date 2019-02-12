@@ -136,7 +136,7 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/formato37/exportar' + '?anio=' + this.kardex.anio;
+      return '/api/index.php/reporte/formato37/exportar';
     },
     kardexSaldo () {
       let saldo = 0
@@ -201,6 +201,8 @@ export default {
           row: (this.page-2) * this.limit,
           idAlmacen: this.almacen.IdAlmacen,
           anio: this.kardex.anio,
+          // fechaDesde: this.kardex.fechaDesde,
+          // fechaHasta: this.kardex.fechaHasta,
           idProductos: this.productos.map((el) => el.IdProducto)
         })
           .then(res => {

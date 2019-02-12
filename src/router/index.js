@@ -14,7 +14,7 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
-import Formato from '@/views/reportes/formato.vue'
+import Formato from '@/views/reportes/Formato.vue'
 
 Vue.use(Router)
 
