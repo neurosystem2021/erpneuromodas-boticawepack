@@ -12,6 +12,7 @@
                 body-text-variant="dark">           
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
+                        ref="tablePreOrden"
                         id="my-table" 
                         striped hover 
                         :busy.sync="isBusy" 
@@ -67,6 +68,13 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
+            }
+        },
+        watch: {
+            show (val) {
+                if (val === true) {
+                    this.$refs.tablePreOrden.refresh();
+                }
             }
         },
         props: ['idAlmacen'],

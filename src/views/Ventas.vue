@@ -32,7 +32,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="FACTURA/IGV ELEC."
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -314,7 +314,7 @@ export default {
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
-            tieneIgv: true,
+            tieneIgv: false,
             venta: {},
             carrito: {
                 fields: [
@@ -383,8 +383,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 8,
-                    TipoDoc: 'FACTURA/IGV ELEC.',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0
                 },
                 almacen: {
@@ -557,12 +557,12 @@ export default {
                 this.$router.replace('/ventas')
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
-                this.tieneIgv = true
+                this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('FACTURA/IGV ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
