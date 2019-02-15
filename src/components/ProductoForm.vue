@@ -125,6 +125,14 @@
               ></b-form-input>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.ControlaStock"
+                   :value="1"
+                   :unchecked-value="0">
+              Controla Stock
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -310,6 +318,7 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.EsHabitacion = newVal.EsHabitacion
         this.producto.Piso = newVal.Piso
+        this.producto.ControlaStock = newVal.ControlaStock
         console.log(newVal)
 
       } else {

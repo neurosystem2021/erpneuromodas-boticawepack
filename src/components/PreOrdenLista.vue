@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Cargar Pre Orden</b-button>
+        <b-button @click="cargarPreOrden" variant="outline-success">Cargar Pre Orden</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
@@ -14,6 +14,7 @@
                     <b-table 
                         id="my-table" 
                         striped hover 
+                        ref="tablaPreOrden"
                         :busy.sync="isBusy" 
                         :filter="filter"
                         :items="myProvider" 
@@ -75,6 +76,10 @@ import { mapActions } from 'vuex'
                 add: 'agregarProducto',
                 obtenerStok: 'obtenerStock'
             }),
+            cargarPreOrden () {
+                this.show = true
+                this.$refs.tablaPreOrden.refresh()
+            },
             selectPreOrden (item) {
                 this.axios.get(this.API + 'preorden/detalle', {
                     params: {

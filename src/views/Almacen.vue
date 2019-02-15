@@ -369,7 +369,7 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy+'&controlaStock=1'
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
