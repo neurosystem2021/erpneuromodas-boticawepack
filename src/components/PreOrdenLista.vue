@@ -21,7 +21,11 @@
                         @row-clicked="selectPreOrden"
                         :fields="fields"
                         :per-page="perPage"
-                        :current-page="currentPage"></b-table>
+                        :current-page="currentPage">
+                         <template slot="imprimir" slot-scope="data">
+                            <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden">Imprimir</b-btn>
+                          </template>
+                    </b-table>
                     <b-row>
                     <b-col md="6" class="my-1">
                         <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -64,7 +68,7 @@ import { mapActions } from 'vuex'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc' ],
+                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc', 'imprimir'],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
