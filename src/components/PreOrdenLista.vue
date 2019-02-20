@@ -78,6 +78,7 @@ import { mapActions } from 'vuex'
         methods: {
             ...mapActions({
                 add: 'agregarProducto',
+                limpiar: 'limpiarCarrito',
                 obtenerStok: 'obtenerStock'
             }),
             cargarPreOrden () {
@@ -90,6 +91,8 @@ import { mapActions } from 'vuex'
                         idPreOrden: item.IdPreOrden
                     }
                 }).then((response) => {
+                    this.limpiar();
+                    
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
