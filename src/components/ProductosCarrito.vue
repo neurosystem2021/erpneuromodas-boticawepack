@@ -99,7 +99,7 @@
 
         <template slot="FechaAlquiler" slot-scope="data">
           <b-form-input
-            v-model="productos[data.index].FechaAlquilerInicio"
+            v-model="productos[data.index].FechaAlquiler"
             type="date"
             placeholder="Fecha Fin"
             :value="formatFecha(data.item.FechaAlquiler)"></b-form-input>
@@ -110,7 +110,7 @@
             v-model="productos[data.index].FechaAlquilerFin"
             type="date"
             placeholder="Fecha Fin"
-            :value="$moment().format('YYYY-MM-DD')"></b-form-input>
+            :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
         <template slot="Descripcion" slot-scope="data">

@@ -18,6 +18,7 @@
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
+									<li><br>Vuelo: {{ hab.Vuelo }}</li>
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
@@ -37,6 +38,11 @@
 										<label for="inputLive">Fecha Reserva:</label>
 										<b-form-input v-model="fechaReserva"
 											type="date"></b-form-input>
+		
+										<label for="inputLive">Vuelo:</label>
+										<b-form-input v-model="vuelo"
+											type="text"></b-form-input>
+										<br />
 										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
 									</b-popover>
 									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
@@ -80,6 +86,21 @@
 												placeholder="Próximo destino"></b-form-input>
 										</b-input-group>
 										<br>
+										<label>Fecha Inicio:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.FechaAlquilerInicio"
+												type="date"
+												placeholder="Fecha Inicio"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Fecha Fin:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.FechaAlquilerFin"
+												type="date"
+												placeholder="Fecha Fin"></b-form-input>
+										</b-input-group>
+										<br>
+
 										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
 									</b-popover>
 									<b-button v-if="hab.IdPreOrden" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
@@ -92,7 +113,7 @@
       </b-container>
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
-			<b-modal v-model="show" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
+			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
 				<b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b>
 				<br>
 				<br>
@@ -106,6 +127,12 @@
 						<b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
 						Pagar Ahora
 						</b-btn>
+					</div>
+					<div style=" float: left; position: relative; right: 3rem;">
+						<b-form-input v-model="selectProducto.Adelanto"
+							type="number"
+							placeholder="Adelanto S/."></b-form-input>
+							<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
 					</div>
 					<b-btn  variant="success" type="submit">
 					Guardar
@@ -135,6 +162,7 @@ export default {
 			habitaciones: [],
 			selectCliente: {},
 			selectProducto: {},
+			vuelo: '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
 			// habitacionesPiso: []
@@ -154,6 +182,14 @@ export default {
 			}).then(res => {
 				this.$toasted.success('Guardado correctamente')
 				this.show = false
+			})
+
+			this.axios.post(this.API + 'preorden/cajaybanco', {
+				IdPreOrden: this.selectProducto.IdPreOrden,
+				IdHabitacion: this.selectProducto.IdProducto,
+				Adelanto: this.selectProducto.Adelanto
+			}).then(res => {
+				console.log(res)
 			})
 		},
 		openCarrito(hab) {
@@ -181,7 +217,8 @@ export default {
 			this.axios.post(this.API + 'habitaciones/reservar', {
 				IdProducto: hab.IdProducto,
 				IdCliente: this.selectCliente.IdCliente,
-				FechaReserva: this.fechaReserva
+				FechaReserva: this.fechaReserva,
+				Vuelo: this.vuelo
 			}).then(res => {
 				this.getHabitaciones()
 				this.limpiarPopover()
