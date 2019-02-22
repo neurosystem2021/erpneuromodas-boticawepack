@@ -114,25 +114,56 @@
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
 			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
-				<b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b>
+				<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
 				<br>
 				<br>
-				<pre-orden-form-det v-if="show"
-					:id-preorden="selectProducto.IdPreOrden"
-					:id-producto="selectProducto.IdProducto"
-					ref="preOrdenProductos"
-					></pre-orden-form-det>
+				
+				<b-row>
+					<b-col md="8">
+						<pre-orden-form-det v-if="show"
+						:id-preorden="selectProducto.IdPreOrden"
+						:id-producto="selectProducto.IdProducto"
+						ref="preOrdenProductos"
+						></pre-orden-form-det>
+					</b-col> 
+					<b-col md="4">
+						<label><b>Adelantos</b></label>
+      					<b-input-group>
+							<b-form-input v-model="selectProducto.Adelanto"
+								size="sm"
+								type="number"
+								placeholder="Adelanto S/."></b-form-input>
+							<b-button @click="insertarAdelanto" variant="primary" size="sm">+</b-button>
+							<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
+      					</b-input-group>
+
+						<br />
+						<table class="table b-table table-sm">
+					      <thead>
+					        <tr>
+					          <th>Fecha</th>
+					          <th>Cantidad</th>
+					        </tr>
+					      </thead>
+					      <tbody>
+					      	<tr v-for="(ade, index) in adelantos" :key="index">
+					      		<td>{{ ade.FechaDoc }}</td>
+					      		<td>{{ ade.Importe }}</td>
+					      	</tr>
+					      	<tr class="bg-info text-white">
+					      		<td>TOTAL</td>
+					      		<td>{{ totalAdelantos }}</td>
+					      	</tr>
+					      </tbody>
+					  	</table>
+					</b-col>
+				</b-row>
+
 				<div slot="modal-footer" >
 					<div style="left: 1rem;position: absolute;">
 						<b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
 						Pagar Ahora
 						</b-btn>
-					</div>
-					<div style=" float: left; position: relative; right: 3rem;">
-						<b-form-input v-model="selectProducto.Adelanto"
-							type="number"
-							placeholder="Adelanto S/."></b-form-input>
-							<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
 					</div>
 					<b-btn  variant="success" type="submit">
 					Guardar
@@ -165,10 +196,48 @@ export default {
 			vuelo: '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
+			adelantos: []
 			// habitacionesPiso: []
 		}
 	},
+	computed: {
+		totalAdelantos() {
+			let sumatoria = 0
+			this.adelantos.map(ad => {
+				sumatoria += parseFloat(ad.Importe)
+			})
+
+			return sumatoria;
+		}
+	},
 	methods: {
+		cargarAdelantos() {
+			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				this.adelantos = res.data
+			})
+
+		},
+		insertarAdelanto() {
+			if(this.selectProducto.Adelanto <= 0) {
+				return;
+			}
+
+			let r = confirm("¿Desea Insertar un adelanto?")
+
+			if (r) {
+				this.axios.post(this.API + 'preorden/cajaybanco', {
+					producto: this.selectProducto,
+					IdPreOrden: this.selectProducto.IdPreOrden,
+					IdHabitacion: this.selectProducto.IdProducto,
+					Adelanto: this.selectProducto.Adelanto
+				}).then(res => {
+					// this.adelantos.push(res.data)
+					this.cargarAdelantos();
+				})
+			}
+		},
 		getHabitacionesPiso (piso) {
 			return this.habitaciones.filter(hab => {
 				return hab.Piso === piso
@@ -184,17 +253,12 @@ export default {
 				this.show = false
 			})
 
-			this.axios.post(this.API + 'preorden/cajaybanco', {
-				IdPreOrden: this.selectProducto.IdPreOrden,
-				IdHabitacion: this.selectProducto.IdProducto,
-				Adelanto: this.selectProducto.Adelanto
-			}).then(res => {
-				console.log(res)
-			})
+			
 		},
 		openCarrito(hab) {
 			this.selectProducto = hab
 			this.$refs.modalCarrito.show()
+			this.cargarAdelantos()
 		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {

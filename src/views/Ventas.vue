@@ -145,6 +145,8 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
+
+                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }}</b-badge>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -307,6 +309,7 @@ export default {
     data () {
         return {
             dni: '',
+            adelanto: 0,
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
@@ -352,10 +355,22 @@ export default {
             obtenerStok: 'obtenerStock'
         }),
         selectPreOrden (orden) {
+            console.log(orden)
            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
            // if (Array.isArray(this.venta.IdPreOrden) ) {
-                this.venta.IdPreOrden.push(orden)
+            this.venta.IdPreOrden.push(orden)
             //}
+
+            // obtener total adelantos
+            this.axios.get(this.API + 'preorden/cajaybanco', { params: { IdPreOrden: orden.IdPreOrden } })
+                .then(res => {
+                    let suma = 0
+                    res.data.map(ad => {
+                        suma += ad.Importe
+                    })
+
+                    this.adelanto = suma
+                })
         },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
