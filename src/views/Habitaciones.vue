@@ -18,7 +18,10 @@
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
-									<li><br>Vuelo: {{ hab.Vuelo }}</li>
+									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
+								</ul>
+								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+									<li><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
@@ -103,7 +106,7 @@
 
 										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
 									</b-popover>
-									<b-button v-if="hab.IdPreOrden" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
+									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
 								</div>
 						</b-card>
 					</b-col>
