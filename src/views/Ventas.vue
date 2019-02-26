@@ -304,6 +304,7 @@ export default {
     },
     mounted () {
         this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -437,6 +438,26 @@ export default {
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.getNumeroVenta()
+        },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            console.log(usuario);
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.loadAlmacen(response.data.IdAlmacen)
+                // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                // this.$refs.inputAlmacen.$refs.input.disabled = true
+                // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -576,6 +597,7 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.getNumeroVenta()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
