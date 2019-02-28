@@ -329,6 +329,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
+                    { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoCategoria', label: 'Categoría' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medicion' },

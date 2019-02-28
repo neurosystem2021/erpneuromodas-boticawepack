@@ -102,6 +102,13 @@
             </b-form-text>
         </template>
 
+        <template slot="Descripcion" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].Descripcion"
+            type="text"
+            placeholder="Descripción"></b-form-input>
+        </template>   
+
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
         </template>
