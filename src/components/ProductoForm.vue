@@ -2,7 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
+    <b-form @submit="guardarProducto" @keydown.enter.prevent="enterSubmit" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
@@ -68,6 +68,14 @@
               @input="(val) => producto.Producto = val && val.toUpperCase()"
               :value="producto.Producto"
               ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Descripción:</label>
+            <textarea>sad</textarea>
+            <b-form-textarea 
+              rows="6"
+              v-model="producto.ProductoDesc"
+              />
           </b-form-group>
 
           
@@ -301,6 +309,11 @@ export default {
     }
   },
   methods: {
+    enterSubmit(e) {
+      if(e.target.tagName.toLowerCase() === 'textarea') {
+        // continuar aqui
+      }
+    },
     eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de eliminar este producto?')
