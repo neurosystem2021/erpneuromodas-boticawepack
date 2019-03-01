@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA SERIE 2"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -381,8 +381,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 9,
-                    TipoDoc: 'BOLETA SERIE 2',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 8
                 },
                 almacen: {
@@ -598,7 +598,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA SERIE 2')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
