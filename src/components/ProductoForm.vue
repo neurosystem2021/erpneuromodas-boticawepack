@@ -2,7 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarProducto" @keydown.enter.prevent="enterSubmit" >
+    <b-form @submit="guardarProducto" @keydown.enter="enterSubmit" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
@@ -71,10 +71,11 @@
           </b-form-group>
           <b-form-group>
             <label>Descripción:</label>
-            <textarea>sad</textarea>
             <b-form-textarea 
+              ref="inputProductoDesc"
               rows="6"
-              v-model="producto.ProductoDesc"
+              v-model="producto._ProductoDesc"
+              @input="(val) => producto.ProductoDesc = val"
               />
           </b-form-group>
 
@@ -266,6 +267,8 @@ export default {
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
+        this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
         this.$refs.inputCodigoBarra.$el.disabled = true
@@ -284,6 +287,7 @@ export default {
         //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
+
 
         this.producto.EsPadre = newVal.EsPadre
         Vue.nextTick(() => {
@@ -310,8 +314,8 @@ export default {
   },
   methods: {
     enterSubmit(e) {
-      if(e.target.tagName.toLowerCase() === 'textarea') {
-        // continuar aqui
+      if(e.target.tagName.toLowerCase() !== 'textarea') {
+        e.preventDefault()
       }
     },
     eliminarProducto (producto) {
@@ -409,7 +413,6 @@ export default {
 
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
-        console.log(response)
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
         }

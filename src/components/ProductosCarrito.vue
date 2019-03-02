@@ -103,10 +103,9 @@
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <b-form-input
+          <b-form-textarea
             v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>
+            placeholder="Descripción" />
         </template>   
 
         <template slot="total" slot-scope="data">

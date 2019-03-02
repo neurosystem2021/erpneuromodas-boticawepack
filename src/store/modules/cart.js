@@ -69,6 +69,7 @@ const actions = {
     }
 
     if(typeof producto === 'object') {
+      producto.Descripcion = producto.ProductoDesc
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -94,6 +95,7 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
+          obj.Descripcion = obj.ProductoDesc
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
