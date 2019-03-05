@@ -585,6 +585,22 @@ export default {
                 return          
             }
 
+            // sin stock
+            let sinStock = 0
+            this.productos.forEach(pro => {
+                if(pro.stock <= 0) {
+                    sinStock += 1
+                }
+            });
+
+            if (sinStock >= 1) {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false            
+                return;
+            }
+
+
+
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
