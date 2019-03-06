@@ -2,23 +2,8 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <b-row  align-h="end" class=" no-print">
-              <label v-if="!this.$route.params.id">Vendedor:</label>
-          <b-col cols="3" v-if="!this.$route.params.id">
-            <b-form-group size="sm">
-              <autocomplete
-                  required="required"
-                  ref="inputVendedor"
-                  :url="API + 'usuarios'"
-                  anchor="NombreUsuario"
-                  label="writer"
-                  :on-select="setVendedor" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                  :classes="{input: 'form-control'}">
-              </autocomplete>
-            </b-form-group>
-          </b-col>
-          <b-col cols="7">
+      <div>
+          <div class="float-right no-print">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
@@ -31,85 +16,14 @@
             <b-button-group size="sm">
               <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
             </b-button-group>
-          </b-col>
-      </b-row>
-      <br class="no-print" /> 
+          </div>
+      </div>
+      <br class="no-print" /><br class="no-print" />
 
-      <h3 class="text-center">Cierre de Caja</h3> 
-      <h4 class="si-print">Cierre de Caja </h4>
-      <hr>
-      <div v-if="cierre.FechaCierre">Fecha:  <b>{{ cierre.FechaCierre }}</b></div>
-      <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</b></div>
-      <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-      <br>
+      <h2 class="text-center">Cierre de Caja</h2> 
+      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
       <b-row>
-        <b-col cols="4">
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Salida S/.</td>
-              <td>{{ (granTotal + totalVentasCredito) | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Credito S/.</td>
-              <td>{{ totalVentasCredito | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Contado S/.</td>
-              <td>{{ granTotal | moneda }} </td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Visa S/.</td>
-              <td>{{ totalVentasVisa | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Mastercard S/.</td>
-              <td>{{ totalVentasMastercard | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Pagos de Creditos S/.</td>
-              <td>{{ totalIngresos | moneda }} </td>
-            </tr>
-          </tbody>
-        </table>
-        </b-col>
-      </b-row>
-
-      <b-row  class="no-print">
-        <b-col>
-          <table class="table b-table table-sm table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>TipoDoc</th>
-                <th>Serie</th>
-                <th>Numero</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(venta, index) in ventas" :key="index">
-                <td>{{ venta.FechaDoc }}</td>
-                <td>{{ venta.TipoDoc }}</td>
-                <td>{{ venta.Serie }}</td>
-                <td>{{ venta.Numero }}</td>
-                <td>{{ venta.Total | moneda }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </b-col>
-      </b-row>
-      
-
-      <!--<b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -124,14 +38,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td>S/. {{ item.Efectivo }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear  }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -153,14 +67,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa | redondear }}</td>
+              <td>S/. {{ item.Visa }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -183,14 +97,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Mastercard }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -210,7 +124,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total | redondear }}</td>
+              <td>S/. {{ item.Total }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -238,14 +152,14 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>S/. {{ item.Importe }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+                <td class="total"><b>S/. {{ totalIngresos }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -263,24 +177,24 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>S/. {{ item.Importe }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas }}</b></td>
               </tr>
             </tfoot>
           </table>
         </b-col>
-      </b-row>-->
+      </b-row>
       
 
       <br>
 
-      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -293,8 +207,6 @@ export default {
     this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
-    } else {
-      this.getVendedor()
     }
   },
   data () {
@@ -310,8 +222,7 @@ export default {
         { value: 2, text: 'Tarde' },
         { value: 3, text: 'Noche' }
       ],
-      cierre: {},
-      vendedor: {}
+      cierre: {}
     }
   },
   computed: {
@@ -385,25 +296,6 @@ export default {
     }
   },
   methods: {
-    getVendedor () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            console.log(response)
-            this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            console.log(this.$refs.inputVendedor.$refs.input)
-            this.$refs.inputVendedor.$refs.input.disabled = true
-        })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-    },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
-    },
     imprimir () {
       window.print();
     },
@@ -421,7 +313,7 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: this.vendedor.Usuario
+          user: sessionStorage.getItem("User")
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
@@ -429,23 +321,15 @@ export default {
         })
       }
     },
-    focusAutocomplete (ref) {
-        // this.$refs[ref].type = ""
-        this.$refs[ref].handleDoubleClick()
-    },
+
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     getVentas () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
-      // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.ventas = res.data
@@ -454,14 +338,10 @@ export default {
       })
     },
     getIngresos () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.ingresos = res.data
@@ -470,14 +350,10 @@ export default {
       })
     },
     getSalidas () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
       this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.salidas = res.data
@@ -518,15 +394,9 @@ th {
   background: #f9f9f9;
   padding: 10px;
 }
-.si-print {
-  display: none;
-}
 @media print {
   .no-print {
     display: none;
-  }
-  .si-print {
-    display: block;
   }
 }
 </style>

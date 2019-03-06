@@ -85,7 +85,7 @@
         <b-col md="6">
 
           <b-form-group>
-            <label>Modelo:</label>
+            <label>N° Chasis:</label>
             <b-input-group>
               <autocomplete
                 required="required"

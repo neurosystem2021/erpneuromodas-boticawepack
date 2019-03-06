@@ -8,7 +8,7 @@
             ref="autocompleteProducto"
             :url="APIProductos"
             :onShouldRenderChild="renderChild"
-            anchor="Producto"
+            anchor="ProductoFilter"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
@@ -388,12 +388,10 @@ export default {
           style = 'ambar'
         }
 
-
         return `
         <div class="${style}">
           <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento: ${data.FechaVen}
+          <b>${data.Producto}</b> / ${data.ProductoModelo} / ${data.ProductoMarca}
         </div>
         `
       }
