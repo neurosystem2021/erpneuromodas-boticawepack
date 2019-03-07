@@ -10,7 +10,6 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
@@ -284,8 +283,8 @@ export default {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
         }*/
-        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
+        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        //this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
 
 
