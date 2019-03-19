@@ -38,7 +38,7 @@
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 105px"
-            readonly=""
+            :readonly="(type === 'mov') ? false : true"
             step="0.0001"
             min="0"
             @input="(val) => {
@@ -52,7 +52,7 @@
             v-model="productos[data.index].precio"
             type="number"
             style="width: 105px"
-            readonly=""
+            :readonly="(type === 'mov') ? false : true"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -207,6 +207,10 @@ export default {
     }
   },
   props: {
+    type: {
+        default: '',
+        type: String
+    },
     setPrecio: Boolean,
     idAlmacen: Number,
 
