@@ -4,5 +4,5 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API: '"http://boticav1.local/api/index.php/"'
+  API: '"http://botica.local/api/index.php/"'
 })

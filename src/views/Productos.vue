@@ -35,9 +35,9 @@
             striped
             hover
             @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
+            id="my-table"
+            :busy.sync="isBusy"
+            :items="myProvider"
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage"></b-table>
@@ -86,9 +86,7 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true }
+            { key: 'ProductoMedicion', label: 'Medicion', sortable: true }
       ],
       totalRows: 50,
       perPage: 10,

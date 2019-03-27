@@ -47,11 +47,11 @@
                 label="writer"
                 :placeholder.sync="producto.marca.ProductoMarca"
                 :on-select="setMarca"
-                :onFocus="focusAutocomplete.bind(null, 'inputMarca')"                
+                :onFocus="focusAutocomplete.bind(null, 'inputMarca')"
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
+                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
               </b-input-group-append>
             </b-input-group>
@@ -68,7 +68,7 @@
                 :placeholder.sync="producto.ProductoModelo"
                 :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
                 :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
             </b-input-group>
@@ -76,7 +76,7 @@
               required="required"
               class="upper"
               type="text"
-              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
+              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"
               ></b-form-input>-->
             <!-- <b-input-group>
               <autocomplete
@@ -86,7 +86,7 @@
                 label="writer"
                 :placeholder.sync="producto.modelo.ProductoModelo"
                 :on-select="setModelo"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"
                 :classes="{input: 'form-control'}">
               </autocomplete>
               <b-input-group-append>
@@ -105,16 +105,16 @@
                 :placeholder.sync="producto.Color"
                 :on-select="val => producto.Color = val.Color && val.Color.toUpperCase()"
                 :onInput="val => producto.Color = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
+                :onFocus="focusAutocomplete.bind(null, 'inputColor')"
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
             <!--<b-form-input v-model="producto.Color"
               type="text"
-              @input="(val) => producto.Color = val && val.toUpperCase()"              
+              @input="(val) => producto.Color = val && val.toUpperCase()"
               ></b-form-input>-->
           </b-form-group>
-          
-          
+
+
         </b-col>
         <b-col md="6">
           <b-form-group>
@@ -127,11 +127,11 @@
               anchor="ProductoMedicion"
               label="writer"
               :placeholder.sync="producto.medicion.ProductoMedicion"
-              :on-select="setMedicion"              
+              :on-select="setMedicion"
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
-          
+
           <b-form-group>
             <label>Talla:</label>
             <b-input-group>
@@ -143,41 +143,29 @@
                 label="writer"
                 :placeholder.sync="producto.talla.ProductoTalla"
                 :on-select="setTalla"
-                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
+                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Genero:</label>            
+            <label>Medicion:</label>
             <b-form-select required="required" v-model="producto.Genero" :options="generos" />
           </b-form-group>
           <b-form-group>
-            <label>Botapie/Manga:</label>
-            <autocomplete
-                required="required"
-                :url="API + 'productos/botapies'"
-                ref="inputBotapie"
-                anchor="Botapie"
-                label="writer"
-                :placeholder.sync="producto.Botapie"
-                :on-select="val => producto.Botapie = val.Botapie && val.Botapie.toUpperCase()"
-                :onInput="val => producto.Botapie = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
+
             <!--<b-form-input v-model="producto.Botapie"
               type="text"
-              @input="(val) => producto.Botapie = val && val.toUpperCase()"              
+              @input="(val) => producto.Botapie = val && val.toUpperCase()"
               ></b-form-input>-->
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input 
+            <b-form-input
               required="required"
               v-model="producto.PorcentajeUtilidad"
               @input.native="actualizarPrecioContado"
@@ -186,7 +174,7 @@
           </b-form-group>
           <b-form-group>
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <b-form-input
               required="required"
               v-model="producto.StockMinimo"
               type="number"
@@ -271,7 +259,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
-      show: false, 
+      show: false,
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: []
@@ -302,24 +290,24 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
-       
+
        // this.$refs.inputCategoria.setValue('')
         this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
+
        // this.$refs.inputMarca.setValue('')
         this.$refs.inputMarca.setValue(newVal.ProductoMarca)
 
        // this.$refs.inputMedicion.setValue('')
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
-        
+
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        
+
         this.$refs.inputColor.setValue(newVal.Color)
         this.$refs.inputBotapie.setValue(newVal.Botapie)
-        
+
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
@@ -499,13 +487,13 @@ export default {
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
       }
-      
+
     },
     crearMarca () {
       if (this.$refs.inputMarca.type) {
         let marca = {}
         marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase()
-  
+
         this.axios.post(this.API + 'marcas', marca)
         .then((response) => {
           this.$toasted.show('Marca guardada correctamente')
@@ -524,7 +512,7 @@ export default {
       if (this.$refs.inputTalla.type) {
         let talla = {}
         talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
-  
+
         this.axios.post(this.API + 'tallas', talla)
         .then((response) => {
           this.$toasted.show('Talla guardada correctamente')
