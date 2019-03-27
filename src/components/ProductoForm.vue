@@ -132,7 +132,7 @@
             </autocomplete>
           </b-form-group>
 
-          <b-form-group>
+          <!--<b-form-group>
             <label>Talla:</label>
             <b-input-group>
               <autocomplete
@@ -148,14 +148,11 @@
               </autocomplete>
               <b-input-group-append>
                 <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>
-                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>
               </b-input-group-append>
             </b-input-group>
-          </b-form-group>
-          <b-form-group>
-            <label>Medicion:</label>
-            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
-          </b-form-group>
+          </b-form-group>-->
+
           <b-form-group>
 
             <!--<b-form-input v-model="producto.Botapie"
