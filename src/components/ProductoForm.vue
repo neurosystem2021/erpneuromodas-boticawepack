@@ -148,11 +148,14 @@
               </autocomplete>
               <b-input-group-append>
                 <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>
-                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>
+               <marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>-->
-
+          <!--<b-form-group>
+            <label>Medicion:</label>
+            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
+          </b-form-group>-->
           <b-form-group>
 
             <!--<b-form-input v-model="producto.Botapie"
@@ -187,7 +190,6 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -300,23 +302,23 @@ export default {
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
-        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
 
         this.$refs.inputColor.setValue(newVal.Color)
-        this.$refs.inputBotapie.setValue(newVal.Botapie)
+        // this.$refs.inputBotapie.setValue(newVal.Botapie)
 
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
         } */
-        this.producto.talla = {
+        /* this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
-        }
+        }*/
         this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.IdProducto = newVal.IdProducto
-        this.producto.Genero = newVal.Genero
-        this.producto.Botapie = newVal.Botapie
+        // this.producto.Genero = newVal.Genero
+        // this.producto.Botapie = newVal.Botapie
         this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
@@ -374,18 +376,18 @@ export default {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
     }, */
-    setTalla (obj) {
+    /*setTalla (obj) {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
-    },
+    },*/
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
-      this.$refs.inputTalla.setValue('')
+      // this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputColor.setValue('')
-      this.$refs.inputBotapie.setValue('')
+     // this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },
@@ -430,10 +432,10 @@ export default {
         return;
       }
 
-      if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
+      /*if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
         this.$toasted.show('Falta seleccionar o guardar la Talla.')
         return;
-      }
+      }*/
 
       // Agregar producto DET
       if (this.showProductoDet) {
@@ -453,7 +455,7 @@ export default {
 
         // this.initForm()
         this.producto.talla = {}
-        this.$refs.inputTalla.setValue('')
+       // this.$refs.inputTalla.setValue('')
 
         this.$refs.productoForm.hide()
       })
@@ -505,7 +507,7 @@ export default {
         })
       }
     },
-    crearTalla () {
+    /*crearTalla () {
       if (this.$refs.inputTalla.type) {
         let talla = {}
         talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
@@ -523,7 +525,7 @@ export default {
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
       }
-    }
+    }*/
   },
   computed : {
   },
