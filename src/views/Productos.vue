@@ -84,8 +84,7 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo / Color', sortable: true },
             { key: 'ProductoMedicion', label: 'Medicion', sortable: true }
       ],
       totalRows: 50,
