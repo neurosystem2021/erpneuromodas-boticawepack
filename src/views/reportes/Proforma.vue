@@ -7,6 +7,7 @@
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
+        <div>RUC: {{ empresa.RUC }}</div>
 				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
 				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
 			</div>
@@ -65,7 +66,7 @@
           </tr>
         </tfoot>
       </table>
-      <div id="thanks">¡Muchas Gracias!</div>
+      <div id="thanks">¡Gracias Por su Preferencia!</div>
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
