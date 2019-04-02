@@ -33,7 +33,11 @@
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+                $emit('onInputCantidad', val)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">

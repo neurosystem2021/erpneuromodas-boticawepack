@@ -75,7 +75,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -121,7 +121,7 @@
               </b-col>  
               <b-col md="3">
                 <b-form-group>
-                  <label>Modelo:</label>
+                  <label>Modelo/Color:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
                     ref="inputModelo"
@@ -135,7 +135,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="6">
+          <!--<b-col md="6">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -194,7 +194,7 @@
                 </b-form-group>
               </b-col> 
             </b-row>
-          </b-col>
+          </b-col>-->
         </b-row>
         <b-row>
           <b-col md="12" class="my-1">
@@ -309,11 +309,11 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', label: 'Artículo', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo/Color', sortable: true },
+            // { key: 'Color', sortable: true },
+            // { key: 'ProductoTalla', label: 'Talla', sortable: true },
+            // { key: 'Genero', sortable: true },
+            // { key: 'Botapie', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
