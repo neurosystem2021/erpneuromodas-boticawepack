@@ -136,6 +136,7 @@
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
+                                initValue="Administrador"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
@@ -395,7 +396,13 @@ export default {
                     IdDocVentaPuntoVenta: 1,
                     PuntoVenta: 'CAJA1'
                 },
-                vendedor: {},
+                vendedor: {
+                    Usuario: "admin",
+                    IdUsuarioPerfil: "1",
+                    NombreUsuario: "Administrador",
+                    IdAlmacen: 1,
+                    IdDocVentaPuntoVenta: 1
+                },
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -566,7 +573,7 @@ export default {
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
+                this.$refs.inputVendedor.setValue('Administrador')
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
