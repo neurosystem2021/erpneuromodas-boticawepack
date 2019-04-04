@@ -428,12 +428,20 @@ export default {
             } else {
                 this.tieneIgv = false
             }
+            console.log(obj)
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+        },
+        getTipoDoc (id) {
+            this.axios.get(this.API + 'tipodoc/' + id)
+                .then(response => {
+                    console.log(response)
+                    this.setTipoVenta(response.data)
+                })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
@@ -453,6 +461,7 @@ export default {
                 // this.$refs.inputAlmacen.$refs.input.disabled = true
                 // this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
+                this.getTipoDoc(response.data.IdTipoDoc)
             })
             .catch((error) => {
                 console.log(error)
