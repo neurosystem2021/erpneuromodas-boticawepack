@@ -131,11 +131,15 @@
 					</b-col> 
 					<b-col md="4">
 						<label><b>Adelantos</b></label>
+                        <b-form-input v-model="selectProducto.Adelanto"
+                                size="sm"
+                                type="number"
+                                placeholder="Adelanto S/."></b-form-input>
       					<b-input-group>
-							<b-form-input v-model="selectProducto.Adelanto"
-								size="sm"
-								type="number"
-								placeholder="Adelanto S/."></b-form-input>
+							<b-form-input v-model="selectProducto.AdelantoDesc"
+                                size="sm"
+                                type="text"
+                                placeholder="Descripción"></b-form-input>
 							<b-button @click="insertarAdelanto" variant="primary" size="sm">+</b-button>
 							<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
       					</b-input-group>
@@ -145,16 +149,18 @@
 					      <thead>
 					        <tr>
 					          <th>Fecha</th>
+                              <th>Concepto</th>
 					          <th>Cantidad</th>
 					        </tr>
 					      </thead>
 					      <tbody>
 					      	<tr v-for="(ade, index) in adelantos" :key="index">
 					      		<td>{{ ade.FechaDoc }}</td>
+                                <td>{{ ade.Concepto.split(" - ").pop() }}</td>
 					      		<td>{{ ade.Importe }}</td>
 					      	</tr>
 					      	<tr class="bg-info text-white">
-					      		<td>TOTAL</td>
+                                <td colspan="2">TOTAL</td>
 					      		<td>{{ totalAdelantos }}</td>
 					      	</tr>
 					      </tbody>
@@ -232,6 +238,7 @@ export default {
 			if (r) {
 				this.axios.post(this.API + 'preorden/cajaybanco', {
 					producto: this.selectProducto,
+                    concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + this.selectProducto.AdelantoDesc,
 					IdPreOrden: this.selectProducto.IdPreOrden,
 					IdHabitacion: this.selectProducto.IdProducto,
 					Adelanto: this.selectProducto.Adelanto
@@ -274,6 +281,7 @@ export default {
 		getVariant(hab) {
 			if (hab.EstadoHabitacion == 2) return 'warning'
 			if (hab.EstadoHabitacion == 3) return 'danger'
+            if (hab.EstadoHabitacion == 1 && hab.EstaSucio == 1) return 'secondary'
 			return 'success'
 		},
 		reservarHab(hab) {
