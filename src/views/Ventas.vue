@@ -428,7 +428,7 @@ export default {
             } else {
                 this.tieneIgv = false
             }
-            console.log(obj)
+            this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
@@ -439,8 +439,7 @@ export default {
         getTipoDoc (id) {
             this.axios.get(this.API + 'tipodoc/' + id)
                 .then(response => {
-                    console.log(response)
-                    this.setTipoVenta(response.data)
+                    if (response.data) this.setTipoVenta(response.data)
                 })
         },
         setPuntoVenta (obj) {
@@ -449,7 +448,6 @@ export default {
         },
         getVendedor () {
             let usuario = sessionStorage.getItem('User')
-            console.log(usuario);
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
@@ -469,6 +467,9 @@ export default {
             })
         },
         setVendedor (obj) {
+            console.log(obj)
+            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+
             this.venta.vendedor = obj
         },
         setCliente (obj, dni = false) {
