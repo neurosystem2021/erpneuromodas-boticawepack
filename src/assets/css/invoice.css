@@ -41,10 +41,13 @@
   #logo {
     float: left;
     margin-top: 8px;
+    text-align: center;
+    width: 100%;
   }
   
   #logo img {
-    height: 100px;
+    max-width: 100%;
+    height: auto;
   }
   
   #company {
