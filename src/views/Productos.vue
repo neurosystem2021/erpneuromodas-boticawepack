@@ -2,7 +2,17 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="4" class="my-1">
+            <b-col md="3" class="my-1">
+                <b-form-group>
+                    <b-input-group prepend="S/">
+                        <b-form-input type="number" v-model="tipoCambio" placeholder="Tipo de cambio" />
+                        <b-input-group-append>
+                          <b-button size="sm" text="Button" variant="success" @click="guardarTipoCambio">Guardar</b-button>
+                        </b-input-group-append>
+                    </b-input-group>
+                </b-form-group>
+            </b-col>
+          <b-col md="2" class="my-1">
             <b-form-group>
               <autocomplete
                   required="required"
@@ -29,7 +39,7 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="3" class="my-1">
             <b-row>
             <b-col md="8">
               <b-form-group horizontal label="Mostrar" class="mb-0">
@@ -60,7 +70,7 @@
                 <div class="text-center" :class="{ 'table-danger' : data.item.stock <= (data.item.StockMinimo || 0) }">{{data.item.stock}}</div>
               </template>
               <template slot="PrecioContado" slot-scope="data">
-                $ {{ (data.item.PrecioContado / 3.3) | redondear }}
+                  $ {{ (data.item.PrecioContado / tipoCambio) | redondear }}
               </template>
             </b-table>
             <b-row>
@@ -92,6 +102,7 @@ export default {
     })
     
     this.loadFirstAlmacen()
+    this.loadTipoCambio()
   },
   data() {
     return {
@@ -118,10 +129,25 @@ export default {
       currentPage: 1,
       almacen: {
         IdAlmacen: 1
-      }
+      },
+      tipoCambio: 3.3
     }
   },
   methods: {
+      guardarTipoCambio () {
+
+          this.axios.post(this.API + 'tipocambio', { tipoCambio: this.tipoCambio })
+              .then(res => {
+                this.$toasted.show('Tipo de cambio actualizado')
+              })
+      },
+      loadTipoCambio () {
+        this.axios.get(this.API + 'empresa/id/1')
+              .then(res => {
+                  console.log(res)
+                  this.tipoCambio = res.data.TIPOCAMBIO
+              })
+      },
       loadFirstAlmacen () {
         this.axios.get(this.API + 'almacenes/primero')
           .then(res => {
