@@ -7,7 +7,7 @@
                     <b-input-group prepend="S/">
                         <b-form-input type="number" v-model="tipoCambio" placeholder="Tipo de cambio" />
                         <b-input-group-append>
-                          <b-button size="sm" text="Button" variant="success">Guardar</b-button>
+                          <b-button size="sm" text="Button" variant="success" @click="guardarTipoCambio">Guardar</b-button>
                         </b-input-group-append>
                     </b-input-group>
                 </b-form-group>
@@ -102,6 +102,7 @@ export default {
     })
     
     this.loadFirstAlmacen()
+    this.loadTipoCambio()
   },
   data() {
     return {
@@ -133,6 +134,20 @@ export default {
     }
   },
   methods: {
+      guardarTipoCambio () {
+
+          this.axios.post(this.API + 'tipocambio', { tipoCambio: this.tipoCambio })
+              .then(res => {
+                this.$toasted.show('Tipo de cambio actualizado')
+              })
+      },
+      loadTipoCambio () {
+        this.axios.get(this.API + 'empresa/id/1')
+              .then(res => {
+                  console.log(res)
+                  this.tipoCambio = res.data.TIPOCAMBIO
+              })
+      },
       loadFirstAlmacen () {
         this.axios.get(this.API + 'almacenes/primero')
           .then(res => {
