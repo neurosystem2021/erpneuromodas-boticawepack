@@ -610,9 +610,21 @@ export default {
                 return  
             } 
 
-            // check if factura DNI
+            if (!this.venta.cliente.DniRuc) {
+                this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esNumerico = Number.isInteger(this.venta.cliente.DniRuc)
+            if (!esNumerico) {
+                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+                this.inProgress = false
+                return
+            }
+
             var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
-            if(!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
                 this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
                 this.inProgress = false
                 return
