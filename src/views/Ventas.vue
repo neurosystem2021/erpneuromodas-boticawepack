@@ -618,7 +618,7 @@ export default {
                 return
             }
 
-            var esNumerico = Number.isInteger(this.venta.cliente.DniRuc)
+            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
             if (!esNumerico) {
                 this.$toasted.show('El RUC debe ser numérico, editar cliente.')
                 this.inProgress = false
