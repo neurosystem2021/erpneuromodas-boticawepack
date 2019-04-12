@@ -92,7 +92,7 @@ export default {
       }
     }
   },
-  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  props: ['idModal', 'ruc', 'editCliente', 'txtButton'],
   /*watch: {
     show (val) {
       console.log(this.editCliente)
@@ -103,7 +103,10 @@ export default {
   },*/
   methods: {
     shownClienteForm () {
-      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+        console.log(this.ruc)
+        if (this.ruc) {
+            this.cliente.DniRuc = this.ruc
+        }
       /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
