@@ -115,44 +115,63 @@ export default {
       }
     },
     consultarDNIRUC () {
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
 
-        let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
+      let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
-        this.axios.get(this.API + 'consultarRUC', {
-            params: {
-                type: tipo,
-                numero: this.cliente.DniRuc
-            }
-        }).then((response) => {
-            if (response.data) {
-                this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-                var data = response.data.result
+      this.axios.get(this.API + 'consultarRUC', {
+          params: {
+              type: tipo,
+              numero: this.cliente.DniRuc
+          }
+      }).then((response) => {
+          if (response.data) {
+              this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
+              var data = response.data.result
 
-                if (tipo == 'DNI') {
-                    this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
-                } else {
-                    this.cliente.Cliente = data.RazonSocial
-                    this.cliente.Direccion = data.Direccion
-                    // this.cliente.Telefono = data.Telefono
-                }
-            } else {
-                this.$toasted.show('No se encontró el Usuario')                
-            }
-            
-        })
-        .catch((error) => {
-            this.$toasted.show('No se encontró el Usuario')        
+              if (tipo == 'DNI') {
+                  this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
+              } else {
+                  this.cliente.Cliente = data.RazonSocial
+                  this.cliente.Direccion = data.Direccion
+                  // this.cliente.Telefono = data.Telefono
+              }
+          } else {
+              this.$toasted.show('No se encontró el Usuario')                
+          }
+          
+      })
+      .catch((error) => {
+          this.$toasted.show('No se encontró el Usuario')        
 
-        })
+      })
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
+
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+
+      var esDocumento = this.cliente.DniRuc.length > 7 ? true : false
+      if (!esDocumento) {
+          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.cliente = {}
+
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')

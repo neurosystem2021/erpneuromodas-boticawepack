@@ -115,12 +115,12 @@
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                         
                                         </b-input-group-append>
+                                    </b-input-group>
                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
                                         <option value="Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
-                                    </b-input-group>
 
                                 </b-form-group>
                             </b-col>
