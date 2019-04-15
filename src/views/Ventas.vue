@@ -87,10 +87,12 @@
                                             placeholder="Nº Placa" />
                                 </b-form-group>
                             </b-col>
-                            <b-col md="8">
+                            <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -103,16 +105,23 @@
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
-                                        <!--<input v-model="dni"
+                                        <input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
                                             class="form-control"
-                                            placeholder="Codigo de Barra" />-->
+                                            placeholder="Codigo de Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                        
                                         </b-input-group-append>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
                                     </b-input-group>
+
                                 </b-form-group>
                             </b-col>
                             
@@ -417,7 +426,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                CampoDireccion: 'Direccion'
             }
 
             this.loadFirstAlmacen()
@@ -478,6 +488,7 @@ export default {
                     if (response.data) {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
+                        console.log(this.venta.cliente)
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
