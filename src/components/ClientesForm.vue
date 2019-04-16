@@ -167,6 +167,7 @@ export default {
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
+        console.log(response)
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
