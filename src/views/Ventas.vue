@@ -18,7 +18,7 @@
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
-                    
+
                 </div>
             </div>
             <br /><br />
@@ -37,7 +37,7 @@
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setTipoVenta" 
+                                        :on-select="setTipoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -54,7 +54,7 @@
                                         initValue=""
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setAlmacen" 
+                                        :on-select="setAlmacen"
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -71,7 +71,7 @@
                                         initValue="CAJA1"
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setPuntoVenta" 
+                                        :on-select="setPuntoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -80,7 +80,9 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -89,7 +91,7 @@
                                             label="writer"
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
-                                            :on-select="setCliente" 
+                                            :on-select="setCliente"
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
@@ -103,7 +105,11 @@
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                         </b-input-group-append>
                                     </b-input-group>
-                                </b-form-group>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>                                  </b-form-group>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -144,7 +150,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedor"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -152,15 +158,15 @@
                     </b-col>
                 </b-row>
                 <b-row>
-                    <b-col> 
-                        <productos-carrito 
+                    <b-col>
+                        <productos-carrito
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
-                            ref="carrito" 
-                            :showButton="false" 
+                            ref="carrito"
+                            :showButton="false"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -189,13 +195,13 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox 
+                                                <b-form-checkbox
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
-                                                <b-form-input 
+                                                <b-form-input
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -204,7 +210,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </template>    
+                            </template>
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -327,14 +333,14 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto' }, 
+                    { key: 'CodigoBarra', label: 'Código' },
+                    { key: 'Producto' },
                     { key: 'ProductoCategoria', label: 'Categoría' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medicion' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
@@ -380,7 +386,7 @@ export default {
         },
         initForm () {
             this.descuentoGeneral = 0
-            
+
             this.venta = {
                 EsCredito: 0,
                 Serie: '',
@@ -405,7 +411,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                CampoDireccion: 'Direccion'
             }
 
             this.loadFirstAlmacen()
@@ -496,7 +503,7 @@ export default {
             }
         },
         aplicarPuntos (val) {
-            if (parseFloat(val) > this.venta.cliente.Puntos) { 
+            if (parseFloat(val) > this.venta.cliente.Puntos) {
                 this.puntosAplicados = this.venta.cliente.Puntos
             }
 
@@ -549,8 +556,8 @@ export default {
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             if(!this.venta.cliente.IdCliente) {
@@ -566,7 +573,7 @@ export default {
             }
 
             this.venta.productos = this.productos
-            
+
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 console.log(response)
@@ -594,8 +601,8 @@ export default {
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false            
-                    return                
+                    this.inProgress = false
+                    return
                 }
             }
 
@@ -621,8 +628,8 @@ export default {
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             this.venta.productos = this.productos
