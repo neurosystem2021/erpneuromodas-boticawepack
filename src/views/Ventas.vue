@@ -109,11 +109,8 @@
                                         <option value="Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
-<<<<<<< HEAD
-                                    </b-form-select>                                  </b-form-group>
-=======
-                                    </b-form-select>                                </b-form-group>
->>>>>>> 1668cd16597f2b8ef73fb8ab7d36de22261245d2
+                                    </b-form-select>                                  
+                                </b-form-group>
                             </b-col>
                         </b-row>
                     </b-col>
