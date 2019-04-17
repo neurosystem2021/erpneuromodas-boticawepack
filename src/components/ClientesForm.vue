@@ -171,7 +171,11 @@ export default {
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
         this.cliente = {}
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 1668cd16597f2b8ef73fb8ab7d36de22261245d2
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
