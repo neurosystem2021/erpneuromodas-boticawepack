@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn @click="show = true" variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente" ref="form">    
-    <b-modal class="modal-cliente" no-close-on-backdrop title="Nuevo Cliente" size="lg" ref="clienteForm" v-if="show" v-model="show" @shown="shownClienteForm">
+    <b-form @submit="guardarCliente">    
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -25,9 +25,21 @@
                 type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
-            <label>Dirección:</label>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -98,9 +110,6 @@
 <script>
 import config from '@/store/config.js'
 export default {
-  mounted () {
-    document.body.appendChild(this.$refs.form)
-  },
   data() {
     return {
       API: config.API,
@@ -109,6 +118,8 @@ export default {
         Cliente: '',
         DniRuc: '',
         Direccion: '',
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
         Email: '',
         Sexo: '',
@@ -118,59 +129,84 @@ export default {
       }
     }
   },
-  props: ['newDniRuc', 'index'],
-  computed: {
-  },
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  /*watch: {
+    show (val) {
+      console.log(this.editCliente)
+      if (this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
+    }
+  },*/
   methods: {
     shownClienteForm () {
-      console.log('show')
-      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
-      this.cliente.Sexo = ''
-      this.cliente.Ocupacion = ''
-      this.cliente.FechaNacimiento = ''
-      this.cliente.Nacionalidad = ''
+*/
+      if (this.editCliente && this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
     },
     consultarDNIRUC () {
-        let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+      
+      let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
-        this.axios.get(this.API + 'consultarRUC', {
-            params: {
-                type: tipo,
-                numero: this.cliente.DniRuc
-            }
-        }).then((response) => {
-            if (response.data) {
-                this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-                var data = response.data.result
-                if (tipo == 'DNI') {
-                    this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
-                } else {
-                    this.cliente.Cliente = data.RazonSocial
-                    this.cliente.Direccion = data.Direccion
-                    // this.cliente.Telefono = data.Telefono
-                }
-            } else {
-                this.$toasted.show('No se encontró el Usuario')                
-            }
-            
-        })
-        .catch((error) => {
-            this.$toasted.show('No se encontró el Usuario')        
-            console.log(error)
-        })
+      this.axios.get(this.API + 'consultarRUC', {
+          params: {
+              type: tipo,
+              numero: this.cliente.DniRuc
+          }
+      }).then((response) => {
+          if (response.data) {
+              this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
+              var data = response.data.result
+              if (tipo == 'DNI') {
+                  this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
+              } else {
+                  this.cliente.Cliente = data.RazonSocial
+                  this.cliente.Direccion = data.Direccion
+                  // this.cliente.Telefono = data.Telefono
+              }
+          } else {
+              this.$toasted.show('No se encontró el Usuario')                
+          }
+          
+      })
+      .catch((error) => {
+          this.$toasted.show('No se encontró el Usuario')        
+          console.log(error)
+      })
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
+
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+
+      var esDocumento = this.cliente.DniRuc.length > 7 ? true : false
+      if (!esDocumento) {
+          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.cliente = {}
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
@@ -179,7 +215,6 @@ export default {
   }
 }
 </script>
-<style scoped>
-
+<style>
 
 </style>
