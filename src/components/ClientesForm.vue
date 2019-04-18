@@ -151,6 +151,7 @@ export default {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.cliente = {}
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
