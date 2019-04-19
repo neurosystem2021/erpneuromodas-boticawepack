@@ -79,7 +79,9 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+                                    
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -100,8 +102,15 @@
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                            
                                         </b-input-group-append>
                                     </b-input-group>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
+
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -400,7 +409,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
-                }
+                },
+                CampoDireccion: 'Direccion'
             }
         },
         setTipoVenta (obj) {
