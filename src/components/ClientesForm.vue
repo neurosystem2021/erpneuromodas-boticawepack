@@ -2,7 +2,7 @@
   <div>
     <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
+  <b-form @submit="guardarCliente" ref="form">
     <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
@@ -105,13 +105,14 @@ export default {
   props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
   methods: {
     shownClienteForm () {
-      // this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       // this.cliente.Direccion = ''
       // this.cliente.Cliente = ''
       // this.cliente.Telefono = ''
       // this.cliente.Email = ''
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
+      } else {
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       }
     },
     consultarDNIRUC () {
