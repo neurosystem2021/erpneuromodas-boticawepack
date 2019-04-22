@@ -2,7 +2,7 @@
   <div>
     <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
+    <b-form @submit="guardarCliente" ref="form">    
     <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
@@ -11,7 +11,7 @@
             <b-input-group>
               <b-form-input 
                 required="required"
-                v-model="cliente.DniRuc"></b-form-input>
+                v-model="cliente.DniRuc" type="number"></b-form-input>
               <b-input-group-append>
                 <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
               </b-input-group-append>
@@ -103,7 +103,6 @@ export default {
   },*/
   methods: {
     shownClienteForm () {
-      //this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
@@ -112,6 +111,8 @@ export default {
 */
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
+      } else {
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       }
     },
     consultarDNIRUC () {
@@ -178,6 +179,11 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
+
