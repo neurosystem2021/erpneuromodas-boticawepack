@@ -392,7 +392,8 @@ export default {
                 tipoVenta: {
                     IdTipoDoc: 7,
                     TipoDoc: 'BOLETA ELEC.',
-                    LimitItems: 8
+                    LimitItems: 8,
+                    CodSunat: '03',
                 },
                 almacen: {
                     IdAlmacen: 1,
