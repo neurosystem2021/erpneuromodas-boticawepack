@@ -44,7 +44,7 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row>
+<!--       <b-row>
           <b-col>
             <b-form-group>
                 <label>Teléfono:</label>
@@ -93,7 +93,7 @@
                 type="date"></b-form-input>
             </b-form-group>
           </b-col>
-      </b-row>
+      </b-row> -->
       
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
