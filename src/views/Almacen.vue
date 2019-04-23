@@ -241,7 +241,7 @@
                   </div>
                 </template>
                 <template slot="Producto" slot-scope="data">
-                  <div>{{data.item.Producto | quitarcodigo}}</div>
+                  <div>{{data.item.Producto}}</div>
                 </template>
                 
               </b-table>
@@ -340,7 +340,6 @@ export default {
         })
 
         // Cargar la sumatoria
-        console.log('asdasd')
         this.getSumaStock()
         this.getSumaValorizado()
 
