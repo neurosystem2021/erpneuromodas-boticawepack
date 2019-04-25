@@ -44,6 +44,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
+            :readOnly="data.field.readOnly"
             type="number"
             style="width: 110px"
             min="0"
@@ -81,6 +82,7 @@
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
+            :readOnly="data.field.readOnly"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -147,7 +149,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-show="showPagoCon">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -194,6 +196,10 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+      showPagoCon: {
+        default: true,
+        type: Boolean
+      },
     idAlmacen: Number,
 
     igvTotal: Boolean,

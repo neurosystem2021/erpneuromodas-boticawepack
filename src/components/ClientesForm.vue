@@ -11,7 +11,7 @@
             <b-input-group>
               <b-form-input 
                 required="required"
-                v-model="cliente.DniRuc"></b-form-input>
+                v-model="cliente.DniRuc" type="number"></b-form-input>
               <b-input-group-append>
                 <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
               </b-input-group-append>
@@ -181,6 +181,10 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
