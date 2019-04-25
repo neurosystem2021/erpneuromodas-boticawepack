@@ -12,6 +12,7 @@ import Traslado from '@/views/Traslado.vue'
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
+import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 
@@ -70,6 +71,11 @@ export default new Router({
       name: 'StockMinimo',
       component: StockMinimo
     },
+    {
+      path: '/reportes/deudaclientes',
+      name: 'DeudaClientes',
+      component: DeudaClientes
+    },    
     {
       path: '/facturacion',
       name: 'VentasFacturacion',
