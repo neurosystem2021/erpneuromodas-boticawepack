@@ -1,11 +1,12 @@
 <template>
   <div>
+
+    <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="4" class="my-1">
             <b-form-group>
                   <label>Buscar:</label>
-							
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
                 <b-input-group-append>
@@ -15,8 +16,8 @@
             </b-form-group>
             <br />
           </b-col>
-					<b-col md="4">
-						<b-form-group>
+          <b-col md="4">
+            <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
                       required="required"
@@ -31,7 +32,7 @@
                       :classes="{input: 'form-control'}">
                   </autocomplete>
                 </b-form-group>
-					</b-col>
+          </b-col>
           <b-col md="4" class="my-1">
             <b-row>
             <b-col md="8">
@@ -86,7 +87,6 @@ export default {
       console.log(response)
       this.totalRows = response.data.total
     })
-
   },
   data() {
     return {
@@ -104,45 +104,48 @@ export default {
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
             { key: 'Saldo', label: 'Saldo', sortable: true },
+            { key: 'FechaDoc', label: 'Emision', sortable: true },
+            { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
-			currentPage: 1,
-			almacen: {
-				IdAlmacen: 1
-			}
+      currentPage: 1,
+      almacen: {
+        IdAlmacen: 1
+      }
     }
   },
   methods: {
-		focusAutocomplete (ref) {
+    focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
-		},
-		setAlmacen (obj) {
-			// this.almacen = obj
-   //    Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
-		myProvider (ctx) {
-			// Here we don't set isBusy prop, so busy state will be handled by table itself
-			// this.isBusy = true
-			// let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-			// url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-			let promise = this.axios.get( this.API + 'cliente/deudas?q=' + ctx.filter )
+    setAlmacen (obj) {
+      // this.almacen = obj
+      // Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
+    myProvider (ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      // console.log(ctx.filter)
+      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
+      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      let promise = this.axios.get( this.API + 'cliente/deudas?q=' + ctx.filter )
 
-			return promise.then((response) => {
+      return promise.then((response) => {
         console.log(response)
-				this.items = response.data
-				//this.totalRows = this.items.length
-				// Here we could override the busy state, setting isBusy to false
-				// this.isBusy = false
-				return(this.items)
-			}).catch(error => {
-				// Here we could override the busy state, setting isBusy to false
-				// this.isBusy = false
-				// Returning an empty array, allows table to correctly handle busy state in case of error
-				return []
-			})
-		}
+        this.items = response.data
+        //this.totalRows = this.items.length
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        return(this.items)
+      }).catch(error => {
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        // Returning an empty array, allows table to correctly handle busy state in case of error
+        return []
+      })
+    }
   },
   components: {
       // ProductoForm
