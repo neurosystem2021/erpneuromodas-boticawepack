@@ -46,11 +46,11 @@
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
+                                        disabled
                                         required="required"
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen"
@@ -67,7 +67,6 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="CAJA1"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta"
@@ -102,14 +101,14 @@
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-                                        
                                         </b-input-group-append>
                                     </b-input-group>
-                                        <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                            <option value="Direccion">{{ venta.cliente.Direccion }}</option>
-                                            <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                            <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                                        </b-form-select>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
+
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -313,7 +312,8 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        // this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -409,7 +409,7 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                CampoDireccion: "Direccion",
+                CampoDireccion: 'Direccion'
             }
         },
         setTipoVenta (obj) {
@@ -421,13 +421,47 @@ export default {
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+                this.getNumeroVenta()
+            })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -588,6 +622,25 @@ export default {
                 }
             }
 
+            if (!this.venta.cliente.DniRuc) {
+                this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
+            if (!esNumerico) {
+                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
+            }
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false
@@ -622,6 +675,7 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.getNumeroVenta()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
