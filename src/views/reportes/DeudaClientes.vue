@@ -92,7 +92,7 @@ export default {
     return {
       API: config.API,
       pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: null,
+      filter: '',
       sortBy: 'IdDocVenta',
       sortDesc: false,
       items: [],
@@ -127,7 +127,7 @@ export default {
 			// this.isBusy = true
 			// let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
 			// url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-			let promise = this.axios.get( this.API + 'cliente/deudas' )
+			let promise = this.axios.get( this.API + 'cliente/deudas?q=' + ctx.filter )
 
 			return promise.then((response) => {
         console.log(response)
