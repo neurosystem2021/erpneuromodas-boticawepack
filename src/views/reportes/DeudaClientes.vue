@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="4" class="my-1">
@@ -102,6 +103,8 @@ export default {
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
             { key: 'Saldo', label: 'Saldo', sortable: true },
+            { key: 'FechaDoc', label: 'Emision', sortable: true },
+            { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
