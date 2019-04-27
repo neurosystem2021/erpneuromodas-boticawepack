@@ -93,12 +93,22 @@ export default {
     }
   },
   props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  /*watch: {
+    show (val) {
+      console.log(this.editCliente)
+      if (this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
+    }
+  },*/
   methods: {
     shownClienteForm () {
-      // this.cliente.Direccion = ''
-      // this.cliente.Cliente = ''
-      // this.cliente.Telefono = ''
-      // this.cliente.Email = ''
+      /*
+      this.cliente.Direccion = ''
+      this.cliente.Cliente = ''
+      this.cliente.Telefono = ''
+      this.cliente.Email = ''
+*/
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
       } else {
@@ -111,7 +121,7 @@ export default {
           this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
           return
       }
-
+      
       let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
       this.axios.get(this.API + 'consultarRUC', {
@@ -141,7 +151,8 @@ export default {
       })
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
+
       var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
       if (!esNumerico) {
           this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
