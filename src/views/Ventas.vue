@@ -648,7 +648,7 @@ export default {
                 this.inProgress = false
                 return
             }
-            
+
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
