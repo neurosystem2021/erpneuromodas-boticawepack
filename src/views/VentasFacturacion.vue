@@ -322,7 +322,8 @@ export default {
       if (items.length){
         this.axios.get(this.API + 'ventas/detalle', {
            params: {
-             idDocVentas: items.map((item) => item.idDocVenta),
+             idAlmacen: this.almacen.IdAlmacen,
+             idDocVentas: items.map((item) => item.idDocVenta)
            }
          }).then((response) => {
               this.itemsDetalle = response.data
