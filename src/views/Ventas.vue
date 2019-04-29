@@ -77,6 +77,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
+
                             <b-col md="3">
                                 <b-form-group>
                                     <label>Nº PLACA:</label>
@@ -84,13 +85,14 @@
                                             type="text"
                                             required
                                             class="form-control"
-                                            placeholder="Nº Placa" />
+                                            placeholder="Placa" />
                                 </b-form-group>
                             </b-col>
+
                             <b-col md="9">
                                 <b-form-group>
                                     <label>Cliente:</label>
-                                    
+
                                     <b-input-group>
                                         <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -113,7 +115,7 @@
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-                                            
+
                                         </b-input-group-append>
                                     </b-input-group>
                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
@@ -412,6 +414,7 @@ export default {
                     TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
                     CodSunat: '03',
+
                 },
                 almacen: {
                     IdAlmacen: 1
@@ -489,6 +492,7 @@ export default {
                     if (response.data) {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
+                        console.log(this.venta.cliente)
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
