@@ -13,6 +13,7 @@ import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
 import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
+import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 
@@ -80,6 +81,11 @@ export default new Router({
       path: '/reportes/deudaproveedores',
       name: 'DeudaProveedores',
       component: DeudaProveedores
+    },
+    {
+      path: '/reportes/rankingclientes',
+      name: 'RankingClientes',
+      component: RankingClientes
     },
     {
       path: '/facturacion',
