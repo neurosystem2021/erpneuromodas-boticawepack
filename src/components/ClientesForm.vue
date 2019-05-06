@@ -72,6 +72,14 @@
             Marcar si es un cliente VIP
           </b-form-checkbox>
         </b-col>
+        <b-col>
+          <b-form-group>
+            <label>Fecha Nacimiento:</label>
+            <b-form-input 
+              v-model="cliente.FechaNacimiento"
+              type="date"></b-form-input>
+          </b-form-group>
+        </b-col>
       </b-row>
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
@@ -99,7 +107,8 @@ export default {
         Direccion2: '',
         Direccion3: '',
         Telefono: '',
-        Email: ''
+        Email: '',
+        FechaNacimiento: '',
       }
     }
   },
@@ -171,7 +180,7 @@ export default {
           return
       }
 
-      var esDocumento = this.cliente.DniRuc.length > 7 ? true : false
+      var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
       if (!esDocumento) {
           this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
           return
