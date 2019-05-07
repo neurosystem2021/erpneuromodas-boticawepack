@@ -391,7 +391,8 @@ export default {
                 tipoVenta: {
                     IdTipoDoc: 7,
                     TipoDoc: 'BOLETA ELEC.',
-                    LimitItems: 0
+                    LimitItems: 0,
+                    CodSunat: '03'
                 },
                 almacen: {
                     // IdAlmacen: 1,
@@ -594,7 +595,7 @@ export default {
                 this.inProgress = false
                 return
             }
-            
+
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
