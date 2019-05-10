@@ -351,7 +351,7 @@
 
 
       <b-row>
-          <b-col v-if="totalIngresos">
+          <b-col v-if="totalAdelantos">
             <h5>Descontar Adelantos</h5><br>
             <table class="table b-table table-sm adelantos">
               <thead>
@@ -627,7 +627,6 @@ export default {
           params: params
         })
         .then(res => {
-console.log(res.data)
           this.adelantos = res.data
         }).catch(err => {
           console.log(err)
