@@ -349,6 +349,35 @@
       </b-row>
       
 
+
+      <b-row>
+          <b-col v-if="totalIngresos">
+            <h5>Descontar Adelantos</h5><br>
+            <table class="table b-table table-sm adelantos">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in adelantos" :key="index">
+                  <td>{{ item.IdCajaBanco }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
+                  <td>S/. {{ item.Importe | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="total"><b>Total Adelantos</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+      </b-row>
+
       <br>
 
       <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
@@ -374,6 +403,7 @@ export default {
       ventas: [],
       ingresos: [],
       salidas: [],
+	  adelantos: [],
       turno: null,
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
@@ -390,7 +420,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -409,6 +439,13 @@ export default {
       });
       return total 
     },
+  	totalAdelantos () {
+  		let total = 0
+  		this.adelantos.forEach(ade => {
+  			if (!ade.Anulado) total += ade.Importe
+  		})
+  		return total
+  	},
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
@@ -545,6 +582,7 @@ export default {
       .then(res => {
         this.ventas = res.data
         this.loadDetalles()
+		this.getAdelantos()
       }).catch(err => {
         console.log(err)
       })
@@ -580,6 +618,20 @@ export default {
       }).catch(err => {
         console.log(err)
       }) 
+    },
+    getAdelantos() {
+        let params = {
+          idDocVentas: this.ventas.map(v => v.idDocVenta)
+        }
+        this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
+          params: params
+        })
+        .then(res => {
+console.log(res.data)
+          this.adelantos = res.data
+        }).catch(err => {
+          console.log(err)
+        })
     },
     getCierre(id) {
       this.axios.get(this.API + 'cierrecaja', {
@@ -648,6 +700,9 @@ th {
 }
 .detalle-producto {
   width: 270px;
+}
+.adelantos {
+  background-color: #ffe8c5;
 }
 @media print {
   .no-print {
