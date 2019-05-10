@@ -77,7 +77,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="2">
+                            <b-col md="3">
                                 <b-form-group>
                                     <label>Nº PLACA:</label>
                                     <input v-model="venta.Placa"
@@ -87,7 +87,7 @@
                                             placeholder="Placa" />
                                 </b-form-group>
                             </b-col>
-                            <b-col md="10">
+                            <b-col md="9">
                                 <b-form-group>
                                     <label>Cliente:</label>
 

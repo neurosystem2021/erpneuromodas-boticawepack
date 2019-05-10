@@ -2,7 +2,7 @@
   <div>
     <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente" ref="form">   
+    <b-form @submit="guardarCliente" ref="form">
     <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
@@ -164,8 +164,6 @@ export default {
       evt.preventDefault();
 
       var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
-      console.log(parseInt(this.cliente.DniRuc))
-      console.log(esNumerico)
       if (!esNumerico) {
           this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
           return
