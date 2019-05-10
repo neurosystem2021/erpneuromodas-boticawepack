@@ -129,7 +129,7 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter +'&limit='+ctx.perPage+'&page='+ctx.currentPage )
+      let promise = this.axios.get( this.API + 'proveedores/deudas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
         console.log(response)
