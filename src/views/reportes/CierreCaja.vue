@@ -391,7 +391,8 @@ export default {
     },
     getIngresos () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: 1
       }
       if (this.vendedor.Usuario) {
         // params.usuario = this.vendedor.Usuario
@@ -407,7 +408,8 @@ export default {
     },
     getSalidas () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: 1
       }
       if (this.vendedor.Usuario) {
         // params.usuario = this.vendedor.Usuario
