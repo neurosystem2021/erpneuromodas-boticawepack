@@ -17,7 +17,7 @@
             <br />
           </b-col>
           <b-col md="4">
-            <b-form-group>
+<!--             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
                       required="required"
@@ -31,7 +31,7 @@
                       :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group> -->
           </b-col>
           <b-col md="4" class="my-1">
             <b-row>
@@ -129,7 +129,7 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter +'&limit='+ctx.perPage+'&page='+ctx.currentPage )
+      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
         console.log(response)

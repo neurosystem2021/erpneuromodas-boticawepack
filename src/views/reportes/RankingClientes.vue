@@ -49,6 +49,7 @@
           </b-col>
 
           <b-table small
+            ref="tablaProductos"
             :filter="filter"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
@@ -68,7 +69,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes'" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -82,7 +83,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ranking/clientes/count').then((response) => {
+    this.axios.get(this.API + 'ranking/clientes/count?idalmacen=' + this.almacen.IdAlmacen ).then((response) => {
       console.log(response)
       this.totalRows = response.data.total
     })
@@ -117,8 +118,8 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     setAlmacen (obj) {
-      // this.almacen = obj
-      // Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+      this.almacen = obj
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
@@ -126,7 +127,7 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'ranking/clientes?q=' + ctx.filter +'&limit='+ctx.perPage+'&page='+ctx.currentPage )
+      let promise = this.axios.get( this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
         console.log(response)
