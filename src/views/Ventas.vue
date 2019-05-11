@@ -195,7 +195,6 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox 
-                                                    id="checkbox1"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
