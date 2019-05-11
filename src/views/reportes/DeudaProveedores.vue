@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
+    <h2 align-h="center" class="text-center" >Reporte Deuda de Proveedores</h2>
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="4" class="my-1">
@@ -17,7 +17,7 @@
             <br />
           </b-col>
           <b-col md="4">
-            <b-form-group>
+<!--             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
                       required="required"
@@ -31,7 +31,7 @@
                       :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group> -->
           </b-col>
           <b-col md="4" class="my-1">
             <b-row>
@@ -43,7 +43,7 @@
               </b-form-group>
             </b-col>
             <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> ArtÃ­culos</p>-->
+             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
             </b-col>
             </b-row>
           </b-col>
@@ -68,7 +68,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2'" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaproveedores'" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -82,7 +82,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'clientes/deuda/count').then((response) => {
+    this.axios.get(this.API + 'proveedores/deuda/count').then((response) => {
       console.log(response)
       this.totalRows = response.data.total
     })
@@ -97,8 +97,8 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-            { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
-            { key: 'Cliente', label: 'Cliente', sortable: true },
+            { key: 'Ruc', label: 'RUC', sortable: true },
+            { key: 'Proveedor', label: 'Cliente', sortable: true },
             { key: 'Correlativo', label: 'Serie', sortable: true },
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
@@ -129,7 +129,7 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/deudas?q=' + ctx.filter +'&limit='+ctx.perPage+'&page='+ctx.currentPage )
+      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
         console.log(response)
