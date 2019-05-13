@@ -568,12 +568,13 @@ export default {
             this.tieneIgv = false
             this.initForm()
             this.limpiarCart()
-            this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
-            this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.getVendedor()
             this.$refs.inputCliente.setValue('')
-            this.$refs.inputVendedor.setValue('')
+            // this.getNumeroVenta()
+            // this.$refs.inputTipoVenta.setValue('TICKET')
+            // this.$refs.inputAlmacen.setValue('VENTA')
+            // this.$refs.inputPuntoVenta.setValue('CAJA1')
+            // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
 
