@@ -4,19 +4,38 @@
     <b-container class="bv-example-row">
       <div>
           <div class="float-right no-print">
-            <b-button-group size="sm" v-if="!this.$route.params.id">
-              <b-form-select v-model="turno" :options="turnos" />
-            </b-button-group>
-            <b-button-group size="sm">
-              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
-            </b-button-group>
-            <b-button-group size="sm">
-              <cierres-caja></cierres-caja>
-            </b-button-group>
-            <b-button-group size="sm">
-              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
-            </b-button-group>
-          </div>
+              <b-row>
+                <b-col cols="2" v-if="!this.$route.params.id">
+                    <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
+                    <b-form-group size="sm" v-show="false">
+                        <autocomplete
+                            required="required"
+                            ref="inputVendedor"
+                            :url="API + 'usuarios'"
+                            anchor="NombreUsuario"
+                            label="writer"
+                            :on-select="setVendedor" 
+                            :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                    <b-button-group size="sm" v-if="!this.$route.params.id">
+                        <b-form-select v-model="turno" :options="turnos" />
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <cierres-caja></cierres-caja>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+                    </b-button-group>
+                </b-col>
+              </b-row>
+                     </div>
       </div>
       <br class="no-print" /><br class="no-print" />
 
@@ -326,6 +345,13 @@ export default {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     getVentas () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        // params.usuario = this.vendedor.Usuario
+      }
+      // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: {
           idCierre: this.$route.params.id
@@ -338,6 +364,13 @@ export default {
       })
     },
     getIngresos () {
+      let params = {
+        idCierre: this.$route.params.id,
+        idCuenta: 1
+      }
+      if (this.vendedor.Usuario) {
+        // params.usuario = this.vendedor.Usuario
+      }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: {
           idCierre: this.$route.params.id
@@ -350,6 +383,13 @@ export default {
       })
     },
     getSalidas () {
+      let params = {
+        idCierre: this.$route.params.id,
+        idCuenta: 1
+      }
+      if (this.vendedor.Usuario) {
+        // params.usuario = this.vendedor.Usuario
+      }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: {
           idCierre: this.$route.params.id

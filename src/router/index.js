@@ -10,6 +10,9 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
+import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
+import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
+import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
@@ -60,6 +63,21 @@ export default new Router({
       path: '/reportes/stockminimo',
       name: 'StockMinimo',
       component: StockMinimo
+    },
+    {
+      path: '/reportes/deudaclientes',
+      name: 'DeudaClientes',
+      component: DeudaClientes
+    },    
+    {
+      path: '/reportes/deudaproveedores',
+      name: 'DeudaProveedores',
+      component: DeudaProveedores
+    },
+    {
+      path: '/reportes/rankingclientes',
+      name: 'RankingClientes',
+      component: RankingClientes
     },
     {
       path: '/reportes/proforma/:id',
