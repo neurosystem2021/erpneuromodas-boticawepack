@@ -10,6 +10,9 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
+                        <proformas></proformas>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -297,6 +300,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
+                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
@@ -315,6 +319,7 @@ import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
+import Proformas from '@/components/ProformaLista.vue'
 
 
 export default {
@@ -638,6 +643,47 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
+        guardarProforma () {
+
+            if(!this.productos.length) {
+                this.$toasted.show('No hay productos para crear la proforma')
+                this.inProgress = false            
+                return          
+            }
+
+            if(!this.venta.cliente.IdCliente) {
+                this.$toasted.show('Debe seleccionar un cliente')
+                this.inProgress = false
+                return
+            }
+
+            if(!this.venta.vendedor.Usuario) {
+                this.$toasted.show('Debe seleccionar un vendedor')
+                this.inProgress = false
+                return
+            }
+
+            this.venta.productos = this.productos
+            
+            this.axios.post(this.API + 'proformas', this.venta)
+            .then((response) => {
+                this.$toasted.show('Proforma Guardada con exito')
+                this.inProgress = false
+                this.tieneIgv = false
+
+                this.initForm()
+                this.limpiarCart()
+                this.getVendedor()
+                this.$refs.inputCliente.setValue('')
+
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.inProgress = false
+            })
+        },
         guardarVenta (evt) {
             evt.preventDefault();
 
@@ -724,7 +770,8 @@ export default {
         ClientesForm,
         ConfigVenta,
         PagoDeuda,
-        PreOrdenLista
+        PreOrdenLista,
+        Proformas
     }
 }
 </script>
