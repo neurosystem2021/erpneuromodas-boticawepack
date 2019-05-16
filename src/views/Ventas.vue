@@ -581,7 +581,12 @@ export default {
         },
         onSetProducto (obj) {
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            console.log(obj)
+            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
+                obj.precio = obj.PrecioPorMayor
+            } else {
+                obj.precio = obj.PrecioContado || 0
+            }
             return obj
         },
         onAddProducto (obj) {

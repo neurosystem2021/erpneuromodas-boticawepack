@@ -47,7 +47,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -362,7 +362,6 @@ export default {
           idAlmacen: this.idAlmacen
         }
       }).then((response) => {
-        console.log(response.data)
         Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
         //console.log(response.data.stock)
           //return response.data.stock

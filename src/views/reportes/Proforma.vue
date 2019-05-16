@@ -6,9 +6,10 @@
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
+        <div>RUC: <b>{{ empresa.RUC }}</b></div>
 				<div>{{ empresa.DIRECCION }}</div>
-				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
+				<!--<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
+				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>-->
 			</div>
 		</header>
 		<main>
@@ -16,6 +17,8 @@
         <div id="client">
           <div class="to">PROFORMA A:</div>
           <h2 class="name">{{ proforma.Cliente }}</h2>
+
+          <div><b>{{ proforma.ClienteDniRuc }}</b></div>
           <div class="address">{{ proforma.ClienteDireccion }}</div>
           <div class="email"><a :href="'mailto:' + proforma.ClienteEmail">{{ proforma.ClienteEmail }}</a></div>
         </div>
@@ -28,19 +31,25 @@
       <table border="0" cellspacing="0" cellpadding="0">
         <thead>
           <tr>
-            <th class="no">#</th>
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="unit">PRECIO U.</th>
+            <th class="no">COD.</th>
             <th class="qty">CANT.</th>
-            <th class="total">TOTAL</th>
+            <th class="">MEDIDA</th>
+            <th class="desc">PRODUCTO</th>
+            <th class="desc">LABORATORIO</th>
+            <th class="unit">PRECIO U.</th>
+            
+            <th class="total">VALOR DE VENTA</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}</td>
-            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
+            <td class="no">{{ prod.Codigo }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
+            <td>{{prod.ProductoMedicion}}</td>
+            <td class="desc"><h3>{{ prod.Producto }}</h3></td>
+            <td class="">{{ prod.ProductoMarca }}</td>
+            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
+            
             <td class="total">
               S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
               <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -49,7 +58,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="2"></td>
+            <td colspan="4"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -59,8 +68,8 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="2"></td>
-            <td colspan="2">GRAN TOTAL</td>
+            <td colspan="4"></td>
+            <td colspan="2">TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
