@@ -1,16 +1,14 @@
 <template>
 	<div id="invoice-container">
-		<header class="clearfix">
-			<div id="logo">
+		<header class="clearfix" style="height: 120px;">
+			<!--<div id="logo">
 				<img src="/resources/images/logo.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
         <div>RUC: <b>{{ empresa.RUC }}</b></div>
 				<div>{{ empresa.DIRECCION }}</div>
-				<!--<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>-->
-			</div>
+			</div>-->
 		</header>
 		<main>
       <div id="details" class="clearfix">
@@ -36,6 +34,7 @@
             <th class="">MEDIDA</th>
             <th class="desc">PRODUCTO</th>
             <th class="desc">LABORATORIO</th>
+            <th class="desc">FECHA VEN.</th>
             <th class="unit">PRECIO U.</th>
             
             <th class="total">VALOR DE VENTA</th>
@@ -48,6 +47,7 @@
             <td>{{prod.ProductoMedicion}}</td>
             <td class="desc"><h3>{{ prod.Producto }}</h3></td>
             <td class="">{{ prod.ProductoMarca }}</td>
+            <td class="">{{ prod.FechaVen }}</td>
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             
             <td class="total">
@@ -58,7 +58,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4"></td>
+            <td colspan="5"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -68,7 +68,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="4"></td>
+            <td colspan="5"></td>
             <td colspan="2">TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
