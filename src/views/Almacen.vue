@@ -467,10 +467,10 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
+      /*this.$refs.inputColor.setValue('')
       this.$refs.inputTalla.setValue('')
       this.$refs.inputGenero.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      this.$refs.inputBotapie.setValue('')*/
 
       this.productoSelect = {}
       this.limpiarClassRows()
