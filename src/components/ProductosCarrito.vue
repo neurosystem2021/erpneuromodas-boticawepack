@@ -33,7 +33,11 @@
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+                $emit('onInputCantidad', val)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -42,7 +46,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.01"
+            step="0.0001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -211,11 +215,11 @@ export default {
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
+          { key: 'ProductoModelo', label: 'Modelo/Color' }, 
+          // { key: 'Color', label: 'Color' }, 
+          // { key: 'ProductoTalla', label: 'Talla' },
+          // { key: 'Genero' },
+          // { key: 'Botapie' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },

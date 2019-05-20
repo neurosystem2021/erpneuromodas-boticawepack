@@ -128,6 +128,7 @@ export default {
       this.cliente.Telefono = ''
       this.cliente.Email = ''
 */
+
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
       } else {
@@ -140,7 +141,7 @@ export default {
           this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
           return
       }
-      
+
       let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
       this.axios.get(this.API + 'consultarRUC', {
