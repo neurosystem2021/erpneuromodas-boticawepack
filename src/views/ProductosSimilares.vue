@@ -2,31 +2,50 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              
+          <b-col md="5" class="my-1">
+            <b-form-group horizontal label="Buscar Producto" class="mb-0">
+
               <autocomplete
-                ref="autocompleteProducto"
-                :url="APIProductos"
-                :onShouldRenderChild="renderChild"
+                ref="autocompleteProductos"
+                :url="API + 'productos'"
                 anchor="Producto"
                 label="writer"
-                placeholder="Agregar Producto"
+                placeholder="Seleccionar Producto"
                 :on-select="setProducto"
-                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProductos')"
                 :classes="{input: 'form-control'}">
               </autocomplete>
 
-              <b-input-group>
+              <!--<b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
                 <b-input-group-append>
                   <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
                 </b-input-group-append>
-              </b-input-group>
+              </b-input-group>-->
             </b-form-group>
+
+            
+          </b-col>
+          <b-col md="5" class="my-1">
+            <b-form-group horizontal label="Buscar Similares" class="mb-0">
+              <autocomplete
+                ref="autocompleteCompuestos"
+                :url="APICompuestos"
+                anchor="ProductoCompuesto"
+                label="writer"
+                placeholder="Seleccionar Compuesto"
+                :on-select="setCompuesto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteCompuestos')"
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="2">
+            <b-btn :disabled="!filter" @click="limpiar">Limpiar</b-btn>
+          </b-col>
+          <!--<b-col md="6" class="my-1">
             <b-row>
             <b-col md="8">
 
@@ -38,7 +57,7 @@
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
             </b-row>
-          </b-col>
+          </b-col>-->
 
           <b-table small
             ref="tablaProductos"
@@ -55,18 +74,18 @@
             :per-page="perPage"
             :current-page="currentPage"></b-table>
             <b-row>
-                <b-col md="6" class="my-1">
+               <!-- <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
+                </b-col>-->
             </b-row>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+        <!--<producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>-->
         <br />
-        <b-row align-h="center" class="text-center">
+        <!--<b-row align-h="center" class="text-center">
             <b-col cols="4">
               <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
             </b-col>
-        </b-row>
+        </b-row>-->
         <br /><br />
       </b-container>
   </div>
@@ -93,25 +112,38 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
+            { key: 'IdProducto', label: 'ID', sortable: true },
+            { key: 'ProductoMarca', label: 'Laboratorio', sortable: true },
+            { key: 'ProductoFormaFarmaceutica', label: 'Forma Farmaceutica', sortable: true },
+            { key: 'ProductoMedicion', label: 'Medición', sortable: true},
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            { key: 'Botapie', sortable: true }
+            { key: 'Producto', sortable: true },
+            { key: 'ProductoDesc', sortable: true },
+            { key: 'CodigoBarra', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
     }
   },
+  computed: {
+    APICompuestos () {
+      if (this.productoSelect  && this.productoSelect.IdProducto) {
+        return this.API + 'productos/compuestos/' + this.productoSelect.IdProducto
+      }
+      return this.API + 'productos/compuestos'
+    },
+  },
   methods: {
+      limpiar () {
+        this.filter = ''
+        this.$refs.autocompleteCompuestos.type = ""
+        this.$refs.autocompleteProductos.type = ""
+        this.productoSelect = {}
+      },
       rowClick (item, index) {
-        this.productoSelect = item
-        this.$refs.productoForm.show = true;
+        /* this.productoSelect = item
+        this.$refs.productoForm.show = true; */
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
@@ -121,12 +153,22 @@ export default {
       nuevoProducto () {
           this.productoSelect = {}
           this.$refs.productoForm.show = true
-
+      },
+      setProducto (obj) {
+        this.productoSelect = obj
+        this.$refs.autocompleteCompuestos.type = ""
+      },
+      setCompuesto (obj) {
+        this.filter = String(obj.IdProductoCompuesto);
+      },
+      focusAutocomplete (ref) {
+        // this.$refs[ref].type = ""
+        this.$refs[ref].handleDoubleClick()
       },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'productos/similares?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
@@ -150,6 +192,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+#my-table{
+  font-size: .9em;
+}
 </style>
