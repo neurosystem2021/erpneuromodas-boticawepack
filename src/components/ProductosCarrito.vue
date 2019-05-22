@@ -295,10 +295,23 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
-
-      if (idProducto) {
-        this.add([idProducto, (obj) => {
+      
+      if (String(this.loadCode).match(/[a-z]/i)) {
+        let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+        if (idProducto) {
+          this.add([idProducto, (obj) => {
+            if (obj) {
+              this.$emit('onAddProducto')
+              this.$toasted.show('Producto añadido correctamente')
+            } else {
+              this.$toasted.show('No se encontró ningun producto')
+            }
+            this.loadCode = ''
+          }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }
+      } else {
+        // console.log(this.loadCode);return;
+        this.add([this.loadCode, (obj) => {
           if (obj) {
             this.$emit('onAddProducto')
             this.$toasted.show('Producto añadido correctamente')
@@ -306,8 +319,10 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
       }
+
+      
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
