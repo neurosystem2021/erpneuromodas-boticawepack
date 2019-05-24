@@ -100,7 +100,7 @@
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 20px;
-    font-size: .9em;
+    font-size: .8em;
   }
   
   table th,
@@ -135,6 +135,10 @@
   
   table .desc {
     text-align: left;
+  }
+
+  table .prod {
+    width: 500px;
   }
   
   table .unit {

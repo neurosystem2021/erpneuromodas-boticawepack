@@ -1,14 +1,14 @@
 <template>
 	<div id="invoice-container">
 		<header class="clearfix" style="height: 120px;">
-			<!--<div id="logo">
+			<div id="logo">
 				<img src="/resources/images/logo.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
         <div>RUC: <b>{{ empresa.RUC }}</b></div>
 				<div>{{ empresa.DIRECCION }}</div>
-			</div>-->
+			</div>
 		</header>
 		<main>
       <div id="details" class="clearfix">
@@ -32,12 +32,12 @@
             <th class="no">COD.</th>
             <th class="qty">CANT.</th>
             <th class="">MEDIDA</th>
-            <th class="desc">PRODUCTO</th>
-            <th class="desc">LABORATORIO</th>
+            <th class="desc prod">PRODUCTO</th>
+            <th class="desc">LABO.</th>
             <th class="desc">FECHA VEN.</th>
             <th class="unit">PRECIO U.</th>
             
-            <th class="total">VALOR DE VENTA</th>
+            <th class="total">VALOR DE V.</th>
           </tr>
         </thead>
         <tbody>
