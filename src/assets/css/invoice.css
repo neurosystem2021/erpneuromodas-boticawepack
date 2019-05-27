@@ -52,6 +52,7 @@
   #company {
     float: right;
     text-align: right;
+    max-width: 65%;
   }
   
   

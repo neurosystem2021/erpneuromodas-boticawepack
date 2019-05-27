@@ -2,12 +2,13 @@
 	<div id="invoice-container">
 		<header class="clearfix" style="height: 120px;">
 			<div id="logo">
-				<img src="/resources/images/logo.png">
+        <img v-if="proforma.IdAlmacen !== 3" src="/resources/images/logo.png">
+				<img v-if="proforma.IdAlmacen == 3" src="/resources/images/logotowan.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
         <div>RUC: <b>{{ empresa.RUC }}</b></div>
-				<div>{{ empresa.DIRECCION }}</div>
+				<div>{{ proforma.AlmacenDireccion }}</div>
 			</div>
 		</header>
 		<main>
