@@ -186,6 +186,9 @@ import axios from 'axios'
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
+    if(this.$route.query.idProducto) {
+        this.add([this.$route.query.idProducto, (obj) => {}, { setPrecio: this.setPrecio,  setSuma: true }])
+    }
   },
   data () {
     return {

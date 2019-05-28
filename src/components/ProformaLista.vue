@@ -13,7 +13,8 @@
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
                         v-if="show"
-                        id="table-proformas" 
+                        id="table-proformas"
+                        ref="tableProforma" 
                         striped hover 
                         :busy.sync="isBusy" 
                         :filter="filter"
@@ -24,7 +25,11 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <div style="width: 180px">
+                            <b-button size="sm" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                            <b-button size="sm" variant="success" @click="() => selectProforma(data.item)">Selec.</b-button>
+                            <b-button size="sm" variant="danger" @click="() => eliminarProforma(data.item)">Eliminar.</b-button>
+                        </div>
                       </template>
 
                     </b-table>
@@ -48,6 +53,7 @@
 </template>
 <script>
 import config from '@/store/config.js'
+import { mapActions } from 'vuex'
 
     export default {
         mounted () {
@@ -69,7 +75,8 @@ import config from '@/store/config.js'
                 isBusy: false,
                 fields: [ 
                     { key: 'IdProforma', label: 'Id' }, 
-                    { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
+                    { key: 'Anio', label: 'Año' } , 
+                    { key: 'Numero', label: 'N°' }, 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
                     { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
                 totalRows: 50,
@@ -77,10 +84,47 @@ import config from '@/store/config.js'
                 currentPage: 1
             }
         },
+        props: ['idAlmacen'],
         methods: {
+            ...mapActions({
+                add: 'agregarProducto',
+                obtenerStok: 'obtenerStock',
+                limpiar: 'limpiarCarrito'
+            }),
             selectCierre (item) {
                // console.log(item)
                 
+            },
+            eliminarProforma (item) {
+                let r = confirm('¿Esta seguro que desea eliminar la proforma?')
+                if (r) {
+                    this.axios.post(this.API + 'proforma/delete', {
+                            idProforma: item.IdProforma
+                    }).then((response) => {
+                        this.$toasted.show('Se eliminó correctamente la proforma: ' + response.data.idProforma)
+                        this.$refs.tableProforma.refresh();
+                    })
+                }
+            },
+            selectProforma (item) {
+                this.limpiar()
+
+                this.axios.get(this.API + 'proforma/detalle', {
+                    params: {
+                        idProforma: item.IdProforma
+                    }
+                }).then((response) => {
+                    response.data.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+
+                        this.filter = ''
+                        this.show = false
+                    })
+
+                    this.$emit('onSelectProforma', item.IdCliente)
+                })
             },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
@@ -103,6 +147,8 @@ import config from '@/store/config.js'
         }
     }
 </script>
-<style>
-
+<style scoped>
+    #table-proformas {
+        font-size: .9em;
+    }
 </style>
