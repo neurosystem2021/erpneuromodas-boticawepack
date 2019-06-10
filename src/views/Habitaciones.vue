@@ -229,6 +229,8 @@ export default {
 
 		},
 		insertarAdelanto() {
+			let usuario = sessionStorage.getItem('User')
+
 			if(this.selectProducto.Adelanto <= 0) {
 				return;
 			}
@@ -241,7 +243,8 @@ export default {
                     concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + this.selectProducto.AdelantoDesc,
 					IdPreOrden: this.selectProducto.IdPreOrden,
 					IdHabitacion: this.selectProducto.IdProducto,
-					Adelanto: this.selectProducto.Adelanto
+					Adelanto: this.selectProducto.Adelanto,
+					Usuario: usuario
 				}).then(res => {
 					// this.adelantos.push(res.data)
 					this.cargarAdelantos();
