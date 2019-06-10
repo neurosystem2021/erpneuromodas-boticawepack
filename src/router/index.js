@@ -3,6 +3,7 @@ import Router from 'vue-router'
 // import HelloWorld from '@/components/HelloWorld'
 import Movimiento from '@/views/Movimiento.vue'
 import Productos from '@/views/Productos.vue'
+import GestionAlmacen from '@/views/GestionAlmacen.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
@@ -32,6 +33,11 @@ export default new Router({
       path: '/productos',
       name: 'Productos',
       component: Productos
+    },
+    {
+      path: '/gestion/almacenes',
+      name: 'GestionAlmacen',
+      component: GestionAlmacen
     },
     {
       path: '/almacen',
