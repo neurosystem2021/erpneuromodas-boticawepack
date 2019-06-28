@@ -78,7 +78,9 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -101,6 +103,11 @@
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                         </b-input-group-append>
                                     </b-input-group>
+                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -185,8 +192,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox 
-                                                    id="checkbox1"
+                                                <b-form-checkbox
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -410,7 +416,8 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                IdPreOrden: []
+                IdPreOrden: [],
+                CampoDireccion: 'Direccion'
             }
         },
         setTipoVenta (obj) {
@@ -541,6 +548,26 @@ export default {
                 }
             }
 
+            if (!this.venta.cliente.DniRuc) {
+                this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
+            if (!esNumerico) {
+                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
+            }
+            
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            

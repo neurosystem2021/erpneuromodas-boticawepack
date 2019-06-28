@@ -11,6 +11,9 @@ import Habitaciones from '@/views/Habitaciones.vue'
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
+import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
+import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
+import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 
@@ -63,6 +66,21 @@ export default new Router({
       path: '/reportes/stockminimo',
       name: 'StockMinimo',
       component: StockMinimo
+    },
+    {
+      path: '/reportes/deudaclientes',
+      name: 'DeudaClientes',
+      component: DeudaClientes
+    },    
+    {
+      path: '/reportes/deudaproveedores',
+      name: 'DeudaProveedores',
+      component: DeudaProveedores
+    },
+    {
+      path: '/reportes/rankingclientes',
+      name: 'RankingClientes',
+      component: RankingClientes
     },
     {
       path: '/reportes/huespedes',
