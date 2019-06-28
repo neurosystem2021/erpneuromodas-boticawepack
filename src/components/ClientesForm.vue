@@ -84,7 +84,7 @@
       </b-row>
       
       <div slot="modal-footer" >
-        <b-btn  variant="primary" type="submit">
+        <b-btn  variant="primary" type="submit" :disabled="isSaving">
            Guardar
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
@@ -115,7 +115,8 @@ export default {
         Ocupacion:'',
         FechaNacimiento: '',
         Nacionalidad: ''
-      }
+      },
+      isSaving: false
     }
   },
   props: ['newDniRuc', 'index'],
@@ -137,12 +138,13 @@ export default {
     consultarDNIRUC () {
         let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
-        this.axios.get(this.API + 'consultarRUC', {
-            params: {
-                type: tipo,
-                numero: this.cliente.DniRuc
-            }
-        }).then((response) => {
+        // this.axios.get(this.API + 'consultarRUC', {
+        //   params: {
+        //         type: tipo,
+        //         numero: this.cliente.DniRuc
+        //     }
+        // })
+        this.axios.get('https://www.facturacionelectronica.us/facturacion/controller/ws_consulta_rucdni_v2.php?usuario=20573027125&password=5i573m45&documento=' + tipo + "&nro_documento=" + this.cliente.DniRuc).then((response) => {
             if (response.data) {
                 this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
                 var data = response.data.result
@@ -165,15 +167,18 @@ export default {
     },
     guardarCliente(evt) {
         evt.preventDefault();
+        this.isSaving = true;
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.isSaving = false;
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        this.isSaving = false
       })
     }
   }
