@@ -4,45 +4,25 @@
     <b-container class="bv-example-row">
       <div>
           <div class="float-right no-print">
-              <b-row>
-                <b-col cols="2" v-if="!this.$route.params.id">
-                    <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
-                    <b-form-group size="sm" v-show="false">
-                        <autocomplete
-                            required="required"
-                            ref="inputVendedor"
-                            :url="API + 'usuarios'"
-                            anchor="NombreUsuario"
-                            label="writer"
-                            :on-select="setVendedor" 
-                            :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
-                    </b-form-group>
-                </b-col>
-                <b-col cols="12">
-                    <b-button-group size="sm" v-if="!this.$route.params.id">
-                        <b-form-select v-model="turno" :options="turnos" />
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <cierres-caja></cierres-caja>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
-                    </b-button-group>
-                </b-col>
-              </b-row>
-                     </div>
+            <b-button-group size="sm" v-if="!this.$route.params.id">
+              <b-form-select v-model="turno" :options="turnos" />
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+            </b-button-group>
+            <b-button-group size="sm">
+              <cierres-caja></cierres-caja>
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+            </b-button-group>
+          </div>
       </div>
       <br class="no-print" /><br class="no-print" />
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
@@ -58,14 +38,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td>S/. {{ item.Efectivo }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -87,14 +67,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa | redondear }}</td>
+              <td>S/. {{ item.Visa }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -117,14 +97,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Mastercard }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -144,14 +124,14 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total | redondear }}</td>
+              <td>S/. {{ item.Total }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -172,14 +152,14 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>S/. {{ item.Importe }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+                <td class="total"><b>S/. {{ totalIngresos }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -197,14 +177,14 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>S/. {{ item.Importe }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -224,11 +204,9 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    // this.loadData()
+    this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
-    } else {
-        this.getVendedor()
     }
   },
   data () {
@@ -244,8 +222,7 @@ export default {
         { value: 2, text: 'Tarde' },
         { value: 3, text: 'Noche' }
       ],
-      cierre: {},
-      vendedor: {}
+      cierre: {}
     }
   },
   computed: {
@@ -254,9 +231,6 @@ export default {
     },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
-    },
-    granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
@@ -322,19 +296,6 @@ export default {
     }
   },
   methods: {
-    getVendedor () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            this.$refs.inputVendedor.$refs.input.disabled = true
-        })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-    },
     imprimir () {
       window.print();
     },
@@ -342,10 +303,6 @@ export default {
       this.getVentas()
       this.getIngresos()
       this.getSalidas()
-    },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
     },
     cerrarCaja () {
       if (!this.turno) {
@@ -356,8 +313,7 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          //user: sessionStorage.getItem("User")
-          user: this.vendedor.Usuario
+          user: sessionStorage.getItem("User")
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
@@ -365,23 +321,15 @@ export default {
         })
       }
     },
-    focusAutocomplete (ref) {
-        // this.$refs[ref].type = ""
-        this.$refs[ref].handleDoubleClick()
-    },
+
     estadoVenta (venta) {
-        return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
+      return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     getVentas () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
-      }
-      // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.ventas = res.data
@@ -390,38 +338,28 @@ export default {
       })
     },
     getIngresos () {
-      let params = {
-        idCierre: this.$route.params.id,
-        idCuenta: 1
-      }
-      if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
-      }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.ingresos = res.data
       }).catch(err => {
         console.log(err)
-      }) 
+      })
     },
     getSalidas () {
-      let params = {
-        idCierre: this.$route.params.id,
-        idCuenta: 1
-      }
-      if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
-      }
       this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: params
+        params: {
+          idCierre: this.$route.params.id
+        }
       })
       .then(res => {
         this.salidas = res.data
       }).catch(err => {
         console.log(err)
-      }) 
+      })
     },
     getCierre(id) {
       this.axios.get(this.API + 'cierrecaja', {
@@ -456,15 +394,9 @@ th {
   background: #f9f9f9;
   padding: 10px;
 }
-.si-print {
-  display: none;
-}
 @media print {
   .no-print {
     display: none;
-  }
-  .si-print {
-    display: block;
   }
 }
 </style>
