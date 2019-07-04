@@ -2,8 +2,23 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <div>
-          <div class="float-right no-print">
+      <b-row  align-h="end" class=" no-print">
+              <label v-if="!this.$route.params.id">Vendedor:</label>
+          <b-col cols="3" v-if="!this.$route.params.id">
+            <b-form-group size="sm">
+              <autocomplete
+                  required="required"
+                  ref="inputVendedor"
+                  :url="API + 'usuarios'"
+                  anchor="NombreUsuario"
+                  label="writer"
+                  :on-select="setVendedor" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+          </b-col>
+          <b-col cols="7">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
@@ -16,8 +31,8 @@
             <b-button-group size="sm">
               <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
             </b-button-group>
-          </div>
-      </div>
+          </b-col>
+      </b-row>
       <br class="no-print" /><br class="no-print" />
 
       <h2 class="text-center">Cierre de Caja</h2> 
@@ -204,9 +219,15 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.loadData()
+    // this.loadData()
+    // if (this.$route.params.id) {
+    //   this.getCierre(this.$route.params.id)
+    // }
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
+      this.loadData()
+    } else {
+      this.getVendedor()
     }
   },
   data () {
@@ -296,6 +317,23 @@ export default {
     }
   },
   methods: {
+    getVendedor () {
+      let usuario = sessionStorage.getItem('User')
+      this.axios.get(this.API + 'usuarios/' + usuario)
+      .then((response) => {
+          this.setVendedor(response.data)
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          this.$refs.inputVendedor.$refs.input.disabled = true
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
+    setVendedor (obj) {
+        this.vendedor = obj
+        this.loadData()
+    },
     imprimir () {
       window.print();
     },
@@ -321,15 +359,23 @@ export default {
         })
       }
     },
-
+    focusAutocomplete (ref) {
+        // this.$refs[ref].type = ""
+        this.$refs[ref].handleDoubleClick()
+    },
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     getVentas () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+
       this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.ventas = res.data
@@ -338,10 +384,15 @@ export default {
       })
     },
     getIngresos () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+
       this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.ingresos = res.data
@@ -350,10 +401,15 @@ export default {
       })
     },
     getSalidas () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+
       this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.salidas = res.data
