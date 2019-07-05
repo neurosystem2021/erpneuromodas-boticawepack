@@ -212,6 +212,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },

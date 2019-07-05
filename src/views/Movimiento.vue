@@ -189,7 +189,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito ref="carrito" @onAddProducto="onAddProducto"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -236,8 +236,18 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
+    onAddProducto (obj) {
+      if (this.movimiento.almacenOrigen.IdAlmacen !== -1 || this.movimiento.almacenDestino.IdAlmacen !== -1) {
+        if (this.movimiento.almacenOrigen.IdAlmacen > 0) {
+          this.obtenerStok({ IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen })
+        } else {
+          this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen })
+        }
+      }
+    },
     afe (e) {
 return false
     },
@@ -300,15 +310,26 @@ return false
       this.movimiento.movimientoTipo = obj
 
       this.cargarNumero()
+
+      if (this.movimiento.almacenOrigen.IdAlmacen > 0) {
+        this.obtenerStok({ IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen })
+      } else {
+        this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen })
+      }
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen })
+      
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
