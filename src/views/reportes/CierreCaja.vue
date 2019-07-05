@@ -243,7 +243,8 @@ export default {
         { value: 2, text: 'Tarde' },
         { value: 3, text: 'Noche' }
       ],
-      cierre: {}
+      cierre: {},
+      vendedor: {}
     }
   },
   computed: {
