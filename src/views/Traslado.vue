@@ -45,7 +45,7 @@
           </b-row>
           <b-row align-h="center" class="text-center">
             <b-col cols="6">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar a BEMAR 2</b-button>
+              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar a BEMAR 1</b-button>
               <!--<b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>-->
                 <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?hashMovimiento=' + ultimoMovimiento">Imprimir Último traslado</b-button>
             </b-col>
