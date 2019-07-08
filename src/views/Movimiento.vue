@@ -183,6 +183,11 @@
                         type="number"
                         placeholder="Tipo de cambio"></b-form-input>
                     </b-form-group>
+                    <b-form-group>
+                      <label>Responsable:</label>
+                      <b-form-input v-model="movimiento.Responsable"
+                        placeholder="Responsable"></b-form-input>
+                    </b-form-group>
                   </b-col>
                 </b-row>
               </b-col>
@@ -271,6 +276,7 @@ return false
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
       return {
         EsCredito: 0,
+        Responsable: '',
         alterarProductos: 1,
         FechaVenCredito: '',
         Moneda: 'PEN',
