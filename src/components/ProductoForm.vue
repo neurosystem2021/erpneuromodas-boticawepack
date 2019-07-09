@@ -7,6 +7,19 @@
       <b-row>
         <b-col md="6">
           <b-form-group>
+            <label>Código barra:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.CodigoBarra"
+              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+              <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -26,17 +39,8 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <b-form-group>
-            <label>Artículo:</label>
-            <b-form-input v-model="producto.Producto"
-              required="required"
-              type="text"
-              @input="(val) => producto.Producto = val && val.toUpperCase()"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
 
-          <b-form-group>
+           <b-form-group>
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
@@ -56,63 +60,29 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
+          
           <b-form-group>
-            <label>Modelo:</label>
-            <b-input-group>
-              <autocomplete
-                required="required"
-                :url="API + 'productos/modelos'"
-                ref="inputModelo"
-                anchor="ProductoModelo"
-                label="writer"
-                :placeholder.sync="producto.ProductoModelo"
-                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
-                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-            </b-input-group>
-            <!--<b-form-input v-model="producto.ProductoModelo"
+            <label>Artículo:</label>
+            <b-form-input v-model="producto.Producto"
+              ref="inputProducto"
               required="required"
-              class="upper"
               type="text"
-              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
-              ></b-form-input>-->
-            <!-- <b-input-group>
-              <autocomplete
-                :url="API + 'modelos'"
-                ref="inputModelo"
-                anchor="ProductoModelo"
-                label="writer"
-                :placeholder.sync="producto.modelo.ProductoModelo"
-                :on-select="setModelo"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
-                :classes="{input: 'form-control'}">
-              </autocomplete>
-              <b-input-group-append>
-                <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
-              </b-input-group-append>
-            </b-input-group> -->
+              @input="(val) => producto.Producto = val && val.toUpperCase()"
+              :value="producto.Producto"
+              ></b-form-input>
           </b-form-group>
+
+         
           <b-form-group>
-            <label>Colores:</label>
-            <autocomplete
-                required="required"
-                :url="API + 'productos/colores'"
-                ref="inputColor"
-                anchor="Color"
-                label="writer"
-                :placeholder.sync="producto.Color"
-                :on-select="val => producto.Color = val.Color && val.Color.toUpperCase()"
-                :onInput="val => producto.Color = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-            <!--<b-form-input v-model="producto.Color"
+            <label>Modelo / Color:</label>
+            <b-form-input v-model="producto.ProductoModelo"
+              ref="inputModelo"
               type="text"
-              @input="(val) => producto.Color = val && val.toUpperCase()"              
-              ></b-form-input>-->
+              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"
+              :value="producto.ProductoModelo"
+              ></b-form-input>
           </b-form-group>
+
           
           
         </b-col>
@@ -127,11 +97,11 @@
               anchor="ProductoMedicion"
               label="writer"
               :placeholder.sync="producto.medicion.ProductoMedicion"
-              :on-select="setMedicion"              
+              :on-select="setMedicion"
+              :onFocus="focusAutocomplete.bind(null, 'inputMedicion')" 
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
-          
           <b-form-group>
             <label>Talla:</label>
             <b-input-group>
@@ -153,38 +123,36 @@
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Genero:</label>            
-            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
-          </b-form-group>
-          <b-form-group>
-            <label>Botapie/Manga:</label>
-            <autocomplete
-                required="required"
-                :url="API + 'productos/botapies'"
-                ref="inputBotapie"
-                anchor="Botapie"
-                label="writer"
-                :placeholder.sync="producto.Botapie"
-                :on-select="val => producto.Botapie = val.Botapie && val.Botapie.toUpperCase()"
-                :onInput="val => producto.Botapie = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-            <!--<b-form-input v-model="producto.Botapie"
-              type="text"
-              @input="(val) => producto.Botapie = val && val.toUpperCase()"              
-              ></b-form-input>-->
-          </b-form-group>
-          <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
               @input.native="actualizarPrecioContado"
               type="number"
+              min="0"
+              step="0.0001"
               ></b-form-input>
           </b-form-group>
           <b-form-group>
+            <label>Precio X Mayor:</label>
+            <b-form-input 
+              v-model="producto.PrecioPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Stock X Mayor:</label>
+            <b-form-input 
+              v-model="producto.StockPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              ></b-form-input>
+          </b-form-group>
+
+          <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
             <b-form-input   
               required="required"
@@ -192,17 +160,27 @@
               type="number"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Activar SubProductos:</label>
+            <b-form-checkbox
+                     v-model="producto.EsPadre"
+                     :value="1"
+                     :unchecked-value="0"
+                     @input="checkIsHijo">
+              Seleccione esta opción si el producto contiene mas productos
+            </b-form-checkbox>
+          </b-form-group>
+          
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto" />
-      <b-row v-if="producto.IdProducto">
+      <hr v-if="producto.IdProducto || producto.EsPadre" />
+      <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -212,6 +190,7 @@
             <label>Precio de Venta:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -223,7 +202,12 @@
       <hr />
       <b-row>
         <b-col>
-          <producto-form-det :id-producto="producto.IdProducto" v-if="showProductoDet && show" ref="productoDet"></producto-form-det>
+          <producto-form-det 
+            @onUpdateProductos="calcularPreciosPaquete"
+            :id-producto="producto.IdProducto" 
+            v-if="showProductoDet && show" 
+            ref="productoDet"
+            ></producto-form-det>
         </b-col>
       </b-row>
 
@@ -240,7 +224,7 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
@@ -267,12 +251,12 @@ import ProductoFormDet from '@/components/ProductoFormDet'
 export default {
   data () {
     return {
-      showProductoDet: false,
+      showProductoDet: true,
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
       show: false, 
-      generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
+      // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: []
     }
@@ -283,11 +267,7 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     show (val) {
-      if (!val) {
-        console.log('close')
-      }
-    },
-    productoUpdate (newVal) {
+      let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -313,12 +293,15 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        
-        this.$refs.inputColor.setValue(newVal.Color)
-        this.$refs.inputBotapie.setValue(newVal.Botapie)
+        // this.$refs.inputProducto.$el.disabled = true
+        this.$refs.inputCodigoBarra.$el.disabled = true
+
+        // this.$refs.inputColor.setValue(newVal.Color)
+        // this.$refs.inputBotapie.setValue(newVal.Botapie)
         
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
@@ -328,15 +311,24 @@ export default {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
         }
-        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
-        this.producto.Genero = newVal.Genero
-        this.producto.Botapie = newVal.Botapie
-        this.producto.Color = newVal.Color
+
+        this.producto.EsPadre = newVal.EsPadre
+        Vue.nextTick(() => {
+           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+        })
+        // this.producto.Genero = newVal.Genero
+        // this.producto.Botapie = newVal.Botapie
+        // this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
+        this.producto.PrecioPorMayor = newVal.PrecioPorMayor
+        this.producto.StockPorMayor = newVal.StockPorMayor
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
         this.producto.ProductoModelo = newVal.ProductoModelo
+        this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
 
@@ -344,10 +336,28 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
+
+        this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
   methods: {
+    calcularPreciosPaquete (prodDetalles) {
+      let sumatoriaCosto = 0
+      let sumatoriaContado = 0
+      prodDetalles.forEach(prod => {
+        if (prod.Cantidad) {
+          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
+          sumatoriaContado += prod.PrecioContado * prod.Cantidad
+        }
+      });
+      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
+      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado)
+      
+      Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
+      Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
+      this.actualizarPorcentajeUtilidad()
+    },
     eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de Anular este producto?')
@@ -368,11 +378,19 @@ export default {
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
       var utilidad = this.producto.PorcentajeUtilidad
-      var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+      // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
 
       this.producto.precioContadoNormal = nuevoPrecioContado
-      this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      this.producto.PrecioContado = this.$options.filters.redondear(nuevoPrecioContado, 1)
 
+    },
+    actualizarPorcentajeUtilidad () {
+      var precioContado = this.producto.PrecioContado
+      var precioCosto = this.producto.PrecioCosto
+
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
@@ -398,29 +416,33 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      //this.$refs.inputModelo.setValue('')
+      //this.$refs.inputPresentacion.setValue('')
+      // this.$refs.inputColor.setValue('')
+      // this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },
     initForm () {
       this.producto = {
+        EsPadre: 0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
-        // IdProductoModelo: null,
-        IdProductoBotapie: null,
+        IdProductoModelo: null,
+        // IdProductoBotapie: null,
         IdProductoTalla: '',
         Producto: '',
         CodigoBarra: '',
-        Color: '',
+        // Color: '',
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
-        Botapie: '',
-        Genero: '',
+        PrecioPorMayor: 0,
+        StockPorMayor: 0,
+        // Botapie: '',
+        // Genero: '',
         categoria: {},
         marca: {},
         // modelo: {},
@@ -434,26 +456,11 @@ export default {
     guardarProducto(e) {
       e.preventDefault();
 
-      // filtro si esta ingresado correctamente
-      if (this.$refs.inputCategoria.$refs.input.value.toLowerCase() != this.producto.categoria.ProductoCategoria.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Categoría.')
-        return;
-      }
-
-      if (this.$refs.inputMarca.$refs.input.value.toLowerCase() != this.producto.marca.ProductoMarca.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Marca.')
-        return;
-      }
-
-      if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Talla.')
-        return;
-      }
-
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
+      // console.log(JSON.stringify(this.producto))
 
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
@@ -461,14 +468,15 @@ export default {
           this.cbGuardar(response.data.insertId)
         }
         if (response.data.error) {
-          this.$toasted.show('Producto insertado correctamente - ' + response.data.codigoBarra)
+          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
+          return
         } else {
           this.$toasted.show('Producto guardado correctamente')
         }
 
         // this.initForm()
-        this.producto.talla = {}
-        this.$refs.inputTalla.setValue('')
+        // this.producto.talla = {}
+        // this.$refs.inputTalla.setValue('')
 
         this.$refs.productoForm.hide()
       })
@@ -537,6 +545,24 @@ export default {
           console.log(error)
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
+      }
+    },
+    checkIsHijo (val) {
+      if (val && this.producto.IdProducto) {
+        this.axios.get(this.API + 'productos/eshijo', {params: {
+          idProducto: this.producto.IdProducto
+        }})
+        .then(res => {
+          let esHijo = res.data.esHijo
+          if(esHijo) {
+            this.$toasted.show('Este producto no puede contener productos ya que es un producto hijo')
+            this.producto.EsPadre = false      
+          }else {
+            this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+          }
+        })
+      } else {
+        if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
       }
     }
   },
