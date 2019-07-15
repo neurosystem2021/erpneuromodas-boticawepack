@@ -3,7 +3,22 @@
     <br>
     <b-container class="bv-example-row">
       <b-row  align-h="end" class=" no-print">
-              <label v-if="!this.$route.params.id">Vendedor:</label>
+        <label v-if="!this.$route.params.id">Almacen:</label>
+        <b-col cols="3" v-if="!this.$route.params.id">
+          <b-form-group size="sm">
+            <autocomplete
+                required="required"
+                ref="inputAlmacen"
+                :url="API + 'almacenes'"
+                anchor="Almacen"
+                label="writer"
+                :on-select="setAlmacen" 
+                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                :classes="{input: 'form-control'}">
+            </autocomplete>
+          </b-form-group>
+        </b-col>
+             <!-- <label v-if="!this.$route.params.id">Vendedor:</label>
           <b-col cols="3" v-if="!this.$route.params.id">
             <b-form-group size="sm">
               <autocomplete
@@ -17,7 +32,7 @@
                   :classes="{input: 'form-control'}">
               </autocomplete>
             </b-form-group>
-          </b-col>
+          </b-col>-->
           <b-col cols="7">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
@@ -244,7 +259,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      almacen: {},
     }
   },
   computed: {
@@ -322,18 +338,26 @@ export default {
       let usuario = sessionStorage.getItem('User')
       this.axios.get(this.API + 'usuarios/' + usuario)
       .then((response) => {
-          this.setVendedor(response.data)
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          this.$refs.inputVendedor.$refs.input.disabled = true
+          // this.setVendedor(response.data)
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              this.$refs.inputVendedor.$refs.input.disabled = true
+            })
       })
       .catch((error) => {
           console.log(error)
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
     },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
+    // setVendedor (obj) {
+    //     this.vendedor = obj
+    //     this.loadData()
+    // },
+    setAlmacen (obj) {
+      this.almacen = obj;
     },
     imprimir () {
       window.print();
@@ -374,6 +398,10 @@ export default {
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
       }
+      
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
 
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
@@ -392,6 +420,10 @@ export default {
         params.usuario = this.vendedor.Usuario
       }
 
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
       })
@@ -407,6 +439,10 @@ export default {
       }
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
+      }
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
 
       this.axios.get(this.API + 'cierrecaja/salidas', {
