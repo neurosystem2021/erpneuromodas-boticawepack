@@ -343,8 +343,9 @@ export default {
           // this.$refs.inputVendedor.$refs.input.disabled = true
           this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
             .then(res => {
+              this.setAlmacen(response.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              this.$refs.inputAlmacen.$refs.input.disabled = true
             })
       })
       .catch((error) => {
@@ -358,6 +359,7 @@ export default {
     // },
     setAlmacen (obj) {
       this.almacen = obj;
+      this.loadData()
     },
     imprimir () {
       window.print();
