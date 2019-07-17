@@ -12,7 +12,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -129,6 +129,11 @@
                   </div>
                 </template>
 
+                <template slot="Total" slot-scope="data">
+                  <div>
+                    {{ data.item.Total | redondear }}
+                  </div>
+                </template>
               </b-table>
           </b-col>
           <b-row>
@@ -182,7 +187,7 @@ export default {
       ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'PRINCIPAL'
       },
       tipoDoc: {
       },
@@ -229,7 +234,8 @@ export default {
            usuario: this.vendedor.Usuario,
            fechaInicio: this.fechaInicio,
            fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+           idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+           idAlmacen: this.almacen.IdAlmacen
          }
        }).then((response) => {
          this.ventasAcumuladas = response.data.total
@@ -280,7 +286,6 @@ export default {
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -300,7 +305,8 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      this.ventasAcumuladas = 0
+      // document.location.reload()
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
