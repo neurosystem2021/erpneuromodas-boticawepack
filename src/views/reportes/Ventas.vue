@@ -128,9 +128,13 @@
                     {{ getStock(data.item.IdProducto) }}
                   </div>
                 </template>
-
-                <template slot="Total" slot-scope="data">
-                  <div>
+                <template slot="Totalcredito" slot-scope="data">
+                  <div v-if="data.item.EsCredito">
+                    {{ data.item.Total | redondear }}
+                  </div>
+                </template>
+                <template slot="Totalcontado" slot-scope="data">
+                  <div v-if="!data.item.EsCredito">
                     {{ data.item.Total | redondear }}
                   </div>
                 </template>
@@ -145,7 +149,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="hrefExportar" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -176,6 +180,7 @@ export default {
     return {
       API: config.API,
       vendedor: '',
+      hrefExportar: config.API + 'reporte/ventadevendedor',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
@@ -206,7 +211,8 @@ export default {
             { key: 'Cliente', sortable: true },
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
-            { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Totalcredito', label: 'Total Credito', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Totalcontado', label: 'Total Contado', sortable: false, variant: 'success', class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
@@ -280,6 +286,9 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+
+      this.hrefExportar = this.API + 'reporte/ventadevendedor?idAlmacen' + this.almacen.IdAlmacen  + '&inicio=' + this.fechaInicio + '&fin=' + this.fechaFin + '&usuario=' + this.vendedor.Usuario; 
+
       let tipoDocFilter = ''
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
