@@ -378,7 +378,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: sessionStorage.getItem("User")
+          user: sessionStorage.getItem("User"),
+          idAlmacen: this.almacen.IdAlmacen
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
