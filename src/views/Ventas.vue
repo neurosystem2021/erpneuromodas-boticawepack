@@ -31,7 +31,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="TICKET"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -389,8 +389,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'TICKET',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0
                 },
                 almacen: {
