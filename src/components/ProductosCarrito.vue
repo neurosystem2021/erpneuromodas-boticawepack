@@ -29,8 +29,8 @@
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="stock" slot-scope="data">
-          <div v-if="!data.item.ControlaStock" >
+        <template slot="stock" slot-scope="data" >
+          <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" >
             {{productosCaja[data.item.IdProducto].stock}}
           </div>
           <div v-if="data.item.ControlaStock" >
