@@ -390,9 +390,9 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
+      this.loadData()
     } else {
         this.getVendedor()
     }
