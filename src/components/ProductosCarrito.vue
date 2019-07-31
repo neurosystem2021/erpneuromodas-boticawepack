@@ -7,6 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -417,12 +418,14 @@ export default {
         var en4meses = anio + '-' + (mes + 4) + '-' + dia
         en4meses = new Date(en4meses).getTime()
 
-        if(fechaVen < hoy && data.stock > 0) {
+        // if(fechaVen < hoy && data.stock > 0) {
+        if(fechaVen && fechaVen < hoy) {
           style = 'danger'
         }
 
         // cambiar color los que faltan 4 meses por vencer
-        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+        // if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+        if (fechaVen >= hoy && fechaVen <= en4meses) {
           style = 'ambar'
         }
 

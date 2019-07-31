@@ -2,8 +2,8 @@
 	<div id="invoice-container">
 		<header class="clearfix" style="height: 120px;">
 			<div id="logo">
-        <img v-if="proforma.IdAlmacen !== 3" src="/resources/images/logo.png">
-				<img v-if="proforma.IdAlmacen == 3" src="/resources/images/logotowan.png">
+        <img v-if="proforma.IdAlmacen !== 3 && proforma.IdAlmacen !== 4" src="/resources/images/logo.png">
+				<img v-if="proforma.IdAlmacen == 3 || proforma.IdAlmacen == 4" src="/resources/images/logotowan.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
@@ -36,6 +36,7 @@
             <th class="desc prod">PRODUCTO</th>
             <th class="desc">LABO.</th>
             <th class="desc">FECHA VEN.</th>
+            <th class="desc">LOTE</th>
             <th class="unit">PRECIO U.</th>
             
             <th class="total">VALOR DE V.</th>
@@ -49,6 +50,7 @@
             <td class="desc"><h3>{{ prod.Producto }}</h3></td>
             <td class="">{{ prod.ProductoMarca }}</td>
             <td class="">{{ prod.FechaVen }}</td>
+            <td class="">{{ prod.IdLote }}</td>
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             
             <td class="total">

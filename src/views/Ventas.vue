@@ -712,6 +712,18 @@ export default {
                 return          
             }
 
+            var sinStock = 0;
+            this.productos.map(pro => {
+                if (pro.stock <= 0) {
+                    this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
+                    sinStock += 1;
+                }
+            })
+            if (sinStock) {
+                this.inProgress = false
+                return;
+            }
+
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
@@ -743,7 +755,7 @@ export default {
             // console.log(this.venta);return;
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
