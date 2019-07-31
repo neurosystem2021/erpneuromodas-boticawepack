@@ -311,8 +311,8 @@ export default {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
         }
-        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
+        // this.producto.Producto = newVal.Producto
+        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.IdProducto = newVal.IdProducto
 
         this.producto.EsPadre = newVal.EsPadre
