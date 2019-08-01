@@ -85,7 +85,10 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo', sortable: true },
+            { key: 'Color', sortable: true },
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
+            { key: 'Genero', sortable: true },
+            { key: 'Botapie', sortable: true }
       ],
       totalRows: 50,
       perPage: 10,

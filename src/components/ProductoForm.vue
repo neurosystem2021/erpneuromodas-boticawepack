@@ -40,6 +40,17 @@
             </b-input-group>
           </b-form-group>
 
+          <b-form-group>
+            <label>Artículo:</label>
+            <b-form-input v-model="producto.Producto"
+              ref="inputProducto"
+              required="required"
+              type="text"
+              @input="(val) => producto.Producto = val && val.toUpperCase()"
+              :value="producto.Producto"
+              ></b-form-input>
+          </b-form-group>
+
            <b-form-group>
             <label>Marca:</label>
             <b-input-group>
@@ -60,27 +71,52 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          
-          <b-form-group>
-            <label>Artículo:</label>
-            <b-form-input v-model="producto.Producto"
-              ref="inputProducto"
-              required="required"
-              type="text"
-              @input="(val) => producto.Producto = val && val.toUpperCase()"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
 
          
-          <b-form-group>
-            <label>Modelo / Color:</label>
+          <!--<b-form-group>
+            <label>Modelo:</label>
             <b-form-input v-model="producto.ProductoModelo"
               ref="inputModelo"
               type="text"
               @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"
               :value="producto.ProductoModelo"
               ></b-form-input>
+          </b-form-group>-->
+          <b-form-group>
+            <label>Modelo:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'productos/modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.ProductoModelo"
+                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
+                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group>
+            <label>Colores:</label>
+            <autocomplete
+                :url="API + 'productos/colores'"
+                ref="inputColor"
+                anchor="Color"
+                label="writer"
+                :placeholder.sync="producto.Color"
+                :on-select="val => producto.Color = val.Color && val.Color.toUpperCase()"
+                :onInput="val => producto.Color = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Color"
+              type="text"
+              @input="(val) => producto.Color = val && val.toUpperCase()"              
+              ></b-form-input>-->
           </b-form-group>
 
           
@@ -122,6 +158,31 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
+
+          <b-form-group>
+            <label>Genero:</label>            
+            <b-form-select v-model="producto.Genero" :options="generos" />
+          </b-form-group>
+
+          <b-form-group>
+            <label>Botapie/Manga:</label>
+            <autocomplete
+                :url="API + 'productos/botapies'"
+                ref="inputBotapie"
+                anchor="Botapie"
+                label="writer"
+                :placeholder.sync="producto.Botapie"
+                :on-select="val => producto.Botapie = val.Botapie && val.Botapie.toUpperCase()"
+                :onInput="val => producto.Botapie = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Botapie"
+              type="text"
+              @input="(val) => producto.Botapie = val && val.toUpperCase()"              
+              ></b-form-input>-->
+          </b-form-group>
+
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input 
@@ -256,7 +317,7 @@ export default {
       title: 'Nuevo Producto',
       API: config.API,
       show: false, 
-      // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
+      generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: []
     }
@@ -293,15 +354,15 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
         this.$refs.inputCodigoBarra.$el.disabled = true
 
-        // this.$refs.inputColor.setValue(newVal.Color)
-        // this.$refs.inputBotapie.setValue(newVal.Botapie)
+        this.$refs.inputColor.setValue(newVal.Color)
+        this.$refs.inputBotapie.setValue(newVal.Botapie)
         
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
@@ -319,9 +380,9 @@ export default {
         Vue.nextTick(() => {
            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
         })
-        // this.producto.Genero = newVal.Genero
-        // this.producto.Botapie = newVal.Botapie
-        // this.producto.Color = newVal.Color
+        this.producto.Genero = newVal.Genero
+        this.producto.Botapie = newVal.Botapie
+        this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.PrecioPorMayor = newVal.PrecioPorMayor
         this.producto.StockPorMayor = newVal.StockPorMayor
@@ -416,10 +477,10 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       //this.$refs.inputPresentacion.setValue('')
-      // this.$refs.inputColor.setValue('')
-      // this.$refs.inputBotapie.setValue('')
+      this.$refs.inputColor.setValue('')
+      this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },
@@ -435,14 +496,14 @@ export default {
         IdProductoTalla: '',
         Producto: '',
         CodigoBarra: '',
-        // Color: '',
+        Color: '',
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
         PrecioPorMayor: 0,
         StockPorMayor: 0,
-        // Botapie: '',
-        // Genero: '',
+        Botapie: '',
+        Genero: '',
         categoria: {},
         marca: {},
         // modelo: {},
@@ -471,7 +532,7 @@ export default {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
           return
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.success('Producto guardado correctamente')
         }
 
         // this.initForm()
