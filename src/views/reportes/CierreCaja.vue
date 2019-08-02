@@ -65,7 +65,41 @@
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
+              <td>
+                
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Efectivo }}</td>
@@ -75,7 +109,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -94,7 +128,41 @@
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
+              <td>
+
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Visa }}</td>
@@ -104,7 +172,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -124,7 +192,41 @@
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
+              <td>
+
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Mastercard }}</td>
@@ -152,9 +254,43 @@
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
+              <td>
+
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total }}</td>
+              <td>S/. {{ item.Total | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -334,6 +470,12 @@ export default {
     }
   },
   methods: {
+    getDetalles (idDocVenta) {
+      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+      //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
+      //this.items[index].productos = detalles
+      return detalles
+    },
     getVendedor () {
       let usuario = sessionStorage.getItem('User')
       this.axios.get(this.API + 'usuarios/' + usuario)
@@ -345,7 +487,9 @@ export default {
             .then(res => {
               this.setAlmacen(response.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              this.$refs.inputAlmacen.$refs.input.disabled = true
+              if(response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+              }
             })
       })
       .catch((error) => {
@@ -394,6 +538,22 @@ export default {
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
+    loadDetalles () {
+      this.axios.get(this.API + 'ventas/detalle', {
+          params: {
+            idDocVentas: this.ventas.map((item) => item.idDocVenta),
+          }
+        }).then((response) => {
+            this.itemsDetalle = response.data
+            this.ventas = this.ventas.map((item) => {
+              item.productos = this.getDetalles(item.idDocVenta)
+              return item
+            })
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     getVentas () {
       let params = {
         idCierre: this.$route.params.id
@@ -411,6 +571,7 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        this.loadDetalles()
       }).catch(err => {
         console.log(err)
       })
@@ -473,6 +634,10 @@ export default {
 }
 </script>
 <style scoped>
+th, td {
+  font-size: .9em;
+  vertical-align: middle;
+}
 th {
   background-color: #f1f1f1;
 }
@@ -489,6 +654,18 @@ th {
 .credito {
   background: #f9f9f9;
   padding: 10px;
+}
+.tabla-detalle {
+}
+.tabla-detalle th {
+  background-color: #ffffff;
+  font-weight: normal;
+}
+.tabla-detalle th, .tabla-detalle td {
+  font-size: .9em;
+}
+.detalle-producto {
+  width: 270px;
 }
 @media print {
   .no-print {
