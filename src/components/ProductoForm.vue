@@ -396,7 +396,7 @@ export default {
       } else {
 
         this.title = 'Nuevo Producto'
-        this.clearForm()
+        // this.clearForm()
 
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
