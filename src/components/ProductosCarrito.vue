@@ -107,7 +107,7 @@
         <template slot="show_details" slot-scope="row">
            <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
-        <template slot="row-details" slot-scope="row">
+        <template slot="row-details" >
 
         </template>
         <template slot="stock" slot-scope="data">
@@ -355,7 +355,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie}
       `
     },
     setNuevoPrecioContado (index) {
