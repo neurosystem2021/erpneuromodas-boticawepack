@@ -175,28 +175,28 @@ export default {
 
       let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
-      // this.axios.get(this.API + 'consultarRUC', {
-      //   params: {
-      //         type: tipo,
-      //         numero: this.cliente.DniRuc
-      //     }
-      // })
-      this.axios.get('https://www.facturacionelectronica.us/facturacion/controller/ws_consulta_rucdni_v2.php?usuario=20573027125&password=5i573m45&documento=' + tipo + "&nro_documento=" + this.cliente.DniRuc).then((response) => {
-          if (response.data) {
-              this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-              var data = response.data.result
-
-              if (tipo == 'DNI') {
-                  this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
-              } else {
-                  this.cliente.Cliente = data.RazonSocial
-                  this.cliente.Direccion = data.Direccion
-                  // this.cliente.Telefono = data.Telefono
-              }
-          } else {
-              this.$toasted.show('No se encontró el Usuario')                
+      this.axios.get(this.API + 'consultarRUC', {
+        params: {
+              type: tipo,
+              numero: this.cliente.DniRuc
           }
-          
+      })
+      // this.axios.get('https://www.facturacionelectronica.us/facturacion/controller/ws_consulta_rucdni_v2.php?usuario=20573027125&password=5i573m45&documento=' + tipo + "&nro_documento=" + this.cliente.DniRuc)
+      .then((response) => {
+          if (response.data) {
+                this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
+                var data = response.data
+                if (tipo == 'DNI') {
+                    this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+                    this.cliente.Direccion = ''
+                } else {
+                    this.cliente.Cliente = data.razonSocial
+                    this.cliente.Direccion = data.direccion
+                    // this.cliente.Telefono = data.Telefono
+                }
+            } else {
+                this.$toasted.show('No se encontró el Usuario')                
+            }
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el Usuario')        
