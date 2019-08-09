@@ -148,6 +148,7 @@ export default {
                 var data = response.data
                 if (tipo == 'DNI') {
                     this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+                    this.cliente.Direccion = ''
                 } else {
                     this.cliente.Cliente = data.razonSocial
                     this.cliente.Direccion = data.direccion
