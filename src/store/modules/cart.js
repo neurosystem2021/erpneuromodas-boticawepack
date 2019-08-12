@@ -39,7 +39,8 @@ const mutations = {
       cantidadTotal += parseFloat(prod.cantidad)
     })
     state.productos = state.productos.map(prod => {
-      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
+      // prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
+      prod.descuento = ((descuento / 100) * (prod.precio*prod.cantidad)).toFixed(2)
       return prod
     })
   },
@@ -58,7 +59,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
@@ -72,13 +73,24 @@ const actions = {
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      let params = {}
+
+      if (isBarCode) {
+        params = {codigoBarra: producto}
+      } 
+
+      axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
         if (response.data) {
           let obj = response.data
 
           if(setPrecio) {
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
+                obj.precio = obj.PrecioPorMayor
+            } else {
+                obj.precio = obj.PrecioContado || 0
+            }
+
           } else {
             obj.cantidad = 0
             obj.precio = 0

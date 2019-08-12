@@ -7,10 +7,14 @@ import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
+import VentaEstrategica from '@/views/VentaEstrategica.vue'
+import VentaReimpresion from '@/views/VentaReimpresion.vue'
+import ProductosSimilares from '@/views/ProductosSimilares.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
+import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 
 Vue.use(Router)
@@ -27,6 +31,11 @@ export default new Router({
       path: '/productos',
       name: 'Productos',
       component: Productos
+    },
+    {
+      path: '/reimpresion',
+      name: 'VentaReimpresion',
+      component: VentaReimpresion
     },
     {
       path: '/clientes',
@@ -59,6 +68,11 @@ export default new Router({
       component: CierreCaja
     },
     {
+      path: '/reportes/proforma/:id',
+      name: 'Proforma',
+      component: Proforma
+    },
+    {
       path: '/reportes/kardex',
       name: 'Kardex',
       component: Kardex
@@ -67,6 +81,16 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
+    },
+    {
+      path: '/consultaventaestrategica',
+      name: 'VentaEstrategica',
+      component: VentaEstrategica
+    },
+    {
+      path: '/productossimilares',
+      name: 'ProductosSimilares',
+      component: ProductosSimilares
     }
   ]
 })

@@ -12,7 +12,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -128,7 +128,16 @@
                     {{ getStock(data.item.IdProducto) }}
                   </div>
                 </template>
-
+                <template slot="Totalcredito" slot-scope="data">
+                  <div v-if="data.item.EsCredito">
+                    {{ data.item.Total | redondear }}
+                  </div>
+                </template>
+                <template slot="Totalcontado" slot-scope="data">
+                  <div v-if="!data.item.EsCredito">
+                    {{ data.item.Total | redondear }}
+                  </div>
+                </template>
               </b-table>
           </b-col>
           <b-row>
@@ -140,7 +149,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="hrefExportar" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -171,6 +180,7 @@ export default {
     return {
       API: config.API,
       vendedor: '',
+      hrefExportar: config.API + 'reporte/ventadevendedor',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
@@ -182,7 +192,7 @@ export default {
       ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'PRINCIPAL'
       },
       tipoDoc: {
       },
@@ -201,7 +211,8 @@ export default {
             { key: 'Cliente', sortable: true },
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
-            { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Totalcredito', label: 'Total Credito', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Totalcontado', label: 'Total Contado', sortable: false, variant: 'success', class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
@@ -229,7 +240,8 @@ export default {
            usuario: this.vendedor.Usuario,
            fechaInicio: this.fechaInicio,
            fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+           idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+           idAlmacen: this.almacen.IdAlmacen
          }
        }).then((response) => {
          this.ventasAcumuladas = response.data.total
@@ -274,13 +286,15 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+
+      this.hrefExportar = this.API + 'reporte/ventadevendedor?idAlmacen' + this.almacen.IdAlmacen  + '&inicio=' + this.fechaInicio + '&fin=' + this.fechaFin + '&usuario=' + this.vendedor.Usuario; 
+
       let tipoDocFilter = ''
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -300,7 +314,8 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      this.ventasAcumuladas = 0
+      // document.location.reload()
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {

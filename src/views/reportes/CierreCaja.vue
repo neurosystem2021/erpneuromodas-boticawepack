@@ -306,9 +306,9 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
+      this.loadData()
     } else {
       this.getVendedor()
     }
@@ -459,6 +459,7 @@ export default {
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
       }
+      
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params

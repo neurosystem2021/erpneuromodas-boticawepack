@@ -7,6 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -29,6 +30,16 @@
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="stock" slot-scope="data" >
+          <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" >
+            {{productosCaja[data.item.IdProducto].stock}}
+          </div>
+          <div v-if="data.item.ControlaStock" >
+            {{ data.item.stock }}
+          </div>
+          
+        </template>
+        
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -37,7 +48,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -45,9 +56,10 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 110px"
             min="0"
             step="0.00001"
+            :readonly="(idPerfil != 1) ? true : false"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -133,11 +145,11 @@
               </tr>
               <tr v-if="sumatoriaDescuento > 0">
                 <td class="table-danger">Descuento</td>
-                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
+                <td class="table-danger">- {{ sumatoriaDescuento }}</td>
               </tr>
               <tr>
                 <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+                <td class="table-danger">{{ sumatoriaSubTotal }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
                 <td><b>IGV</b></td>
@@ -170,10 +182,14 @@
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
+import axios from 'axios'
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
+    if(this.$route.query.idProducto) {
+        this.add([this.$route.query.idProducto, (obj) => {}, { setPrecio: this.setPrecio,  setSuma: true }])
+    }
   },
   data () {
     return {
@@ -181,10 +197,12 @@ export default {
       loadCode: '',
       pasteCode: false,
       producto: {},
+      productosCaja: {},
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
@@ -238,9 +256,9 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
-      }
+      // if (this.idAlmacen) {
+      //   return this.API + 'productos/stock/' + this.idAlmacen
+      // }
       return this.API + 'productos'
     },
     sumatoriaSubTotal () {
@@ -299,7 +317,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(this.loadCode.length -2);
+      let idProducto = this.loadCode;
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
@@ -310,7 +328,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
       }
     },
     /*alterarBuscadorProductos() {
@@ -341,6 +359,21 @@ export default {
         this.pasteCode = false
       }
     },*/
+    obtenerStockCaja(prod) {
+     axios.get(this.API + 'productos/stock/caja', {
+        params: {
+          idProducto: prod.IdProducto,
+          idAlmacen: this.idAlmacen
+        }
+      }).then((response) => {
+        Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
+        //console.log(response.data.stock)
+          //return response.data.stock
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -351,6 +384,8 @@ export default {
         this.$toasted.show('No esta permitido la venta sin stock!')
         return;
       }
+
+      this.obtenerStockCaja(obj)
 
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -383,12 +418,14 @@ export default {
         var en4meses = anio + '-' + (mes + 4) + '-' + dia
         en4meses = new Date(en4meses).getTime()
 
-        if(fechaVen < hoy && data.stock > 0) {
+        // if(fechaVen < hoy && data.stock > 0) {
+        if(fechaVen && fechaVen < hoy) {
           style = 'danger'
         }
 
         // cambiar color los que faltan 4 meses por vencer
-        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+        // if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+        if (fechaVen >= hoy && fechaVen <= en4meses) {
           style = 'ambar'
         }
 
@@ -396,9 +433,10 @@ export default {
           data.stock = '---'
         }
 
+//<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
         return `
         <div class="${style}">
-          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
+           <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
@@ -457,6 +495,12 @@ export default {
       }
       if (this.productos[index].descuento) {
         total -= parseFloat(this.productos[index].descuento)
+      }
+
+      if (total <= 0) {
+        alert('El total de un producto no puede ser menor o igual a 0')
+        Vue.set(this.productos[index], 'descuento', 0)
+        return
       }
 
       total =  this.$options.filters.redondear(total)
