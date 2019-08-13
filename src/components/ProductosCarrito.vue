@@ -25,6 +25,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Marca, Modelo, Talla)</b-form-text>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
@@ -33,7 +34,10 @@
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+              $emit('onInputCantidad', val)
+              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -173,6 +177,14 @@ import config from '@/store/config.js'
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
+  },
+  created() {
+    document.addEventListener('keyup', (evt) => {
+        if (evt.keyCode === 27) {
+          var lista = this.$refs.autocompleteProducto.$el.children[1]
+          lista.style.display = "none"
+        }
+    });
   },
   data () {
     return {
@@ -338,7 +350,13 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      this.$refs.autocompleteProducto.setValue('')
+      this.$nextTick(() => {
+        var lista = this.$refs.autocompleteProducto.$el.children[1]
+        lista.style.display = "block"
+      })
+      
+      // this.$refs.autocompleteProducto.type = this.$refs.autocompleteProducto.$el.children[0].value
+      this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
