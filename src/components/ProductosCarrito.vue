@@ -36,7 +36,8 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              if (isVentas)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -205,7 +206,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -358,7 +359,7 @@ export default {
       // this.$refs.autocompleteProducto.type = this.$refs.autocompleteProducto.$el.children[0].value
       this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
       //obj.FLETE = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioCosto
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0

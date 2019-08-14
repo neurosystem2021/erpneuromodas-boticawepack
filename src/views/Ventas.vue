@@ -159,6 +159,7 @@
                 <b-row>
                     <b-col> 
                         <productos-carrito 
+                            :isVentas="true"
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
