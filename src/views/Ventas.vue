@@ -714,7 +714,7 @@ export default {
 
             var sinStock = 0;
             this.productos.map(pro => {
-                if (pro.stock <= 0) {
+                if (pro.stock <= 0 && pro.ControlaStock) {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
