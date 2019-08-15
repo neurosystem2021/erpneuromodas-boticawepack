@@ -25,6 +25,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo, Talla)</b-form-text>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
@@ -33,7 +34,11 @@
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => {
+              $emit('onInputCantidad', val)
+              if (isVentas)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -107,7 +112,7 @@
         <template slot="show_details" slot-scope="row">
            <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
-        <template slot="row-details" slot-scope="row">
+        <template slot="row-details" >
 
         </template>
         <template slot="stock" slot-scope="data">
@@ -174,6 +179,14 @@ export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
+  created() {
+    document.addEventListener('keyup', (evt) => {
+        if (evt.keyCode === 27) {
+          var lista = this.$refs.autocompleteProducto.$el.children[1]
+          lista.style.display = "none"
+        }
+    });
+  },
   data () {
     return {
       API: config.API,
@@ -193,7 +206,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -338,9 +351,15 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      this.$refs.autocompleteProducto.setValue('')
+      this.$nextTick(() => {
+        var lista = this.$refs.autocompleteProducto.$el.children[1]
+        lista.style.display = "block"
+      })
+      
+      // this.$refs.autocompleteProducto.type = this.$refs.autocompleteProducto.$el.children[0].value
+      this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
       //obj.FLETE = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioCosto
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
@@ -355,7 +374,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie}
       `
     },
     setNuevoPrecioContado (index) {

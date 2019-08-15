@@ -159,6 +159,7 @@
                 <b-row>
                     <b-col> 
                         <productos-carrito 
+                            :isVentas="true"
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
@@ -335,7 +336,9 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
+                    { key: 'Color' },
                     { key: 'Genero' },
+                    { key: 'Botapie' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
