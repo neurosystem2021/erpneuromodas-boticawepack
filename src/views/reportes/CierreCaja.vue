@@ -480,7 +480,7 @@ export default {
       let usuario = sessionStorage.getItem('User')
       this.axios.get(this.API + 'usuarios/' + usuario)
       .then((response) => {
-          // this.setVendedor(response.data)
+          this.setVendedor(response.data)
           // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
           // this.$refs.inputVendedor.$refs.input.disabled = true
           this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
@@ -497,10 +497,10 @@ export default {
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
     },
-    // setVendedor (obj) {
-    //     this.vendedor = obj
-    //     this.loadData()
-    // },
+    setVendedor (obj) {
+        this.vendedor = obj
+        // this.loadData()
+    },
     setAlmacen (obj) {
       this.almacen = obj;
       this.loadData()
