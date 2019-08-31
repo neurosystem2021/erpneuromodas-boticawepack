@@ -35,7 +35,11 @@
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                if (!esMovimiento) {
+                  productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                } else {
+                  productos[data.index].precio = productos[data.index].PrecioCosto;
+                }
 
             }"
             placeholder="Cantidad"></b-form-input>
@@ -46,7 +50,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.0001"
+            step="0.000001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -197,7 +201,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    esMovimiento: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,

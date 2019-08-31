@@ -662,9 +662,11 @@ export default {
             });
 
             if (sinStock >= 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
-                this.inProgress = false
-                return;
+                if (this.venta.tipoVenta.IdTipoDoc !== 3) { // NOTA DE VENTA
+                    this.$toasted.error('No se puede vender un producto sin stock');
+                    this.inProgress = false
+                    return;
+                }
             }
 
 
