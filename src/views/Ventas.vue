@@ -457,6 +457,7 @@ export default {
             }
 
             this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
