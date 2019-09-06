@@ -620,11 +620,11 @@ export default {
                 }
             });
 
-            if (sinStock >= 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
-                this.inProgress = false
-                return;
-            }
+            // if (sinStock >= 1) {
+            //     this.$toasted.error('No se puede vender un producto sin stock');
+            //     this.inProgress = false
+            //     return;
+            // }
 
 
 
