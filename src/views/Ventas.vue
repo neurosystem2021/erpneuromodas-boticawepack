@@ -333,7 +333,7 @@ export default {
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoMedicion', label: 'Producto' },
+                    { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
@@ -603,7 +603,8 @@ export default {
 
                 this.limpiarDespuesVenta()
 
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
