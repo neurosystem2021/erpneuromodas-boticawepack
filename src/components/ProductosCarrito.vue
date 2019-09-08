@@ -32,6 +32,7 @@
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 75px"
+            step="0.001"
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)
@@ -360,7 +361,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b>${data.ProductoMedicion}</b>
       `
     },
     setNuevoPrecioContado (index) {
