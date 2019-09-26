@@ -485,6 +485,7 @@ export default {
           // this.$refs.inputVendedor.$refs.input.disabled = true
           this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
             .then(res => {
+              console.log(response.data.IdUsuarioPerfil)
               this.setAlmacen(response.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
               if(response.data.IdUsuarioPerfil !== 1) {
@@ -558,9 +559,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      // if (this.vendedor.Usuario) {
+      //   params.usuario = this.vendedor.Usuario
+      // }
       
       if (this.almacen.IdAlmacen) {
         params.IdAlmacen = this.almacen.IdAlmacen
@@ -580,9 +581,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      // if (this.vendedor.Usuario) {
+      //   params.usuario = this.vendedor.Usuario
+      // }
 
       if (this.almacen.IdAlmacen) {
         params.IdAlmacen = this.almacen.IdAlmacen
@@ -601,9 +602,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      // if (this.vendedor.Usuario) {
+      //   params.usuario = this.vendedor.Usuario
+      // }
 
       if (this.almacen.IdAlmacen) {
         params.IdAlmacen = this.almacen.IdAlmacen
