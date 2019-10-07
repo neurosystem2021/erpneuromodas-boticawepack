@@ -121,9 +121,10 @@ const actions = {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
+    var idProductos = state.productos.map(prod => prod.IdProducto);
     axios.get(API + 'productos/stock', {
       params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
+        idProductos: idProductos.length ? idProductos : [1],
         idAlmacen: obj.IdAlmacen
       }
     }).then((response) => {
