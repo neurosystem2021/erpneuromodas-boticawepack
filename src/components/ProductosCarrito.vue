@@ -35,7 +35,11 @@
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                if (isMov) {
+                  productos[data.index].precio = productos[data.index].PrecioCosto;
+                } else {
+                  productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                }
 
             }"
             placeholder="Cantidad"></b-form-input>
@@ -196,6 +200,7 @@ export default {
     }
   },
   props: {
+    isMov: Boolean,
     setPrecio: Boolean,
 
     igvTotal: Boolean,
