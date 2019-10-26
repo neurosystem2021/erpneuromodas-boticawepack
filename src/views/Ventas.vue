@@ -67,7 +67,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="CAJA1"
+                                        initValue="ABTAO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -81,12 +81,13 @@
                                     <label>Cliente:</label>
                                     <b-input-group>
                                         <autocomplete
+                                            required="required"
                                             ref="inputCliente"
                                             :url="API + 'clientes'"
                                             anchor="ClienteDniRuc"
                                             label="writer"
                                             placeholder=""
-                                            initValue="--"
+                                            initValue=""
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
@@ -458,7 +459,7 @@ export default {
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    PuntoVenta: 'ABTAO'
                 },
                 vendedor: {},
                 repartidor: {},
@@ -593,11 +594,11 @@ export default {
             this.limpiarCart()
             this.getNumeroVenta()
             this.$refs.inputTipoVenta.setValue('TICKET')
-            this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.$refs.inputAlmacen.setValue('ABTAO')
+            this.$refs.inputPuntoVenta.setValue('ABTAO')
             this.$refs.inputVendedor.setValue('')
             this.$refs.inputRepartidor.setValue('')
-            this.$refs.inputCliente.setValue('--')
+            // this.$refs.inputCliente.setValue('--')
 
             this.$refs.inputCliente.$refs.input.disabled = false
             this.$refs.inputDni.disabled = false 
