@@ -67,7 +67,6 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="ABTAO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -348,7 +347,8 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        // this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -455,11 +455,11 @@ export default {
                     LimitItems: 0
                 },
                 almacen: {
-                    IdAlmacen: 1
+                    // IdAlmacen: 1
                 },
                 puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'ABTAO'
+                    // IdDocVentaPuntoVenta: 1,
+                    // PuntoVenta: 'ABTAO'
                 },
                 vendedor: {},
                 repartidor: {},
@@ -483,13 +483,51 @@ export default {
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+                this.getNumeroVenta()
+            })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        getVendedor (user) {
+            let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
@@ -587,24 +625,6 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
-        limpiarDespuesVenta () {
-            this.inProgress = false
-            this.tieneIgv = false
-            this.initForm()
-            this.limpiarCart()
-            this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
-            this.$refs.inputAlmacen.setValue('ABTAO')
-            this.$refs.inputPuntoVenta.setValue('ABTAO')
-            this.$refs.inputVendedor.setValue('')
-            this.$refs.inputRepartidor.setValue('')
-            // this.$refs.inputCliente.setValue('--')
-
-            this.$refs.inputCliente.$refs.input.disabled = false
-            this.$refs.inputDni.disabled = false 
-            this.direccionTemp = ''
-
-        },
         guardarProforma () {
 
             if(!this.productos.length) {
@@ -629,10 +649,14 @@ export default {
             
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
+                this.inProgress = false
+                this.tieneIgv = false
 
-                this.limpiarDespuesVenta()
+                this.initForm()
+                this.limpiarCart()
+                this.getVendedor()
+                this.$refs.inputCliente.setValue('')
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -680,15 +704,22 @@ export default {
             console.log(this.venta)
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                console.log(response)
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
+                this.inProgress = false
+                this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
-                this.limpiarDespuesVenta()
+                this.initForm()
+                this.limpiarCart()
+                this.getVendedor()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                // this.$refs.inputAlmacen.setValue('VENTA')
+                // this.$refs.inputPuntoVenta.setValue('CAJA1')
+                this.$refs.inputCliente.setValue('')
+                // this.$refs.inputVendedor.setValue('')
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
-                console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
