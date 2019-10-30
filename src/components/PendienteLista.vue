@@ -132,6 +132,8 @@ import config from '@/store/config.js'
         }
     }
 </script>
-<style>
-
+<style scoped>
+#table-pendientes {
+    font-size: .8em;
+}
 </style>

@@ -322,7 +322,7 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       //this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      // document.location.reload()
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
