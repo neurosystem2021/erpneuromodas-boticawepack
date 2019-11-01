@@ -42,6 +42,21 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Doc. Referencia:</label>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRef"
+                                        :url="API + 'ventas/lista'"
+                                        anchor="NroComprobante"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRef" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
                             </b-col>
                             <b-col md="4">
                                 <b-form-group>
@@ -58,6 +73,10 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Motivo :</label>
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -337,6 +356,7 @@ export default {
     data () {
         return {
             dni: '',
+            isNota: false,
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
@@ -346,6 +366,19 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            itemsMotivoNota: [
+                { value: null, text: '-- SELECCIONE EL MOTIVO --' },
+                { value: '01', text: 'ANULACION DE LA OPERACION' },
+                { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+                { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+                { value: '04', text: 'DESCUENTO GLOBAL' },
+                { value: '05', text: 'DESCUENTO POR ITEM' },
+                { value: '06', text: 'DEVOLUCION TOTAL' },
+                { value: '07', text: 'DEVOLUCION POR ITEM' },
+                { value: '08', text: 'BONIFICACION' },
+                { value: '09', text: 'DISMINUCION EN EL VALOR' },
+                { value: '10', text: 'OTROS CONCEPTOS' }
+            ],
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
@@ -437,6 +470,18 @@ export default {
             this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
+            this.isNota = false
+            this.venta.NroComprobanteModifica = ''
+            this.venta.CodSunatModifica = ''
+            this.venta.NotaIdMotivo = ''
+            this.venta.NotaDescMotivo = ''
+
+            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
+
+            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                this.isNota = true
+            }
+            
             if (obj.TieneIgv) {
                 this.tieneIgv = true
             } else {
@@ -444,6 +489,28 @@ export default {
             }
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
+        },
+        setDocRef (obj) {
+            this.venta.CodSunatModifica = obj.CodSunat
+            this.venta.NroComprobanteModifica = obj.NroComprobante
+
+            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
+            }
+
+            this.axios.get(this.API + 'ventas/solonumero', {
+                params: {
+                    serie: this.venta.Serie,
+                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+                }
+            })
+            .then((response) => {
+                this.venta.Numero = response.data.numero
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
@@ -651,6 +718,22 @@ export default {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
                 return          
+            }
+
+            if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+                    this.inProgress = false
+                    return 
+                }
+
+                if(!this.venta.NotaIdMotivo) {
+                    this.$toasted.show('Debe seleccionar un Motivo')
+                    this.inProgress = false
+                    return 
+                }
+
+                this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
 
             this.venta.productos = this.productos
