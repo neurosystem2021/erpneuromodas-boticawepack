@@ -4,17 +4,19 @@
         <thead>
             <tr class="text-center">
                 <th>FECHA</th>
+                <th>PRESTADOR</th>
                 <th>TIPO DOC</th>
                 <th>SERIE</th>
                 <th>NUMERO</th>
                 <th>CLIENTE</th>
                 <th>DNI/RUC</th>
-                <th class="table-danger">PRESTADOS</th>
+                <th class="table-danger">CANTIDAD</th>
             </tr>
         </thead>
         <tbody>
             <tr class="text-center" v-for="(item, i) in productosPrestados" :key="i">
                 <td>{{ item.FechaReg }}</td>
+                <td>{{ item.Repartidor }}</td>
                 <td>{{ item.TipoDoc }}</td>
                 <td>{{ item.Serie }}</td>
                 <td>{{ item.Numero }}</td>
@@ -67,6 +69,9 @@ export default {
 }
 </script>
 <style scoped>
+table {
+    font-size: .8em;
+}
 table thead th {
     vertical-align: middle;
 }

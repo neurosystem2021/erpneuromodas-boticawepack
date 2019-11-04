@@ -41,7 +41,10 @@
                         <br />
                         <table class="table table-sm">
                             <thead>
-                                <tr class="text-center"><td>Código</td><td>Producto</td><td>Prestados</td><td>Devolver</td></tr>
+                                <tr class="text-center"><td>Código</td><td>Producto</td><td>Prestados</td>
+                                <td>Devolver</td>
+                                <td>Persona</td>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in prestados" :key="index" class="text-center">
@@ -49,6 +52,7 @@
                                     <td>{{ item.Producto }}</td>
                                     <td>{{ item.Prestados }}</td>
                                     <td><input type="number" class="form-control" v-model="item.devueltos" /></td>
+                                    <td><input type="text" class="form-control" v-model="item.persona" /></td>
                                 </tr>
                             </tbody>
                         </table>
