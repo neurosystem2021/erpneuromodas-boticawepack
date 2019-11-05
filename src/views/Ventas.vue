@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <retiros-fise></retiros-fise>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pendiente-lista></pendiente-lista>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -268,7 +271,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>FISE</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -288,7 +291,7 @@
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <!--<tr>
                                             <td>Mastercard</td>
                                             <td>
                                                 <b-form-input
@@ -308,7 +311,7 @@
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
                                                 />
                                             </td>
-                                        </tr>
+                                        </tr>-->
                                     </tbody>
                                 </table>
                             </template>
@@ -340,6 +343,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import PendienteLista from '@/components/PendienteLista.vue'
+import RetirosFise from '@/components/RetirosFise.vue'
 
 
 export default {
@@ -735,7 +739,8 @@ export default {
         ConfigVenta,
         PreOrdenLista,
         Proformas,
-        PendienteLista
+        PendienteLista,
+        RetirosFise
     }
 }
 </script>

@@ -119,7 +119,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Ventas con FISE</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -173,7 +173,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Visa</b></td>
+              <td class="total"><b>Total FISE</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
@@ -183,7 +183,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Compras FISE</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -191,7 +191,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in comprasFise" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -229,16 +229,16 @@
                 <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
 
               </td>
-              <td>{{ item.MastercardDesc }}</td>
+              <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard }}</td>
+              <td>S/. {{ item.Efectivo }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
+              <td class="total-salida"><b>Total Compras FISE</b></td>
+              <td class="total-salida"><b>S/. {{ totalComprasFise }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -406,7 +406,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalComprasFise
     },
     totalSalidas () {
       let total = 0
@@ -431,8 +431,20 @@ export default {
     },
     ventasEfectivo () {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito
+        return venta.Efectivo > 0 && !venta.EsCredito && venta.IdTipoDoc != 8 // 8 es Ticket fise
       })
+    },
+    comprasFise () {
+      return this.ventas.filter(venta => {
+        return venta.Efectivo > 0 && !venta.EsCredito && venta.IdTipoDoc == 8 // 8 es Ticket fise
+      })
+    },
+    totalComprasFise () {
+      let total = 0
+      this.comprasFise.forEach(venta => {
+        if (!venta.Anulado) total += venta.Efectivo
+      });
+      return total
     },
     totalVentasVisa () {
       let total = 0
