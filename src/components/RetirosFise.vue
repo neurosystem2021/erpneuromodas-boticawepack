@@ -13,8 +13,7 @@
                 
                 <b-row class="mb-1">
                     <b-col>
-
-                    <b>VENTAS FISE</b><br /><br />
+                    <b>Ventas FISE</b><br /><br />
                          <table class="table b-table table-sm">
                             <thead>
                                 <tr>
@@ -27,9 +26,9 @@
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{ventasFise.Cantidad}}</td>
+                                    <td>{{ventasFise.Precio}}</td>
+                                    <td>{{ventasFise.Total}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -38,7 +37,7 @@
                 <b-row class="mb-1">
                     <b-col>
 
-                    <b>COMPRAS FISE</b><br /><br />
+                    <b>Compras FISE</b><br /><br />
                          <table class="table b-table table-sm">
                             <thead>
                                 <tr>
@@ -51,12 +50,24 @@
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{comprasFise.Cantidad}}</td>
+                                    <td>{{comprasFise.Precio}}</td>
+                                    <td>{{comprasFise.Total}}</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </b-col>
+                </b-row>
+                <b-row  style="background: rgb(235, 97, 44);color: #fff;padding: 10px;">
+                    <b-col style="text-align: right">
+                        <b>Total Acumulado FISE: </b><br>
+                        <b>Total Retiros: </b><br>
+                        <b>Gran TOTAL: </b>
+                    </b-col>
+                    <b-col>
+                        <b>S/ {{ventasFise.Total+comprasFise.Total}}</b><br>
+                        <b>S/ {{totalRetiros}}</b><br>
+                        <b>S/ {{ventasFise.Total+comprasFise.Total-totalRetiros}}</b>
                     </b-col>
                 </b-row>
                 
@@ -105,16 +116,18 @@
                                 <th>Fecha Retiro</th>
                                 <th>Concepto</th>
                                 <th>Importe</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(pago, index) in pagos" :key="index">
-                                <td>{{ pago.IdFiseRetiro }}</td>
-                                <td>{{ pago.FechaDoc }}</td>
-                                <td>{{ pago.Concepto }}</td>
-                                <td>{{ pago.Importe }}</td>
-                                <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                            <tr v-for="(ret, index) in retiros" :key="index">
+                                <td>{{ ret.IdFiseRetiro }}</td>
+                                <td>{{ ret.FechaDoc }}</td>
+                                <td>{{ ret.Concepto }}</td>
+                                <td>{{ ret.Importe }}</td>                            
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td colspan="3" style="text-align: center;"> Total retiros</td>
+                                <td>{{ totalRetiros }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -133,8 +146,9 @@ import config from '@/store/config.js'
 
     export default {
         mounted () {
-            this.initForm()
-            this.getVendedor()
+            this.getVentasFise()
+            this.getComprasFise()
+            this.getRetiros()
         },
         data () {
             return {
@@ -142,67 +156,49 @@ import config from '@/store/config.js'
                 fechaRetiro: this.$moment().format("YYYY-MM-DD"),
                 conceptoRetiro: '',
                 importeRetiro: '',
-                documentos: [],
-                pagos: [],
-                cajaBanco: {},
-                vendedor: {},
-                show: false
+                ventasFise: {},
+                comprasFise: {},
+                show: false,
+                retiros: []
             }
         },
+        computed: {
+            totalRetiros() {
+                let total = 0
+                this.retiros.forEach(r => {
+                    total += r.Importe
+                });
+                return total
+            },
+        },
         methods: {
-            initForm () {
-                this.vendedor = {}
-                this.documentos = []
-                this.pagos = []
-                this.cajaBanco = {
-                    FechaDoc: this.$moment().format("YYYY-MM-DD")
-                }
-                // this.$refs.inputCliente.setValue('')
-            },
             getVentasFise() {
-
-            },
-            getComprasFise() {
-                
-            },
-            getVendedor () {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'usuarios/' + usuario)
+                this.axios.get(this.API + 'ventas/fise')
                 .then((response) => {
-                    this.setVendedor(response.data)
-                    this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                    this.$refs.inputVendedor.$refs.input.disabled = true
+                   this.ventasFise = response.data
                 })
                 .catch((error) => {
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
-            setVendedor (obj) {
-                this.vendedor = obj
+            getComprasFise() {
+                this.axios.get(this.API + 'compras/fise')
+                .then((response) => {
+                   this.comprasFise = response.data
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
             },
             focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
             },
-            cargarDeuda (cliente) {
-                this.cajaBanco.cliente = cliente
-
-                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
+            getRetiros() {
+                this.axios.get(this.API + 'retiros')
                 .then((response) => {
-                   this.documentos = response.data
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-
-                this.cargarPagos(cliente)
-            },
-            cargarPagos (cliente) {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
-                .then((response) => {
-                   this.pagos = response.data
+                   this.retiros = response.data
                 })
                 .catch((error) => {
                     console.log(error)
@@ -211,28 +207,16 @@ import config from '@/store/config.js'
             },
             guardarPago (evt) {
                 evt.preventDefault()
-                let importe = 0
-                this.documentos.map(doc => {
-                    if (doc.aplicar > 0) {
-                        importe += doc.aplicar
-                    }
-                })
 
-                if(importe === 0) {
-                    this.$toasted.show('Error: no ha ingresado ningun importe');
-                }
-
-                this.axios.post(this.API + 'cliente/deudas/pagar', {
-                    cajaBanco: this.cajaBanco,
-                    documentos: this.documentos,
-                    vendedor: this.vendedor
+                this.axios.post(this.API + 'retiro/fise', {
+                    Concepto: this.conceptoRetiro,
+                    Importe: this.importeRetiro
                 })
                 .then((response) => {
-                    console.log(response.data)
-                    this.$toasted.show('Se pagó la deuda del cliente.')
-                    this.show = false
-                    this.initForm()
-                    window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
+                    this.$toasted.success('Retiro registrado correctamente.')
+                    this.getRetiros()
+                    this.conceptoRetiro = '';
+                    this.importeRetiro = '';
                 })
                 .catch((error) => {
                     console.log(error)
