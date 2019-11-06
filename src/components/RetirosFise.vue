@@ -63,12 +63,27 @@
                 <br>
                 <b-row class="mb-1">
                     <b-col>
-                        <br>
                         <b-form-input
                             required
-                            id="input-fecha"
+                            v-model="fechaRetiro"
                             type="date"
                             placeholder=""></b-form-input>
+                    </b-col>
+                    <b-col>
+                        <b-form-input
+                            required
+                            v-model="conceptoRetiro"
+                            type="text"
+                            placeholder="Concepto"></b-form-input>
+                    </b-col>
+                    <b-col>
+                        <b-form-input
+                            required
+                            v-model="importeRetiro"
+                            type="number"
+                            placeholder="Importe"></b-form-input>
+                    </b-col>
+                    <b-col>
                         <div class="floast-right">
                             <b-btn size="sm" variant="success" type="submit">
                                 Retirar
@@ -77,28 +92,32 @@
                                 Cerrar
                             </b-btn>
                         </div>
-                        <hr>
-                        <br><br>
-                        <table class="table b-table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha Retiro</th>
-                                    <th>Concepto</th>
-                                    <th>Importe</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(pago, index) in pagos" :key="index">
-                                    <td>{{ pago.IdFiseRetiro }}</td>
-                                    <td>{{ pago.FechaDoc }}</td>
-                                    <td>{{ pago.Concepto }}</td>
-                                    <td>{{ pago.Importe }}</td>
-                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    </b-col>
+                </b-row>
+                <hr>
+                <b-row>
+                    <b-col>
+                    <br><br>
+                    <table class="table b-table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha Retiro</th>
+                                <th>Concepto</th>
+                                <th>Importe</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(pago, index) in pagos" :key="index">
+                                <td>{{ pago.IdFiseRetiro }}</td>
+                                <td>{{ pago.FechaDoc }}</td>
+                                <td>{{ pago.Concepto }}</td>
+                                <td>{{ pago.Importe }}</td>
+                                <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                            </tr>
+                        </tbody>
+                    </table>
                     </b-col>
                 </b-row>
                 <div slot="modal-footer" >
@@ -120,6 +139,9 @@ import config from '@/store/config.js'
         data () {
             return {
                 API: config.API,
+                fechaRetiro: this.$moment().format("YYYY-MM-DD"),
+                conceptoRetiro: '',
+                importeRetiro: '',
                 documentos: [],
                 pagos: [],
                 cajaBanco: {},
@@ -136,6 +158,12 @@ import config from '@/store/config.js'
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
                 // this.$refs.inputCliente.setValue('')
+            },
+            getVentasFise() {
+
+            },
+            getComprasFise() {
+                
             },
             getVendedor () {
                 let usuario = sessionStorage.getItem('User')
