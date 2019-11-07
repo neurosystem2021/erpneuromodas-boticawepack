@@ -309,7 +309,7 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      idPerfil: sessionStorage.getItem('idPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {

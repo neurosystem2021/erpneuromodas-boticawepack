@@ -100,7 +100,7 @@
                         </table>
                         <br>
                         <div class="float-right">
-                            <b-btn size="sm" variant="success" type="submit">
+                            <b-btn size="sm" variant="success" type="submit" :disabled="isLoading">
                                 Guardar
                             </b-btn>
                             <b-btn size="sm" variant="secondary" @click="show=false">
@@ -154,7 +154,8 @@ import config from '@/store/config.js'
                 pagos: [],
                 cajaBanco: {},
                 vendedor: {},
-                show: false
+                show: false,
+                isLoading: false
             }
         },
         methods: {
@@ -212,6 +213,7 @@ import config from '@/store/config.js'
                 })
             },
             guardarPago (evt) {
+                this.isLoading = true;
                 evt.preventDefault()
                 let importe = 0
                 this.documentos.map(doc => {
@@ -234,10 +236,12 @@ import config from '@/store/config.js'
                     this.$toasted.show('Se pagó la deuda del cliente.')
                     this.show = false
                     this.initForm()
+                    this.isLoading = false;
                     window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {
                     console.log(error)
+                    this.isLoading = false;
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             }
