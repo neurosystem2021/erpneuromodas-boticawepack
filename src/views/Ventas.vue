@@ -13,6 +13,9 @@
                         <pendiente-lista></pendiente-lista>
                     </b-button-group>
                     <b-button-group size="sm">
+                        <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -344,7 +347,7 @@ import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import PendienteLista from '@/components/PendienteLista.vue'
 import RetirosFise from '@/components/RetirosFise.vue'
-
+import PagoDeuda from '@/components/PagoDeuda'
 
 export default {
     beforeMount () {
@@ -740,7 +743,8 @@ export default {
         PreOrdenLista,
         Proformas,
         PendienteLista,
-        RetirosFise
+        RetirosFise,
+        PagoDeuda
     }
 }
 </script>

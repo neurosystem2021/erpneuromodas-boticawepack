@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Pendientes de Pago</b-button>
+        <b-button @click="show=true" variant="outline-primary" size="sm">Repartidor Pendientes de Pago</b-button>
         
         <b-form >    
             <b-modal id="modalPendientes" 

@@ -3,6 +3,18 @@
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="3" class="my-1">
+            <b-row>
+              <b-col style="text-align: center;color: #fff;background: #ff9900;">
+                <b>Balones vacíos<br>
+                {{cantidadVacios}}</b>
+              </b-col>
+              <b-col style="text-align: center;color: #fff;background: #ff9900;">
+                <b>Cantidad prestados<br>
+                {{cantidadPrestado}}</b>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="3" class="my-1">
             <b-form-group>
               <autocomplete
                   required="required"
@@ -18,7 +30,7 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col md="5" class="my-1">
+          <b-col md="4" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -29,7 +41,7 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="2" class="my-1">
             <b-row>
             <b-col md="8">
               <b-form-group horizontal label="Mostrar" class="mb-0">
@@ -90,6 +102,7 @@ export default {
     })
     
     this.loadFirstAlmacen()
+    this.getBalonesVacios()
   },
   data() {
     return {
@@ -115,7 +128,9 @@ export default {
       currentPage: 1,
       almacen: {
         IdAlmacen: 1
-      }
+      },
+      cantidadVacios: 0,
+      cantidadPrestado: 0
     }
   },
   methods: {
@@ -125,6 +140,12 @@ export default {
             this.$refs.inputAlmacen.setValue(res.data.Almacen)
             this.setAlmacen(res.data)
             //this.almacen = res.data
+          })
+      },
+      getBalonesVacios() {
+        this.axios.get(this.API + 'balonesvacios' + '?idAlmacen=' + this.almacen.IdAlmacen)
+          .then(res => {
+            this.cantidadVacios = res.data.cantidad
           })
       },
       setAlmacen (obj) {
@@ -160,6 +181,11 @@ export default {
 
         return promise.then((result) => {
           this.items = result.data
+          var cont = 0;
+          result.data.map(d => {
+            cont += parseInt(d['Prestados']);
+          })
+          this.cantidadPrestado  = cont  
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
