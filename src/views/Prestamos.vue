@@ -151,6 +151,7 @@ export default {
       setAlmacen (obj) {
         this.almacen = obj
         Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+        this.getBalonesVacios()
       },
       focusAutocomplete (ref) {
         // this.$refs[ref].type = ""
