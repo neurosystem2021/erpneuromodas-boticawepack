@@ -359,7 +359,8 @@ export default {
       var precioCosto = this.producto.PrecioCosto
       var utilidad = this.producto.PorcentajeUtilidad
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      // var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      var nuevoPrecioContado = parseFloat(precioCosto) + (precioCosto * (utilidad / 100))
 
       this.producto.precioContadoNormal = nuevoPrecioContado
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
@@ -370,7 +371,8 @@ export default {
       var precioContado = this.producto.PrecioContado
       var precioCosto = this.producto.PrecioCosto
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      // this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(((precioContado-precioCosto)/precioCosto) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj

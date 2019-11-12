@@ -337,7 +337,7 @@ export default {
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
-                    { key: 'descuento', label: 'Descuento'},
+                    { key: 'descuento', label: 'Descuento %'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]

@@ -89,14 +89,14 @@
             min="0"
             step="0.01"
             placeholder="Precio Venta"></b-form-input>
-            <b-form-text>
+            <!--<b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
-            </b-form-text>
+            </b-form-text>-->
         </template>
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
-            v-model="productos[data.index].descuento"
+            @input="val => productos[data.index].descuento = getSubtotal(data.index) * val/100"
             type="number"
             min="0"
             step="0.01"
@@ -380,7 +380,8 @@ export default {
 
 
       let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+      // let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+      let nuevoPrecio = this.$options.filters.redondear(precio)
       
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
@@ -429,6 +430,9 @@ export default {
       this.eliminar(index)
       this.$emit('onRemoveProducto', index)
       this.$toasted.show('Producto quitado del listado')
+    },
+    changeDescuento (val, index) {
+      this.productos[index].descuento = this.getSubtotal(index) * val/100
     }
   },
   components: {
