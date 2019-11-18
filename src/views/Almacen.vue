@@ -378,6 +378,7 @@ export default {
       let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      url = url.replace(/\+/g, "%2B");
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
