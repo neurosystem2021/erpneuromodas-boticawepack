@@ -440,6 +440,7 @@ export default {
       // this.isBusy = true
       let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      url = url.replace(/\+/g, "%2B");
       let promise = this.axios.get( url )
       
       this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
