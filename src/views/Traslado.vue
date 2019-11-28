@@ -34,6 +34,7 @@
           <b-row>
             <b-col>
               <productos-carrito ref="carrito"
+                tipo="mov"
                 @onAddProducto="onAddProducto"
                 :showButton="false"
                 :showPagoCon="false"
