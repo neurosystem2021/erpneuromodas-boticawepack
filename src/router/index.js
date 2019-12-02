@@ -14,6 +14,7 @@ import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import ReporteEntregas from '@/views/reportes/Entregas.vue'
+import DeudaCliente from '@/views/reportes/DeudaCliente.vue'
 
 Vue.use(Router)
 
@@ -74,6 +75,11 @@ export default new Router({
       path: '/reportes/stockminimo',
       name: 'StockMinimo',
       component: StockMinimo
+    },
+    {
+      path: '/reportes/deudacliente',
+      name: 'DeudaCliente',
+      component: DeudaCliente
     },
     {
       path: '/facturacion',
