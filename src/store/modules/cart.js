@@ -39,7 +39,7 @@ const mutations = {
       cantidadTotal += parseFloat(prod.cantidad)
     })
     state.productos = state.productos.map(prod => {
-      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
+      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(3)
       return prod
     })
   },
