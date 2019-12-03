@@ -4,7 +4,7 @@
         <b-row>
           <b-col md="12"  class="my-1">
             <b-row>
-              <b-col md="2" v-if="(idPerfil == 1)">
+              <b-col md="2" v-if="(idPerfil == 1 && almacen.IdAlmacen != 3 && almacen.IdAlmacen != 4)">
                 <div class="suma-stock text-center">
                   <b>Stock <br> Valorizado</b>
                   <div> S/. {{ sumaValorizado | moneda }} </div>
