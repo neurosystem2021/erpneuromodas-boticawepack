@@ -17,15 +17,15 @@
                          <table class="table b-table table-sm">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>Almacen</th>
                                     <th>Cantidad</th>
                                     <th>Precio</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td></td>
+                                <tr v-for="(ventasFise, index) in ventasFise" :key="index">
+                                    <td>{{ventasFise.Almacen}}</td>
                                     <td>{{ventasFise.Cantidad}}</td>
                                     <td>{{ventasFise.Precio}}</td>
                                     <td>{{ventasFise.Total}}</td>
@@ -65,9 +65,9 @@
                         <b>Gran TOTAL: </b>
                     </b-col>
                     <b-col>
-                        <b>S/ {{ventasFise.Total+comprasFise.Total}}</b><br>
+                        <b>S/ {{totalVentaFise+totalCompraFise}}</b><br>
                         <b>S/ {{totalRetiros}}</b><br>
-                        <b>S/ {{ventasFise.Total+comprasFise.Total-totalRetiros}}</b>
+                        <b>S/ {{totalVentaFise+totalCompraFise-totalRetiros}}</b>
                     </b-col>
                 </b-row>
                 
@@ -156,8 +156,10 @@ import config from '@/store/config.js'
                 fechaRetiro: this.$moment().format("YYYY-MM-DD"),
                 conceptoRetiro: '',
                 importeRetiro: '',
-                ventasFise: {},
-                comprasFise: {},
+                ventasFise: [],
+                comprasFise: [],
+                totalVentaFise: 0,
+                totalCompraFise: 0,
                 show: false,
                 retiros: []
             }
@@ -173,9 +175,11 @@ import config from '@/store/config.js'
         },
         methods: {
             getVentasFise() {
+                let total
                 this.axios.get(this.API + 'ventas/fise')
                 .then((response) => {
-                   this.ventasFise = response.data
+                    this.ventasFise = response.data
+                    this.totalVentaFise = response.data.map( item => item.Total).reduce((sumaTotal, actual) => sumaTotal + actual)
                 })
                 .catch((error) => {
                     console.log(error)
@@ -185,7 +189,10 @@ import config from '@/store/config.js'
             getComprasFise() {
                 this.axios.get(this.API + 'compras/fise')
                 .then((response) => {
-                   this.comprasFise = response.data
+                    if(response.data.Cantidad && response.data.Total ){
+                        this.comprasFise = response.data
+                        this.totalCompraFise = response.data.map( item => item.Total).reduce((sumaTotal, actual) => sumaTotal + actual)
+                    }
                 })
                 .catch((error) => {
                     console.log(error)
