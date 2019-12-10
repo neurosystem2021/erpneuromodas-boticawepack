@@ -15,6 +15,7 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import ReporteEntregas from '@/views/reportes/Entregas.vue'
 import DeudaCliente from '@/views/reportes/DeudaCliente.vue'
+import VentaVendedor from '@/views/reportes/VentaVendedor.vue'
 
 Vue.use(Router)
 
@@ -80,6 +81,11 @@ export default new Router({
       path: '/reportes/deudacliente',
       name: 'DeudaCliente',
       component: DeudaCliente
+    },
+    {
+      path: '/reportes/ventavendedor',
+      name: 'VentaVendedor',
+      component: VentaVendedor
     },
     {
       path: '/facturacion',
