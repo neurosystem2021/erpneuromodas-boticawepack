@@ -93,7 +93,7 @@
 
       <b-row  class="no-print">
         <b-col>
-          <table class="table b-table table-sm table-striped table-bordered">
+<!--           <table class="table b-table table-sm table-striped table-bordered">
             <thead>
               <tr>
                 <th>Fecha</th>
@@ -113,19 +113,19 @@
                 <td>{{ venta.Total | moneda }}</td>
                 <td>{{ estadoVenta(venta) }}</td>
               </tr>
-              <!--<tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.FechaDoc }}</td>
                 <td>RECIBO</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>-->
+              </tr>
             </tbody>
-          </table>
+          </table> -->
         </b-col>
       </b-row>
       
 
-      <!--<b-row>
+      <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -180,9 +180,7 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-
-      
+      </b-row>      
 
       <b-row>
         <h5>Ventas Mastercard</h5><br>
@@ -291,7 +289,7 @@
             </tfoot>
           </table>
         </b-col>
-      </b-row>-->
+      </b-row>
       
 
       <br>
