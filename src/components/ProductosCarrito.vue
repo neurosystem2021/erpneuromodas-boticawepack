@@ -49,6 +49,8 @@
             @input="(val) => {
               $emit('onInputCantidad', val)
               productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              
+              // productos[data.index].precio = (cliente.EsVIP) ? productos[data.index].PrecioConvenio || productos[data.index].precio : productos[data.index].precio
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -202,6 +204,7 @@ export default {
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
+      cliente: {},
       idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
