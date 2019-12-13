@@ -367,8 +367,8 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
                     { key: 'ProductoMedicion', label: 'Med.' },
-                    { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
-                    { key: 'StockPorMayor', label: 'Stock x Mayor' },
+                    // { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
+                    // { key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -395,7 +395,8 @@ export default {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock'
+            obtenerStok: 'obtenerStock',
+            actualizarPrecioConvenio: 'actualizarPrecioConvenio'
         }),
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
@@ -579,7 +580,11 @@ export default {
                     console.log(error)
                 })
             }
-            // this.$refs.carrito.cliente = obj;
+            if (obj.EsVIP) {
+
+            }
+            this.actualizarPrecioConvenio(obj)
+            this.$refs.carrito.cliente = obj;
         },
         onSetProducto (obj) {
             obj.cantidad = 1

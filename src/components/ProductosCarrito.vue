@@ -49,8 +49,7 @@
             @input="(val) => {
               $emit('onInputCantidad', val)
               productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
-              
-              // productos[data.index].precio = (cliente.EsVIP) ? productos[data.index].PrecioConvenio || productos[data.index].precio : productos[data.index].precio
+              productos[data.index].precio = (cliente.EsVIP) ? productos[data.index].precioConvenio || productos[data.index].precio : productos[data.index].precio
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -382,7 +381,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      
+      console.log(this.cliente)
       if (obj.ControlaStock && obj.stock <= 0) {
         this.$toasted.show('No esta permitido la venta sin stock!')
         return;
@@ -401,7 +400,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      }, false, false, this.cliente.EsVIP])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
