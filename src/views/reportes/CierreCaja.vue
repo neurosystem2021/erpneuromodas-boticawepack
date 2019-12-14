@@ -137,17 +137,51 @@
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
+              <td>
+                
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td>S/. {{ item.Efectivo }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear  }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -324,7 +358,8 @@ export default {
         { value: 2, text: 'Tarde' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      almacen: {}
     }
   },
   computed: {
@@ -401,6 +436,12 @@ export default {
     }
   },
   methods: {
+    getDetalles (idDocVenta) {
+      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+      //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
+      //this.items[index].productos = detalles
+      return detalles
+    },
     getVendedor () {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
@@ -417,6 +458,10 @@ export default {
     setVendedor (obj) {
         this.vendedor = obj
         this.loadData()
+    },
+    setAlmacen (obj) {
+      this.almacen = obj;
+      this.loadData()
     },
     imprimir () {
       window.print();
@@ -435,11 +480,11 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: this.vendedor.Usuario
+          user: this.vendedor.Usuario,
+          idAlmacen: this.almacen.IdAlmacen
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
-          console.log(res)
         })
       }
     },
@@ -457,13 +502,16 @@ export default {
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
       }
-      
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
       })
       .then(res => {
         this.ventas = res.data
+        this.loadDetalles()
       }).catch(err => {
         console.log(err)
       })
@@ -474,6 +522,9 @@ export default {
       }
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -490,6 +541,9 @@ export default {
       }
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
@@ -508,6 +562,22 @@ export default {
       }).then(res =>{
         this.cierre = res.data[0]
       })
+    },
+    loadDetalles () {
+      this.axios.get(this.API + 'ventas/detalle', {
+          params: {
+            idDocVentas: this.ventas.map((item) => item.idDocVenta),
+          }
+        }).then((response) => {
+            this.itemsDetalle = response.data
+            this.ventas = this.ventas.map((item) => {
+              item.productos = this.getDetalles(item.idDocVenta)
+              return item
+            })
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     /*getPenultimoCierre(id) {
       this.axios.get(this.API + 'cierrecaja/penultimo', {
@@ -544,6 +614,18 @@ th {
 }
 .si-print {
   display: none;
+}
+.tabla-detalle {
+}
+.tabla-detalle th {
+  background-color: #ffffff;
+  font-weight: normal;
+}
+.tabla-detalle th, .tabla-detalle td {
+  font-size: .9em;
+}
+.detalle-producto {
+  width: 270px;
 }
 @media print {
   .no-print {
