@@ -73,7 +73,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <!--<b-form-group>
             <label>Modelo / Color:</label>
             <b-form-input v-model="producto.ProductoModelo"
               ref="inputModelo"
@@ -81,7 +81,7 @@
               @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"
               :value="producto.ProductoModelo"
               ></b-form-input>
-          </b-form-group>
+          </b-form-group>-->
 
           
           
