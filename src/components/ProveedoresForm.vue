@@ -71,9 +71,9 @@ export default {
           }
       }).then((response) => {
           this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data.result
-          this.proveedor.Proveedor = data.RazonSocial
-          this.proveedor.Direccion = data.Direccion
+          var data = response.data
+          this.proveedor.Proveedor = data.razonSocial
+          this.proveedor.Direccion = data.direccion
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el RUC')        
