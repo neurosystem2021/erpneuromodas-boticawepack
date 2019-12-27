@@ -56,6 +56,7 @@
             striped
             hover
             id="my-table" 
+            @row-dblclicked="rowDblClick"
             :busy.sync="isBusy" 
             :items="myProvider" 
             :fields="fields"
@@ -74,12 +75,17 @@
         </b-row>-->
         <br /><br />
       </b-container>
+
+      <b-modal id="pagos" size="lg" modal-class="modal-xl" v-model="showPagos" title="pagos a comisionista">
+        <b-alert show variant="warning">{{ clienteSelect.DniRuc }} - {{ clienteSelect.Cliente }}</b-alert>
+        <PagosComisionista :cliente="clienteSelect" v-if="clienteSelect.IdCliente"/> 
+      </b-modal>
   </div>
 </template>
 
 <script>
 import config from '@/store/config.js'
-// import ProductoForm from '@/components/ProductoForm'
+import PagosComisionista from '@/components/PagosComisionista'
 
 export default {
   mounted() {
@@ -91,6 +97,8 @@ export default {
   data() {
     return {
       API: config.API,
+      clienteSelect: {},
+      showPagos: false,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: '',
       sortBy: 'IdDocVenta',
@@ -111,6 +119,10 @@ export default {
     }
   },
   methods: {
+    rowDblClick (item) {
+      this.clienteSelect = item
+      this.showPagos = true;
+    },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -143,7 +155,7 @@ export default {
     }
   },
   components: {
-      // ProductoForm
+      PagosComisionista
   }
 }
 </script>
