@@ -83,8 +83,12 @@
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
-              <td>Pagos de Creditos S/.</td>
+              <td>Ingresos S/.</td>
               <td>{{ totalIngresos | moneda }} </td>
+            </tr>
+             <tr>
+              <td>Salidas S/.</td>
+              <td>{{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
         </table>
