@@ -313,6 +313,7 @@ export default {
     },
     mounted () {
         this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -428,6 +429,25 @@ export default {
             this.venta.puntoVenta = obj
             this.getNumeroVenta()
         },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                // this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.loadAlmacen(response.data.IdAlmacen)
+                // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                // this.$refs.inputAlmacen.$refs.input.disabled = true
+                // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+        },
         setVendedor (obj) {
             this.venta.vendedor = obj
         },
@@ -531,7 +551,7 @@ export default {
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
-            this.$refs.inputVendedor.setValue('')
+            // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
 
@@ -621,9 +641,9 @@ export default {
             });
 
             if (sinStock >= 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
-                this.inProgress = false
-                return;
+                // this.$toasted.error('No se puede vender un producto sin stock');
+                // this.inProgress = false
+                // return;
             }
 
 
@@ -645,7 +665,7 @@ export default {
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
+                // this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
