@@ -206,6 +206,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    setPrecioCosto: Boolean,
     isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -315,7 +316,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: this.setPrecioCosto }])
       }
     },
     /*alterarBuscadorProductos() {

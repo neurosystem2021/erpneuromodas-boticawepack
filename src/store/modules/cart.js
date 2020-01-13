@@ -60,10 +60,12 @@ const mutations = {
 const actions = {
   agregarProducto ({ commit }, [producto, cb, obje]) {
     let setPrecio = false
+    let setPrecioCosto = false
     let cantidad = false
     let setSuma = false
     if (obje) {
       setPrecio = obje.setPrecio
+      setPrecioCosto = obje.setPrecioCosto
       cantidad = obje.cantidad
       setSuma = obje.setSuma
     }
@@ -90,6 +92,11 @@ const actions = {
 
           if (setSuma) {
             obj.setSuma = true
+          }
+
+          if (setPrecioCosto) {
+            obj.cantidad = 1
+            obj.precio = obj.PrecioCosto || 0
           }
 
           obj.descuento = 0
