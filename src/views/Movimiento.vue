@@ -261,7 +261,7 @@ return false
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
       return {
         EsCredito: 0,
-        alterarProductos: 1,
+        alterarProductos: 0,
         FechaVenCredito: '',
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
