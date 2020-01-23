@@ -172,7 +172,7 @@
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
 
-                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
+                      <!--<b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <form @submit.prevent="emitirNotaCredito(data.item)" >
                           <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
@@ -180,7 +180,7 @@
                           <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
                           <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
                         </form>
-                      </b-popover>
+                      </b-popover>-->
                   </div>
                 </template>
 
@@ -207,7 +207,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="12">
-              <b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>
+              <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
@@ -389,7 +389,7 @@ export default {
       
       return obj
     },
-    emitirNotaCredito (item) {
+    /*emitirNotaCredito (item) {
       let doc = Object.assign({}, item);
       this.loading = true
       doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
@@ -413,7 +413,7 @@ export default {
       })
 
 
-    },
+    },*/
     async emitirElectronico (doc) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
@@ -423,7 +423,7 @@ export default {
       this.loading = true
       let arr = []
 
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07') { // Factura / boleta
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
           console.log(JSON.stringify(item))
@@ -469,7 +469,7 @@ export default {
         })
       }*/
     },
-    async emitirElectronicoResumen (doc) {
+    /*async emitirElectronicoResumen (doc) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -490,7 +490,7 @@ export default {
           this.loading = false
         })
       }
-    },
+    },*/
     eliminarElectronico (venta) {
       let r = confirm('�Desea Anular la venta?')
       if (r == true) {
