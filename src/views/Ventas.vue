@@ -49,7 +49,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="VENTA"
+                                        initValue="HUANUCO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -66,7 +66,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="CAJA1"
+                                        initValue="HUANUCO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -311,7 +311,7 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
@@ -414,11 +414,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'VENTA'
+                    Almacen: 'HUANUCO'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    PuntoVenta: 'HUANUCO'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -442,9 +442,23 @@ export default {
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+                this.getNumeroVenta()
+            })
         },
         getTipoDoc (id) {
             this.axios.get(this.API + 'tipodoc/' + id)
@@ -454,6 +468,7 @@ export default {
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
         getVendedor () {
@@ -463,11 +478,11 @@ export default {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
-                // this.loadAlmacen(response.data.IdAlmacen)
-                // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                // this.$refs.inputAlmacen.$refs.input.disabled = true
-                // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
             })
