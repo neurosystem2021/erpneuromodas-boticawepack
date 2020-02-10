@@ -143,18 +143,18 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
-            <label>Activar Habitación:</label>
+            <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
                      :value="1"
                      :unchecked-value="0"
                      >
-              Seleccione esta opción si es una habitación
+              Seleccione esta opción si es un proyecto
             </b-form-checkbox>
           </b-form-group>
           <b-form-group v-if="producto.EsHabitacion">
-            <label>Piso Habitación:</label>
-            <b-form-select required="required" v-model="producto.Piso" :options="[1,2,3,4,5,6,7,8,9,10]" class="mb-3" />
+            <label>Lugar:</label>
+            <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
           
         </b-col>

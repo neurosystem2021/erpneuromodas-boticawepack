@@ -4,7 +4,7 @@
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>
-			  	<b-alert show class="text-center"><b>PISO {{ pi }}</b></b-alert>
+			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'Huánuco' : 'Pucallpa' }}</b></b-alert>
 			  <br>
 			</div>
         	<b-row>
@@ -25,7 +25,7 @@
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
-									<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>	
+									<!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
 									<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
 										<label>Seleccione un cliente:</label>
 										<autocomplete
@@ -48,7 +48,7 @@
 										<br />
 										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
 									</b-popover>
-									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
+									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
 									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Alquilar Habitación">
 										<label>Seleccione un cliente:</label>
 										<b-input-group>

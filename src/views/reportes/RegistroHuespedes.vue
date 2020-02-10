@@ -33,12 +33,12 @@
 
         </b-row>
         <div class="registro">
-          <h1 class="text-center" >Registro de Huéspedes</h1>
+          <h1 class="text-center" >Registro de Proyectos</h1>
         <b-row>
           <table class="table b-table table-striped table-hover">
             <thead>
               <tr>
-                <th>Habitación</th>
+                <th>Proyecto</th>
                 <th>Apellidos y Nombres</th>
                 <th>Sexo</th>
                 <th>Ocupacion</th>
