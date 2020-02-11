@@ -10,7 +10,6 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
