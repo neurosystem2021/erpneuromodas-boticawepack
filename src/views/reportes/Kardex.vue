@@ -60,9 +60,11 @@
             <b-col md="3" class="my-1">
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
-              <hr>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
-              <b-button variant="success" size="sm" :href="hrefXlsGeneral" target="_blank">Exportar General</b-button>
+              <hr>
+              <b-button variant="success" :disabled="loading" size="sm" @click="() => exportarGeneral()" target="_blank">{{ loading ? 'loading...' : 'Generar Reporte General'}}</b-button>
+              <b-button variant="success" size="sm" :href="hrefXlsGeneral" target="_blank">Exportar Reporte General</b-button>
+
             </b-col>
           </b-row>
 
@@ -125,7 +127,11 @@ export default {
         fechaDesde: this.$moment().format("YYYY-01-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
-      kardexSelect: []
+      kardexSelect: [],
+      row: 0,
+      count: 0,
+      loading: false,
+      isGenerated: false
     }
   },
   computed: {
@@ -139,7 +145,7 @@ export default {
       return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
     },
     hrefXlsGeneral () {
-      return '/api/index.php/reporte/kardexvalorizadogeneral?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+      return '/api/index.php/reporte/kardexvalorizadogeneral/exportar?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
     },
     kardexSaldo () {
       let saldo = 0
@@ -196,6 +202,29 @@ export default {
     }
   },
   methods: {
+    exportarGeneral(row, count) {
+      this.loading = true;
+      this.axios.get(this.API + 'reporte/kardexvalorizadogeneral', {
+        params: {
+          idAlmacen: this.almacen.IdAlmacen,
+          fechaDesde: this.kardex.fechaDesde,
+          fechaHasta: this.kardex.fechaHasta,
+          row: row || 0,
+          count: count || 0
+        }
+      })
+        .then(res => {
+          if (res.data.row) {
+            this.$toasted.show('Generando excel... espere por favor...')
+            setTimeout(() => {
+              this.exportarGeneral(res.data.row, parseFloat(res.data.count) + 50);
+            }, 1500);
+          } else {
+            this.$toasted.show('Generado correctamente')
+            this.isGenerated = true
+          }
+        })
+    },
     loadFirstAlmacen () {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
