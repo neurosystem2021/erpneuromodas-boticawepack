@@ -62,6 +62,7 @@
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
               <hr>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="sm" :href="hrefXlsGeneral" target="_blank">Exportar General</b-button>
             </b-col>
           </b-row>
 
@@ -136,6 +137,9 @@ export default {
       }
 
       return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+    },
+    hrefXlsGeneral () {
+      return '/api/index.php/reporte/kardexvalorizadogeneral?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
     },
     kardexSaldo () {
       let saldo = 0
