@@ -52,8 +52,16 @@
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <b-form-input
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            @input="val => setSubtotal(data.index, val)"></b-form-input> 
+           <b>{{ getSubtotal(data.index) }}</b>
         </template>
+        
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -383,6 +391,15 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
     },
+    
+    setSubtotal(index, val) {
+      let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 5)
+      //let cantidad=2
+      // Vue.set(this.productos[index], 'subtotal', val)
+      Vue.set(this.productos[index], 'cantidad', cantidad)
+      //this.getSubtotal(index)
+    },
+    
     getSubtotal(index) {
       
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
