@@ -379,23 +379,23 @@ export default {
       
       this.axios.get(this.API + 'empresa/config/1')
         .then( response => {
-          this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
+          this.sumaValorizado = response.data && response.data.CONFIG && (response.data.CONFIG.SUMA_VALORIZADO).toFixed(2);
         })
 
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1')
         .then( response => {
-          this.sumaValorizadoContado = (response.data[0].sumaValorizado);
+          this.sumaValorizadoContado = (response.data[0].sumaValorizado).toFixed(2);
         })
     },
     getSumaStock () {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
-          this.sumaStock = response.data[0].sumaStock
+          this.sumaStock = (response.data[0].sumaStock).toFixed(2)
         })
     },
     getStock (idProducto) {
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
+      return this.itemsStock[index] && (this.itemsStock[index].stock).toFixed(2)
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
