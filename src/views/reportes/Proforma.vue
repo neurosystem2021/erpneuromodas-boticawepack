@@ -1,7 +1,7 @@
 <template>
 	<div id="invoice-container">
 		<header class="clearfix">
-			<div id="logo">
+			<div id="logo" style="width: 160px;">
 				<img src="/resources/images/logo-banner.jpg">
 			</div>
 			<div id="company">
