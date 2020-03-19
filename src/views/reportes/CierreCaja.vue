@@ -330,6 +330,7 @@
       <br>
 
       <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="warning" class="text-center" show><b>TOTAL KG: {{ totalKg }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -383,6 +384,17 @@ export default {
   computed: {
     getFechaCierre () {
       //return this.$route.params.id ? 
+    },
+    totalKg() {
+      let total = 0
+      this.ventas.forEach(venta => {
+        venta.productos.forEach(producto => {
+          if (producto.CodigoMedicion === 'KGM') {
+            total += parseFloat(producto.Cantidad)
+          }
+        })
+      })
+      return total.toFixed(2)
     },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
