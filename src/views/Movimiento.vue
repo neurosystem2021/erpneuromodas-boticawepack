@@ -28,6 +28,8 @@
                     <b-form-group>
                       <label>Proveedor:</label>
                       <b-input-group>
+                        <proveedores-form txtButton="Editar" v-if="movimiento.proveedor.IdProveedor" idModal="editProveedor" @onAddProveedor="setProveedor" :editProveedor="movimiento.proveedor"></proveedores-form>
+
                         <autocomplete
                           required="required"
                           ref="inputProveedor"
@@ -43,7 +45,7 @@
 
                         <b-input-group-append>
                           <!--<proveedores-tabla></proveedores-tabla>-->
-                          <proveedores-form :ruc="newRuc"></proveedores-form>
+                          <proveedores-form :ruc="newRuc"  @onAddProveedor="setProveedor" ></proveedores-form>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
@@ -325,6 +327,7 @@ return false
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
+      this.$refs.inputProveedor.setValue(obj.Ruc + ' - ' + obj.Proveedor)
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
