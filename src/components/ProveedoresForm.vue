@@ -1,8 +1,8 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-modal id="modal1" title="Nuevo Proveedor" size="lg" ref="proveedorForm" v-model="show" @shown="shownProveedorForm">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Proveedor" size="lg" ref="proveedorForm" v-model="show" @shown="shownProveedorForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -56,12 +56,18 @@ export default {
       }
     }
   },
-  props: ['newRuc'],
+  props: ['idModal', 'newRuc', 'editProveedor', 'txtButton'],
   methods: {
     shownProveedorForm () {
-      this.proveedor.Ruc = this.$parent.$parent.newRuc
-      this.proveedor.Direccion = ''
-      this.proveedor.Proveedor = ''
+      // this.proveedor.Ruc = this.$parent.$parent.newRuc
+      // this.proveedor.Direccion = ''
+      // this.proveedor.Proveedor = ''
+
+      if (this.editProveedor && this.editProveedor.IdProveedor) {
+        this.proveedor = this.editProveedor
+      } else {
+        this.proveedor.Ruc = this.$parent.$parent.newRuc
+      }
     },
     consultarRUC() {
       this.axios.get(this.API + 'consultarRUC', {
@@ -83,8 +89,10 @@ export default {
     guardarProveedor() {
       this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
+        this.$emit('onAddProveedor', response.data)
         this.$toasted.show('Proveedor guardado correctamente')
         this.$refs.proveedorForm.hide()
+        this.proveedor = {}
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')

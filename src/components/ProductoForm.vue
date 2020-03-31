@@ -177,6 +177,14 @@
               </b-form-text>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Convenio:</label>
+            <b-form-input v-model="producto.precioConvenio"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
       </b-row>
 
       <hr />
@@ -311,6 +319,7 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.precioConvenio = newVal.precioConvenio
 
       } else {
 
@@ -420,6 +429,7 @@ export default {
         StockMinimo: 0,
         PrecioContado: '',
         PrecioPorMayor: 0,
+        precioConvenio: 0,
         StockPorMayor: 0,
         // Botapie: '',
         // Genero: '',

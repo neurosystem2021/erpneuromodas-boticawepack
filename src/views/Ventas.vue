@@ -132,6 +132,9 @@
                         <b-form-text v-if="descuentoPuntos.ValorPunto">
                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                         </b-form-text>
+                        <b-form-text v-if="venta.cliente.EsVIP">
+                           Cliente VIP con Precio Convenio
+                        </b-form-text>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
@@ -359,7 +362,8 @@ export default {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock'
+            obtenerStok: 'obtenerStock',
+            actualizarPrecioConvenio: 'actualizarPrecioConvenio'
         }),
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
@@ -503,6 +507,8 @@ export default {
                     console.log(error)
                 })
             }
+            this.actualizarPrecioConvenio(obj)
+             this.$refs.carrito.cliente = obj;
         },
         onSetProducto (obj) {
             obj.cantidad = 1

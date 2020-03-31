@@ -190,7 +190,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      cliente: {},
     }
   },
   watch: {
@@ -357,7 +358,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      }, false, false, this.cliente.EsVIP])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
