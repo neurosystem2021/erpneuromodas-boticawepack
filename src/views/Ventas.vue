@@ -381,7 +381,7 @@ export default {
                     { key: 'Producto' }, 
                     // { key: 'ProductoMarca', label: 'Marca' },
                     // { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
-                    { key: 'ProductoMedicion', label: 'Med.' },
+                    // { key: 'ProductoMedicion', label: 'Med.' },
                     // { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
                     // { key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad' },
