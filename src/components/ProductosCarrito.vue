@@ -60,7 +60,7 @@
             style="width: 110px"
             min="0"
             step="0.00001"
-            :readonly="(idPerfil != 1) ? true : false"
+            :readonly="(idPerfil != 1) ? false : false"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
