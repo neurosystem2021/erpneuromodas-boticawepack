@@ -485,7 +485,10 @@ export default {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
           user: this.vendedor.Usuario,
-          idAlmacen: this.almacen.IdAlmacen
+          idAlmacen: this.almacen.IdAlmacen,
+          ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas: this.totalSalidas,
+          total: this.granTotal
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
