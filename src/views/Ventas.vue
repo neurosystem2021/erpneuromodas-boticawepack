@@ -657,16 +657,16 @@ export default {
             // sin stock
             let sinStock = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock)) {
                     sinStock += 1
                 }
             });
 
-            // if (sinStock >= 1) {
-            //     this.$toasted.error('No se puede vender un producto sin stock');
-            //     this.inProgress = false
-            //     return;
-            // }
+            if (sinStock >= 1) {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false            
+                return;
+            }
 
 
 
