@@ -85,6 +85,9 @@
 <script>
 import config from '@/store/config.js'
 export default {
+  mounted() {
+    this.getVendedor()
+  },
   data () {
     return {
       API: config.API,
@@ -117,6 +120,31 @@ export default {
       }).then((response) => {
         this.cierres = response.data
       })
+    },
+    getVendedor () {
+      let usuario = sessionStorage.getItem('User')
+      this.axios.get(this.API + 'usuarios/' + usuario)
+        .then((response) => {
+            // this.setVendedor(response.data)
+            // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            // this.$refs.inputVendedor.$refs.input.disabled = true
+            this.loadAlmacen(response.data.IdAlmacen)
+            // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+            // bloquear ambos inputs
+            this.$refs.inputAlmacen.$refs.input.disabled = true
+            // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+            //this.getNumeroVenta()
+        })
+        .catch((error) => {
+            console.log(error)
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+    },
+    loadAlmacen (id) {
+        this.axios.get(this.API + 'almacenes/id/' + id)
+        .then(res => {
+            this.setAlmacen(res.data)
+        })
     },
     setAlmacen (obj) {
       this.almacen = obj
