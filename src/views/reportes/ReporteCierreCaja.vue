@@ -131,7 +131,9 @@ export default {
             this.loadAlmacen(response.data.IdAlmacen)
             // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
             // bloquear ambos inputs
-            this.$refs.inputAlmacen.$refs.input.disabled = true
+            if (response.data.IdUsuarioPerfil !== 1) {
+              this.$refs.inputAlmacen.$refs.input.disabled = true
+            }
             // this.$refs.inputPuntoVenta.$refs.input.disabled = true
             //this.getNumeroVenta()
         })
