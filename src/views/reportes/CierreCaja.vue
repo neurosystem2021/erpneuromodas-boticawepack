@@ -293,7 +293,7 @@
               <tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.TipoCajaBanco + ' - ' + item.Concepto }}</td>
+                <td>{{ item.TipoCajaBanco + ' - ' + item.Cliente + ' - ' + item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
@@ -318,7 +318,7 @@
               <tr v-for="(item, index) in salidas" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.TipoCajaBanco + ' - ' + item.Concepto }}</td>
+                <td>{{ item.TipoCajaBanco + ' - ' + item.Proveedor + ' - ' + item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
