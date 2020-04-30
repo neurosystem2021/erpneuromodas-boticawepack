@@ -18,6 +18,8 @@ import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Comisionistas from '@/views/reportes/Comisionistas.vue'
+import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
+
 
 Vue.use(Router)
 
@@ -103,6 +105,11 @@ export default new Router({
       path: '/reportes/comisionistas',
       name: 'comisionistas',
       component: Comisionistas
-    }
+    },
+    {
+      path: '/reportes/deudaclientes',
+      name: 'DeudaClientes',
+      component: DeudaClientes
+    }, 
   ]
 })

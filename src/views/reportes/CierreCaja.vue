@@ -47,7 +47,7 @@
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
-              <td>Total Pago S/.</td>
+              <td>Ingreso Neto S/.</td>
               <td>{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
@@ -55,17 +55,21 @@
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
-              <td>Salida S/.</td>
-              <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
+              <td>Total Ventas S/.</td>
+              <td>{{ (this.totalVentasEfectivo ) | moneda }} </td>
             </tr>
             <tr>
-              <td>Credito S/.</td>
+              <td>Ventas Credito S/.</td>
               <td>{{ totalVentasCredito | moneda }} </td>
             </tr>
             <tr>
+              <td>Ventas Visa/Mastercard S/.</td>
+              <td>{{ totalVentasVisa + totalVentasMastercard | moneda }}</td>
+            </tr>
+            <!-- <tr>
               <td>Contado S/.</td>
               <td>{{ granTotalSinPagoCliente | moneda }} </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
         <table class="table b-table table-sm table-striped table-bordered">
@@ -74,20 +78,20 @@
               <td>Efectivo S/.</td>
               <td>{{ totalVentasEfectivo | moneda }} </td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Visa S/.</td>
               <td>{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
               <td>Mastercard S/.</td>
               <td>{{ totalVentasMastercard | moneda }} </td>
-            </tr>
+            </tr> -->
             <tr>
               <td>Ingresos S/.</td>
               <td>{{ totalIngresos | moneda }} </td>
             </tr>
              <tr>
-              <td>Salidas S/.</td>
+              <td>Egresos S/.</td>
               <td>{{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
@@ -289,7 +293,7 @@
               <tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
+                <td>{{ item.TipoCajaBanco + ' - ' + item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
@@ -314,7 +318,7 @@
               <tr v-for="(item, index) in salidas" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
+                <td>{{ item.TipoCajaBanco + ' - ' + item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
