@@ -85,9 +85,21 @@
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                 </b-form-group>
-                <div class="total-ventas">
-                  S/ {{ ventasAcumuladas || '0.00' }}
-                </div>
+                <b-row>
+                  <b-col md="6">
+                    Total Ventas 
+                    <div class="total-ventas">
+                       {{ ventasAcumuladasTodo || '0.00' }}
+                    </div>
+                  </b-col>
+                  <b-col md="6">
+                    Visa/Mastercard
+                    <div class="total-ventas">
+                       {{ ventasAcumuladasVisaMastercard || '0.00' }}
+                    </div>
+                  </b-col>
+                </b-row>
+                  
               </b-col>
             </b-row>
           </b-col>
@@ -97,9 +109,9 @@
                 <b-form-group label="Limpiar Filtros">
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
-                <b-form-group label="Mostrar">
+                <!-- <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group>
+                </b-form-group> -->
                 <br />
               </b-col>
             </b-row>
@@ -212,7 +224,8 @@ export default {
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Totalcredito', label: 'Total Credito', sortable: false, variant: 'success', class:'text-center'},
-            { key: 'Totalcontado', label: 'Total Contado', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'TotalVisaMastercard', label: 'Total (Visa/Mastercard)', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Totalcontado', label: 'Total', sortable: false, variant: 'success', class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
@@ -220,6 +233,22 @@ export default {
     }
   },
   computed: {
+    ventasAcumuladasTodo() {
+      let total = 0
+      this.items.map(v => {
+        total += v.Total
+      })
+
+      return total;
+    },
+    ventasAcumuladasVisaMastercard() {
+      let total = 0
+      this.items.map(v => {
+        total += v.TotalVisaMastercard
+      })
+
+      return total;
+    }
   },
   methods: {
     setTipoVenta (obj) {
@@ -293,7 +322,8 @@ export default {
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
-      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      // let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
 
