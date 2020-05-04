@@ -37,10 +37,10 @@
             <b-row>
             <b-col md="8">
 
-              <b-form-group>
+              <!-- <b-form-group>
                   <label>Mostrar:</label>
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
+              </b-form-group> -->
             </b-col>
             <b-col md="4">
              <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
@@ -114,7 +114,7 @@ export default {
       perPage: 10,
       currentPage: 1,
       almacen: {
-        IdAlmacen: 1
+        IdAlmacen: 0
       }
     }
   },
@@ -137,7 +137,8 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      //  let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter )
 
       return promise.then((response) => {
         console.log(response)
@@ -160,6 +161,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+@media print {
+  .pagination {
+    display: none;
+  }
+}
 </style>

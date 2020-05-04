@@ -15,6 +15,7 @@ import ProductosSimilares from '@/views/ProductosSimilares.vue'
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
+import ReporteCierreCajaGeneral from '@/views/reportes/ReporteCierreCajaGeneral.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Comisionistas from '@/views/reportes/Comisionistas.vue'
@@ -75,6 +76,11 @@ export default new Router({
       path: '/reportes/reportecierrecaja',
       name: 'ReporteCierreCaja',
       component: ReporteCierreCaja
+    },
+    {
+      path: '/reportes/reportecierrecajageneral',
+      name: 'ReporteCierreCajaGeneral',
+      component: ReporteCierreCajaGeneral
     },
     {
       path: '/reportes/proforma/:id',
