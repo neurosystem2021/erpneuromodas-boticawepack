@@ -96,7 +96,7 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
-            step="0.01"
+            step="0.001"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -206,6 +206,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    setPrecioCosto: Boolean,
     isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -315,7 +316,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: this.setPrecioCosto }])
       }
     },
     /*alterarBuscadorProductos() {

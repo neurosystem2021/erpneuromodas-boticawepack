@@ -231,6 +231,16 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
+
+          <b-form-group>
+            <label>Controla Stock:</label>
+            <b-form-checkbox
+                     v-model="producto.ControlaStock"
+                     :value="1"
+                     :unchecked-value="0">
+              Seleccione esta opción si el producto controla stock
+            </b-form-checkbox>
+          </b-form-group>
           
         </b-col>
       </b-row>
@@ -377,6 +387,7 @@ export default {
         this.producto.IdProducto = newVal.IdProducto
 
         this.producto.EsPadre = newVal.EsPadre
+        this.producto.ControlaStock = newVal.ControlaStock
         Vue.nextTick(() => {
            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
         })
@@ -487,6 +498,7 @@ export default {
     initForm () {
       this.producto = {
         EsPadre: 0,
+        ControlaStock: 1,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,

@@ -189,7 +189,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito ref="carrito" :setPrecioCosto="true"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -261,7 +261,7 @@ return false
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
       return {
         EsCredito: 0,
-        alterarProductos: 1,
+        alterarProductos: 0,
         FechaVenCredito: '',
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,

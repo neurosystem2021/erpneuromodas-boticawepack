@@ -661,7 +661,8 @@ export default {
             // sin stock
             let sinStock = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                console.log(pro)
+                if(pro.stock <= 0 && pro.ControlaStock) {
                     sinStock += 1
                 }
             });
