@@ -90,7 +90,6 @@ import PagosComisionista from '@/components/PagosComisionista'
 export default {
   mounted() {
     this.axios.get(this.API + 'clientes/comisionistas/count?idAlmacen=' + this.almacen.IdAlmacen ).then((response) => {
-      console.log(response)
       this.totalRows = response.data.total
     })
   },
@@ -141,7 +140,6 @@ export default {
       let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter )
 
       return promise.then((response) => {
-        console.log(response)
         this.items = response.data
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false

@@ -92,7 +92,20 @@
                                             type="number"
                                             step="0.01"
                                             min="0"
-
+                                            @input="distribuirAplicar"
+                                            placeholder="0"></b-form-input>
+                                    </td>
+                                </tr>
+                                <tr style="background: #efefef" v-if="documentos.length">
+                                    <td colspan="6" class="text-center"><b>SUMATORIA</b></td>
+                                    <td><b>{{ totalDeuda }}</b></td>
+                                    <td>
+                                        <b-form-input
+                                            v-model="totalPagar"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            @input="distribuirAplicar"
                                             placeholder="0"></b-form-input>
                                     </td>
                                 </tr>
@@ -155,10 +168,34 @@ import config from '@/store/config.js'
                 cajaBanco: {},
                 vendedor: {},
                 show: false,
-                isLoading: false
+                isLoading: false,
+                totalPagar: 0
+            }
+        },
+        computed: {
+            totalDeuda() {
+                return this.documentos.reduce((a, b) => a + b.Saldo, 0)
             }
         },
         methods: {
+            distribuirAplicar() {
+                let val = this.totalPagar
+                if (val > 0) {
+                    this.documentos.forEach((element, index) => {
+                            if (element.Saldo >= val) {
+                                this.$set(this.documentos[index], 'aplicar', val)
+                                val = 0
+                            } else {
+                                this.$set(this.documentos[index], 'aplicar', element.Saldo)
+                                val = val - element.Saldo
+                            }
+                    });
+                } else {
+                    this.documentos.forEach((element, index) => {
+                        this.$set(this.documentos[index], 'aplicar', val)
+                    })
+                }
+            },
             initForm () {
                 this.vendedor = {}
                 this.documentos = []
