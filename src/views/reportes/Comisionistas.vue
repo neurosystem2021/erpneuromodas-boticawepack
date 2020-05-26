@@ -61,7 +61,17 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+            
+            <template slot="pagar" slot-scope="data">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Monto" style="width:30px">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-success" type="button" id="button-addon2">Pagar</button>
+                </div>
+              </div>
+            </template>
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -107,7 +117,8 @@ export default {
       fields: [
             { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
             { key: 'Cliente', label: 'Cliente', sortable: true },
-            { key: 'Comision', label: 'Total Comisión', sortable: true}
+            { key: 'Comision', label: 'Total Comisión', sortable: true},
+            { key: 'pagar', label: 'Pagar' }
       ],
       totalRows: 50,
       perPage: 10,
