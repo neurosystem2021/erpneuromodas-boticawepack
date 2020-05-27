@@ -34,18 +34,9 @@
                 </b-form-group>
           </b-col>
           <b-col md="4" class="my-1">
-            <b-row>
-            <b-col md="8">
-
-              <!-- <b-form-group>
-                  <label>Mostrar:</label>
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group> -->
-            </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
-            </b-row>
+              Total Comisión
+              <div class="total-comision">{{ totalComision }}</div>
+       
           </b-col>
 
           <b-table small
@@ -67,7 +58,7 @@
               <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="Monto" style="width:30px">
                 <div class="input-group-append">
-                  <button class="btn btn-outline-success" type="button" id="button-addon2">Pagar</button>
+                  <button class="btn btn-outline-success" type="button" id="button-addon2" @click="(e) => pagarAComisionista(e, data.item)">Pagar</button>
                 </div>
               </div>
             </template>
@@ -103,9 +94,20 @@ export default {
       this.totalRows = response.data.total
     })
   },
+  watch: {
+    items (items) {
+      let total = 0
+      items.map(v => {
+        total += v.Comision
+      })
+
+      this.totalComision = total
+    }
+  },
   data() {
     return {
       API: config.API,
+      totalComision: 0,
       clienteSelect: {},
       showPagos: false,
       pageOptions: [ 5, 10, 15, 50, 100 ],
@@ -129,6 +131,25 @@ export default {
     }
   },
   methods: {
+    pagarAComisionista (e, cliente) {
+      let r = confirm('Desea pagar al comisionista')
+      if (r) {
+        let importe = e.target.parentElement.previousElementSibling.value
+
+        this.axios.post(this.API + 'cliente/comisionistas/pagar', {
+          cliente: cliente,
+          importe: importe
+        })
+        .then((response) => {
+          this.$toasted.success('Pago a comisionista realizado')
+          Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
+    },
     rowDblClick (item) {
       this.clienteSelect = item
       this.showPagos = true;
@@ -175,5 +196,14 @@ export default {
   .pagination {
     display: none;
   }
+}
+
+.total-comision {
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+  background-color: #ff7675;
+  padding: 10px;
+  font-size: 20px;
 }
 </style>

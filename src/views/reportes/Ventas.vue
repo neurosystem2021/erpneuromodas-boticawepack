@@ -86,13 +86,19 @@
                     </autocomplete>
                 </b-form-group>
                 <b-row>
-                  <b-col md="6">
-                    Total Ventas 
+                  <b-col md="4">
+                    Total 
                     <div class="total-ventas">
                        {{ ventasAcumuladasTodo || '0.00' }}
                     </div>
                   </b-col>
-                  <b-col md="6">
+                  <b-col md="4">
+                    Credito
+                    <div class="total-ventas">
+                       {{ ventasAcumuladasCredito || '0.00' }}
+                    </div>
+                  </b-col>
+                  <b-col md="4">
                     Visa/Mastercard
                     <div class="total-ventas">
                        {{ ventasAcumuladasVisaMastercard || '0.00' }}
@@ -248,6 +254,16 @@ export default {
       })
 
       return total;
+    },
+    ventasAcumuladasCredito () {
+      let total = 0
+      this.items.map(v => {
+        if (v.EsCredito) {
+          total += v.Total
+        }
+      })
+
+      return total;
     }
   },
   methods: {
@@ -375,7 +391,7 @@ export default {
   color: #ffffff;
   background-color: #ff7675;
   padding: 10px;
-  font-size: 40px;
+  font-size: 20px;
 }
 #tabla-productos tr {
   cursor: pointer;
