@@ -3,7 +3,7 @@
     <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="4" class="my-1">
+          <b-col md="3" class="my-1">
             <b-form-group>
                   <label>Buscar:</label>
               
@@ -16,7 +16,8 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4">
+          
+          <b-col md="2">
             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -33,7 +34,17 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
+          
+          <b-col md="2">
+            <label>Fecha Inicio</label>
+            <input type="date" class="form-control" v-model="fechaInicio" />
+          </b-col>
+          <b-col md="2">
+            <label>Fecha Fin</label>
+            <input type="date" class="form-control" v-model="fechaFin" />
+          </b-col>
+
+          <b-col md="1" class="my-1">
             <b-row>
             <b-col md="8">
 
@@ -47,7 +58,14 @@
             </b-col>
             </b-row>
           </b-col>
-
+          <b-col md="1">
+            <label>Total</label><br />
+            <b>S/ {{ sumatoria }}</b>
+          </b-col>
+          <b-col md="1">
+            <label>Filtrar</label>
+            <button type="button" class="btn btn-success" @click="filtrar">Buscar</button>
+          </b-col>
           <b-table small
             ref="tablaProductos"
             :filter="filter"
@@ -88,9 +106,13 @@ export default {
       this.totalRows = response.data.total
     })
   },
+  watch: {
+  },
   data() {
     return {
       API: config.API,
+      fechaInicio: '',
+      fechaFin: '',
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: '',
       sortBy: 'IdDocVenta',
@@ -115,6 +137,16 @@ export default {
       }
     }
   },
+  computed: {
+    sumatoria() {
+      let total = 0;
+      this.items.map(i => {
+        total += i.Saldo
+      })
+
+      return total;
+    }
+  },
   methods: {
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
@@ -124,13 +156,24 @@ export default {
       this.almacen = obj
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
+    filtrar() {
+      this.$refs.tablaProductos.refresh()
+    },
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise;
+      if (this.fechaInicio && this.fechaFin) {
+        promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' 
+          + this.almacen.IdAlmacen + '&q=' 
+          + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage
+          + '&fechaInicio=' + this.fechaInicio + '&fechaFin=' + this.fechaFin )
+      } else {
+        promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      }
 
       return promise.then((response) => {
         console.log(response)
