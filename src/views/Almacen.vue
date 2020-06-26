@@ -7,13 +7,17 @@
               <b-col md="2" v-if="(idPerfil == 1 && almacen.IdAlmacen != 3 && almacen.IdAlmacen != 4)">
                 <div class="suma-stock text-center">
                   <b>Stock <br> Valorizado</b>
-                  <div> S/. {{ sumaValorizado | moneda }} </div>
+                  <br />
+                  <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button>
+                  <div v-if="verValorizado"> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
               <b-col md="2" v-if="(idPerfil == 1)">
                 <div class="suma-stock text-center">
                   <b>Stock Valorizado<br> Sin Utilidad</b>
-                  <div> S/. {{ sumaValorizadoSin | moneda }} </div>
+                  <br />
+                  <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button>
+                  <div v-if="verValorizado"> S/. {{ sumaValorizadoSin | moneda }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -309,7 +313,8 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      verValorizado: false
     }
   },
   watch: {
@@ -362,6 +367,19 @@ export default {
     }
   },
   methods: {
+    clickVerValorizado() {
+      let pass = window.prompt('Escriba su contraseña')
+      if (pass) {
+        this.axios.post(this.API + 'login', {
+          user: sessionStorage.getItem('User'),
+          password: pass
+        }).then(r => {
+          if (r.data) {
+            this.verValorizado = true;
+          }
+        })
+      }
+    },
     getSumaValorizado () {
       this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
