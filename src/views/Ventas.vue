@@ -21,7 +21,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
+            <b-form @submit="guardarVenta" @keydown.enter="preventDefault">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -335,6 +335,7 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
+                    { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
@@ -367,6 +368,11 @@ export default {
             obtenerStok: 'obtenerStock',
             actualizarPrecioConvenio: 'actualizarPrecioConvenio'
         }),
+        preventDefault(evt) {
+            if(evt.target.nodeName != 'TEXTAREA') {
+                evt.preventDefault()  
+            }
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
