@@ -170,6 +170,7 @@
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
+                                required="required"
                                 :url="API + 'comisionistas'"
                                 anchor="ClienteDniRuc"
                                 label="writer"
