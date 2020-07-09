@@ -293,7 +293,7 @@
               <tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.TipoCajaBanco + ' - ' + item.Cliente + ' - ' + item.Concepto }}</td>
+                <td>{{ item.TipoCajaBanco + ' - ' + (item.Cliente || '') + ' - ' + item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
@@ -499,7 +499,7 @@ export default {
           total: this.granTotal
         }).then(res => {
           this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
+          this.$toasted.success('¡Caja cerrada! Se ha aperturado un ingreso por el monto total.')
         })
       }
     },
