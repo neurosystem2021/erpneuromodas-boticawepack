@@ -191,6 +191,14 @@ export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
+  created() {
+    document.addEventListener('keyup', (evt) => {
+        if (evt.keyCode === 27) {
+          var lista = this.$refs.autocompleteProducto.$el.children[1]
+          lista.style.display = "none"
+        }
+    });
+  },
   data () {
     return {
       API: config.API,
@@ -355,7 +363,14 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      this.$refs.autocompleteProducto.setValue('')
+      this.$nextTick(() => {
+        var lista = this.$refs.autocompleteProducto.$el.children[1]
+        lista.style.display = "block"
+      })
+      
+      // this.$refs.autocompleteProducto.type = this.$refs.autocompleteProducto.$el.children[0].value
+      this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
+      // this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
