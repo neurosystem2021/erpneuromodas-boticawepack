@@ -101,11 +101,25 @@ export default {
     }
   },
   computed: {
+    // totalGeneral() {
+    //   let total = 0;
+    //   this.cierres.map(cierre => {
+    //     total += cierre.Total
+    //   })
+    //   return total
+    // }
     totalGeneral() {
       let total = 0;
-      this.cierres.map(cierre => {
-        total += cierre.Total
-      })
+      
+      for (var i = 0; i < this.cierres.length; i++) {
+        if (!this.cierres[i].Ingresos && !this.cierres[i].Salidas) {
+          continue;
+        } else {
+          total = this.cierres[i].Total
+          break;
+        }
+      }
+
       return total
     }
   },
