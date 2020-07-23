@@ -169,6 +169,7 @@
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
                       &nbsp;&nbsp;
+                      <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
 
@@ -360,6 +361,13 @@ export default {
         this.loading = false
       })
     },
+    regenerarXML (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+
+      this.emitirElectronico(doc, true);
+
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -411,10 +419,9 @@ export default {
         this.notaIdMotivo = null
         this.loading = false
       })
-
-
     },
-    async emitirElectronico (doc) {
+
+    async emitirElectronico (doc, generarXml) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -424,27 +431,51 @@ export default {
       let arr = []
 
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
-        for (let item of this.items) {
-          if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
-          console.log(JSON.stringify(item))
+
+        if (doc.idDocVenta && generarXml) {
+          if (doc.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
-                docVenta: item
+                generarXml: true,
+                docVenta: doc
               }).then((response) => {
                 console.log(response)
                 if(response.data.Estado == 1) {
-                  this.$toasted.error(response.data.msj_sunat)                  
+                  this.$toasted.error('')                  
                 } else {
-                  this.$toasted.success(response.data.msj_sunat)
+                  this.$toasted.success('XML Generado')
                   // ocultar el documento emitido
-                  Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                  // Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
                   // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
                   // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
                 }
-                Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+                // Vue.set(this.itemsStatus, item.idDocVenta, response.data)
 
               }))
           }
+        } else {
+          for (let item of this.items) {
+            if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
+            console.log(JSON.stringify(item))
+                arr.push(await this.axios.post(this.API + 'emitirelectronico', {
+                  docVenta: item
+                }).then((response) => {
+                  console.log(response)
+                  if(response.data.Estado == 1) {
+                    this.$toasted.error(response.data.msj_sunat)                  
+                  } else {
+                    this.$toasted.success(response.data.msj_sunat)
+                    // ocultar el documento emitido
+                    Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                    // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                    // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+                  }
+                  Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
+                }))
+            }
+          }
         }
+
         Promise.all(arr).then(values => {
 
           this.loading = false
