@@ -82,9 +82,9 @@ export default {
       fields: [
             { key: 'CodigoBarra', label: 'Codigo', sortable: true },
             { key: 'Producto', sortable: true },
-            { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'ProductoCategoria', label: 'Tipo Producto', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo / Color', sortable: true },
+            { key: 'ProductoModelo', label: 'Presentación', sortable: true },
             { key: 'ProductoMedicion', label: 'Medicion', sortable: true }
       ],
       totalRows: 50,

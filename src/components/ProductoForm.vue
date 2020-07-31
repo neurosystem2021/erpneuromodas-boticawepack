@@ -20,7 +20,7 @@
               </b-form-text>
           </b-form-group>
           <b-form-group>
-            <label>Categoría:</label>
+            <label>Tipo Producto:</label>
             <b-input-group>
               <autocomplete
                 required="required"
@@ -62,7 +62,7 @@
           </b-form-group>
           
           <b-form-group>
-            <label>Artículo:</label>
+            <label>Producto:</label>
             <b-form-input v-model="producto.Producto"
               ref="inputProducto"
               required="required"
@@ -74,7 +74,7 @@
 
          
           <b-form-group>
-            <label>Modelo / Color:</label>
+            <label>Presentacion:</label>
             <b-form-input v-model="producto.ProductoModelo"
               ref="inputModelo"
               type="text"
