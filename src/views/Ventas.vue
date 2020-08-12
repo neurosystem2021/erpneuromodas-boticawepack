@@ -437,7 +437,7 @@ export default {
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    PuntoVenta: 'LAGUNA'
                 },
                 vendedor: this.venta.vendedor || {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
