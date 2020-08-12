@@ -84,7 +84,8 @@ const actions = {
           let obj = response.data
 
           if(setPrecio) {
-            obj.cantidad = 1
+            obj.cantidad = cantidad || 1
+            
             if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
                 obj.precio = obj.PrecioPorMayor
             } else {
