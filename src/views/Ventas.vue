@@ -99,7 +99,6 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
-
                                     <b-input-group>
                                         <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -621,7 +620,7 @@ export default {
             this.getNumeroVenta()
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.$refs.inputPuntoVenta.setValue('LAGUNA')
             this.$refs.inputCliente.setValue('')
             // this.$refs.inputVendedor.setValue('')
         },
