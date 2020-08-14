@@ -69,7 +69,7 @@
             min="0"
             placeholder="Flete"></b-form-input>
         </template>-->
-        
+
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
@@ -213,10 +213,10 @@ export default {
       default () {
         return [
           { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
+          { key: 'Producto', label: 'Artículo' },
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' }, 
-          // { key: 'Color', label: 'Color' }, 
+          { key: 'ProductoModelo', label: 'Modelo/Color' },
+          // { key: 'Color', label: 'Color' },
           // { key: 'ProductoTalla', label: 'Talla' },
           // { key: 'Genero' },
           // { key: 'Botapie' },
@@ -258,7 +258,7 @@ export default {
       this.productos.map((value) => {
         sumatoria += parseFloat(value.total)
       })
-      
+
       this.actualizarTotal(sumatoria)
       return this.$options.filters.redondear(sumatoria)
     },
@@ -295,7 +295,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      
+
       if (String(this.loadCode).match(/[a-z]/i)) {
         let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
         if (idProducto) {
@@ -322,7 +322,7 @@ export default {
         }, { setPrecio: this.setPrecio,  setSuma: true }, true])
       }
 
-      
+
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
@@ -344,8 +344,8 @@ export default {
             }])
           } else {
             e.preventDefault()
-            this.handleKeyDown(e) 
-          }   
+            this.handleKeyDown(e)
+          }
         } else {
           this.handleKeyDown(e)
         }
@@ -355,7 +355,7 @@ export default {
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
-    },  
+    },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -374,7 +374,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / S/  ${data.PrecioContado}
       `
     },
     setNuevoPrecioContado (index) {
@@ -391,14 +391,14 @@ export default {
 
       let normalPrecio = this.$options.filters.redondear(precio)
       let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
+
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
-      
+
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
