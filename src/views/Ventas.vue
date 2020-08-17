@@ -170,7 +170,7 @@
                             :showButton="false"
                             :fields="carrito.fields"
                             :onSetProducto="onSetProducto">
-
+                           
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
@@ -333,8 +333,9 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    // { key: 'movimiento', label: 'Lote', variant: 'info', class: 'text-center' },
                     { key: 'Producto' },
-                    { key: 'ProductoModelo', label: 'Modelo' },
+                    { key: 'ProductoModelo', label: 'Presentación' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
