@@ -101,6 +101,17 @@
             <b-form-text>
             </b-form-text>
         </template>
+        
+        <template slot="movimiento" slot-scope="data">
+          <b-form-select v-model="hashMovimiento" :options="movimientosStock"></b-form-select>
+        </template>
+
+        <template slot="fechavencimiento" slot-scope="data">
+          <b-form-input
+            v-model="productos[data.index].FechaVen"
+            type="date"
+            ></b-form-input>
+        </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -190,6 +201,7 @@ export default {
       vuelto: 0,
       pagocon: 0,
       cliente: {},
+      movimientosStock:[]
     }
   },
   watch: {
@@ -231,6 +243,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta' },
           { key: 'total', label: 'Total', variant: 'danger' },
+          { key: 'fechavencimiento', label: 'Vencimiento' },
           { key: 'acciones', label: ''}
         ]
       },
@@ -295,6 +308,17 @@ export default {
     }),
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
+    },
+    loadMovimientosSock ($idProducto) {
+
+      this.axios.get(this.API + 'movimientosstock/' . $idProducto)
+        .then((response) => {
+          
+        })
+        .catch((error) => {
+          
+        })
+
     },
     loadBarcode (e) {
       e.preventDefault()
