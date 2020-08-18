@@ -103,7 +103,7 @@
         </template>
         
         <template slot="movimiento" slot-scope="data">
-          <b-form-select v-model="hashMovimiento" :options="movimientosStock"></b-form-select>
+          <b-form-select v-model="productos[data.index].hashMovimiento" :options="movimientoLotes"></b-form-select>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data">
@@ -201,7 +201,8 @@ export default {
       vuelto: 0,
       pagocon: 0,
       cliente: {},
-      movimientosStock:[]
+      movimientoLotes: [],
+      movimientoLotes2: [{}]
     }
   },
   watch: {
@@ -309,14 +310,14 @@ export default {
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
-    loadMovimientosSock ($idProducto) {
-
-      this.axios.get(this.API + 'movimientosstock/' . $idProducto)
+    loadMovimientoLotes ($idProducto) {
+      
+      this.axios.get(this.API + '/movimientolotes/' + $idProducto)
         .then((response) => {
-          
+          this.movimientoLotes = response.data
         })
         .catch((error) => {
-          
+          console.log(error)
         })
 
     },
@@ -380,6 +381,9 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        console.log(obj.IdProducto)
+        this.loadMovimientoLotes(obj.IdProducto)
+        // console.log(obj.IdProducto)
       }, false, false, this.cliente.EsVIP])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
