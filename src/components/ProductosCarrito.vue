@@ -106,7 +106,7 @@
           <b-form-select 
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <small>Stock: {{ getStock(productos[data.index].hashMovimiento, data.item.IdProducto) }}</small><br />
-          <small>Venci: {{ getFechaVen(productos[data.index].hashMovimiento, data.item.IdProducto) }}</small>
+          <div v-html="getFechaVen(productos[data.index].hashMovimiento, data.item.IdProducto)"></div>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data">
@@ -311,12 +311,33 @@ export default {
     }),
     getStock(hash, idProducto) {
       if  (hash) {
-        return this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        if (stock)
+          return stock
       }
     },
     getFechaVen(hash, idProducto) {
-      if  (hash) {
-        return this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+
+      if  (hash ) {
+
+        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+
+        let hoy      = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en5dias  = this.$moment().add(5, 'days').unix();
+
+        let style = 'bg-success'
+
+        if(fechaVenUnix && fechaVenUnix < hoy) {
+          style = 'bg-danger'
+        }
+
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+          style = 'bg-warning'
+        }
+
+        if (fechaVen)
+          return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
       }
     },
     asignarVuelto () {
@@ -326,15 +347,12 @@ export default {
       
       this.axios.get(this.API + '/movimientolotes/' + $idProducto)
         .then((response) => {
-          console.log(response.data);
           this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
             text : l.Serie + '-' + l.Numero,
             Stock : l.Stock,
             FechaVen: l.FechaVen
           }))
-          
-          console.log(this.movimientoLotes)
         })
         .catch((error) => {
           console.log(error)
@@ -401,7 +419,6 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        console.log(obj.IdProducto)
         this.loadMovimientoLotes(obj.IdProducto)
         // console.log(obj.IdProducto)
       }, false, false, this.cliente.EsVIP])
@@ -484,4 +501,15 @@ export default {
 </script>
 
 <style>
+small.venci.bg-success {
+  padding: 3px;
+  color: #fff;
+}
+small.venci.bg-danger {
+  padding: 3px;
+  color: #fff;
+}
+small.venci.bg-warning {
+  padding: 3px;
+}
 </style>
