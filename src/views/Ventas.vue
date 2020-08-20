@@ -333,7 +333,7 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    // { key: 'movimiento', label: 'Lote', variant: 'info', class: 'text-center' },
+                    { key: 'movimiento', label: 'Lote', variant: 'info',  },
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Presentación' },
                     { key: 'ProductoMarca', label: 'Marca' },
