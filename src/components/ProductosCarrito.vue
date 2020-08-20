@@ -103,7 +103,10 @@
         </template>
         
         <template slot="movimiento" slot-scope="data">
-          <b-form-select v-model="productos[data.index].hashMovimiento" :options="movimientoLotes"></b-form-select>
+          <b-form-select 
+            v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+          <small>Stock: {{ getStock(productos[data.index].hashMovimiento, data.item.IdProducto) }}</small><br />
+          <small>Venci: {{ getFechaVen(productos[data.index].hashMovimiento, data.item.IdProducto) }}</small>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data">
@@ -201,8 +204,7 @@ export default {
       vuelto: 0,
       pagocon: 0,
       cliente: {},
-      movimientoLotes: [],
-      movimientoLotes2: [{}]
+      movimientoLotes: {}
     }
   },
   watch: {
@@ -307,6 +309,16 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    getStock(hash, idProducto) {
+      if  (hash) {
+        return this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+      }
+    },
+    getFechaVen(hash, idProducto) {
+      if  (hash) {
+        return this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+      }
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -314,7 +326,15 @@ export default {
       
       this.axios.get(this.API + '/movimientolotes/' + $idProducto)
         .then((response) => {
-          this.movimientoLotes = response.data
+          console.log(response.data);
+          this.movimientoLotes[$idProducto] = response.data.map(l => ({
+            value: l.hashMovimiento,
+            text : l.Serie + '-' + l.Numero,
+            Stock : l.Stock,
+            FechaVen: l.FechaVen
+          }))
+          
+          console.log(this.movimientoLotes)
         })
         .catch((error) => {
           console.log(error)
