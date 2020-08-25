@@ -6,17 +6,23 @@
             <b-row>
               <b-col md="2">
                 <div class="suma-stock text-center">
-                  <b>Stock Valorizado</b>
+                  <b>Stock Valorizado <br />Precio Costo</b>
                   <div> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
+              <b-col md="2">
+                <div class="suma-stock text-center">
+                  <b>Stock Valorizado <br />Precio Venta</b>
+                  <div> S/. {{ sumaValorizadoContado | moneda }} </div>
+                </div>
+              </b-col>  
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock General</b>
                   <div> {{ sumaStock }} </div>
                 </div>
               </b-col>
-              <b-col md="2">
+              <b-col md="1">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -60,7 +66,7 @@
                   </b-form-checkbox>
                 </b-form-group>
               </b-col>-->
-              <b-col md="2">
+              <b-col md="1">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
@@ -249,7 +255,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="hrefExcel" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -271,12 +277,16 @@ export default {
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
+
+    this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen
   },
   data() {
     return {
       API: config.API,
+      hrefExcel: '',
       sumaStock: '...',
       sumaValorizado: '...',
+      sumaValorizadoContado: '...',
       APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
@@ -362,9 +372,20 @@ export default {
   },
   methods: {
     getSumaValorizado () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
+    
+      /*this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
+        })*/
+      
+      this.axios.get(this.API + 'empresa/config/1')
+        .then( response => {
+          this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
+        })
+
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1')
+        .then( response => {
+          this.sumaValorizadoContado = (response.data[0].sumaValorizado);
         })
     },
     getSumaStock () {
@@ -419,9 +440,11 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
+      
+      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
+      console.log(this.hrefExcel);
 
       return promise.then((result) => {
         this.items = result.data
@@ -504,7 +527,7 @@ export default {
     color: #fff;
 }
 .suma-stock div {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: bold;
 }
 @media (min-width: 992px) {

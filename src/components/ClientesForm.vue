@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-form @submit="guardarCliente" ref="form">    
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -11,7 +11,7 @@
             <b-input-group>
               <b-form-input 
                 required="required"
-                v-model="cliente.DniRuc"></b-form-input>
+                v-model="cliente.DniRuc" type="number"></b-form-input>
               <b-input-group-append>
                 <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
               </b-input-group-append>
@@ -25,9 +25,21 @@
                 type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
-            <label>Dirección:</label>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -49,6 +61,24 @@
                 type="email"></b-form-input>
             </b-form-group>
           </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-form-checkbox id="checkbox1"
+                     v-model="cliente.EsVIP"
+                     :value="1"
+                     :unchecked-value="0">
+            Marcar si es un cliente VIP
+          </b-form-checkbox>
+        </b-col>
+        <b-col>
+          <b-form-group>
+            <label>Fecha Nacimiento:</label>
+            <b-form-input 
+              v-model="cliente.FechaNacimiento"
+              type="date"></b-form-input>
+          </b-form-group>
+        </b-col>
       </b-row>
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
@@ -73,22 +103,45 @@ export default {
         Cliente: '',
         DniRuc: '',
         Direccion: '',
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
-        Email: ''
+        Email: '',
+        FechaNacimiento: '',
       }
     }
   },
-  props: ['newDniRuc'],
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  /*watch: {
+    show (val) {
+      console.log(this.editCliente)
+      if (this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      }
+    }
+  },*/
   methods: {
     shownClienteForm () {
-      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
+*/
+      if (this.editCliente && this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      } else {
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+      }
     },
     consultarDNIRUC () {
-        let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+      
+      let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
         this.axios.get(this.API + 'consultarRUC', {
             params: {
@@ -118,13 +171,26 @@ export default {
         })
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
+
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+
+      var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
+      if (!esDocumento) {
+          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.cliente = {}
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
@@ -133,6 +199,10 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
