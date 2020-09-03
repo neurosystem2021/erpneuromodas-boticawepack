@@ -237,9 +237,9 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
-      }
+      // if (this.idAlmacen) {
+      //   return this.API + 'productos/stock/' + this.idAlmacen
+      // }
       return this.API + 'productos'
     },
     sumatoriaSubTotal () {
@@ -398,7 +398,7 @@ export default {
 
         return `
         <div class="${style}">
-          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
+          <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
