@@ -22,6 +22,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -360,7 +361,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
       `
     },
     setNuevoPrecioContado (index) {
