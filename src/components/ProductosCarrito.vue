@@ -32,7 +32,7 @@
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)
