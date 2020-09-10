@@ -208,7 +208,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="12">
-              <b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>
+              <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
@@ -497,7 +497,7 @@ export default {
         })
       }*/
     },
-    async emitirElectronicoResumen (doc) {
+    /*async emitirElectronicoResumen (doc) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -518,7 +518,7 @@ export default {
           this.loading = false
         })
       }
-    },
+    },*/
     eliminarElectronico (venta) {
       let r = confirm('�Desea Anular la venta?')
       if (r == true) {
