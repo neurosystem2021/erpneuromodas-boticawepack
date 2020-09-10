@@ -156,6 +156,7 @@
                   </table>
 
                       <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                      <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
                     </b-row>
                   </b-card>
                 </template>
@@ -205,7 +206,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="12">
-              <b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>
+              <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
         </b-row>
@@ -457,7 +458,7 @@ export default {
         })
       }*/
     },
-    async emitirElectronicoResumen (doc) {
+    /*async emitirElectronicoResumen (doc) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -478,7 +479,7 @@ export default {
           this.loading = false
         })
       }
-    },
+    },*/
     eliminarElectronico (venta) {
       let r = confirm('¿Desea Anular la venta?')
       if (r == true) {
@@ -612,6 +613,15 @@ console.log(url)
     moverAEmitidos (doc) {
       this.loading = true
       this.axios.post(this.API + 'moveraemitidos', {
+        idDocVenta: doc.idDocVenta
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
+    cambiarAAnonimo (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'cambiaraanonimo', {
         idDocVenta: doc.idDocVenta
       }).then( response => {
         this.$refs.tablaVentas.refresh()
