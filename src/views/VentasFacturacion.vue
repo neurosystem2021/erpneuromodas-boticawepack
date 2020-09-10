@@ -469,7 +469,7 @@ export default {
         })
       }*/
     },
-    async emitirElectronicoResumen (doc) {
+    /*async emitirElectronicoResumen (doc) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -490,7 +490,7 @@ export default {
           this.loading = false
         })
       }
-    },
+    },*/
     eliminarElectronico (venta) {
       let r = confirm('�Desea Anular la venta?')
       if (r == true) {
