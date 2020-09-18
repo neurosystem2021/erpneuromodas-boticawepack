@@ -422,7 +422,7 @@ export default {
 
 
     },*/
-    async emitirElectronico (doc) {
+    async emitirElectronico (doc, generarXml) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
