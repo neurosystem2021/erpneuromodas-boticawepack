@@ -168,9 +168,10 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                      
                       &nbsp;&nbsp;
-
+                      <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
+                      <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
+                      &nbsp;&nbsp;
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <form @submit.prevent="emitirNotaCredito(data.item)" >
@@ -348,6 +349,24 @@ export default {
           this.setAlmacen(res.data)
         })
     },
+     regenerarPDF (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+      this.axios.post(this.API + 'generarpdfelectronico', { 
+        docVenta: doc 
+      }).then(res => {
+        console.log(res)
+        this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
+        this.loading = false
+      })
+    },
+    regenerarXML (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+
+      this.emitirElectronico(doc, true);
+
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -412,6 +431,25 @@ export default {
       let arr = []
 
       if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
+        if (doc.idDocVenta && generarXml) {
+          arr.push(await this.axios.post(this.API + 'emitirelectronico', {
+            generarXml: true,
+            docVenta: doc
+          }).then((response) => {
+            console.log(response)
+            if(response.data.Estado == 1) {
+              this.$toasted.error('')                  
+            } else {
+              this.$toasted.success('XML Generado')
+              // ocultar el documento emitido
+              // Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+              // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+              // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+            }
+            // Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
+          }))
+        } else {
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
           console.log(JSON.stringify(item))
@@ -432,6 +470,7 @@ export default {
 
               }))
           }
+        }
         }
         Promise.all(arr).then(values => {
 
