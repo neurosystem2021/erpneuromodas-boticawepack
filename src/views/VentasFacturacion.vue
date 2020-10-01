@@ -647,7 +647,7 @@ console.log(url)
       let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
       console.log(fecha)
 
-      if (doc.CodSunat == '03'20393521091) {
+      if (doc.CodSunat == '03') {
         tipocomprobante = '06'
       }
       if (doc.CodSunat == '01') {
