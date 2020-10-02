@@ -660,6 +660,25 @@ export default {
                 return          
             }
 
+            // NO PERMITE CANTIDAD Y PRECIO EN CERO
+            let sinStock = 0
+            let totalCero = 0 
+            this.productos.forEach(pro => {
+                if(pro.stock <= 0) {
+                    sinStock += 1
+                }
+
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
+
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
+
             if (this.totalCart <= 0) {
                 this.$toasted.show('La venta en S/. 0.00 no está permitido')
                 this.inProgress = false            
