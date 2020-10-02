@@ -653,14 +653,24 @@ export default {
                 return
             }
 
-            // sin stock
+            // No se permite CANTIDAD Y PRECIO EN CERO
             let sinStock = 0
+            let totalCero = 0
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
                     sinStock += 1
                 }
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
             });
 
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
+            
             if (sinStock >= 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false
