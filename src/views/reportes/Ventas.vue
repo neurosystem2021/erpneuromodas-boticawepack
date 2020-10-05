@@ -166,6 +166,7 @@ export default {
     })
 
     this.getVentasAcumuladas()
+    this.loadClienteVarios()
   },
   data() {
     return {
@@ -221,6 +222,14 @@ export default {
       this.generateFilter('vendedor', obj.Usuario)
   
     },
+    loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
     getVentasAcumuladas() {
       if(this.filters.vendedor) {
         this.axios.get(this.API + 'ventas/usuario', {
