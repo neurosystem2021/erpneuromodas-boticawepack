@@ -660,13 +660,16 @@ console.log(url)
       })
     },
     cambiarAAnonimo (doc) {
-      this.loading = true
-      this.axios.post(this.API + 'cambiaraanonimo', {
-        idDocVenta: doc.idDocVenta
-      }).then( response => {
-        this.$refs.tablaVentas.refresh()
-        this.loading = false
-      })
+       let r = confirm('¿Desea Cambiar a Cliente Anónimo?')
+      if (r == true) {
+        this.loading = true
+        this.axios.post(this.API + 'cambiaraanonimo', {
+          idDocVenta: doc.idDocVenta
+        }).then( response => {
+          this.$refs.tablaVentas.refresh()
+          this.loading = false
+        })
+      }   
     },
     consultaElectronico (doc) {
       console.log(doc)
