@@ -667,7 +667,7 @@ console.log(url)
         }).then( response => {
           this.$refs.tablaVentas.refresh()
           this.loading = false
-        })
+        }) 
       }
     },
     consultaElectronico (doc) {
