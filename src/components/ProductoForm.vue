@@ -3,7 +3,12 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" 
+    no-close-on-backdrop
+    id="modalProducto" 
+    :title="title" 
+    size="lg" 
+    ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -154,6 +159,28 @@
         </b-col>
       </b-row>
 
+      <hr>
+      <b-row v-for="i in 5" :key="i.id">
+        <b-col md="6">
+          <b-form-group>
+            <label>Cantidad:</label>
+            <b-form-input
+              v-model="precios[i-1].cantidad"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio:</label>
+            <b-form-input 
+              v-model="precios[i-1].precio"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      
       <hr v-if="producto.IdProducto || producto.EsPadre" />
       <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
@@ -238,7 +265,14 @@ export default {
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
-      productosDet: []
+      productosDet: [],
+      precios: [
+        {cantidad: 0, precio: 0},
+        {cantidad: 0, precio: 0},
+        {cantidad: 0, precio: 0},
+        {cantidad: 0, precio: 0},
+        {cantidad: 0, precio: 0}
+      ]
     }
   },
   beforeMount () {
@@ -262,7 +296,6 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
-       
        // this.$refs.inputCategoria.setValue('')
         this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
        
@@ -302,15 +335,17 @@ export default {
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-        this.producto.PrecioPorMayor = newVal.PrecioPorMayor
-        this.producto.StockPorMayor = newVal.StockPorMayor
-        this.producto.StockMinimo = newVal.StockMinimo
-        this.producto.CodigoBarra = newVal.CodigoBarra
-        this.producto.ProductoModelo = newVal.ProductoModelo
-        this.producto.ProductoPresentacion = newVal.ProductoPresentacion
-        this.producto.PrecioCosto = newVal.PrecioCosto
-        this.producto.PrecioContado = newVal.PrecioContado
+        
+        this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
+        this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
+        this.producto.StockPorMayor         = newVal.StockPorMayor
+        this.producto.StockMinimo           = newVal.StockMinimo
+        this.producto.CodigoBarra           = newVal.CodigoBarra
+        this.producto.ProductoModelo        = newVal.ProductoModelo
+        this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
+        this.producto.PrecioCosto           = newVal.PrecioCosto
+        this.producto.PrecioContado         = newVal.PrecioContado
+        this.precios                        = JSON.parse(newVal.PreciosPorProducto)
 
       } else {
 
@@ -442,7 +477,10 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
-      this.axios.post(this.API + 'productos', this.producto)
+      this.axios.post(this.API + 'productos', {
+        ...this.producto, 
+        PreciosPorProducto: this.precios 
+      })
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)

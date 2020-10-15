@@ -23,6 +23,10 @@ const mutations = {
       }
     }
   },
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(index, 1, prod)
+  },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
@@ -108,6 +112,9 @@ const actions = {
         }
       })
     }
+  },
+  actualizarProducto ({ commit }, prod) {
+    commit('ACTUALIZAR_PRODUCTO', prod)
   },
   eliminarProducto ({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)
