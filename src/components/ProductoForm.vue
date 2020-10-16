@@ -9,6 +9,7 @@
           <b-form-group>
             <label>Código barra:</label>
             <b-form-input 
+              disabled
               ref="inputCodigoBarra"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
@@ -322,7 +323,7 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
 
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        // this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
