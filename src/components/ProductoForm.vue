@@ -376,7 +376,9 @@ export default {
       var precioContado = this.producto.PrecioContado
       var precioCosto = this.producto.PrecioCosto
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      var tot = ((precioContado - precioCosto) / precioCosto)*100;
+      this.producto.PorcentajeUtilidad = tot;
+      // this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
