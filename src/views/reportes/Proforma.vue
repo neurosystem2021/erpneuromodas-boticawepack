@@ -65,7 +65,7 @@
           </tr>
         </tfoot>
       </table>
-      <div id="thanks">¡Muchas Gracias!</div>
+      <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
