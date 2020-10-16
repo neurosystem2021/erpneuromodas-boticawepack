@@ -201,6 +201,13 @@
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
+
+                                                <b-form-checkbox 
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox>
                                             </td>
                                         </tr>
                                     </tbody>
