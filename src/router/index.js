@@ -18,6 +18,7 @@ import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import PorEntregar from '@/views/reportes/PorEntregar.vue'
 
 Vue.use(Router)
 
@@ -103,6 +104,11 @@ export default new Router({
       path: '/traslado',
       name: 'Traslado',
       component: Traslado
-     }
+    },
+    {
+      path: '/porentregar',
+      name: 'PorEntregar',
+      component: PorEntregar
+    }
   ]
 })
