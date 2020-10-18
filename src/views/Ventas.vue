@@ -317,6 +317,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -367,6 +368,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+            .then(res => {
+                if (res.data.IdCliente) {
+                    this.setCliente(res.data)
+                }
+            })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -384,7 +393,6 @@ export default {
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
-
             if (dni) {
                 this.setCliente(false, dni)
             }
@@ -480,6 +488,7 @@ export default {
         setVendedor (obj) {
             this.venta.vendedor = obj
         },
+        
         setCliente (obj, dni = false) {
             let params = {}
             if (dni) {
