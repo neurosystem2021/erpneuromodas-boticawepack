@@ -669,7 +669,7 @@ console.log(url)
           this.loading = false
         })
       }
-    },
+    }, 
     consultaElectronico (doc) {
       console.log(doc)
       let tipocomprobante = ''
