@@ -658,7 +658,7 @@ console.log(url)
         this.$refs.tablaVentas.refresh()
         this.loading = false
       })
-    },
+    }, 
     cambiarAAnonimo (doc) {
       let r = confirm('¿Desea Cambiar a Cliente Anónimo?')
       if (r == true) {
