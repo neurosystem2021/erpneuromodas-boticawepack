@@ -27,7 +27,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta">
+            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="5">
                         <b-row>
@@ -39,7 +39,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="TICKET"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -357,6 +357,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -408,6 +409,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         setDireccion(direccion) {
             if (direccion) {
                 this.$refs.inputCliente.$refs.input.disabled = true
@@ -444,7 +453,7 @@ export default {
             }
         },
         focusAutocomplete (ref) {
-            // this.$refs[ref].type = ""
+            //this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
         },
         initForm () {
@@ -457,9 +466,10 @@ export default {
                     IdCliente: 0
                 },
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'TICKET',
-                    LimitItems: 0
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
+                    LimitItems: 8,
+                    CodSunat: '03',
                 },
                 almacen: {
                     // IdAlmacen: 1
