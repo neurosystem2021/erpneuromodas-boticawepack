@@ -57,11 +57,11 @@
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" variant="info" @click="showPresentacion"><i class="fas fa-pencil-alt"></i></b-button>
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+          <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
           <b-form-input
             type="number"
             style="width: 75px"
@@ -87,7 +87,7 @@
                 return
               }
 
-              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === val )
+              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
               if(reg && reg.cantidad){
                 productos[data.index].precio = reg.precio
                 return
@@ -439,6 +439,8 @@ export default {
       }])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
+      obj.cantidadPres = obj.cantidad
+      this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.cant = prod.cantidad
@@ -455,14 +457,19 @@ export default {
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad)
       this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
+      this.$emit('onAddProducto', obj)
       }])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
     },
-    showPresentacion () {
-      this.$refs['modalCant'].show()
+    showPresentacion (obj) {
+      if (!obj.PreciosPorProducto !== '') {
+        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+        this.objProd = obj
+        this.$refs['modalCant'].show()
+        return
+      }
     },
     renderChild(data) {
       return `
