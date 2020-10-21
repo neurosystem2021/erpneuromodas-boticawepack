@@ -7,7 +7,9 @@
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
+				<div>SUCURSAL: JANCAO S/N CARRETERA TINGO MARIA HUANUCO. AMARILIS - HUANUCO - HUANUCO</div>
         <div>RUC: {{ empresa.RUC }}</div>
+        <div>CEL: 933071930</div>
 				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
 				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
 			</div>
