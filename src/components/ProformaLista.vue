@@ -82,9 +82,11 @@ import { mapActions } from 'vuex'
         methods: {
             ...mapActions({
                 add         : 'agregarProducto',
-                obtenerStok : 'obtenerStock'
+                obtenerStok : 'obtenerStock',
+                limpiarCarrito: 'limpiarCarrito'
             }),
             selectProformas (item) {
+                // console.log('adsasdasdasd');
                 this.axios.get(this.API + 'proformas/detalle', {
                     params: {
                         idProforma: item.IdProforma
@@ -100,6 +102,7 @@ import { mapActions } from 'vuex'
                     })
 
                     this.$emit('onSelectProforma', item.IdCliente)
+                    this.limpiarCarrito()
                 })
             },
             myProvider (ctx) {

@@ -71,7 +71,8 @@ import { mapActions } from 'vuex'
         methods: {
             ...mapActions({
                 add: 'agregarProducto',
-                obtenerStok: 'obtenerStock'
+                obtenerStok: 'obtenerStock',
+                limpiarCarrito: 'limpiarCarrito'
             }),
             cargarPreOrden () {
                 this.show = true
@@ -105,6 +106,7 @@ import { mapActions } from 'vuex'
                     })
 
                     this.$emit('onSelectPreOrden', item.IdCliente)
+                    this.limpiarCarrito()
                 })
                 //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
             },
