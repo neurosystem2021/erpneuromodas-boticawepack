@@ -597,7 +597,7 @@ export default {
     },
     actualizarTabla() {
       this.$refs.tablaVentas.refresh()
-    },
+    }, 
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
