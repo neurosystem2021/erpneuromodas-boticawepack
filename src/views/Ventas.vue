@@ -712,12 +712,23 @@ export default {
             }
 
             var sinStock = 0;
+            let totalCero = 0
             this.productos.map(pro => {
                 if (pro.stock <= 0 || pro.stock <= pro.cantidad) {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
             })
+            
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
+
             if (sinStock) {
                 this.inProgress = false
                 return;
@@ -746,7 +757,6 @@ export default {
                 this.inProgress = false
                 return
             }
-
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
