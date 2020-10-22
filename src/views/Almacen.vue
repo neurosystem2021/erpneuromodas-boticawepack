@@ -395,7 +395,7 @@ export default {
     },
     getStock (idProducto) {
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
+      return this.itemsStock[index] && (this.itemsStock[index].stock).toFixed(2)
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
