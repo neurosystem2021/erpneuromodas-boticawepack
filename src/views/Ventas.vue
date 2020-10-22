@@ -10,7 +10,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
@@ -204,6 +204,13 @@
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
+
+                                                <b-form-checkbox 
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -314,6 +321,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -364,6 +372,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+            .then(res => {
+                if (res.data.IdCliente) {
+                    this.setCliente(res.data)
+                }
+            })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -381,7 +397,6 @@ export default {
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
-
             if (dni) {
                 this.setCliente(false, dni)
             }
@@ -461,7 +476,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -477,6 +492,7 @@ export default {
         setVendedor (obj) {
             this.venta.vendedor = obj
         },
+        
         setCliente (obj, dni = false) {
             let params = {}
             if (dni) {
@@ -666,6 +682,25 @@ export default {
                 return 
             }
 
+            // NO PERMITE CANTIDAD Y PRECIOS EN CERO
+            let sinStock = 0
+            let totalCero = 0 
+            this.productos.forEach(pro => {
+                if(pro.stock <= 0) {
+                    sinStock += 1
+                }
+
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
+
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
+            
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0

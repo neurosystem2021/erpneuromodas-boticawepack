@@ -9,11 +9,10 @@
 
                 <b-row>
                  <b-col md="3">
-                    <b-form-group
-                      v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
-                      <label>Almacen Origen:</label>
+                    <b-form-group>
+                      <label>Almacen:</label>
                       <autocomplete
-                        ref="inputAlmacenOrigen"
+                        ref="inputAlmacen"
                         required="required"
                         initValue=""
                         :url="API + 'almacenes'"
@@ -21,7 +20,7 @@
                         label="writer"
                         placeholder=""
                         :on-select="setAlmacenOrigen"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
+                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
                     </b-form-group>
@@ -35,6 +34,7 @@
           <b-row>
             <b-col>
               <productos-carrito ref="carrito"
+                tipo="mov"
                 @onAddProducto="onAddProducto"
                 :showButton="false"
                 :showPagoCon="false"
@@ -70,9 +70,14 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+    this.loadFirstAlmacen(data => {
+      this.$refs.inputAlmacen.setValue(data.Almacen)
+      this.almacenOrigen = data
+    })
   },
   data () {
     return {
+      almacenOrigen: {},
       smsAdvertencia: '',
       inProgress: false,
       newRuc: '',
@@ -99,14 +104,14 @@ export default {
   computed: {
     ...mapState({
       proveedoresFiltrados: state => state.proveedoresFiltrados,
-      almacenes: state => state.almacenesFiltrados,
+      // almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
     })
   },
   methods: {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
-      buscarAlmacenes: 'buscarAlmacenes',
+      // buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito'
     }),
     loadFirstAlmacen (cb) {
@@ -181,41 +186,41 @@ export default {
     afe (e) {
       return false
     },
-    setTipoMovimiento (obj) {
-      if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: -1 }
-        // this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenDestino.setValue(data.Almacen)
-          this.movimiento.almacenDestino = data
-        })
-      }else if (obj.Tipo == 1) {
-        this.movimiento.almacenDestino = { IdAlmacen: -1 }
-        // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
-          this.movimiento.almacenOrigen = data
-        })
-      }else {
-        // this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
-          this.movimiento.almacenOrigen = data
+    // setTipoMovimiento (obj) {
+    //   if (obj.Tipo == 0) {
+    //     this.movimiento.almacenOrigen = { IdAlmacen: -1 }
+    //     // this.movimiento.almacenDestino = { IdAlmacen: 1 }
+    //     this.loadFirstAlmacen(data => {
+    //       this.$refs.inputAlmacenDestino.setValue(data.Almacen)
+    //       this.movimiento.almacenDestino = data
+    //     })
+    //   }else if (obj.Tipo == 1) {
+    //     this.movimiento.almacenDestino = { IdAlmacen: -1 }
+    //     // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+    //     this.loadFirstAlmacen(data => {
+    //       this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
+    //       this.movimiento.almacenOrigen = data
+    //     })
+    //   }else {
+    //     // this.movimiento.almacenDestino = { IdAlmacen: 1 }
+    //     // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+    //     this.loadFirstAlmacen(data => {
+    //       this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
+    //       this.movimiento.almacenOrigen = data
 
-          this.$refs.inputAlmacenDestino.setValue(data.Almacen)
-          this.movimiento.almacenDestino = data
-        })
-      }
-      this.movimiento.movimientoTipo = obj
+    //       this.$refs.inputAlmacenDestino.setValue(data.Almacen)
+    //       this.movimiento.almacenDestino = data
+    //     })
+    //   }
+    //   this.movimiento.movimientoTipo = obj
 
-      this.cargarNumero()
-    },
+    //   this.cargarNumero()
+    // },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
     },
     setAlmacenOrigen (obj) {
-      this.movimiento.almacenOrigen = obj
+      this.almacenOrigen = obj
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
@@ -228,9 +233,9 @@ export default {
     getProveedores (value) {
       this.buscarProveedores(value)
     },
-    getAlmacenes (value) {
-      this.buscarAlmacenes(value)
-    },
+    // getAlmacenes (value) {
+    //   this.buscarAlmacenes(value)
+    // },
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
@@ -256,7 +261,8 @@ export default {
 
       this.axios.post(this.API + 'traslado', {
         movimiento: this.movimiento,
-        productos: this.productos
+        productos: this.productos,
+        idAlmacen: this.almacenOrigen.IdAlmacen
       })
       .then((response) => {
         if (response.data.error) {

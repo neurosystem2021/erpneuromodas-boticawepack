@@ -284,7 +284,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        // this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
@@ -323,7 +323,7 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
 
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        // this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
@@ -376,7 +376,9 @@ export default {
       var precioContado = this.producto.PrecioContado
       var precioCosto = this.producto.PrecioCosto
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      var tot = ((precioContado - precioCosto) / precioCosto)*100;
+      this.producto.PorcentajeUtilidad = tot.toFixed(2);
+      // this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
