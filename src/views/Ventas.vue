@@ -581,7 +581,6 @@ export default {
         },
         onSetProducto (obj) {
             obj.cantidad = 1
-            console.log(obj)
             if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
                 obj.precio = obj.PrecioPorMayor
             } else {
@@ -714,7 +713,7 @@ export default {
 
             var sinStock = 0;
             this.productos.map(pro => {
-                if (pro.stock <= 0) {
+                if (pro.stock <= 0 || pro.stock <= pro.cantidad) {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
