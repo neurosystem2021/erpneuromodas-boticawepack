@@ -178,7 +178,7 @@
               </td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo }}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
