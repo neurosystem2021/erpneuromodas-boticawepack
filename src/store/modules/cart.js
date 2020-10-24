@@ -43,6 +43,10 @@ const mutations = {
       return prod
     })
   },
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(index, 1, prod)
+  },
   ACTUALIZAR_TOTAL (state, total) {
     state.totalCart = total
   },
@@ -122,6 +126,9 @@ const actions = {
   },
   aplicarDescuentoGeneral ({ commit }, descuento) {
     commit('APLICAR_DESCUENTO', descuento)
+  },
+  actualizarProducto ({ commit }, prod) {
+    commit('ACTUALIZAR_PRODUCTO', prod)
   },
   actualizarTotalCart ({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
