@@ -314,6 +314,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -334,6 +335,8 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'eventPres', label: '' },
+                    { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
@@ -361,6 +364,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -506,7 +517,13 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, cant) {
+            if (cant) {
+                obj.cantidad = cant
+                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+                obj.precio = preciosPorProducto.precio || 0
+                return obj
+            }
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             return obj
