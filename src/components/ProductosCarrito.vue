@@ -347,6 +347,18 @@ export default {
       
       this.axios.get(this.API + '/movimientolotes/' + $idProducto)
         .then((response) => {
+          let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+
+          // Cargar por defecto lote próximo a vencer.
+          let primeroVencer = response.data.reduce((a,b) => {
+            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+          })
+          
+          this.$nextTick(() => {
+
+            this.productos[indexProducto].hashMovimiento = primeroVencer.hashMovimiento;
+          })
+          
           this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
             text : l.Serie + '-' + l.Numero,
