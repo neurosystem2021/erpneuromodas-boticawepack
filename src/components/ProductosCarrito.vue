@@ -104,9 +104,10 @@
         
         <template slot="movimiento" slot-scope="data">
           <b-form-select 
+            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
-          <small>Stock: {{ getStock(productos[data.index].hashMovimiento, data.item.IdProducto) }}</small><br />
-          <div v-html="getFechaVen(productos[data.index].hashMovimiento, data.item.IdProducto)"></div>
+          <small>Stock: {{ productos[data.index].stockMovimiento }}</small><br />
+          <div v-html="productos[data.index].fechaVenMovimiento"></div>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data">
@@ -309,23 +310,27 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
-    getStock(hash, idProducto) {
+    changeMovimiento(hash, idProducto, index) {
       if  (hash) {
+        // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
-        if (stock)
-          return stock
-      }
-    },
-    getFechaVen(hash, idProducto) {
 
-      if  (hash ) {
+        if (stock) {
+          // this.productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', stock)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', 0)
+          })
+        }
 
+        // Fecha de vencimiento
         var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
-
         let hoy      = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
         let en5dias  = this.$moment().add(5, 'days').unix();
-
         let style = 'bg-success'
 
         if(fechaVenUnix && fechaVenUnix < hoy) {
@@ -336,10 +341,43 @@ export default {
           style = 'bg-warning'
         }
 
-        if (fechaVen)
-          return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+        if (fechaVen) {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small class='venci ${style}'>Venci: ${fechaVen}</small>`)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'fechaVenMovimiento', '')
+          })
+        }
+          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+
       }
     },
+    // getFechaVen(hash, idProducto) {
+
+    //   if  (hash ) {
+
+    //     var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+
+    //     let hoy      = this.$moment().unix();
+    //     let fechaVenUnix = this.$moment(fechaVen).unix();
+    //     let en5dias  = this.$moment().add(5, 'days').unix();
+
+    //     let style = 'bg-success'
+
+    //     if(fechaVenUnix && fechaVenUnix < hoy) {
+    //       style = 'bg-danger'
+    //     }
+
+    //     if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+    //       style = 'bg-warning'
+    //     }
+
+    //     if (fechaVen)
+    //       return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+    //   }
+    // },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -355,8 +393,8 @@ export default {
           })
           
           this.$nextTick(() => {
-
-            this.productos[indexProducto].hashMovimiento = primeroVencer.hashMovimiento;
+            Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+            this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
           })
           
           this.movimientoLotes[$idProducto] = response.data.map(l => ({
