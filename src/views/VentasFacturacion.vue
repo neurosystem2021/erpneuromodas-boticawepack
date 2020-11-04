@@ -687,8 +687,26 @@ console.log(url)
       }
 
       this.imgCaptcha = false
-      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20602905242&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
+      //window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20602905242&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
       
+      this.axios({
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'multipart/form-data'
+        },
+        method: 'POST',
+        url: 'http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm',
+        data: {
+          accion: 'CapturaCriterioValidez',
+          num_ruc: '20602905242',
+          tipocomprobante: tipocomprobante,
+          num_serie: doc.Serie,
+          num_comprob: doc.Numero,
+          fec_emision: encodeURI(fecha),
+          cantidad: doc.Total,
+          codigo: this.captcha
+        }
+      }).then(res=> console.log(res))
       /*this.$nextTick(() => {
         this.imgCaptcha = true
         this.captcha = ''
