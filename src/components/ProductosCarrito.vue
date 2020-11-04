@@ -63,6 +63,7 @@
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
           <b-form-input
+            v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
             step="0.001"
@@ -76,6 +77,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
             style="width: 75px"
             step="0.001"
@@ -443,6 +445,7 @@ export default {
       this.actualizarProd(obj)
     },
     setProductoCant (prod) {
+      this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
       this.$refs.autocompleteProducto.setValue('')
@@ -493,6 +496,7 @@ export default {
       
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      this.getSubtotal(index)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
     },
