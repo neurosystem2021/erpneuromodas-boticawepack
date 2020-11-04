@@ -185,7 +185,7 @@
           <b-form-group>
             <label>Cantidad:</label>
             <b-form-input
-              v-model="precios[i-1].cantidad"
+              v-model="producto.precios[i-1].cantidad"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -194,7 +194,7 @@
           <b-form-group>
             <label>Precio:</label>
             <b-form-input 
-              v-model="precios[i-1].precio"
+              v-model="producto.precios[i-1].precio"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -261,13 +261,6 @@ export default {
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
-      precios: [
-        {cantidad: 0, precio: 0},
-        {cantidad: 0, precio: 0},
-        {cantidad: 0, precio: 0},
-        {cantidad: 0, precio: 0},
-        {cantidad: 0, precio: 0}
-      ]
     }
   },
   beforeMount () {
@@ -340,7 +333,7 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
-        this.precios = JSON.parse(newVal.PreciosPorProducto)
+        this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
 
       } else {
 
@@ -460,7 +453,14 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
-        }
+        },
+        precios: [
+          {cantidad: 0, precio: 0},
+          {cantidad: 0, precio: 0},
+          {cantidad: 0, precio: 0},
+          {cantidad: 0, precio: 0},
+          {cantidad: 0, precio: 0}
+        ]
       }
     },
     guardarProducto(e) {
@@ -474,7 +474,7 @@ export default {
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
-        PreciosPorProducto: this.precios 
+        PreciosPorProducto: this.producto.precios 
       })
       .then((response) => {
         if (this.cbGuardar) {
