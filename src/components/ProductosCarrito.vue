@@ -427,6 +427,7 @@ export default {
       this.objProd = obj
     },
     setProductoUni (obj) {
+      this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
