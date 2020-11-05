@@ -271,6 +271,7 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
+        this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -333,7 +334,9 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
-        this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        if (newVal.PreciosPorProducto !== '') {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }
 
       } else {
 
