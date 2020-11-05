@@ -63,6 +63,7 @@
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
           <b-form-input
+            v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
             step="0.001"
@@ -76,6 +77,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
             style="width: 75px"
             step="0.001"
@@ -423,45 +425,47 @@ export default {
       this.objProd = obj
     },
     setProductoUni (obj) {
-        this.$refs.autocompleteProducto.setValue('')
-        //obj.FLETE = 0
-        obj.precio = 0
-        obj.cantidad = 0
-        //obj.IdLote = 0
-        //obj.TieneIgv = 0
-        obj.descuento = 0
-        obj.nuevoPrecioContado = 0
-        obj = this.onSetProducto(obj)
-        this.add([obj, () => {
-          this.$emit('onAddProducto', obj)
-        }])
-        // Vue.set(this.productos, obj.IdProducto, obj)
-        this.$refs['modalCant'].hide()
-        obj.cantidadPres = obj.cantidad
-        this.actualizarProd(obj)
-      },
-      setProductoCant (prod) {
-        this.cant = prod.cantidad
-        let obj = this.objProd
-        this.$refs.autocompleteProducto.setValue('')
-        //obj.FLETE = 0
-        // this.objProd.precio = 0
-        // this.objProd.cantidad = 0
-        obj.precio = 0
-        obj.cantidad = 0
-        //obj.IdLote = 0
-        //obj.TieneIgv = 0
-        obj.descuento = 0
-        obj.nuevoPrecioContado = 0
-        obj = this.onSetProducto(obj, prod.cantidad)
-        this.add([obj, () => {
+      this.objProd.cantxPrecio = 1
+      this.$refs.autocompleteProducto.setValue('')
+      //obj.FLETE = 0
+      obj.precio = 0
+      obj.cantidad = 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      obj.descuento = 0
+      obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj)
+      this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        }])
-        this.$refs['modalCant'].hide()
-        obj.cantidadPres = this.cant
-        this.actualizarProd(obj)
-      },
-      showPresentacion (obj) {
+      }])
+      // Vue.set(this.productos, obj.IdProducto, obj)
+      this.$refs['modalCant'].hide()
+      obj.cantidadPres = obj.cantidad
+      this.actualizarProd(obj)
+    },
+    setProductoCant (prod) {
+      this.objProd.cantxPrecio = 1
+      this.cant = prod.cantidad
+      let obj = this.objProd
+      this.$refs.autocompleteProducto.setValue('')
+      //obj.FLETE = 0
+      // this.objProd.precio = 0
+      // this.objProd.cantidad = 0
+      obj.precio = 0
+      obj.cantidad = 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      obj.descuento = 0
+      obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj, prod.cantidad)
+      this.add([obj, () => {
+        this.$emit('onAddProducto', obj)
+      }])
+      this.$refs['modalCant'].hide()
+      obj.cantidadPres = this.cant
+      this.actualizarProd(obj)
+    },
+    showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
@@ -491,6 +495,7 @@ export default {
       
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      this.getSubtotal(index)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
     },
