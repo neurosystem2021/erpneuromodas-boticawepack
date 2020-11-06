@@ -259,6 +259,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
 
     igvTotal: Boolean,
@@ -416,6 +417,10 @@ export default {
     setProducto (obj) {
       this.preciosProd = []
       this.objProd = {}
+
+      if (!this.isVentas) {
+        obj.PreciosPorProducto = '';
+      }
 
       if (!obj.PreciosPorProducto) {
         this.setProductoUni(obj)
