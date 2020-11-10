@@ -160,6 +160,9 @@
                   </b-card>
                 </template>
 
+                <template slot="Total" slot-scope="data">
+                  {{data.item.Total | redondear}}
+                </template>
                 <template slot="estado" slot-scope="data">
                   <div style="display:flex;">
                       <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
