@@ -95,6 +95,14 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
+              
+              <b-col md="3">
+                <b-form-group>
+                  <label>Código de barra:</label>
+                  <input class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value)"/>
+                </b-form-group>
+              </b-col>
+
               <b-col md="3">
                 <b-form-group>
                   <label>Producto:</label>

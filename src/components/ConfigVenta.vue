@@ -45,7 +45,7 @@
                             id="input-porcada"
                             type="number"
                             min="0"
-                            step="0.1"
+                            step="0.001"
                             placeholder=""></b-form-input>
                         </b-input-group>
                     </b-col>
