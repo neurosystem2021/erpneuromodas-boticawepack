@@ -108,7 +108,7 @@
 
                 <template slot="Entregar" slot-scope="data">
                   <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
-                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR2222</button>
+                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
                 </template>
 
               </b-table>
@@ -165,11 +165,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="en in porEntregar" :key="en.id">
+            <tr v-for="en in porEntregar" :key="en.id" :class="{'rowImprimir': en.th}">
               <td>{{ en.IdDocVentaDetEntrega }}</td>
               <td>{{ en.Producto }}</td>
               <td>{{ en.Fecha }}</td>
               <td>{{ en.Cantidad }}</td>
+              <td v-if="en.th">
+                <button class="btn btn-info" target="_blank" @click="imprimir(en)">IMPRIMIR</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -240,7 +243,9 @@ export default {
       currentPage: 1,
       modalShow: false,
       porEntregarDet: {},
-      porEntregar: {}
+      porEntregar: {},
+      idDocVen: '',
+      dVentDet: {}
     }
   },
   computed: {
@@ -259,6 +264,7 @@ export default {
         }
     },
     openEntregarDet (item) {
+      this.idDocVen = item.idDocVenta
       this.axios.get(this.API + 'ventas/detalle/entregar', {
         params: {
           idDocVenta: item.idDocVenta
@@ -278,16 +284,36 @@ export default {
           idDocVenta: item.idDocVenta
         }
       }).then((response) => {
-        this.porEntregar = response.data
+        var lista = []
+        for (let i = 0; i < response.data.length; i++) {
+          
+          if ((response.data[i-1] && (response.data[i-1].Fecha !== response.data[i].Fecha)) || i == 0) {
+            lista.push({
+              Fecha : response.data[i].Fecha,
+              th    : true,
+            })
+          } 
+
+          lista.push(response.data[i])
+        }
+
+        this.porEntregar = lista
       })
       
+    },
+    imprimir (dEnt) {
+      window.open("/imprimir/index.php?IdDocVent=" + this.idDocVen + "&fecha=%27"+ dEnt.Fecha + "%27","_blank");
     },
     saveEntrega () {
       this.axios.post(this.API + 'entregar', {
         productos: this.porEntregarDet
       })
       .then((response) => {
-
+        response.data.productoEntregado.forEach(element => {
+          if (element.cantEntregar) {
+            window.open("/imprimir/index.php?IdDocVent=" + element.IdDocVenta + "&fecha=%27"+ response.data.Fecha + "%27","_blank");
+          }
+        });
       })
 
     },
@@ -331,6 +357,7 @@ export default {
     //   Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     // },
     rowClick (item) {
+      this.dVentDet = item
       this.ventaSelect = item
       this.showKardex = true
 
@@ -429,5 +456,8 @@ console.log(url)
     .modal-xl .modal-dialog {
         max-width: 1200px;
     }
+}
+.rowImprimir {
+  background: #E3E3E3;
 }
 </style>
