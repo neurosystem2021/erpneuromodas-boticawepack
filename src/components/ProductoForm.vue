@@ -148,6 +148,7 @@
             <b-form-input
               v-model="producto.PrecioCosto"
               type="number"
+              step="0.01"
               ></b-form-input>
           </b-form-group>
         </b-col>
