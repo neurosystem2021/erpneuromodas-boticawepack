@@ -103,9 +103,11 @@ export default {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
+            if (response.data.IdUsuarioPerfil != 1) {
+              this.$refs.inputVendedor.$refs.input.disabled = true
+            }
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            this.$refs.inputVendedor.$refs.input.disabled = true
             this.loadAlmacen(response.data.IdAlmacen)
             this.$refs.inputAlmacen.$refs.input.disabled = true
         })
