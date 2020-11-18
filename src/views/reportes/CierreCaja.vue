@@ -2,8 +2,38 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <div>
-          <div class="float-right no-print">
+      <b-row  align-h="end" class=" no-print">
+        <label v-if="!this.$route.params.id">Almacen:</label>
+        <b-col cols="3" v-if="!this.$route.params.id">
+          <b-form-group size="sm">
+            <autocomplete
+                required="required"
+                ref="inputAlmacen"
+                :url="API + 'almacenes'"
+                anchor="Almacen"
+                label="writer"
+                :on-select="setAlmacen" 
+                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                :classes="{input: 'form-control'}">
+            </autocomplete>
+          </b-form-group>
+        </b-col>
+             <!-- <label v-if="!this.$route.params.id">Vendedor:</label>
+          <b-col cols="3" v-if="!this.$route.params.id">
+            <b-form-group size="sm">
+              <autocomplete
+                  required="required"
+                  ref="inputVendedor"
+                  :url="API + 'usuarios'"
+                  anchor="NombreUsuario"
+                  label="writer"
+                  :on-select="setVendedor" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+          </b-col>-->
+          <b-col cols="7">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
@@ -16,8 +46,8 @@
             <b-button-group size="sm">
               <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
             </b-button-group>
-          </div>
-      </div>
+          </b-col>
+      </b-row>
       <br class="no-print" /><br class="no-print" />
 
       <h2 class="text-center">Cierre de Caja</h2> 
@@ -28,11 +58,11 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasEfectivo" :key="index"  :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -70,13 +100,14 @@
                 <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
 
               </td>
+              <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear}}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3"></td>
+              <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
               <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
@@ -90,7 +121,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -134,7 +165,7 @@
               </td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa }}</td>
+              <td>S/. {{ item.Visa | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -154,7 +185,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -198,7 +229,7 @@
               </td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard }}</td>
+              <td>S/. {{ item.Mastercard | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -216,7 +247,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -287,7 +318,7 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
@@ -312,7 +343,7 @@
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
@@ -339,9 +370,15 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.loadData()
+    // this.loadData()
+    // if (this.$route.params.id) {
+    //   this.getCierre(this.$route.params.id)
+    // }
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
+      this.loadData()
+    } else {
+      this.getVendedor()
     }
   },
   data () {
@@ -354,31 +391,13 @@ export default {
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
         { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' }
+        { value: 2, text: 'Tarde' },
+        { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      itemsDetalle: []
+      vendedor: {},
+      almacen: {},
     }
-  },
-  watch: {
-    /*ventas (items) {
-      if (items.length){
-        this.axios.get(this.API + 'ventas/detalle', {
-            params: {
-              idDocVentas: items.map((item) => item.idDocVenta),
-            }
-          }).then((response) => {
-              this.itemsDetalle = response.data
-              this.ventas = this.ventas.map((item) => {
-                item.productos = this.getDetalles(item.idDocVenta)
-                return item
-              })
-          })
-          .catch((error) => {
-            console.log(error)
-          })
-      }
-    },*/
   },
   computed: {
     getFechaCierre () {
@@ -457,6 +476,35 @@ export default {
       //this.items[index].productos = detalles
       return detalles
     },
+    getVendedor () {
+      let usuario = sessionStorage.getItem('User')
+      this.axios.get(this.API + 'usuarios/' + usuario)
+      .then((response) => {
+          this.setVendedor(response.data)
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(response.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              if(response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+              }
+            })
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
+    setVendedor (obj) {
+        this.vendedor = obj
+        // this.loadData()
+    },
+    setAlmacen (obj) {
+      this.almacen = obj;
+      this.loadData()
+    },
     imprimir () {
       window.print();
     },
@@ -474,7 +522,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: sessionStorage.getItem("User")
+          user: sessionStorage.getItem("User"),
+          idAlmacen: this.almacen.IdAlmacen
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
@@ -482,7 +531,10 @@ export default {
         })
       }
     },
-
+    focusAutocomplete (ref) {
+        // this.$refs[ref].type = ""
+        this.$refs[ref].handleDoubleClick()
+    },
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
@@ -503,10 +555,19 @@ export default {
         })
     },
     getVentas () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+      
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.ventas = res.data
@@ -516,10 +577,19 @@ export default {
       })
     },
     getIngresos () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.ingresos = res.data
@@ -528,10 +598,19 @@ export default {
       })
     },
     getSalidas () {
+      let params = {
+        idCierre: this.$route.params.id
+      }
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario
+      }
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
+        params: params
       })
       .then(res => {
         this.salidas = res.data
