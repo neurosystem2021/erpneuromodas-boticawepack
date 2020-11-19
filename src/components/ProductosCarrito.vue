@@ -57,18 +57,18 @@
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
             step="0.001"
             min="0"
-            @input="(val) => changeCant(val, productos[data.index])"
+            @keyup="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -259,6 +259,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
 
     igvTotal: Boolean,
@@ -416,6 +417,10 @@ export default {
     setProducto (obj) {
       this.preciosProd = []
       this.objProd = {}
+
+      if (!this.isVentas) {
+        obj.PreciosPorProducto = '';
+      }
 
       if (!obj.PreciosPorProducto) {
         this.setProductoUni(obj)
