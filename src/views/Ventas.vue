@@ -166,6 +166,7 @@
                             ref="carrito"
                             :showButton="false"
                             :fields="carrito.fields"
+                            :isVentas="true"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">

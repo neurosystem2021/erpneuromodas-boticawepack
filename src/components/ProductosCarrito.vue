@@ -69,7 +69,7 @@
             style="width: 75px"
             step="0.001"
             min="0"
-            @input="(val) => changeCant(val, productos[data.index])"
+            @keyup="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -259,6 +259,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
 
     igvTotal: Boolean,
@@ -416,6 +417,10 @@ export default {
     setProducto (obj) {
       this.preciosProd = []
       this.objProd = {}
+
+      if (!this.isVentas) {
+        obj.PreciosPorProducto = '';
+      }
 
       if (!obj.PreciosPorProducto) {
         this.setProductoUni(obj)
