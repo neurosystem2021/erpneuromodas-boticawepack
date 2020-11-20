@@ -21,7 +21,8 @@
 									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 								</ul>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-									<li><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
+									<li><b>Inicio: {{ hab.FechaAlquiler }}</b></li>
+									<li><b>Fin: {{ hab.FechaAlquilerFin }}</b></li>
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
@@ -92,14 +93,14 @@
 										<label>Fecha Inicio:</label>
 										<b-input-group>
 											<b-form-input v-model="selectCliente.FechaAlquilerInicio"
-												type="date"
+												type="datetime-local"
 												placeholder="Fecha Inicio"></b-form-input>
 										</b-input-group>
 										<br>
 										<label>Fecha Fin:</label>
 										<b-input-group>
 											<b-form-input v-model="selectCliente.FechaAlquilerFin"
-												type="date"
+												type="datetime-local"
 												placeholder="Fecha Fin"></b-form-input>
 										</b-input-group>
 										<br>
@@ -118,6 +119,13 @@
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
 			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
 				<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+				<div class="text-center">Inicio: {{ selectProducto.FechaAlquiler }}</div>
+				<div class="text-center">Fin: {{ selectProducto.FechaAlquilerFin }} </div>
+				<div class="text-center">
+					Nueva Fecha Fin: 
+					<input class="form-control" style="width: 210px; display: inline" type="datetime-local" v-model="nuevaFechaFin" />
+					<button @click="guardarNuevaFechaFin" style="width: 100px" type="button" class="form-control btn btn-primary">Actualizar</button>
+				</div>
 				<br>
 				<br>
 				
@@ -145,7 +153,7 @@
       					</b-input-group>
 
 						<br />
-						<table class="table b-table table-sm">
+						<table class="table b-table table-sm table-hover" style="cursor: pointer;">
 					      <thead>
 					        <tr>
 					          <th>Fecha</th>
@@ -154,7 +162,7 @@
 					        </tr>
 					      </thead>
 					      <tbody>
-					      	<tr v-for="(ade, index) in adelantos" :key="index">
+					      	<tr v-for="(ade, index) in adelantos" :key="index" @click="() => openImprimir(ade)">
 					      		<td>{{ ade.FechaDoc }}</td>
                                 <td>{{ ade.Concepto.split(" - ").pop() }}</td>
 					      		<td>{{ ade.Importe }}</td>
@@ -205,7 +213,8 @@ export default {
 			vuelo: '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
-			adelantos: []
+			adelantos: [],
+			nuevaFechaFin: ''
 			// habitacionesPiso: []
 		}
 	},
@@ -220,6 +229,21 @@ export default {
 		}
 	},
 	methods: {
+		guardarNuevaFechaFin() {
+			this.axios.post(this.API + 'habitaciones/fecha', {
+				IdProducto: this.selectProducto.IdProducto,
+				fechaAlquilerFin: this.nuevaFechaFin
+			}).then(res => {
+				if (res.data.updated) {
+					this.selectProducto.FechaAlquilerFin = this.nuevaFechaFin.replace('T', ' ')
+					this.$toasted.success('Fecha fin actualizad')
+				}
+			
+			})
+		},
+		openImprimir(adelanto) {
+			window.open('/imprimir/index.php?IdCajaBanco=' + adelanto.IdCajaBanco, '_blank');
+		},
 		cargarAdelantos() {
 			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
 				IdPreOrden: this.selectProducto.IdPreOrden
@@ -240,7 +264,7 @@ export default {
 			if (r) {
 				this.axios.post(this.API + 'preorden/cajaybanco', {
 					producto: this.selectProducto,
-                    concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + this.selectProducto.AdelantoDesc,
+                    concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + (this.selectProducto.AdelantoDesc || ''),
 					IdPreOrden: this.selectProducto.IdPreOrden,
 					IdHabitacion: this.selectProducto.IdProducto,
 					Adelanto: this.selectProducto.Adelanto,

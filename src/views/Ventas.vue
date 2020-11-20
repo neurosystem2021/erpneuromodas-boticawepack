@@ -155,7 +155,8 @@
                             </autocomplete>
                         </b-form-group>
 
-                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }}</b-badge>
+                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
+                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ totalCart - adelanto }} </b-badge>
                     </b-col>
                 </b-row>
                 <b-row>

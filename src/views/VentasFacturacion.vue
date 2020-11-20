@@ -168,7 +168,6 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                      
                       &nbsp;&nbsp;
                       <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
