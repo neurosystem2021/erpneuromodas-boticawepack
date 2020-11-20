@@ -68,7 +68,7 @@
             style="width: 75px"
             step="0.001"
             min="0"
-            @keyup="(val) => changeCant(val, productos[data.index])"
+            @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -357,11 +357,13 @@ export default {
       actualizarTotal     : 'actualizarTotalCart'
     }),
     changeCant (val, prod) {
-      if (val !== '') {
+      if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
-      this.actualizarProd(prod)
+      this.$nextTick(() => {
+        this.actualizarProd(prod)
+      })
     },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
