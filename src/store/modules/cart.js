@@ -56,6 +56,10 @@ const mutations = {
   ACTUALIZAR_TOTAL (state, total) {
     state.totalCart = total
   },
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(index, 1, prod)
+  },
   OBTENER_STOCK (state, items) {
     state.productos = state.productos.map((prod) => {
       let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
@@ -126,6 +130,9 @@ const actions = {
         }
       })
     }
+  },
+  actualizarProducto ({ commit }, prod) {
+    commit('ACTUALIZAR_PRODUCTO', prod)
   },
   actualizarPrecioConvenio ({ commit }, cliente) {
     commit('ACTUALIZAR_PRECIOCONVENIO', cliente);
