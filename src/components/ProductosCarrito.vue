@@ -58,11 +58,11 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
 
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
