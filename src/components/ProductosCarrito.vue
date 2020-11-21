@@ -378,7 +378,8 @@ export default {
       }
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      precio = precio / (1 - (this.productos[index].PorcentajeUtilidad/100))
+      // precio = precio / (1 - (this.productos[index].PorcentajeUtilidad/100))
+      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
 
