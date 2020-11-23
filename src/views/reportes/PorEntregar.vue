@@ -145,7 +145,8 @@
               <td>
                 <input 
                   type="number" 
-                  class="form-control" 
+                  class="form-control"
+                  :disabled="end.entregar === 0"
                   v-model="end.cantEntregar"
                 >
               </td>
@@ -305,16 +306,28 @@ export default {
       window.open("/imprimir/index.php?IdDocVent=" + this.idDocVen + "&fecha=%27"+ dEnt.Fecha + "%27","_blank");
     },
     saveEntrega () {
-      this.axios.post(this.API + 'entregar', {
-        productos: this.porEntregarDet
-      })
-      .then((response) => {
-        response.data.productoEntregado.forEach(element => {
-          if (element.cantEntregar) {
-            window.open("/imprimir/index.php?IdDocVent=" + element.IdDocVenta + "&fecha=%27"+ response.data.Fecha + "%27","_blank");
+      
+      this.porEntregarDet.forEach(d => {
+        if (d.cantEntregar) {
+          if (d.cantEntregar <= d.entregar ) {
+            this.axios.post(this.API + 'entregar', {
+              productos: this.porEntregarDet
+            })
+            .then((response) => {
+              response.data.productoEntregado.forEach(element => {
+                if (element.cantEntregar) {
+                  window.open("/imprimir/index.php?IdDocVent=" + element.IdDocVenta + "&fecha=%27"+ response.data.Fecha + "%27","_blank");
+                }
+              });
+            })
+
+          } else {
+            this.$toasted.show('Ha ocurrido un error, solo queda por entregar ' + d.entregar)
           }
-        });
-      })
+        }
+      });
+
+      
 
     },
     setCliente (obj) {
