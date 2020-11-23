@@ -26,7 +26,6 @@
           <b-form-group>
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
