@@ -38,7 +38,7 @@
                 if (isMov) {
                   productos[data.index].precio = productos[data.index].PrecioCosto;
                 } else {
-                  productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                  productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? Math.ceil(productos[data.index].PrecioPorMayor) : Math.ceil(productos[data.index].PrecioContado)
                 }
 
             }"
@@ -94,6 +94,14 @@
             </b-form-text>
         </template>
 
+        <template slot="utilidad" slot-scope="data">
+          <input 
+            class="form-control"
+            v-model="productos[data.index].PorcentajeUtilidad"
+            type="number" 
+            @input="cambiarPrecio(data.index, productos[data.index])" />
+            <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+        </template>
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
@@ -303,6 +311,10 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    cambiarPrecio (index, prod) {
+      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
+      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },

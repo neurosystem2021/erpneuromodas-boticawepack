@@ -171,7 +171,6 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :onSetProducto="onSetProducto">
-
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
@@ -338,10 +337,11 @@ export default {
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoTalla', label: 'Talla' },
-                    { key: 'Genero' },
+                    // { key: 'ProductoTalla', label: 'Talla' },
+                    // { key: 'Genero' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
+                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },

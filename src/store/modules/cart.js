@@ -82,6 +82,7 @@ const actions = {
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
+      producto.precio = Math.ceil(producto.precio)
 
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
