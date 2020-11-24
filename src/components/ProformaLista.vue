@@ -18,7 +18,7 @@
                         :busy.sync="isBusy" 
                         :filter="filter"
                         :items="myProvider" 
-                        @row-clicked="selectCierre"
+                        @row-clicked="selectProformas"
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
@@ -48,6 +48,7 @@
 </template>
 <script>
 import config from '@/store/config.js'
+import { mapActions } from 'vuex'
 
     export default {
         mounted () {
@@ -77,10 +78,31 @@ import config from '@/store/config.js'
                 currentPage: 1
             }
         },
+        props: ['idAlmacen'],
         methods: {
-            selectCierre (item) {
-               // console.log(item)
-                
+            ...mapActions({
+                add         : 'agregarProducto',
+                obtenerStok : 'obtenerStock',
+                limpiarCarrito: 'limpiarCarrito'
+            }),
+            selectProformas (item) {
+                this.axios.get(this.API + 'proformas/detalle', {
+                    params: {
+                        idProforma: item.IdProforma
+                    }
+                }).then((response) => {
+                    response.data.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+
+                        this.filter = ''
+                        this.show = false
+                    })
+
+                    this.$emit('onSelectProforma', item.IdCliente)
+                    this.limpiarCarrito()
+                })
             },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
