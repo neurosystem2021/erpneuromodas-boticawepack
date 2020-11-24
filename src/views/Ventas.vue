@@ -10,7 +10,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
@@ -318,6 +318,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -368,6 +369,14 @@ export default {
             obtenerStok: 'obtenerStock',
             actualizarPrecioConvenio: 'actualizarPrecioConvenio'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         preventDefault(evt) {
             if(evt.target.nodeName != 'TEXTAREA') {
                 evt.preventDefault()  
