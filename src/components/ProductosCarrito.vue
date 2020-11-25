@@ -100,6 +100,7 @@
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
             type="number" 
+            step="0.01"
             @input="cambiarPrecio(data.index, productos[data.index])" />
             <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
