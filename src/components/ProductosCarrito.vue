@@ -48,7 +48,12 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="setProductoCant(d)"
+              :class="{'disabledMouse': d.cantidad <= 0}"
+              @click="() => {
+                if (!(d.cantidad == 0)) {
+                  setProductoCant(d)
+                }
+              }"
             >
               {{d.cantidad}} - UNIDADES
             </b-card>
@@ -562,7 +567,11 @@ export default {
 </script>
 
 <style>
-.contentCard {
-  cursor: pointer;
-}
+  .contentCard {
+    cursor: pointer;
+  }
+  .disabledMouse {
+    background: #CECECE;
+    cursor: inherit;
+  }
 </style>
