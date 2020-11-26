@@ -47,7 +47,12 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="setProductoCant(d)"
+              :class="{'disabledMouse': d.cantidad == 0}"
+              @click="() => {
+                if (!(d.cantidad == 0)) {
+                  setProductoCant(d)
+                }
+              }"
             >
               {{d.cantidad}} - UNIDADES
             </b-card>
@@ -371,15 +376,16 @@ export default {
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.setProducto(response.data)
           } else {
-            this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
           }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true ])
+        })
       }
     },
     /*alterarBuscadorProductos() {
@@ -415,6 +421,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
 
@@ -444,6 +451,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
       }])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
@@ -467,6 +475,7 @@ export default {
       obj = this.onSetProducto(obj, prod.cantidad)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
       }])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
@@ -559,5 +568,9 @@ export default {
 <style>
   .contentCard {
     cursor: pointer;
+  }
+  .disabledMouse {
+    background: #CECECE;
+    cursor: inherit;
   }
 </style>
