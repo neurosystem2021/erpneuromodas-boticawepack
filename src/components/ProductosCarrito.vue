@@ -47,7 +47,7 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              :class="{'disabledMouse': d.cantidad == 0}"
+              :class="{'disabledMouse': d.cantidad <= 0}"
               @click="() => {
                 if (!(d.cantidad == 0)) {
                   setProductoCant(d)
