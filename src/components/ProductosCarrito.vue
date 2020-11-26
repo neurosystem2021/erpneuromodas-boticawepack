@@ -48,7 +48,12 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="setProductoCant(d)"
+              :class="{'disabledMouse': !d.cantidad || d.cantidad <= 0}"
+              @click="() => {
+                if (!(d.cantidad || d.cantidad <= 0)) {
+                  setProductoCant(d)
+                }
+              }"
             >
               {{d.cantidad}} - UNIDADES
             </b-card>
@@ -57,11 +62,11 @@
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto !== ''">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -357,11 +362,13 @@ export default {
       actualizarTotal     : 'actualizarTotalCart'
     }),
     changeCant (val, prod) {
-      if (val !== '') {
+      if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
-      this.actualizarProd(prod)
+      this.$nextTick(() => {
+        this.actualizarProd(prod)
+      })
     },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
@@ -371,15 +378,16 @@ export default {
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.setProducto(response.data)
           } else {
-            this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
           }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true ])
+        })
       }
     },
     /*alterarBuscadorProductos() {
@@ -415,6 +423,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
 
@@ -444,6 +453,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
       }])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
@@ -466,7 +476,8 @@ export default {
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad)
       this.add([obj, () => {
-      this.$emit('onAddProducto', obj)
+        this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
       }])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
@@ -556,7 +567,11 @@ export default {
 </script>
 
 <style>
-.contentCard {
-  cursor: pointer;
-}
+  .contentCard {
+    cursor: pointer;
+  }
+  .disabledMouse {
+    background: #CECECE;
+    cursor: inherit;
+  }
 </style>
