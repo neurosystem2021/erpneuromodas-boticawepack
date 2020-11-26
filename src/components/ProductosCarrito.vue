@@ -48,9 +48,9 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              :class="{'disabledMouse': !d.cantidad || d.cantidad <= 0}"
+              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
               @click="() => {
-                if (!(d.cantidad || d.cantidad <= 0)) {
+                if ( parseFloat(d.cantidad) ) {
                   setProductoCant(d)
                 }
               }"
