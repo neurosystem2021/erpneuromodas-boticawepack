@@ -46,14 +46,24 @@
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <!--<b-form-input
             v-model="productos[data.index].precio"
             type="number"
             style="width: 75px"
             min="0"
             step="0.0001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"></b-form-input>-->
+            <input 
+            class="form-control"
+            v-model="productos[data.index].precio"
+            style="width: 75px"
+            type="number" 
+            step="0.01"
+            @mouseup="setNuevoPrecioContado(data.index)" 
+            @keyup="setNuevoPrecioContado(data.index)" 
+            />
+
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -82,6 +92,7 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
+
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
@@ -99,9 +110,12 @@
           <input 
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
+            style="width: 80px"
             type="number" 
             step="0.01"
-            @input="cambiarPrecio(data.index, productos[data.index])" />
+            @input="cambiarPrecio(data.index, productos[data.index])" 
+            @mouseup="cambiarPrecio(data.index, productos[data.index])" 
+            />
             <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
         <template slot="descuento" slot-scope="data">
@@ -409,6 +423,10 @@ export default {
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
+
+      let pUtilidad = ((this.productos[index].precio - this.productos[index].PrecioCosto) / this.productos[index].PrecioCosto) * 100
+
+      Vue.set(this.productos[index], 'PorcentajeUtilidad', pUtilidad.toFixed(2))
     },
     getSubtotal(index) {
       

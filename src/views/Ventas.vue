@@ -625,7 +625,8 @@ export default {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
 
-                this.limpiarDespuesVenta()
+                // this.limpiarDespuesVenta()
+                this.limpiarCart()
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
