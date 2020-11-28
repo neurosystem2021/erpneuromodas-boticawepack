@@ -107,7 +107,8 @@
                 </template>
 
                 <template slot="Entregar" slot-scope="data">
-                  <button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>
+                  <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
+                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
                 </template>
 
               </b-table>
@@ -122,6 +123,61 @@
 
         <br /><br />
       </b-container>
+
+      <!-- POR ENTREGAR -->
+      <b-modal v-model="modalShow" title="Por Entregar" size="lg" @ok="saveEntrega ">
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>PRODUCTO</th>
+              <th>CANTIDAD</th>
+              <th>ACTUAL</th>
+              <th>ENTREGAR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="end in porEntregarDet" :key="end.id">
+              <td>{{ end.IdDocVentaDet }}</td>
+              <td>{{ end.Producto }}</td>
+              <td>{{ end.Cantidad }}</td>
+              <td>{{ end.entregar }}</td>
+              <td>
+                <input 
+                  type="number" 
+                  class="form-control"
+                  :disabled="end.entregar === 0"
+                  v-model="end.cantEntregar"
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>PRODUCTO</th>
+              <th>FECHA</th>
+              <th>CANTIDAD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="en in porEntregar" :key="en.id" :class="{'rowImprimir': en.th}">
+              <td>{{ en.IdDocVentaDetEntrega }}</td>
+              <td>{{ en.Producto }}</td>
+              <td>{{ en.Fecha }}</td>
+              <td>{{ en.Cantidad }}</td>
+              <td v-if="en.th">
+                <button class="btn btn-info" target="_blank" @click="imprimir(en)">IMPRIMIR</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </b-modal>
 
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showVenta" title="Kardex de producto">
         <b-alert show variant="warning">titulo</b-alert>
@@ -184,7 +240,12 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      modalShow: false,
+      porEntregarDet: {},
+      porEntregar: {},
+      idDocVen: '',
+      dVentDet: {},
     }
   },
   computed: {
@@ -201,6 +262,72 @@ export default {
                 this.$refs.tablaVentas.refresh()
             })
         }
+    },
+    openEntregarDet (item) {
+      this.idDocVen = item.idDocVenta
+      this.axios.get(this.API + 'ventas/detalle/entregar', {
+        params: {
+          idDocVenta: item.idDocVenta
+        }
+      }).then((response) => {
+        this.porEntregarDet = response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+      this.openEntregar(item)  
+      this.modalShow = !this.modalShow
+    },
+    openEntregar (item) {
+      this.axios.get(this.API + 'entregar', {
+        params: {
+          idDocVenta: item.idDocVenta
+        }
+      }).then((response) => {
+        var lista = []
+        for (let i = 0; i < response.data.length; i++) {
+          
+          if ((response.data[i-1] && (response.data[i-1].Fecha !== response.data[i].Fecha)) || i == 0) {
+            lista.push({
+              Fecha : response.data[i].Fecha,
+              th    : true,
+            })
+          } 
+
+          lista.push(response.data[i])
+        }
+
+        this.porEntregar = lista
+      })
+    },
+    imprimir (dEnt) {
+      window.open("/imprimir/index.php?IdDocVent=" + this.idDocVen + "&fecha=%27"+ dEnt.Fecha + "%27","_blank");
+    },
+    saveEntrega (event) {
+      var exceso = false
+      this.porEntregarDet.forEach(d => {
+        if (d.cantEntregar) {
+          if (d.cantEntregar > d.entregar) {
+            exceso = true
+            this.$toasted.show('Entrega excesiva ' + d.Producto + ': ' + d.cantEntregar)
+            event.preventDefault()
+          }
+        }
+      });
+
+      if (exceso) return;
+
+      this.axios.post(this.API + 'entregar', {
+        productos: this.porEntregarDet
+      })
+      .then((response) => {
+        this.$toasted.success('Entrega realizada con exito')
+        response.data.productoEntregado.forEach(element => {
+          if (element.cantEntregar) {
+            window.open("/imprimir/index.php?IdDocVent=" + element.IdDocVenta + "&fecha=%27"+ response.data.Fecha + "%27","_blank");
+          }
+        });
+      })
     },
     setCliente (obj) {
       this.currentPage = 1
