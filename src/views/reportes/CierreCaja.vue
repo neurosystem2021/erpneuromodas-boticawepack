@@ -2,130 +2,48 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <b-row  align-h="end" class=" no-print">
-              <label v-if="!this.$route.params.id">Vendedor:</label>
-          <b-col cols="3" v-if="!this.$route.params.id">
-            <b-form-group size="sm">
-              <autocomplete
-                  required="required"
-                  ref="inputVendedor"
-                  :url="API + 'usuarios'"
-                  anchor="NombreUsuario"
-                  label="writer"
-                  :on-select="setVendedor" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                  :classes="{input: 'form-control'}">
-              </autocomplete>
-            </b-form-group>
-          </b-col>
-          <b-col cols="7">
-            <b-button-group size="sm" v-if="!this.$route.params.id">
-              <b-form-select v-model="turno" :options="turnos" />
-            </b-button-group>
-            <b-button-group size="sm">
-              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
-            </b-button-group>
-            <b-button-group size="sm">
-              <cierres-caja></cierres-caja>
-            </b-button-group>
-            <b-button-group size="sm">
-              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
-            </b-button-group>
-          </b-col>
-      </b-row>
-      <br class="no-print" /> 
+      <div>
+          <div class="float-right no-print">
+              <b-row>
+                <b-col cols="2" v-if="!this.$route.params.id">
+                    <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
+                    <b-form-group size="sm" v-show="false">
+                        <autocomplete
+                            required="required"
+                            ref="inputVendedor"
+                            :url="API + 'usuarios'"
+                            anchor="NombreUsuario"
+                            label="writer"
+                            :on-select="setVendedor" 
+                            :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                    <b-button-group size="sm" v-if="!this.$route.params.id">
+                        <b-form-select v-model="turno" :options="turnos" />
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <cierres-caja></cierres-caja>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+                    </b-button-group>
+                </b-col>
+              </b-row>
+                     </div>
+      </div>
+      <br class="no-print" /><br class="no-print" />
 
-      <h3 class="text-center">Cierre de Caja</h3> 
-      <h4 class="si-print">Cierre de Caja </h4>
-      <hr>
-      <div v-if="cierre.FechaCierre">Fecha Fin:  <b>{{ cierre.FechaCierre }}</b></div>
-      <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</b></div>
-      <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-      <br>
+      <h2 class="text-center">Cierre de Caja</h2> 
+      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <b-row>
-        <b-col cols="4">
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Total Pago S/.</td>
-              <td>{{ granTotal | moneda }}</td>
-            </tr>
-          </tbody>
-        </table>          
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Salida S/.</td>
-              <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Credito S/.</td>
-              <td>{{ totalVentasCredito | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Contado S/.</td>
-              <td>{{ granTotalSinPagoCliente | moneda }} </td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Visa S/.</td>
-              <td>{{ totalVentasVisa | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Mastercard S/.</td>
-              <td>{{ totalVentasMastercard | moneda }} </td>
-            </tr>
-            <tr>
-              <td>Pagos de Creditos S/.</td>
-              <td>{{ totalIngresos | moneda }} </td>
-            </tr>
-          </tbody>
-        </table>
-        </b-col>
-      </b-row>
-
-      <b-row  class="no-print">
-        <b-col>
-          <table class="table b-table table-sm table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>TipoDoc</th>
-                <th>Serie</th>
-                <th>Numero</th>
-                <th>Total</th>
-                <th>Condición Venta</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(venta, index) in ventas" :key="index">
-                <td>{{ venta.FechaDoc }}</td>
-                <td>{{ venta.TipoDoc }}</td>
-                <td>{{ venta.Serie }}</td>
-                <td>{{ venta.Numero }}</td>
-                <td>{{ venta.Total | moneda }}</td>
-                <td>{{ estadoVenta(venta) }}</td>
-              </tr>
-              <!--<tr v-for="(item, index) in ingresos" :key="index">
-                <td>{{ item.FechaDoc }}</td>
-                <td>RECIBO</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>-->
-            </tbody>
-          </table>
-        </b-col>
-      </b-row>
-      
-
-      <!--<b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -147,7 +65,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear  }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -233,7 +151,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -291,12 +209,12 @@
             </tfoot>
           </table>
         </b-col>
-      </b-row>-->
+      </b-row>
       
 
       <br>
 
-      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -306,11 +224,11 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
+    this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
-      this.loadData()
     } else {
-      this.getVendedor()
+        this.getVendedor()
     }
   },
   data () {
@@ -323,7 +241,8 @@ export default {
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
         { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' }
+        { value: 2, text: 'Tarde' },
+        { value: 3, text: 'Noche' }
       ],
       cierre: {},
       vendedor: {}
@@ -416,10 +335,6 @@ export default {
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
     },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
-    },
     imprimir () {
       window.print();
     },
@@ -427,6 +342,10 @@ export default {
       this.getVentas()
       this.getIngresos()
       this.getSalidas()
+    },
+    setVendedor (obj) {
+        this.vendedor = obj
+        this.loadData()
     },
     cerrarCaja () {
       if (!this.turno) {
@@ -437,6 +356,7 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
+          //user: sessionStorage.getItem("User")
           user: this.vendedor.Usuario
         }).then(res => {
           this.loadData()
@@ -450,16 +370,15 @@ export default {
         this.$refs[ref].handleDoubleClick()
     },
     estadoVenta (venta) {
-      return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
+        return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
     },
     getVentas () {
       let params = {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        // params.usuario = this.vendedor.Usuario
       }
-      
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
@@ -472,10 +391,11 @@ export default {
     },
     getIngresos () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: 1
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        // params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -484,14 +404,15 @@ export default {
         this.ingresos = res.data
       }).catch(err => {
         console.log(err)
-      })
+      }) 
     },
     getSalidas () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: 1
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        // params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
@@ -500,7 +421,7 @@ export default {
         this.salidas = res.data
       }).catch(err => {
         console.log(err)
-      })
+      }) 
     },
     getCierre(id) {
       this.axios.get(this.API + 'cierrecaja', {
@@ -510,16 +431,7 @@ export default {
       }).then(res =>{
         this.cierre = res.data[0]
       })
-    },
-    /*getPenultimoCierre(id) {
-      this.axios.get(this.API + 'cierrecaja/penultimo', {
-        params: {
-          idCierre: id
-        }
-      }).then(res =>{
-        this.cierre = res.data[0]
-      })
-    }*/
+    }
   },
   components: {
     CierresCaja

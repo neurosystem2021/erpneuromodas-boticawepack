@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy': 'stock', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -256,10 +256,11 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      // if (this.idAlmacen) {
-      //   return this.API + 'productos/stock/' + this.idAlmacen
-      // }
-      return this.API + 'productos'
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
     },
     sumatoriaSubTotal () {
       let sumatoria = 0
@@ -438,7 +439,7 @@ export default {
         <div class="${style}">
            <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
+          / F. Vencimiento: ${data.FechaVen || ''} / <b style=""> Precio: S/. ${data.PrecioContado}</b> / Stock: ${data.stock}
         </div>
         `
       }
