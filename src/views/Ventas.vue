@@ -592,6 +592,19 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
+        limpiarDespuesVenta () {
+            this.inProgress = false
+            this.tieneIgv = false
+            this.initForm()
+            this.limpiarCart()
+            this.getVendedor()
+            this.$refs.inputCliente.setValue('')
+            // this.getNumeroVenta()
+            // this.$refs.inputTipoVenta.setValue('TICKET')
+            // this.$refs.inputAlmacen.setValue('VENTA')
+            // this.$refs.inputPuntoVenta.setValue('CAJA1')
+            // this.$refs.inputVendedor.setValue('')
+        },
         guardarProforma () {
 
             if(!this.productos.length) {
