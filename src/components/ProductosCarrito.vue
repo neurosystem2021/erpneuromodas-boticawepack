@@ -114,10 +114,15 @@
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <b-form-input
+          <textarea 
+            class="form-control"
+            placeholder="Descripción"
+            cols="9" rows="3"
+            v-model="productos[data.index].Descripcion"></textarea>
+          <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>
+            placeholder="Descripción"></b-form-input>-->
         </template>        
 
         <template slot="total" slot-scope="data">
@@ -234,6 +239,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
+          { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Present.' }, 
           { key: 'ProductoMedicion', label: 'Medición' },

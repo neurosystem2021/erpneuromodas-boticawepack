@@ -23,7 +23,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
+            <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -337,8 +337,8 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+                    // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+                    // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -367,6 +367,11 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        prevent (evt) {
+            if (evt.target.tagName !== 'TEXTAREA') {
+                evt.preventDefault();
+            }
+        },
         selectPreOrden (orden) {
             // console.log(orden)
            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
