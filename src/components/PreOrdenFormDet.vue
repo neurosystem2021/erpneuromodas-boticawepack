@@ -21,14 +21,16 @@
         <tr>
           <th>Id</th>
           <th>Producto</th>
+          <th>Precio</th>
           <th>Cantidad</th>
           <th class="text-center">Quitar</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(prod, index) in productos" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
+        <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
+          <td><input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" /></td>
           <td><input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" /></td>
           <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
@@ -88,7 +90,9 @@ export default {
         this.$toasted.show('No puede ingresar este producto')
         return
       }
-
+ 
+      data.Precio = data.PrecioContado
+      
       this.productos.push(data)
       this.emitUpdate()
 

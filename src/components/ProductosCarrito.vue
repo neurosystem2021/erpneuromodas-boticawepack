@@ -73,6 +73,14 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
+        
+        <template slot="manoobra" slot-scope="data">
+          <input 
+            v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
+            v-model="productos[data.index].EsManoDeObra"
+            class="form-check-input" type="checkbox" />
+        </template>
+
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
