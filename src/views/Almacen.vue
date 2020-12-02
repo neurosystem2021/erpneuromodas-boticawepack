@@ -6,13 +6,23 @@
             <b-row>
               <b-col md="2">
                 <div class="suma-stock text-center">
-                  <b>Stock Valorizado</b>
-                  <div> S/. {{ sumaValorizado | moneda }} </div>
+                  <b>Stock <br> Valorizado</b>
+                  <br />
+                  <!-- <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button> -->
+                  <div > S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
               <b-col md="2">
                 <div class="suma-stock text-center">
-                  <b>Stock General</b>
+                  <b>Stock Valorizado<br> Sin Utilidad</b>
+                  <br />
+                  <!-- <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button> -->
+                  <div> S/. {{ sumaValorizadoSin | moneda }} </div>
+                </div>
+              </b-col>
+              <b-col md="2">
+                <div class="suma-stock text-center">
+                  <b>Stock <br>General</b>
                   <div> {{ sumaStock }} </div>
                 </div>
               </b-col>
@@ -24,7 +34,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -50,7 +60,7 @@
                 </b-form-group>
                 <br />
               </b-col>
-              <b-col md="1">
+              <!--<b-col md="1">
                 <b-form-group label="Stock Mínimo">
                   <b-form-checkbox id="stock"
                      @change="val => generateFilter('minimo', val)"
@@ -59,8 +69,8 @@
 
                   </b-form-checkbox>
                 </b-form-group>
-              </b-col>
-              <b-col md="2">
+              </b-col>-->
+              <b-col md="1">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
@@ -69,7 +79,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -114,36 +124,78 @@
                 </b-form-group>
               </b-col>  
               <b-col md="3">
-                <b-form-group>
-                  <label>Presentación:</label>
+                <!--<b-form-group>
+                  <label>Modelo:</label>
                   <autocomplete
-                    :url="API + 'productos/presentaciones'"
-                    ref="inputPresentacion"
-                    anchor="ProductoPresentacion"
+                    :url="API + 'productos/modelos'"
+                    ref="inputModelo"
+                    anchor="ProductoModelo"
                     label="writer"
-                    :on-select="val => generateFilter('presentacion', val.ProductoPresentacion)"
-                    :onInput="(val) => !val ? generateFilter('presentacion', val) : false"
+                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
+                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
               </b-col>
             </b-row>
           </b-col>
           <b-col md="6">
             <b-row>
               <b-col md="3">
-                <b-form-group>
-                  <label>Medición:</label>
+                <!--<b-form-group>
+                  <label>Color:</label>
                   <autocomplete
-                    :url="API + 'mediciones'"
-                    ref="inputMedicion"
-                    anchor="ProductoMedicion"
+                    :url="API + 'productos/colores'"
+                    ref="inputColor"
+                    anchor="Color"
                     label="writer"
-                    :on-select="val => generateFilter('medicion', val.Genero)"
-                    :onInput="(val) => !val ? generateFilter('medicion', val) : false"
+                    :on-select="val => generateFilter('color', val.Color)"
+                    :onInput="(val) => !val ? generateFilter('color', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>
+                </b-form-group>-->
+              </b-col>  
+              <b-col md="3">
+                <!--<b-form-group>
+                  <label>Talla:</label>
+                  <autocomplete
+                    :url="API + 'tallas'"
+                    ref="inputTalla"
+                    anchor="ProductoTalla"
+                    label="writer"
+                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
+                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>-->
+              </b-col> 
+              <b-col md="3">
+                <!--<b-form-group>
+                  <label>Genero:</label>
+                  <autocomplete
+                    :url="API + 'productos/generos'"
+                    ref="inputGenero"
+                    anchor="Genero"
+                    label="writer"
+                    :on-select="val => generateFilter('genero', val.Genero)"
+                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>-->
+              </b-col>
+              <b-col md="3">
+                <!--<b-form-group>
+                  <label>Botapie/Manga:</label>
+                  <autocomplete
+                    :url="API + 'productos/botapies'"
+                    ref="inputBotapie"
+                    anchor="Botapie"
+                    label="writer"
+                    :on-select="val => generateFilter('botapie', val.Botapie)"
+                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>-->
               </b-col> 
             </b-row>
           </b-col>
@@ -191,7 +243,6 @@
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
                     {{ getStock(data.item.IdProducto) }}
                   </div>
-                  <img v-if="getStock(data.item.IdProducto) === undefined" src="static/box.png" style="width: 24px" />
                 </template>
 
               </b-table>
@@ -205,7 +256,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -233,12 +284,13 @@ export default {
       API: config.API,
       sumaStock: '...',
       sumaValorizado: '...',
+      sumaValorizadoSin: '...',
       APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'PRINCIPAL'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -255,13 +307,13 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Present.', sortable: true },
-            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      verValorizado: false
     }
   },
   watch: {
@@ -273,7 +325,8 @@ export default {
        this.axios.get(this.API + 'productos/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
+            idAlmacen: this.almacen.IdAlmacen,
+            limit: items.length
           }
         }).then((response) => {
              this.itemsStock = response.data
@@ -285,6 +338,7 @@ export default {
         // Cargar la sumatoria
         this.getSumaStock()
         this.getSumaValorizado()
+        this.getSumaValorizadoSin()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -308,18 +362,37 @@ export default {
   computed: {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoPresentacion + ' / ' + this.productoSelect.ProductoMedicion 
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
     }
   },
   methods: {
+    clickVerValorizado() {
+      let pass = window.prompt('Escriba su contraseña')
+      if (pass) {
+        this.axios.post(this.API + 'login', {
+          user: sessionStorage.getItem('User'),
+          password: pass
+        }).then(r => {
+          if (r.data) {
+            this.verValorizado = true;
+          }
+        })
+      }
+    },
     getSumaValorizado () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
+      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
         })
     },
+    getSumaValorizadoSin () {
+      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizadoSin=1')
+        .then( response => {
+          this.sumaValorizadoSin = (response.data[0].sumaValorizadoSin);
+        })
+    },
     getSumaStock () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
+      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
           this.sumaStock = response.data[0].sumaStock
         })
@@ -339,6 +412,7 @@ export default {
       });
     },
     setAlmacen (obj) {
+      console.log(obj)
       this.almacen = obj
       this.limpiarFiltros()
       console.log(this.filter)
@@ -369,7 +443,7 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy+'&controlaStock=1'
+      let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
@@ -395,7 +469,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
