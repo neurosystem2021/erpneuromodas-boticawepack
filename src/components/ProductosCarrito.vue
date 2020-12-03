@@ -22,6 +22,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -314,7 +315,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(this.loadCode.length -2);
+      let idProducto = this.loadCode;
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
@@ -325,7 +326,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
       }
     },
     /*alterarBuscadorProductos() {

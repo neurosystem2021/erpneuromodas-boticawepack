@@ -58,21 +58,34 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
+    let setPrecioCosto = false
+
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      setPrecioCosto = obje.setPrecioCosto
     }
 
     if(typeof producto === 'object') {
+      if (setPrecioCosto) {
+        producto.precio = producto.PrecioCosto
+      }
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      let params = {}
+
+      if (isBarCode) {
+        params = {codigoBarra: producto}
+      } 
+      
+      axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
         if (response.data) {
           let obj = response.data
 
