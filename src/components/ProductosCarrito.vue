@@ -73,6 +73,15 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
+        
+        <template slot="manoobra" slot-scope="data">
+          <input 
+            @change="(e) => addManoDeObra(data.index, e)"
+            v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
+            v-model="productos[data.index].EsManoDeObra"
+            class="form-check-input" type="checkbox" />
+        </template>
+
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
@@ -151,7 +160,10 @@
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2">
+    <b-col md="2">
+      <slot name="adicional"></slot>
+    </b-col>
+    <b-col md="3">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -217,6 +229,13 @@ export default {
   watch: {
     sumatoriaTotal (sum) {
       this.asignarVuelto()
+    },
+    productos (prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+
+      if (pi >= 0 && !this.productos[pi].precioBruta) {
+        this.productos[pi].precioBruta = this.productos[pi].precio
+      }
     }
   },
   props: {
@@ -314,6 +333,39 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+
+    addManoDeObra (index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+      if ( pi < 0 ) {
+        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
+        
+        this.productos[index].EsManoDeObra = 0
+        return ;
+      }
+      if (this.productos[index].EsManoDeObra) {
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
+        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - parseFloat(this.productos[index].precio)
+      } else {
+        e.target.parentNode.parentNode.removeAttribute("style")
+        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + parseFloat(this.productos[index].precio)
+      }
+    },
+
+    updateManoDeObraNeta (index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+      let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+      this.productos.filter(p => p.EsManoDeObra).map(p => {
+          precio -= parseFloat(p.precio)
+      })
+      
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+
+      if (pi >= 0 && index !== pi) {
+        this.productos[pi].precio = precio
+      }
+    },
+
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -407,6 +459,7 @@ export default {
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
+      this.updateManoDeObraNeta(index)
     },
     getSubtotal(index) {
       

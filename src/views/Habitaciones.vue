@@ -67,7 +67,7 @@
 												<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 											</b-input-group-append>
 										</b-input-group>
-										<br />
+										<!--<br />
 										<label>Lugar Procedencia:</label>
 										<b-input-group>
 											<b-form-input v-model="selectCliente.LugarProcedencia"
@@ -87,7 +87,7 @@
 											<b-form-input v-model="selectCliente.ProximoDestino"
 												type="text"
 												placeholder="Próximo destino"></b-form-input>
-										</b-input-group>
+										</b-input-group>-->
 										<br>
 										<label>Fecha Inicio:</label>
 										<b-input-group>

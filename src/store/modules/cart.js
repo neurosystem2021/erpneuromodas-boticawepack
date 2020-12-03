@@ -61,10 +61,12 @@ const actions = {
   agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
+    let precio = false
     let setSuma = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
+      precio = obje.precio
       setSuma = obje.setSuma
     }
 
@@ -92,6 +94,10 @@ const actions = {
 
           if (cantidad) {
             obj.cantidad = cantidad
+          }
+
+          if (precio) {
+            obj.precio = precio
           }
 
           if (setSuma) {

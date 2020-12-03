@@ -94,12 +94,14 @@ import { mapActions } from 'vuex'
                     this.limpiar();
                     
                     response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+                        if (!item.EsHabitacion) {
+                            this.add([item.IdProducto, () => {
+                                this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                            }, { setPrecio: true, cantidad: item.Cantidad, precio: item.Precio } ])
 
-                        this.filter = ''
-                        this.show = false
+                            this.filter = ''
+                            this.show = false
+                        }
                     })
                     this.$emit('onPreOrden', item)
                     this.$emit('onSelectPreOrden', item.IdCliente)

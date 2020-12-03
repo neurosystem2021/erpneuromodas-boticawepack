@@ -284,6 +284,16 @@
                                     </tbody>
                                 </table>
                             </template>
+                            <template slot="adicional" v-if="!venta.EsCredito">
+                                <table class="table b-table border table-footer table-sm text-center" >
+                                    <tbody>
+                                        <tr><td>Mano de obra bruta</td></tr>
+                                        <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+                                        <tr><td>Mano de obra neta</td></tr>
+                                        <tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                    </tbody>
+                                </table>
+                            </template>
                         </productos-carrito>
                     </b-col>
                 </b-row>
@@ -334,6 +344,7 @@ export default {
             venta: {},
             carrito: {
                 fields: [
+                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
@@ -359,7 +370,19 @@ export default {
         ...mapState({
             productos: state => state.cart.productos,
             totalCart: state => state.cart.totalCart
-        })
+        }),
+        manoDeObraBruta () {
+            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+            let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+            return precio
+        },
+        manoDeObraNeta () {
+            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+            let precio = pManoObra ? pManoObra.precio : 0;
+
+            return precio
+        }
     },
     methods: {
         ...mapActions({
