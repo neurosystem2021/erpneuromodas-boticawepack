@@ -85,8 +85,12 @@
               </autocomplete>
           </b-form-group>
 
-          
-          
+          <b-form-group>
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+          </b-form-group>
+
         </b-col>
         <b-col md="6">
           <b-form-group>
@@ -244,7 +248,10 @@ export default {
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
-      productosDet: []
+      productosDet: [],
+      file: '',
+      selectedFile: null,
+      // imagenProd: null
     }
   },
   beforeMount () {
@@ -318,7 +325,7 @@ export default {
         this.producto.EsHabitacion = newVal.EsHabitacion
         this.producto.Piso = newVal.Piso
         this.producto.ControlaStock = newVal.ControlaStock
-        console.log(newVal)
+        this.producto.Imagen = newVal.Imagen
 
       } else {
 
@@ -330,6 +337,9 @@ export default {
     }
   },
   methods: {
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0]
+    },
     calcularPreciosPaquete (prodDetalles) {
       let sumatoriaCosto = 0
       let sumatoriaContado = 0
@@ -438,7 +448,8 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
-        }
+        },
+        imagen: null
       }
     },
     guardarProducto(e) {
@@ -465,6 +476,21 @@ export default {
         // this.initForm()
         // this.producto.talla = {}
         // this.$refs.inputTalla.setValue('')
+
+
+        //INSERTANDO IMAGEN
+        let formData = new FormData();
+        formData.append('imagen', this.file);
+
+        this.axios({
+            method    : 'post',
+            url       : this.API + 'producto/imagen/' + response.data.insertId,
+            data      : formData,
+            headers   : { 'Content-Type': 'multipart/form-data' }
+          })
+          .then((res) => {
+            console.log(res);
+          })
 
         this.$refs.productoForm.hide()
       })
