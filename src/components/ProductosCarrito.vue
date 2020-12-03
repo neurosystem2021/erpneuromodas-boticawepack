@@ -336,7 +336,12 @@ export default {
 
     addManoDeObra (index, e) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-
+      if ( pi < 0 ) {
+        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
+        
+        this.productos[index].EsManoDeObra = 0
+        return ;
+      }
       if (this.productos[index].EsManoDeObra) {
         e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
         this.productos[pi].precio = parseFloat(this.productos[pi].precio) - parseFloat(this.productos[index].precio)
