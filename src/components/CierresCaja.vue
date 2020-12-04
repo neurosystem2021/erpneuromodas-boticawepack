@@ -1,28 +1,28 @@
 <template>
     <div>
         <b-button @click="show=true" variant="outline-success">Ver Cierres</b-button>
-        
-        <b-form >    
-            <b-modal id="modalCierres" 
+
+        <b-form >
+            <b-modal id="modalCierres"
                 title="Seleccionar Cierre de Caja"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">           
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <b-table 
+                body-text-variant="dark">
+                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+                    <b-table
                         v-if="show"
-                        id="my-table" 
-                        striped hover 
-                        :busy.sync="isBusy" 
+                        id="my-table"
+                        striped hover
+                        :busy.sync="isBusy"
                         :filter="filter"
-                        :items="myProvider" 
+                        :items="myProvider"
                         @row-clicked="selectCierre"
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
-                        
+
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
                       </template>
@@ -41,7 +41,7 @@
                         Cerrar
                     </b-btn>
                 </div>
-            
+
             </b-modal>
         </b-form>
     </div>
@@ -51,7 +51,7 @@ import config from '@/store/config.js'
 
     export default {
         mounted () {
-            
+
         },
         watch: {
           items () {
@@ -76,13 +76,12 @@ import config from '@/store/config.js'
         methods: {
             selectCierre (item) {
                // console.log(item)
-                
+
             },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
-
+                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter + '&sortBy=IdCierreCaja&sortDesc=1')
                 return promise.then((result) => {
                 this.items = result.data
                 //this.totalRows = this.items.length
