@@ -242,7 +242,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    tipoCambio: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -257,6 +257,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
@@ -270,7 +271,7 @@ export default {
           { key: 'igv', label: 'IGV' },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
+          { key: 'precioVenta', label: 'Precio venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
           { key: 'acciones', label: ''}
         ]
@@ -463,8 +464,13 @@ export default {
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
       let nuevoPrecio = this.$options.filters.redondear(precio, 1)
       
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      if (this.tipoCambio > 0) {
+        normalPrecio *= this.tipoCambio
+        nuevoPrecio *= this.tipoCambio
+      }
+
+      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio.toFixed(2))
+      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
       this.updateManoDeObraNeta(index)
