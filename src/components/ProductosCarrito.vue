@@ -223,7 +223,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      cliente: {},
     }
   },
   watch: {
@@ -256,12 +257,12 @@ export default {
       default () {
         return [
           { key: 'CodigoBarra', label: 'Código'},
-          { key: 'ProductoCategoria', label: 'Categoria'},
+          // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Present.' }, 
-          { key: 'ProductoMedicion', label: 'Medición' },
+          // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -429,7 +430,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      }, false, false, this.cliente.EsVIP])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },

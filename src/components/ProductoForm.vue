@@ -119,6 +119,15 @@
               step="0.0001"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Precio X Mayor:</label>
+            <b-form-input 
+              v-model="producto.PrecioPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              ></b-form-input>
+          </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
             <b-form-input   
@@ -185,6 +194,14 @@
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Convenio:</label>
+            <b-form-input v-model="producto.precioConvenio"
+              type="number"
+              ></b-form-input>
           </b-form-group>
         </b-col>
       </b-row>
@@ -315,17 +332,19 @@ export default {
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-        this.producto.StockMinimo = newVal.StockMinimo
-        this.producto.CodigoBarra = newVal.CodigoBarra
-        //this.producto.ProductoModelo = newVal.ProductoModelo
-        this.producto.ProductoPresentacion = newVal.ProductoPresentacion
-        this.producto.PrecioCosto = newVal.PrecioCosto
-        this.producto.PrecioContado = newVal.PrecioContado
-        this.producto.EsHabitacion = newVal.EsHabitacion
-        this.producto.Piso = newVal.Piso
-        this.producto.ControlaStock = newVal.ControlaStock
-        this.producto.Imagen = newVal.Imagen
+        this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
+        this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
+        this.producto.StockMinimo           = newVal.StockMinimo
+        this.producto.CodigoBarra           = newVal.CodigoBarra
+        //this.producto.ProductoModelo      = newVal.ProductoModelo
+        this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
+        this.producto.PrecioCosto           = newVal.PrecioCosto
+        this.producto.PrecioContado         = newVal.PrecioContado
+        this.producto.precioConvenio        = newVal.precioConvenio
+        this.producto.EsHabitacion          = newVal.EsHabitacion
+        this.producto.Piso                  = newVal.Piso
+        this.producto.ControlaStock         = newVal.ControlaStock
+        this.producto.Imagen                = newVal.Imagen
 
       } else {
 
@@ -439,6 +458,8 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        PrecioPorMayor: 0,
+        precioConvenio: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},
