@@ -23,6 +23,16 @@ const mutations = {
       }
     }
   },
+  ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
+    productos = productos.map(p => {
+      if (cliente.EsVIP) {
+        p.precio = p.precioConvenio || p.precio
+      } else {
+        p.precio = p.PrecioContado
+      }
+      return p;
+    })
+  },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
@@ -58,7 +68,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip]) {
     let setPrecio = false
     let cantidad = false
     let precio = false
@@ -71,6 +81,10 @@ const actions = {
     }
 
     if(typeof producto === 'object') {
+      if (isClienteVip) {
+        producto.precio = producto.precioConvenio || producto.precio;
+      }
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -90,6 +104,10 @@ const actions = {
           } else {
             obj.cantidad = 0
             obj.precio = 0
+          }
+
+          if (isClienteVip) {
+            producto.precio = producto.precioConvenio || producto.precio;
           }
 
           if (cantidad) {
@@ -114,6 +132,9 @@ const actions = {
         }
       })
     }
+  },
+  actualizarPrecioConvenio ({ commit }, cliente) {
+    commit('ACTUALIZAR_PRECIOCONVENIO', cliente);
   },
   eliminarProducto ({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)
