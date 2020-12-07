@@ -29,7 +29,7 @@
         <thead>
           <tr>
             <th class="no">#</th>
-            <th>Imagen</th>
+            <th></th>
             <th class="desc">DESCRIPCIÓN</th>
             <th class="unit">PRECIO U.</th>
             <th class="qty">CANT.</th>

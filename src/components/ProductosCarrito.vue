@@ -30,15 +30,17 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="productos[data.index].disabled"
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            @input="(val) => setCantidad(data.index, val)"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
+            :disabled="productos[data.index].disabled"
             type="number"
             style="width: 75px"
             min="0"
@@ -343,12 +345,15 @@ export default {
         this.productos[index].EsManoDeObra = 0
         return ;
       }
+
       if (this.productos[index].EsManoDeObra) {
         e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - parseFloat(this.productos[index].precio)
+        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
+        this.productos[index].disabled = true
       } else {
         e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + parseFloat(this.productos[index].precio)
+        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
+        this.productos[index].disabled = false
       }
     },
 
@@ -357,7 +362,7 @@ export default {
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= parseFloat(p.precio)
+          precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
       })
       
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
@@ -438,6 +443,9 @@ export default {
       return `
         <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
       `
+    },
+    setCantidad (index, val) {
+      this.$emit('onInputCantidad', val)
     },
     setNuevoPrecioContado (index) {
 
