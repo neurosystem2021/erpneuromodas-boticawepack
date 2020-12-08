@@ -515,7 +515,7 @@ export default {
     },
     cerrarCaja () {
       if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
+        this.$toasted.error('Seleccione un Turno')
         return
       }
       let r = confirm('¿Está seguro de cerrar la caja?')
@@ -525,9 +525,12 @@ export default {
           user: sessionStorage.getItem("User"),
           idAlmacen: this.almacen.IdAlmacen
         }).then(res => {
-          this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
-          console.log(res)
+          if (res.data.error) {
+            this.$toasted.error(res.data.error)
+          } else {
+            this.loadData()
+            this.$toasted.success('¡Caja cerrada!')
+          }
         })
       }
     },
