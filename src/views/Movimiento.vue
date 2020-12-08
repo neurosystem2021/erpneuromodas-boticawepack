@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="VENTA"
+                        initValue="HUANUCO"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
+                        initValue="HUANUCO"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -189,7 +189,10 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito 
+                ref="carrito"
+                @onAddProducto="onAddProducto" 
+                :tipoCambio="movimiento.TipoCambio"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -236,8 +239,14 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
+    onAddProducto (obj) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+        })
+    },
     afe (e) {
 return false
     },
@@ -309,9 +318,15 @@ return false
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
+      if (obj.Moneda === 'USD') {
+        this.movimiento.TipoCambio = 3.7
+      } else {
+        this.movimiento.TipoCambio = 1
+      }
     },
     getProveedores (value) {
       this.buscarProveedores(value)
