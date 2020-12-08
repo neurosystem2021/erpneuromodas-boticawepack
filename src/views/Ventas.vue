@@ -318,6 +318,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -368,6 +369,14 @@ export default {
             obtenerStok: 'obtenerStock',
             actualizarPrecioConvenio: 'actualizarPrecioConvenio'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         preventDefault(evt) {
             if(evt.target.nodeName != 'TEXTAREA') {
                 evt.preventDefault()  
