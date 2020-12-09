@@ -49,6 +49,7 @@ export default {
   data () {
     return {
       API: config.API,
+      productosACargar: [],
       productos: []
     }
   },
@@ -68,6 +69,14 @@ export default {
             }
             return item
           })
+
+          this.productosACargar.map(pc => {
+            let producto = this.productos.find(pr => pr.IdProducto === pc.IdProducto)
+            if (!producto) {
+              this.productos.push(pc)
+            }
+          })
+
         }).catch(err => {
           console.log(err)
         })
