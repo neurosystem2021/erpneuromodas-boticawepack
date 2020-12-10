@@ -361,6 +361,7 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
+                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },

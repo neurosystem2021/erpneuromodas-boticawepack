@@ -2,7 +2,7 @@
     <div>
         <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
         
-        <b-form >    
+        <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
                 size="lg" v-model="show"
@@ -52,7 +52,7 @@ import { mapActions } from 'vuex'
 
     export default {
         mounted () {
-            
+            this.$emit('mounted', this.$refs.formProformaModal)
         },
         watch: {
           items () {
@@ -85,14 +85,16 @@ import { mapActions } from 'vuex'
                 obtenerStok : 'obtenerStock',
                 limpiarCarrito: 'limpiarCarrito'
             }),
-            selectProformas (item) {
+            selectProformas (proforma) {
+                console.log(proforma)
                 // console.log('adsasdasdasd');
                 this.axios.get(this.API + 'proformas/detalle', {
                     params: {
-                        idProforma: item.IdProforma
+                        idProforma: proforma.IdProforma
                     }
                 }).then((response) => {
                     response.data.map((item) => {
+                        
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
                         }, { setPrecio: true, cantidad: item.Cantidad } ])
@@ -101,7 +103,9 @@ import { mapActions } from 'vuex'
                         this.show = false
                     })
 
-                    this.$emit('onSelectProforma', item.IdCliente)
+                    proforma.productos = response.data
+
+                    this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.limpiarCarrito()
                 })
             },

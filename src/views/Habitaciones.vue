@@ -117,9 +117,11 @@
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
 			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
+
 				<div id="contentModal" >
 				  	<div class="row">
 						<div id="headerCamiones" class="col-md-12">
+
 							<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
 							<br>
 							<br>
@@ -133,6 +135,23 @@
 									></pre-orden-form-det>
 								</b-col> 
 								<b-col md="4">
+
+									<label><b>Gastos</b></label>
+									<b-form-input v-model="selectProducto.Gasto"
+											size="sm"
+											type="number"
+											placeholder="Gasto S/."></b-form-input>
+									<b-input-group>
+										<b-form-input v-model="selectProducto.GastoDesc"
+											size="sm"
+											type="text"
+											placeholder="Descripción"></b-form-input>
+										<b-button @click="insertarGasto" variant="primary" size="sm">+</b-button>
+										<b-form-text id="inputLiveHelp">Los gastos se reflejará en Caja y Banco.</b-form-text>
+									</b-input-group>
+
+									<hr />
+
 									<label><b>Adelantos</b></label>
 									<b-form-input v-model="selectProducto.Adelanto"
 											size="sm"
@@ -160,7 +179,7 @@
 										<tr v-for="(ade, index) in adelantos" :key="index">
 											<td>{{ ade.FechaDoc }}</td>
 											<td>{{ ade.Concepto.split(" - ").pop() }}</td>
-											<td>{{ ade.Importe }}</td>
+											<td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
 										</tr>
 										<tr class="bg-info text-white">
 											<td colspan="2">TOTAL</td>
@@ -169,7 +188,8 @@
 									</tbody>
 									</table>
 								</b-col>
-							</b-row>	
+							</b-row>
+						
 						</div>
 				  	</div>
 				</div>
@@ -182,6 +202,9 @@
 						<b-btn  variant="" @click="imprimir">
 							Imprimir
 						</b-btn>
+						<div style="float: right; margin-left: 10px;">
+							<proformas @onSelectProforma="selectProforma" @mounted="mountedProforma"></proformas>
+						</div>
 					</div>
 					<b-btn  variant="success" type="submit">
 					Guardar
@@ -198,6 +221,7 @@
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 import ClientesForm from '@/components/ClientesForm'
+import Proformas from '@/components/ProformaLista.vue'
 
 export default {
   	mounted () {
@@ -214,7 +238,8 @@ export default {
 			vuelo: '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
-			adelantos: []
+			adelantos: [],
+			gastos: []
 			// habitacionesPiso: []
 		}
 	},
@@ -222,6 +247,18 @@ export default {
 		totalAdelantos() {
 			let sumatoria = 0
 			this.adelantos.map(ad => {
+				if (ad.Tipo) {
+					sumatoria -= parseFloat(ad.Importe)
+				} else {
+					sumatoria += parseFloat(ad.Importe)
+				}
+			})
+
+			return sumatoria;
+		},
+		totalGastos() {
+			let sumatoria = 0
+			this.gastos.map(ad => {
 				sumatoria += parseFloat(ad.Importe)
 			})
 
@@ -229,13 +266,25 @@ export default {
 		}
 	},
 	methods: {
+		mountedProforma(modal) {
+			document.body.appendChild(modal)
+		},
+		selectProforma(idCliente, proforma) {
+			this.show = true
+			this.$nextTick(() => {
+				proforma.productos.map(p => {
+					
+					this.$refs.preOrdenProductos.productosACargar.push(p)
+				})
+				console.log(this.$refs.preOrdenProductos.productosACargar)
+			})
+		},
 		cargarAdelantos() {
 			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
 				IdPreOrden: this.selectProducto.IdPreOrden
 			} }).then(res => {
 				this.adelantos = res.data
 			})
-
 		},
 		insertarAdelanto() {
 			let usuario = sessionStorage.getItem('User')
@@ -260,6 +309,31 @@ export default {
 				})
 			}
 		},
+
+		insertarGasto() {
+			let usuario = sessionStorage.getItem('User')
+
+			if(this.selectProducto.Gasto <= 0) {
+				return;
+			}
+
+			let r = confirm("¿Desea Insertar un gasto?")
+
+			if (r) {
+				this.axios.post(this.API + 'preorden/cajaybanco/gasto', {
+					producto: this.selectProducto,
+                    concepto: 'Gasto Proyecto ' + this.selectProducto.Producto + ' - ' + this.selectProducto.GastoDesc,
+					IdPreOrden: this.selectProducto.IdPreOrden,
+					IdHabitacion: this.selectProducto.IdProducto,
+					Gasto: this.selectProducto.Gasto,
+					Usuario: usuario
+				}).then(res => {
+					// this.adelantos.push(res.data)
+					this.cargarAdelantos();
+				})
+			}
+		},
+
 		getHabitacionesPiso (piso) {
 			return this.habitaciones.filter(hab => {
 				return hab.Piso === piso
@@ -409,7 +483,8 @@ export default {
 	},
 	components: {
 		PreOrdenFormDet,
-		ClientesForm
+		ClientesForm,
+		Proformas,
 	}
 }
 </script>

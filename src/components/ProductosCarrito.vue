@@ -97,6 +97,19 @@
             </b-form-text>
         </template>
 
+        <template slot="utilidad" slot-scope="data">
+          <input 
+            class="form-control"
+            v-model="productos[data.index].PorcentajeUtilidad"
+            style="width: 80px"
+            type="number" 
+            step="0.01"
+            @input="cambiarPrecio(data.index, productos[data.index])" 
+            @mouseup="cambiarPrecio(data.index, productos[data.index])" 
+            />
+            <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+        </template>
+
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
@@ -338,6 +351,11 @@ export default {
       actualizarTotal: 'actualizarTotalCart'
     }),
 
+    cambiarPrecio (index, prod) {
+      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
+      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+    },
+    
     addManoDeObra (index, e) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
       if ( pi < 0 ) {
@@ -470,7 +488,7 @@ export default {
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio.toFixed(2))
+      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
       Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
