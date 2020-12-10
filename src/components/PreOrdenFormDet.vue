@@ -30,8 +30,14 @@
         <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" /></td>
-          <td><input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" /></td>
+          <td>
+            <span class="hideInModal">{{ prod.Precio }}</span>
+            <input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" />
+          </td>
+          <td>
+            <span class="hideInModal">{{ prod.Cantidad }}</span>
+            <input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
+          </td>
           <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -110,4 +116,7 @@ export default {
 }
 </script>
 <style scoped>
+.hideInModal {
+  display: none;
+}
 </style>

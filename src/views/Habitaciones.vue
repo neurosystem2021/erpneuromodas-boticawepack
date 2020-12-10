@@ -117,61 +117,70 @@
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
 			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
-				<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
-				<br>
-				<br>
-				
-				<b-row>
-					<b-col md="8">
-						<pre-orden-form-det v-if="show"
-						:id-preorden="selectProducto.IdPreOrden"
-						:id-producto="selectProducto.IdProducto"
-						ref="preOrdenProductos"
-						></pre-orden-form-det>
-					</b-col> 
-					<b-col md="4">
-						<label><b>Adelantos</b></label>
-                        <b-form-input v-model="selectProducto.Adelanto"
-                                size="sm"
-                                type="number"
-                                placeholder="Adelanto S/."></b-form-input>
-      					<b-input-group>
-							<b-form-input v-model="selectProducto.AdelantoDesc"
-                                size="sm"
-                                type="text"
-                                placeholder="Descripción"></b-form-input>
-							<b-button @click="insertarAdelanto" variant="primary" size="sm">+</b-button>
-							<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
-      					</b-input-group>
+				<div id="contentModal" >
+				  	<div class="row">
+						<div id="headerCamiones" class="col-md-12">
+							<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+							<br>
+							<br>
+							
+							<b-row>
+								<b-col md="8" id="productosProduccion">
+									<pre-orden-form-det v-if="show"
+									:id-preorden="selectProducto.IdPreOrden"
+									:id-producto="selectProducto.IdProducto"
+									ref="preOrdenProductos"
+									></pre-orden-form-det>
+								</b-col> 
+								<b-col md="4">
+									<label><b>Adelantos</b></label>
+									<b-form-input v-model="selectProducto.Adelanto"
+											size="sm"
+											type="number"
+											placeholder="Adelanto S/."></b-form-input>
+									<b-input-group>
+										<b-form-input v-model="selectProducto.AdelantoDesc"
+											size="sm"
+											type="text"
+											placeholder="Descripción"></b-form-input>
+										<b-button @click="insertarAdelanto" variant="primary" size="sm">+</b-button>
+										<b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
+									</b-input-group>
 
-						<br />
-						<table class="table b-table table-sm">
-					      <thead>
-					        <tr>
-					          <th>Fecha</th>
-                              <th>Concepto</th>
-					          <th>Cantidad</th>
-					        </tr>
-					      </thead>
-					      <tbody>
-					      	<tr v-for="(ade, index) in adelantos" :key="index">
-					      		<td>{{ ade.FechaDoc }}</td>
-                                <td>{{ ade.Concepto.split(" - ").pop() }}</td>
-					      		<td>{{ ade.Importe }}</td>
-					      	</tr>
-					      	<tr class="bg-info text-white">
-                                <td colspan="2">TOTAL</td>
-					      		<td>{{ totalAdelantos }}</td>
-					      	</tr>
-					      </tbody>
-					  	</table>
-					</b-col>
-				</b-row>
+									<br />
+									<table class="table b-table table-sm">
+									<thead>
+										<tr>
+										<th>Fecha</th>
+										<th>Concepto</th>
+										<th>Cantidad</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(ade, index) in adelantos" :key="index">
+											<td>{{ ade.FechaDoc }}</td>
+											<td>{{ ade.Concepto.split(" - ").pop() }}</td>
+											<td>{{ ade.Importe }}</td>
+										</tr>
+										<tr class="bg-info text-white">
+											<td colspan="2">TOTAL</td>
+											<td>{{ totalAdelantos }}</td>
+										</tr>
+									</tbody>
+									</table>
+								</b-col>
+							</b-row>	
+						</div>
+				  	</div>
+				</div>
 
 				<div slot="modal-footer" >
 					<div style="left: 1rem;position: absolute;">
 						<b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
 						Pagar Ahora
+						</b-btn>
+						<b-btn  variant="" @click="imprimir">
+							Imprimir
 						</b-btn>
 					</div>
 					<b-btn  variant="success" type="submit">
@@ -351,9 +360,6 @@ export default {
 		},
 		setCliente(obj, index) {
 			if (index >= 0) {
-				console.log(this.$refs)
-				console.log(index)
-				console.log('inputCliente2' + index)
 				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
 			}
 			this.selectCliente = obj
@@ -371,6 +377,34 @@ export default {
 		},
 		formatFecha(fecha) {
 			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+		},
+		imprimir() {
+			var elem = "contentModal";
+			var cssHead = '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>'
+
+			var mywindow = window.open('', 'PRINT', 'height=600,width=1000');
+			mywindow.document.write(cssHead);
+			mywindow.document.write('<h5 style="text-align:center">' + document.querySelector('#carrito .modal-title').textContent  + '</h5> <hr>');
+			mywindow.document.write(document.getElementById(elem).innerHTML);
+			
+			for (var i = 0; i < mywindow.document.querySelectorAll('input, button, a').length; ++i) {
+				mywindow.document.querySelectorAll('input, button, a')[i].style.display = "none";
+			}
+
+			mywindow.document.getElementById('headerCamiones').className = "col-md-12";
+			mywindow.document.getElementById('productosProduccion').className = "col-md-8";
+
+			mywindow.document.close(); // necessary for IE >= 10
+			mywindow.focus(); // necessary for IE >= 10*/
+
+			mywindow.onload = function() {
+				setTimeout(function(){
+					mywindow.print();
+					// mywindow.close();
+				}, 500);
+			}
+
+			return true;
 		}
 	},
 	components: {
@@ -379,6 +413,29 @@ export default {
 	}
 }
 </script>
+<style>
+@media print {
+	body .printable, body .modal {
+		display:block;
+	}
+	#pisos {
+		visibility: hidden;
+	}
+	.modal {
+		/**Remove scrollbar for printing.**/
+		overflow: visible !important;
+		position: absolute;
+	}
+	.modal-dialog {
+		visibility: visible !important;
+		/**Remove scrollbar for printing.**/
+		overflow: visible !important;
+	}
+	.modal-footer {
+		visibility: hidden;
+	}
+}
+</style>
 <style scoped>
 h5 {
 	font-size: 1.2rem;

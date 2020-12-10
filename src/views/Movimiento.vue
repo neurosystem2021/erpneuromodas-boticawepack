@@ -179,7 +179,7 @@
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
-                      <b-form-input v-model="movimiento.TipoCambio"
+                      <b-form-input v-model.number="movimiento.TipoCambio"
                         type="number"
                         placeholder="Tipo de cambio"></b-form-input>
                     </b-form-group>
