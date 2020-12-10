@@ -10,6 +10,7 @@ import Clientes from '@/views/Clientes.vue'
 import VentaEstrategica from '@/views/VentaEstrategica.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import ProductosSimilares from '@/views/ProductosSimilares.vue'
+import Configuraciones from '@/views/Configuraciones.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -91,6 +92,11 @@ export default new Router({
       path: '/productossimilares',
       name: 'ProductosSimilares',
       component: ProductosSimilares
+    },
+    {
+      path: '/configuraciones',
+      name: 'Configuraciones',
+      component: Configuraciones
     }
   ]
 })
