@@ -8,29 +8,52 @@
 			  <br>
 			</div>
         	<b-row>
-
-					<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
-						<b-card :bg-variant="getVariant(hab)"
-										class="text-center">
-										
-								<h5>{{ hab.Producto }}</h5>
-								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
-								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
-									<li><b>{{ hab.Cliente }}</b> </li>
-									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
-									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
-								</ul>
-								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-									<li><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
-								</ul>
-								<div slot="footer">
-									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
-									<!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
-									<!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
-										<label>Seleccione un cliente:</label>
+				<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
+					<b-card :bg-variant="getVariant(hab)"
+									class="text-center">
+									
+							<h5>{{ hab.Producto }}</h5>
+							<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
+							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
+								<li><b>{{ hab.Cliente }}</b> </li>
+								<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
+								<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
+							</ul>
+							<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+								<li><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
+							</ul>
+							<div slot="footer">
+								<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
+								<!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
+								<!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
+									<label>Seleccione un cliente:</label>
+									<autocomplete
+											required="required"
+											:ref="'inputCliente1' + index"
+											:url="API + 'clientes'"
+											anchor="ClienteDniRuc"
+											label="writer"
+											placeholder=""
+											:on-select="setCliente" 
+											:classes="{input: 'form-control'}">
+									</autocomplete>
+									<label for="inputLive">Fecha Reserva:</label>
+									<b-form-input v-model="fechaReserva"
+										type="date"></b-form-input>
+	
+									<label for="inputLive">Vuelo:</label>
+									<b-form-input v-model="vuelo"
+										type="text"></b-form-input>
+									<br />
+									<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
+								</b-popover>-->
+								<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
+								<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
+									<label>Seleccione un cliente:</label>
+									<b-input-group>
 										<autocomplete
 												required="required"
-												:ref="'inputCliente1' + index"
+												:ref="'inputCliente2' + index"
 												:url="API + 'clientes'"
 												anchor="ClienteDniRuc"
 												label="writer"
@@ -38,80 +61,55 @@
 												:on-select="setCliente" 
 												:classes="{input: 'form-control'}">
 										</autocomplete>
-										<label for="inputLive">Fecha Reserva:</label>
-										<b-form-input v-model="fechaReserva"
-											type="date"></b-form-input>
-		
-										<label for="inputLive">Vuelo:</label>
-										<b-form-input v-model="vuelo"
-											type="text"></b-form-input>
-										<br />
-										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
-									</b-popover>-->
-									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
-									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
-										<label>Seleccione un cliente:</label>
-										<b-input-group>
-											<autocomplete
-													required="required"
-													:ref="'inputCliente2' + index"
-													:url="API + 'clientes'"
-													anchor="ClienteDniRuc"
-													label="writer"
-													placeholder=""
-													:on-select="setCliente" 
-													:classes="{input: 'form-control'}">
-											</autocomplete>
-											<b-input-group-append>
-												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
-											</b-input-group-append>
-										</b-input-group>
-										<!--<br />
-										<label>Lugar Procedencia:</label>
-										<b-input-group>
-											<b-form-input v-model="selectCliente.LugarProcedencia"
-												type="text"
-												placeholder="Lugar Procedencia"></b-form-input>
-										</b-input-group>
-										<br>
-										<label>Medio de transporte:</label>
-										<b-input-group>
-											<b-form-input v-model="selectCliente.MedioTransporte"
-												type="text"
-												placeholder="Medio de transporte"></b-form-input>
-										</b-input-group>
-										<br>
-										<label>Próximo destino:</label>
-										<b-input-group>
-											<b-form-input v-model="selectCliente.ProximoDestino"
-												type="text"
-												placeholder="Próximo destino"></b-form-input>
-										</b-input-group>-->
-										<br>
-										<label>Fecha Inicio:</label>
-										<b-input-group>
-											<b-form-input v-model="selectCliente.FechaAlquilerInicio"
-												type="date"
-												placeholder="Fecha Inicio"></b-form-input>
-										</b-input-group>
-										<br>
-										<label>Fecha Fin:</label>
-										<b-input-group>
-											<b-form-input v-model="selectCliente.FechaAlquilerFin"
-												type="date"
-												placeholder="Fecha Fin"></b-form-input>
-										</b-input-group>
-										<br>
+										<b-input-group-append>
+											<!--<proveedores-tabla></proveedores-tabla>-->
+											<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
+										</b-input-group-append>
+									</b-input-group>
+									<!--<br />
+									<label>Lugar Procedencia:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.LugarProcedencia"
+											type="text"
+											placeholder="Lugar Procedencia"></b-form-input>
+									</b-input-group>
+									<br>
+									<label>Medio de transporte:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.MedioTransporte"
+											type="text"
+											placeholder="Medio de transporte"></b-form-input>
+									</b-input-group>
+									<br>
+									<label>Próximo destino:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.ProximoDestino"
+											type="text"
+											placeholder="Próximo destino"></b-form-input>
+									</b-input-group>-->
+									<br>
+									<label>Fecha Inicio:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.FechaAlquilerInicio"
+											type="date"
+											placeholder="Fecha Inicio"></b-form-input>
+									</b-input-group>
+									<br>
+									<label>Fecha Fin:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.FechaAlquilerFin"
+											type="date"
+											placeholder="Fecha Fin"></b-form-input>
+									</b-input-group>
+									<br>
 
-										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
-									</b-popover>
-									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
-								</div>
-						</b-card>
-					</b-col>
-
-		</b-row>
+									<b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
+								</b-popover>
+								<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
+							</div>
+					</b-card>
+				</b-col>
+			</b-row>
 		  </div>
       </b-container>
 
@@ -189,6 +187,10 @@
 									</table>
 								</b-col>
 							</b-row>
+							
+							<div class="text-center">
+								<h4>Gran total: {{ sumProductos() }}</h4> 
+							</div>
 						
 						</div>
 				  	</div>
@@ -239,7 +241,8 @@ export default {
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
 			adelantos: [],
-			gastos: []
+			gastos: [],
+			montoTotal: 0
 			// habitacionesPiso: []
 		}
 	},
@@ -479,7 +482,18 @@ export default {
 			}
 
 			return true;
-		}
+		},
+		sumProductos() {
+			if (this.$refs.preOrdenProductos) {
+				if (this.totalAdelantos < 0) {
+					return (Math.abs(this.totalAdelantos) + this.$refs.preOrdenProductos.sumProductos).toFixed(2);
+				} else {
+					return (this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)
+				}
+			}
+			return Math.abs(this.totalAdelantos).toFixed(2)
+			// console.log('this.totalAdelantos');
+		},
 	},
 	components: {
 		PreOrdenFormDet,

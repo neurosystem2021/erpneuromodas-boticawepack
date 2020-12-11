@@ -60,6 +60,16 @@ export default {
     }
   },
   props: ['idPreorden', 'idProducto'],
+  computed: {
+    sumProductos() {
+      var sum = 0;
+      this.productos.map(prod => {
+        sum += (prod.Cantidad * prod.PrecioContado) || 0
+      })
+
+      return sum;
+    }
+  },
   methods: {
     emitUpdate () {
       this.$emit('onUpdateProductos', this.productos)
