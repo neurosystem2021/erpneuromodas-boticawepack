@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -306,6 +309,7 @@ import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
+import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 
@@ -683,7 +687,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -714,6 +718,7 @@ export default {
         ProductosCarrito,
         ClientesForm,
         ConfigVenta,
+        PagoDeuda,
         PreOrdenLista,
         Proformas
     }
