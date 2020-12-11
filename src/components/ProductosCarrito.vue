@@ -56,6 +56,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
+            :disabled="true"
             type="number"
             style="width: 110px"
             min="0"
@@ -439,13 +440,13 @@ export default {
         return `
         <div class="${style}">
            <b>${data.CodigoBarra}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
+          <b>${data.Producto}</b> 
+          / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
         `
       }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} /
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / 
          V. Estratégica: ${data.VentaEstrategica}
       `
     },

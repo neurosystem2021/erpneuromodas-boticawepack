@@ -32,11 +32,7 @@
           <tr>
             <th class="no">COD.</th>
             <th class="qty">CANT.</th>
-            <th class="">MEDIDA</th>
             <th class="desc prod">PRODUCTO</th>
-            <th class="desc">LABO.</th>
-            <th class="desc">FECHA VEN.</th>
-            <th class="desc">LOTE</th>
             <th class="unit">PRECIO U.</th>
             
             <th class="total">VALOR DE V.</th>
@@ -46,11 +42,7 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ prod.Codigo }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
-            <td>{{prod.ProductoMedicion}}</td>
             <td class="desc"><h3>{{ prod.Producto }}</h3></td>
-            <td class="">{{ prod.ProductoMarca }}</td>
-            <td class="">{{ prod.FechaVen }}</td>
-            <td class="">{{ prod.IdLote }}</td>
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             
             <td class="total">
@@ -61,7 +53,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="5"></td>
+            <td colspan="2"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -71,7 +63,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="5"></td>
+            <td colspan="2"></td>
             <td colspan="2">TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
