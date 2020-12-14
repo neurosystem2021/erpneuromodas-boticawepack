@@ -306,6 +306,7 @@ import PreOrdenLista from '@/components/PreOrdenLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         //this.getNumeroVenta()
@@ -360,6 +361,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         selectPreOrden (orden) {
            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
            // if (Array.isArray(this.venta.IdPreOrden) ) {
