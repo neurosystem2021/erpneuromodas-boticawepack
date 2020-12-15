@@ -256,10 +256,11 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      // if (this.idAlmacen) {
-      //   return this.API + 'productos/stock/' + this.idAlmacen
-      // }
-      return this.API + 'productos'
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
     },
     sumatoriaSubTotal () {
       let sumatoria = 0
@@ -436,15 +437,14 @@ export default {
 //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
         return `
         <div class="${style}">
-           <b>${data.CodigoBarra}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
-          / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
+           <b>Stock: ${data.stock}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} 
+          / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
         `
       }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} /
-         V. Estratégica: ${data.VentaEstrategica}
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} 
       `
     },
     setNuevoPrecioContado (index) {
