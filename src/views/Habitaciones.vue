@@ -12,15 +12,15 @@
 					<b-card :bg-variant="getVariant(hab)"
 									class="text-center">
 									
-							<h5>{{ hab.Producto }}</h5>
+							<h5>{{ hab.Cliente }}</h5>
 							<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
-								<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
+								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
 								<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 							</ul>
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-								<li><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
+								<li class="text-warning"><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
 							</ul>
 							<div slot="footer">
 								<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
@@ -242,7 +242,7 @@ export default {
 			pisos: [1, 2, 3, 4, 5],
 			adelantos: [],
 			gastos: [],
-			montoTotal: 0
+			montoTotal: 0,
 			// habitacionesPiso: []
 		}
 	},
@@ -492,8 +492,17 @@ export default {
 				}
 			}
 			return Math.abs(this.totalAdelantos).toFixed(2)
-			// console.log('this.totalAdelantos');
 		},
+		// totalaso() {
+
+		// 	console.log(this.habitaciones);
+
+		// 	// this.axios.get(this.API + 'movimientos/granTotal/' + , { params: {
+		// 	// 	IdPreOrden: this.selectProducto.IdPreOrden
+		// 	// } }).then(res => {
+		// 	// 	this.adelantos = res.data
+		// 	// })
+		// }
 	},
 	components: {
 		PreOrdenFormDet,
