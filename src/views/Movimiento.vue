@@ -189,7 +189,11 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" tipo="mov"></productos-carrito>
+              <productos-carrito 
+                ref="carrito"
+                @onAddProducto="onAddProducto"
+                :tipoCambio="movimiento.TipoCambio"
+                tipo="mov"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -236,8 +240,14 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
+    onAddProducto (obj) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+        })
+    },
     afe (e) {
 return false
     },
@@ -309,9 +319,15 @@ return false
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
+      if (obj.Moneda === 'USD') {
+        this.movimiento.TipoCambio = 3.7
+      } else {
+        this.movimiento.TipoCambio = 1
+      }
     },
     getProveedores (value) {
       this.buscarProveedores(value)
