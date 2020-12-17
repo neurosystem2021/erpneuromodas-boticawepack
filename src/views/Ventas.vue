@@ -326,12 +326,23 @@ export default {
     beforeMount () {
         this.initForm()
     },
+    created () {
+        window.addEventListener('keyup', (e) => {
+            if (e.which === 120) {
+                let r = confirm('¿Está seguro de realizar la venta?')
+                if (r) {
+                    this.guardarVenta();
+                }
+            }
+        });
+    },
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         /* this.loadFirstAlmacen()
         this.loadFirstPuntoVenta() */
+        this.loadClienteVarios()
     },
     data () {
         return {
@@ -397,6 +408,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -691,7 +710,9 @@ export default {
             })
         },
         guardarVenta (evt) {
-            evt.preventDefault();
+            if (evt) {
+                evt.preventDefault();
+            }
 
             this.inProgress = true
             let totalPagos = 0
@@ -766,11 +787,12 @@ export default {
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
+                // this.$refs.inputCliente.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.loadClienteVarios();
             })
             .catch((error) => {
                 console.log(error)

@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen}"
+            :customParams="{idAlmacen: idAlmacen, 'stock': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -430,16 +430,46 @@ export default {
           style = 'ambar'
         }
 
-        if (!data.ControlaStock) {
-          data.stock = '---'
-        }
+        // if (!data.ControlaStock) {
+        //   data.stock = '---'
+        // }
 
 //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
         return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+        </style>
+
         <div class="${style}">
-           <b>Stock: ${data.stock}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} 
-          / <b style=""> Precio: S/. ${data.PrecioContado}</b>
+          <table id="table-render" style="width: 700px; text-align: center  ">
+            <thead>
+              <tr style>
+                <th class="table-info" style="width: 60px">Stock</th>
+                <th>Lab.</th>
+                <th>Forma.</th>
+                <th>Medición.</th>
+                <th>Producto.</th>
+                <th class="table-success" style="width: 65px">Precio.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-info"><b>${data.stock}</b></td>
+                <td>${data.ProductoMarca}</td>
+                <td>${data.ProductoFormaFarmaceutica}</td>
+                <td>${data.ProductoMedicion}</td>
+                <td>${data.Producto}</td>
+                <td class="table-success"><b>${data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
         </div>
         `
       }
