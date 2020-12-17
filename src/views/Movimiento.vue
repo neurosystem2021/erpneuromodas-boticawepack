@@ -245,7 +245,7 @@ export default {
     }),
     onAddProducto (obj) {
         this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : ( this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1 )
         })
     },
     afe (e) {
@@ -316,6 +316,7 @@ return false
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1 })
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
