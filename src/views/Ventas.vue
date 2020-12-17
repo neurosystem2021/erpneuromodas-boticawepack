@@ -178,6 +178,7 @@
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"
+                            :isVentas="true"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -356,6 +357,8 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
+                    { key: 'eventPres', label: '' },
+                    { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
@@ -581,7 +584,13 @@ export default {
             }
             this.actualizarPrecioConvenio(obj)
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, cant) {
+            if (cant) {
+                obj.cantidad = cant
+                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+                obj.precio = preciosPorProducto.precio || 0
+                return obj
+            }
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             return obj

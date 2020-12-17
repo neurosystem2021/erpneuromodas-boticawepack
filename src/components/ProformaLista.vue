@@ -86,8 +86,6 @@ import { mapActions } from 'vuex'
                 limpiarCarrito: 'limpiarCarrito'
             }),
             selectProformas (proforma) {
-                console.log(proforma)
-                // console.log('adsasdasdasd');
                 this.axios.get(this.API + 'proformas/detalle', {
                     params: {
                         idProforma: proforma.IdProforma
@@ -103,9 +101,7 @@ import { mapActions } from 'vuex'
                         this.show = false
                     })
 
-                    proforma.productos = response.data
-
-                    this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+                    this.$emit('onSelectProforma', proforma.IdCliente)
                     this.limpiarCarrito()
                 })
             },

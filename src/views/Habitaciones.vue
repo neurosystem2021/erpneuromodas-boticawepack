@@ -12,8 +12,11 @@
 					<b-card :bg-variant="getVariant(hab)"
 									class="text-center">
 									
+							<h5>{{ hab.Producto }}</h5>
 							<h5>{{ hab.Cliente }}</h5>
 							<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
+							<!--<input type="text" @keyup="totalaso2">-->
+							<!--<p>{{totalaso2}}</p>-->
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
 								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
@@ -266,6 +269,37 @@ export default {
 			})
 
 			return sumatoria;
+		},
+		totalaso2() {
+			// console.log(this.habitaciones.IdPreOrden);
+			// this.habitaciones.forEach(element => {
+			// 	// console.log(element.IdPreOrden);
+			// 	// this.axios.get(this.API + 'movimientos/granTotal', 
+			// 	// { 
+			// 	// 	params: {
+			// 	// 		idPreOrden: element.IdPreOrden	
+			// 	// 	} 
+			// 	// })
+			// 	// .then(res => {
+			// 	// 	console.log(res);
+			// 	// 	// this.adelantos = res.data
+			// 	// })
+
+
+			// 	this.axios.get(this.API + 'movimientos/granTotal', { params: {
+			// 		idPreOrden: element.IdPreOrden
+			// 	} }).then(res => {
+			// 		console.log(res.data);
+			// 		// this.adelantos = res.data
+			// 	})
+
+
+			// });
+
+
+			
+			
+			// return a;
 		}
 	},
 	methods: {
@@ -493,16 +527,6 @@ export default {
 			}
 			return Math.abs(this.totalAdelantos).toFixed(2)
 		},
-		// totalaso() {
-
-		// 	console.log(this.habitaciones);
-
-		// 	// this.axios.get(this.API + 'movimientos/granTotal/' + , { params: {
-		// 	// 	IdPreOrden: this.selectProducto.IdPreOrden
-		// 	// } }).then(res => {
-		// 	// 	this.adelantos = res.data
-		// 	// })
-		// }
 	},
 	components: {
 		PreOrdenFormDet,

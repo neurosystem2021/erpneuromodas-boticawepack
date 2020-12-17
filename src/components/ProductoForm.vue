@@ -3,7 +3,7 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -88,7 +88,7 @@
           <b-form-group>
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-            <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
         </b-col>
@@ -206,6 +206,29 @@
         </b-col>
       </b-row>
 
+      <hr>
+      <b-row>
+        <b-col md="3" v-for="i in 4" :key="i.id">
+          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+            <b-form-group>
+              <label>Cantidad:</label>
+              <b-form-input
+                v-model="producto.precios[i-1].cantidad"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+            
+            <b-form-group>
+              <label>Precio:</label>
+              <b-form-input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+          </b-card>
+        </b-col>
+      </b-row>
+
       <hr />
       <b-row>
         <b-col>
@@ -279,6 +302,7 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
+        this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -345,6 +369,10 @@ export default {
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
+
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }
 
       } else {
 
@@ -470,7 +498,13 @@ export default {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
         },
-        imagen: null
+        Imagen: null,
+        precios: [
+          {nombre: 'ph', cantidad: 0, precio: 0},
+          {nombre: 'pp', cantidad: 0, precio: 0},
+          {nombre: 'pt', cantidad: 0, precio: 0},
+          {nombre: 'pd', cantidad: 0, precio: 0}
+        ]
       }
     },
     guardarProducto(e) {
@@ -482,7 +516,10 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
-      this.axios.post(this.API + 'productos', this.producto)
+      this.axios.post(this.API + 'productos', {
+        ...this.producto, 
+        PreciosPorProducto: this.producto.precios 
+      })
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
@@ -510,7 +547,7 @@ export default {
             headers   : { 'Content-Type': 'multipart/form-data' }
           })
           .then((res) => {
-            console.log(res);
+            // console.log(res);
           })
 
         this.$refs.productoForm.hide()
