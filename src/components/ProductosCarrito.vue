@@ -445,6 +445,9 @@ export default {
           #table-render td, #table-render th {
             border: 1px solid #eaeaea;
           }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
         </style>
 
         <div class="${style}">

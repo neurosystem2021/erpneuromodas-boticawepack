@@ -43,7 +43,7 @@
   
   .autocomplete ul li a:hover, .autocomplete ul li.focus-list a{
     color: white;
-    background: #2F9AF7;
+    background: #c1c0ff;
   }
   
   .autocomplete ul li a span, /*backwards compat*/
