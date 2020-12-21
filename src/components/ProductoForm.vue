@@ -290,8 +290,6 @@ export default {
       producto: {},
       productosDet: [],
       file: '',
-      selectedFile: null,
-      // imagenProd: null
     }
   },
   beforeMount () {

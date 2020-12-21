@@ -16,7 +16,6 @@
 							<h5>{{ hab.Cliente }}</h5>
 							<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 							<!--<input type="text" @keyup="totalaso2">-->
-							<!--<p>{{totalaso2}}</p>-->
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
 								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
@@ -271,35 +270,17 @@ export default {
 			return sumatoria;
 		},
 		totalaso2() {
-			// console.log(this.habitaciones.IdPreOrden);
+			// // console.log(this.habitaciones.IdPreOrden);
 			// this.habitaciones.forEach(element => {
-			// 	// console.log(element.IdPreOrden);
-			// 	// this.axios.get(this.API + 'movimientos/granTotal', 
-			// 	// { 
-			// 	// 	params: {
-			// 	// 		idPreOrden: element.IdPreOrden	
-			// 	// 	} 
-			// 	// })
-			// 	// .then(res => {
-			// 	// 	console.log(res);
-			// 	// 	// this.adelantos = res.data
-			// 	// })
-
 
 			// 	this.axios.get(this.API + 'movimientos/granTotal', { params: {
 			// 		idPreOrden: element.IdPreOrden
 			// 	} }).then(res => {
-			// 		console.log(res.data);
-			// 		// this.adelantos = res.data
+			// 		console.log(res);
 			// 	})
-
-
 			// });
-
-
-			
-			
-			// return a;
+			// console.log(typeof(this.habitaciones));			
+			// // return a;
 		}
 	},
 	methods: {
