@@ -14,15 +14,8 @@
 									
 							<h5>{{ hab.Producto }}</h5>
 							<h5>{{ hab.Cliente }}</h5>
-
-							<!--<h5>{{ hab.IdPreOrden }}</h5>-->
-
-							<!--<h5>{{ totalaso2 }}</h5>-->
-							<!--<h5>{{ sumaaaaaa(hab.IdPreOrden) }}</h5>
-							<h5>{{ aaa }}</h5>-->
-
-							<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
-							<!--<input type="text" @keyup="totalaso2">-->
+							<h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
+							
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
 								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
@@ -215,6 +208,7 @@
 						</b-btn>
 						<div style="float: right; margin-left: 10px;">
 							<proformas @onSelectProforma="selectProforma" @mounted="mountedProforma"></proformas>
+							<!--<proformas :idAlmacen="hab.Piso" @onSelectProforma="setCliente"></proformas>-->
 						</div>
 					</div>
 					<b-btn  variant="success" type="submit">
@@ -237,7 +231,6 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
   	mounted () {
 		this.getHabitaciones()
-		this.sumaaaaaa()
 	},
 	data () {
 		return {
@@ -253,7 +246,6 @@ export default {
 			adelantos: [],
 			gastos: [],
 			montoTotal: 0,
-			aaa: [],
 			// habitacionesPiso: []
 		}
 	},
@@ -277,19 +269,6 @@ export default {
 			})
 
 			return sumatoria;
-		},
-		totalaso2() {
-			
-			// this.habitaciones.forEach(element => {
-			// 	if (element.IdPreOrden) {
-			// 		this.axios.get(this.API + 'movimientos/granTotal', { params: {
-			// 			idPreOrden: element.IdPreOrden
-			// 		} }).then(res => {
-			// 			this.aaa.push(res.data[0])			
-			// 		})
-			// 	}
-			// });
-
 		}
 	},
 	methods: {
@@ -517,17 +496,6 @@ export default {
 			}
 			return Math.abs(this.totalAdelantos).toFixed(2)
 		},
-		sumaaaaaa(idPreOrden) {
-			if (idPreOrden) {
-				this.axios.get(this.API + 'movimientos/granTotal', { params: {
-					idPreOrden: idPreOrden
-				} }).then(res => {
-					// this.aaa.push(res.data[0])			
-
-					// return res.data
-				})
-			}
-		}
 	},
 	components: {
 		PreOrdenFormDet,
