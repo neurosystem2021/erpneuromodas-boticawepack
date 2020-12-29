@@ -94,14 +94,15 @@ import { mapActions } from 'vuex'
                     response.data.map((item) => {
                         
                         this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
                         }, { setPrecio: true, cantidad: item.Cantidad } ])
 
                         this.filter = ''
                         this.show = false
                     })
+                    proforma.productos = response.data
 
-                    this.$emit('onSelectProforma', proforma.IdCliente)
+                    this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.limpiarCarrito()
                 })
             },

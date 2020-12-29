@@ -208,7 +208,6 @@
 						</b-btn>
 						<div style="float: right; margin-left: 10px;">
 							<proformas @onSelectProforma="selectProforma" @mounted="mountedProforma"></proformas>
-							<!--<proformas :idAlmacen="hab.Piso" @onSelectProforma="setCliente"></proformas>-->
 						</div>
 					</div>
 					<b-btn  variant="success" type="submit">
@@ -279,10 +278,8 @@ export default {
 			this.show = true
 			this.$nextTick(() => {
 				proforma.productos.map(p => {
-					
 					this.$refs.preOrdenProductos.productosACargar.push(p)
 				})
-				console.log(this.$refs.preOrdenProductos.productosACargar)
 			})
 		},
 		cargarAdelantos() {
