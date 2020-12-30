@@ -2,24 +2,38 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
+          <b-col md="4" class="my-1">
+            <b-form-group>
+                  <label>Almacen:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      initValue="PRINCIPAL"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+          </b-col>
+          <b-col md="4" class="my-1">
+           <label>Buscar:</label>
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
                 <b-input-group-append>
                   <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
                 </b-input-group-append>
               </b-input-group>
-            </b-form-group>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="4" class="my-1">
             <b-row>
             <b-col md="8">
-
-              <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
+              <label>Mostrar:</label>
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
             </b-col>
             <b-col md="4">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Documentos</p>
@@ -89,7 +103,8 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      almacen: {}
     }
   },
   methods: {
@@ -106,11 +121,23 @@ export default {
           this.$refs.productoForm.show = true
 
       },
+      focusAutocomplete (ref) {
+        // this.$refs[ref].type = ""
+        this.$refs[ref].handleDoubleClick()
+      },
+      setAlmacen (obj) {
+        this.almacen = obj
+        Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+      },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
         let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+        
+        url += '&idAlmacen=' + (this.almacen.IdAlmacen || '1')
+        
+
         let promise = this.axios.get( url )
 
         return promise.then((result) => {

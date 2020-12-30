@@ -33,9 +33,9 @@
             <th class="no">COD.</th>
             <th class="qty">CANT.</th>
             <th class="desc prod">PRODUCTO</th>
-            <th class="unit">PRECIO U.</th>
+            <th class="unit">PRECIO UNIT.</th>
             
-            <th class="total">VALOR DE V.</th>
+            <th class="total">PRECIO TOT.</th>
           </tr>
         </thead>
         <tbody>
