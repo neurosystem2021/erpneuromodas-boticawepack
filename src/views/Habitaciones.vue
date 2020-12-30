@@ -123,6 +123,7 @@
 						<div id="headerCamiones" class="col-md-12">
 
 							<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+							<div class="text-left" v-if="proformaTotal"><b style="padding: 10px; background: #ebf0ff;">PROFORMA: S/ {{ proformaTotal }}</b></div>
 							<br>
 							<br>
 							
@@ -245,6 +246,8 @@ export default {
 			adelantos: [],
 			gastos: [],
 			montoTotal: 0,
+			IdProforma: null,
+			proformaTotal: null,
 			// habitacionesPiso: []
 		}
 	},
@@ -280,6 +283,8 @@ export default {
 				proforma.productos.map(p => {
 					this.$refs.preOrdenProductos.productosACargar.push(p)
 				})
+
+				this.IdProforma = proforma.IdProforma
 			})
 		},
 		cargarAdelantos() {
@@ -346,7 +351,8 @@ export default {
 			this.axios.post(this.API + 'preorden/detalle', {
 				IdPreOrden: this.selectProducto.IdPreOrden,
 				IdHabitacion: this.selectProducto.IdProducto,
-				productos: this.$refs.preOrdenProductos.productos
+				productos: this.$refs.preOrdenProductos.productos,
+				IdProforma: this.IdProforma
 			}).then(res => {
 				this.$toasted.success('Guardado correctamente')
 				this.show = false
@@ -355,9 +361,18 @@ export default {
 			
 		},
 		openCarrito(hab) {
+			this.proformaTotal = null
 			this.selectProducto = hab
 			this.$refs.modalCarrito.show()
 			this.cargarAdelantos()
+			this.cargarProformaTotal(this.selectProducto.IdProforma)
+		},
+		cargarProformaTotal(idProforma) {
+			if (idProforma) {
+				this.axios.get(this.API + 'preorden/proforma', {params: {idProforma: idProforma}}).then(res => {
+					this.proformaTotal = res.data.Total
+				})
+			}
 		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {

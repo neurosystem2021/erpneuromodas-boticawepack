@@ -445,7 +445,10 @@ export default {
                 .then(res => {
                     let suma = 0
                     res.data.map(ad => {
-                        suma += ad.Importe
+                        console.log(ad)
+                        if (ad.Tipo == 0) {
+                            suma += ad.Importe
+                        }
                     })
 
                     this.adelanto = suma

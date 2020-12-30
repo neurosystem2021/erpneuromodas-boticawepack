@@ -88,7 +88,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <b-form-checkbox id="checkbox1"
+          <b-form-checkbox 
                      v-model="cliente.EsVIP"
                      :value="1"
                      :unchecked-value="0">

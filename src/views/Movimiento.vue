@@ -99,7 +99,7 @@
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Credito: ">
-                      <b-form-checkbox id="checkbox1"
+                      <b-form-checkbox 
                         v-model="movimiento.EsCredito"
                         :value="1"
                         :unchecked-value="0">
