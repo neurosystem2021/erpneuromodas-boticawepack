@@ -17,6 +17,7 @@ import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
 import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
+import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 
@@ -74,6 +75,11 @@ export default new Router({
       path: '/reportes/cierrecaja/:id',
       name: 'CierreCajaId',
       component: CierreCaja
+    },
+    {
+      path: '/reportes/reportecierrecaja',
+      name: 'ReporteCierreCaja',
+      component: ReporteCierreCaja
     },
     {
       path: '/reportes/stockminimo',
