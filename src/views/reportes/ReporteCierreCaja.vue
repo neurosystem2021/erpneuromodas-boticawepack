@@ -132,6 +132,7 @@ export default {
             fechaHasta: this.fechaHasta + ' 23:59:59'
         }
       }).then((response) => {
+        console.log(response);
         this.cierres = response.data
       })
     },

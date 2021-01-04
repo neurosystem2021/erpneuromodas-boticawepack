@@ -537,11 +537,15 @@ export default {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
           //user: sessionStorage.getItem("User")
-          user: this.vendedor.Usuario
+          user: this.vendedor.Usuario,
+          idAlmacen: this.almacen.IdAlmacen,
+          ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas: this.totalSalidas,
+          total: this.granTotal
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
-          console.log(res)
+          // console.log(res)
         })
       }
     },
