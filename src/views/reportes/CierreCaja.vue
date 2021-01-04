@@ -23,7 +23,7 @@
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
             <b-button-group size="sm">
-              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+              <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id" :disabled="disabledCerrarCaja">Cerrar Caja</b-button>
             </b-button-group>
             <b-button-group size="sm">
               <cierres-caja></cierres-caja>
@@ -367,7 +367,8 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      almacen: {}
+      almacen: {},
+      disabledCerrarCaja: true
     }
   },
   computed: {
@@ -479,9 +480,15 @@ export default {
       window.print();
     },
     loadData () {
-      this.getVentas()
-      this.getIngresos()
-      this.getSalidas()
+      this.disabledCerrarCaja = true;
+
+      var ventas   = this.getVentas()
+      var ingresos = this.getIngresos()
+      var salidas  =this.getSalidas()
+
+      Promise.all([ventas, ingresos, salidas]).then(() => {
+        this.disabledCerrarCaja = false;
+      })
     },
     cerrarCaja () {
       if (!this.turno) {
@@ -521,7 +528,7 @@ export default {
         params.IdAlmacen = this.almacen.IdAlmacen
       }
       // cierre de caja enviar el vendedor
-      this.axios.get(this.API + 'cierrecaja/ventas', {
+      return this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
       })
       .then(res => {
@@ -541,7 +548,7 @@ export default {
       if (this.almacen.IdAlmacen) {
         params.IdAlmacen = this.almacen.IdAlmacen
       }
-      this.axios.get(this.API + 'cierrecaja/ingresos',{
+      return this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
       })
       .then(res => {
@@ -560,7 +567,7 @@ export default {
       if (this.almacen.IdAlmacen) {
         params.IdAlmacen = this.almacen.IdAlmacen
       }
-      this.axios.get(this.API + 'cierrecaja/salidas', {
+      return this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
       })
       .then(res => {
