@@ -166,6 +166,7 @@
         
         <template slot="movimiento" slot-scope="data">
           <b-form-select 
+            style="width: 90px;"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <small>Stock: {{ productos[data.index].stockMovimiento }}</small><br />
@@ -566,6 +567,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
+        this.loadMovimientoLotes(obj.IdProducto)
       }])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
