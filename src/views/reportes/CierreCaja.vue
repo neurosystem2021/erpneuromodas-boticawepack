@@ -3,11 +3,11 @@
     <br>
     <b-container class="bv-example-row">
       <div>
-          <div class="float-right no-print">
-              <b-row>
-                <b-col cols="2" v-if="!this.$route.params.id">
-                    <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
-                    <b-form-group size="sm" v-show="false">
+          <div class="no-print">
+              <b-row align-h="end" class=" no-print">
+                    <label v-if="!this.$route.params.id" >Vendedor:</label>
+                <b-col cols="3" v-if="!this.$route.params.id">
+                    <b-form-group size="sm" >
                         <autocomplete
                             required="required"
                             ref="inputVendedor"
@@ -20,7 +20,7 @@
                         </autocomplete>
                     </b-form-group>
                 </b-col>
-                <b-col cols="12">
+                <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
                     </b-button-group>
@@ -508,7 +508,11 @@ export default {
         .then((response) => {
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            this.$refs.inputVendedor.$refs.input.disabled = true
+            // this.$refs.inputVendedor.$refs.input.disabled = true
+
+            if(response.data.IdUsuarioPerfil !== 1) {
+              this.$refs.inputVendedor.$refs.input.disabled = true
+            }
         })
         .catch((error) => {
             console.log(error)
@@ -538,7 +542,6 @@ export default {
           idTurno: this.turno,
           //user: sessionStorage.getItem("User")
           user: this.vendedor.Usuario,
-          idAlmacen: this.almacen.IdAlmacen,
           ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas: this.totalSalidas,
           total: this.granTotal

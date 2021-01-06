@@ -7,6 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{ limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
