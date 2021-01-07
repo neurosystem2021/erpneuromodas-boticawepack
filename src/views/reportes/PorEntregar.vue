@@ -200,7 +200,7 @@ export default {
       this.totalRows = response.data.total
     })
 
-    this.getVentasAcumuladas()
+    // this.getVentasAcumuladas()
   },
   data() {
     return {
@@ -413,6 +413,9 @@ export default {
       let tipoDocFilter = ''
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
+      }
+      if (!ctx.filter) {
+        ctx.filter = '&filter[fechaInicio]=' + this.fechaInicio
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'porEntregar=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
