@@ -26,6 +26,7 @@
                   <b-form-input v-model="fechaInicio"
                     type="date"
                     placeholder=""
+                    :value="fechaInc"
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
                 </b-form-group>
                 <b-form-group>
@@ -250,6 +251,23 @@ export default {
     }
   },
   computed: {
+    fechaInc() {
+      let year = this.fechaInicio.substr(0, 4)
+      let month = this.fechaInicio.substr(5, 2)
+      
+      var fecha = new Date(year, month);
+      fecha.setMonth(fecha.getMonth() - 7);
+      fecha.toLocaleDateString('es-PE')
+      
+      if (fecha.getMonth() < 10) {
+        this.fechaInicio = fecha.getFullYear() + '-0' + (fecha.getMonth()+1) + '-0' + 1
+        return this.fechaInicio
+      }
+
+      this.fechaInicio = fecha.getFullYear() + '-' + (fecha.getMonth()+1) + '-0' + 1
+      
+      return this.fechaInicio
+    }  
   },
   methods: {
     entregarVenta (venta) {
