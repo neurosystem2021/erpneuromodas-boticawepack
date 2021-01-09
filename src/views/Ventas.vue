@@ -167,6 +167,7 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
+                            :isVentas="true"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -344,6 +345,8 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     /*{ key: 'PrecioDocena', label: 'Present.' },*/
                     { key: 'ProductoMedicion', label: 'Med.' },
+                    { key: 'eventPres', label: '' },
+                    { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'precioMayor', label: 'Pre. Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -525,7 +528,13 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, cant) {
+            if (cant) {
+                obj.cantidad = cant
+                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+                obj.precio = preciosPorProducto.precio || 0
+                return obj
+            }
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             return obj

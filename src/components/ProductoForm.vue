@@ -3,7 +3,7 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -195,6 +195,29 @@
         </b-col>
       </b-row>
 
+      <hr>
+      <b-row>
+        <b-col md="3" v-for="i in 4" :key="i.id">
+          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+            <b-form-group>
+              <label>Cantidad:</label>
+              <b-form-input
+                v-model="producto.precios[i-1].cantidad"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+            
+            <b-form-group>
+              <label>Precio:</label>
+              <b-form-input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+          </b-card>
+        </b-col>
+      </b-row>
+
       <hr />
       <b-row>
         <b-col>
@@ -265,6 +288,7 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
+        this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -328,6 +352,10 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.PrecioDocena = newVal.PrecioDocena
         this.producto.PrecioCentena = newVal.PrecioCentena
+
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }
 
       } else {
 
@@ -448,7 +476,13 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
-        }
+        },
+        precios: [
+          {nombre: 'Precio 1', cantidad: 0, precio: 0},
+          {nombre: 'Precio 2', cantidad: 0, precio: 0},
+          {nombre: 'Precio 3', cantidad: 0, precio: 0},
+          {nombre: 'Precio 4', cantidad: 0, precio: 0}
+        ]
       }
     },
     guardarProducto(e) {
@@ -460,7 +494,10 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
-      this.axios.post(this.API + 'productos', this.producto)
+      this.axios.post(this.API + 'productos', {
+        ...this.producto, 
+        PreciosPorProducto: this.producto.precios 
+      })
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)

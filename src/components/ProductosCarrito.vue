@@ -26,7 +26,58 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+
+      <b-modal ref="modalCant" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3>PRESENTACIONES</h3>
+        </div>
+
+        <b-row>
+          <b-col cols="6">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              @click="setProductoUni(objProd)"
+            >
+              <b>1 - UNIDAD</b>
+            </b-card>
+          </b-col>
+
+          <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+              @click="() => {
+                if ( parseFloat(d.cantidad) ) {
+                  setProductoCant(d)
+                }
+              }"
+            >
+              {{d.cantidad}} - UNIDADES
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+          <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+        </template>
+
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+          <b-form-input
+            v-model="productos[data.index].cantxPrecio"
+            type="number"
+            style="width: 75px"
+            step="0.001"
+            min="0"
+            @input="(val) => changeCant(val, productos[data.index])"
+            placeholder="Cantidad">
+          </b-form-input>
+          <span>x{{productos[data.index].cantidadPres}}</span>
+        </template>
+
         <template slot="precioMayor" slot-scope="data" >
           <small style="display: block; width:105px" v-show="productos[data.index].PrecioDocena">Por 12 -> S/{{productos[data.index].PrecioDocena}}</small>
           <small v-show="productos[data.index].PrecioCentena">Por 100 -> S/{{productos[data.index].PrecioCentena}}</small>
@@ -34,15 +85,24 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
             style="width: 75px"
             min="0"
             step="0.001"
             @input="(val) => {
-              $emit('onInputCantidad', val)
-              if (tipo != 'mov') {
-                productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+            $emit('onInputCantidad', val)
+              if(!productos[data.index].PreciosPorProducto) {
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                return
               }
+
+              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
+              if(reg && reg.cantidad){
+                productos[data.index].precio = reg.precio
+                return
+              }
+              productos[data.index].precio = productos[data.index].PrecioContado 
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -194,7 +254,10 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      preciosProd: [],
+      objProd: {},
+      cant: 0,
     }
   },
   watch: {
@@ -203,6 +266,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
     tipo: String,
 
@@ -296,8 +360,18 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      actualizarProd : 'actualizarProducto',
     }),
+    changeCant (val, prod) {
+      if (val) {
+        prod.cantidad = prod.cantidadPres
+        prod.cantidad *= val
+      }
+      this.$nextTick(() => {
+        this.actualizarProd(prod)
+      })
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -306,15 +380,16 @@ export default {
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.setProducto(response.data)
           } else {
-            this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
           }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
+        })
       }
     },
     /*alterarBuscadorProductos() {
@@ -350,6 +425,25 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      this.loadCode = ''
+      this.preciosProd = []
+      this.objProd = {}
+
+      if (!this.isVentas) {
+        obj.PreciosPorProducto = '';
+      }
+
+      if (!obj.PreciosPorProducto) {
+        this.setProductoUni(obj)
+        return
+      }
+
+      this.$refs['modalCant'].show()
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      this.objProd = obj
+    },
+    setProductoUni (obj) {
+      this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
@@ -361,9 +455,43 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }, { setPrecioCosto: this.tipo == 'mov' ? true : false }])
-
+        this.$toasted.success('Producto añadido correctamente')
+      }])
       // Vue.set(this.productos, obj.IdProducto, obj)
+      this.$refs['modalCant'].hide()
+      obj.cantidadPres = obj.cantidad
+      this.actualizarProd(obj)
+    },
+    setProductoCant (prod) {
+      this.objProd.cantxPrecio = 1
+      this.cant = prod.cantidad
+      let obj = this.objProd
+      this.$refs.autocompleteProducto.setValue('')
+      //obj.FLETE = 0
+      // this.objProd.precio = 0
+      // this.objProd.cantidad = 0
+      obj.precio = 0
+      obj.cantidad = 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      obj.descuento = 0
+      obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj, prod.cantidad)
+      this.add([obj, () => {
+        this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
+      }])
+      this.$refs['modalCant'].hide()
+      obj.cantidadPres = this.cant
+      this.actualizarProd(obj)
+    },
+    showPresentacion (obj) {
+      if (!obj.PreciosPorProducto !== '') {
+        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+        this.objProd = obj
+        this.$refs['modalCant'].show()
+        return
+      }
     },
     renderChild(data) {
       return `
@@ -390,6 +518,7 @@ export default {
       
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      this.getSubtotal(index)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
     },
@@ -444,4 +573,11 @@ export default {
 </script>
 
 <style>
+  .contentCard {
+    cursor: pointer;
+  }
+  .disabledMouse {
+    background: #CECECE;
+    cursor: inherit;
+  }
 </style>
