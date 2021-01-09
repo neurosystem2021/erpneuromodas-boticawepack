@@ -57,6 +57,7 @@
                   <th>Ingresos</th>
                   <th>Salidas</th>
                   <th>Saldo</th>
+                  <th>Ventas</th>
                   <th>Ver</th>
                 </tr> 
               </thead>
@@ -71,6 +72,7 @@
                   <td>{{ cierre.Ingresos }}</td>
                   <td>{{ cierre.Salidas }}</td>
                   <td><b>{{ cierre.Total }}</b></td>
+                  <td>{{ cierre.Ventas }}</td>
                   <td>
                     <b-button :href="'/views/ve_cierreform.php?idCierre=' + cierre.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
                   </td>
@@ -78,7 +80,11 @@
               </tbody>
             </table>
           </b-row>
-          <b-alert variant="success" class="text-center no-print" show><b>TOTAL GENERAL: S/. {{ totalGeneral | moneda }}</b></b-alert>
+          <b-alert variant="success" class="text-center no-print" show>
+            TOTAL VENTAS: S/ {{ totalVentas | moneda }}
+            <br>
+            <b>TOTAL GENERAL: S/ {{ totalGeneral | moneda }}</b>
+          </b-alert>
         </b-container>
     </div>
 </template>
@@ -108,6 +114,15 @@ export default {
     //   })
     //   return total
     // }
+    totalVentas() {
+      let total = 0;
+      
+      for (var i = 0; i < this.cierres.length; i++) {
+        total += this.cierres[i].Ventas
+      }
+
+      return total
+    },
     totalGeneral() {
       let total = 0;
       
@@ -132,7 +147,6 @@ export default {
             fechaHasta: this.fechaHasta + ' 23:59:59'
         }
       }).then((response) => {
-        console.log(response);
         this.cierres = response.data
       })
     },
