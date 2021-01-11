@@ -173,7 +173,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="3">
+        <!-- <b-col md="3">
           <b-form-group>
             <label>Precio por 12:</label>
             <b-form-input
@@ -182,8 +182,8 @@
               step="0.01"
               ></b-form-input>
           </b-form-group>
-        </b-col>
-        <b-col md="3">
+        </b-col> -->
+        <!-- <b-col md="3">
           <b-form-group>
             <label>Precio por 100:</label>
             <b-form-input
@@ -192,7 +192,7 @@
               step="0.01"
               ></b-form-input>
           </b-form-group>
-        </b-col>
+        </b-col> -->
       </b-row>
 
       <hr>
