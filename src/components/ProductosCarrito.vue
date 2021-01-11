@@ -81,7 +81,7 @@
         <template slot="precioMayor" slot-scope="data" >
          <!-- <small style="display: block; width:105px" v-show="productos[data.index].PrecioDocena">Por 12 -> S/{{productos[data.index].PrecioDocena}}</small>
           <small v-show="productos[data.index].PrecioCentena">Por 100 -> S/{{productos[data.index].PrecioCentena}}</small> -->
-          <small style="white-space: nowrap;" v-for="(p, index) in JSON.parse(data.item.PreciosPorProducto)" v-if="p.cantidad > 0" :v-key="index">
+          <small style="white-space: nowrap;" v-for="(p, index) in JSON.parse(data.item.PreciosPorProducto || '[]')" v-if="p.cantidad > 0" :v-key="index">
           Por {{p.cantidad}} -> S/ {{p.precio}} <br />
           </small>
         </template>
