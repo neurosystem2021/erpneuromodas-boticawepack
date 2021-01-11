@@ -382,7 +382,6 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      console.log(this.cliente)
       if (obj.ControlaStock && obj.stock <= 0) {
         this.$toasted.show('No esta permitido la venta sin stock!')
         return;

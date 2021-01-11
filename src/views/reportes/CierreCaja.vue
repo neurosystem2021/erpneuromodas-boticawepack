@@ -381,6 +381,9 @@ export default {
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
     },
+    totalVentas () {
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+    },
     totalSalidas () {
       let total = 0
       this.salidas.forEach(salida => {
@@ -498,12 +501,13 @@ export default {
       let r = confirm('¿Está seguro de cerrar la caja?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
-          idTurno: this.turno,
-          user: this.vendedor.Usuario,
-          idAlmacen: this.almacen.IdAlmacen,
-          ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
-          salidas: this.totalSalidas,
-          total: this.granTotal
+          idTurno:      this.turno,
+          user:         this.vendedor.Usuario,
+          idAlmacen:    this.almacen.IdAlmacen,
+          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas:      this.totalSalidas,
+          total:        this.granTotal,
+          totalVentas:  this.totalVentas
         }).then(res => {
           this.loadData()
           this.$toasted.success('¡Caja cerrada! Se ha aperturado un ingreso por el monto total.')

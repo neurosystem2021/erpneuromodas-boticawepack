@@ -55,6 +55,7 @@
                   <th>Turno</th>
                   <th>Usuario</th>
                   <th>Ingresos</th>
+                  <th>Ventas</th>
                   <th>Salidas</th>
                   <th>Saldo</th>
                   <th>Ver</th>
@@ -69,6 +70,7 @@
                   <td v-if="cierre.IdTurno === 3">Noche</td>
                   <td>{{ cierre.UsuarioReg }}</td>
                   <td>{{ cierre.Ingresos }}</td>
+                  <td>{{ cierre.Ventas }}</td>
                   <td>{{ cierre.Salidas }}</td>
                   <td><b>{{ cierre.Total }}</b></td>
                   <td>
@@ -76,6 +78,17 @@
                   </td>
                 </tr>
               </tbody>
+              <tfoot>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>S/ {{ totalIngresos | moneda }}</th>
+                <th>S/ {{ totalVentas | moneda }}</th>
+                <th>S/ {{ totalSalidas | moneda }}</th>
+                <!--<th>S/ {{ totalSaldo | moneda }}</th>-->
+                <th></th>
+              </tfoot>
             </table>
           </b-row>
           <b-alert variant="success" class="text-center no-print" show><b>TOTAL GENERAL: S/. {{ totalGeneral | moneda }}</b></b-alert>
@@ -108,6 +121,34 @@ export default {
     //   })
     //   return total
     // }
+    totalIngresos() {
+      let total = 0;
+      for (var i = 0; i < this.cierres.length; i++) {
+        total += this.cierres[i].Ingresos
+      }
+      return total
+    },
+    totalVentas() {
+      let total = 0;      
+      for (var i = 0; i < this.cierres.length; i++) {
+        total += this.cierres[i].Ventas
+      }
+      return total
+    },
+    totalSalidas() {
+      let total = 0;
+      for (var i = 0; i < this.cierres.length; i++) {
+        total += this.cierres[i].Salidas
+      }
+      return total
+    },
+    totalSaldo() {
+      let total = 0;
+      for (var i = 0; i < this.cierres.length; i++) {
+        total += this.cierres[i].Total
+      }
+      return total
+    },
     totalGeneral() {
       let total = 0;
       
