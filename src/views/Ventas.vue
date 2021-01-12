@@ -52,7 +52,7 @@
                                         initValue=""
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setDocRef" 
+                                        :on-select="setDocRef"
                                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -127,7 +127,7 @@
                                         <option value="Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                                    </b-form-select>                                  
+                                    </b-form-select>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -331,6 +331,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -398,6 +399,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                  if (res.data.IdCliente) {
+                      this.setCliente(res.data)
+                  }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -468,7 +477,7 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
-            
+
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
 
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
@@ -537,7 +546,7 @@ export default {
                 // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-                
+
                 this.$refs.inputAlmacen.$refs.input.disabled = true
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
             })
@@ -722,13 +731,13 @@ export default {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
                     this.inProgress = false
-                    return 
+                    return
                 }
 
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
-                    return 
+                    return
                 }
 
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
@@ -749,7 +758,7 @@ export default {
 
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
-            let totalCero = 0 
+            let totalCero = 0
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
                     sinStock += 1
@@ -765,7 +774,7 @@ export default {
                 this.inProgress = false
                 return;
             }
-            
+
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
