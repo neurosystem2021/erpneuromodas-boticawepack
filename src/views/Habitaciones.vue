@@ -15,6 +15,8 @@
 							<h5>{{ hab.Producto }}</h5>
 							<h5>{{ hab.Cliente }}</h5>
 							<h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
+							<!--<h5>{{hab}}</h5>-->
+							<!-- <h5 @keyup="cargarProformaTotal(hab.IdProforma)">{{proformaTotalCard}}</h5> -->
 							
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
@@ -122,9 +124,12 @@
 				  	<div class="row">
 						<div id="headerCamiones" class="col-md-12">
 
-							<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
-							<div class="text-left" v-if="proformaTotal"><b style="padding: 10px; background: #ebf0ff;">PROFORMA: S/ {{ proformaTotal }}</b></div>
-							<br>
+							<div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+							<div class="text-left" v-if="proformaTotal">
+								<b style="padding: 4px; background: #ebf0ff;">
+									<b>PROFORMA:</b> {{ codProforma }} <br> S/ {{ proformaTotal }}
+								</b>
+							</div>
 							<br>
 							
 							<b-row>
@@ -134,6 +139,16 @@
 									:id-producto="selectProducto.IdProducto"
 									ref="preOrdenProductos"
 									></pre-orden-form-det>
+
+									<!--<table class="table b-table border table-footer table-sm text-center" >
+										<tbody>
+											<tr><td>Mano de obra bruta</td></tr>
+											<tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+											<tr><td>Mano de obra neta</td></tr>
+											<tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+										</tbody>
+									</table>-->
+
 								</b-col> 
 								<b-col md="4">
 
@@ -150,6 +165,27 @@
 										<b-button @click="insertarGasto" variant="primary" size="sm">+</b-button>
 										<b-form-text id="inputLiveHelp">Los gastos se reflejará en Caja y Banco.</b-form-text>
 									</b-input-group>
+									<br>
+									<table class="table b-table table-sm">
+										<thead>
+											<tr>
+											<th>Fecha</th>
+											<th>Concepto</th>
+											<th>Cantidad</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr v-for="(ade, index) in gastos" :key="index">
+												<td>{{ ade.FechaDoc }}</td>
+												<td>{{ ade.Concepto.split(" - ").pop() }}</td>
+												<td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
+											</tr>
+											<tr class="bg-info text-white">
+												<td colspan="2">TOTAL</td>
+												<td>{{ totalGastos }}</td>
+											</tr>
+										</tbody>
+									</table>
 
 									<hr />
 
@@ -169,24 +205,24 @@
 
 									<br />
 									<table class="table b-table table-sm">
-									<thead>
-										<tr>
-										<th>Fecha</th>
-										<th>Concepto</th>
-										<th>Cantidad</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr v-for="(ade, index) in adelantos" :key="index">
-											<td>{{ ade.FechaDoc }}</td>
-											<td>{{ ade.Concepto.split(" - ").pop() }}</td>
-											<td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
-										</tr>
-										<tr class="bg-info text-white">
-											<td colspan="2">TOTAL</td>
-											<td>{{ totalAdelantos }}</td>
-										</tr>
-									</tbody>
+										<thead>
+											<tr>
+											<th>Fecha</th>
+											<th>Concepto</th>
+											<th>Cantidad</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr v-for="(ade, index) in adelantos" :key="index">
+												<td>{{ ade.FechaDoc }}</td>
+												<td>{{ ade.Concepto.split(" - ").pop() }}</td>
+												<td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
+											</tr>
+											<tr class="bg-info text-white">
+												<td colspan="2">TOTAL</td>
+												<td>{{ totalAdelantos }}</td>
+											</tr>
+										</tbody>
 									</table>
 								</b-col>
 							</b-row>
@@ -223,6 +259,7 @@
     </div>
 </template>
 <script>
+import { mapActions, mapState } from 'vuex'
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 import ClientesForm from '@/components/ClientesForm'
@@ -248,10 +285,15 @@ export default {
 			montoTotal: 0,
 			IdProforma: null,
 			proformaTotal: null,
+			codProforma: null,
+			// proformaTotalCard: null,
 			// habitacionesPiso: []
 		}
 	},
 	computed: {
+		...mapState({
+            productos: state => state.cart.productos
+        }),
 		totalAdelantos() {
 			let sumatoria = 0
 			this.adelantos.map(ad => {
@@ -271,7 +313,20 @@ export default {
 			})
 
 			return sumatoria;
-		}
+		},
+		manoDeObraBruta () {
+			// console.log(this.selectProducto.IdPreOrden);
+            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+            let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+            return precio
+        },
+        manoDeObraNeta () {
+            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+            let precio = pManoObra ? pManoObra.precio : 0;
+
+            return precio
+        }
 	},
 	methods: {
 		mountedProforma(modal) {
@@ -289,9 +344,18 @@ export default {
 		},
 		cargarAdelantos() {
 			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
-				IdPreOrden: this.selectProducto.IdPreOrden
+				IdPreOrden		: this.selectProducto.IdPreOrden,
+				TipoCajaBanco 	: 0
 			} }).then(res => {
 				this.adelantos = res.data
+			})
+		},
+		cargarGastos() {
+			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
+				IdPreOrden		: this.selectProducto.IdPreOrden,
+				TipoCajaBanco 	: 1
+			} }).then(res => {
+				this.gastos = res.data
 			})
 		},
 		insertarAdelanto() {
@@ -314,6 +378,9 @@ export default {
 				}).then(res => {
 					// this.adelantos.push(res.data)
 					this.cargarAdelantos();
+					this.selectProducto.Adelanto 		= '' 
+					this.selectProducto.Producto 		= '' 
+					this.selectProducto.AdelantoDesc	= ''
 				})
 			}
 		},
@@ -337,7 +404,10 @@ export default {
 					Usuario: usuario
 				}).then(res => {
 					// this.adelantos.push(res.data)
-					this.cargarAdelantos();
+					this.cargarGastos();
+					this.selectProducto.Gasto 		= '' 
+					this.selectProducto.Producto 	= '' 
+					this.selectProducto.GastoDesc 	= ''
 				})
 			}
 		},
@@ -365,12 +435,15 @@ export default {
 			this.selectProducto = hab
 			this.$refs.modalCarrito.show()
 			this.cargarAdelantos()
+			this.cargarGastos()
 			this.cargarProformaTotal(this.selectProducto.IdProforma)
 		},
 		cargarProformaTotal(idProforma) {
 			if (idProforma) {
 				this.axios.get(this.API + 'preorden/proforma', {params: {idProforma: idProforma}}).then(res => {
 					this.proformaTotal = res.data.Total
+					this.codProforma = res.data.IdProforma
+					this.codProforma = res.data.Anio + ' - ' + res.data.Numero
 				})
 			}
 		},
@@ -499,14 +572,17 @@ export default {
 			return true;
 		},
 		sumProductos() {
+			let total = 0
 			if (this.$refs.preOrdenProductos) {
-				if (this.totalAdelantos < 0) {
-					return (Math.abs(this.totalAdelantos) + this.$refs.preOrdenProductos.sumProductos).toFixed(2);
-				} else {
-					return (this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)
-				}
+				// console.log(this.$refs.preOrdenProductos.sumProductos);
+				// if (this.totalAdelantos < 0) {
+				// 	return (Math.abs(this.totalAdelantos) + this.$refs.preOrdenProductos.sumProductos).toFixed(2);
+				// } else {
+				// 	return (this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)
+				// }
+				total = this.$refs.preOrdenProductos.sumProductos + this.totalGastos - this.totalAdelantos
 			}
-			return Math.abs(this.totalAdelantos).toFixed(2)
+			return Math.abs(total).toFixed(2)
 		},
 	},
 	components: {

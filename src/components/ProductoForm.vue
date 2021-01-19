@@ -91,6 +91,16 @@
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
+          <b-form-group>
+            <label>Descripción:</label>
+            <b-form-textarea 
+              ref="inputProductoDesc"
+              rows="6"
+              v-model="producto._ProductoDesc"
+              @input="(val) => producto.ProductoDesc = val"
+              />
+          </b-form-group>
+
         </b-col>
         <b-col md="6">
           <b-form-group>
@@ -327,6 +337,8 @@ export default {
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+
+        this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true

@@ -550,6 +550,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     setProducto (obj) {
+      console.log(obj);
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}

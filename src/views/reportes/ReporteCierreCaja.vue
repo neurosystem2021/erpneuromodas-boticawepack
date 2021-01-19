@@ -146,7 +146,6 @@ export default {
     },
     totalSaldo() {
       let total = 0;
-      console.log(this.cierres);
       for (var i = 0; i < this.cierres.length; i++) {
         total += this.cierres[i].Total
       }
