@@ -57,6 +57,45 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
+
+          <b-form-group>
+            <label>Modelo:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'productos/modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.ProductoModelo"
+                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
+                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+            <!--<b-form-input v-model="producto.ProductoModelo"
+              required="required"
+              class="upper"
+              type="text"
+              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
+              ></b-form-input>-->
+            <!-- <b-input-group>
+              <autocomplete
+                :url="API + 'modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.modelo.ProductoModelo"
+                :on-select="setModelo"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+              <b-input-group-append>
+                <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
+              </b-input-group-append>
+            </b-input-group> -->
+          </b-form-group>
           
           <b-form-group>
             <label>Artículo:</label>
@@ -335,7 +374,7 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
@@ -370,7 +409,7 @@ export default {
         this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
         this.producto.StockMinimo           = newVal.StockMinimo
         this.producto.CodigoBarra           = newVal.CodigoBarra
-        //this.producto.ProductoModelo      = newVal.ProductoModelo
+        this.producto.ProductoModelo        = newVal.ProductoModelo
         this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
