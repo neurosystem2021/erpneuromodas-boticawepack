@@ -712,6 +712,8 @@ export default {
 
             this.venta.productos = this.productos
             
+            // console.log(this.venta);
+
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 // console.log(response)

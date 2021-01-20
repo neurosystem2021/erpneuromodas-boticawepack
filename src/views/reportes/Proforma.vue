@@ -22,6 +22,7 @@
         <div id="invoice">
           <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
           <div class="date">Fecha Proforma: {{ proforma.FechaReg }}</div>
+          <div class="date">Usuario: {{ proforma.UsuarioReg }}</div>
           <!--<div class="date">Due Date: 30/06/2014</div>-->
         </div>
       </div>
