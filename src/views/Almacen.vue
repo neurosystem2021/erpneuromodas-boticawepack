@@ -123,6 +123,20 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
+              <!--<b-col md="3">
+                <b-form-group>
+                  <label>Codigo de Barra:</label>
+                  <autocomplete
+                    :url="API + 'marcas'"
+                    ref="inputCodigoBarra"
+                    anchor="CodigoBarra"
+                    label="writer"
+                    :on-select="val => generateFilter('marca', val.ProductoMarca)"
+                    :onInput="(val) => !val ? generateFilter('marca', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>-->
               <b-col md="3">
                 <!--<b-form-group>
                   <label>Modelo:</label>
@@ -469,6 +483,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
+      // this.$refs.inputCodigoBarra.setValue('')
       // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
