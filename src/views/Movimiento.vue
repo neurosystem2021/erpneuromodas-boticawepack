@@ -193,6 +193,7 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto"
                 :tipoCambio="movimiento.TipoCambio"
+                :setPrecio="true"
                 tipo="mov"></productos-carrito>
             </b-col>
           </b-row>
