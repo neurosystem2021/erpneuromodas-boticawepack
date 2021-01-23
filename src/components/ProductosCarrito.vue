@@ -95,6 +95,10 @@
             step="0.001"
             @input="(val) => {
             $emit('onInputCantidad', val)
+              if (tipo == 'mov') {
+                return;
+              }
+
               if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 return
