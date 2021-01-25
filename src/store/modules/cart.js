@@ -133,17 +133,19 @@ const actions = {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
-    axios.get(API + 'productos/stock', {
-      params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
-      }
-    }).then((response) => {
-        commit('OBTENER_STOCK', response.data)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+    if (state.productos.length) {
+      axios.get(API + 'productos/stock', {
+        params: {
+          idProductos: state.productos.map(prod => prod.IdProducto),
+          idAlmacen: obj.IdAlmacen
+        }
+      }).then((response) => {
+          commit('OBTENER_STOCK', response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
   }
 }
 
