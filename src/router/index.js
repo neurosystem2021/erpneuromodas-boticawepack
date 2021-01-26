@@ -19,6 +19,7 @@ import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 
 Vue.use(Router)
@@ -70,6 +71,11 @@ export default new Router({
       path: '/reportes/proforma/:id',
       name: 'Proforma',
       component: Proforma
+    },
+    {
+      path: '/reportes/kardex',
+      name: 'Kardex',
+      component: Kardex
     },
     {
       path: '/reportes/cierrecaja/:id',
