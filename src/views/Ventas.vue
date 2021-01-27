@@ -776,7 +776,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock)) {
                     sinStock += 1
                 }
 
@@ -784,6 +784,12 @@ export default {
                     totalCero += 1
                 }
             });
+
+            if (sinStock >= 1) {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false            
+                return;
+            }
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
