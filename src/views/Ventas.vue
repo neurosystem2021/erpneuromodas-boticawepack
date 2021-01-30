@@ -709,7 +709,7 @@ export default {
             totalPagos += parseFloat(this.venta.pago.mastercard.monto)
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (this.totalCart.toFixed(2) != totalPagos.toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
