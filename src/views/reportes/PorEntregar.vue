@@ -419,7 +419,7 @@ export default {
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'porEntregar=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
+// console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
