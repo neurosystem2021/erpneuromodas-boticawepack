@@ -69,7 +69,7 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -129,7 +129,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="6">
+          <!-- <b-col md="6">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -146,7 +146,7 @@
                 </b-form-group>
               </b-col> 
             </b-row>
-          </b-col>
+          </b-col> -->
         </b-row>
         <b-row>
           <b-col md="12" class="my-1">

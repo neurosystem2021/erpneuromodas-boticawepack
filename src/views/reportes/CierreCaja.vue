@@ -107,7 +107,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Ventas Izipay y Transferencias</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
