@@ -33,9 +33,14 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
+           <b-col md="2" class="my-1">
               Total Comisión
               <div class="total-comision">{{ totalComision }}</div>
+       
+          </b-col>
+          <b-col md="2" class="my-1">
+              Total Saldo Comisión
+              <div class="total-comision">{{ totalSaldoComision }}</div>
        
           </b-col>
 
@@ -96,18 +101,22 @@ export default {
   },
   watch: {
     items (items) {
-      let total = 0
+      let total = 0;
+      let saldo = 0;
       items.map(v => {
-        total += v.Comision
+        total += v.ComisionTotal
+        saldo += v.Comision
+        
       })
-
-      this.totalComision = total
+      this.totalComision = Math.round(total)
+      this.totalSaldoComision = Math.round(saldo)
     }
   },
   data() {
     return {
       API: config.API,
       totalComision: 0,
+      totalSaldoComision: 0,
       clienteSelect: {},
       showPagos: false,
       pageOptions: [ 5, 10, 15, 50, 100 ],
@@ -119,7 +128,8 @@ export default {
       fields: [
             { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
             { key: 'Cliente', label: 'Cliente', sortable: true },
-            { key: 'Comision', label: 'Total Comisión', sortable: true},
+            { key: 'ComisionTotal', label: 'Total Comisión', sortable: true},
+            { key: 'Comision', label: 'Saldo', sortable: true},
             { key: 'pagar', label: 'Pagar' }
       ],
       totalRows: 50,
@@ -172,7 +182,11 @@ export default {
       let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter )
 
       return promise.then((response) => {
-        this.items = response.data
+        this.items = response.data.map(d => {
+          d.ComisionTotal = Math.round(d.ComisionTotal)
+          d.Comision = Math.round(d.Comision)
+          return d
+        })
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false
         // this.isBusy = false

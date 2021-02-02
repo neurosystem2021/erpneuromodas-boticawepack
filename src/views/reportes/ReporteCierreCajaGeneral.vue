@@ -73,10 +73,11 @@ export default {
   computed: {
     totalGeneral() {
       let total = 0;
-      this.cierres.map(cierre => {
-        total += cierre.Total
+      
+      this.cierresAlmacen.map(cierre => {
+        total += parseFloat(cierre.Total)
       })
-      return total
+      return total.toFixed(2)
     },
     cierresAlmacen() {
         let cierres = []
@@ -85,9 +86,9 @@ export default {
                 let ca = this.cierres.filter(ci => ci.IdAlmacen === c.IdAlmacen)
                 cierres[c.IdAlmacen] = {
                     Almacen: c.Almacen,
-                    Ingresos: ca.reduce( (a, b) => a + b.Ingresos , 0),
-                    Salidas: ca.reduce( (a, b) => a + b.Salidas , 0),
-                    Total: ca.reduce( (a, b) => a + b.Ingresos , 0) - ca.reduce( (a, b) => a + b.Salidas , 0)
+                    Ingresos: ca.reduce( (a, b) => a + b.Ingresos , 0).toFixed(2),
+                    Salidas: ca.reduce( (a, b) => a + b.Salidas , 0).toFixed(2),
+                    Total: (ca.reduce( (a, b) => a + b.Ingresos , 0) - ca.reduce( (a, b) => a + b.Salidas , 0)).toFixed(2)
                 }
             }
         })

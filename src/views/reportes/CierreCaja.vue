@@ -46,16 +46,20 @@
         <b-col cols="4">
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
-            <tr>
-              <td>Ingreso Neto S/.</td>
+            <tr style="background: #ffd19f;">
+              <td>Caja Total S/.</td>
               <td>{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
         </table>          
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
-            <tr>
+            <tr style="background: #ffb191;">
               <td>Total Ventas S/.</td>
+              <td>{{ (this.totalVentas ) | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Ventas Contado S/.</td>
               <td>{{ (this.totalVentasEfectivo ) | moneda }} </td>
             </tr>
             <tr>
@@ -74,7 +78,7 @@
         </table>
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
-            <tr>
+            <tr style="background: #ffb191;">
               <td>Efectivo S/.</td>
               <td>{{ totalVentasEfectivo | moneda }} </td>
             </tr>
@@ -86,14 +90,15 @@
               <td>Mastercard S/.</td>
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr> -->
-            <tr>
-              <td>Ingresos S/.</td>
-              <td>{{ totalIngresos | moneda }} </td>
-            </tr>
-             <tr>
+            <tr style="background: #ffb191;">
               <td>Egresos S/.</td>
               <td>{{ totalSalidas | moneda }} </td>
             </tr>
+            <tr style="background: #ffb191;">
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | moneda }} </td>
+            </tr>
+            
           </tbody>
         </table>
         </b-col>
@@ -376,13 +381,13 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
     },
     totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasCredito
     },
     totalSalidas () {
       let total = 0

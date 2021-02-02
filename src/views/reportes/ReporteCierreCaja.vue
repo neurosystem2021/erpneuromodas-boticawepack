@@ -50,12 +50,12 @@
             <table class="table b-table table-striped table-hover table-sm">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <!-- <th>ID</th> -->
                   <th>Fecha Cierre</th>
-                  <th>Turno</th>
+                  <!-- <th>Turno</th> -->
                   <th>Usuario</th>
                   <th>Ingresos</th>
-                  <th>Ventas</th>
+                  <!-- <th>Ventas</th> -->
                   <th>Salidas</th>
                   <th>Saldo</th>
                   <th>Ver</th>
@@ -63,14 +63,14 @@
               </thead>
               <tbody>
                 <tr v-for="(cierre, i) in cierres" :key="i">
-                  <td>{{ cierre.IdCierreCaja }}</td>
+                  <!-- <td>{{ cierre.IdCierreCaja }}</td> -->
                   <td>{{ cierre.FechaCierre }}</td>
-                  <td v-if="cierre.IdTurno === 1">Mañana</td>
+                  <!-- <td v-if="cierre.IdTurno === 1">Mañana</td>
                   <td v-if="cierre.IdTurno === 2">Tarde</td>
-                  <td v-if="cierre.IdTurno === 3">Noche</td>
+                  <td v-if="cierre.IdTurno === 3">Noche</td> -->
                   <td>{{ cierre.UsuarioReg }}</td>
                   <td>{{ cierre.Ingresos }}</td>
-                  <td>{{ cierre.Ventas }}</td>
+                  <!-- <td>{{ cierre.Ventas }}</td> -->
                   <td>{{ cierre.Salidas }}</td>
                   <td><b>{{ cierre.Total }}</b></td>
                   <td>
@@ -81,10 +81,10 @@
               <tfoot>
                 <th></th>
                 <th></th>
-                <th></th>
-                <th></th>
+                <!-- <th></th>
+                <th></th> -->
                 <th>S/ {{ totalIngresos | moneda }}</th>
-                <th>S/ {{ totalVentas | moneda }}</th>
+                <!-- <th>S/ {{ totalVentas | moneda }}</th> -->
                 <th>S/ {{ totalSalidas | moneda }}</th>
                 <!--<th>S/ {{ totalSaldo | moneda }}</th>-->
                 <th></th>
@@ -123,6 +123,7 @@ export default {
     // }
     totalIngresos() {
       let total = 0;
+      console.log(this.cierres)
       for (var i = 0; i < this.cierres.length; i++) {
         total += this.cierres[i].Ingresos
       }
