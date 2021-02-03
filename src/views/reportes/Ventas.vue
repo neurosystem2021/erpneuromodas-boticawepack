@@ -2,7 +2,7 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="10" class="my-1">
+          <b-col md="12" class="my-1">
             <b-row>
               <b-col md="4">
                 <b-form-group>
@@ -71,20 +71,31 @@
                 
               </b-col>
               <b-col md="4">
-                <b-form-group>
-                    <label>Vendedor:</label>
-                    <autocomplete
-                        required="required"
-                        ref="inputVendedor"
-                        :url="API + 'usuarios'"
-                        anchor="NombreUsuario"
-                        label="writer"
-                        :on-select="setVendedor" 
-                        :onInput="(val) => !val ? generateFilter('vendedor', val) : false"
-                        :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                        :classes="{input: 'form-control'}">
-                    </autocomplete>
-                </b-form-group>
+                <b-row>
+                  <b-col md="7"> 
+                    <b-form-group>
+                      <label>Vendedor:</label>
+                      <autocomplete
+                          required="required"
+                          ref="inputVendedor"
+                          :url="API + 'usuarios'"
+                          anchor="NombreUsuario"
+                          label="writer"
+                          :on-select="setVendedor" 
+                          :onInput="(val) => !val ? generateFilter('vendedor', val) : false"
+                          :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                        
+                    </b-form-group>
+                  </b-col>
+                  <b-col md="5">
+                    <b-form-group label="Limpiar Filtros">
+                      <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+                
                 <b-row>
                   <b-col md="4">
                     Total 
@@ -109,19 +120,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="2" class="my-1">
-            <b-row>
-              <b-col md="12">
-                <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
-                </b-form-group>
-                <!-- <b-form-group label="Mostrar">
-                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group> -->
-                <br />
-              </b-col>
-            </b-row>
-          </b-col>
+          
         </b-row>
         <b-row>
           
@@ -186,13 +185,19 @@ import ProductoKardex from '@/components/ProductoKardex'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count', {
-      params: { idAlmacen: this.almacen.IdAlmacen }
-    }).then((response) => {
-      this.totalRows = response.data.total
-    })
+    
 
     this.getVentasAcumuladas()
+  },
+  watch: {
+    items (items) {
+      console.log(this.filter)
+      this.axios.get(this.API + 'ventas/count?' + this.filter, {
+        params: { idTipoDoc: this.tipoDoc.IdTipoDoc, idAlmacen: this.almacen.IdAlmacen }
+      }).then((response) => {
+        this.totalRows = response.data.total
+      })
+    }
   },
   data() {
     return {
@@ -245,7 +250,7 @@ export default {
         total += v.Total
       })
 
-      return total;
+      return total.toFixed(2);
     },
     ventasAcumuladasVisaMastercard() {
       let total = 0
@@ -253,7 +258,7 @@ export default {
         total += v.TotalVisaMastercard
       })
 
-      return total;
+      return total.toFixed(2);
     },
     ventasAcumuladasCredito () {
       let total = 0
@@ -263,7 +268,7 @@ export default {
         }
       })
 
-      return total;
+      return total.toFixed(2);
     }
   },
   methods: {
@@ -339,7 +344,7 @@ export default {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
       // let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy+'&page='+ctx.currentPage+'&limit='+ctx.perPage;
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
 
