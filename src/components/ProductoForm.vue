@@ -431,6 +431,9 @@ export default {
         this.producto.StockMinimo           = newVal.StockMinimo
         this.producto.CodigoBarra           = newVal.CodigoBarra
         this.producto.ProductoModelo        = newVal.ProductoModelo
+        this.producto.ProductoDesc          = newVal.ProductoDesc
+        this.producto.ProductoDesc2         = newVal.ProductoDesc2
+        this.producto.ProductoDesc3         = newVal.ProductoDesc3
         this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
@@ -551,6 +554,9 @@ export default {
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
         Producto: '',
+        ProductoDesc: '',
+        ProductoDesc2: '',
+        ProductoDesc3: '',
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: '',
