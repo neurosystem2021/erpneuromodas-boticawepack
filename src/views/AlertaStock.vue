@@ -188,7 +188,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen + '&stocknumero=' + this.stockMaximo" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -207,7 +207,7 @@ import ProductoKardex from '@/components/ProductoKardex'
 
 export default {
   mounted() {
-    let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+this.perPage+'&page='+this.currentPage+'&filter='+ (this.filter||'')+'&sortBy='+this.sortBy+'&filter[stock]=menor&filter[stocknumero]=5&count=1'
+    let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+this.perPage+'&page='+this.currentPage+'&filter='+ (this.filter||'')+'&sortBy='+this.sortBy+'&filter[stock]=menor&filter[stocknumero]'+this.stockMaximo+'&count=1'
 
     this.axios.get(url).then((response) => {
       this.totalRows = response.data[0].count
@@ -248,7 +248,8 @@ export default {
       perPage: 10,
       currentPage: 1,
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      verValorizado: false
+      verValorizado: false,
+      stockMaximo: 5
     }
   },
   watch: {
@@ -378,7 +379,7 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy+'&filter[stock]=menor&filter[stocknumero]=5'
+      let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy+'&filter[stock]=menor&filter[stocknumero]='+this.stockMaximo
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
