@@ -131,12 +131,22 @@
           </b-form-group>
 
           <b-form-group>
-            <label>Descripción:</label>
+            <label>1ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
               rows="6"
               v-model="producto._ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
+              />
+          </b-form-group>
+
+          <b-form-group>
+            <label>3ra Descripción:</label>
+            <b-form-textarea 
+              ref="inputProductoDesc3"
+              rows="6"
+              v-model="producto._ProductoDesc3"
+              @input="(val) => producto.ProductoDesc3 = val"
               />
           </b-form-group>
 
@@ -216,6 +226,16 @@
           <b-form-group v-if="producto.EsHabitacion">
             <label>Lugar:</label>
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
+          </b-form-group>
+
+          <b-form-group>
+            <label>2da Descripción:</label>
+            <b-form-textarea 
+              ref="inputProductoDesc2"
+              rows="6"
+              v-model="producto._ProductoDesc2"
+              @input="(val) => producto.ProductoDesc2 = val"
+              />
           </b-form-group>
           
         </b-col>
@@ -376,7 +396,13 @@ export default {
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
+        console.log(newVal.ProductoDesc);
+        console.log(newVal.ProductoDesc2);
+        console.log(newVal.ProductoDesc3);
+
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+        this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
+        this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true

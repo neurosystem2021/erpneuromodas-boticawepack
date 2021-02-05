@@ -4,20 +4,20 @@
         <b-row>
           <b-col md="12"  class="my-1">
             <b-row>
-              <b-col md="2">
+              <b-col md="2" v-if="(idPerfil !== 1)">
                 <div class="suma-stock text-center">
                   <b>Stock <br> Valorizado</b>
                   <br />
-                  <!-- <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button> -->
-                  <div > S/. {{ sumaValorizado | moneda }} </div>
+                  <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button>
+                  <div v-if="verValorizado"> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
               </b-col>
-              <b-col md="2">
+              <b-col md="2" v-if="(idPerfil !== 1)">
                 <div class="suma-stock text-center">
                   <b>Stock Valorizado<br> Sin Utilidad</b>
                   <br />
-                  <!-- <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button> -->
-                  <div> S/. {{ sumaValorizadoSin | moneda }} </div>
+                  <button class="btn btn-warning mb-2" v-if="!verValorizado" @click="clickVerValorizado">ver</button> 
+                  <div v-if="verValorizado"> S/. {{ sumaValorizadoSin | moneda }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -277,6 +277,30 @@
       </b-container>
 
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
+      
+        <!--<b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input v-model="fechaInicio"
+                type="date"
+                placeholder=""
+                :value="fechaInc"
+                @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input v-model="fechaFin"
+              type="date"
+              placeholder=""
+              @input="val => generateFilter('fechaFin', val) "></b-form-input>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <p>{{kardexSelect}}</p>-->
+
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
       </b-modal>

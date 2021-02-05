@@ -88,7 +88,7 @@ const actions = {
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
-      producto.Descripcion = producto.ProductoDesc
+      producto.Descripcion = producto.ProductoDesc + producto.ProductoDesc2 + producto.ProductoDesc3
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -128,7 +128,7 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
-          obj.Descripcion = obj.ProductoDesc
+          obj.Descripcion = obj.ProductoDesc + '\n' + obj.ProductoDesc2 + '\n' + obj.ProductoDesc3
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   

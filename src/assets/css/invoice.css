@@ -189,6 +189,12 @@
     border: none;
   }
   
+  #accounts{
+    font-size: .9em;
+    margin-bottom: 12px;
+    margin-top: 12px;
+  }
+
   #thanks{
     font-size: 2em;
     margin-bottom: 9px;
