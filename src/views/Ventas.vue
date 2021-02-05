@@ -4,7 +4,7 @@
 
         <br />
         <b-container class="bv-example-row">
-            <div>
+            <div class="d-none d-lg-block d-xl-block">
                 <div class="float-right">
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
@@ -21,7 +21,7 @@
                     
                 </div>
             </div>
-            <br /><br />
+            <br class="d-none d-lg-block d-xl-block"/><br class="d-none d-lg-block d-xl-block"/>
             <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="7">
@@ -58,7 +58,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="d-none d-lg-block d-xl-block">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -79,7 +79,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="d-none d-lg-block d-xl-block">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -177,7 +177,7 @@
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group class="d-none d-lg-block d-xl-block">
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
@@ -206,8 +206,8 @@
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
-                            <template slot="operaciones">
-                                <table class="table b-table border table-footer">
+                            <template slot="operaciones" >
+                                <table class="table b-table border table-footer d-none d-lg-block d-xl-block">
                                     <tbody>
                                         <tr>
                                             <td  class="text-center">Opciones</td>
@@ -322,7 +322,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="d-none d-lg-block d-xl-inline" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
