@@ -1,5 +1,6 @@
-<template>
+
   <div>
+    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
     <b-modal id="modal1" title="Editar Cliente" size="lg" ref="clienteForm" v-model="show">

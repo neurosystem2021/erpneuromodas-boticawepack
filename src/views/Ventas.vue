@@ -98,6 +98,7 @@
                                 <b-form-group>
                                     <label>Cliente:</label>
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -404,6 +405,14 @@ export default {
                     this.venta.almacen = res.data
                 })
         },
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstPuntoVenta () {
             this.axios.get(this.API + 'puntoventa/primero')
                 .then(res => {
@@ -700,13 +709,33 @@ export default {
             totalPagos += parseFloat(this.venta.pago.mastercard.monto)
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (this.totalCart.toFixed(2) != totalPagos.toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
                 }
             }
 
+            if (!this.venta.cliente.DniRuc) {
+                this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
+            if (!esNumerico) {
+                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
+            }
+            
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
