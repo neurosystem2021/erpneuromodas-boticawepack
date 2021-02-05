@@ -396,10 +396,6 @@ export default {
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
-        console.log(newVal.ProductoDesc);
-        console.log(newVal.ProductoDesc2);
-        console.log(newVal.ProductoDesc3);
-
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
         this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
         this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
