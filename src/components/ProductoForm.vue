@@ -9,7 +9,6 @@
           <b-form-group>
             <label>Código barra:</label>
             <b-form-input 
-              disabled
               ref="inputCodigoBarra"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
