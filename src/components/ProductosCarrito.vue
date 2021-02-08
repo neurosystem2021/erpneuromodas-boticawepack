@@ -6,7 +6,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -199,7 +199,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    idAlmacen: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -241,6 +241,12 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      }
+      return this.API + 'productos'
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -362,7 +368,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
+        <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
       `
     },
     setNuevoPrecioContado (index) {

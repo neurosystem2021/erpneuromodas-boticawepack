@@ -390,7 +390,7 @@ export default {
     getSumaStock () {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
-          this.sumaStock = response.data[0].sumaStock
+          this.sumaStock = response.data[0].sumaStock.toFixed(2)
         })
     },
     getStock (idProducto) {
