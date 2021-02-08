@@ -118,7 +118,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ data.item.stock.toFixed(2) }}</div>
         </template>
 
       </b-table>
@@ -368,7 +368,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
+        <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock.toFixed(2)}</b> | <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
       `
     },
     setNuevoPrecioContado (index) {
