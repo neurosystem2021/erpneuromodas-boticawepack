@@ -18,7 +18,7 @@
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
-                    
+
                 </div>
             </div>
             <br /><br />
@@ -37,7 +37,7 @@
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setTipoVenta" 
+                                        :on-select="setTipoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -52,7 +52,7 @@
                                         initValue=""
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setDocRef" 
+                                        :on-select="setDocRef"
                                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -68,7 +68,7 @@
                                         anchor="Almacen"
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setAlmacen" 
+                                        :on-select="setAlmacen"
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -88,7 +88,7 @@
                                         anchor="PuntoVenta"
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setPuntoVenta" 
+                                        :on-select="setPuntoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -106,7 +106,7 @@
                                             label="writer"
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
-                                            :on-select="setCliente" 
+                                            :on-select="setCliente"
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
@@ -161,7 +161,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedor"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -169,15 +169,15 @@
                     </b-col>
                 </b-row>
                 <b-row>
-                    <b-col> 
-                        <productos-carrito 
+                    <b-col>
+                        <productos-carrito
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
-                            ref="carrito" 
-                            :showButton="false" 
+                            ref="carrito"
+                            :showButton="false"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -208,13 +208,13 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox 
+                                                <b-form-checkbox
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
-                                                <b-form-input 
+                                                <b-form-input
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -223,7 +223,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </template>    
+                            </template>
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -325,6 +325,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -362,16 +363,16 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto' }, 
+                    { key: 'CodigoBarra', label: 'Código' },
+                    { key: 'Producto' },
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
+                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.' },
                     { key: 'ProductoMedicion', label: 'Med.' },
                     { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
                     { key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
@@ -397,6 +398,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -465,7 +474,7 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
-            
+
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
 
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
@@ -606,7 +615,7 @@ export default {
             }
         },
         aplicarPuntos (val) {
-            if (parseFloat(val) > this.venta.cliente.Puntos) { 
+            if (parseFloat(val) > this.venta.cliente.Puntos) {
                 this.puntosAplicados = this.venta.cliente.Puntos
             }
 
@@ -653,8 +662,8 @@ export default {
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             if(!this.venta.cliente.IdCliente) {
@@ -670,7 +679,7 @@ export default {
             }
 
             this.venta.productos = this.productos
-            
+
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.show('Proforma Guardada con exito')
@@ -702,15 +711,15 @@ export default {
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false            
-                    return                
+                    this.inProgress = false
+                    return
                 }
             }
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             var sinStock = 0;
@@ -729,13 +738,13 @@ export default {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
                     this.inProgress = false
-                    return 
+                    return
                 }
 
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
-                    return 
+                    return
                 }
 
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
