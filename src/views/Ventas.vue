@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pre-orden-lista 
+                        <pre-orden-lista
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
@@ -35,7 +35,7 @@
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setTipoVenta" 
+                                        :on-select="setTipoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -52,7 +52,7 @@
                                         initValue="VENTA"
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setAlmacen" 
+                                        :on-select="setAlmacen"
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -69,7 +69,7 @@
                                         initValue="CAJA1"
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setPuntoVenta" 
+                                        :on-select="setPuntoVenta"
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -78,7 +78,7 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
-                                    
+
                                     <b-input-group>
                                         <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -89,7 +89,7 @@
                                             label="writer"
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
-                                            :on-select="setCliente" 
+                                            :on-select="setCliente"
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
@@ -101,7 +101,7 @@
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-                                            
+
                                         </b-input-group-append>
                                     </b-input-group>
                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
@@ -149,7 +149,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedor"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -160,15 +160,15 @@
                     </b-col>
                 </b-row>
                 <b-row>
-                    <b-col> 
-                        <productos-carrito 
+                    <b-col>
+                        <productos-carrito
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
-                            ref="carrito" 
-                            :showButton="false" 
+                            ref="carrito"
+                            :showButton="false"
                             :fields="carrito.fields"
                             :onSetProducto="onSetProducto">
 
@@ -202,7 +202,7 @@
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
-                                                <b-form-input 
+                                                <b-form-input
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -211,7 +211,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </template>    
+                            </template>
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -310,6 +310,7 @@ import PreOrdenLista from '@/components/PreOrdenLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         this.getNumeroVenta()
@@ -339,7 +340,7 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
@@ -380,6 +381,14 @@ export default {
                     })
 
                     this.adelanto = suma
+                })
+        },
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
                 })
         },
         loadFirstAlmacen () {
@@ -484,7 +493,7 @@ export default {
             this.venta.vendedor = obj
         },
         setCliente (obj, dni = false) {
-            
+
             let params = {}
             if (dni) {
                 params = {
@@ -537,7 +546,7 @@ export default {
             }
         },
         aplicarPuntos (val) {
-            if (parseFloat(val) > this.venta.cliente.Puntos) { 
+            if (parseFloat(val) > this.venta.cliente.Puntos) {
                 this.puntosAplicados = this.venta.cliente.Puntos
             }
 
@@ -586,8 +595,8 @@ export default {
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false            
-                    return                
+                    this.inProgress = false
+                    return
                 }
             }
 
@@ -613,19 +622,19 @@ export default {
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             if (this.totalCart <= 0) {
                 this.$toasted.show('La venta en S/. 0.00 no está permitido')
-                this.inProgress = false            
-                return 
+                this.inProgress = false
+                return
             }
 
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
-            let totalCero = 0 
+            let totalCero = 0
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
                     sinStock += 1
@@ -641,7 +650,7 @@ export default {
                 this.inProgress = false
                 return;
             }
-            
+
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
