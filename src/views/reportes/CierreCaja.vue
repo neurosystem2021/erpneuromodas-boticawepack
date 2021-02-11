@@ -512,7 +512,7 @@ export default {
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
-          totalVentas:  this.totalVentas
+          totalVentas:  this.totalVentasEfectivo
         }).then(res => {
           this.loadData()
           this.$toasted.success('¡Caja cerrada! Se ha aperturado un ingreso por el monto total.')

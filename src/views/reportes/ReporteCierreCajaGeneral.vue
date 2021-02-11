@@ -43,7 +43,7 @@
               <tbody>
                 <tr v-for="(cierre, i) in cierresAlmacen" :key="i">
                   <td>{{ cierre.Almacen }}</td>
-                  <td>{{ cierre.Ingresos }}</td>
+                  <td>{{ cierre.Ventas }}</td>
                   <td>{{ cierre.Salidas }}</td>
                   <td><b>{{ cierre.Total }}</b></td>
                 </tr>
@@ -87,9 +87,12 @@ export default {
                 cierres[c.IdAlmacen] = {
                     Almacen: c.Almacen,
                     Ingresos: ca.reduce( (a, b) => a + b.Ingresos , 0).toFixed(2),
+                    Ventas: ca.reduce( (a, b) => a + b.Ventas , 0).toFixed(2),
                     Salidas: ca.reduce( (a, b) => a + b.Salidas , 0).toFixed(2),
-                    Total: (ca.reduce( (a, b) => a + b.Ingresos , 0) - ca.reduce( (a, b) => a + b.Salidas , 0)).toFixed(2)
+                    // Total: (ca.reduce( (a, b) => a + b.Ingresos , 0) - ca.reduce( (a, b) => a + b.Salidas , 0)).toFixed(2)
+                    Total: ca.reduce( (a, b) => a.IdCierreCaja > b.IdCierreCaja ? a : b ).Total.toFixed(2)
                 }
+                ca
             }
         })
         

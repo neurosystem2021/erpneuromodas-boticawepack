@@ -191,7 +191,6 @@ export default {
   },
   watch: {
     items (items) {
-      console.log(this.filter)
       this.axios.get(this.API + 'ventas/count?' + this.filter, {
         params: { idTipoDoc: this.tipoDoc.IdTipoDoc, idAlmacen: this.almacen.IdAlmacen }
       }).then((response) => {

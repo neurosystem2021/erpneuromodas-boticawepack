@@ -69,8 +69,8 @@
                   <td v-if="cierre.IdTurno === 2">Tarde</td>
                   <td v-if="cierre.IdTurno === 3">Noche</td> -->
                   <td>{{ cierre.UsuarioReg }}</td>
-                  <td>{{ cierre.Ingresos }}</td>
-                  <!-- <td>{{ cierre.Ventas }}</td> -->
+                  <!-- <td>{{ cierre.Ingresos }}</td> -->
+                  <td>{{ cierre.Ventas }}</td>
                   <td>{{ cierre.Salidas }}</td>
                   <td><b>{{ cierre.Total }}</b></td>
                   <td>
@@ -83,7 +83,7 @@
                 <th></th>
                 <!-- <th></th>
                 <th></th> -->
-                <th>S/ {{ totalIngresos | moneda }}</th>
+                <th>S/ {{ totalVentas | moneda }}</th>
                 <!-- <th>S/ {{ totalVentas | moneda }}</th> -->
                 <th>S/ {{ totalSalidas | moneda }}</th>
                 <!--<th>S/ {{ totalSaldo | moneda }}</th>-->

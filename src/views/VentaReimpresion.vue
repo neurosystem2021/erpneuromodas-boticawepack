@@ -18,15 +18,31 @@
                       :classes="{input: 'form-control'}">
                   </autocomplete>
                 </b-form-group>
+                <b-form-group>
+                  <label>Fecha Inicio:</label>
+                  <b-form-input v-model="fechaInicio"
+                    type="date"
+                    placeholder=""
+                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+                </b-form-group>
           </b-col>
           <b-col md="4" class="my-1">
            <label>Buscar:</label>
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
+              <b-form-group>
+                  <b-input-group>
+                    <b-form-input v-model="txtBuscar" placeholder="Buscar" @input="val => buscar(val)"/>
+                    <b-input-group-append>
+                      <b-btn  @click="limpiarFiltros">Limpiar</b-btn>
+                    </b-input-group-append>
+                  </b-input-group>
+              </b-form-group>
+              <b-form-group>
+                <label>Fecha Fin:</label>
+                <b-form-input v-model="fechaFin"
+                  type="date"
+                  placeholder=""
+                  @input="val => generateFilter('fechaFin', val) "></b-form-input>
+              </b-form-group>
             <br />
           </b-col>
           <b-col md="4" class="my-1">
@@ -77,9 +93,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.cantidadFilas();
   },
   data() {
     return {
@@ -87,9 +101,13 @@ export default {
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
       sortBy: 'idDocVenta',
+      filters: { },
+      fechaInicio: this.$moment().format("YYYY-MM-DD"),
+      fechaFin: this.$moment().format("YYYY-MM-DD"),
       sortDesc: true,
       productoSelect: {},
       items: [],
+      txtBuscar: '',
       isBusy: false,
       fields: [
             { key: 'idDocVenta', label: 'ID', sortable: true },
@@ -113,6 +131,22 @@ export default {
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
+      cantidadFilas() {
+        this.axios.get(this.API + 'ventas/count' + '?filter='+ (this.filter||'')).then((response) => {
+          this.totalRows = response.data.total
+        })
+      },
+      buscar (val) {
+        this.generateFilter('buscar', this.txtBuscar)
+      },
+      limpiarFiltros() {
+        this.filters = {}
+        this.filter = ''
+        this.txtBuscar = ''
+        this.fechaInicio = this.$moment().format("YYYY-MM-DD");
+        this.fechaFin = this.$moment().format("YYYY-MM-DD")
+
+      },
       actualizarTabla() {
         this.$refs.tablaVentas.refresh()
       },
@@ -129,10 +163,25 @@ export default {
         this.almacen = obj
         Vue.nextTick(() => this.$refs.tablaVentas.refresh())
       },
+      generateFilter (key, value) {
+        this.filters[key] = value
+
+        let filter = ''
+        for (var key in this.filters) {
+          filter += '&filter[' + key + ']=' + this.filters[key]
+        }
+        this.filter = filter
+        // this.actualizarTabla();
+      },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        
+        if (!ctx.filter) {
+          ctx.filter = '&filter[fechaInicio]=' + this.fechaInicio
+          ctx.filter += '&filter[fechaFin]=' + this.fechaFin
+        }
+        let url = this.API + 'ventas?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         
         url += '&idAlmacen=' + (this.almacen.IdAlmacen || '1')
@@ -142,6 +191,7 @@ export default {
 
         return promise.then((result) => {
           this.items = result.data
+          this.cantidadFilas()
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false

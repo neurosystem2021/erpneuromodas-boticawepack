@@ -3,7 +3,7 @@
 		<header class="clearfix" style="height: 120px;">
 			<div id="logo">
         <img v-if="proforma.IdAlmacen !== 3 && proforma.IdAlmacen !== 4" src="/resources/images/logo.png">
-				<img v-if="proforma.IdAlmacen == 3 || proforma.IdAlmacen == 4" src="/resources/images/logotowan.png">
+				<img v-if="proforma.IdAlmacen == 3 || proforma.IdAlmacen == 4" src="/resources/images/logo.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
