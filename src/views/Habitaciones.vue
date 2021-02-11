@@ -15,9 +15,8 @@
 							<h5>{{ hab.Producto }}</h5>
 							<h5>{{ hab.Cliente }}</h5>
 							<h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
-							<!--<h5>{{hab}}</h5>-->
-							<!-- <h5 @keyup="cargarProformaTotal(hab.IdProforma)">{{proformaTotalCard}}</h5> -->
-							
+							<i><h6 v-if="hab.IdProforma"><b>Prof.: </b>S/ {{ hab.TotalProf | moneda }}</h6></i>
+
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 								<li><b>{{ hab.Cliente }}</b> </li>
 								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
@@ -140,14 +139,14 @@
 									ref="preOrdenProductos"
 									></pre-orden-form-det>
 
-									<!--<table class="table b-table border table-footer table-sm text-center" >
+									<table class="table b-table border table-footer table-sm text-center" >
 										<tbody>
 											<tr><td>Mano de obra bruta</td></tr>
 											<tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
 											<tr><td>Mano de obra neta</td></tr>
 											<tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
 										</tbody>
-									</table>-->
+									</table>
 
 								</b-col> 
 								<b-col md="4">
@@ -286,6 +285,7 @@ export default {
 			IdProforma: null,
 			proformaTotal: null,
 			codProforma: null,
+			profTotHab: 0,
 			// proformaTotalCard: null,
 			// habitacionesPiso: []
 		}
@@ -619,6 +619,10 @@ export default {
 h5 {
 	font-size: 1.2rem;
 	color: #ffffff;
+}
+h6 {
+	font-size: 1rem;
+	color: #DBDBDB;
 }
 .card-footer {
 	padding-left: 0;

@@ -21,6 +21,7 @@ import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
+import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 
 Vue.use(Router)
 
@@ -116,6 +117,11 @@ export default new Router({
       path: '/reportes/huespedes',
       name: 'RegistroHuespedes',
       component: RegistroHuespedes
+    },
+    {
+      path: '/reportes/articulosmovimientos',
+      name: 'Articulosmovimientos',
+      component: Articulosmovimientos
     },
     {
       path: '/facturacion',
