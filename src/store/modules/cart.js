@@ -77,14 +77,19 @@ const actions = {
     let cantidad = false
     let precio = false
     let setSuma = false
+    let setPrecioCosto = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       precio = obje.precio
       setSuma = obje.setSuma
+      setPrecioCosto = obje.setPrecioCosto
     }
 
     if(typeof producto === 'object') {
+      if (setPrecioCosto) {
+        producto.precio = producto.PrecioCosto
+      }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
