@@ -194,7 +194,11 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" @onAddProducto="onAddProducto"></productos-carrito>
+              <productos-carrito 
+                ref="carrito" 
+                @onAddProducto="onAddProducto"
+                :tipoCambio="movimiento.TipoCambio"
+                tipo="mov"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">

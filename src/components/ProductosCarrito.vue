@@ -35,7 +35,9 @@
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                if (tipo != 'mov') {
+                  productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                }
 
             }"
             placeholder="Cantidad"></b-form-input>
@@ -197,6 +199,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    tipo: String,
 
     igvTotal: Boolean,
     onSetProducto: {
@@ -307,7 +310,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false)  }, true])
       }
     },
     /*alterarBuscadorProductos() {
@@ -354,7 +357,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      }, { setPrecioCosto: this.tipo == 'mov' ? true : false }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
