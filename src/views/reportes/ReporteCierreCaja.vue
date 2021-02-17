@@ -70,9 +70,9 @@
                   <td v-if="cierre.IdTurno === 3">Noche</td> -->
                   <td>{{ cierre.UsuarioReg }}</td>
                   <!-- <td>{{ cierre.Ingresos }}</td> -->
-                  <td>{{ cierre.Ventas }}</td>
-                  <td>{{ cierre.Salidas }}</td>
-                  <td><b>{{ cierre.Total }}</b></td>
+                  <td>{{ cierre.Ventas.toFixed(2) }}</td>
+                  <td>{{ cierre.Salidas.toFixed(2)  }}</td>
+                  <td><b>{{ cierre.Total.toFixed(2)  }}</b></td>
                   <td>
                     <b-button :href="'/views/ve_cierreform.php?idCierre=' + cierre.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
                   </td>
