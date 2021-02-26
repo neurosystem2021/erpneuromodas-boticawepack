@@ -4,7 +4,7 @@
         <b-row>
           <b-col md="12" class="my-1">
             <b-row>
-              <b-col md="4">
+              <b-col md="3">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -70,7 +70,7 @@
                 
                 
               </b-col>
-              <b-col md="4">
+              <b-col md="5">
                 <b-row>
                   <b-col md="7"> 
                     <b-form-group>
@@ -100,7 +100,7 @@
                   <b-col md="4">
                     Total 
                     <div class="total-ventas">
-                       {{ ventasAcumuladasTodo || '0.00' }}
+                       {{ ventasAcumuladas || '0.00' }}
                     </div>
                   </b-col>
                   <b-col md="4">
@@ -212,6 +212,8 @@ export default {
       sortBy: 'FechaDoc',
       sortDesc: false,
       ventasAcumuladas: 0,
+      ventasAcumuladasVisaMastercard: 0,
+      ventasAcumuladasCredito: 0,
       almacen: {
         IdAlmacen: 1,
         Almacen: 'PRINCIPAL'
@@ -243,32 +245,32 @@ export default {
     }
   },
   computed: {
-    ventasAcumuladasTodo() {
-      let total = 0
-      this.items.map(v => {
-        total += v.Total
-      })
+    // ventasAcumuladasTodo() {
+    //   let total = 0
+    //   this.items.map(v => {
+    //     total += v.Total
+    //   })
 
-      return total.toFixed(2);
-    },
-    ventasAcumuladasVisaMastercard() {
-      let total = 0
-      this.items.map(v => {
-        total += v.TotalVisaMastercard
-      })
+    //   return total.toFixed(2);
+    // },
+    // ventasAcumuladasVisaMastercard() {
+    //   let total = 0
+    //   this.items.map(v => {
+    //     total += v.TotalVisaMastercard
+    //   })
 
-      return total.toFixed(2);
-    },
-    ventasAcumuladasCredito () {
-      let total = 0
-      this.items.map(v => {
-        if (v.EsCredito) {
-          total += v.Total
-        }
-      })
+    //   return total.toFixed(2);
+    // },
+    // ventasAcumuladasCredito () {
+    //   let total = 0
+    //   this.items.map(v => {
+    //     if (v.EsCredito) {
+    //       total += v.Total
+    //     }
+    //   })
 
-      return total.toFixed(2);
-    }
+    //   return total.toFixed(2);
+    // }
   },
   methods: {
     setTipoVenta (obj) {
@@ -293,7 +295,10 @@ export default {
            idAlmacen: this.almacen.IdAlmacen
          }
        }).then((response) => {
-         this.ventasAcumuladas = response.data.total
+         this.ventasAcumuladas = response.data.TotalEfectivo
+         this.ventasAcumuladasVisaMastercard = response.data.TotalVisaMastercard
+         this.ventasAcumuladasVisaMastercard = response.data.TotalVisaMastercard
+         this.ventasAcumuladasCredito = response.data.TotalCredito
        })
       } else {
         this.axios.get(this.API + 'ventas/total', {

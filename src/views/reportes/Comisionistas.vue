@@ -14,7 +14,13 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <br />
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input v-model="fechaInicio"
+                type="date"
+                placeholder=""
+                @input="$refs.tablaProductos.refresh()"></b-form-input>
+            </b-form-group>
           </b-col>
           <b-col md="4">
             <b-form-group>
@@ -31,6 +37,13 @@
                       :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
+                </b-form-group>
+                <b-form-group>
+                  <label>Fecha Fin:</label>
+                  <b-form-input v-model="fechaFin"
+                    type="date"
+                    placeholder=""
+                    @input="$refs.tablaProductos.refresh()"></b-form-input>
                 </b-form-group>
           </b-col>
            <b-col md="2" class="my-1">
@@ -137,7 +150,9 @@ export default {
       currentPage: 1,
       almacen: {
         IdAlmacen: 0
-      }
+      },
+      fechaInicio: null,
+      fechaFin: this.$moment().format("YYYY-MM-DD")
     }
   },
   methods: {
@@ -179,7 +194,18 @@ export default {
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       //  let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
-      let promise = this.axios.get( this.API + 'cliente/comisionistas?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter )
+      
+      let params = '?idAlmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter;
+      
+      if (this.fechaInicio) {
+        params += '&fechaInicio=' + this.fechaInicio;
+      }
+
+      if (this.fechaFin) {
+        params += '&fechaFin=' + this.fechaFin;
+      }
+
+      let promise = this.axios.get( this.API + 'cliente/comisionistas' + params )
 
       return promise.then((response) => {
         this.items = response.data.map(d => {
