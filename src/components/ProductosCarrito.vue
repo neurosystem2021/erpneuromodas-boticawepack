@@ -163,16 +163,29 @@
     </b-col>
     <br><br>
     
-     <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular M2">
-      <div class="d-block text-center">
+     <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
+      <div class="d-block ">
         <b>{{ productoSelect.Producto }}</b>
         <hr />
-        <label>Metros Cuadrados (M²):</label>
+        <label>Medida de corte en (cm):</label>
+        <br />
+        <label>Ancho:</label>
         <b-form-input
             type="number"
-            ref="inputM2"
-            placeholder="M²"
-            @input="val => calcularm2(val, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo, productoSelect.ProductoDetCantidad )"></b-form-input><br>
+            ref="inputAncho"
+            v-model="ancho"
+            placeholder="Ancho"
+            @input="val => calcularm2()"></b-form-input>
+        <br />
+        <label>Largo:</label>
+        <b-form-input
+            type="number"
+            ref="inputLargo"
+            v-model="largo"
+            placeholder="Largo"
+            @input="val => calcularm2()"></b-form-input>
+
+          <br>
         <hr />
         <p v-html="mensajeM2"></p>
       </div>
@@ -202,7 +215,9 @@ export default {
       pagocon: 0,
       productoSelect: {},
       mensajeM2: '',
-      M2: ''
+      M2: '',
+      ancho: 0,
+      largo: 0
     }
   },
   watch: {
@@ -231,7 +246,6 @@ export default {
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Present.' }, 
           { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -357,68 +371,85 @@ export default {
     },  
     abrirCalcularM2 (obj) {
       this.setProducto(obj)
-      if (obj.Rendimiento || obj.Ancho || obj.Largo) {
+      if (obj.Ancho && obj.Largo) {
         this.$refs.modalCalcularM2.show()
       }
       this.productoSelect = obj
       this.productoSelect.cantidad = 1
       this.mensajeM2 = ''
-      this.$refs.inputM2.$refs.input.value = ''
+      // this.$refs.inputM2.$refs.input.value = ''
     },
-    calcularm2 (m2, rendimiento = 0, ancho = 0, largo = 0, productoDetCantidad = 0) {
-      rendimiento = (rendimiento == '0' ) ? false : rendimiento;
-      ancho = (ancho == '0' ) ? false : ancho;
-      largo = (largo == '0' ) ? false : largo;
+    calcularm2 () {
+      // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
 
-      if ((!rendimiento && !ancho) || (!rendimiento && !largo)) {
-        alert('El producto no cuenta con un rendimiento en M2, un ancho o largo establecido');
-        return;
-      }
+      let cm2total = this.productoSelect.Ancho * this.productoSelect.Largo
+      let cm2corte = 0;
 
-      var cantidad = 0
-      var mensaje = 0
-      // console.log(rendimiento)
-      if(rendimiento && rendimiento != '0') {
-        cantidad = (m2 / rendimiento).toFixed(1);
-        cantidad = Math.ceil(cantidad)
-        mensaje = "Total de cajas requeridas: " + cantidad
-      } else {
-        // console.log(ancho)
-        // console.log(largo)
-        cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
-        cantidad = Math.ceil(cantidad)
-        mensaje = "Total de unidades requeridas: " + cantidad
-      }
+      // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
+      // let largo = (largo == '0' ) ? false : prod.Largo;
 
-      if (cantidad > 0) {
-        var mensajeAdicional = ''
-        if (productoDetCantidad) {
-          if (cantidad > productoDetCantidad) {
-            var cajas = Math.floor(cantidad / productoDetCantidad);
-            var unidades = cantidad%productoDetCantidad;
-            mensajeAdicional += '(Cajas: ' + cajas;
-            if (unidades > 0) {
-              mensajeAdicional += ', Unidades: ' + unidades + ')';
-            }else {
-              mensajeAdicional += ')';
-            }
-          }
-        } 
-        this.mensajeM2 = mensaje;
-        this.mensajeM2 += " <br /> " + mensajeAdicional
-        this.productoSelect.cantidad = cantidad
+      if (cm2total > 0 && this.ancho > 0 && this.largo > 0) {
+        cm2corte = this.ancho * this.largo;
+        let precio = (cm2corte * this.productoSelect.PrecioContado) / cm2total;
+        this.precioCorte = precio.toFixed(2);
+        this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
       }
       
-      if(!m2) {
-        this.mensajeM2 = ''
-        this.productoSelect.cantidad = 1
-      }
+      // if (!ancho || !largo) {
+      //   alert('El producto no cuenta con un ancho o largo establecido');
+      //   return;
+      // }
+
+      // this.productoSelect.precio = 133
+
+      // var cantidad = 0
+      // var mensaje = 0
+      // // console.log(rendimiento)
+      // if(rendimiento && rendimiento != '0') {
+      //   cantidad = (m2 / rendimiento).toFixed(1);
+      //   cantidad = Math.ceil(cantidad)
+      //   mensaje = "Total de cajas requeridas: " + cantidad
+      // } else {
+        // console.log(ancho)
+        // console.log(largo)
+      //   cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
+      //   cantidad = Math.ceil(cantidad)
+      //   mensaje = "Total de unidades requeridas: " + cantidad
+      // }
+
+      // if (cantidad > 0) {
+      //   var mensajeAdicional = ''
+      //   if (productoDetCantidad) {
+      //     if (cantidad > productoDetCantidad) {
+      //       var cajas = Math.floor(cantidad / productoDetCantidad);
+      //       var unidades = cantidad%productoDetCantidad;
+      //       mensajeAdicional += '(Cajas: ' + cajas;
+      //       if (unidades > 0) {
+      //         mensajeAdicional += ', Unidades: ' + unidades + ')';
+      //       }else {
+      //         mensajeAdicional += ')';
+      //       }
+      //     }
+      //   } 
+      //   this.mensajeM2 = mensaje;
+      //   this.mensajeM2 += " <br /> " + mensajeAdicional
+      //   this.productoSelect.cantidad = cantidad
+      // }
+      
+      // if(!m2) {
+      //   this.mensajeM2 = ''
+      //   this.productoSelect.cantidad = 1
+      // }
 
     },
     seleccionarCalcularM2 () {
       this.$refs.modalCalcularM2.hide()
-      
-      this.productoSelect.cantidad = this.productoSelect.cantidad || 1
+
+      if (this.precioCorte) {
+        this.productoSelect.precio = this.precioCorte;
+        this.productoSelect.Ancho = this.ancho
+        this.productoSelect.Largo = this.largo
+      }
       // this.setProducto(this.productoSelect)
     },
     setProducto (obj) {

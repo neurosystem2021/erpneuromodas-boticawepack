@@ -140,7 +140,7 @@
       </b-row>
 
       <b-row class="rendimiento">
-        <b-col md="4">
+        <!-- <b-col md="4">
           <b-form-group>
             <label>Rendimiento (M²):</label>
             <b-form-input
@@ -149,8 +149,8 @@
               :readonly="!producto.EsPadre"
               ></b-form-input>
           </b-form-group>
-        </b-col>
-        <b-col md="4">
+        </b-col> -->
+        <b-col md="6">
           <b-form-group>
             <label>Ancho (cm):</label>
             <b-form-input
@@ -160,7 +160,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
             <label>Largo (cm):</label>
             <b-form-input
