@@ -115,11 +115,7 @@
         <template slot="row-details" slot-scope="row">
 
         </template>
-        <template slot="stock" slot-scope="data">
-          <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
-        </template>
-
+        
       </b-table>
     </b-col>
     <b-col md="3">
