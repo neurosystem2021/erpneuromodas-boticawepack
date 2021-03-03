@@ -115,7 +115,10 @@
         <template slot="row-details" slot-scope="row">
 
         </template>
-        
+        <template slot="stock" slot-scope="data">
+          <img v-if="data.item.EsPadre && data.item.stock<=0" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA3QAAAN0BcFOiBwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAPTSURBVFiFvZdLbBVVGMd/Zx537qsvaItVsb0gYKmPalcmxERd6U5Xho0BKg3BhUajG5ObJrqQ0LSJJqSKNO5cuTIxccNGNC4KJKUEhQQISq1Ce2nvY+bO47g4fdh27tw70PJPTjKZOY/f+c433/cdIaUktiaHTNp3vI3gPQAkY9yZ/ZaBcTfuVCIWwI3hJMIfRPARsHPd11tITiD10/Tk7c0F+Gm4k3/1r3k8eImc11qn9yxSjpA2TtGRLz4YwA+fPcY8E9zWXsUWGgCtATznQc4DETn3HFKOIY0v6MkX4gHMDLdT9d9nMvEB04ZFEDKyWcKzLuz2QIsEWUDyJQl9lK78nWiAW8OPEgQfIuQQkAagLGDKhN8N8EOmzyyB7PFAjwQpI8U4mnaSnfnbawGuf9KNpn+MkIcBK3S4LeCSAVcMcENsn5bwtAv7PDAiQRykOEPgf07u05tC/nJkGxkxQ1NHAj16JABVAZcNmDbU83olJfR50OuBWcO/ZAB2qYovuoQ8f7yb0l83EAKy26CpAwyzPogrlDUuGco665WQsN9TzVoCCXxwSlAtg5RgtvSsbllKWLwLxTnItEJzBxjhpwGo3T3jwn5X+ceUqfzl/5a6aMK0id9XQt+3oBZep402lxKK81AsQLoFWjrATNYG0VG7fMqDq0sgiwrES1YpVgtUz3p05iqhwyMOXUK5oFqqGVo6IZGq3V1DOeAeD67B/LlF7Gvq/9XStYc14HVAZUG1ZFaBWJnwfl4V7CJyu4P9Z8SqsQGWZRdVszLqaJJN6r3rgFNUADEVD2BZTgn+KakjybSCHzsJrig6iNZTtdLQ4npT7XxzfxZoUHpWkh1wSfV5DxdA6ND2ukMy59e18ZZZILk7LHNt1CpftgeeeAOs9i1CqgdQmQG/Ar3HYddBSHU9ZAAh4e45mDoBlb9h7yB0vbLlAKs+IAS0PaKe536D2Z/BaCyabQ6A68DMVRX3dX0pbcaPbPEBROkemiYJApXCKgtbvigAQkgc/55G/0SB9PYDJJunEdFl7iatDIY1jZk6QP9oYW1RevnY81Qqp7EXX0CGlcIham70txVgWucxE4M8OXJh5W1oWX7l6F7KzgR28cWVo7lfACEkRuJXLOsQu0b+2PA58mJy4d1u5OIZ7NLLBH44SC0AISSmdRZpHab35M2afA1dza6/s4N57xuc4mv43trovh5A0wIM60cs7Qi5sdl6U8e7nF481IrkKyqlNwlcfQ2A0HzM5PfY2lH6R2texR4MYFmTQ2k09xRO6S2ybaAnvqPsHGNgfGPZW0f/AXVqdbMxRPYMAAAAAElFTkSuQmCC" style="width: 24px" />
+          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+        </template>
       </b-table>
     </b-col>
     <b-col md="3">
