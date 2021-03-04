@@ -6,6 +6,7 @@ import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
+import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import Traslado from '@/views/Traslado.vue'
 
 // Reportes
@@ -34,6 +35,11 @@ export default new Router({
       path: '/productos',
       name: 'Productos',
       component: Productos
+    },
+    {
+      path: '/reimpresion',
+      name: 'VentaReimpresion',
+      component: VentaReimpresion
     },
     {
       path: '/almacen',
