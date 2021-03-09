@@ -776,7 +776,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock)) {
+                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
                 }
 

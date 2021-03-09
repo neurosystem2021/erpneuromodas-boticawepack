@@ -139,14 +139,28 @@
 									ref="preOrdenProductos"
 									></pre-orden-form-det>
 
-									<table class="table b-table border table-footer table-sm text-center" >
-										<tbody>
-											<tr><td>Mano de obra bruta</td></tr>
-											<tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
-											<tr><td>Mano de obra neta</td></tr>
-											<tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
-										</tbody>
-									</table>
+									<b-row>
+										<b-col md="6">
+											<table class="table b-table border table-footer table-sm text-center" >
+											<tbody>
+												<tr><td>Mano de obra bruta</td></tr>
+												<tr><td><h3>{{ totManoObraBruta() }}</h3></td></tr>
+												<tr><td>Mano de obra - Materiales</td></tr>
+												<tr><td><h3 :class="{'text-danger': totManoObraMenoMat() <= 0}">{{ totManoObraMenoMat() }}</h3></td></tr>
+											</tbody>
+											</table>
+										</b-col>
+										<b-col md="6">
+											<table class="table b-table border table-footer table-sm text-center" >
+											<tbody>
+												<tr><td>Total de Gastos</td></tr>
+												<tr><td><h3>{{ totalGastos | redondear }}</h3></td></tr>
+												<tr><td>Mano de obra neta</td></tr>
+												<tr><td><h3 :class="{'text-danger': totManoObraNeta() <= 0}">{{ totManoObraNeta() | redondear }}</h3></td></tr>
+											</tbody>
+											</table>
+										</b-col>
+									</b-row>
 
 								</b-col> 
 								<b-col md="4">
@@ -314,19 +328,6 @@ export default {
 
 			return sumatoria;
 		},
-		manoDeObraBruta () {
-			// console.log(this.selectProducto.IdPreOrden);
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precioBruta : 0;
-
-            return precio
-        },
-        manoDeObraNeta () {
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precio : 0;
-
-            return precio
-        }
 	},
 	methods: {
 		mountedProforma(modal) {
@@ -574,15 +575,30 @@ export default {
 		sumProductos() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
-				// console.log(this.$refs.preOrdenProductos.sumProductos);
-				// if (this.totalAdelantos < 0) {
-				// 	return (Math.abs(this.totalAdelantos) + this.$refs.preOrdenProductos.sumProductos).toFixed(2);
-				// } else {
-				// 	return (this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)
-				// }
 				total = this.$refs.preOrdenProductos.sumProductos + this.totalGastos - this.totalAdelantos
 			}
 			return Math.abs(total).toFixed(2)
+		},
+		totManoObraBruta() {
+			let total = 0
+			if (this.$refs.preOrdenProductos) {
+				total = this.$refs.preOrdenProductos.manoDeObraBruta
+			}
+			return total.toFixed(2)
+		},
+		totManoObraMenoMat() {
+			let total = 0
+			if (this.$refs.preOrdenProductos) {
+				total = this.$refs.preOrdenProductos.manoDeObraMenosMat
+			}
+			return total.toFixed(2)
+		},
+		totManoObraNeta() {
+			let total = 0
+			if (this.$refs.preOrdenProductos) {
+				total = this.$refs.preOrdenProductos.manoDeObraMenosMat - this.totalGastos
+			}
+			return total.toFixed(2)
 		},
 	},
 	components: {

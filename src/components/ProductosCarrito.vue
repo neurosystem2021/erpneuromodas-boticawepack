@@ -32,7 +32,7 @@
         <div class="d-block text-center">
           <h3>PRESENTACIONES</h3>
         </div>
-
+        <hr>
         <b-row>
           <b-col cols="6">
             <b-card
@@ -40,12 +40,22 @@
               class="mb-3 contentCard"
               @click="setProductoUni(objProd)"
             >
-              <b>1 - UNIDAD</b>
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">UNI</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>1
+                  <br>
+                  <b>Pre: </b>S/ {{ precioCont }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
+              v-if="d.cantidad != 0"
               align="center"
               class="mb-3 contentCard"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
@@ -55,18 +65,27 @@
                 }
               }"
             >
-              {{d.cantidad}} - {{d.nombre}}
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>{{ d.cantidad }}
+                  <br>
+                  <b>Pre: </b>S/ {{ d.precio }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
         </b-row>
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -82,7 +101,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].disabled"
+            :disabled="productos[data.index].estadoPxP == false"
             type="number"
             style="width: 75px"
             min="0"
@@ -308,6 +327,7 @@ export default {
       preciosProd: [],
       objProd: {},
       cant: 0,
+      precioCont: 0,
     }
   },
   watch: {
@@ -458,7 +478,9 @@ export default {
         this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
         this.productos[index].disabled = true
       } else {
+        console.log(this.productos[pi].precio);
         e.target.parentNode.parentNode.removeAttribute("style")
+        this.productos[pi].precio = 0
         this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
         this.productos[index].disabled = false
       }
@@ -550,7 +572,8 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     setProducto (obj) {
-      console.log(obj);
+      this.precioCont = obj.PrecioContado
+      obj.estadoPxP = false
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
@@ -558,14 +581,18 @@ export default {
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
       }
-
-      if (!obj.PreciosPorProducto) {
+      
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      let fPP = this.preciosProd.filter(p => p.cantidad === 0)
+      
+      if (!obj.PreciosPorProducto || fPP.length === 4) {
+        obj.estadoPxP = true
         this.setProductoUni(obj)
         return
       }
 
       this.$refs['modalCant'].show()
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
     },  
     setProductoUni (obj) {
@@ -715,12 +742,17 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .contentCard {
     cursor: pointer;
   }
   .disabledMouse {
     background: #CECECE;
     cursor: inherit;
+  }
+  .nomCart {
+    display: flex;
+    align-items: center;
+    border-right: 2px solid black;
   }
 </style>

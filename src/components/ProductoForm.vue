@@ -2,7 +2,7 @@
   <div>
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
+    <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
@@ -581,6 +581,11 @@ export default {
           {nombre: 'pt', cantidad: 0, precio: 0},
           {nombre: 'pd', cantidad: 0, precio: 0}
         ]
+      }
+    },
+    keyDownInput(e) {
+      if (e.target.tagName != 'TEXTAREA') {  
+        e.preventDefault();
       }
     },
     guardarProducto(e) {

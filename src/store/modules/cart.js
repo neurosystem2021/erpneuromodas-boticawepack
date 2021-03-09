@@ -88,7 +88,19 @@ const actions = {
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
-      producto.Descripcion = producto.ProductoDesc + producto.ProductoDesc2 + producto.ProductoDesc3
+
+      let arr = [
+        {"desc": producto.ProductoDesc},
+        {"desc": producto.ProductoDesc2},
+        {"desc": producto.ProductoDesc3}
+      ]
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].desc == null) {
+          arr[i].desc = ''
+        }
+        producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
+      }
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -128,8 +140,19 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
-          obj.Descripcion = obj.ProductoDesc + '\n' + obj.ProductoDesc2 + '\n' + obj.ProductoDesc3
-        
+          
+          let arr2 = [
+            {"desc": obj.ProductoDesc},
+            {"desc": obj.ProductoDesc2},
+            {"desc": obj.ProductoDesc3}
+          ]
+          for (let i = 0; i < arr2.length; i++) {
+            if (arr2[i].desc == null) {
+              arr2[i].desc = ''
+            }
+            obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
+          }
+
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {

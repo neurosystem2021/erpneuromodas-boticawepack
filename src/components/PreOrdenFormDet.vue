@@ -19,6 +19,7 @@
     <table class="table b-table table-sm">
       <thead>
         <tr>
+          <th>Mano de Obra</th>
           <th>Id</th>
           <th>Producto</th>
           <th>Precio</th>
@@ -28,6 +29,13 @@
       </thead>
       <tbody>
         <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
+          <td>
+            <input 
+            @change="(e) => addManoDeObra(index, e)"
+            v-if="prod.CodigoBarra != 'MANODEOBRA' " 
+            v-model="prod.EsManoDeObra"
+            class="form-check-input" type="checkbox" />
+          </td>
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
           <td>
@@ -66,8 +74,26 @@ export default {
       this.productos.map(prod => {
         sum += (prod.Cantidad * prod.Precio) || 0
       })
-
       return sum;
+    },
+    manoDeObraBruta () {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+      let precio = pManoObra ? pManoObra.PrecioMO : 0;
+      return precio
+    },
+    manoDeObraMenosMat () {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+      let precio = pManoObra ? pManoObra.PrecioMOmM : 0;
+      return precio
+    },
+  },
+  watch: {
+    productos (prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+
+      if (pi >= 0 && !this.productos[pi].Precio) {
+        this.productos[pi].Precio = this.productos[pi].Precio
+      }
     }
   },
   methods: {
@@ -80,6 +106,8 @@ export default {
           params: {idPreOrden: this.idPreorden}
         }).then(res => {
           this.productos = res.data.map(item => {
+            item.PrecioMO = item.Precio
+            item.PrecioMOmM = item.Precio
             if (item.IdProducto === this.idProducto) {
               item.isDisabled = true
             }
@@ -131,11 +159,47 @@ export default {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    addManoDeObra (index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+      if ( pi < 0 ) {
+        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
+        
+        this.productos[index].EsManoDeObra = 0
+        return ;
+      }
+
+      if (this.productos[index].EsManoDeObra) {
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"  
+        this.productos[pi].PrecioMOmM -= (parseFloat(this.productos[index].Precio) * parseFloat(this.productos[index].Cantidad))
+        this.productos[index].disabled = true
+      } else {  
+        e.target.parentNode.parentNode.removeAttribute("style")
+        this.productos[pi].PrecioMOmM += (parseFloat(this.productos[index].Precio) * parseFloat(this.productos[index].Cantidad))
+        this.productos[index].disabled = false
+      }
+    },
+    updateManoDeObraNeta (index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+      let precio = pManoObra ? pManoObra.precio : 0;
+
+      this.productos.filter(p => p.EsManoDeObra).map(p => {
+          precio -= (parseFloat(p.precio) * parseFloat(p.Cantidad))
+      })
+      
+      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+
+      if (pi >= 0 && index !== pi) {
+        this.productos[pi].precio = precio
+      }
+    },
   }
 }
 </script>
 <style scoped>
-.hideInModal {
-  display: none;
-}
+  .hideInModal {
+    display: none;
+  }
+  .form-check-input {
+    margin-left: 0.75rem !important;
+  }
 </style>
