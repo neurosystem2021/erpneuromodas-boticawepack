@@ -189,7 +189,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito ref="carrito" :idAlmacen="this.movimiento.almacenDestino.IdAlmacen"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">

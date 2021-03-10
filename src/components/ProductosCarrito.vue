@@ -367,8 +367,13 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      let stock = '';
+      if (data.stock && this.idAlmacen > 0) {
+        stock = `<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock.toFixed(2)}</b> |`;
+      }
+
       return `
-        <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock.toFixed(2)}</b> | <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
+        ${stock} <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} /<b> S/ ${data.PrecioContado} </b>
       `
     },
     setNuevoPrecioContado (index) {
