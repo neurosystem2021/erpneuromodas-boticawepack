@@ -582,8 +582,8 @@ export default {
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
       }
-      
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0)
       
       if (!obj.PreciosPorProducto || fPP.length === 4) {
