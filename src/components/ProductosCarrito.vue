@@ -46,6 +46,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
+            :disabled="idPerfil != '1'"
             type="number"
             style="width: 75px"
             min="0"
@@ -192,6 +193,7 @@ export default {
       vuelto: 0,
       pagocon: 0,
       cliente: {},
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
