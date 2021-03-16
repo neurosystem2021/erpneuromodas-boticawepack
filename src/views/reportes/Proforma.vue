@@ -80,7 +80,7 @@
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Esta proforma solo tiene validez durante los 5 dias posteriores.</div>
       </div>
     </main>
     <!--<footer>
