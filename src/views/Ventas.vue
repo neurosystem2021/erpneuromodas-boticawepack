@@ -326,6 +326,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -398,6 +399,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -777,7 +786,22 @@ export default {
                 this.inProgress = false
                 return
             }
+            
+            let totalCero = 0
+            this.productos.forEach(pro => {
+                if(pro.stock <= 0) {
+                    sinStock += 1
+                }
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
 
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
