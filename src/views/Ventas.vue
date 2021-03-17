@@ -761,6 +761,22 @@ export default {
 
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
+            
+            let totalCero = 0
+            this.productos.forEach(pro => {
+                if(pro.stock <= 0) {
+                    sinStock += 1
+                }
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
+            
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
 
             // check if factura DNI
             var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
