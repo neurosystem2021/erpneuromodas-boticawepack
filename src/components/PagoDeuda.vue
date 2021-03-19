@@ -75,7 +75,8 @@
                                     <th>Total</th>
                                     <th>Aplicado</th>
                                     <th>Saldo</th>
-                                    <th>Aplicar</th>
+                                    <th class="text-center">Aplicar Efectivo</th>
+                                    <th class="text-center">Aplicar Tarjeta</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,11 +85,19 @@
                                     <td>{{ item.FechaDoc }}</td>
                                     <td>{{ item.FechaCredito }}</td>
                                     <td>{{ item.Correlativo }}</td>
-                                    <td>{{ item.Total }}</td>
-                                    <td class="text-center">{{ item.Aplicado }}</td>
-                                    <td>{{ item.Saldo }}</td>
+                                    <td>{{ (item.Total).toFixed(2) }}</td>
+                                    <td class="text-center">{{ (item.Aplicado).toFixed(2) }}</td>
+                                    <td>{{ (item.Saldo).toFixed(2) }}</td>
                                     <td>
-                                        <b-form-input v-model="item.aplicar"
+                                        <b-form-input v-model="item.AplicarEfectivo"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+
+                                            placeholder="0"></b-form-input>
+                                    </td>
+                                    <td>
+                                        <b-form-input v-model="item.AplicarTarjeta"
                                             type="number"
                                             step="0.01"
                                             min="0"
@@ -114,6 +123,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha Pago</th>
+                                    <th>Cuenta</th>
                                     <th>Concepto</th>
                                     <th>Importe</th>
                                     <th></th>
@@ -123,8 +133,9 @@
                                 <tr v-for="(pago, index) in pagos" :key="index">
                                     <td>{{ pago.IdCajaBanco }}</td>
                                     <td>{{ pago.FechaDoc }}</td>
+                                    <td>{{ pago.Cuenta }}</td>
                                     <td>{{ pago.Concepto }}</td>
-                                    <td>{{ pago.Importe }}</td>
+                                    <td>{{ (pago.Importe).toFixed(2) }}</td>
                                     <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
                                 </tr>
                             </tbody>
@@ -217,14 +228,29 @@ import config from '@/store/config.js'
                 evt.preventDefault()
                 let importe = 0
                 this.documentos.map(doc => {
-                    if (doc.aplicar > 0) {
-                        importe += doc.aplicar
+                    if (doc.AplicarEfectivo > 0) {
+                        importe += doc.AplicarEfectivo
+                    }
+                    if (doc.AplicarTarjeta > 0) {
+                        importe += doc.AplicarTarjeta
                     }
                 })
 
                 if(importe === 0) {
                     this.$toasted.show('Error: no ha ingresado ningun importe');
+                    this.isLoading = false;
+                    return;
                 }
+                
+
+               for (let index = 0; index < this.documentos.length; index++) {
+                    if ((parseFloat(this.documentos[index].AplicarEfectivo)+parseFloat(this.documentos[index].AplicarTarjeta))>this.documentos[index].Saldo){
+                        this.isLoading = false
+                        this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo')
+                        return;
+                    }
+                    
+                }   
 
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
@@ -232,12 +258,16 @@ import config from '@/store/config.js'
                     vendedor: this.vendedor
                 })
                 .then((response) => {
-                    console.log(response.data)
+                    console.log(response.data);
                     this.$toasted.show('Se pagó la deuda del cliente.')
                     this.show = false
                     this.initForm()
-                    this.isLoading = false;
-                    window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
+                    this.isLoading = false
+                    response.data.Comprobantes.forEach(comprobante => {
+                        window.open('/imprimir/pagocredito.php?idCajaBanco=' + comprobante)
+                    });
+                    
+
                 })
                 .catch((error) => {
                     console.log(error)
