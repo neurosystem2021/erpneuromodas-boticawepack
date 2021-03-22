@@ -420,7 +420,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -446,6 +446,13 @@ export default {
   		let total = 0
   		this.adelantos.forEach(ade => {
   			if (!ade.Anulado) total += ade.Importe
+  		})
+  		return total
+  	},
+    totalAdelantosActivos () {
+  		let total = 0
+  		this.adelantos.forEach(ade => {
+  			if (!ade.Anulado  &&  !ade.AnuladoVenta && !ade.EsCreditoVenta) total += ade.Importe
   		})
   		return total
   	},
