@@ -71,27 +71,12 @@
         </tfoot>
       </table>
       <div id="accounts">
-        <div>
-          <b>BANCO DE LA NACIÓN: <i>(Soles)</i></b>
-          <b>Nº: </b>00-580-008062
-          <b>CCI: </b>018-580-000580008062-13
-          <b>DETRACCIÓN: </b>00-580-006981
-        </div>
-        <div>
-          <b>BANCO CONTINENTAL (BBVA): <i>(Soles)</i></b>
-          <b>Nº: </b>0011-0210-29-0200746343
-          <b>CCI: </b>0011-210-000200746343-29
-        </div>
-        <div>
-          <b>BANCO DE CRÉDITO DEL PERÚ (BCP): <i>(Soles)</i></b>
-          <b>Nº: </b>365-28875212-0-27
-          <b><i>(Dólares)</i> Nº: </b>365-28875215-1-30
-        </div>        
+        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Esta proforma solo tiene validez durante los 7 dias posteriores.</div>
       </div>
     </main>
     <!--<footer>
