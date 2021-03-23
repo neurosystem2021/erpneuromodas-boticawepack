@@ -235,6 +235,16 @@
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
+          <br>
+          <h6><i>Prof.</i></h6>
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            @change="(e) => {
+              $emit('onCheckProf', e)
+              asignarDisabledProf(data.index, e)
+            }"
+          />
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
@@ -479,7 +489,6 @@ export default {
         this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
         this.productos[index].disabled = true
       } else {
-        console.log(this.productos[pi].precio);
         e.target.parentNode.parentNode.removeAttribute("style")
         this.productos[pi].precio = 0
         this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
@@ -500,6 +509,14 @@ export default {
       if (pi >= 0 && index !== pi) {
         this.productos[pi].precio = precio
       }
+    },
+
+    asignarDisabledProf (index, e) {
+      if (e.target.checked === true) {
+        this.productos[index].disabledProf = 1
+        return
+      }
+      this.productos[index].disabledProf = 0
     },
 
     asignarVuelto () {
@@ -755,5 +772,8 @@ export default {
     display: flex;
     align-items: center;
     border-right: 2px solid black;
+  }
+  .form-check-input {
+    margin-left: -0.2rem !important;
   }
 </style>

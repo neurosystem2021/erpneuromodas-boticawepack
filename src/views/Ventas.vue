@@ -179,8 +179,8 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-
-                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }}</b-badge>
+                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
+                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -233,6 +233,12 @@
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
+                                                <b-form-checkbox 
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -359,6 +365,7 @@ export default {
         return {
             dni: '',
             adelanto: 0,
+            gasto: 0,
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
@@ -441,18 +448,21 @@ export default {
             //}
 
             // obtener total adelantos
-            this.axios.get(this.API + 'preorden/cajaybanco', { params: { IdPreOrden: orden.IdPreOrden } })
-                .then(res => {
-                    let suma = 0
-                    res.data.map(ad => {
-                        console.log(ad)
-                        if (ad.Tipo == 0) {
-                            suma += ad.Importe
-                        }
-                    })
-
-                    this.adelanto = suma
+            this.axios.get(this.API + 'preorden/cajaybanco', { 
+                params: { 
+                    IdPreOrden      : orden.IdPreOrden,
+                    TipoCajaBanco 	: 0
+                } 
+            })
+            .then(res => {
+                let suma = 0
+                res.data.map(ad => {
+                    if (ad.Tipo == 0) {
+                        suma += ad.Importe
+                    }
                 })
+                this.adelanto = suma
+            })
         },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
@@ -580,7 +590,6 @@ export default {
             }
         },
         setCliente (obj, dni = false) {
-            
             let params = {}
             if (dni) {
                 params = {
@@ -588,7 +597,7 @@ export default {
                 }
             }else {
                 params = {
-                    idCliente: obj
+                    idCliente: obj.IdCliente
                 }
             }
 
@@ -611,7 +620,9 @@ export default {
                     console.log(error)
                 })
             }
+            
             this.actualizarPrecioConvenio(obj)
+            // Actualizar DisabledTotal
         },
         onSetProducto (obj, cant) {
             if (cant) {
@@ -711,16 +722,11 @@ export default {
             }
 
             this.venta.productos = this.productos
-            
-            // console.log(this.venta);
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                // console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
                 this.limpiarDespuesVenta()
-
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {

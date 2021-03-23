@@ -45,8 +45,10 @@
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
             <td class="total">
-              S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
-              <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+              <div v-if="prod.DisabledTotal === 0">
+                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+                <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+              </div>
             </td>
           </tr>
         </tbody>

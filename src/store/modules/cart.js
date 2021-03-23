@@ -106,6 +106,9 @@ const actions = {
         producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
       }
 
+      // console.log(producto);
+      producto.disabledProf = 0
+      
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {

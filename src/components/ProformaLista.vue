@@ -18,11 +18,14 @@
                         :busy.sync="isBusy" 
                         :filter="filter"
                         :items="myProvider" 
-                        @row-clicked="selectProformas"
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
-                        
+
+                      <template slot="update" slot-scope="data">
+                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                      </template>
+
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
                       </template>
@@ -72,7 +75,7 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -92,7 +95,6 @@ import { mapActions } from 'vuex'
                     }
                 }).then((response) => {
                     response.data.map((item) => {
-                        
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
                         }, { setPrecio: true, cantidad: item.Cantidad } ])
@@ -101,8 +103,10 @@ import { mapActions } from 'vuex'
                         this.show = false
                     })
                     proforma.productos = response.data
+                    // console.log(proforma);
 
-                    this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+                    // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+                    this.$emit('onSelectProforma', proforma)
                     this.limpiarCarrito()
                 })
             },

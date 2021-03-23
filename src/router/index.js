@@ -22,6 +22,7 @@ import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
+import PorEntregar from '@/views/reportes/PorEntregar.vue'
 
 Vue.use(Router)
 
@@ -127,6 +128,11 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
+    },
+    {
+      path: '/porentregar',
+      name: 'PorEntregar',
+      component: PorEntregar
     }
   ]
 })
