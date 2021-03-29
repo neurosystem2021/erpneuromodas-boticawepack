@@ -124,13 +124,13 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>1ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
@@ -140,7 +140,7 @@
               />
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>3ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc3"
@@ -178,13 +178,21 @@
               step="0.0001"
               ></b-form-input>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio X Mayor:</label>
             <b-form-input 
               v-model="producto.PrecioPorMayor"
               type="number"
               min="0"
               step="0.0001"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="false">
+            <label>Stock X Mayor:</label>
+            <b-form-input 
+              v-model="producto.StockPorMayor"
+              type="number"
+              min="0"
               ></b-form-input>
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
@@ -228,7 +236,7 @@
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>2da Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc2"
@@ -254,7 +262,16 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Venta:</label>
+            <label>Precio Especial:</label>
+            <b-form-input
+              v-model="producto.PrecioEspecial"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Público:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
               @input.native="actualizarPorcentajeUtilidad"
@@ -266,7 +283,7 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio Convenio:</label>
+            <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
               type="number"
               ></b-form-input>
@@ -275,7 +292,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="false">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -396,9 +413,9 @@ export default {
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
-        this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
-        this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
-        this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
+        //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+        //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
+        //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
@@ -429,6 +446,7 @@ export default {
         this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
         this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
         this.producto.StockMinimo           = newVal.StockMinimo
+        this.producto.StockPorMayor         = newVal.StockPorMayor
         this.producto.CodigoBarra           = newVal.CodigoBarra
         this.producto.ProductoModelo        = newVal.ProductoModelo
         this.producto.ProductoDesc          = newVal.ProductoDesc
@@ -438,6 +456,7 @@ export default {
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
         this.producto.precioConvenio        = newVal.precioConvenio
+        this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
@@ -561,9 +580,11 @@ export default {
         // Color: '',
         PorcentajeUtilidad: '',
         StockMinimo: 0,
+        StockPorMayor: 0,
         PrecioContado: '',
         PrecioPorMayor: 0,
         precioConvenio: 0,
+        PrecioEspecial: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},
