@@ -402,7 +402,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        //this.$refs.inputCodigoBarra.$el.disabled = true
+        this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
