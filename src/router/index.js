@@ -10,6 +10,7 @@ import Clientes from '@/views/Clientes.vue'
 import VentaEstrategica from '@/views/VentaEstrategica.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import ProductosSimilares from '@/views/ProductosSimilares.vue'
+import Traslado from '@/views/Traslado.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -81,6 +82,11 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
+    },
+    {
+      path: '/traslado',
+      name: 'Traslado',
+      component: Traslado
     },
     {
       path: '/consultaventaestrategica',
