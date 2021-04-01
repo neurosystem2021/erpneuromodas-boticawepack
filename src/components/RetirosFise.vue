@@ -179,7 +179,9 @@ import config from '@/store/config.js'
                 this.axios.get(this.API + 'ventas/fise')
                 .then((response) => {
                     this.ventasFise = response.data
-                    this.totalVentaFise = response.data.map( item => item.Total).reduce((sumaTotal, actual) => sumaTotal + actual)
+                    if (response.data.length) {
+                        this.totalVentaFise = response.data.map( item => item.Total).reduce((sumaTotal, actual) => sumaTotal + actual)
+                    }
                 })
                 .catch((error) => {
                     console.log(error)
