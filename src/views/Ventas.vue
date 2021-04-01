@@ -164,7 +164,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group>
+                        <!--<b-form-group>
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -178,7 +178,7 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
-                        </b-form-group>
+                        </b-form-group>-->
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
@@ -561,7 +561,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
