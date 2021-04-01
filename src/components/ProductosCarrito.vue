@@ -101,7 +101,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false"
+            :disabled="isVentas? true : false"
             type="number"
             style="width: 75px"
             min="0"
@@ -594,6 +594,11 @@ export default {
       obj.estadoPxP = false
       this.loadCode = ''
       this.preciosProd = []
+      if (!this.isVentas) {
+        obj.estadoPxP = true
+        this.setProductoUni(obj)
+        return
+      }
       this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
       if(obj.precioConvenio){
         this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
@@ -606,15 +611,11 @@ export default {
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
       }
-
+      
      // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
      // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
       
-    /*   if (!obj.PreciosPorProducto || fPP.length === 4) {
-        obj.estadoPxP = true
-        this.setProductoUni(obj)
-        return
-      } */
+ 
 
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
@@ -630,7 +631,10 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      console.log(obj);
+      if(this.isVentas){
       obj.PrecioContado=precio
+      }
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
