@@ -164,11 +164,10 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <!--<b-form-group>
+                        <b-form-group v-show="false">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
-                                required="required"
                                 :url="API + 'comisionistas'"
                                 anchor="ClienteDniRuc"
                                 label="writer"
@@ -178,7 +177,7 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
-                        </b-form-group>-->
+                        </b-form-group>
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
