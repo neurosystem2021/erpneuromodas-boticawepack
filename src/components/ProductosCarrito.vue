@@ -221,17 +221,17 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <template slot="Descripcion" slot-scope="data">
+        <!--<template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
             v-model="productos[data.index].Descripcion"></textarea>
-          <!--<b-form-input
+          <b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>-->
-        </template>        
+            placeholder="Descripción"></b-form-input>
+        </template>--> 
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -376,7 +376,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          { key: 'Descripcion', label: 'Descripción'},
+          //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Present.' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
