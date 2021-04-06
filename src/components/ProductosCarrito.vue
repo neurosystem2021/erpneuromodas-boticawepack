@@ -107,7 +107,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              if(!productos[data.index].PreciosPorProducto) {
+             /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
               }
@@ -117,7 +117,7 @@
                 productos[data.index].precio = reg.precio
                 return
               }
-              productos[data.index].precio = productos[data.index].PrecioContado 
+              productos[data.index].precio = productos[data.index].PrecioContado */
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -596,6 +596,7 @@ export default {
       this.preciosProd = []
       if (!this.isVentas) {
         obj.estadoPxP = true
+        obj.PreciosPorProducto = ''
         this.setProductoUni(obj)
         return
       }
@@ -607,11 +608,7 @@ export default {
        this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
       }
       this.objProd = {}
-
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
-      }
-      
+    
      // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
      // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
       
@@ -631,14 +628,21 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      console.log(obj);
-      if(this.isVentas){
-      obj.PrecioContado=precio
-      }
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,false,precio)
+      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
+        if(existe){
+          if(this.isVentas){
+            this.$toasted.success('Precio Modificado')
+          }else{
+            this.$toasted.success('El producto ya está en la lista')
+          }
+          
+        }else{
+          this.$toasted.success('Producto añadido correctamente')
+        }
+        
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
@@ -672,6 +676,7 @@ export default {
       
      // if (!obj.PreciosPorProducto !== '') {
        // this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+       if(this.isVentas){
         this.preciosProd = []
         this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
         if(obj.precioConvenio){
@@ -683,6 +688,8 @@ export default {
         this.objProd = obj
         this.$refs['modalCant'].show()
         return
+       }
+ 
       //}
     },
     renderChild(data) {

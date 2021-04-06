@@ -620,10 +620,10 @@ export default {
                 })
             }
             
-            this.actualizarPrecioConvenio(obj)
+            //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
+        onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
                 let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
@@ -631,7 +631,7 @@ export default {
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || 0
             return obj
         },
         onAddProducto (obj) {
