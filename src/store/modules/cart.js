@@ -97,6 +97,10 @@ const actions = {
             obj.precio = 0
           }
 
+          if (setPrecioCosto) {
+            obj.precio =  obj.PrecioCosto
+          }
+
           if (cantidad) {
             obj.cantidad = cantidad
           }
