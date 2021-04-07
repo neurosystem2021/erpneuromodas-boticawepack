@@ -89,7 +89,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              if(!productos[data.index].PreciosPorProducto) {
+              if(!productos[data.index].PreciosPorProducto && tipo != 'mov') {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 return
               }
@@ -264,6 +264,7 @@ export default {
   props: {
     isVentas: Boolean,
     setPrecio: Boolean,
+    tipo: String,
 
     igvTotal: Boolean,
     onSetProducto: {
@@ -452,7 +453,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }])
+      }, {setPrecioCosto: (this.tipo == 'mov' ? true : false)} ])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
@@ -476,7 +477,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }])
+      }, {setPrecioCosto: (this.tipo == 'mov' ? true : false)}])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
