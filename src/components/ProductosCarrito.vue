@@ -26,6 +26,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
       <b-modal ref="modalCant" hide-footer hide-header>
@@ -693,8 +694,14 @@ export default {
       //}
     },
     renderChild(data) {
+      let style = '';
+      if(parseFloat(data.stock) <= 0) {
+          style = "background-color:#ff7675; color: #ffffff;";
+      }
       return `
+      <div style="${style}">
         <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock}
+      </div>  
       `
     },
     // setCantidad (index, val) {
