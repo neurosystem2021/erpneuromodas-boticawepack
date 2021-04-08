@@ -48,7 +48,10 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
+                <th>Recibo</th><th>Fecha</th>
+                <th v-if="$route.query.noDetalle">Cliente</th>
+                <th v-else>Productos</th>
+                <th>Estado</th><th style="width:90px">Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +60,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
               
-                  <table class="tabla-detalle">
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                       <th>Codigo</th>
@@ -87,7 +90,11 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b>
+                
+                 {{ item.Cliente }}</small></i></div>
 
               </td>
               <!--<td>{{ item.EfectivoDesc }}</td>-->
@@ -111,7 +118,10 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th>
+              <th v-if="$route.query.noDetalle">Cliente</th>
+              <th v-else>Productos</th>
+              <th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -120,7 +130,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
               
-                  <table class="tabla-detalle">
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                       <th>Codigo</th>
@@ -150,7 +160,10 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b>
+                {{ item.Cliente }}</small></i></div>
 
               </td>
               <td>{{ item.VisaDesc }}</td>
@@ -175,7 +188,10 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                <th>Recibo</th><th>Fecha</th>
+                <th v-if="$route.query.noDetalle">Cliente</th>
+                <th v-else>Productos</th>
+                <th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -184,7 +200,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
 
-                  <table class="tabla-detalle">
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                       <th>Codigo</th>
@@ -214,7 +230,10 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
                     
               </td>
               <td>{{ item.MastercardDesc }}</td>
@@ -237,7 +256,10 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th>
+              <th v-if="$route.query.noDetalle">Cliente</th>
+              <th v-else>Productos</th>
+              <th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -246,7 +268,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
                 
-                  <table class="tabla-detalle">
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                       <th>Codigo</th>
@@ -276,7 +298,10 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
 
 
               </td>

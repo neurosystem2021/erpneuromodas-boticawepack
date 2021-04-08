@@ -24,7 +24,7 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/views/ve_cierreform.php?noDetalle=1&idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                     </b-table>
