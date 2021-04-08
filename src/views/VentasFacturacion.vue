@@ -173,6 +173,7 @@
                       <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
+                      <!--
                       <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <form @submit.prevent="emitirNotaCredito(data.item)" >
@@ -181,7 +182,7 @@
                           <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
                           <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
                         </form>
-                      </b-popover>
+                      </b-popover>-->
                   </div>
                 </template>
 
@@ -431,7 +432,7 @@ export default {
       this.loading = true
       let arr = []
 
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07') { // Factura / boleta  /Nota credito
         if (doc.idDocVenta && generarXml) {
           arr.push(await this.axios.post(this.API + 'emitirelectronico', {
             generarXml: true,
