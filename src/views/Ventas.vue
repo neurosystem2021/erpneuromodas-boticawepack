@@ -81,7 +81,7 @@
                                 </b-form-group>
                                 <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
-                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="md" required/>
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -213,6 +213,7 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
@@ -226,6 +227,7 @@
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <b-form-input
+                                                        :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
@@ -241,17 +243,20 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
+                                                    :disabled="bloquearInput?true:false"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -272,6 +277,7 @@
                                             <td>Efectivo</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -279,6 +285,7 @@
                                             </td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
@@ -291,6 +298,7 @@
                                             <td>Visa</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.visa.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -298,6 +306,7 @@
                                             </td>
                                             <td>
                                                 <input
+                                                    :disabled="bloquearInput?true:false"
                                                     class="form-control"
                                                     v-model="venta.pago.visa.monto"
                                                     min="0"
@@ -312,6 +321,7 @@
                                             <td>Mastercard</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.mastercard.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -319,6 +329,7 @@
                                             </td>
                                             <td>
                                                 <input
+                                                    :disabled="bloquearInput?true:false"
                                                     class="form-control"
                                                     v-model="venta.pago.mastercard.monto"
                                                     min="0"
@@ -394,6 +405,7 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            bloquearInput:false,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -556,6 +568,7 @@ export default {
         },
         setTipoVenta (obj) {
             this.isNota = false
+            this.bloquearInput=false,
             this.venta.NroComprobanteModifica = ''
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
@@ -621,8 +634,17 @@ export default {
                         this.add([item, () => {
                         }, false ])
                     })     
-                    this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });                     
+                    this.venta.NotaIdMotivo=null
+                    this.bloquearInput=true
+                    this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })                   
                 })
+        },
+        setMotivo(ev){
+            if(ev == '01' || ev == '02' || ev == '06' || ev == null){
+                this.bloquearInput=true;
+            }else{
+                this.bloquearInput=false;
+            }
         },
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
