@@ -265,7 +265,7 @@
                                             </td>
                                             <tr>
                                                 <td>
-                                                    <b-input-group prepend="Dias" append="Valdidos prof.">
+                                                    <b-input-group prepend="Dias" append="Valdidos Pr.">
                                                     <b-form-input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="diasValidosProf"

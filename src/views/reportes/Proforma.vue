@@ -2,7 +2,7 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg">
+				<img src="/resources/images/banner-proforma.jpg"> 
 			</div>
 			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
