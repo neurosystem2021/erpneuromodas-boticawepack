@@ -62,7 +62,7 @@
   
   #client {
     padding-left: 6px;
-    border-left: 6px solid #0087C3;
+    border-left: 6px solid #E7BC2F;
     float: left;
     width: 12cm;
   }
@@ -131,25 +131,30 @@
   table .no {
     color: #FFFFFF;
     font-size: 1em;
-    background: #57B223;
+    background: #E7BC2F;
   }
   
   table .desc {
     text-align: left;
     white-space: pre-wrap;
+    color:black;
   }
   
   table .unit {
+    color:black;
     font-size: 1em;
     background: #DDDDDD;
+    text-align: center;
   }
   
   table .qty {
+    color: black;
+    text-align: center;
   }
   
   table .total {
-    background: #57B223;
-    color: #FFFFFF;
+    background: #E7BC2F;
+    color: black;
     text-align: right;
   }
   table .total .dsct {
@@ -159,7 +164,8 @@
   table td.unit,
   table td.qty,
   table td.total {
-    font-size: .8em;
+    font-size: .9em;
+    color: black;
   }
   
   table tbody tr:last-child td {
@@ -180,7 +186,7 @@
   }
   
   table tfoot tr:last-child td {
-    color: #57B223;
+    color: black;
     font-size: 1.4em;
     border-top: 1px solid #57B223; 
   
@@ -203,11 +209,11 @@
   
   #notices{
     padding-left: 6px;
-    border-left: 6px solid #0087C3;  
+    border-left: 6px solid #E7BC2F;  
   }
   
   #notices .notice {
-    font-size: 1.2em;
+    font-size: 1em;
   }
   
   footer {
