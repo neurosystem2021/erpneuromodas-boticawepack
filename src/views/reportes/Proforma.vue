@@ -30,7 +30,7 @@
         <thead>
           <tr>
             <th class="no">#</th>
-            <th></th>
+            <!--<th></th>-->
             <th class="desc">DESCRIPCIÓN</th>
             <th class="unit">PRECIO U.</th>
             <th class="qty">CANT.</th>
@@ -40,7 +40,7 @@
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
+            <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
             <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
@@ -54,7 +54,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3"></td>
+            <td colspan="2"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -64,7 +64,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="3"></td>
+            <td colspan="2"></td>
             <td colspan="2">GRAN TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
