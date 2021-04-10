@@ -48,7 +48,7 @@
             <tbody>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Desde</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg.substring(0,10) }}</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>

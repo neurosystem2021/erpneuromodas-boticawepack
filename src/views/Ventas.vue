@@ -265,7 +265,7 @@
                                             </td>
                                             <tr>
                                                 <td>
-                                                    <b-input-group prepend="Dias" append="Valdidos Pr.">
+                                                    <b-input-group prepend="Proforma válido por:" append="días">
                                                     <b-form-input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="diasValidosProf"
