@@ -535,7 +535,7 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
             }
-
+            this.isNota = false
             this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
