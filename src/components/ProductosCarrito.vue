@@ -82,7 +82,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
-          <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
@@ -92,6 +92,7 @@
             style="width: 75px"
             step="0.001"
             min="0"
+            :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
@@ -101,7 +102,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false"
+            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false"
             type="number"
             style="width: 75px"
             min="0"
@@ -124,7 +125,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
             style="width: 75px"
             min="0"
@@ -139,6 +140,7 @@
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
             :value="1"
+            :disabled="bloquearInput?true:false"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
             <div>{{ getIgv(data.index) }}</div>
@@ -164,12 +166,14 @@
           <input 
             @change="(e) => addManoDeObra(data.index, e)"
             v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].EsManoDeObra"
             class="form-check-input" type="checkbox" />
         </template>
 
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
@@ -183,6 +187,7 @@
 
         <template slot="utilidad" slot-scope="data">
           <input 
+            :disabled="bloquearInput?true:false"
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
             style="width: 80px"
@@ -196,6 +201,7 @@
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
@@ -223,6 +229,7 @@
 
         <template slot="Descripcion" slot-scope="data">
           <textarea 
+            :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
@@ -240,6 +247,7 @@
           <input 
             class="form-check-input" 
             type="checkbox" 
+            :disabled="bloquearInput?true:false"
             @change="(e) => {
               $emit('onCheckProf', e)
               asignarDisabledProf(data.index, e)
@@ -247,11 +255,11 @@
           />
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -300,6 +308,7 @@
                   <label>pagó con:</label>
                   <b-form-input
                     type="text"
+                    :disabled="bloquearInput?true:false"
                     placeholder="Pagó con"
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
@@ -359,6 +368,7 @@ export default {
     tipoCambio: Number,
     igvTotal: Boolean,
     idAlmacen: Number,
+    bloquearInput:Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -658,6 +668,7 @@ export default {
     },
     showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
+        this.precioCont = obj.PrecioContado
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
         this.$refs['modalCant'].show()
