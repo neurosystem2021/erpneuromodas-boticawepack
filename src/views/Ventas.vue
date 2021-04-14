@@ -52,7 +52,7 @@
                                     <autocomplete
                                         required="required"
                                         ref="inputDocRef"
-                                        :url="API + 'ventas/lista'"
+                                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
                                         anchor="NroComprobante"
                                         initValue=""
                                         label="writer"
