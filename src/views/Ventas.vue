@@ -579,6 +579,7 @@ export default {
                 diasValidosProf:0
             }
             this.isNota = false
+            this.bloquearInput = false
         },
         setTipoVenta (obj) {
             this.isNota = false
