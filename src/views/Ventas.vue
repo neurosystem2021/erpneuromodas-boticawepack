@@ -536,11 +536,12 @@ export default {
                 NotaDescMotivo: '',
             }
             this.isNota = false
+            this.bloquearInput = false
             this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
             this.isNota = false
-            this.bloquearInput=false,
+            this.bloquearInput = false
             this.venta.NroComprobanteModifica = ''
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
