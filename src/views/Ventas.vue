@@ -565,6 +565,7 @@ export default {
                 CampoDireccion: 'Direccion'
             }
             this.isNota = false
+            this.bloquearInput=false
         },
         setTipoVenta (obj) {
             this.isNota = false
