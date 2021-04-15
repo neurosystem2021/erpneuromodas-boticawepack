@@ -407,6 +407,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
+            adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -501,6 +502,7 @@ export default {
                 } 
             })
             .then(res => {
+                this.adelantosPreOrden = res.data
                 let suma = 0
                 res.data.map(ad => {
                     if (ad.Tipo == 0) {
@@ -551,6 +553,7 @@ export default {
                     PuntoVenta: 'HUANUCO'
                 },
                 vendedor: {},
+                adelantosPreOrden:[],
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -567,6 +570,8 @@ export default {
             }
             this.isNota = false
             this.bloquearInput=false
+            this.adelantosPreOrden=[]
+            this.adelanto = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -726,7 +731,7 @@ export default {
                 }
             }else {
                 params = {
-                    idCliente: obj.IdCliente
+                    idCliente: obj.IdCliente || obj
                 }
             }
 
@@ -957,6 +962,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
