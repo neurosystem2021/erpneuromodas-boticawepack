@@ -98,6 +98,7 @@
                                 <b-form-group>
                                     <label>Cliente:</label>
                                     <b-input-group>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente">EDITAR</clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -712,6 +713,26 @@ export default {
                     this.inProgress = false            
                     return                
                 }
+            }
+
+            if (!this.venta.cliente.DniRuc) {
+                this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
+            if (!esNumerico) {
+                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+                this.inProgress = false
+                return
+            }
+
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
             }
 
             if(!this.productos.length) {
