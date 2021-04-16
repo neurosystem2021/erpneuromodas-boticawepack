@@ -190,10 +190,15 @@
             style="width: 80px"
             type="number" 
             step="0.01"
+            :min="productos[data.index].PorcentajeUtilidadMin"
+            :max="productos[data.index].PorcentajeUtilidadMax"
             :disabled="bloquearInput?true:false"
+            required
             @input="cambiarPrecio(data.index, productos[data.index])" 
             @mouseup="cambiarPrecio(data.index, productos[data.index])" 
             />
+            <b-badge variant="danger">{{productos[data.index].PorcentajeUtilidadMin}}</b-badge> - <b-badge variant="success">{{productos[data.index].PorcentajeUtilidadMax}}</b-badge>
+              <br>
             <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
 
@@ -478,8 +483,9 @@ export default {
     },
 
     cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+     // if( this.productos[index].PorcentajeUtilidadMin <= this.productos[index].PorcentajeUtilidad && this.productos[index].PorcentajeUtilidad <= this.productos[index].PorcentajeUtilidadMax){
+        var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
+        this.productos[index].precio = (Math.round((this.productos[index].PrecioCosto + utilidad) * 100) / 100).toFixed(2);
     },
     
     addManoDeObra (index, e) {

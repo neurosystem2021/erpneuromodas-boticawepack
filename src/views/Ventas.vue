@@ -937,12 +937,12 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+/*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
             }
-
+ */
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
@@ -954,6 +954,14 @@ export default {
                 this.inProgress = false            
                 return 
             }
+
+            this.productos.forEach(p => {
+                if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)){
+                    this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
+                    this.inProgress = false
+                    return
+                }
+            });
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
