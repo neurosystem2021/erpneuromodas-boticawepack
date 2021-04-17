@@ -1,9 +1,10 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+      
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -136,13 +137,26 @@ export default {
         })
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
+
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+
+      var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
+      if (!esDocumento) {
+          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
 
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
         this.$toasted.show('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
+        this.cliente = {}
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
