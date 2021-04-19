@@ -61,6 +61,14 @@
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
               <hr>
+              <b-form-checkbox
+                :disabled="!producto.IdProducto"
+                v-model="esElectronico"
+                :value="1"
+                @input="setElectronico"
+                :unchecked-value="0">
+                Solo Electrónico
+              </b-form-checkbox>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
             </b-col>
           </b-row>
@@ -120,6 +128,7 @@ export default {
       producto: {},
       almacen: {},
       esValorizado: false,
+      esElectronico: 0,
       kardex: {
         fechaDesde: this.$moment().format("YYYY-01-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
@@ -135,7 +144,7 @@ export default {
         tipoKardex = 'kardexvalorizado'
       }
 
-      return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+      return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta+'&esElectronico='+this.esElectronico;
     },
     kardexSaldo () {
       let saldo = 0
@@ -219,7 +228,8 @@ export default {
       this.axios.get(this.API + 'productos/kardex/' + this.producto.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.kardex.fechaHasta
+              fechaHasta: this.kardex.fechaHasta,
+              esElectronico: this.esElectronico
           }
       }).then((response) => {
           this.kardexSelect = response.data
@@ -228,6 +238,16 @@ export default {
     verKardexValorizado () {
       this.verKardex()
       this.esValorizado = true
+    },
+    setElectronico(){
+      this.kardexSelect=[]
+      if(this.esValorizado == true){
+        this.verKardex()
+        this.esValorizado = true
+      }else{
+        this.verKardex ()
+        this.esValorizado = false
+      }
     },
     exportar () {
 
