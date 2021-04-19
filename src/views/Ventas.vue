@@ -131,9 +131,9 @@
                                         </b-input-group-append>
                                     </b-input-group>
                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
-                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                        <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
 
                                 </b-form-group>
@@ -562,7 +562,7 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: 'Direccion'
+                CampoDireccion: ''
             }
             this.isNota = false
             this.bloquearInput=false
@@ -964,7 +964,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
