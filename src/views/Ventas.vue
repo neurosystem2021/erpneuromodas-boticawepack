@@ -727,6 +727,7 @@ export default {
             if (typeof obj === 'object') {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
+                this.venta.CampoDireccion = this.venta.cliente.Direccion
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -735,6 +736,7 @@ export default {
                     if (response.data) {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
+                        this.venta.CampoDireccion = this.venta.cliente.Direccion
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
