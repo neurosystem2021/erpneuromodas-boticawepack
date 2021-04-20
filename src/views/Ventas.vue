@@ -167,6 +167,7 @@
                             ref="carrito"
                             :showButton="false"
                             :fields="carrito.fields"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -640,12 +641,12 @@ export default {
                 return;
             }
             
-            if (sinStock >= 1) {
+/*             if (sinStock >= 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false
                 return;
             }
-
+ */
 
 
             this.venta.productos = this.productos

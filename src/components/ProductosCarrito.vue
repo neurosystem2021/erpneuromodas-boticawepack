@@ -6,7 +6,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -200,7 +200,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    idAlmacen: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -242,6 +242,13 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -362,10 +369,30 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      /* return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+      ` */
+      if (this.idAlmacen) {
+        let style = 'ss'
+
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+        }
+        return `
+        <div>
+          <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        </div>
+        `
+      }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
       `
-    },
+   },
     setNuevoPrecioContado (index) {
 
       // Añadir IGV si check IGV
