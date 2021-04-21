@@ -310,6 +310,10 @@
                 </b-row>
             </b-form>
         </b-container>
+
+        <b-modal id="prodVenc" size="lg" modal-class="modal-xl" v-model="mostrarProdVenc" ok-only ok-title="Cerrar" title="Productos por vencer (proximos 2 meses)">
+            <producto-vencimiento v-show="this.$route.query.ini"></producto-vencimiento>
+        </b-modal>
     </div>
 </template>
 <script>
@@ -321,6 +325,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import ProductoVencimiento from '@/components/ProductoVencimiento.vue'
 
 
 export default {
@@ -331,6 +336,11 @@ export default {
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
+        if(this.$route.query.ini){
+            this.mostrarProdVenc  = true
+        } else {
+            this.mostrarProdVenc = false
+        }
         //setInterval(this.updateTime, 1000)
         /* this.loadFirstAlmacen()
         this.loadFirstPuntoVenta() */
@@ -348,6 +358,7 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            mostrarProdVenc:false,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -476,6 +487,7 @@ export default {
 
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
+            this.mostrarProdVenc = false
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -762,6 +774,20 @@ export default {
                 this.inProgress = false
                 return;
             }
+            let cantidadstock = false;
+            this.productos.map(pro=>{
+                 let cantidad = pro.cantidad?parseFloat(pro.cantidad):0    
+                 let stock =pro.stock?parseFloat(pro.stock):0
+                if(cantidad > stock){
+                    this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. Para cantidad de '+cantidad+' ingresada');
+                    cantidadstock = true    
+                }
+            })
+            if(cantidadstock){
+                this.inProgress = false
+                return;  
+            }
+
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
@@ -842,7 +868,8 @@ export default {
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
-        Proformas
+        Proformas,
+        ProductoVencimiento
     }
 }
 </script>
@@ -853,5 +880,7 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+#prodVenc .modal-dialog {
+    max-width: 75% !important;
+   }
 </style>
