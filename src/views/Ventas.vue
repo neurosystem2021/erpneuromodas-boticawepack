@@ -311,8 +311,8 @@
             </b-form>
         </b-container>
 
-        <b-modal id="prodVenc" size="lg" modal-class="modal-xl" v-model="mostrarProdVenc" ok-only ok-title="Cerrar" title="Productos por vencer (proximos 2 meses)">
-            <producto-vencimiento v-show="this.$route.query.ini"></producto-vencimiento>
+        <b-modal id="prodVenc" size="lg" modal-class="modal-xl" v-model="mostrarProdVenc" ok-only ok-title="Cerrar" title="Estado de Productos">
+            <producto-estado v-show="this.$route.query.ini"></producto-estado>
         </b-modal>
     </div>
 </template>
@@ -325,7 +325,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-import ProductoVencimiento from '@/components/ProductoVencimiento.vue'
+import ProductoEstado from '@/components/ProductoEstado.vue'
 
 
 export default {
@@ -869,7 +869,7 @@ export default {
         PagoDeuda,
         PreOrdenLista,
         Proformas,
-        ProductoVencimiento
+        ProductoEstado
     }
 }
 </script>
