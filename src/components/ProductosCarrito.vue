@@ -170,7 +170,7 @@
                 <b-form-radio-group id="btnradios1"
                   buttons
                   v-model="declarado"
-                  :options="[{ text: 'Público', value: 2 }, { text: 'Vidriero', value: 1 }, { text: 'Pulgada', value: 0 }]"
+                  :options="[{ text: 'Público', value: 1 }, { text: 'Vidriero', value: 0 }]"
                   @input="val => generateFilter('declarado', val) "
                   name="radiosBtnDefault" />
           </b-col>
@@ -194,7 +194,7 @@
             @input="val => calcularm2()"></b-form-input>
 
           <br>
-          <label>Factor: {{ precioxpie.toFixed(2) }}</label>
+          <label>Factor: {{ precioxpie.toFixed(1) }}</label>
           <br>
         <hr />
         <p v-html="mensajeM2"></p>
@@ -395,9 +395,10 @@ export default {
     },
     calcularm2 () {
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
+      //halla el pie2
       this.precioxpie = this.ancho*this.largo/this.pie
       let cm2total = this.productoSelect.Ancho * this.productoSelect.Largo
-      let cm2corte = 0;
+      let cm2corte = 85;
 
       // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
       // let largo = (largo == '0' ) ? false : prod.Largo;
@@ -562,7 +563,7 @@ export default {
 <style scoped>
 #btnradios1 {
   text-align: center;
-  padding: 5px 0 0 90px;
+  padding: 5px 0 0 130px;
   justify-items: center;
 }
 </style>
