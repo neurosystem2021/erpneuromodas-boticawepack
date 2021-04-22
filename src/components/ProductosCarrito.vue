@@ -166,6 +166,14 @@
      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
       <div class="d-block ">
         <b>{{ productoSelect.Producto }}</b>
+          <b-col md="6">
+                <b-form-radio-group id="btnradios1"
+                  buttons
+                  v-model="declarado"
+                  :options="[{ text: 'Público', value: 2 }, { text: 'Vidriero', value: 1 }, { text: 'Pulgada', value: 0 }]"
+                  @input="val => generateFilter('declarado', val) "
+                  name="radiosBtnDefault" />
+          </b-col>
         <hr />
         <label>Medida de corte en (cm):</label>
         <br />
@@ -185,6 +193,8 @@
             placeholder="Largo"
             @input="val => calcularm2()"></b-form-input>
 
+          <br>
+          <label>Factor: {{ precioxpie.toFixed(2) }}</label>
           <br>
         <hr />
         <p v-html="mensajeM2"></p>
@@ -208,8 +218,10 @@ export default {
       API: config.API,
       loadCode: '',
       pasteCode: false,
+      declarado: 2,
       producto: {},
       items: [],
+      productosDet: [],
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
@@ -217,7 +229,9 @@ export default {
       mensajeM2: '',
       M2: '',
       ancho: 0,
-      largo: 0
+      largo: 0,
+      precioxpie: 0,
+      pie: 900,
     }
   },
   watch: {
@@ -381,7 +395,7 @@ export default {
     },
     calcularm2 () {
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
-
+      this.precioxpie = this.ancho*this.largo/this.pie
       let cm2total = this.productoSelect.Ancho * this.productoSelect.Largo
       let cm2corte = 0;
 
@@ -545,5 +559,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+#btnradios1 {
+  text-align: center;
+  padding: 5px 0 0 90px;
+  justify-items: center;
+}
 </style>

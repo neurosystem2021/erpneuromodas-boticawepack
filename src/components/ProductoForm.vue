@@ -157,6 +157,7 @@
               v-model="producto.Ancho"
               type="number"
               :readonly="!!producto.EsPadre"
+               @input="val => calcularm2()"
               ></b-form-input>
           </b-form-group>
         </b-col>
@@ -167,7 +168,13 @@
               v-model="producto.Largo"
               type="number"
               :readonly="!!producto.EsPadre"
+               @input="val => calcularm2()"
               ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Calculo de Pie: {{ precioxpie.toFixed(1) }}</label>
           </b-form-group>
         </b-col>
       </b-row>
@@ -343,6 +350,9 @@ export default {
     }
   },
   methods: {
+    calcularm2(){
+      this.precioxpie = this.producto.Ancho*this.producto.Largo/this.pie
+    },
     calcularPreciosPaquete (prodDetalles) {
       let sumatoriaCosto = 0
       let sumatoriaContado = 0
