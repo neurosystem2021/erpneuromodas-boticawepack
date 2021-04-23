@@ -64,6 +64,20 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
+                <b-row class="mb-1">
+                    <b-col><label for="input-porcada">Texto al final del comprobante:</label></b-col>
+                    <b-col>
+                     <textarea 
+                    class="form-control"
+                    placeholder="Descripción"
+                    cols="9" rows="4"
+                    v-model="valorPublicidad">
+                    </textarea>
+                    <b-btn class="mt-1" size="sm" variant="success"  @click="guardarConfigTexto">
+                        Guardar Texto
+                    </b-btn>  
+                    </b-col>
+                </b-row>
                 <div slot="modal-footer" >
                     <b-btn size="sm" variant="success" type="submit">
                         Guardar
@@ -85,6 +99,14 @@ import config from '@/store/config.js'
             this.obtenerDescuento()
             this.obtenerComision()
         },
+        watch:{
+            show(){
+                if(this.show){
+                 this.obtenerDescuento()
+                 this.obtenerComision() 
+                }
+            }
+        },
         data () {
             return {
                 API: config.API,
@@ -93,6 +115,7 @@ import config from '@/store/config.js'
                 puntos: 1,
                 valorPunto: 1,
                 valorComision: 1,
+                valorPublicidad: ''
             }
         },
         methods: {
@@ -113,6 +136,7 @@ import config from '@/store/config.js'
                 this.axios.get(this.API + 'ventas/comision')
                 .then((response) => {
                     this.valorComision = response.data.valorComision
+                    this.valorPublicidad = response.data.textoPublicidad
                 })
                 .catch((error) => {
                     console.log(error)
@@ -146,6 +170,23 @@ import config from '@/store/config.js'
                     this.$emit('onUpdateConfigComision', response.data)
                     this.obtenerComision()
                     this.$toasted.show('Se actualizó la configuración')
+                    this.show = false
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+
+            },
+            guardarConfigTexto() {
+                // Comision
+                this.axios.post(this.API + 'ventas/publicidad', {
+                    valorPublicidad: this.valorPublicidad
+                }).then((response) => {
+                    //this.$emit('onUpdateConfigComision', response.data)
+                    //this.obtenerComision()
+                    this.valorPublicidad = response.data.textoPublicidad
+                    this.$toasted.show('Se actualizó el texto al final del comprobante')
                     this.show = false
                 })
                 .catch((error) => {
