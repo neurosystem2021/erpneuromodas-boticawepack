@@ -47,7 +47,7 @@
                                     <autocomplete
                                         required="required"
                                         ref="inputDocRef"
-                                        :url="API + 'ventas/lista'"
+                                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
                                         anchor="NroComprobante"
                                         initValue=""
                                         label="writer"
@@ -75,7 +75,7 @@
                                 </b-form-group>
                                 <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
-                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="md" required/>
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -178,6 +178,7 @@
                             :setPrecio="true"
                             ref="carrito" 
                             :showButton="false" 
+                            :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -197,6 +198,7 @@
                                                         value="0"
                                                         max="100"
                                                         :readonly="(idPerfil == 3) ? true : false"
+                                                        :disabled="bloquearInput?true:false"
                                                         @input="aplicarDescuentoGeneral"
                                                         type="number"
                                                     ></b-form-input>
@@ -209,12 +211,14 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox 
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
+                                                    :disabled="bloquearInput?true:false"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -234,6 +238,7 @@
                                             <td>Efectivo</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -241,6 +246,7 @@
                                             </td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
@@ -253,6 +259,7 @@
                                             <td>Visa</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.visa.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -260,6 +267,7 @@
                                             </td>
                                             <td>
                                                 <input
+                                                    :disabled="bloquearInput?true:false"
                                                     class="form-control"
                                                     v-model="venta.pago.visa.monto"
                                                     min="0"
@@ -274,6 +282,7 @@
                                             <td>Mastercard</td>
                                             <td>
                                                 <b-form-input
+                                                    :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.mastercard.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
@@ -281,6 +290,7 @@
                                             </td>
                                             <td>
                                                 <input
+                                                    :disabled="bloquearInput?true:false"
                                                     class="form-control"
                                                     v-model="venta.pago.mastercard.monto"
                                                     min="0"
@@ -347,6 +357,7 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            bloquearInput:false,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -396,7 +407,8 @@ export default {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock'
+            obtenerStok: 'obtenerStock',
+            add:'agregarProducto'
         }),
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
@@ -464,11 +476,13 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: ''
             }
-
+            this.isNota = false
+            this.bloquearInput = false
             this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
+            this.bloquearInput=false
             this.venta.NroComprobanteModifica = ''
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
@@ -492,7 +506,7 @@ export default {
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
-
+  
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
             }
@@ -510,6 +524,59 @@ export default {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
+             //Cargar producto del documento afectado nota credito
+             this.axios.get(this.API + 'venta/detalle/comprobante', {
+                    params: {
+                        NroComprobante: obj.NroComprobante
+                    }
+                }).then((response) => {
+                this.axios.get(this.API + 'cliente', {
+                    params: {
+                        idCliente: response.data[0].IdCliente
+                    }})
+                    .then((response) => {
+                        if (response.data) {
+                            this.$refs.inputCliente.setValue(response.data.Cliente)
+                            this.venta.cliente = response.data
+                        } else {
+                            this.$toasted.show('No se encontro al cliente')
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                     this.limpiarCart()
+                     response.data.map((item) => {
+                        this.obtenerStockCaja(item);
+                        this.add([item, () => {
+                        }, false ])
+                    })     
+                    this.venta.NotaIdMotivo=null
+                    this.bloquearInput=true
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })                
+                })
+        },
+        obtenerStockCaja(prod) {
+        this.axios.get(this.API + 'productos/stock/caja', {
+            params: {
+            idProducto: prod.IdProducto,
+            idAlmacen: this.venta.almacen.IdAlmacen
+            }
+        }).then((response) => {
+            Vue.set( this.$refs.carrito.productosCaja, prod.IdProducto, {stock: response.data.stock})
+            //console.log(response.data.stock)
+            //return response.data.stock
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+        },
+        setMotivo(ev){
+            if(ev == '01' || ev == '02' || ev == '06' || ev == null){
+                this.bloquearInput=true;
+            }else{
+                this.bloquearInput=false;
+            }
         },
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
@@ -641,7 +708,7 @@ export default {
         getNumeroVenta () {
             this.axios.get(this.API + 'ventas/numero', {
                 params: {
-                    idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+                    idPuntoVenta: 1,
                     idTipoDoc: this.venta.tipoVenta.IdTipoDoc
                 }
             })
@@ -782,6 +849,7 @@ export default {
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
+                this.$refs.carrito.pagocon = 0
                 // this.$refs.inputVendedor.setValue('')
 
 

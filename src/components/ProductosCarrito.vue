@@ -31,16 +31,17 @@
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
           <div v-if="!data.item.ControlaStock" >
-            {{productosCaja[data.item.IdProducto].stock}}
+            {{productosCaja[data.item.IdProducto].stock?productosCaja[data.item.IdProducto].stock:''}}
           </div>
           <div v-if="data.item.ControlaStock" >
-            {{ data.item.stock }}
+            {{ data.item.stock?data.item.stock:'' }}
           </div>
           
         </template>
         
         <template slot="cantidad" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 75px"
@@ -53,6 +54,7 @@
         </template>
         <template slot="precio" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].precio"
             type="number"
             style="width: 110px"
@@ -67,6 +69,7 @@
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].TieneIgv"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
@@ -92,6 +95,7 @@
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -104,6 +108,7 @@
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
@@ -117,11 +122,11 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+           <b-button size="sm" variant="info" :disabled="bloquearInput?true:false" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -162,6 +167,7 @@
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
+                    :disabled="bloquearInput?true:false"
                     type="text"
                     placeholder="Pagó con"
                     v-model="pagocon"
@@ -212,7 +218,7 @@ export default {
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
-
+    bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
