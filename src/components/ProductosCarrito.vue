@@ -235,6 +235,7 @@
         <template slot="Descripcion" slot-scope="data" v-if="isVentas">
           <b-form-input 
             readonly
+            v-if="productos[data.index].estadoPxP == false"
             class="form-control"
             v-model="productos[data.index].descripcion"></b-form-input>
         </template>
