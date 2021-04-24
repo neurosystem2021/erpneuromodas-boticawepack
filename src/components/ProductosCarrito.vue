@@ -166,36 +166,45 @@
      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
       <div class="d-block ">
         <b>{{ productoSelect.Producto }}</b>
-          <b-col md="6">
-                <b-form-radio-group id="btnradios1"
-                  buttons
-                  v-model="declarado"
-                  :options="[{ text: 'Público', value: 1 }, { text: 'Vidriero', value: 0 }]"
-                  @input="val => generateFilter('declarado', val) "
-                  name="radiosBtnDefault" />
+        <br/>
+        <br/>
+          <b-col md="12" style="text-align:center">
+              <b-button @click="accionFactor(0)" variant="outline-primary">Público</b-button>
+              <b-button @click="accionFactor(1)" variant="outline-primary">Vidriero</b-button>
           </b-col>
-        <hr />
-        <label>Medida de corte en (cm):</label>
-        <br />
-        <label>Ancho:</label>
-        <b-form-input
+        <div v-if="mostrarInputs">
+          <hr />
+          <label>Medida de corte en (cm):</label>
+          <br />
+          <label>Ancho:</label>
+          <b-form-input
             type="number"
             ref="inputAncho"
             v-model="ancho"
             placeholder="Ancho"
             @input="val => calcularm2()"></b-form-input>
-        <br />
-        <label>Largo:</label>
-        <b-form-input
+          <br />
+          <label>Largo:</label>
+          <b-form-input
             type="number"
             ref="inputLargo"
             v-model="largo"
             placeholder="Largo"
-            @input="val => calcularm2()"></b-form-input>
-
+            @input="val => calcularm2()">
+          </b-form-input>
           <br>
-          <label>Factor: {{ precioxpie.toFixed(1) }}</label>
+          <label>Factor: ({{factorNombre}}):</label>  
+          <b-form-input
+            type="number"
+            ref="inputFactor"
+            v-model="factor"
+            placeholder="factor"
+            @input="val => calcularm2()">
+          </b-form-input>
           <br>
+          <label>Pie<sup>2</sup> del corte: ({{factorNombre}}): {{ pie2corte.toFixed(1) }}</label>
+          <br>
+        </div>
         <hr />
         <p v-html="mensajeM2"></p>
       </div>
@@ -218,7 +227,6 @@ export default {
       API: config.API,
       loadCode: '',
       pasteCode: false,
-      declarado: 2,
       producto: {},
       items: [],
       productosDet: [],
@@ -230,8 +238,10 @@ export default {
       M2: '',
       ancho: 0,
       largo: 0,
-      precioxpie: 0,
-      pie: 900,
+      factorNombre: '',
+      factor: 0,
+      pie2corte: 0,
+      mostrarInputs:false
     }
   },
   watch: {
@@ -332,6 +342,25 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    accionFactor(val){
+    console.log(val)
+    this.mostrarInputs=true
+      switch (val) {
+        case 0:
+          this.factorNombre="Público"
+          this.factor = 850
+          break;
+        case 1:
+          this.factorNombre="Vidriero"
+          this.factor = 900
+          break;
+
+        default:
+          break;
+      }
+
+      
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -386,6 +415,9 @@ export default {
     abrirCalcularM2 (obj) {
       this.setProducto(obj)
       if (obj.Ancho && obj.Largo) {
+        this.mostrarInputs = false
+        this.largo = 0
+        this.ancho = 0
         this.$refs.modalCalcularM2.show()
       }
       this.productoSelect = obj
@@ -396,16 +428,13 @@ export default {
     calcularm2 () {
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       //halla el pie2
-      this.precioxpie = this.ancho*this.largo/this.pie
-      let cm2total = this.productoSelect.Ancho * this.productoSelect.Largo
-      let cm2corte = 85;
-
+      let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/900
       // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
       // let largo = (largo == '0' ) ? false : prod.Largo;
 
-      if (cm2total > 0 && this.ancho > 0 && this.largo > 0) {
-        cm2corte = this.ancho * this.largo;
-        let precio = (cm2corte * this.productoSelect.PrecioContado) / cm2total;
+      if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
+        this.pie2corte = Math.round((this.ancho*this.largo/this.factor)*10)/10
+        let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
       }

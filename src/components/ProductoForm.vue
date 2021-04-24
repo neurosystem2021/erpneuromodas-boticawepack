@@ -174,12 +174,12 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Calculo de Pie<sup>2</sup> : {{ precioxpie.toFixed(1) }}</label>
+            <label>Calculo de Pie<sup>2</sup> : {{ pie2total.toFixed(1) }}</label>
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio por Pie<sup>2</sup> : {{ preciototal.toFixed(1) }}</label>
+            <label>Precio por Pie<sup>2</sup> : {{ (producto.PrecioContado/pie2total).toFixed(2) }}</label>
           </b-form-group>
         </b-col>
       </b-row>
@@ -271,7 +271,7 @@ export default {
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
-      precioxpie:0,
+      pie2total:0,
       pie:900,
       preciototal:0
     }
@@ -359,8 +359,8 @@ export default {
   },
   methods: {
     calcularm2(){
-      this.precioxpie = this.producto.Ancho*this.producto.Largo/this.pie
-      this.preciototal = this.precioxpie*this.precioContado
+      this.pie2total = Math.round((this.producto.Ancho*this.producto.Largo/this.pie)*10)/10
+      this.preciototal = this.pie2total*this.precioContado
     },
     calcularPreciosPaquete (prodDetalles) {
       let sumatoriaCosto = 0
