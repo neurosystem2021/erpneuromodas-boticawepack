@@ -193,7 +193,7 @@
             @input="val => calcularm2()">
           </b-form-input>
           <br>
-          <label>Factor: ({{factorNombre}}):</label>  
+          <label>Factor ({{factorNombre}}):</label>  
           <b-form-input
             type="number"
             ref="inputFactor"
@@ -202,7 +202,7 @@
             @input="val => calcularm2()">
           </b-form-input>
           <br>
-          <label>Pie<sup>2</sup> del corte: ({{factorNombre}}): {{ pie2corte.toFixed(1) }}</label>
+          <label>Pie<sup>2</sup> del corte ({{factorNombre}}): {{ pie2corte.toFixed(1) }}</label>
           <br>
         </div>
         <hr />
