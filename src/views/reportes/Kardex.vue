@@ -228,7 +228,7 @@ export default {
       this.axios.get(this.API + 'productos/kardex/' + this.producto.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.kardex.fechaHasta,
+              fechaHasta: this.kardex.fechaHasta + ' 23:59:59',
               esElectronico: this.esElectronico
           }
       }).then((response) => {
