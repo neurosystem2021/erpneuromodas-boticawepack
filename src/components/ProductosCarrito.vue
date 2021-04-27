@@ -168,7 +168,7 @@
         <b>{{ productoSelect.Producto }}</b>
         <br/>
         <br/>
-          <b-col md="12" style="text-align:center">
+          <b-col md="12" style="text-align:center" v-show="!productoSelect.SoloLargo">
               <b-button @click="accionFactor(0)" variant="outline-primary">Público</b-button>
               <b-button @click="accionFactor(1)" variant="outline-primary">Vidriero</b-button>
           </b-col>
@@ -176,6 +176,7 @@
           <hr />
           <label>Medida de corte en (cm):</label>
           <br />
+          <div v-show="!productoSelect.SoloLargo">
           <label>Ancho:</label>
           <b-form-input
             type="number"
@@ -184,6 +185,7 @@
             placeholder="Ancho"
             @input="val => calcularm2()"></b-form-input>
           <br />
+          </div>
           <label>Largo:</label>
           <b-form-input
             type="number"
@@ -193,6 +195,7 @@
             @input="val => calcularm2()">
           </b-form-input>
           <br>
+          <div v-show="!productoSelect.SoloLargo">
           <label>Factor: ({{factorNombre}}):</label>  
           <b-form-input
             type="number"
@@ -202,7 +205,13 @@
             @input="val => calcularm2()">
           </b-form-input>
           <br>
-          <label>Pie<sup>2</sup> del corte: ({{factorNombre}}): {{ pie2corte.toFixed(1) }}</label>
+          <label>Pie<sup>2</sup> del corte: ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
+          </div>
+
+          <div v-show="!productoSelect.SoloLargo">
+          
+          </div>
+
           <br>
         </div>
         <hr />
@@ -420,12 +429,23 @@ export default {
         this.ancho = 0
         this.$refs.modalCalcularM2.show()
       }
+      if (obj.SoloLargo) {
+        this.accionFactor(0);
+      }
+
       this.productoSelect = obj
       this.productoSelect.cantidad = 1
       this.mensajeM2 = ''
       // this.$refs.inputM2.$refs.input.value = ''
     },
     calcularm2 () {
+      if (this.productoSelect.SoloLargo) {
+        let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
+        this.precioCorte = precio.toFixed(2);
+        this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
+        return;
+      }
+
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       //halla el pie2
       let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/900
@@ -433,7 +453,7 @@ export default {
       // let largo = (largo == '0' ) ? false : prod.Largo;
 
       if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
-        this.pie2corte = Math.round((this.ancho*this.largo/this.factor)*10)/10
+        this.pie2corte = ((this.ancho*this.largo/this.factor)*10)/10
         let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);

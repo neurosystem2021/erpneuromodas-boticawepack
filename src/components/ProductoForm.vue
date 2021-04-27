@@ -136,6 +136,15 @@
             </b-form-checkbox>
           </b-form-group>
           
+          <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.SoloLargo"
+                     :value="1"
+                     :unchecked-value="0">
+                     Solo Largo
+            </b-form-checkbox>
+          </b-form-group>
+          
         </b-col>
       </b-row>
 
@@ -150,7 +159,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col> -->
-        <b-col md="6">
+        <b-col md="6" v-show="!producto.SoloLargo">
           <b-form-group>
             <label>Ancho (cm):</label>
             <b-form-input
@@ -172,12 +181,12 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-show="!producto.SoloLargo">
           <b-form-group>
             <label>Calculo de Pie<sup>2</sup> : {{ pie2total.toFixed(1) }}</label>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-show="!producto.SoloLargo">
           <b-form-group>
             <label>Precio por Pie<sup>2</sup> : {{ (producto.PrecioContado/pie2total).toFixed(2) }}</label>
           </b-form-group>
@@ -331,6 +340,7 @@ export default {
         this.producto.IdProducto = newVal.IdProducto
 
         this.producto.EsPadre = newVal.EsPadre
+        this.producto.SoloLargo = newVal.SoloLargo
         Vue.nextTick(() => {
            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
         })
@@ -446,6 +456,7 @@ export default {
     initForm () {
       this.producto = {
         EsPadre: 0,
+        SoloLargo: 0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
