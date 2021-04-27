@@ -169,12 +169,28 @@
         <br/>
         <br/>
           <b-col md="12" style="text-align:center">
-              <b-button @click="accionFactor(0)" variant="outline-primary">Público</b-button>
-              <b-button @click="accionFactor(1)" variant="outline-primary">Vidriero</b-button>
-          </b-col>
+              <b-button @click="accionFactor(0)" :variant="indexFactor == 0 ? 'primary' : 'outline-primary'">Público</b-button>
+              <b-button @click="accionFactor(1)" :variant="indexFactor == 1 ? 'primary' : 'outline-primary'">Vidriero</b-button>
+          </b-col><br/>
         <div v-if="mostrarInputs">
+          <b-cold md="12">
+            <b-from-group label="Pulgadas:">
+              <b-form-radio-group id="Pulgadas"
+              button-variant="outline-primary" 
+              v-model="esPulgadas"
+              @input="() => esPulgadas ? accionFactor(2) : accionFactor(indexFactor) "
+              buttons
+              :options="[
+              { text: 'Pulgada', value: 1 },
+              { text: 'Centimetro', value: 0 }
+              ]"/>
+            </b-from-group>
+          </b-cold>
           <hr />
-          <label>Medida de corte en (cm):</label>
+          <label>Medida de corte en (
+            <span v-if="esPulgadas">Pulgadas</span>
+            <span v-else>Centímetros</span>
+            ):</label>
           <br />
           <label>Ancho:</label>
           <b-form-input
@@ -227,6 +243,7 @@ export default {
       API: config.API,
       loadCode: '',
       pasteCode: false,
+      esPulgadas:'0',
       producto: {},
       items: [],
       productosDet: [],
@@ -347,14 +364,21 @@ export default {
     this.mostrarInputs=true
       switch (val) {
         case 0:
+          this.indexFactor = val
           this.factorNombre="Público"
+          this.esPulgadas=0
           this.factor = 850
           break;
         case 1:
+          this.indexFactor = val
           this.factorNombre="Vidriero"
+          this.esPulgadas=0
           this.factor = 900
           break;
-
+        case 2:
+          this.factorNombre="Pulgadas"
+          this.factor = 144
+          break;
         default:
           break;
       }
@@ -363,6 +387,18 @@ export default {
     },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
+    },
+
+    setPulgadas(esPulgadas){
+      if(!esPulgadas){
+        this.$refs.inputFactor.setValue('');
+        this.factor = {}
+        this.$refs.inputFactor.$refs.input.disable = true
+        this.$refs.inputFactor.$refs.input.required = false
+      }else{
+        this.$refs.inputFactor.$refs.input.disable = false
+        this.$refs.inputFactor.$refs.input.required = true
+      }
     },
     loadBarcode (e) {
       e.preventDefault()
