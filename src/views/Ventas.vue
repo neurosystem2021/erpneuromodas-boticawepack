@@ -747,15 +747,15 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
+        onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
                 let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
+                obj.precio = preciosPorProducto.precioPub || 0
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || 0
             return obj
         },  
         onAddProducto (obj) {
@@ -962,6 +962,20 @@ export default {
                     return
                 }
             });
+
+            let cantidadstock = false;
+            this.productos.map(pro=>{
+                 let cantidad = pro.cantidad?parseFloat(pro.cantidad):0    
+                 let stock =pro.stock?parseFloat(pro.stock):0
+                if(cantidad > stock){
+                    this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. Para cantidad de '+cantidad+' ingresada');
+                    cantidadstock = true    
+                }
+            })
+            if(cantidadstock){
+                this.inProgress = false
+                return;  
+            }
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
