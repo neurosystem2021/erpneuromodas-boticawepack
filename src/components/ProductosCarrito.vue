@@ -643,12 +643,19 @@ export default {
         obj.estadoPxP = true
         obj.descripcion = this.preciosProd[0].nombre
         obj.PrecioCosto = this.preciosProd[0].costoNeto
-        obj.PorcentajeUtilidad = this.preciosProd[0].porcUtil
-        obj.PorcentajeUtilidadMax = this.preciosProd[0].porcUtil
+        obj.PorcentajeUtilidad = this.preciosProd[0].utilNeta
+        obj.PorcentajeUtilidadMax = this.preciosProd[0].utilNeta
         obj.PorcentajeUtilidadMin = this.preciosProd[0].utilMin
         obj.precioxcantidaselec = this.preciosProd[0]
         obj.pxpposition = 0
-        this.setProductoUni(obj, this.preciosProd[0].precioPub)
+        if(this.isVentas){
+          obj.PrecioCosto = this.preciosProd[0].costoNeto
+          this.setProductoUni(obj, this.preciosProd[0].precioPub)
+        }else{
+          obj.PrecioCosto = this.preciosProd[0].costoProv
+          this.setProductoUni(obj, this.preciosProd[0].costoProv)
+        }
+        
         return
       }
 
@@ -668,7 +675,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj,false,precio)
+      obj = this.onSetProducto(obj, false, precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -684,9 +691,10 @@ export default {
       this.cant = prod.cantidad
       let obj = this.objProd
       obj.PorcentajeUtilidadMin = prod.utilMin
-      obj.PorcentajeUtilidadMax = prod.porcUtil
-      obj.PorcentajeUtilidad = prod.porcUtil
+      obj.PorcentajeUtilidadMax = prod.utilNeta
+      obj.PorcentajeUtilidad = prod.utilNeta
       obj.descripcion=prod.nombre
+      obj.PrecioCosto=prod.costoNeto
       obj.precioxcantidaselec = prod
       obj.pxpposition = index
       this.$refs.autocompleteProducto.setValue('')
@@ -755,7 +763,7 @@ export default {
       }
 
       Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio

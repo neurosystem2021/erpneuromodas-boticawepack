@@ -402,7 +402,7 @@
                 <b-form-input 
                 v-model="producto.precios[i-1].utilMin"
                 :min="0.00"
-                :max="producto.precios[i-1].porcUtil"
+                :max="producto.precios[i-1].utilNeta"
                 step="0.01"
                 type="number">
                 </b-form-input>
