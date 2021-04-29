@@ -627,7 +627,6 @@ export default {
       } else {
 
         this.title = 'Nuevo Producto'
-        this.numPresentacion = 1
         this.clearForm()
 
         this.$refs.inputCodigoBarra.$el.disabled = false
@@ -733,6 +732,8 @@ export default {
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
       this.initForm()
+      this.producto.precios.push({nombre: 'UNIDAD', cantidad:1, costoProv: 0, costoNeto: 0, porcUtil:0, utilMin:0, valorVenta:0, porcDesc:0, utilNeta:0, precioPub:0})
+      this.numPresentacion = 1
     },
     initForm () {
       this.producto = {
