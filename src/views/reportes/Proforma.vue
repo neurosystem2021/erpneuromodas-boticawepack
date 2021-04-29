@@ -2,7 +2,7 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg"> 
+				<!--<img src="/resources/images/banner-proforma.jpg"> -->
 			</div>
 			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
@@ -117,7 +117,7 @@
           </tr>
         </tfoot>
       </table>
-      <div id="accounts" style="margin-top:-20px; font-weight:bold;">
+      <!--<div id="accounts" style="margin-top:-20px; font-weight:bold;">
         <h3 style="font-weight:bold">Información de pago</h3>
         <div style="margin-bottom:10px;">
           CTA AHORROS SOLES |BCP|48094954751051
@@ -128,11 +128,11 @@
         <div style="margin-bottom:10px;">
           CTA AHORROS SOLES |SCOTIABANK|765-0457125
         </div>
-      </div>
+      </div>-->
       <br>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">LAS BATERIAS SERAN ENTREGADAS EN EL LOCAL COMERCIAL DE PUCALLPA</div>
+        <!--<div class="notice">LAS BATERIAS SERAN ENTREGADAS EN EL LOCAL COMERCIAL DE PUCALLPA</div>-->
         <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
       <div>
