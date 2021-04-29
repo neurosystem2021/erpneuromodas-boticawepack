@@ -333,7 +333,7 @@ export default {
 		mountedProforma(modal) {
 			document.body.appendChild(modal)
 		},
-		selectProforma(idCliente, proforma) {
+		selectProforma(proforma) {
 			this.show = true
 			this.$nextTick(() => {
 				proforma.productos.map(p => {
