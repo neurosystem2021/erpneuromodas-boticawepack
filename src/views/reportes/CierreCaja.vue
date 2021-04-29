@@ -210,6 +210,34 @@
           </table>
         </b-col>
       </b-row>
+
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos con tarjeta</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos con Tarjeta</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
       
 
       <br>
@@ -236,6 +264,7 @@ export default {
       API: config.API,
       ventas: [],
       ingresos: [],
+      ingresosTarjeta: [],
       salidas: [],
       turno: null,
       turnos: [
@@ -268,6 +297,13 @@ export default {
     totalIngresos () {
       let total = 0
       this.ingresos.forEach(ingreso => {
+        if (!ingreso.Anulado) total += ingreso.Importe
+      });
+      return total 
+    },
+    totalIngresosTarjeta () {
+      let total = 0
+      this.ingresosTarjeta.forEach(ingreso => {
         if (!ingreso.Anulado) total += ingreso.Importe
       });
       return total 
@@ -341,6 +377,7 @@ export default {
     loadData () {
       this.getVentas()
       this.getIngresos()
+      this.getIngresosTarjeta()
       this.getSalidas()
     },
     setVendedor (obj) {
@@ -402,6 +439,23 @@ export default {
       })
       .then(res => {
         this.ingresos = res.data
+      }).catch(err => {
+        console.log(err)
+      }) 
+    },
+    getIngresosTarjeta () {
+      let params = {
+        idCierre: this.$route.params.id,
+        idCuenta: 2
+      }
+      if (this.vendedor.Usuario) {
+        // params.usuario = this.vendedor.Usuario
+      }
+      this.axios.get(this.API + 'cierrecaja/ingresos',{
+        params: params
+      })
+      .then(res => {
+        this.ingresosTarjeta = res.data
       }).catch(err => {
         console.log(err)
       }) 
