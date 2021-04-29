@@ -122,6 +122,19 @@
                 <template slot="row-details" slot-scope="row">
 
                   <b-card>
+                    <b-row class="m-2" v-if="row.item.CodSunat=='07'" style="font-weight:bold">
+                      <b-col md="12" class="text-center">
+                        <label>DOCUMENTO QUE MODIFICA</label>
+                      </b-col>
+                      <b-col  md="6" class="text-left">
+                        <label>Tipo de Documento: <span style="font-weight:normal">{{row.item.CodSunatModifica=='01'? '01 - FACTURA ELECTRÓNICA':'03 - BOLETA ELECTRÓNICA'}}</span> </label>
+                        <br>
+                        <label>Serie y Número: <span style="font-weight:normal">{{row.item.NroComprobanteModifica}}</span></label>
+                      </b-col>
+                      <b-col md="6" class="text-right">
+                        <label>Motivo: <span style="font-weight:normal">{{row.item.NotaDescMotivo}} - {{row.item.NotaIdMotivo}}</span></label>
+                      </b-col>
+                    </b-row>
                     <b-row class="mb-2">
                   <table class="table b-table table-sm prod-detalle">
                     <thead>
@@ -139,7 +152,7 @@
                     <tbody>
                       <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
                         <td>{{ item.CodigoBarra }}</td>
-                        <td>{{ item.Producto }}</td>
+                        <td>{{ item.Descripcion }}</td>
                         <td>{{ item.Cantidad }}</td>
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
@@ -173,7 +186,7 @@
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
 
-                      <b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
+                      <!--<b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
                       <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
                         <form @submit.prevent="emitirNotaCredito(data.item)" >
                           <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
@@ -181,7 +194,7 @@
                           <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
                           <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
                         </form>
-                      </b-popover>
+                      </b-popover>-->
                   </div>
                 </template>
 
@@ -397,7 +410,7 @@ export default {
       
       return obj
     },
-    emitirNotaCredito (item) {
+    /*emitirNotaCredito (item) {
       let doc = Object.assign({}, item);
       this.loading = true
       doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
@@ -419,8 +432,7 @@ export default {
         this.notaIdMotivo = null
         this.loading = false
       })
-    },
-
+    },*/
     async emitirElectronico (doc, generarXml) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
@@ -430,7 +442,7 @@ export default {
       this.loading = true
       let arr = []
 
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03') { // Factura / boleta
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07') { // Factura / boleta //nota de credito
         if (doc.idDocVenta && generarXml) {
           arr.push(await this.axios.post(this.API + 'emitirelectronico', {
             generarXml: true,
