@@ -22,7 +22,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])" :tipo="tipo"></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo, Talla)</b-form-text>
@@ -205,6 +205,7 @@ export default {
     }
   },
   props: {
+    tipo: String,
     setPrecio: Boolean,
     isVentas: Boolean,
     igvTotal: Boolean,

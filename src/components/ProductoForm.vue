@@ -325,7 +325,7 @@ export default {
   beforeMount () {
     this.initForm()
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ['showButton', 'productoUpdate', 'cbGuardar', 'tipo'],
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
@@ -396,7 +396,9 @@ export default {
       } else {
 
         this.title = 'Nuevo Producto'
-        this.clearForm()
+        if (this.tipo !== "mov") {
+          this.clearForm()
+        }
 
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
