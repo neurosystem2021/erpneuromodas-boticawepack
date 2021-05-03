@@ -173,8 +173,8 @@
               <b-button @click="accionFactor(1)" :variant="indexFactor == 1 ? 'primary' : 'outline-primary'">Vidriero</b-button>
           </b-col><br/>
         <div v-if="mostrarInputs">
-          <b-cold md="12">
-            <b-from-group label="Pulgadas:">
+          <b-col md="12">
+            <b-form-group label="Pulgadas:">
               <b-form-radio-group id="Pulgadas"
               button-variant="outline-primary" 
               v-model="esPulgadas"
@@ -184,8 +184,8 @@
               { text: 'Pulgada', value: 1 },
               { text: 'Centimetro', value: 0 }
               ]"/>
-            </b-from-group>
-          </b-cold>
+            </b-form-group>
+          </b-col>
           <hr />
           <label>Medida de corte en (
             <span v-if="esPulgadas">Pulgadas</span>
@@ -263,7 +263,8 @@ export default {
       factorNombre: '',
       factor: 0,
       pie2corte: 0,
-      mostrarInputs:false
+      mostrarInputs:false,
+      indexFactor: null
     }
   },
   watch: {
@@ -273,7 +274,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -455,20 +456,26 @@ export default {
     },  
     abrirCalcularM2 (obj) {
       this.setProducto(obj)
-      if (obj.Ancho && obj.Largo) {
-        this.mostrarInputs = false
-        this.largo = 0
-        this.ancho = 0
-        this.$refs.modalCalcularM2.show()
-      }
-      if (obj.SoloLargo) {
-        this.accionFactor(0);
+      if(this.isVentas){    
+        if (obj.Ancho && obj.Largo) {
+          this.mostrarInputs = false
+          this.largo = 0
+          this.ancho = 0
+          this.$refs.modalCalcularM2.show()
+        }
+        if (obj.SoloLargo) {
+          this.accionFactor(0);
+        }
+
+        this.productoSelect = obj
+        this.productoSelect.cantidad = 1
+        this.mensajeM2 = ''
+        // this.$refs.inputM2.$refs.input.value = ''
+
+      }else{
+        obj.precio=obj.PrecioCosto
       }
 
-      this.productoSelect = obj
-      this.productoSelect.cantidad = 1
-      this.mensajeM2 = ''
-      // this.$refs.inputM2.$refs.input.value = ''
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
