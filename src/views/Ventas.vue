@@ -734,7 +734,7 @@ export default {
                 return          
             }
 
-            var sinStock = 0;
+            /* var sinStock = 0;
             this.productos.map(pro => {
                 if (pro.stock <= 0 && pro.ControlaStock) {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
@@ -744,7 +744,7 @@ export default {
             if (sinStock) {
                 this.inProgress = false
                 return;
-            }
+            } */
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
