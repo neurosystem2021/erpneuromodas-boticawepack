@@ -42,7 +42,6 @@
         </template>
         <template slot="precio" slot-scope="data">
           <b-form-input
-            disabled
             v-model="productos[data.index].precio"
             type="number"
             style="width: 75px"
@@ -355,7 +354,7 @@ export default {
 
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioCosto
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0

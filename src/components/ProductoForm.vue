@@ -57,7 +57,7 @@
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Modelo:</label>
+            <!--<label>Modelo:</label>
             <b-input-group>
               <autocomplete
                 required="required"
@@ -71,7 +71,7 @@
                 :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
-            </b-input-group>
+            </b-input-group>-->
             <!--<b-form-input v-model="producto.ProductoModelo"
               required="required"
               class="upper"
@@ -94,7 +94,8 @@
               </b-input-group-append>
             </b-input-group> -->
           </b-form-group>
-          <b-form-group>
+          
+          <!--<b-form-group>
             <label>Colores:</label>
             <autocomplete
                 required="required"
@@ -107,12 +108,12 @@
                 :onInput="val => producto.Color = val && val.toUpperCase()"
                 :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
                 :classes="{input: 'form-control upper'}">
-              </autocomplete>
+              </autocomplete>-->
             <!--<b-form-input v-model="producto.Color"
               type="text"
               @input="(val) => producto.Color = val && val.toUpperCase()"              
               ></b-form-input>-->
-          </b-form-group>
+          <!--</b-form-group>-->
           
           
         </b-col>
@@ -132,7 +133,7 @@
             </autocomplete>
           </b-form-group>
           
-          <b-form-group>
+          <!--<b-form-group>
             <label>Talla:</label>
             <b-input-group>
               <autocomplete
@@ -147,16 +148,16 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>-->                
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
-              </b-input-group-append>
+              <!--</b-input-group-append>
             </b-input-group>
-          </b-form-group>
-          <b-form-group>
+          </b-form-group>-->
+          <!--<b-form-group>
             <label>Genero:</label>            
             <b-form-select required="required" v-model="producto.Genero" :options="generos" />
-          </b-form-group>
-          <b-form-group>
+          </b-form-group>-->
+         <!-- <b-form-group>
             <label>Botapie/Manga:</label>
             <autocomplete
                 required="required"
@@ -169,12 +170,12 @@
                 :onInput="val => producto.Botapie = val && val.toUpperCase()"
                 :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
                 :classes="{input: 'form-control upper'}">
-              </autocomplete>
+              </autocomplete>-->
             <!--<b-form-input v-model="producto.Botapie"
               type="text"
               @input="(val) => producto.Botapie = val && val.toUpperCase()"              
               ></b-form-input>-->
-          </b-form-group>
+          <!--</b-form-group>-->
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input 
@@ -194,7 +195,6 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -300,26 +300,26 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
-        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         
-        this.$refs.inputColor.setValue(newVal.Color)
-        this.$refs.inputBotapie.setValue(newVal.Botapie)
+        // this.$refs.inputColor.setValue(newVal.Color)
+        // this.$refs.inputBotapie.setValue(newVal.Botapie)
         
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
         } */
-        this.producto.talla = {
-          IdProductoTalla: newVal.IdProductoTalla,
-          ProductoTalla: newVal.ProductoTalla
-        }
-        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+        // this.producto.talla = {
+        //   IdProductoTalla: newVal.IdProductoTalla,
+        //   ProductoTalla: newVal.ProductoTalla
+        // }
+        this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
-        this.producto.Genero = newVal.Genero
-        this.producto.Botapie = newVal.Botapie
-        this.producto.Color = newVal.Color
+        // this.producto.Genero = newVal.Genero
+        // this.producto.Botapie = newVal.Botapie
+        // this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.CodigoBarra = newVal.CodigoBarra
         this.producto.ProductoModelo = newVal.ProductoModelo
@@ -377,10 +377,10 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      // this.$refs.inputTalla.setValue('')
+      // this.$refs.inputModelo.setValue('')
+      // this.$refs.inputColor.setValue('')
+      // this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },
@@ -431,7 +431,7 @@ export default {
 
         // this.initForm()
         this.producto.talla = {}
-        this.$refs.inputTalla.setValue('')
+        // this.$refs.inputTalla.setValue('')
 
         this.$refs.productoForm.hide()
       })

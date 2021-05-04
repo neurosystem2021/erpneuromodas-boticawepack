@@ -271,7 +271,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -368,8 +368,6 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
                     { key: 'ProductoMedicion', label: 'Med.' },
-                    { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
-                    { key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -590,7 +588,7 @@ export default {
         },
         onSetProducto (obj) {
             obj.cantidad = 1
-            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
+            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor > 0) {
                 obj.precio = obj.PrecioPorMayor
             } else {
                 obj.precio = obj.PrecioContado || 0
