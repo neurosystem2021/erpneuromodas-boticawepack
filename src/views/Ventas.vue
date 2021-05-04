@@ -776,8 +776,14 @@ export default {
             }
             let cantidadstock = false;
             this.productos.map(pro=>{
-                 let cantidad = pro.cantidad?parseFloat(pro.cantidad):0    
-                 let stock =pro.stock?parseFloat(pro.stock):0
+                let cantidad = pro.cantidad?parseFloat(pro.cantidad):0    
+                let stock =pro.stock?parseFloat(pro.stock):0
+                
+                if (!pro.ControlaStock && this.$refs.carrito.productosCaja[pro.IdProducto]) {
+                    stock = this.$refs.carrito.productosCaja[pro.IdProducto].stock
+                }
+
+
                 if(cantidad > stock){
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. Para cantidad de '+cantidad+' ingresada');
                     cantidadstock = true    
