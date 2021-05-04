@@ -963,7 +963,7 @@ export default {
                 }
             });
 
-            let cantidadstock = false;
+/*             let cantidadstock = false;
             this.productos.map(pro=>{
                  let cantidad = pro.cantidad?parseFloat(pro.cantidad):0    
                  let stock =pro.stock?parseFloat(pro.stock):0
@@ -975,7 +975,7 @@ export default {
             if(cantidadstock){
                 this.inProgress = false
                 return;  
-            }
+            } */
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
