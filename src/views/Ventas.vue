@@ -736,10 +736,10 @@ export default {
                 return;
             }
 
-            if (sinStock) {
-                this.inProgress = false
-                return;
-            }
+            // if (sinStock) {
+            //     this.inProgress = false
+            //     return;
+            // }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

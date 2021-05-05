@@ -37,7 +37,10 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado            }"
+              if (tipo != 'mov') {
+                productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor > 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado            
+              }
+              }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -194,6 +197,7 @@ export default {
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
+    tipo:  String,
 
     igvTotal: Boolean,
     onSetProducto: {
