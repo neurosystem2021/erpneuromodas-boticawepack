@@ -20,6 +20,7 @@
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
+                  ref="barcodeInput"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -620,10 +621,14 @@ export default {
      // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
       
  
-
+      this.objProd = obj
+      if(this.preciosProd.length==1){
+        this.setProductoUni(obj,this.preciosProd[0].precio)
+        return
+      }
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
+      
     },  
     setProductoUni (obj, precio) {
       this.objProd.cantxPrecio = 1
@@ -655,6 +660,7 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
