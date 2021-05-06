@@ -398,7 +398,7 @@ export default {
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado) total += venta.Efectivo
+        if (!venta.Anulado && venta.CodSunat!='07') total += venta.Efectivo
       });
       return total
     },
