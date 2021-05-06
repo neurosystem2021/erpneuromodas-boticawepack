@@ -79,7 +79,7 @@
               <td>{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
-              <td>Mastercard S/.</td>
+              <td>Transferencia S/.</td>
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
@@ -221,7 +221,7 @@
       </b-row>      
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -241,7 +241,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
+              <td class="total"><b>Total Transferencia</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
