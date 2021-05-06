@@ -40,7 +40,14 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+            <template slot="PrecioCosto" slot-scope="data" >
+              {{(items[data.index].PrecioCosto).toFixed(2)}}
+            </template>
+            <template slot="PrecioContado" slot-scope="data" >
+              {{(items[data.index].PrecioContado).toFixed(2)}}
+            </template>
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -86,6 +93,8 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'PorcentajeUtilidad', label: 'Porcentaje Utilidad', sortable: true },
+            { key: 'PrecioCosto', label: 'Precio Compra' },
+            { key: 'PrecioContado', label: 'Precio Venta' }
       ],
       totalRows: 50,
       perPage: 10,
