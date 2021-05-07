@@ -387,6 +387,9 @@ export default {
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
     },
+    totalVentas () {
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+    },
     totalSalidas () {
       let total = 0
       this.salidas.forEach(salida => {
@@ -474,7 +477,11 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: sessionStorage.getItem("User")
+          user: sessionStorage.getItem("User"),
+          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas:      this.totalSalidas,
+          total:        this.granTotal,
+          totalVentas:  this.totalVentas
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')

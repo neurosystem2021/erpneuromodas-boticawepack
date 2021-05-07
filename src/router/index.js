@@ -20,6 +20,8 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
+import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
+import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
 
 Vue.use(Router)
 
@@ -67,6 +69,11 @@ export default new Router({
       component: CierreCaja
     },
     {
+      path: '/reportes/reportecierrecaja',
+      name: 'ReporteCierreCaja',
+      component: ReporteCierreCaja
+    },
+    {
       path: '/reportes/cierrecaja/:id',
       name: 'CierreCajaId',
       component: CierreCaja
@@ -100,6 +107,11 @@ export default new Router({
       path: '/reportes/kardex',
       name: 'Kardex',
       component: Kardex
+    },
+    {
+      path: '/reportes/articulosmovimientos',
+      name: 'Articulosmovimientos',
+      component: Articulosmovimientos
     },
     {
       path: '/facturacion',
