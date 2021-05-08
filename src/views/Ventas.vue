@@ -357,7 +357,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
-        this.loadClienteVarios()
+        //this.loadClienteVarios()
     },
     mounted () {
         this.getNumeroVenta()
