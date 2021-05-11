@@ -46,6 +46,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
+            :disabled="true"
             type="number"
             style="width: 75px"
             min="0"
