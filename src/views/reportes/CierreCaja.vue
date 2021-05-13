@@ -39,6 +39,62 @@
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+
+      <br>
+      <b-row>
+        <b-col cols="4">
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Total Pago S/.</td>
+              <td>{{ granTotal | moneda }}</td>
+            </tr>
+          </tbody>
+        </table>          
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <!--<tr>
+              <td>Salida S/.</td>
+              <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
+            </tr>-->
+            <tr>
+              <td>Credito S/.</td>
+              <td>{{ totalVentasCredito | moneda }} </td>
+            </tr>
+            <!--<tr>
+              <td>Contado S/.</td>
+              <td>{{ granTotalSinPagoCliente | moneda }} </td>
+            </tr>-->
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Visa S/.</td>
+              <td>{{ totalVentasVisa | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Mastercard S/.</td>
+              <td>{{ totalVentasMastercard | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | moneda }} </td>
+            </tr>
+             <tr>
+              <td>Salidas S/.</td>
+              <td>{{ totalSalidas | moneda }} </td>
+            </tr>
+          </tbody>
+        </table>
+        </b-col>
+      </b-row>
+
+
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
