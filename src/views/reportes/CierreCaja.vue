@@ -2,7 +2,7 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <b-row  align-h="end" class=" no-print">
+      <b-row  align-h="end"  class=" no-print">
               <label v-if="!this.$route.params.id">Vendedor:</label>
           <b-col cols="3" v-if="!this.$route.params.id">
             <b-form-group size="sm">
@@ -18,14 +18,14 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col cols="7">
+          <b-col cols="7" class=" no-print">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
-            <b-button-group size="sm">
+            <b-button-group size="sm" >
               <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
             </b-button-group>
-            <b-button-group size="sm">
+            <b-button-group size="sm" >
               <cierres-caja></cierres-caja>
             </b-button-group>
             <b-button-group size="sm">
@@ -34,24 +34,23 @@
           </b-col>
       </b-row>
       <br class="no-print" /> 
+      
+      <h2  style="text-align: center;" class="titulo" >Cierre de Caja</h2>  </br>
+      <label   v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</label></br>
+      <label  v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</label></br>
+            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> 
 
-      <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-
-      <br>
-      <b-row>
+      <b-row class="cierre" >
         <b-col cols="4">
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
+        <table class="table b-table table-sm table-striped table-bordered " style="border: 2px solid">
+          <tbody >
             <tr>
-              <td>Total Pago S/.</td>
-              <td>{{ granTotal | moneda }}</td>
+              <td  >Total Pago S/.</td>
+              <td class="text-right">{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
         </table>          
-        <table class="table b-table table-sm table-striped table-bordered">
+        <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <!--<tr>
               <td>Salida S/.</td>
@@ -59,7 +58,7 @@
             </tr>-->
             <tr>
               <td>Credito S/.</td>
-              <td>{{ totalVentasCredito | moneda }} </td>
+              <td class="text-right">{{ totalVentasCredito | moneda }} </td>
             </tr>
             <!--<tr>
               <td>Contado S/.</td>
@@ -67,27 +66,27 @@
             </tr>-->
           </tbody>
         </table>
-        <table class="table b-table table-sm table-striped table-bordered">
+        <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <tr>
               <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | moneda }} </td>
+              <td class="text-right">{{ totalVentasEfectivo | moneda }} </td>
             </tr>
             <tr>
               <td>Visa S/.</td>
-              <td>{{ totalVentasVisa | moneda }} </td>
+              <td class="text-right">{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
               <td>Mastercard S/.</td>
-              <td>{{ totalVentasMastercard | moneda }} </td>
+              <td class="text-right">{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
               <td>Ingresos S/.</td>
-              <td>{{ totalIngresos | moneda }} </td>
+              <td class="text-right">{{ totalIngresos | moneda }} </td>
             </tr>
              <tr>
               <td>Salidas S/.</td>
-              <td>{{ totalSalidas | moneda }} </td>
+              <td class="text-right">{{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
         </table>
@@ -95,7 +94,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -158,7 +157,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Visa</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -222,7 +221,7 @@
 
       
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Mastercard</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -284,7 +283,7 @@
         </table>
       </b-row>
 
-      <b-row class="credito">
+      <b-row class="credito no-print">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -347,7 +346,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class ="no-print">
         <b-col v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
@@ -569,6 +568,7 @@ export default {
         .then((response) => {
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+           
             // this.$refs.inputVendedor.$refs.input.disabled = true
             if(response.data.IdUsuarioPerfil !== 1) {
               this.$refs.inputVendedor.$refs.input.disabled = true
@@ -721,8 +721,18 @@ export default {
 }
 </script>
 <style scoped>
+ .cierre {
+    font-weight:  bold;
+    font-size: 5mm;
+    font-family: "Times New Roman";
+    font-weight:  bold;
+    
+ }
+    
+  
 th {
   background-color: #f1f1f1;
+ 
 }
 .total {
   background-color: #e4ff95;
@@ -742,11 +752,17 @@ th {
   display: none;
 }
 @media print {
+  
   .no-print {
     display: none;
   }
   .si-print {
     display: block;
+  }
+  .titulo {
+        display: inline;
+    text-align: left;
+    font-size:30px ; font-family:"Times New Roman";
   }
 }
 </style>
