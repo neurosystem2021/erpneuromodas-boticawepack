@@ -2,7 +2,7 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <b-row  align-h="end"  class=" no-print">
+      <b-row align-h="end"  class=" no-print">
               <label v-if="!this.$route.params.id">Vendedor:</label>
           <b-col cols="3" v-if="!this.$route.params.id">
             <b-form-group size="sm">
@@ -34,12 +34,16 @@
           </b-col>
       </b-row>
       <br class="no-print" /> 
-      
       <h2  style="text-align: center;" class="titulo" >Cierre de Caja</h2>  </br>
-      <label   v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</label></br>
-      <label  v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</label></br>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> 
+      <div   v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</div>
+      <div v-else>Fecha: {{ $moment().format("YYYY-MM-DD H:mm:ss") }}</div>
 
+      <div  v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</div>
+      <div v-else-if="turno">Turno: {{  turno == 1 ? 'MAÑANA' : 'TARDE' }}</div>
+      
+            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> 
+            <div v-else>Empleado: <b> {{ vendedor.NombreUsuario }} </b></div>
+<br>
       <b-row class="cierre" >
         <b-col cols="4">
         <table class="table b-table table-sm table-striped table-bordered " style="border: 2px solid">
@@ -492,6 +496,7 @@ export default {
       });
       return total 
     },
+  
   	totalAdelantos () {
   		let total = 0
   		this.adelantos.forEach(ade => {
