@@ -35,24 +35,27 @@
       </b-row>
       <br class="no-print" /> 
 
-      <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      <h2 style="text-align: center;" class="titulo" >Cierre de Caja</h2> 
+       <div   v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</div>
+      <div v-else>Fecha: {{ $moment().format("YYYY-MM-DD H:mm:ss") }}</div>
 
-
+      <div  v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</div>
+      <div v-else-if="turno">Turno: {{  turno == 1 ? 'MAÑANA' : 'TARDE' }}</div>
+      
+            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> 
+            <div v-else>Empleado: <b> {{ vendedor.NombreUsuario }} </b></div>
       <br>
-      <b-row>
+      <b-row class="cierre">
         <b-col cols="4">
-        <table class="table b-table table-sm table-striped table-bordered">
+        <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <tr>
               <td>Total Pago S/.</td>
-              <td>{{ granTotal | moneda }}</td>
+              <td class="text-right">{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
         </table>          
-        <table class="table b-table table-sm table-striped table-bordered">
+        <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <!--<tr>
               <td>Salida S/.</td>
@@ -60,7 +63,7 @@
             </tr>-->
             <tr>
               <td>Credito S/.</td>
-              <td>{{ totalVentasCredito | moneda }} </td>
+              <td class="text-right">{{ totalVentasCredito | moneda }} </td>
             </tr>
             <!--<tr>
               <td>Contado S/.</td>
@@ -68,27 +71,27 @@
             </tr>-->
           </tbody>
         </table>
-        <table class="table b-table table-sm table-striped table-bordered">
+        <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <tr>
               <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | moneda }} </td>
+              <td class="text-right">{{ totalVentasEfectivo | moneda }} </td>
             </tr>
             <tr>
               <td>Visa S/.</td>
-              <td>{{ totalVentasVisa | moneda }} </td>
+              <td class="text-right">{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
               <td>Mastercard S/.</td>
-              <td>{{ totalVentasMastercard | moneda }} </td>
+              <td class="text-right">{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
               <td>Ingresos S/.</td>
-              <td>{{ totalIngresos | moneda }} </td>
+              <td class="text-right">{{ totalIngresos | moneda }} </td>
             </tr>
              <tr>
               <td>Salidas S/.</td>
-              <td>{{ totalSalidas | moneda }} </td>
+              <td class="text-right">{{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
         </table>
@@ -722,6 +725,13 @@ export default {
 }
 </script>
 <style scoped>
+.cierre {
+    font-weight:  bold;
+    font-size: 5mm;
+    font-family: "Times New Roman";
+    font-weight:  bold;
+    
+ }
 th {
   background-color: #f1f1f1;
 }
@@ -748,6 +758,11 @@ th {
   }
   .si-print {
     display: block;
+  }
+  .titulo {
+    display: inline;
+    text-align: left;
+    font-size:30px ; font-family:"Times New Roman";
   }
 }
 </style>
