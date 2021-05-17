@@ -99,7 +99,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row  class=" no-print">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -162,7 +162,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row  class=" no-print">
         <h5>Ventas Visa</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -226,7 +226,7 @@
 
       
 
-      <b-row>
+      <b-row  class=" no-print">
         <h5>Ventas Mastercard</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -288,7 +288,7 @@
         </table>
       </b-row>
 
-      <b-row class="credito">
+      <b-row class="credito no-print">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -351,7 +351,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row  class="no-print">
         <b-col v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
