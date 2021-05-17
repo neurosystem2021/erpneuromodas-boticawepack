@@ -99,7 +99,7 @@
               <b-col md="3">
                 <b-form-group>
                   <label>Código de barra:</label>
-                  <input class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value)"/>
+                  <input class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
                 </b-form-group>
               </b-col>
 
@@ -305,6 +305,7 @@ export default {
       filter: '',
       sortBy: 'IdProducto',
       sortDesc: false,
+      isCodigoBarra:false,
       productoSelect: {},
       kardexSelect: [],
       items: [],
@@ -452,6 +453,8 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+      ctx.sortBy = this.isCodigoBarra?'CodigoBarra':'IdProducto'
+      ctx.sortDesc = this.isCodigoBarra?true:ctx.sortDesc
       let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
@@ -488,9 +491,9 @@ export default {
       this.limpiarClassRows()
       console.log(this.filter)
     },
-    generateFilter (key, value) {
+    generateFilter (key, value, opc=false) {
       this.filters[key] = value
-      
+      this.isCodigoBarra =value.trim().length==0?false:opc
       let filter = ''
       for (var key in this.filters) {
         filter += '&filter[' + key + ']=' + this.filters[key]
