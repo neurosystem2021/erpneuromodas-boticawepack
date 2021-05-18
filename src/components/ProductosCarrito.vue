@@ -33,7 +33,8 @@
             type="number"
             style="width: 75px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
+            step="0.01"
+            @input="(val) => {$emit('onInputCantidad', val);  getSubtotal(data.index)}"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
@@ -44,7 +45,7 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="()=>{setNuevoPrecioContado(data.index); getSubtotal(data.index)}"></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -113,7 +114,7 @@
 
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ data.item.stock?data.item.stock.toFixed(2):data.item.stock }}</div>
         </template>
       </b-table>
     </b-col>
@@ -187,6 +188,14 @@
             </b-form-group>
           </b-col>
           <hr />
+          <label>Cantidad:</label>
+          <b-form-input
+            type="number"
+            ref="inputCantidadPro"
+            v-model="productoSelect.cantidad"
+            placeholder="Cantidad">
+          </b-form-input>
+          <br>
           <label>Medida de corte en (
             <span v-if="esPulgadas">Pulgadas</span>
             <span v-else>Centímetros</span>
@@ -230,6 +239,7 @@
         <p v-html="mensajeM2"></p>
       </div>
       <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
+      <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalCalcularM2.hide()}">Cerrar</b-btn>
     </b-modal>
   </b-row>
 </template>
@@ -366,7 +376,6 @@ export default {
       actualizarTotal: 'actualizarTotalCart'
     }),
     accionFactor(val){
-    console.log(val)
     this.mostrarInputs=true
       switch (val) {
         case 0:
@@ -455,16 +464,19 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     abrirCalcularM2 (obj) {
-      this.setProducto(obj)
-      if(this.isVentas){    
-        if (obj.Ancho && obj.Largo) {
-          this.mostrarInputs = false
+      if(this.isVentas){   
           this.largo = 0
           this.ancho = 0
+          this.pie2corte = 0 
+        if (obj.Ancho && obj.Largo) {
+          this.mostrarInputs = false
           this.$refs.modalCalcularM2.show()
-        }
-        if (obj.SoloLargo) {
+        } else if (obj.SoloLargo) {
           this.accionFactor(0);
+          this.$refs.modalCalcularM2.show()
+          //this.setProducto(obj)
+        } else{
+          this.setProducto(obj)
         }
 
         this.productoSelect = obj
@@ -473,6 +485,7 @@ export default {
         // this.$refs.inputM2.$refs.input.value = ''
 
       }else{
+        this.setProducto(obj)
         obj.precio=obj.PrecioCosto
       }
 
@@ -546,16 +559,28 @@ export default {
 
     },
     seleccionarCalcularM2 () {
-      this.$refs.modalCalcularM2.hide()
 
+      //this.$refs.modalCalcularM2.hide()
+      
       if (this.precioCorte) {
         this.productoSelect.precio = this.precioCorte;
         this.productoSelect.Ancho = this.ancho
         this.productoSelect.Largo = this.largo
+      }else{
+        this.productoSelect.precio = this.PrecioContado
       }
-      // this.setProducto(this.productoSelect)
+
+      let cantidad =  parseFloat(this.productoSelect.cantidad)
+      let precio = parseFloat(this.productoSelect.precio)
+      this.setProducto (this.productoSelect, cantidad , precio )
+      this.ancho = 0
+      this.largo = 0
+      this.precioCorte = 0
+      this.pie2corte = 0
+      this.productoSelect.cantidad = 1
+      this.mensajeM2 = '';
     },
-    setProducto (obj) {
+    setProducto (obj, cant, precio) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
@@ -564,9 +589,10 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj, cant, precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto agregado correctamente')
       }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)

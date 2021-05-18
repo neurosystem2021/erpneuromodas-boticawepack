@@ -509,9 +509,9 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
-            obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+        onSetProducto (obj, cant, precio) {
+            obj.cantidad = cant || 1
+            obj.precio = precio || obj.PrecioContado 
             return obj
         },
         onAddProducto (obj) {
