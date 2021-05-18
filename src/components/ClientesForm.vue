@@ -33,9 +33,21 @@
                 type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
-            <label>Dirección:</label>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -90,7 +102,9 @@ export default {
       cliente: {
         Cliente: '',
         DniRuc: '',
-        Direccion: '',
+        Direccion: '',       
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
         Email: ''
       }
@@ -173,5 +187,9 @@ export default {
 }
 </script>
 <style>
-
+ input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
