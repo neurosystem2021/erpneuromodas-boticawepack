@@ -580,7 +580,8 @@ export default {
       this.productoSelect.cantidad = 1
       this.mensajeM2 = '';
     },
-    setProducto (obj, cant, precio) {
+    setProducto (obj2, cant, precio) {
+      let obj= {...obj2}
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
