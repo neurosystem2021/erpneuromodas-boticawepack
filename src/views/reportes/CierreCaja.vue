@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="general">
     <br>
     <b-container class="bv-example-row">
       <b-row align-h="end"  class=" no-print">
@@ -44,13 +44,13 @@
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> 
             <div v-else>Empleado: <b> {{ vendedor.NombreUsuario }} </b></div>
 <br>
-      <b-row class="cierre" >
+      <b-row >
         <b-col cols="4">
         <table class="table b-table table-sm table-striped table-bordered " style="border: 2px solid">
           <tbody >
-            <tr>
-              <td  >Total Pago S/.</td>
-              <td class="text-right">{{ granTotal | moneda }}</td>
+            <tr >
+              <td >Total Pago </td>
+              <td class="text-right"> S/ {{ granTotal | moneda }}</td>
             </tr>
           </tbody>
         </table>          
@@ -61,8 +61,8 @@
               <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
             </tr>-->
             <tr>
-              <td>Credito S/.</td>
-              <td class="text-right">{{ totalVentasCredito | moneda }} </td>
+              <td>Credito </td>
+              <td class="text-right"> S/ {{ totalVentasCredito | moneda }} </td>
             </tr>
             <!--<tr>
               <td>Contado S/.</td>
@@ -73,24 +73,24 @@
         <table class="table b-table table-sm table-striped table-bordered" style="border: 2px solid">
           <tbody>
             <tr>
-              <td>Efectivo S/.</td>
-              <td class="text-right">{{ totalVentasEfectivo | moneda }} </td>
+              <td>Efectivo</td>
+              <td class="text-right"> S/ {{ totalVentasEfectivo | moneda }} </td>
             </tr>
             <tr>
-              <td>Visa S/.</td>
-              <td class="text-right">{{ totalVentasVisa | moneda }} </td>
+              <td>Visa </td>
+              <td class="text-right">S/ {{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
-              <td>Mastercard S/.</td>
-              <td class="text-right">{{ totalVentasMastercard | moneda }} </td>
+              <td>Mastercard </td>
+              <td class="text-right">S/ {{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
-              <td>Ingresos S/.</td>
-              <td class="text-right">{{ totalIngresos | moneda }} </td>
+              <td>Ingresos </td>
+              <td class="text-right">S/ {{ totalIngresos | moneda }} </td>
             </tr>
              <tr>
-              <td>Salidas S/.</td>
-              <td class="text-right">{{ totalSalidas | moneda }} </td>
+              <td>Salidas </td>
+              <td class="text-right">S/ {{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
         </table>
@@ -726,15 +726,9 @@ export default {
 }
 </script>
 <style scoped>
- .cierre {
-    font-weight:  bold;
-    font-size: 5mm;
-    font-family: "Times New Roman";
-    font-weight:  bold;
+
+
     
- }
-    
-  
 th {
   background-color: #f1f1f1;
  
@@ -765,9 +759,17 @@ th {
     display: block;
   }
   .titulo {
-        display: inline;
+    display: inline;
     text-align: left;
-    font-size:30px ; font-family:"Times New Roman";
+    font-size:30px ; ;
   }
+  .general{
+    color: #000000 !important; 
+    text-transform: uppercase;
+    font-size: 5mm;
+    font-weight:  bold; 
+   
+  }
+
 }
 </style>
