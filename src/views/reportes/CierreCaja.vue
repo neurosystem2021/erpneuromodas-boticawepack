@@ -373,7 +373,11 @@ export default {
       cierre: {},
       vendedor: {},
       almacen: {},
-      disabledCerrarCaja: true
+      disabledCerrarCaja: true,
+      ventasEstado:false,
+      ingresosEstado:false,
+      salidasEstado:false,
+      detalleEstado:false
     }
   },
   computed: {
@@ -499,24 +503,30 @@ export default {
       })
     },
     cerrarCaja () {
-      if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
-        return
-      }
-      let r = confirm('¿Está seguro de cerrar la caja?')
-      if (r) {
-        this.axios.post(this.API + 'cierrecaja', {
-          idTurno:      this.turno,
-          user:         this.vendedor.Usuario,
-          idAlmacen:    this.almacen.IdAlmacen,
-          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
-          salidas:      this.totalSalidas,
-          total:        this.granTotal,
-          totalVentas:  this.totalVentasEfectivo
-        }).then(res => {
-          this.loadData()
-          this.$toasted.success('¡Caja cerrada! Se ha aperturado un ingreso por el monto total.')
-        })
+      if(this.detalleEstado==true && this.ingresosEstado==true && this.salidasEstado==true && this.ventasEstado==true){
+
+        if (!this.turno) {
+          this.$toasted.show('Seleccione un Turno')
+          return
+        }
+        let r = confirm('¿Está seguro de cerrar la caja?')
+        if (r) {
+          this.axios.post(this.API + 'cierrecaja', {
+            idTurno:      this.turno,
+            user:         this.vendedor.Usuario,
+            idAlmacen:    this.almacen.IdAlmacen,
+            ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+            salidas:      this.totalSalidas,
+            total:        this.granTotal,
+            totalVentas:  this.totalVentasEfectivo
+          }).then(res => {
+            this.loadData()
+            this.$toasted.success('¡Caja cerrada! Se ha aperturado un ingreso por el monto total.')
+          })
+        }
+      }else{
+        this.$toasted.show('Falto cargar algunos datos, por favor intente nuevamente')
+        this.loadData ()
       }
     },
     focusAutocomplete (ref) {
@@ -527,6 +537,7 @@ export default {
       return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
     },
     getVentas () {
+      this.ventasEstado = false;
       let params = {
         idCierre: this.$route.params.id
       }
@@ -542,12 +553,15 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        this.ventasEstado=true
         this.loadDetalles()
       }).catch(err => {
+        this.ventasEstado=false
         console.log(err)
       })
     },
     getIngresos () {
+      this.ingresosEstado = false
       let params = {
         idCierre: this.$route.params.id
       }
@@ -562,11 +576,14 @@ export default {
       })
       .then(res => {
         this.ingresos = res.data
+        this.ingresosEstado = true
       }).catch(err => {
         console.log(err)
+        this.ingresosEstado = false
       })
     },
     getSalidas () {
+      this.salidasEstado = false
       let params = {
         idCierre: this.$route.params.id
       }
@@ -581,8 +598,10 @@ export default {
       })
       .then(res => {
         this.salidas = res.data
+        this.salidasEstado = true
       }).catch(err => {
         console.log(err)
+        this.salidasEstado = false
       })
     },
     getCierre(id) {
@@ -595,20 +614,28 @@ export default {
       })
     },
     loadDetalles () {
-      this.axios.get(this.API + 'ventas/detalle', {
+      this.detalleEstado = false
+      if(this.ventas.length!=0){
+              this.axios.get(this.API + 'ventas/detalle', {
           params: {
             idDocVentas: this.ventas.map((item) => item.idDocVenta),
           }
         }).then((response) => {
             this.itemsDetalle = response.data
+            this.detalleEstado = true
             this.ventas = this.ventas.map((item) => {
               item.productos = this.getDetalles(item.idDocVenta)
               return item
             })
         })
         .catch((error) => {
+          this.detalleEstado = false
           console.log(error)
         })
+      }else{
+        this.detalleEstado = true
+      }
+
     },
     /*getPenultimoCierre(id) {
       this.axios.get(this.API + 'cierrecaja/penultimo', {
