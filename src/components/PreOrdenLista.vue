@@ -22,8 +22,11 @@
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
-                        <template slot="eliminar" slot-scope="data">
+                        <!--<template slot="eliminar" slot-scope="data">
                             <button class="btn btn-danger" type="button" @click.stop="eliminarPreOrden(data.item)">Eliminar</button>
+                        </template>-->
+                        <template slot="imprimir" slot-scope="data">
+                            <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden">Imprimir</b-btn>
                         </template>
                     </b-table>
                     <b-row>
@@ -61,7 +64,7 @@ import { mapActions } from 'vuex'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc', 'eliminar' ],
+                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc', 'imprimir' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
