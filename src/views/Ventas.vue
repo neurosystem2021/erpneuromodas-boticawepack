@@ -557,6 +557,7 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
+                idProductos:[],
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
@@ -961,28 +962,39 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
+                if(response.data.actualizar){
+                    this.inProgress = false
+                    this.obtenerStok({IdAlmacen: this.venta.almacen.IdAlmacen})
+                    this.$toasted.show(response.data.msg)
+                    return; 
+                }else{
                 // limpiar preorden seleccionado
-                this.$router.replace('/ventas')
-                this.$toasted.success('Venta realizada con exito')
-                this.inProgress = false
-                this.tieneIgv = false
-                this.ultimaVenta = response.data.insertId
-                this.initForm()
-                this.limpiarCart()
-                this.getVendedor()
-                this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
-                this.$refs.inputComisionista.setValue('')
-                this.$refs.carrito.pagocon = 0
+                    this.$router.replace('/ventas')
+                    this.$toasted.success('Venta realizada con exito')
+                    this.inProgress = false
+                    this.tieneIgv = false
+                    this.ultimaVenta = response.data.insertId
+                    this.initForm()
+                    this.limpiarCart()
+                    this.getVendedor()
+                    this.getNumeroVenta()
+                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                    this.$refs.inputAlmacen.setValue('VENTA')
+                    this.$refs.inputPuntoVenta.setValue('CAJA1')
+                    this.$refs.inputCliente.setValue('')
+                    this.$refs.inputVendedor.setValue('')
+                    this.$refs.inputComisionista.setValue('')
+                    this.$refs.carrito.pagocon = 0
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                }
+                 
+                   
+
             })
             .catch((error) => {
                 console.log(error)
