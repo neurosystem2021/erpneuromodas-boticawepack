@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
+     <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
-    <b-modal :id="idModal || 'modal1'" :title=" idModal?'Editar Cliente':'Nuevo Cliente'" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+  <b-form @submit="guardarCliente" ref="form">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -168,6 +168,10 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
