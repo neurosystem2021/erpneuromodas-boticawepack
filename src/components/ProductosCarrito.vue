@@ -48,7 +48,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.0001"
+            step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
