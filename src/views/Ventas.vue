@@ -218,7 +218,7 @@
                                             <td>
                                                 <b-form-checkbox
                                                     v-model="venta.EsCredito"
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
@@ -226,7 +226,7 @@
                                                 <b-form-input
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     type="date">
                                                 </b-form-input>
                                             </td>
@@ -873,5 +873,7 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+#modalConfigVenta .modal-dialog{
+    max-width: 65% !important;
+}
 </style>
