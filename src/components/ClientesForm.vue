@@ -27,7 +27,6 @@
           <b-form-group>
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
@@ -133,6 +132,13 @@ export default {
         this.cliente = this.editCliente
       } else {
         this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+         this.cliente.Direccion = ''
+          this.cliente.Direccion2 = ''
+           this.cliente.Direccion3 = ''
+           this.cliente.Cliente = ''
+           this.cliente.NombreComercial = ''
+           this.cliente.Telefono = ''
+           this.cliente.Email = ''
       }
     },
     consultarDNIRUC () {
