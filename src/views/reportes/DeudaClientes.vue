@@ -103,6 +103,7 @@ export default {
             { key: 'Correlativo', label: 'Serie', sortable: true },
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
+            { key: 'NotaCreApli', label: 'Apli. Nota Cred.', sortable: true},
             { key: 'Saldo', label: 'Saldo', sortable: true },
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
