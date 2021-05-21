@@ -381,7 +381,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2)
         }
     },
     computed: {
@@ -705,7 +705,7 @@ export default {
             totalPagos += parseFloat(this.venta.pago.mastercard.monto)
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (this.totalCart.toFixed(2) != totalPagos.toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
