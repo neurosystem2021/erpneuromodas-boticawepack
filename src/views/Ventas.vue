@@ -243,14 +243,14 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -612,7 +612,9 @@ export default {
            //Cargar producto del documento afectado nota credito
              this.axios.get(this.API + 'venta/detalle/comprobante', {
                     params: {
-                        NroComprobante: obj.NroComprobante
+                        NroComprobante: obj.NroComprobante,
+                        idDocVenta: obj.IdDocVenta,
+                        IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
                     }
                 }).then((response) => {
 
