@@ -27,6 +27,11 @@
                         <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
+                      <template slot="verTicket" slot-scope="data">
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                      </template>
+
+
                     </b-table>
                     <b-row>
                     <b-col md="6" class="my-1">
@@ -71,7 +76,7 @@ import config from '@/store/config.js'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver','verTicket' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -104,5 +109,7 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
-
+.modal-dialog {
+    max-width: 65% !important;
+   }
 </style>
