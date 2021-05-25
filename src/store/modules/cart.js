@@ -20,6 +20,10 @@ const mutations = {
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
+      }else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.unshift(item)
       }
     }
   },
@@ -72,7 +76,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
     let setPrecio = false
     let cantidad = false
     let precio = false
@@ -144,6 +148,28 @@ const actions = {
 
           if (setSuma) {
             obj.setSuma = true
+          }
+
+          if(actualizar){
+            let preciosProd = []
+            preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+            let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            obj.estadoPxP = false
+            obj.cantidad = 1
+            obj.precio = obj.PrecioContado
+            obj.cantidadPres = 1
+            obj.cantxPrecio = 1
+            obj.descripcion = "UNIDAD"
+            if (!obj.PreciosPorProducto || fPP.length === 4 || !isVentas) {
+              obj.estadoPxP = true
+              obj.descripcion="UNIDAD"
+
+              if(!isVentas){
+                obj.cantidad = 0
+                obj.precio = obj.PrecioCosto
+              }
+
+            }
           }
 
           obj.descuento = 0

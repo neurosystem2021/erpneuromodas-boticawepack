@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -62,7 +62,6 @@
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -168,7 +167,17 @@
             </autocomplete>
           </b-form-group>
           <b-form-group>
-            <label>Porcentaje Utilidad:</label>
+            <label>Porcentaje Utilidad Min:</label>
+            <b-form-input 
+              required="required"
+              v-model="producto.PorcentajeUtilidadMin"
+              type="number"
+              min="0"
+              step="0.0001"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Porcentaje Utilidad Max:</label>
             <b-form-input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
@@ -253,6 +262,15 @@
       <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
           <b-form-group>
+            <label>Precio sin impuesto a la Renta</label>
+            <b-form-input
+              v-model="producto.PrecioCostoSinImp"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
@@ -260,7 +278,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+         <!--<b-col md="6">
           <b-form-group>
             <label>Precio Especial:</label>
             <b-form-input
@@ -268,7 +286,7 @@
               type="number"
               ></b-form-input>
           </b-form-group>
-        </b-col>
+        </b-col>-->
         <b-col md="6">
           <b-form-group>
             <label>Precio Público:</label>
@@ -281,20 +299,30 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <!--<b-col md="6">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
               type="number"
               ></b-form-input>
           </b-form-group>
-        </b-col>
+        </b-col>-->
       </b-row>
 
       <hr>
-      <b-row v-if="false">
+      <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+          <b-card border-variant="light" class="text-center">
+
+            <b-form-group>
+              <label>Presentación:</label>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                onkeyup="this.value = this.value.toUpperCase();"
+                ></b-form-input>
+            </b-form-group>
+            
             <b-form-group>
               <label>Cantidad:</label>
               <b-form-input
@@ -302,7 +330,7 @@
                 type="number"
                 ></b-form-input>
             </b-form-group>
-            
+
             <b-form-group>
               <label>Precio:</label>
               <b-form-input 
@@ -370,6 +398,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -384,7 +413,7 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
         this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -444,6 +473,7 @@ export default {
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
+        this.producto.PorcentajeUtilidadMin = newVal.PorcentajeUtilidadMin
         this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
         this.producto.StockMinimo           = newVal.StockMinimo
         this.producto.StockPorMayor         = newVal.StockPorMayor
@@ -453,10 +483,11 @@ export default {
         this.producto.ProductoDesc2         = newVal.ProductoDesc2
         this.producto.ProductoDesc3         = newVal.ProductoDesc3
         this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
+        this.producto.PrecioCostoSinImp     = newVal.PrecioCostoSinImp   
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
-        this.producto.precioConvenio        = newVal.precioConvenio
-        this.producto.PrecioEspecial        = newVal.PrecioEspecial
+        //this.producto.precioConvenio        = newVal.precioConvenio
+        //this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
@@ -585,6 +616,7 @@ export default {
         PrecioPorMayor: 0,
         precioConvenio: 0,
         PrecioEspecial: 0,
+        PrecioCostoSinImp: 0, 
         // Botapie: '',
         // Genero: '',
         categoria: {},
@@ -597,10 +629,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'ph', cantidad: 0, precio: 0},
-          {nombre: 'pp', cantidad: 0, precio: 0},
-          {nombre: 'pt', cantidad: 0, precio: 0},
-          {nombre: 'pd', cantidad: 0, precio: 0}
+          {nombre: '', cantidad: 0, precio: 0},
+          {nombre: '', cantidad: 0, precio: 0},
+          {nombre: '', cantidad: 0, precio: 0},
+          {nombre: '', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -617,6 +649,11 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      
+      this.producto.precios.map(pre=>{
+        pre.cantidad=pre.cantidad==''?pre.cantidad=0:pre.cantidad
+        pre.precio=pre.precio==''?pre.precio=0:pre.precio
+      }) 
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
