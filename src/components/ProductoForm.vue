@@ -102,6 +102,28 @@
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
+          
+          <b-form-group>
+            <label>Talla:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'tallas'"
+                ref="inputTalla"
+                anchor="ProductoTalla"
+                label="writer"
+                :placeholder.sync="producto.talla.ProductoTalla"
+                :on-select="setTalla"
+                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <b-form-input 
@@ -274,6 +296,7 @@ export default {
         
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
@@ -302,6 +325,11 @@ export default {
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
+        this.producto.talla = {
+          IdProductoTalla: newVal.IdProductoTalla,
+          ProductoTalla: newVal.ProductoTalla
+        }
+
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.PrecioPorMayor = newVal.PrecioPorMayor
         this.producto.StockPorMayor = newVal.StockPorMayor
@@ -391,11 +419,15 @@ export default {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
     },*/
+    setTalla (obj) {
+      this.producto.talla = obj
+      this.$refs.inputTalla.setValue(obj.ProductoTalla)
+    },
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
-      // this.$refs.inputTalla.setValue('')
+      this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
       //this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
@@ -412,7 +444,7 @@ export default {
         IdProductoCategoria: null,
         IdProductoModelo: null,
         // IdProductoBotapie: null,
-        // IdProductoTalla: '',
+        IdProductoTalla: '',
         Producto: '',
         CodigoBarra: '',
         // Color: '',
@@ -426,7 +458,7 @@ export default {
         categoria: {},
         marca: {},
         // modelo: {},
-        //talla: {},
+        talla: {},
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
@@ -455,8 +487,8 @@ export default {
         }
 
         // this.initForm()
-        // this.producto.talla = {}
-        // this.$refs.inputTalla.setValue('')
+        this.producto.talla = {}
+        this.$refs.inputTalla.setValue('')
 
         this.$refs.productoForm.hide()
       })
