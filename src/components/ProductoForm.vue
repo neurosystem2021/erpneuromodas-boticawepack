@@ -658,7 +658,7 @@ export default {
     let valorImpuesto = parseFloat(valorVenta)*1.5/100
     this.producto.precios[index].costoNeto = Math.round((parseFloat(costoProv)+valorImpuesto)*1000)/1000
     this.producto.precios[index].porcUtil = (Math.round(((valorVenta-costoNeto)/valorVenta*100)*100)/100)
-    this.producto.precios[index].utilNeta = (((valorVenta-costoNeto)/costoNeto)*100/100*100).toFixed(2)
+    this.producto.precios[index].utilNeta = parseFloat((((valorVenta-costoNeto)/costoNeto)*100/100*100).toFixed(2))
     this.producto.precios[index].precioPub = valorVenta
     },
     calcularCantidad(index){
@@ -791,12 +791,20 @@ export default {
       // console.log(JSON.stringify(this.producto))
       let isCorrecto = true
       this.producto.precios.map(pre=>{
+        if (isNaN(pre.utilNeta)) {
+          pre.utilNeta=0;
+        }
+        if (isNaN(pre.porcUtil)) {
+          pre.porcUtil=0;
+        }
         if(pre.nombre.trim().length==0 || pre.cantidad==0 || pre.cantidad=='' || pre.cantidad=='0'){
           console.log("no es correcto");
           isCorrecto=false 
         }
       }) 
 
+      console.log(this.producto.precios);
+      
       if(!isCorrecto){
         this.$toasted.show('El producto debe tener por lo menos una presentacion correcta para guardarse.')
         return

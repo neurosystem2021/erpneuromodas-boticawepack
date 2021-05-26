@@ -636,6 +636,21 @@ export default {
                     })
                      this.limpiarCart()
                      console.log(response.data);
+
+                    response.data.map((item)=>{
+                        let presentacionVenta=JSON.parse(item.descrip)
+                        item.descripcion = presentacionVenta.nombre
+                        item.PrecioCosto = presentacionVenta.costoNeto
+                        item.precioxcantidaselec = presentacionVenta
+                        let preciosProd = JSON.parse(item.PreciosPorProducto)
+                        let fpp = preciosProd.filter(p => p.cantidad !==0 || p.cantidad !== '0' )
+                        if( fpp.length == 1){
+                            item.estadoPxP = true
+                        }else{
+                            item.estadoPxP = false
+                        }
+                    })
+
                      response.data.map((item) => {
                         this.add([item, () => {
                         }, false ])
@@ -961,15 +976,20 @@ export default {
                 this.inProgress = false            
                 return 
             }
-
+            
+            let errPorcentaje = 0    
             this.productos.forEach(p => {
-                if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)){
+                if(!((p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad) || (p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax))){
                     this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
-                    this.inProgress = false
-                    return
+                    errPorcentaje++
                 }
             }); 
-               
+
+            if (errPorcentaje >= 1 && this.venta.tipoVenta.CodSunat != '07') {    
+                this.inProgress = false  
+                return 
+            }
+              
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
