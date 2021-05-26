@@ -23,7 +23,7 @@ const mutations = {
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
-        productos.unshift(item)
+        productos.splice(index2, 0 ,item)
       }
     }
   },
@@ -153,23 +153,47 @@ const actions = {
           if(actualizar){
             let preciosProd = []
             preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-            let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            // let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            let fpp = preciosProd.filter(p => p.cantidad !==0 || p.cantidad !== '0' )
             obj.estadoPxP = false
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
-            obj.descripcion = "UNIDAD"
-            if (!obj.PreciosPorProducto || fPP.length === 4 || !isVentas) {
+            if(fpp.length == 1){
               obj.estadoPxP = true
-              obj.descripcion="UNIDAD"
-
-              if(!isVentas){
-                obj.cantidad = 0
-                obj.precio = obj.PrecioCosto
-              }
-
+              obj.descripcion = preciosProd[0].nombre
+              obj.PrecioCosto = preciosProd[0].costoNeto
+              obj.PorcentajeUtilidad = preciosProd[0].utilNeta
+              obj.PorcentajeUtilidadMax = preciosProd[0].utilNeta
+              obj.PorcentajeUtilidadMin = preciosProd[0].utilMin
+              obj.precio = preciosProd[0].precioPub
+              obj.precioxcantidaselec = preciosProd[0]
+              obj.pxpposition = 0
             }
+
+            if(fpp.length > 1 ){
+              obj.estadoPxP = false
+              obj.descripcion = preciosProd[0].nombre
+              obj.PrecioCosto = preciosProd[0].costoNeto
+              obj.PorcentajeUtilidad = preciosProd[0].utilNeta
+              obj.PorcentajeUtilidadMax = preciosProd[0].utilNeta
+              obj.PorcentajeUtilidadMin = preciosProd[0].utilMin
+              obj.precio = preciosProd[0].precioPub
+              obj.precioxcantidaselec = preciosProd[0]
+              obj.pxpposition = 0
+            }
+
+            if(!obj.PreciosPorProducto || fpp.length === 0){
+              obj.estadoPxP = true
+              this.$toasted.show('El producto no tiene presentacion, editelo antes de agregarlo')
+              return
+            }
+
+            if(!isVentas){
+              obj.precio = preciosProd[0].costoProv
+            }
+
+
           }
 
           obj.descuento = 0

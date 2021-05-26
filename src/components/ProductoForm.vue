@@ -108,7 +108,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Presentación:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
@@ -166,7 +166,7 @@
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Porcentaje Utilidad Min:</label>
             <b-form-input 
               required="required"
@@ -176,7 +176,7 @@
               step="0.0001"
               ></b-form-input>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Porcentaje Utilidad Max:</label>
             <b-form-input 
               required="required"
@@ -220,7 +220,7 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -230,7 +230,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -258,10 +258,10 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
+      <!--<hr v-if="producto.IdProducto || producto.EsPadre" />-->
       <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio sin impuesto a la Renta</label>
             <b-form-input
               v-model="producto.PrecioCostoSinImp"
@@ -270,7 +270,7 @@
           </b-form-group>
         </b-col>
         <b-col md="6">
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
@@ -288,7 +288,7 @@
           </b-form-group>
         </b-col>-->
         <b-col md="6">
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio Público:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
@@ -310,35 +310,154 @@
       </b-row>
 
       <hr>
+      <b-row class="mb-1">
+        <b-col md="5">
+            <b-input-group size="sm" prepend="Presentaciones">
+            <b-form-input v-model="numPresentacion"
+                id="input-porcada"
+                type="number"
+                min="0"
+                readonly
+                step="1"
+                placeholder=""></b-form-input>
+                <b-button size="sm" text="Button" variant="info" @click="agregarPresentacion"><i class="fas fa-plus"></i></b-button>
+                <b-button size="sm" text="Button" variant="danger" @click="quitarPresentacion"><i class="fas fa-minus"></i></b-button>
+            </b-input-group>
+        </b-col>
+      </b-row>
+      <br>
       <b-row>
-        <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" class="text-center">
-
-            <b-form-group>
-              <label>Presentación:</label>
-              <b-form-input
+        <b-col md="12">
+          <table class="tablaGuia">
+          <thead>
+            <tr>
+              <th class="form-control text-center">
+                -----
+              </th>
+              <th v-for="i in numPresentacion" :key="i.id">
+                <b-form-input
+                class="text-white bg-success"
                 v-model="producto.precios[i-1].nombre"
                 type="text"
-                onkeyup="this.value = this.value.toUpperCase();"
-                ></b-form-input>
-            </b-form-group>
-            
-            <b-form-group>
-              <label>Cantidad:</label>
-              <b-form-input
+                onkeyup="this.value = this.value.toUpperCase();">
+                </b-form-input>
+              </th>
+            </tr>
+          </thead> 
+          <tbody>
+            <tr>
+              <td class="form-control">
+                Cantidad:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input
                 v-model="producto.precios[i-1].cantidad"
-                type="number"
-                ></b-form-input>
-            </b-form-group>
-
-            <b-form-group>
-              <label>Precio:</label>
-              <b-form-input 
-                v-model="producto.precios[i-1].precio"
-                type="number"
-                ></b-form-input>
-            </b-form-group>
-          </b-card>
+                @input="calcularCantidad(i-1)"             
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                Costo Prov.:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input
+                v-model="producto.precios[i-1].costoProv"
+                @input="calcularValores(i-1)"
+                step="0.01"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                Costo Neto:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                readonly
+                v-model="producto.precios[i-1].costoNeto"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                Porc. Util.:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                readonly
+                v-model="producto.precios[i-1].porcUtil"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                Utilidad Min.:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                v-model="producto.precios[i-1].utilMin"
+                :min="0.00"
+                :max="producto.precios[i-1].utilNeta"
+                step="0.01"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                Valor Venta:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                v-model="producto.precios[i-1].valorVenta"
+                @input="calcularValores(i-1)"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <!--<tr>
+              <td class="form-control">
+                % Desc.:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                v-model="producto.precios[i-1].porcDesc"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>-->
+            <tr>
+              <td class="form-control">
+                % Util. Neta:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                readonly
+                v-model="producto.precios[i-1].utilNeta"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+            <tr>
+              <td class="form-control">
+                % Precio al Púb.:
+              </td>
+              <td v-for="i in numPresentacion" :key="i.id">
+                <b-form-input 
+                style="background-color:#F7A4A4"
+                readonly
+                v-model="producto.precios[i-1].precioPub"
+                type="number">
+                </b-form-input>
+              </td>
+            </tr>
+          </tbody> 
+          </table>
         </b-col>
       </b-row>
 
@@ -397,6 +516,7 @@ export default {
       showProductoDet: true,
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
+      numPresentacion: 0,
       API: config.API,
       nuevo:false,
       show: false, 
@@ -440,7 +560,7 @@ export default {
         
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+        //this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
         //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
@@ -492,9 +612,16 @@ export default {
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
-
+        this.numPresentacion = 0
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+          this.numPresentacion = this.producto.precios.length
+        }
+
+        if(this.numPresentacion == 0){
+          this.agregarPresentacion()
+          this.producto.precios[0].nombre = "UNIDAD"
+          this.producto.precios[0].cantidad = 1
         }
 
       } else {
@@ -504,7 +631,7 @@ export default {
 
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
-    }
+    },
   },
   methods: {
     handleFileUpload() {
@@ -525,6 +652,21 @@ export default {
       Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
       Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
       this.actualizarPorcentajeUtilidad()
+    },
+    calcularValores(index){
+    let {nombre, cantidad, costoProv, costoNeto, porcUtil, utilMin, valorVenta, porcDesc, utilNeta, precioPub} = this.producto.precios[index]
+    let valorImpuesto = parseFloat(valorVenta)*1.5/100
+    this.producto.precios[index].costoNeto = Math.round((parseFloat(costoProv)+valorImpuesto)*1000)/1000
+    this.producto.precios[index].porcUtil = (Math.round(((valorVenta-costoNeto)/valorVenta*100)*100)/100)
+    this.producto.precios[index].utilNeta = (((valorVenta-costoNeto)/costoNeto)*100/100*100).toFixed(2)
+    this.producto.precios[index].precioPub = valorVenta
+    },
+    calcularCantidad(index){
+      if(index!=0){
+        const {nombre, cantidad, costoProv, costoNeto, porcUtil, utilMin, valorVenta, porcDesc, utilNeta, precioPub} = this.producto.precios[0]
+        this.producto.precios[index].costoProv = (this.producto.precios[index].cantidad * costoProv).toFixed(2)
+        this.producto.precios[index].costoNeto = (this.producto.precios[index].cantidad * costoNeto).toFixed(2)
+      }
     },
     eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
@@ -566,6 +708,7 @@ export default {
     },
     setMedicion (obj) {
       this.producto.medicion = obj
+      this.producto.precios[0].nombre=obj.ProductoMedicion
     },
     setMarca (obj) {
       this.producto.marca = obj
@@ -585,11 +728,13 @@ export default {
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      //this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
       this.initForm()
+      this.producto.precios.push({nombre: 'UNIDAD', cantidad:1, costoProv: 0, costoNeto: 0, porcUtil:0, utilMin:0, valorVenta:0, porcDesc:0, utilNeta:0, precioPub:0})
+      this.numPresentacion = 1
     },
     initForm () {
       this.producto = {
@@ -628,12 +773,7 @@ export default {
           ProductoMedicion:"UNIDAD"
         },
         Imagen: null,
-        precios: [
-          {nombre: '', cantidad: 0, precio: 0},
-          {nombre: '', cantidad: 0, precio: 0},
-          {nombre: '', cantidad: 0, precio: 0},
-          {nombre: '', cantidad: 0, precio: 0}
-        ]
+        precios: []
       }
     },
     keyDownInput(e) {
@@ -649,11 +789,18 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-      
+      let isCorrecto = true
       this.producto.precios.map(pre=>{
-        pre.cantidad=pre.cantidad==''?pre.cantidad=0:pre.cantidad
-        pre.precio=pre.precio==''?pre.precio=0:pre.precio
+        if(pre.nombre.trim().length==0 || pre.cantidad==0 || pre.cantidad=='' || pre.cantidad=='0'){
+          console.log("no es correcto");
+          isCorrecto=false 
+        }
       }) 
+
+      if(!isCorrecto){
+        this.$toasted.show('El producto debe tener por lo menos una presentacion correcta para guardarse.')
+        return
+      }
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
@@ -661,7 +808,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(response.data.insertId, this.producto.precios, this.numPresentacion)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
@@ -775,6 +922,16 @@ export default {
       } else {
         if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
       }
+    },
+    agregarPresentacion(){
+      this.numPresentacion++;
+      this.producto.precios.push({nombre: '', cantidad:0, costoProv: 0, costoNeto: 0, porcUtil:0, utilMin:0, valorVenta:0, porcDesc:0, utilNeta:0, precioPub:0})
+    },
+    quitarPresentacion(){
+      if(this.numPresentacion >1){
+        this.numPresentacion--;
+        this.producto.precios.pop()
+      }
     }
   },
   computed : {
@@ -785,5 +942,12 @@ export default {
 }
 </script>
 <style>
-
+.tablaGuia td  {
+    vertical-align: middle;
+    text-align: right;
+}
+.tablaGuia td a, .tablaGuia td input, .tablaGuia td img {
+    vertical-align: middle;
+    display: inline-block;
+}
 </style>

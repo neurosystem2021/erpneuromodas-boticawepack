@@ -635,6 +635,7 @@ export default {
                         console.log(error)
                     })
                      this.limpiarCart()
+                     console.log(response.data);
                      response.data.map((item) => {
                         this.add([item, () => {
                         }, false ])
@@ -753,15 +754,15 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
+        onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
                 let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
+                obj.precio = preciosPorProducto.precioPub || 0
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || 0
             return obj
         },
         onAddProducto (obj) {

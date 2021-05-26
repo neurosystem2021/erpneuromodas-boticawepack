@@ -191,7 +191,8 @@
             <b-col>
               <productos-carrito 
                 ref="carrito"
-                @onAddProducto="onAddProducto" 
+                @onAddProducto="onAddProducto"
+                :onSetProducto="onSetProducto"
                 :tipoCambio="movimiento.TipoCambio"
                 tipo="mov"></productos-carrito>
             </b-col>
@@ -243,6 +244,17 @@ export default {
       limpiar: 'limpiarCarrito',
       obtenerStok: 'obtenerStock'
     }),
+    onSetProducto (obj, cant, precio) {
+      if (cant) {
+          obj.cantidad = cant
+          let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+            obj.precio = preciosPorProducto.costoProv || 0
+          return obj
+      }
+      obj.cantidad = 1
+      obj.precio = precio || 0
+      return obj
+    }, 
     onAddProducto (obj) {
         this.obtenerStok({
           IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
@@ -401,5 +413,8 @@ return false
 <style>
   .input-group {
     /*margin: 0.25rem 0 !important;*/
+  }
+  #modalPresent  .modal-dialog {
+    max-width: 60% !important;
   }
 </style>
