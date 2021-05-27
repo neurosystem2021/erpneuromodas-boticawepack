@@ -128,6 +128,7 @@
                       <tr>
                         <th>Codigo</th>
                         <th>Producto</th>
+                        <th>Presentacion</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Descuento</th>
@@ -140,6 +141,7 @@
                       <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
                         <td>{{ item.CodigoBarra }}</td>
                         <td>{{ item.Producto }}</td>
+                        <td>{{ item.Presentacion }}</td>
                         <td>{{ item.Cantidad }}</td>
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
@@ -330,6 +332,9 @@ export default {
            }
          }).then((response) => {
               this.itemsDetalle = response.data
+              this.itemsDetalle.map((det)=>{
+              det.Presentacion= JSON.parse(det.Descripcion).nombre
+               })
               this.items.map((item) => {
                 item.productos = this.getDetalles(item.idDocVenta)
                 return item
