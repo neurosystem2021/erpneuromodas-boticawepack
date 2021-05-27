@@ -447,8 +447,8 @@ export default {
       obj.precio = 0
       obj.cantidad = 0
       //obj.IdLote = 0
-      //obj.TieneIgv = 0
-      obj.descuento = 0
+      // //obj.TieneIgv = 0
+      // obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
@@ -472,7 +472,7 @@ export default {
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
+      // obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad)
       this.add([obj, () => {
