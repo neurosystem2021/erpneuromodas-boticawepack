@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"

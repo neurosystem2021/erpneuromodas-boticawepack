@@ -131,7 +131,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.001"
+            step="0.0001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             :v-on="setNuevoPrecioContado(data.index)"></b-form-input>
@@ -653,6 +653,7 @@ export default {
           this.setProductoUni(obj, this.preciosProd[0].precioPub)
         }else{
           obj.PrecioCosto = this.preciosProd[0].costoProv
+          obj.preciocontado = this.preciosProd[0].precioPub
           this.setProductoUni(obj, this.preciosProd[0].costoProv)
         }
         
@@ -695,6 +696,7 @@ export default {
       obj.PorcentajeUtilidad = prod.utilNeta
       obj.descripcion=prod.nombre
       obj.PrecioCosto=prod.costoNeto
+      obj.preciocontado = prod.precioPub
       obj.precioxcantidaselec = prod
       obj.pxpposition = index
       this.$refs.autocompleteProducto.setValue('')
@@ -743,7 +745,13 @@ export default {
     setNuevoPrecioContado (index) {
 
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
+      let precio = 0
+      if (this.isVentas) {
+          precio = parseFloat(this.productos[index].precio)
+      } else {
+          precio = parseFloat(this.productos[index].precio)+ parseFloat(this.productos[index].preciocontado)*1.5/100
+      }
+      console.log(this.productos[index].preciocontado);
       if(this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
       }
@@ -761,9 +769,14 @@ export default {
         normalPrecio *= this.tipoCambio
         nuevoPrecio *= this.tipoCambio
       }
+      if(this.isVentas){
+        Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+        Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      }else{
+        Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+        Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio

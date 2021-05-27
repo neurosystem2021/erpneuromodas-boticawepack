@@ -65,6 +65,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Presentacion</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -77,6 +78,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ prod.Presentacion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -135,6 +137,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Presentacion</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -147,6 +150,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ prod.Presentacion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -205,6 +209,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Presentacion</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -217,6 +222,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ prod.Presentacion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -273,6 +279,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Presentacion</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -285,6 +292,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ prod.Presentacion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -602,6 +610,10 @@ export default {
           }
         }).then((response) => {
             this.itemsDetalle = response.data
+            this.itemsDetalle.map((det)=>{
+              det.Presentacion= JSON.parse(det.Descripcion).nombre
+            })
+
             this.ventas = this.ventas.map((item) => {
               item.productos = this.getDetalles(item.idDocVenta)
               return item
