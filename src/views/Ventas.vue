@@ -545,6 +545,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion 
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
@@ -833,7 +834,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
-                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
