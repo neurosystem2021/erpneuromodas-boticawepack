@@ -6,7 +6,8 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy': 'stock', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -204,6 +205,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    idAlmacen: Number,
     tipo: String,
 
     igvTotal: Boolean,
@@ -246,6 +248,13 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -345,6 +354,21 @@ export default {
         this.pasteCode = false
       }
     },*/
+        obtenerStockCaja(prod) {
+     axios.get(this.API + 'productos/stock/caja', {
+        params: {
+          idProducto: prod.IdProducto,
+          idAlmacen: this.idAlmacen
+        }
+      }).then((response) => {
+        Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
+        //console.log(response.data.stock)
+          //return response.data.stock
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -366,9 +390,25 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
-      return `
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
+      if (this.idAlmacen) {
+      let style = 'ss'
+      let color='#080808'
+      if(data.stock <= 0) {
+        style = 'bg-danger'
+        color='#FCFCFC'
+      }
+       return `
+             <b  class="${style}" style="color: ${color}";> Stock: ${data.stock}/</b><b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
+        
+        
+        `
+      }
+       return `
+        <b> Stock: ${data.stock}/</b><b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
       `
+      
+
+     
     },
     setNuevoPrecioContado (index) {
 
