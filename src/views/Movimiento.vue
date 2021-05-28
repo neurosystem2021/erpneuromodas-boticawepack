@@ -166,7 +166,7 @@
                         type="datetime-local"
                         step="1"
                         placeholder="Fecha Contable"
-                        disabled="disabled"></b-form-input>
+                        ></b-form-input>
 
                     </b-form-group>
                     <b-form-group>
@@ -175,7 +175,7 @@
                         v-model="movimiento.FechaStock"
                         type="date"
                         placeholder="Fecha Stock"
-                        disabled="disabled"></b-form-input>
+                        ></b-form-input>
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
