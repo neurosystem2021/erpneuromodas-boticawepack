@@ -343,7 +343,7 @@
                                     </tbody>
                                 </table>
                             </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                            <template slot="adicional" v-if="false">
                                 <table class="table b-table border table-footer table-sm text-center" >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -421,10 +421,12 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'ProductoMarca', label: 'Marca' },
+                    { key: 'ProductoModelo', label: 'Modelo/Color' }, 
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -985,8 +987,8 @@ export default {
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                    this.$refs.inputAlmacen.setValue('VENTA')
-                    this.$refs.inputPuntoVenta.setValue('CAJA1')
+                    this.$refs.inputAlmacen.setValue('PRINCIPAL')
+                    this.$refs.inputPuntoVenta.setValue('TUPAC')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')

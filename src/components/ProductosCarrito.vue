@@ -162,7 +162,7 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         
-        <template slot="manoobra" slot-scope="data">
+        <template slot="manoobra" slot-scope="data" v-if="false">
           <input  :disabled="bloquearInput?true:false"
             @change="(e) => addManoDeObra(data.index, e)"
             v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
@@ -204,6 +204,7 @@
             type="number"
             min="0"
             step="0.01"
+            @input="getTotal(data.index)"        
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -381,11 +382,11 @@ export default {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código'},
-          // { key: 'ProductoCategoria', label: 'Categoria'},
+          //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Present.' }, 
+          { key: 'ProductoModelo', label: 'Modelo/Color' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -615,15 +616,18 @@ export default {
        this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
       }
       this.objProd = {}
-    
+      this.objProd = obj
+
+      if(this.preciosProd.length=1){
+        this.setProductoUni(obj,this.preciosProd[0].precio)
+        return
+
+      }
      // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
      // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
-      
- 
-
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
+      
     },  
     setProductoUni (obj, precio) {
       this.objProd.cantxPrecio = 1
