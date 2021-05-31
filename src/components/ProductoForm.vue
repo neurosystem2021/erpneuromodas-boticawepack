@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -221,7 +221,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group  v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -260,7 +260,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
             <b-form-input
@@ -281,7 +281,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
@@ -292,7 +292,7 @@
       </b-row>
 
       <hr>
-      <b-row v-if="false">
+      <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -370,6 +370,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -384,7 +385,7 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
         this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -553,7 +554,7 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
@@ -578,7 +579,7 @@ export default {
         ProductoDesc3: '',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         StockMinimo: 0,
         StockPorMayor: 0,
         PrecioContado: '',
@@ -597,10 +598,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'ph', cantidad: 0, precio: 0},
-          {nombre: 'pp', cantidad: 0, precio: 0},
-          {nombre: 'pt', cantidad: 0, precio: 0},
-          {nombre: 'pd', cantidad: 0, precio: 0}
+          {nombre: 'Precio 1', cantidad: 0, precio: 0},
+          {nombre: 'Precio 2', cantidad: 0, precio: 0},
+          {nombre: 'Precio 3', cantidad: 0, precio: 0},
+          {nombre: 'Precio 4', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -617,6 +618,14 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      this.producto.precios.map((pre)=>{
+        if(pre.cantidad==''){
+          pre.cantidad=0
+        }
+        if(pre.precio==''){
+          pre.precio=0
+        }
+      })
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
@@ -624,7 +633,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(response.data.insertId,this.producto.precios)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)

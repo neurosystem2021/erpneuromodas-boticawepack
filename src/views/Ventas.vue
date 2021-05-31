@@ -344,7 +344,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center"  v-if="false" >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -752,7 +752,7 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant, precio) {
+        onSetProducto (obj, cant) {
             if (cant) {
                 obj.cantidad = cant
                 let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
@@ -760,7 +760,7 @@ export default {
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = precio || 0
+            obj.precio = obj.PrecioContado || 0
             return obj
         },
         onAddProducto (obj) {
