@@ -44,7 +44,7 @@
           </td>
           <td>
             <span class="hideInModal">{{ prod.Cantidad }}</span>
-            <input :disabled="prod.isDisabled || prod.CodigoBarra == 'MANODEOBRA'" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
+            <input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
           </td>
           <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
@@ -144,10 +144,6 @@ export default {
         return
       }
       
-      if(data.CodigoBarra == 'MANODEOBRA'){
-        data.Cantidad = 1
-      }
-
       data.Precio = data.PrecioContado
       
       this.productos.push(data)

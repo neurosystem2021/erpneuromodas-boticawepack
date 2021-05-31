@@ -92,7 +92,7 @@
             style="width: 75px"
             step="0.001"
             min="0"
-            :disabled="bloquearInput?true:false || productos[data.index].CodigoBarra == 'MANODEOBRA' "
+            :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
@@ -102,7 +102,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || productos[data.index].CodigoBarra == 'MANODEOBRA'"
+            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false"
             type="number"
             style="width: 75px"
             min="0"
