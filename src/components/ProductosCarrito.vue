@@ -18,37 +18,37 @@
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
+                   ref="barcodeInput"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+<b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
+          <h5>{{objProd.Producto}}</h5>
         </div>
         <hr>
         <b-row>
-          <b-col cols="6" v-if="false">
+          <b-col cols="6">
             <b-card
               align="center"
               class="mb-3 contentCard"
               @click="setProductoUni(objProd)"
             >
               <b-row>
-                <b-col md="4" class="nomCart">
-                  <h5 class="text-uppercase">UNI</h5>
+                <b-col md="7" class="nomCart">
+                  <h5 class="text-uppercase">{{medicionPro}}</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
-                  <b>Cant: </b>1
-                  <br>
-                  <b>Pre: </b>S/ {{ precioCont }}
+                <b-col md="5" class="text-left">
+                  <b>Precio: </b><br>S/ {{ precioCont }}
                 </b-col>
               </b-row>
             </b-card>
@@ -56,24 +56,22 @@
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
-              v-if="d.cantidad != 0"
+              v-if="parseFloat(d.cantidad) > 0"
               align="center"
               class="mb-3 contentCard"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
-                  setProductoUni(objProd, d.precio)
+                  setProductoCant(d)
                 }
               }"
             >
               <b-row>
-                <b-col md="4" class="nomCart">
-                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                <b-col md="7" class="nomCart" >
+                  <h5>x{{ d.cantidad }}</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
-                  <b>Cant: </b>{{ d.cantidad }}
-                  <br>
-                  <b>Pre: </b>S/ {{ d.precio }}
+                <b-col md="5" class="text-left">
+                  <b>Precio: </b>S/ {{ d.precio }}
                 </b-col>
               </b-row>
             </b-card>
@@ -82,11 +80,11 @@
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
-          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -132,7 +130,9 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            :v-on="setNuevoPrecioContado(data.index)">
+          </b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -204,7 +204,7 @@
             type="number"
             min="0"
             step="0.01"
-            @input="getTotal(data.index)"        
+            @input="(val)=>ActulizarDesc(data.index,val)"        
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -241,8 +241,8 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
-          <input 
+          <h6 v-if="isVentas"><i>Prof.</i></h6>
+          <input v-if="isVentas"
             class="form-check-input" 
             type="checkbox" 
             :disabled="bloquearInput?true:false"
@@ -253,7 +253,8 @@
           />
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -345,6 +346,9 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
+      medicionPro:'UNIDAD',
+      productoSelect: {},
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
@@ -387,7 +391,7 @@ export default {
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' }, 
-          // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -466,6 +470,7 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart',
       actualizarProd : 'actualizarProducto',
+      obtenerStok: 'obtenerStock',
     }),
 
     changeCant (val, prod) {
@@ -479,8 +484,8 @@ export default {
     },
 
     cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+      var utilidad =   (1-(this.productos[index].PorcentajeUtilidad / 100))
+      this.productos[index].precio = Math.round((this.productos[index].PrecioCosto / utilidad)*10)/10
     },
     
     addManoDeObra (index, e) {
@@ -597,68 +602,72 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    editarProducto(Pro){
+      this.productoSelect = Pro
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarGuardar(id,pxp,obj){
+      this.add([id,false,false,false,false,true,this.isVentas]);
+      setTimeout(() => {
+              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      }, 200); 
+      
+      if(this.isVentas){
+        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
+        if(fPP.length!=4){
+          obj.ProductoMedicion = obj.medicion.ProductoMedicion
+          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
+          obj.IdProductoMarca= obj.marca.IdProductoMarca
+          obj.ProductoMarca= obj.marca.ProductoMarca
+          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
+          obj.ProductoCategoria = obj.categoria.ProductoCategoria
+          this.productoSelect = obj
+          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
+          this.showPresentacion(this.productoSelect)
+        } 
+      }
+    },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
+      this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
       this.preciosProd = []
-      if (!this.isVentas) {
-        obj.estadoPxP = true
-        obj.PreciosPorProducto = ''
+      this.objProd = {}
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+      let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+      if(!this.isVentas){
         this.setProductoUni(obj)
         return
       }
-      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-      if(obj.precioConvenio){
-        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
-      }
-      if(obj.PrecioEspecial){
-       this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
-      }
-      this.objProd = {}
-      this.objProd = obj
-
-      if(this.preciosProd.length=1){
-        this.setProductoUni(obj,this.preciosProd[0].precio)
+      if(fPP.length==4){
+        obj.cantxPrecio=1
+        this.setProductoUni(obj)
         return
-
       }
-     // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-     // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
       this.$refs['modalCant'].show()
-      // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      
+      this.objProd = obj
     },  
-    setProductoUni (obj, precio) {
+    setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioCosto
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj,false,precio)
-      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        if(existe){
-          if(this.isVentas){
-            this.$toasted.success('Precio Modificado')
-          }else{
-            this.$toasted.success('El producto ya está en la lista')
-          }
-          
-        }else{
-          this.$toasted.success('Producto añadido correctamente')
-        }
-        
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+        this.$toasted.success('Producto añadido correctamente')
+      },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -682,26 +691,17 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
-    showPresentacion (obj) {
-      
-     // if (!obj.PreciosPorProducto !== '') {
-       // this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
-       if(this.isVentas){
-        this.preciosProd = []
-        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-        if(obj.precioConvenio){
-          this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
-        }
-        if(obj.PrecioEspecial){
-        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
-        }
+    showPresentacion (obj) { 
+      if (!obj.PreciosPorProducto !== '') {
+        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.precioCont = obj.PrecioContado
+        this.medicionPro = obj.ProductoMedicion
         this.$refs['modalCant'].show()
         return
-       }
- 
-      //}
+      }
     },
     renderChild(data) {
       let style = '';
@@ -725,10 +725,11 @@ export default {
         precio += (precio * 0.18)
       }
 
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
+      if(this.isVentas){
+        precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
+      }else{
+        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      }
 
       let normalPrecio = this.$options.filters.redondear(precio)
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
@@ -745,7 +746,11 @@ export default {
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
-      this.updateManoDeObraNeta(index)
+      //this.updateManoDeObraNeta(index)
+    },
+    ActulizarDesc(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
     getSubtotal(index) {
       
@@ -816,6 +821,7 @@ export default {
   .nomCart {
     display: flex;
     align-items: center;
+    justify-content: center;
     border-right: 2px solid black;
   }
   .form-check-input {

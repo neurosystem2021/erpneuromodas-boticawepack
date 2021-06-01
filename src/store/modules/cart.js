@@ -20,6 +20,10 @@ const mutations = {
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
+      }else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2,0,item)
       }
     }
   },
@@ -72,7 +76,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
     let setPrecio = false
     let cantidad = false
     let precio = false
@@ -145,7 +149,17 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-
+          
+          if(actualizar){
+            obj.cantidad = 1
+            obj.precio = obj.PrecioContado
+            obj.cantidadPres = 1
+            obj.cantxPrecio = 1
+            if(!isVentas){
+              obj.cantidad = 0
+              obj.precio = obj.PrecioCosto
+            }
+          }
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
           

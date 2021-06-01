@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -59,10 +59,9 @@
           </b-form-group>
 
           <b-form-group>
-            <label>Modelo:</label>
+            <label>Modelo/Color:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -221,7 +220,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group  v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -256,11 +255,12 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
+              step="0.01"
               type="number"
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6"  v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
             <b-form-input
@@ -274,6 +274,7 @@
             <label>Precio Público:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              step="0.01"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
@@ -281,7 +282,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6"  v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
@@ -292,7 +293,7 @@
       </b-row>
 
       <hr>
-      <b-row v-if="false">
+      <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -370,6 +371,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -384,87 +386,89 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
-        this.initForm()
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
-        this.producto.categoria = {
-          IdProductoCategoria: newVal.IdProductoCategoria,
-          ProductoCategoria: newVal.ProductoCategoria
-        }
-        this.producto.marca = {
-          IdProductoMarca: newVal.IdProductoMarca,
-          ProductoMarca: newVal.ProductoMarca
-        }
-        this.producto.medicion = {
-          IdProductoMedicion: newVal.IdProductoMedicion,
-          ProductoMedicion: newVal.ProductoMedicion
-        }
-       
-       // this.$refs.inputCategoria.setValue('')
-        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
-       // this.$refs.inputMarca.setValue('')
-        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
-
-       // this.$refs.inputMedicion.setValue('')
-        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+      if (newVal.IdProducto && !this.nuevo) {
+        this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+        ).then((response) => {
+          newVal = response.data
+          this.initForm()
+          this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+          this.producto.categoria = {
+            IdProductoCategoria: newVal.IdProductoCategoria,
+            ProductoCategoria: newVal.ProductoCategoria
+          }
+          this.producto.marca = {
+            IdProductoMarca: newVal.IdProductoMarca,
+            ProductoMarca: newVal.ProductoMarca
+          }
+          this.producto.medicion = {
+            IdProductoMedicion: newVal.IdProductoMedicion,
+            ProductoMedicion: newVal.ProductoMedicion
+          }
         
-        // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
-
-        //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
-        //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
-        //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
-
-        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        // this.$refs.inputProducto.$el.disabled = true
-        //this.$refs.inputCodigoBarra.$el.disabled = true
-
-        // this.$refs.inputColor.setValue(newVal.Color)
-        // this.$refs.inputBotapie.setValue(newVal.Botapie)
+        // this.$refs.inputCategoria.setValue('')
+          this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
         
-        /* this.producto.modelo = {
-          IdProductoModelo: newVal.IdProductoModelo,
-          ProductoModelo: newVal.ProductoModelo
-        } */
-        /*this.producto.talla = {
-          IdProductoTalla: newVal.IdProductoTalla,
-          ProductoTalla: newVal.ProductoTalla
-        }*/
-        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
-        this.producto.IdProducto = newVal.IdProducto
-
-        this.producto.EsPadre = newVal.EsPadre
-        Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
-        })
-        // this.producto.Genero = newVal.Genero
-        // this.producto.Botapie = newVal.Botapie
-        // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
-        this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
-        this.producto.StockMinimo           = newVal.StockMinimo
-        this.producto.StockPorMayor         = newVal.StockPorMayor
-        this.producto.CodigoBarra           = newVal.CodigoBarra
-        this.producto.ProductoModelo        = newVal.ProductoModelo
-        this.producto.ProductoDesc          = newVal.ProductoDesc
-        this.producto.ProductoDesc2         = newVal.ProductoDesc2
-        this.producto.ProductoDesc3         = newVal.ProductoDesc3
-        this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
-        this.producto.PrecioCosto           = newVal.PrecioCosto
-        this.producto.PrecioContado         = newVal.PrecioContado
-        this.producto.precioConvenio        = newVal.precioConvenio
-        this.producto.PrecioEspecial        = newVal.PrecioEspecial
-        this.producto.EsHabitacion          = newVal.EsHabitacion
-        this.producto.Piso                  = newVal.Piso
-        this.producto.ControlaStock         = newVal.ControlaStock
-        this.producto.Imagen                = newVal.Imagen
-
-        if (newVal.PreciosPorProducto) {
-          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
-        }
+        // this.$refs.inputMarca.setValue('')
+          this.$refs.inputMarca.setValue(newVal.ProductoMarca)
+        // this.$refs.inputMedicion.setValue('')
+          this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+          
+          // this.$refs.inputModelo.setValue('')
+          this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+          this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+          //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+          //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
+          //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
+          // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+          // this.$refs.inputProducto.$el.disabled = true
+          //this.$refs.inputCodigoBarra.$el.disabled = true
+          // this.$refs.inputColor.setValue(newVal.Color)
+          // this.$refs.inputBotapie.setValue(newVal.Botapie)
+          
+          /* this.producto.modelo = {
+            IdProductoModelo: newVal.IdProductoModelo,
+            ProductoModelo: newVal.ProductoModelo
+          } */
+          /*this.producto.talla = {
+            IdProductoTalla: newVal.IdProductoTalla,
+            ProductoTalla: newVal.ProductoTalla
+          }*/
+          //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+          this.producto.Producto = newVal.Producto
+          this.producto.IdProducto = newVal.IdProducto
+          this.producto.EsPadre = newVal.EsPadre
+          Vue.nextTick(() => {
+            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+          })
+          // this.producto.Genero = newVal.Genero
+          // this.producto.Botapie = newVal.Botapie
+          // this.producto.Color = newVal.Color
+          this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
+          this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
+          this.producto.StockMinimo           = newVal.StockMinimo
+          this.producto.StockPorMayor         = newVal.StockPorMayor
+          this.producto.CodigoBarra           = newVal.CodigoBarra
+          this.producto.ProductoModelo        = newVal.ProductoModelo
+          this.producto.ProductoDesc          = newVal.ProductoDesc
+          this.producto.ProductoDesc2         = newVal.ProductoDesc2
+          this.producto.ProductoDesc3         = newVal.ProductoDesc3
+          this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
+          this.producto.PrecioCosto           = newVal.PrecioCosto
+          this.producto.PrecioContado         = newVal.PrecioContado
+          this.producto.precioConvenio        = newVal.precioConvenio
+          this.producto.PrecioEspecial        = newVal.PrecioEspecial
+          this.producto.EsHabitacion          = newVal.EsHabitacion
+          this.producto.Piso                  = newVal.Piso
+          this.producto.ControlaStock         = newVal.ControlaStock
+          this.producto.Imagen                = newVal.Imagen
+          if (newVal.PreciosPorProducto) {
+            this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+          }
+          }).catch((error) => {
+            console.log(error)
+            this.initForm()
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
 
       } else {
 
@@ -553,7 +557,7 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
@@ -578,10 +582,10 @@ export default {
         ProductoDesc3: '',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         StockMinimo: 0,
         StockPorMayor: 0,
-        PrecioContado: '',
+        PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
         PrecioEspecial: 0,
@@ -597,10 +601,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'ph', cantidad: 0, precio: 0},
-          {nombre: 'pp', cantidad: 0, precio: 0},
-          {nombre: 'pt', cantidad: 0, precio: 0},
-          {nombre: 'pd', cantidad: 0, precio: 0}
+          {nombre: 'Precio 1', cantidad: 0, precio: 0},
+          {nombre: 'Precio 2', cantidad: 0, precio: 0},
+          {nombre: 'Precio 3', cantidad: 0, precio: 0},
+          {nombre: 'Precio 4', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -617,6 +621,14 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      this.producto.precios.map((pre)=>{
+        if(pre.cantidad==''){
+          pre.cantidad=0
+        }
+        if(pre.precio==''){
+          pre.precio=0
+        }
+      })
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
@@ -624,7 +636,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
