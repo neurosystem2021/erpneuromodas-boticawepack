@@ -318,5 +318,7 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
-
+#modalConfigVenta .modal-dialog{
+    max-width: 65% !important;
+}
 </style>

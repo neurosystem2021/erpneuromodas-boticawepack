@@ -23,7 +23,7 @@ const mutations = {
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
-        productos.unshift(item)
+        productos.splice(index2,0,item)
       }
     }
   },

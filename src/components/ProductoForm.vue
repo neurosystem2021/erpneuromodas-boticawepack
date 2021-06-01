@@ -62,7 +62,6 @@
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -256,6 +255,7 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
+              step="0.01"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -274,6 +274,7 @@
             <label>Precio Público:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              step="0.01"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
@@ -633,7 +634,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId,this.producto.precios)
+          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto.precioContado, this.producto.medicion.ProductoMedicion)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)

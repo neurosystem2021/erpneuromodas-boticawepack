@@ -44,11 +44,11 @@
               @click="setProductoUni(objProd)"
             >
               <b-row>
-                <b-col md="4" class="nomCart">
-                  <h5 class="text-uppercase">UNI</h5>
+                <b-col md="7" class="nomCart">
+                  <h5 class="text-uppercase">{{medicionPro}}</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
-                  <b>Precio: </b>S/ {{ precioCont }}
+                <b-col md="5" class="text-left">
+                  <b>Precio: </b><br>S/ {{ precioCont }}
                 </b-col>
               </b-row>
             </b-card>
@@ -67,10 +67,10 @@
               }"
             >
               <b-row>
-                <b-col md="4" class="nomCart" >
+                <b-col md="7" class="nomCart" >
                   <h5 class="text-uppercase">x{{ d.cantidad }}</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
+                <b-col md="5" class="text-left">
                   <b>Precio: </b>S/ {{ d.precio }}
                 </b-col>
               </b-row>
@@ -253,7 +253,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil != 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -345,6 +345,7 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
+      medicionPro:'UNIDAD',
       productoSelect: {},
       idPerfil: sessionStorage.getItem('IdPerfil')
     }
@@ -389,7 +390,7 @@ export default {
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Present.' }, 
-          // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -482,8 +483,8 @@ export default {
     },
 
     cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+      var utilidad =   (1-(this.productos[index].PorcentajeUtilidad / 100))
+      this.productos[index].precio = Math.round((this.productos[index].PrecioCosto / utilidad)*10)/10
     },
     
     addManoDeObra (index, e) {
@@ -605,7 +606,7 @@ export default {
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    agregarGuardar(id,pxp){
+    agregarGuardar(id,pxp,pp,med){
       this.add([id,false,false,false,false,true,this.isVentas]);
       setTimeout(() => {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
@@ -615,6 +616,8 @@ export default {
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
         if(fPP.length!=4){
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
+          this.precioCont = pp
+          this.medicionPro = med
           this.showPresentacion(this.productoSelect)
         } 
 
@@ -623,6 +626,7 @@ export default {
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
+      this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
@@ -693,6 +697,8 @@ export default {
       if (!obj.PreciosPorProducto !== '') {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.precioCont = obj.PrecioContado
+        this.medicionPro = obj.ProductoMedicion
         this.$refs['modalCant'].show()
         return
       }
@@ -715,20 +721,19 @@ export default {
 
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio)
+      
       if(this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
       }
       if(this.isVentas){
         precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-      }else{
-        let pre= precio
-        precio += (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-        precio=precio-pre
+       }else{
+        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+
       }
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
 
       let normalPrecio = this.$options.filters.redondear(precio)
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
@@ -816,6 +821,7 @@ export default {
   .nomCart {
     display: flex;
     align-items: center;
+    justify-content: center;
     border-right: 2px solid black;
   }
   .form-check-input {

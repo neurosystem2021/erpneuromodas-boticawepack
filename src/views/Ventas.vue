@@ -421,15 +421,16 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
+                    { key: 'ProductoMarca', label: 'Marca' },
+                    { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'eventPres', label: '' },
+                    { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -1033,5 +1034,4 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
 </style>
