@@ -387,86 +387,96 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto && !this.nuevo) {
-        this.initForm()
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
-        this.producto.categoria = {
-          IdProductoCategoria: newVal.IdProductoCategoria,
-          ProductoCategoria: newVal.ProductoCategoria
-        }
-        this.producto.marca = {
-          IdProductoMarca: newVal.IdProductoMarca,
-          ProductoMarca: newVal.ProductoMarca
-        }
-        this.producto.medicion = {
-          IdProductoMedicion: newVal.IdProductoMedicion,
-          ProductoMedicion: newVal.ProductoMedicion
-        }
-       
-       // this.$refs.inputCategoria.setValue('')
-        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
-       // this.$refs.inputMarca.setValue('')
-        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
-
-       // this.$refs.inputMedicion.setValue('')
-        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+        this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+        ).then((response) => {
+          newVal = response.data
+          this.initForm()
+          this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+          this.producto.categoria = {
+            IdProductoCategoria: newVal.IdProductoCategoria,
+            ProductoCategoria: newVal.ProductoCategoria
+          }
+          this.producto.marca = {
+            IdProductoMarca: newVal.IdProductoMarca,
+            ProductoMarca: newVal.ProductoMarca
+          }
+          this.producto.medicion = {
+            IdProductoMedicion: newVal.IdProductoMedicion,
+            ProductoMedicion: newVal.ProductoMedicion
+          }
         
-        // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
-
-        //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
-        //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
-        //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
-
-        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        // this.$refs.inputProducto.$el.disabled = true
-        //this.$refs.inputCodigoBarra.$el.disabled = true
-
-        // this.$refs.inputColor.setValue(newVal.Color)
-        // this.$refs.inputBotapie.setValue(newVal.Botapie)
+        // this.$refs.inputCategoria.setValue('')
+          this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
         
-        /* this.producto.modelo = {
-          IdProductoModelo: newVal.IdProductoModelo,
-          ProductoModelo: newVal.ProductoModelo
-        } */
-        /*this.producto.talla = {
-          IdProductoTalla: newVal.IdProductoTalla,
-          ProductoTalla: newVal.ProductoTalla
-        }*/
-        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
-        this.producto.IdProducto = newVal.IdProducto
+        // this.$refs.inputMarca.setValue('')
+          this.$refs.inputMarca.setValue(newVal.ProductoMarca)
 
-        this.producto.EsPadre = newVal.EsPadre
-        Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
-        })
-        // this.producto.Genero = newVal.Genero
-        // this.producto.Botapie = newVal.Botapie
-        // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
-        this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
-        this.producto.StockMinimo           = newVal.StockMinimo
-        this.producto.StockPorMayor         = newVal.StockPorMayor
-        this.producto.CodigoBarra           = newVal.CodigoBarra
-        this.producto.ProductoModelo        = newVal.ProductoModelo
-        this.producto.ProductoDesc          = newVal.ProductoDesc
-        this.producto.ProductoDesc2         = newVal.ProductoDesc2
-        this.producto.ProductoDesc3         = newVal.ProductoDesc3
-        this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
-        this.producto.PrecioCosto           = newVal.PrecioCosto
-        this.producto.PrecioContado         = newVal.PrecioContado
-        this.producto.precioConvenio        = newVal.precioConvenio
-        this.producto.PrecioEspecial        = newVal.PrecioEspecial
-        this.producto.EsHabitacion          = newVal.EsHabitacion
-        this.producto.Piso                  = newVal.Piso
-        this.producto.ControlaStock         = newVal.ControlaStock
-        this.producto.Imagen                = newVal.Imagen
+        // this.$refs.inputMedicion.setValue('')
+          this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+          
+          // this.$refs.inputModelo.setValue('')
+          this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+          this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
-        if (newVal.PreciosPorProducto) {
-          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
-        }
+          //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+          //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
+          //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
+
+          // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+          // this.$refs.inputProducto.$el.disabled = true
+          //this.$refs.inputCodigoBarra.$el.disabled = true
+
+          // this.$refs.inputColor.setValue(newVal.Color)
+          // this.$refs.inputBotapie.setValue(newVal.Botapie)
+          
+          /* this.producto.modelo = {
+            IdProductoModelo: newVal.IdProductoModelo,
+            ProductoModelo: newVal.ProductoModelo
+          } */
+          /*this.producto.talla = {
+            IdProductoTalla: newVal.IdProductoTalla,
+            ProductoTalla: newVal.ProductoTalla
+          }*/
+          //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+          this.producto.Producto = newVal.Producto
+          this.producto.IdProducto = newVal.IdProducto
+
+          this.producto.EsPadre = newVal.EsPadre
+          Vue.nextTick(() => {
+            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+          })
+          // this.producto.Genero = newVal.Genero
+          // this.producto.Botapie = newVal.Botapie
+          // this.producto.Color = newVal.Color
+          this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
+          this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
+          this.producto.StockMinimo           = newVal.StockMinimo
+          this.producto.StockPorMayor         = newVal.StockPorMayor
+          this.producto.CodigoBarra           = newVal.CodigoBarra
+          this.producto.ProductoModelo        = newVal.ProductoModelo
+          this.producto.ProductoDesc          = newVal.ProductoDesc
+          this.producto.ProductoDesc2         = newVal.ProductoDesc2
+          this.producto.ProductoDesc3         = newVal.ProductoDesc3
+          this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
+          this.producto.PrecioCosto           = newVal.PrecioCosto
+          this.producto.PrecioContado         = newVal.PrecioContado
+          this.producto.precioConvenio        = newVal.precioConvenio
+          this.producto.PrecioEspecial        = newVal.PrecioEspecial
+          this.producto.EsHabitacion          = newVal.EsHabitacion
+          this.producto.Piso                  = newVal.Piso
+          this.producto.ControlaStock         = newVal.ControlaStock
+          this.producto.Imagen                = newVal.Imagen
+
+          if (newVal.PreciosPorProducto) {
+            this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+          }
+
+          }).catch((error) => {
+            console.log(error)
+            this.initForm()
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
+
 
       } else {
 
@@ -583,7 +593,7 @@ export default {
         PorcentajeUtilidad: 0,
         StockMinimo: 0,
         StockPorMayor: 0,
-        PrecioContado: '',
+        PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
         PrecioEspecial: 0,
@@ -634,7 +644,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto.precioContado, this.producto.medicion.ProductoMedicion)
+          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)

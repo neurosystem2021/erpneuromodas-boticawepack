@@ -24,7 +24,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp) =>{agregarGuardar(id,pxp)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
@@ -606,7 +606,7 @@ export default {
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    agregarGuardar(id,pxp,pp,med){
+    agregarGuardar(id,pxp,obj){
       this.add([id,false,false,false,false,true,this.isVentas]);
       setTimeout(() => {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
@@ -615,14 +615,19 @@ export default {
       if(this.isVentas){
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
         if(fPP.length!=4){
+          obj.ProductoMedicion = obj.medicion.ProductoMedicion
+          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
+          obj.IdProductoMarca= obj.marca.IdProductoMarca
+          obj.ProductoMarca= obj.marca.ProductoMarca
+          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
+          obj.ProductoCategoria = obj.categoria.ProductoCategoria
+          this.productoSelect = obj
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-          this.precioCont = pp
-          this.medicionPro = med
           this.showPresentacion(this.productoSelect)
         } 
 
       }
-
+//miley 1
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado

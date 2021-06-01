@@ -155,7 +155,6 @@ const actions = {
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
-
             if(!isVentas){
               obj.cantidad = 0
               obj.precio = obj.PrecioCosto
