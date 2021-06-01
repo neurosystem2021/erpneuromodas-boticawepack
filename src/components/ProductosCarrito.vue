@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'sortBy': 'stock', 'sortDesc': 1}"
+            :customParams="{idAlmacen: idAlmacen}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -397,14 +397,14 @@ export default {
         style = 'bg-danger'
         color='#FCFCFC'
       }
+       
+       let stockElement = `<b  class="${style}" style="color: ${color}";> Stock: ${data.stock} / </b>`;
        return `
-             <b  class="${style}" style="color: ${color}";> Stock: ${data.stock}/</b><b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
-        
-        
+             ${stockElement}<b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
         `
       }
        return `
-        <b> Stock: ${data.stock}/</b><b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
       `
       
 
