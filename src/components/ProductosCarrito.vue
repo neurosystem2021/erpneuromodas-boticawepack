@@ -18,18 +18,19 @@
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
+                  ref="barcodeInput"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,obj) =>{agregarGuardar(id,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
           <h3>PRESENTACIONES</h3>
         </div>
@@ -132,7 +133,9 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            :v-on="setNuevoPrecioContado(data.index)"
+            ></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -204,6 +207,7 @@
             type="number"
             min="0"
             step="0.01"
+            @input="(val)=>ActualizarDesc(data.index,val)"    
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -240,8 +244,8 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
-          <input 
+          <h6 v-if="isVentas"><i>Prof.</i></h6>
+          <input v-if="isVentas"
             class="form-check-input" 
             type="checkbox" 
             :disabled="bloquearInput?true:false"
@@ -252,7 +256,8 @@
           />
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -344,6 +349,8 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
+      productoSelect: {},
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
@@ -465,6 +472,7 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart',
       actualizarProd : 'actualizarProducto',
+      obtenerStok: 'obtenerStock',
     }),
 
     changeCant (val, prod) {
@@ -478,8 +486,8 @@ export default {
     },
 
     cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+      var utilidad =   (1-(this.productos[index].PorcentajeUtilidad / 100))
+      this.productos[index].precio = Math.round((this.productos[index].PrecioCosto / utilidad)*10)/10
     },
     
     addManoDeObra (index, e) {
@@ -596,6 +604,29 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    editarProducto(Pro){
+      this.productoSelect = Pro
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarGuardar(id,obj){
+      this.add([id,false,false,false,false,true,this.isVentas]);
+      setTimeout(() => {
+              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      }, 200); 
+      
+      if(this.isVentas){
+          obj.estadoPxP = false
+          obj.ProductoMedicion = obj.medicion.ProductoMedicion
+          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
+          obj.IdProductoMarca= obj.marca.IdProductoMarca
+          obj.ProductoMarca= obj.marca.ProductoMarca
+          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
+          obj.ProductoCategoria = obj.categoria.ProductoCategoria
+          this.productoSelect = obj
+          this.showPresentacion(this.productoSelect)
+      }
+    },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
@@ -655,6 +686,7 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -678,6 +710,7 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     showPresentacion (obj) {
       
@@ -721,10 +754,11 @@ export default {
         precio += (precio * 0.18)
       }
 
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
+      if(this.isVentas){
+        precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
+      }else{
+        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      }
 
       let normalPrecio = this.$options.filters.redondear(precio)
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
@@ -742,6 +776,10 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
       this.updateManoDeObraNeta(index)
+    },
+    ActualizarDesc(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
     getSubtotal(index) {
       

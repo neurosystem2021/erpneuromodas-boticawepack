@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton" @click="()=>nuevo=true"  v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -62,7 +62,6 @@
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -257,6 +256,7 @@
             <b-form-input
               v-model="producto.PrecioCosto"
               type="number"
+              step="0.001"
               ></b-form-input>
           </b-form-group>
         </b-col>
@@ -266,6 +266,7 @@
             <b-form-input
               v-model="producto.PrecioEspecial"
               type="number"
+              step="0.01"
               ></b-form-input>
           </b-form-group>
         </b-col>
@@ -274,6 +275,7 @@
             <label>Precio Público:</label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              step="0.01"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
@@ -286,6 +288,7 @@
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
               type="number"
+              step="0.01"
               ></b-form-input>
           </b-form-group>
         </b-col>
@@ -370,6 +373,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -384,7 +388,10 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
+        this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+        ).then((response) => {
+          newVal = response.data
         this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -465,6 +472,12 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+
+        }).catch((error) => {
+            console.log(error)
+            this.initForm()
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
 
       } else {
 
@@ -553,7 +566,7 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
@@ -578,7 +591,7 @@ export default {
         ProductoDesc3: '',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         StockMinimo: 0,
         StockPorMayor: 0,
         PrecioContado: '',
@@ -624,7 +637,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(response.data.insertId, this.producto)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
