@@ -204,7 +204,7 @@
             type="number"
             min="0"
             step="0.01"
-            @input="(val)=>ActulizarDesc(data.index,val)"        
+            @input="(val)=>ActualizarDesc(data.index,val)"        
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -748,7 +748,7 @@ export default {
       // return nuevoPrecio 
       //this.updateManoDeObraNeta(index)
     },
-    ActulizarDesc(index,val){
+    ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
