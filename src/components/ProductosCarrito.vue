@@ -204,6 +204,7 @@
             type="number"
             min="0"
             step="0.01"
+            @input="(val)=>ActualizarDesc(data.index,val)" 
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -756,6 +757,10 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
       //this.updateManoDeObraNeta(index)
+    },
+    ActualizarDesc(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
     getSubtotal(index) {
       
