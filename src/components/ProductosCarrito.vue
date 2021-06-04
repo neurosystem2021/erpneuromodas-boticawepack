@@ -274,7 +274,8 @@ export default {
       factor: 0,
       pie2corte: 0,
       mostrarInputs:false,
-      indexFactor: null
+      indexFactor: null,
+      precioCorte:0
     }
   },
   watch: {
@@ -468,6 +469,7 @@ export default {
           this.largo = 0
           this.ancho = 0
           this.pie2corte = 0 
+          this.precioCorte = 0
         if (obj.Ancho && obj.Largo) {
           this.mostrarInputs = false
           this.$refs.modalCalcularM2.show()
@@ -478,9 +480,8 @@ export default {
         } else{
           this.setProducto(obj)
         }
-
+        obj.cantidad = 1
         this.productoSelect = obj
-        this.productoSelect.cantidad = 1
         this.mensajeM2 = ''
         // this.$refs.inputM2.$refs.input.value = ''
 
@@ -559,26 +560,35 @@ export default {
 
     },
     seleccionarCalcularM2 () {
-
-      //this.$refs.modalCalcularM2.hide()
-      
-      if (this.precioCorte) {
-        this.productoSelect.precio = this.precioCorte;
-        this.productoSelect.Ancho = this.ancho
-        this.productoSelect.Largo = this.largo
-      }else{
-        this.productoSelect.precio = this.PrecioContado
+      if(this.productoSelect.SoloLargo==1 && (this.largo == 0 || this.largo=='')){
+         this.$toasted.show('Necesita asignar un medida  de corte largo')
+         return
       }
 
-      let cantidad =  parseFloat(this.productoSelect.cantidad)
-      let precio = parseFloat(this.productoSelect.precio)
-      this.setProducto (this.productoSelect, cantidad , precio )
+      if(this.precioCorte==0 && this.productoSelect.Ancho>0 && this.productoSelect.Largo>0 ){
+         this.$toasted.show('Necesita asignar una medida de corte largo y ancho')
+         return
+      }
+
+      let objCalculado = {...this.productoSelect} 
+
+      if (this.precioCorte) {
+        objCalculado.precio = this.precioCorte;
+        objCalculado.Ancho = this.ancho
+        objCalculado.Largo = this.largo
+      }else{
+        objCalculado.precio = this.PrecioContado
+      }
+
+      let cantidad =  parseFloat(objCalculado.cantidad)
+      let precio = parseFloat(objCalculado.precio)
+      this.productoSelect.cantidad = 1
+      this.setProducto (objCalculado, cantidad , precio )
       this.ancho = 0
       this.largo = 0
       this.precioCorte = 0
       this.pie2corte = 0
-      this.productoSelect.cantidad = 1
-      this.mensajeM2 = '';
+      this.mensajeM2 = ''; 
     },
     setProducto (obj2, cant, precio) {
       let obj= {...obj2}
