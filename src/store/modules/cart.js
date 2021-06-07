@@ -136,7 +136,8 @@ const actions = {
     axios.get(API + 'productos/stock', {
       params: {
         idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
+        idAlmacen: obj.IdAlmacen,
+        limit:state.productos.length
       }
     }).then((response) => {
         commit('OBTENER_STOCK', response.data)
