@@ -244,10 +244,11 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      // if (this.idAlmacen) {
-      //   return this.API + 'productos/stock/' + this.idAlmacen
-      // }
-      return this.API + 'productos'
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
     },
     sumatoriaSubTotal () {
       let sumatoria = 0
@@ -377,6 +378,7 @@ export default {
     renderChild(data) {
       if (this.idAlmacen) {
         let style = 'ss'
+        let styleBag = 'ss'
 
         // cambiar color los vencidos
         var dt = new Date()
@@ -403,8 +405,17 @@ export default {
           data.stock = '---'
         }
 
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+
+        if (data.stock <= 0) {
+          styleBag  = 'secondary'
+        }
+
         return `
         <div class="${style}">
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
           <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
