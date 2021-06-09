@@ -183,6 +183,7 @@
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
                             ref="carrito" 
+                            :isVentas="true"
                             :showButton="false"
                             :bloquearInput="bloquearInput"  
                             :fields="carrito.fields"

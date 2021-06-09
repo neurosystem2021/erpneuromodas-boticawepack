@@ -7,6 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -199,6 +200,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
