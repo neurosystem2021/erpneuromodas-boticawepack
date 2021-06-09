@@ -627,6 +627,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
@@ -943,11 +944,11 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+/*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            } */
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
