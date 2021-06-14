@@ -317,6 +317,13 @@ return false
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
       }
+
+      if (obj.Tipo == 2) {
+        this.movimiento.alterarProductos = 0;
+      } else {
+        this.movimiento.alterarProductos = 1;
+      }
+
       this.movimiento.movimientoTipo = obj
 
       this.cargarNumero()
