@@ -111,7 +111,7 @@ export default {
       perPage: 10,
       currentPage: 1,
       almacen: {
-        IdAlmacen: 1
+        IdAlmacen: 0
       }
     }
   },
