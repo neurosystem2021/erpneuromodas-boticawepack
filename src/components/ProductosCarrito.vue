@@ -25,6 +25,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo, Talla)</b-form-text>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
