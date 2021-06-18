@@ -122,6 +122,19 @@
                 <template slot="row-details" slot-scope="row">
 
                   <b-card>
+                    <b-row class="m-2" v-if="row.item.CodSunat=='07'" style="font-weight:bold">
+                      <b-col md="12" class="text-center">
+                        <label>DOCUMENTO QUE MODIFICA</label>
+                      </b-col>
+                      <b-col  md="6" class="text-left">
+                        <label>Tipo de Documento: <span style="font-weight:normal">{{row.item.CodSunatModifica=='01'? '01 - FACTURA ELECTRÓNICA':'03 - BOLETA ELECTRÓNICA'}}</span> </label>
+                        <br>
+                        <label>Serie y Número: <span style="font-weight:normal">{{row.item.NroComprobanteModifica}}</span></label>
+                      </b-col>
+                      <b-col md="6" class="text-right">
+                        <label>Motivo: <span style="font-weight:normal">{{row.item.NotaDescMotivo}} - {{row.item.NotaIdMotivo}}</span></label>
+                      </b-col>
+                    </b-row>
                     <b-row class="mb-2">
                   <table class="table b-table table-sm prod-detalle">
                     <thead>
@@ -209,7 +222,7 @@
         <b-row align-h="center" class="text-center">
             <b-col cols="12">
               <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
-              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
+              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicos</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -525,7 +538,7 @@ export default {
       if (r == true) {
         this.loading = true
         
-        if (this.tipoDoc.CodSunat == '01') { // Factura
+        if (this.tipoDoc.CodSunat == '01' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '01')) { // Factura
           let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
           if (desc) {  
             this.axios.post(this.API + 'bajaelectronico', {
@@ -535,7 +548,7 @@ export default {
               // fechaReferencia: this.fechaReferencia
             }).then(res => {
               console.log(res)
-              this.$toasted.show('Factura Anulada')
+              this.$toasted.show('Comprobante Anulado')
               this.$refs.tablaVentas.refresh()
               this.loading = false
               //mensaje success
@@ -543,7 +556,7 @@ export default {
           }
         }
 
-        if (this.tipoDoc.CodSunat == '03') { // Boleta
+        if (this.tipoDoc.CodSunat == '03' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '03')) { // Boleta
           this.axios.post(this.API + 'emitirelectronicoboleta', {
             boletas: [venta],
             statu: 3, // Statu 3 = dar de baja / 1 = emitir
@@ -551,7 +564,7 @@ export default {
             fechaReferencia: this.fechaReferencia
           }).then(res => {
             console.log(res)
-            this.$toasted.show('Boleta Anulada')
+            this.$toasted.show('Comprobante Anulado')
             this.$refs.tablaVentas.refresh()
             this.loading = false
           })
