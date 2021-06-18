@@ -423,6 +423,7 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'movimiento', label: 'Lote', variant: 'info',  },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -867,7 +868,8 @@ export default {
         },
         guardarVenta (evt) {
             evt.preventDefault();
-
+            //console.log(this.productos);
+            //return;
             this.inProgress = true
             let totalPagos = 0
             totalPagos += parseFloat(this.venta.pago.efectivo.monto)
@@ -931,21 +933,35 @@ export default {
                 return          
             }
 
-            // NO PERMITE CANTIDAD Y PRECIOS 0
+            // NO PERMITE CANTIDAD Y PRECIOS 0  Y QUE NO SEAN MISMO LOTE
             let sinStock = 0
             let totalCero = 0 
+            let igualLote = 0
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                console.log(pro);
+                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) )) {
                     sinStock += 1
                 }
 
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
+                if(lote > 1){
+                    igualLote += 1 
+                }
+                
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false            
+                return;
+            }
+
+            if (igualLote >= 1) {
+                this.$toasted.error('Debe seleccionar diferente lote por producto');
                 this.inProgress = false            
                 return;
             }

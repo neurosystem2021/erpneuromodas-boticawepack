@@ -81,7 +81,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
@@ -92,7 +92,7 @@
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val, productos[data.index])"
+            @input="(val) => changeCant(val, productos[data.index], data.index)"
             placeholder="Cantidad">
           </b-form-input>
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -238,6 +238,24 @@
             placeholder="Descripción"></b-form-input>
         </template>--> 
 
+        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+          <b-form-select 
+            style="width: 90px;"
+            :disabled="bloquearInput?true:false"
+            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+            v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+          <small>Stock: {{ productos[data.index].stockMovimiento }}</small><br />
+          <div v-html="productos[data.index].fechaVenMovimiento"></div>
+        </template>
+
+        <template slot="fechavencimiento" slot-scope="data" >
+          <b-form-input
+            required="required"
+            v-model="productos[data.index].FechaVen"
+            type="date"
+            ></b-form-input>
+        </template>
+
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
@@ -347,7 +365,9 @@ export default {
       cant: 0,
       precioCont: 0,
       medicionPro:'UNIDAD',
+      movimientoLotes: {},
       productoSelect: {},
+      indexProdSelect: null,
       idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
@@ -370,6 +390,9 @@ export default {
     tipoCambio: Number,
     igvTotal: Boolean,
     idAlmacen: Number,
+    movTipo: Number,
+    almacenDestino:Number,
+    almacenOrigen:Number,
     bloquearInput:Boolean,
     onSetProducto: {
       type: Function,
@@ -385,13 +408,14 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: 'movimiento', label: 'Lote', variant: 'info',  },
           { key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' }, 
-          { key: 'ProductoMedicion', label: 'Medición' },
+          //{ key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -400,6 +424,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
+          { key: 'fechavencimiento', label: 'Vencimiento' },
           { key: 'acciones', label: ''}
         ]
       },
@@ -473,13 +498,13 @@ export default {
       obtenerStok: 'obtenerStock',
     }),
 
-    changeCant (val, prod) {
+    changeCant (val, prod, index) {
       if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
       this.$nextTick(() => {
-        this.actualizarProd(prod)
+        this.actualizarProd({Producto:prod,Pos:index})
       })
     },
 
@@ -551,7 +576,82 @@ export default {
     //     }, { setPrecio: this.setPrecio,  setSuma: true }, true])
     //   }
     // },
+    changeMovimiento(hash, idProducto, index) {
+      if  (hash) {
+        // Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        if (stock) {
+          // this.productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', stock)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', 0)
+          })
+        }
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+        let hoy      = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en5dias  = this.$moment().add(5, 'days').unix();
+        let style = 'bg-success'
+        if(fechaVenUnix && fechaVenUnix < hoy) {
+          style = 'bg-danger'
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+          style = 'bg-warning'
+        }
+        if (fechaVen) {
+          this.$nextTick(() => {
 
+            if(!this.isVentas){
+              if(this.movTipo!=0 &&  this.movTipo!=undefined ){
+                console.log(fechaVen);
+                this.productos[index].fechaVen = fechaVen
+                Vue.set(this.productos[index], 'fechaVen', ''+fechaVen)
+                this.actualizarProd({Producto:this.productos[index],Pos:index})
+              }
+            }
+
+
+
+
+            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>Venci: ${fechaVen}</small>`)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'fechaVenMovimiento', '')
+          })
+        }
+          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+    loadMovimientoLotes ($idProducto) {
+      this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
+        .then((response) => {
+          let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+          // Cargar por defecto lote próximo a vencer.
+          let primeroVencer = response.data.reduce((a,b) => {
+            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+          })
+          
+          this.$nextTick(() => {
+            Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+            this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
+          })
+          
+          this.movimientoLotes[$idProducto] = response.data.map(l => ({
+            value: l.hashMovimiento,
+            text : l.Serie + '-' + l.Numero,
+            Stock : l.Stock,
+            FechaVen: l.FechaVen
+          }))
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     loadBarcode (e) {
       e.preventDefault()
       let idProducto = this.loadCode;
@@ -608,25 +708,11 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id,pxp,obj){
-      this.add([id,false,false,false,false,true,this.isVentas]);
+     /* this.add([id,false,false,false,false,true,this.isVentas]);
       setTimeout(() => {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
-      
-      if(this.isVentas){
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
-        if(fPP.length!=4){
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-          obj.IdProductoMarca= obj.marca.IdProductoMarca
-          obj.ProductoMarca= obj.marca.ProductoMarca
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria
-          this.productoSelect = obj
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-          this.showPresentacion(this.productoSelect)
-        } 
-      }
+      */
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
@@ -637,6 +723,13 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       if(!this.isVentas){
+        console.log(this.movTipo);
+        console.log(this.almacenDestino);
+        console.log(this.almacenOrigen);
+        if(this.movTipo==undefined){
+          this.$toasted.show('Primero seleccione un tipo de movimiento')
+          return
+        }
         this.setProductoUni(obj)
         return
       }
@@ -645,6 +738,7 @@ export default {
         this.setProductoUni(obj)
         return
       }
+      this.indexProdSelect = null
       this.$refs['modalCant'].show()
       this.objProd = obj
     },  
@@ -659,14 +753,21 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
+      obj.cantidadPres = obj.cantidad
+      if(this.indexProdSelect == null){
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
+        this.loadMovimientoLotes(obj.IdProducto)
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+      }else{
+        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+      }
       // Vue.set(this.productos, obj.IdProducto, obj)
+      
       this.$refs['modalCant'].hide()
-      obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      
+      //this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
@@ -684,19 +785,28 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad)
-      this.add([obj, () => {
+      obj.cantidadPres = this.cant
+      if(this.indexProdSelect == null){
+        this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
+        this.loadMovimientoLotes(obj.IdProducto)
       }, false, false, this.cliente.EsVIP])
+
+      }else{
+        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+      }
+
       this.$refs['modalCant'].hide()
-      obj.cantidadPres = this.cant
-      this.actualizarProd(obj)
+      
+      //this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
-    showPresentacion (obj) { 
+    showPresentacion (obj, index=null) {
       if (!obj.PreciosPorProducto !== '') {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.indexProdSelect = index
         this.precioCont = obj.PrecioContado
         this.medicionPro = obj.ProductoMedicion
         this.$refs['modalCant'].show()

@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -193,6 +193,9 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
+                :movTipo = "movimiento.movimientoTipo.Tipo"
+                :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
+                :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
                 tipo="mov"></productos-carrito>
             </b-col>
           </b-row>
@@ -241,7 +244,8 @@ export default {
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito',
-      obtenerStok: 'obtenerStock'
+      obtenerStok: 'obtenerStock',
+      limpiarCart: 'limpiarCarrito',
     }),
     onAddProducto (obj) {
         this.obtenerStok({
@@ -303,9 +307,11 @@ return false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+         this.limpiarCart()
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+         this.limpiarCart()
       }
       this.movimiento.movimientoTipo = obj
 
@@ -315,6 +321,7 @@ return false
       this.movimiento.proveedor = obj
     },
     setAlmacenOrigen (obj) {
+      this.limpiarCart()
       this.movimiento.almacenOrigen = obj
     },
     setAlmacenDestino (obj) {
@@ -352,11 +359,37 @@ return false
       }
 
       let faltaLlenar = false
+      let faltaFechaVen = false
+      let igualLote = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
         }
+
+        if (prod.FechaVen == undefined || prod.FechaVen=='' ) {
+          faltaFechaVen = true
+        }
+
+        if(this.movimiento.movimientoTipo.Tipo!=0){
+          let lote = this.productos.filter(p => p.hashMovimiento == prod.hashMovimiento && p.IdProducto == prod.IdProducto).length
+          if(lote > 1){
+          igualLote = true
+          }
+        }
+
       })
+
+      if (igualLote) {
+          this.$toasted.error('Debe seleccionar diferente lote por producto');
+          this.inProgress = false            
+          return;
+      }
+
+      if (faltaFechaVen) {
+        this.$toasted.show('Ingrese la fecha de vencimiento del producto')
+        this.inProgress = false
+        return;
+      }
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')

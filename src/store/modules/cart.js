@@ -18,13 +18,13 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+     // if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
-      }else{
-        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
-        productos.splice(index2, 1)
-        productos.splice(index2,0,item)
-      }
+    //  }else{
+      //  let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+     //   productos.splice(index2, 1)
+      //  productos.splice(index2,0,item)
+     // }
     }
   },
   ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
@@ -37,9 +37,10 @@ const mutations = {
       return p;
     })
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
-    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
-    productos.splice(index, 1, prod)
+  ACTUALIZAR_PRODUCTO ({ productos }, obj) {
+    console.log(obj);
+    //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(obj.Pos, 1, obj.Producto)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
@@ -186,8 +187,8 @@ const actions = {
   actualizarPrecioConvenio ({ commit }, cliente) {
     commit('ACTUALIZAR_PRECIOCONVENIO', cliente);
   },
-  actualizarProducto ({ commit }, prod) {
-    commit('ACTUALIZAR_PRODUCTO', prod)
+  actualizarProducto ({ commit }, obj) {
+    commit('ACTUALIZAR_PRODUCTO', obj)
   },
   eliminarProducto ({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)
