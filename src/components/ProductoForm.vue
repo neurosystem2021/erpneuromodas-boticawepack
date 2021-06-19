@@ -326,20 +326,60 @@
             ></producto-form-det>
         </b-col>
       </b-row>
+      <hr />
+      <b-row v-if="producto.IdProducto">
+        <b-col md="12">
+          <label>Impresión de Codigo Barras</label>
+        </b-col>
+        <b-col md="3">
+          <b-form-group>
+              <label>Almacen:</label>
+              <autocomplete
+                  required="required"
+                  ref="inputAlmacen"
+                  :url="API + 'almacenes'"
+                  anchor="Almacen"
+                  initValue="HUANUCO"
+                  label="writer"
+                  placeholder=""
+                  :on-select="setAlmacen" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+          </b-form-group>
+        </b-col>
+        <b-col md="2">
+            <b-form-group>
+              <label>Lote:</label>
+              <br>
+              <b-form-select
+              style="width: 125px;"
+              @change="(val) => changeMovimiento(val)"
+              v-model="hashMovimiento" :options="movimientoLotes">
+              </b-form-select>
+            </b-form-group>
+        </b-col>
+        <b-col md="3">
+            <b-form-group style="text-align: center;">
+              <label>Fecha Vencimiento:</label>
+              <br>
+              <div style=" margin-top:7px" v-html="fechaVenMovimiento"></div>
+            </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <label>Cantidad:</label>
+        <b-input-group>
+          <b-form-input v-model="cantidadCodigoBarra"
+                  type="number"
+                  style="width:80px;"></b-form-input>
+          <b-input-group-append>
+             <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra +'&lote='+lote">Código de barra</b-btn>
+          </b-input-group-append>
+        </b-input-group>
 
+        </b-col>
+      </b-row>
       <div slot="modal-footer" >
-        <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
-          <b-input-group>
-            <b-form-input
-              v-model="cantidadCodigoBarra"
-              type="number"
-              style="width:80px;"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
-            </b-input-group-append>
-          </b-input-group>
-        </div>
        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>
@@ -369,7 +409,15 @@ export default {
     return {
       showProductoDet: true,
       cantidadCodigoBarra: 1,
+      hashMovimiento:'',
+      movimientoLotes: [],
+      lote:'',
+      fechaVenMovimiento:'',
       title: 'Nuevo Producto',
+      almacen: {
+        IdAlmacen: 1,
+        Almacen: 'PRINCIPAL'
+      },
       API: config.API,
       nuevo:false,
       show: false, 
@@ -437,6 +485,7 @@ export default {
           this.producto.Producto = newVal.Producto
           this.producto.IdProducto = newVal.IdProducto
           this.producto.EsPadre = newVal.EsPadre
+          this.loadAlmacen(1);
           Vue.nextTick(() => {
             if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
           })
@@ -515,6 +564,65 @@ export default {
           }
         })
       }
+    },
+    loadAlmacen(id) {
+    this.axios.get(this.API + 'almacenes/id/' + id)
+    .then(res => {
+        this.setAlmacen(res.data)
+    })
+    },
+    setAlmacen (obj) {
+        this.almacen = obj
+        this.$refs.inputAlmacen.setValue(obj.Almacen)
+        this.loadMovimientoLotes(this.producto.IdProducto)
+    },
+    changeMovimiento(hash) {
+      if  (hash) {
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes.find(m => m.value === hash).FechaVen
+        this.lote = this.movimientoLotes.find(m => m.value === hash).text
+        let hoy      = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en5dias  = this.$moment().add(5, 'days').unix();
+        let style = 'bg-success'
+        if(fechaVenUnix && fechaVenUnix < hoy) {
+          style = 'bg-danger'
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+          style = 'bg-warning'
+        }
+        if (fechaVen) {
+            this.fechaVenMovimiento= `<label style="font-weight:bold" class='venci ${style}'>${fechaVen}</label>`;
+        } else {
+
+        }
+          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+    loadMovimientoLotes ($idProducto) {
+      this.axios.get(this.API + '/movimientolotesbarra/' + $idProducto+'/'+(this.almacen.IdAlmacen))
+        .then((response) => {
+       
+          // Cargar por defecto lote próximo a vencer.
+          let primeroVencer = response.data.reduce((a,b) => {
+            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+          })
+          
+          this.$nextTick(() => {
+            this.hashMovimiento = primeroVencer.hashMovimiento
+            this.changeMovimiento(primeroVencer.hashMovimiento)
+          })
+          
+          this.movimientoLotes = response.data.map(l => ({
+            value: l.hashMovimiento,
+            text : l.Serie + '-' + l.Numero,
+            Stock : l.Stock,
+            FechaVen: l.FechaVen
+          }))
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto

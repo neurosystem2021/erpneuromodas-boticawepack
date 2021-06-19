@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container fluid class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -360,7 +360,8 @@ return false
 
       let faltaLlenar = false
       let faltaFechaVen = false
-      let igualLote = false
+      let igualProducto = false
+      let faltaStock = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
@@ -370,17 +371,28 @@ return false
           faltaFechaVen = true
         }
 
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
+        if(pro > 1){
+        igualProducto = true
+        }
+
         if(this.movimiento.movimientoTipo.Tipo!=0){
-          let lote = this.productos.filter(p => p.hashMovimiento == prod.hashMovimiento && p.IdProducto == prod.IdProducto).length
-          if(lote > 1){
-          igualLote = true
+          if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stockMovimiento){
+           faltaStock=true
           }
         }
 
+        
       })
 
-      if (igualLote) {
-          this.$toasted.error('Debe seleccionar diferente lote por producto');
+      if (faltaStock) {
+          this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
+          this.inProgress = false            
+          return;
+      }
+
+      if (igualProducto) {
+          this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
           this.inProgress = false            
           return;
       }

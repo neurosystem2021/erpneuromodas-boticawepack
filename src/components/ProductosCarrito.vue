@@ -14,9 +14,11 @@
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+            :classes="{input: 'form-control'}"
+            v-if="!isNota">
           </autocomplete>
           <input v-model="loadCode"
+                  :disabled="isNota"
                   @keydown.enter.prevent="loadBarcode"
                    ref="barcodeInput"
                   type="text"
@@ -239,13 +241,20 @@
         </template>--> 
 
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
-          <b-form-select 
-            style="width: 90px;"
+          <div v-if="isNota" style="width: 80px;">
+            {{productos[data.index].Serie}}-{{productos[data.index].Numero}}
+            <div>
+              {{productos[data.index].fechaVen}}
+            </div>
+          </div>
+          <b-form-select v-if="!isNota"
+            style="width: 110px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
-          <small>Stock: {{ productos[data.index].stockMovimiento }}</small><br />
-          <div v-html="productos[data.index].fechaVenMovimiento"></div>
+          <br>
+          <small v-if="!isNota">Stock: {{ productos[data.index].stockMovimiento }}</small><br />
+          <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data" >
@@ -385,6 +394,7 @@ export default {
   },
   props: {
     isVentas: Boolean,
+    isNota:Boolean,
     tipo: String,
     setPrecio: Boolean,
     tipoCambio: Number,
@@ -414,7 +424,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' }, 
+          { key: 'ProductoModelo', label: 'Modelo/Color'}, 
           //{ key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -613,9 +623,6 @@ export default {
                 this.actualizarProd({Producto:this.productos[index],Pos:index})
               }
             }
-
-
-
 
             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>Venci: ${fechaVen}</small>`)
           })

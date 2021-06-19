@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -213,6 +213,7 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :isNota="isNota"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -427,7 +428,7 @@ export default {
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoModelo', label: 'Modelo/Color' }, 
+                    { key: 'ProductoModelo', label: 'Modelo/Color' , tdClass: 'widthTable'}, 
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
@@ -572,6 +573,10 @@ export default {
             this.bloquearInput=false
         },
         setTipoVenta (obj) {
+            console.log(obj);
+            if(this.isNota==true){
+                this.limpiarCart();
+            }
             this.isNota = false
             this.bloquearInput = false
             this.venta.NroComprobanteModifica = ''
@@ -580,6 +585,7 @@ export default {
             this.venta.NotaDescMotivo = ''
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                this.limpiarCart();
                 this.isNota = true
             }
 
@@ -590,6 +596,7 @@ export default {
             }
             this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
             this.venta.tipoVenta = obj
+            console.log(this.venta.tipoVenta);
             this.getNumeroVenta()
         },
         setDocRef (obj) {
