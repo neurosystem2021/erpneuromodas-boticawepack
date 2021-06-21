@@ -350,10 +350,10 @@
         </b-col>
         <b-col md="2">
             <b-form-group>
-              <label>Lote:</label>
+              <label>Lote: <span style="font-weight:bold">{{serieNumero}}</span></label>
               <br>
               <b-form-select
-              style="width: 125px;"
+              style="width: 130px;"
               @change="(val) => changeMovimiento(val)"
               v-model="hashMovimiento" :options="movimientoLotes">
               </b-form-select>
@@ -373,7 +373,7 @@
                   type="number"
                   style="width:80px;"></b-form-input>
           <b-input-group-append>
-             <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra +'&lote='+lote">Código de barra</b-btn>
+             <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra +'&hash='+lote+'&serieNumero='+serieNumero" >Código de barra</b-btn>
           </b-input-group-append>
         </b-input-group>
 
@@ -413,6 +413,7 @@ export default {
       movimientoLotes: [],
       lote:'',
       fechaVenMovimiento:'',
+      serieNumero:'',
       title: 'Nuevo Producto',
       almacen: {
         IdAlmacen: 1,
@@ -438,6 +439,11 @@ export default {
         this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
         ).then((response) => {
           newVal = response.data
+          this.hashMovimiento=''
+          this.movimientoLotes=[]
+          this.lote=''
+          this.fechaVenMovimiento=''
+          this.serieNumero = ''
           this.initForm()
           this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
           this.producto.categoria = {
@@ -581,6 +587,7 @@ export default {
         // Fecha de vencimiento
         var fechaVen = this.movimientoLotes.find(m => m.value === hash).FechaVen
         this.lote = this.movimientoLotes.find(m => m.value === hash).text
+        this.serieNumero = this.movimientoLotes.find(m => m.value === hash).SerieNumero
         let hoy      = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
         let en5dias  = this.$moment().add(5, 'days').unix();
@@ -592,7 +599,7 @@ export default {
           style = 'bg-warning'
         }
         if (fechaVen) {
-            this.fechaVenMovimiento= `<label style="font-weight:bold" class='venci ${style}'>${fechaVen}</label>`;
+            this.fechaVenMovimiento= `<label style="font-weight:bold" class='venci ${style}'>${this.$moment(fechaVen).format("DD-MM-YYYY")}</label>`;
         } else {
 
         }
@@ -615,9 +622,10 @@ export default {
           
           this.movimientoLotes = response.data.map(l => ({
             value: l.hashMovimiento,
-            text : l.Serie + '-' + l.Numero,
+            text : l.hashMovimiento,
             Stock : l.Stock,
-            FechaVen: l.FechaVen
+            FechaVen: l.FechaVen,
+            SerieNumero: l.Serie + '-' + l.Numero
           }))
         })
         .catch((error) => {

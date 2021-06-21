@@ -14,8 +14,7 @@
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}"
-            v-if="!isNota">
+            :classes="{input: 'form-control'}">
           </autocomplete>
           <input v-model="loadCode"
                   :disabled="isNota"
@@ -241,19 +240,27 @@
         </template>--> 
 
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
-          <div v-if="isNota" style="width: 80px;">
-            {{productos[data.index].Serie}}-{{productos[data.index].Numero}}
+          <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
-              {{productos[data.index].fechaVen}}
+              {{productos[data.index].hashMovimiento}}
+            </div>
+            <small>Doc: <span style="font-weight:bold;"> {{productos[data.index].Serie}}-{{productos[data.index].Numero}}</span></small><br />
+
+            <div>
+              {{productos[data.index].FechaVen}}
             </div>
           </div>
           <b-form-select v-if="!isNota"
-            style="width: 110px;"
+            style="width: 135px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
-          <small v-if="!isNota">Stock: {{ productos[data.index].stockMovimiento }}</small><br />
+          <div style="text-align:center" v-if="!isNota">
+          <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
+          <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
+          </div>
+
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
         </template>
 
@@ -418,7 +425,7 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'movimiento', label: 'Lote', variant: 'info',  },
+          { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
           { key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
@@ -590,14 +597,17 @@ export default {
       if  (hash) {
         // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
             Vue.set(this.productos[index], 'stockMovimiento', stock)
+            Vue.set(this.productos[index], 'SerieNumero', serieNumero)
           })
         } else {
           this.$nextTick(() => {
             Vue.set(this.productos[index], 'stockMovimiento', 0)
+            Vue.set(this.productos[index], 'SerieNumero', '----')
           })
         }
         // Fecha de vencimiento
@@ -617,14 +627,14 @@ export default {
 
             if(!this.isVentas){
               if(this.movTipo!=0 &&  this.movTipo!=undefined ){
-                console.log(fechaVen);
-                this.productos[index].fechaVen = fechaVen
-                Vue.set(this.productos[index], 'fechaVen', ''+fechaVen)
+                this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+                //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
+                //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
                 this.actualizarProd({Producto:this.productos[index],Pos:index})
               }
             }
 
-            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>Venci: ${fechaVen}</small>`)
+            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>F. Venci: ${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
           this.$nextTick(() => {
@@ -647,12 +657,13 @@ export default {
             Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
             this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
           })
-          
+          //
           this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
-            text : l.Serie + '-' + l.Numero,
+            text : l.hashMovimiento,
             Stock : l.Stock,
-            FechaVen: l.FechaVen
+            FechaVen: l.FechaVen,
+            SerieNumero: l.Serie + '-' + l.Numero
           }))
         })
         .catch((error) => {
@@ -730,9 +741,6 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       if(!this.isVentas){
-        console.log(this.movTipo);
-        console.log(this.almacenDestino);
-        console.log(this.almacenOrigen);
         if(this.movTipo==undefined){
           this.$toasted.show('Primero seleccione un tipo de movimiento')
           return

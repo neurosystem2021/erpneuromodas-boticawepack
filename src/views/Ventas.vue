@@ -424,7 +424,7 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'movimiento', label: 'Lote', variant: 'info',  },
+                    { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca' },

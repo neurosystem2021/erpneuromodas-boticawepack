@@ -38,7 +38,6 @@ const mutations = {
     })
   },
   ACTUALIZAR_PRODUCTO ({ productos }, obj) {
-    console.log(obj);
     //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
     productos.splice(obj.Pos, 1, obj.Producto)
   },
