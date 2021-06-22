@@ -410,7 +410,7 @@ export default {
     renderChild(data) {
       if (this.idAlmacen) {
         let style = 'ss'
-
+        let styleBag = 'ss'
         // cambiar color los vencidos
         var dt = new Date()
         var anio = dt.getFullYear()
@@ -436,9 +436,21 @@ export default {
           data.stock = '---'
         }
 
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+
+        if (data.stock <= 0) {
+          styleBag  = 'danger'
+        }
+
+        if (data.stock == '---') {
+          styleBag  = 'dark'
+        }
+
         return `
         <div class="${style}">
-          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
