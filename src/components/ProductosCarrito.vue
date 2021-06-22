@@ -106,8 +106,9 @@
             v-model="productos[data.index].cantidad"
             :disabled="isVentas? true : false"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
+            step="0.001"
             @input="(val) => {
               $emit('onInputCantidad', val)
              /* if(!productos[data.index].PreciosPorProducto) {
@@ -129,7 +130,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -392,7 +393,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Present.' }, 
+          //{ key: 'ProductoPresentacion', label: 'Present.' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
