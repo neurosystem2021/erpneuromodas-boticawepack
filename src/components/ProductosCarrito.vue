@@ -17,6 +17,7 @@
             :classes="{input: 'form-control'}">
           </autocomplete>
           <input v-model="loadCode"
+                  :disabled="bloquearInput?true:false"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
@@ -143,6 +144,7 @@
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
+            :disabled="bloquearInput?true:false"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
@@ -177,6 +179,7 @@
           <b-form-input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
+            :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"

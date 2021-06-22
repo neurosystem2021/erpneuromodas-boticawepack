@@ -243,14 +243,14 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
@@ -608,13 +608,14 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
 
-           //Cargar producto del documento afectado nota credito
+            //Cargar producto del documento afectado nota credito
              this.axios.get(this.API + 'venta/detalle/comprobante', {
                     params: {
-                        NroComprobante: obj.NroComprobante
+                        NroComprobante: obj.NroComprobante,
+                        idDocVenta: obj.IdDocVenta,
+                        IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
                     }
                 }).then((response) => {
-
                 this.axios.get(this.API + 'cliente', {
                     params: {
                         idCliente: response.data[0].IdCliente
@@ -623,6 +624,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
@@ -637,7 +639,7 @@ export default {
                     })     
                     this.venta.NotaIdMotivo=null
                     this.bloquearInput=true
-                    this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })                   
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
                 })
         },
         setMotivo(ev){
@@ -929,6 +931,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let errorPorcentaje = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -958,12 +961,16 @@ export default {
             }
 
             this.productos.forEach(p => {
-                if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)){
+                if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax) ){
                     this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
-                    this.inProgress = false
-                    return
+                    errorPorcentaje +=1 ;
                 }
             });
+
+            if (errorPorcentaje <= 0 && this.venta.tipoVenta.CodSunat != '07') {
+                this.inProgress = false            
+                return 
+            }
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
@@ -1027,5 +1034,7 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+#modalConfigVenta .modal-dialog{
+    max-width: 65% !important;
+}
 </style>

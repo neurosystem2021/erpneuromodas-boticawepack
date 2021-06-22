@@ -415,7 +415,11 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto && !this.nuevo) {
-        this.initForm()
+
+        this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+        ).then((response) => {
+          newVal = response.data
+          this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -497,6 +501,12 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+
+        }).catch((error) => {
+          console.log(error)
+          this.initForm()
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
 
       } else {
 
@@ -625,7 +635,7 @@ export default {
         // modelo: {},
         //talla: {},
         medicion: {
-          IdProductoMedicion:6,
+          IdProductoMedicion:1,
           ProductoMedicion:"UNIDAD"
         },
         Imagen: null,
