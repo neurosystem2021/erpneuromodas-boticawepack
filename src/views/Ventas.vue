@@ -963,11 +963,11 @@ export default {
             this.productos.forEach(p => {
                 if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax) ){
                     this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
-                    errorPorcentaje +=1 ;
+                    errorPorcentaje += 1
                 }
             });
 
-            if (errorPorcentaje <= 0 && this.venta.tipoVenta.CodSunat != '07') {
+            if (errorPorcentaje >=1  && this.venta.tipoVenta.CodSunat != '07') {
                 this.inProgress = false            
                 return 
             }
