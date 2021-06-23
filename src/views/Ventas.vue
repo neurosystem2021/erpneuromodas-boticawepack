@@ -967,11 +967,11 @@ export default {
                 }
             });
 
-            if (errorPorcentaje <= 0 && this.venta.tipoVenta.CodSunat != '07') {
+            if (errorPorcentaje > 0 && this.venta.tipoVenta.CodSunat != '07') {
                 this.inProgress = false            
+
                 return 
             }
-
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
