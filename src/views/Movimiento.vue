@@ -165,9 +165,9 @@
                       <b-form-input
                         v-model="movimiento.MovimientoFecha"
                         type="datetime-local"
-                        step="1"
                         placeholder="Fecha Contable"
-                        disabled="disabled"></b-form-input>
+                        disabled="disabled">
+                      </b-form-input>
 
                     </b-form-group>
                     <b-form-group>
