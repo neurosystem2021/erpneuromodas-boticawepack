@@ -47,7 +47,7 @@
                 <b-form-group >
                   <label>Fecha Inicio:</label>
                   <b-form-input v-model="fechaInicio"
-                    type="time"
+                    type="datetime-local"
                     step="1"
                     placeholder=""
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
