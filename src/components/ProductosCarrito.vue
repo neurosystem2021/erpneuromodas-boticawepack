@@ -221,7 +221,7 @@
           </b-form-input>
           <br>
           <div v-show="!productoSelect.SoloLargo">
-          <label>Factor: ({{factorNombre}}):</label>  
+          <label>Factor ({{factorNombre}}):</label>  
           <b-form-input
             type="number"
             ref="inputFactor"
@@ -230,7 +230,7 @@
             @input="val => calcularm2()">
           </b-form-input>
           <br>
-          <label>Pie<sup>2</sup> del corte: ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
+          <label>Pie<sup>2</sup> del corte ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
           </div>
 
           <br>
@@ -383,7 +383,7 @@ export default {
           this.indexFactor = val
           this.factorNombre="Público"
           this.esPulgadas=0
-          this.factor = 850
+          this.factor = 620
           break;
         case 1:
           this.indexFactor = val
