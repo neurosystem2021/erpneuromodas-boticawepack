@@ -106,7 +106,7 @@
                                     <label>Cliente:</label>
                                     
                                     <b-input-group>
-              <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                          <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -131,11 +131,10 @@
                                         </b-input-group-append>
                                     </b-input-group>
                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                        <option value="Direccion">{{ venta.cliente.Direccion }}</option>
-                                        <option value="Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                        <option value="Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                        <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
+                                        <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                        <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
-
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -739,6 +738,7 @@ export default {
             if (typeof obj === 'object') {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
+                this.venta.CampoDireccion = this.venta.cliente.Direccion
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -747,6 +747,7 @@ export default {
                     if (response.data) {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
+                        this.venta.CampoDireccion = this.venta.cliente.Direccion
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
