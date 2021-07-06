@@ -95,6 +95,16 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
+                             <b-col md="6">
+                                <b-form-group>
+                                    <label>OBSERVACIÓN</label>
+                                    <input v-model="venta.Observacion"
+                                            type="text"
+                                            required
+                                            class="form-control"
+                                            placeholder="Observación" />
+                                </b-form-group>
+                            </b-col>
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
