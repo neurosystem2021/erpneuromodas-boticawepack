@@ -125,7 +125,7 @@
 
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
+                    {{ getStock(data.item.IdProducto).toFixed(0) }}
                   </div>
                 </template>
 

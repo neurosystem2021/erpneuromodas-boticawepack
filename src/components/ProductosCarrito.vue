@@ -71,12 +71,12 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
-          <span>x{{productos[data.index].cantidadPres}}</span>
+          <span>x{{(productos[data.index].cantidadPres).toFixed(0)}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
@@ -85,7 +85,7 @@
             :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -110,7 +110,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.0001"
+            step="1"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -147,7 +147,7 @@
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
-            step="0.01"
+            step="1"
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -159,7 +159,7 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
-            step="0.01"
+            step="0.1"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -180,7 +180,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ (data.item.stock).toFixed(0) }}</div>
         </template>
 
       </b-table>

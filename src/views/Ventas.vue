@@ -229,7 +229,7 @@
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
-                                                    step="0.01"
+                                                    step="0.1"
                                                     type="number"
                                                     placeholder="S/."
                                                 ></b-form-input>
@@ -249,7 +249,7 @@
                                                     class="form-control"
                                                     v-model="venta.pago.visa.monto"
                                                     min="0"
-                                                    step="0.01"
+                                                    step="0.1"
                                                     type="number"
                                                     placeholder="S/."
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
@@ -270,7 +270,7 @@
                                                     class="form-control"
                                                     v-model="venta.pago.mastercard.monto"
                                                     min="0"
-                                                    step="0.01"
+                                                    step="0.1"
                                                     type="number"
                                                     placeholder="S/."
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"

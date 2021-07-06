@@ -124,7 +124,7 @@
               v-model="producto.PrecioPorMayor"
               type="number"
               min="0"
-              step="0.0001"
+              step="0.1"
               ></b-form-input>
           </b-form-group>
           <b-form-group>
@@ -133,7 +133,7 @@
               v-model="producto.StockPorMayor"
               type="number"
               min="0"
-              step="0.0001"
+              step="1"
               ></b-form-input>
           </b-form-group>
 
