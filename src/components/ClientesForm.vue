@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal.modal1 variant="primary">Nuevo</b-btn>
+      <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+      <b-form @submit="guardarCliente" ref="form">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -27,14 +27,25 @@
           <b-form-group>
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
-          <b-form-group>
-            <label>Dirección:</label>
+            <b-form-group>
+            <label>Dirección 1:</label>
             <b-form-input 
               v-model="cliente.Direccion"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 2:</label>
+            <b-form-input 
+              v-model="cliente.Direccion2"
+              type="text"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 3:</label>
+            <b-form-input 
+              v-model="cliente.Direccion3"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -87,25 +98,39 @@ export default {
       API: config.API,
       show: false,
       cliente: {
-        Cliente: '',
+         Cliente: '',
         DniRuc: '',
         Direccion: '',
+        Direccion2: '',
+        Direccion3: '',
         Telefono: '',
-        Email: ''
+        Email: '',
       }
     }
   },
-  props: ['newDniRuc'],
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
   methods: {
     shownClienteForm () {
-      this.cliente.DniRuc = this.$parent.$parent.newDniRuc
-      this.cliente.Direccion = ''
-      this.cliente.Cliente = ''
-      this.cliente.NombreComercial = ''
-      this.cliente.Telefono = ''
-      this.cliente.Email = ''
+    
+        if (this.editCliente && this.editCliente.IdCliente) {
+        this.cliente = this.editCliente
+      } else {
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+        this.cliente.Direccion = ''
+        this.cliente.Direccion2 = ''
+        this.cliente.Direccion3 = ''
+        this.cliente.Cliente = ''
+        this.cliente.NombreComercial = ''
+        this.cliente.Telefono = ''
+        this.cliente.Email = ''
+      }
     },
     consultarDNIRUC () {
+        var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
         let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
         this.axios.get(this.API + 'consultarRUC', {
@@ -138,6 +163,16 @@ export default {
     guardarCliente(evt) {
         evt.preventDefault();
 
+    var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
+          return
+      }
+      var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
+      if (!esDocumento) {
+          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
@@ -151,6 +186,10 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 </style>
