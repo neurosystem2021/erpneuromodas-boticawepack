@@ -99,7 +99,7 @@
                 productos[data.index].precio = reg.precio
                 return
               }
-              productos[data.index].precio = productos[data.index].PrecioContado 
+              productos[data.index].precio = productos[data.index].PrecioContado
             }"
             placeholder="Cantidad">
           </b-form-input>
@@ -110,7 +110,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="1"
+            step="0.1"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
@@ -133,7 +133,7 @@
             min="0"
             placeholder="Flete"></b-form-input>
         </template>-->
-        
+
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
@@ -147,7 +147,7 @@
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
-            step="1"
+            step="0.1"
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -283,10 +283,10 @@ export default {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
+          { key: 'Producto', label: 'Artículo' },
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' }, 
-          // { key: 'Color', label: 'Color' }, 
+          { key: 'ProductoModelo', label: 'Modelo/Color' },
+          // { key: 'Color', label: 'Color' },
           // { key: 'ProductoTalla', label: 'Talla' },
           // { key: 'Genero' },
           // { key: 'Botapie' },
@@ -328,7 +328,7 @@ export default {
       this.productos.map((value) => {
         sumatoria += parseFloat(value.total)
       })
-      
+
       this.actualizarTotal(sumatoria)
       return this.$options.filters.redondear(sumatoria)
     },
@@ -385,7 +385,7 @@ export default {
             this.setProducto(response.data)
           } else {
             this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
+            this.$toasted.show('No se encontró ningun producto')
           }
         })
       }
@@ -410,8 +410,8 @@ export default {
             }])
           } else {
             e.preventDefault()
-            this.handleKeyDown(e) 
-          }   
+            this.handleKeyDown(e)
+          }
         } else {
           this.handleKeyDown(e)
         }
@@ -421,7 +421,7 @@ export default {
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
-    },  
+    },
     setProducto (obj) {
       this.loadCode = ''
       this.preciosProd = []
@@ -510,12 +510,12 @@ export default {
 
       let normalPrecio = this.$options.filters.redondear(precio)
       let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
+
       Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       this.getSubtotal(index)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)

@@ -15,7 +15,7 @@
                   <b>Stock Valorizado <br />Precio Venta</b>
                   <div> S/. {{ sumaValorizadoContado | moneda }} </div>
                 </div>
-              </b-col>  
+              </b-col>
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock General</b>
@@ -33,7 +33,7 @@
                       initValue="VENTA"
                       label="writer"
                       placeholder=""
-                      :on-select="setAlmacen" 
+                      :on-select="setAlmacen"
                       :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
@@ -41,8 +41,8 @@
               </b-col>
               <b-col md="2">
                 <b-form-group label="Tipo de Muestra">
-                  <b-form-radio-group button-variant="primary" buttons v-model="tipoStock" 
-                    name="butons1" 
+                  <b-form-radio-group button-variant="primary" buttons v-model="tipoStock"
+                    name="butons1"
                     :options="[
                       {text: 'Stock > 0', value: 'mayor'},
                       {text: 'Stock <= 0', value: 'menor'}
@@ -99,7 +99,7 @@
                     ref="inputProducto"
                     anchor="Producto"
                     label="writer"
-                    :on-select="val => generateFilter('producto', val.Producto)"                    
+                    :on-select="val => generateFilter('producto', val.Producto)"
                     :onInput="val => generateFilter('producto', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
@@ -118,7 +118,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>  
+              </b-col>
               <b-col md="3">
                 <b-form-group>
                   <label>Modelo/Color:</label>
@@ -150,7 +150,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>  
+              </b-col>
               <b-col md="3">
                 <b-form-group>
                   <label>Talla:</label>
@@ -164,7 +164,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col> 
+              </b-col>
               <b-col md="3">
                 <b-form-group>
                   <label>Genero:</label>
@@ -192,7 +192,7 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col> 
+              </b-col>
             </b-row>
           </b-col>-->
         </b-row>
@@ -217,7 +217,7 @@
               </tbody>
             </table>
           </b-col>
-          
+
           <b-col md="12">
             <b-table small
               ref="tablaProductos"
@@ -228,9 +228,9 @@
               hover
               @row-clicked="rowClick"
               @row-dblclicked="rowDblClick"
-              id="tabla-productos" 
-              :busy.sync="isBusy" 
-              :items="myProvider" 
+              id="tabla-productos"
+              :busy.sync="isBusy"
+              :items="myProvider"
               :fields="fields"
               :per-page="perPage"
               :current-page="currentPage">
@@ -243,7 +243,7 @@
                 <template slot="Producto" slot-scope="data">
                   <div>{{data.item.Producto}}</div>
                 </template>
-                
+
               </b-table>
           </b-col>
           <b-row>
@@ -364,19 +364,19 @@ export default {
   },
   computed: {
     titleKardex () {
-      return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
+      return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' +
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo + ' / ' + this.productoSelect.Color
-      this.productoSelect.ProductoTalla 
+      this.productoSelect.ProductoTalla
     }
   },
   methods: {
     getSumaValorizado () {
-    
+
       /*this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
         })*/
-      
+
       this.axios.get(this.API + 'empresa/config/1')
         .then( response => {
           this.sumaValorizado = (response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO).toFixed(0);
@@ -441,7 +441,7 @@ export default {
       let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
-      
+
       this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
       console.log(this.hrefExcel);
 
@@ -478,18 +478,17 @@ export default {
     },
     generateFilter (key, value) {
       this.filters[key] = value
-      
+
       let filter = ''
       for (var key in this.filters) {
         filter += '&filter[' + key + ']=' + this.filters[key]
-        
+
         if(key == 'stock' || key == 'minimo') {
           // si la consulta se hace al stock jalar de otro endpoint
           this.APISTOCK = 'productos/stock'
         }
       }
 
-      
       this.filter = filter
     },
     exportarProductos () {
@@ -511,7 +510,7 @@ export default {
 }
 .table-detalle th {
   color: #fff;
-  background-color: #6c757d; 
+  background-color: #6c757d;
 }
 .table-detalle tbody td {
   font-size: 18px;
