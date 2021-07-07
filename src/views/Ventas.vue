@@ -229,7 +229,7 @@
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
-                                                    step="0.1"
+                                                    step="0.01"
                                                     type="number"
                                                     placeholder="S/."
                                                 ></b-form-input>
