@@ -354,7 +354,7 @@ export default {
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
         { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' }
+        // { value: 2, text: 'Tarde' }
       ],
       cierre: {},
       itemsDetalle: []
