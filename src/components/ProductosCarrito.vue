@@ -76,7 +76,7 @@
             @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
           </b-form-input>
-          <span>x{{(productos[data.index].cantidadPres).toFixed(0)}}</span>
+          <span>x{{(productos[data.index].cantidadPres)}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
@@ -180,7 +180,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ (data.item.stock).toFixed(0) }}</div>
+          <div v-if="!data.item.EsPadre">{{ (data.item.stock?data.item.stock.toFixed(0):0) }}</div>
         </template>
 
       </b-table>
@@ -439,6 +439,7 @@ export default {
       this.$refs['modalCant'].show()
       this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
+      console.log(obj);
     },
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
