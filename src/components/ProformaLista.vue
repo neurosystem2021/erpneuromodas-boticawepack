@@ -23,8 +23,11 @@
                         :per-page="perPage"
                         :current-page="currentPage">
                         
-                      <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <template slot="ver" slot-scope="data">
+                        <div style="width: 150px">
+                            <b-button size="sm" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                            <b-button size="sm" variant="success" @click="() => selectProforma(data.item)">Selec.</b-button>
+                        </div>
                       </template>
 
                     </b-table>
@@ -48,6 +51,7 @@
 </template>
 <script>
 import config from '@/store/config.js'
+import { mapActions } from 'vuex'
 
     export default {
         mounted () {
@@ -77,10 +81,38 @@ import config from '@/store/config.js'
                 currentPage: 1
             }
         },
+        
+        props: ['idAlmacen'],
         methods: {
+             ...mapActions({
+                  add: 'agregarProducto',
+                  obtenerStok: 'obtenerStock',
+                 limpiar: 'limpiarCarrito'
+            }),
             selectCierre (item) {
                // console.log(item)
                 
+            },
+            
+            selectProforma (item) {
+                this.limpiar()
+
+                this.axios.get(this.API + 'proforma/detalle', {
+                    params: {
+                        idProforma: item.IdProforma
+                    }
+                }).then((response) => {
+                    response.data.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                        }, { setPrecio:true, setPreOr: item.Precio, cantidad: item.Cantidad } ])
+
+                        this.filter = ''
+                        this.show = false
+                    })
+
+                    this.$emit('onSelectProforma', item.IdCliente)
+                })
             },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
@@ -103,6 +135,8 @@ import config from '@/store/config.js'
         }
     }
 </script>
-<style>
-
+<style scoped>
+    #table-proformas {
+        font-size: .9em;
+    }
 </style>
