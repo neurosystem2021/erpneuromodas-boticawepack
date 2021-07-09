@@ -31,6 +31,8 @@
             <th class="no">#</th>
             <th class="desc">DESCRIPCIÓN</th>
             <th class="unit">PRECIO U.</th>
+            <th class="ca">CORTE ANCHO</th>
+            <th class="cl">CORTE LARGO</th>
             <th class="qty">CANT.</th>
             <th class="total">TOTAL</th>
           </tr>
@@ -39,16 +41,21 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}</td>
-            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
+            <td class="unit">S/ {{ prod.Precio | moneda }}</td>
+            <td class="ca" v-if="prod.Ancho === 0" >-</td>
+            <td class="ca" v-else >{{ prod.Ancho }}</td>
+             <td class="cl" v-if="prod.Largo === 0" >-</td>
+            <td class="cl" v-else >{{ prod.Largo }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
             <td class="total">
-              S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+              S/ {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
               <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
+            <td colspan="2"></td>
             <td colspan="2"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
@@ -59,7 +66,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="2"></td>
+            <td colspan="2"></td><td colspan="2"></td>
             <td colspan="2">GRAN TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
