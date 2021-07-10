@@ -104,7 +104,6 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
             type="number"
             style="width: 90px"
             min="0"

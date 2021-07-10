@@ -14,12 +14,12 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                   <!-- <b-button-group size="sm">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
-                    </b-button-group>
+                    </b-button-group>-->
                     <b-button-group size="sm">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
@@ -30,6 +30,14 @@
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
+                        <b-row v-if="this.$route.query.idPreOrden" class="mb-2">
+                            <b-col md="12">
+                                <div class="form-inline">
+                                    <h4>Pago de la mesa: <b-badge variant="danger">{{mesa}}</b-badge> </h4>
+                                    <h4 class="ml-3">Atendido por: <b-badge variant="danger">{{mesero}}</b-badge></h4>
+                                </div>
+                            </b-col>
+                        </b-row>
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
@@ -343,7 +351,7 @@
                                     </tbody>
                                 </table>
                             </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                            <!--<template slot="adicional" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm text-center" >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -352,14 +360,15 @@
                                         <tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
                                 </table>
-                            </template>
+                            </template>-->
                         </productos-carrito>
                     </b-col>
                 </b-row>
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" @click="anularPago" variant="danger" v-if="this.$route.query.idPreOrden">Anular Pago</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPreOrden" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -399,6 +408,8 @@ export default {
             newDniRuc: '',
             ultimaVenta: '',
             inProgress: false,
+            mesa:'',
+            mesero:'',
             API: config.API,
             puntosAplicados: 0,
             descuentoPuntos: {},
@@ -421,12 +432,12 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                   // { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    { key: 'ProductoCategoria', label: 'Categoria'},
+                   // { key: 'eventPres', label: '' },
+                   // { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
@@ -472,6 +483,40 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        cargarPreOrden(){
+            this.axios.get(this.API + '/preorden/estado', {
+                params: {
+                    idPreOrden: this.$route.query.idPreOrden
+                }
+            }).then((response) => {
+                this.mesa=response.data.Mesa
+                this.mesero = response.data.UsuarioReg
+                this.axios.get(this.API + 'preorden/detalle/agrupado', {
+                    params: {
+                        idPreOrden: this.$route.query.idPreOrden
+                    }
+                }).then((response) => {
+                    this.limpiarCart()
+                    response.data.map((item) => {
+                        this.add([item, () => {
+                        }, false ])
+                    }) 
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+
+                }).catch(error=>{
+                    this.$toasted.show('Hubo un error, no hay conexion')
+                })
+
+            }).catch(error=>{
+                this.$toasted.show('Hubo un error, no hay conexion')
+            })
+
+        },
+        anularPago(){
+            this.limpiarCart()
+            this.loadClienteVarios()
+            this.$router.replace('/ventas')
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -486,28 +531,7 @@ export default {
             }
         },
         selectPreOrden (orden) {
-            // console.log(orden)
-           // this.venta.IdPreOrden = this.venta.IdPreOrden || []
-           // if (Array.isArray(this.venta.IdPreOrden) ) {
-            this.venta.IdPreOrden.push(orden)
-            //}
-
-            // obtener total adelantos
-            this.axios.get(this.API + 'preorden/cajaybanco', { 
-                params: { 
-                    IdPreOrden      : orden.IdPreOrden,
-                    TipoCajaBanco 	: 0
-                } 
-            })
-            .then(res => {
-                let suma = 0
-                res.data.map(ad => {
-                    if (ad.Tipo == 0) {
-                        suma += ad.Importe
-                    }
-                })
-                this.adelanto = suma
-            })
+            this.venta.IdPreOrden=orden               
         },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
@@ -562,7 +586,7 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
-                IdPreOrden: [],
+                IdPreOrden: null,
                 CampoDireccion: ''
             }
             this.isNota = false
@@ -662,6 +686,11 @@ export default {
             if (this.productos.length) {
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
+            if(this.$route.query.idPreOrden && this.$route.query.idCliente) {
+                this.cargarPreOrden()
+                this.setCliente(this.$route.query.idCliente)
+             }
+            
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -723,7 +752,7 @@ export default {
                 }
             }else {
                 params = {
-                    idCliente: obj.IdCliente
+                    idCliente: obj.IdCliente || obj
                 }
             }
 
@@ -963,6 +992,7 @@ export default {
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.IdPreOrden = this.$route.query.idPreOrden || null
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.axios.post(this.API + 'ventas', this.venta)
@@ -975,7 +1005,7 @@ export default {
                     return; 
                 }else{
                 // limpiar preorden seleccionado
-                    this.$router.replace('/ventas')
+
                     this.$toasted.success('Venta realizada con exito')
                     this.inProgress = false
                     this.tieneIgv = false
@@ -992,6 +1022,7 @@ export default {
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    this.$router.replace('/ventas')
 
                 }
                  

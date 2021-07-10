@@ -9,6 +9,8 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
+import Ordenes from '@/views/Ordenes.vue'
+import Impresoras from '@/views/Impresoras.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -139,6 +141,16 @@ export default new Router({
       path: '/porentregar',
       name: 'PorEntregar',
       component: PorEntregar
-    }
+    },
+    {
+      path: '/ordenes',
+      name: 'Ordenes',
+      component: Ordenes
+    },
+    {
+      path: '/impresoras',
+      name: 'Impresoras',
+      component: Impresoras
+    },
   ]
 })
