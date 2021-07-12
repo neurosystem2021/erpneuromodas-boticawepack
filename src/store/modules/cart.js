@@ -61,11 +61,15 @@ const actions = {
   agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
+    let setAncho = false
+    let setLargo = false
     let setSuma = false
     let setPreOr = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
+      setAncho = obje.ancho
+      setLargo = obje.largo
       setSuma = obje.setSuma
       setPreOr =obje.setPreOr
     }
@@ -99,6 +103,14 @@ const actions = {
 
           if (cantidad) {
             obj.cantidad = cantidad
+          }
+
+          if (setAncho) {
+            obj.Ancho = setAncho || 0
+          }
+
+          if (setLargo) {
+            obj.Largo = setLargo || 0
           }
 
           if (setSuma) {
