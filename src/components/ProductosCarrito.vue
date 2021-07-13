@@ -298,21 +298,40 @@ export default {
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
-    loadBarcode (e) {
+    async loadBarcode (e) {
+      e.target.disabled = true
+      console.log(e)
       e.preventDefault()
+      let cadena = "#";
       let idProducto = this.loadCode;
-
+      let letra1 = idProducto.substr(0,1);
+     
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true ])
-      }
+        if (letra1 === cadena ){
+          idProducto = idProducto.substr(1, idProducto.length);
+          await this.add([idProducto, (obj) => {
+            if (obj) {
+              this.$emit('onAddProducto')
+              this.$toasted.show('Producto añadido correctamente')
+            } else {
+              this.$toasted.show('No se encontró ningun producto')
+            }
+            this.loadCode = ''
+          }, { setPrecio: this.setPrecio,  setSuma: true }, false ])
+        } else {
+          await this.add([idProducto, (obj) => {
+            if (obj) {
+              this.$emit('onAddProducto')
+              this.$toasted.show('Producto añadido correctamente')
+            } else {
+              this.$toasted.show('No se encontró ningun producto')
+            }
+            this.loadCode = ''
+          }, { setPrecio: this.setPrecio,  setSuma: true }, true ])
+        }
+      } 
+      e.target.disabled = false
+      e.target.focus()
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
