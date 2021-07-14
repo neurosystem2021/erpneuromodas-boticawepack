@@ -683,6 +683,13 @@ export default {
                 return 
             }
 
+            let totalCero = 0
+            this.productos.forEach(pro => {
+                if(isNaN(parseFloat(pro.total)) || parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
+            
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
