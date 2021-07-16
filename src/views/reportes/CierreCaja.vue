@@ -444,6 +444,9 @@ export default {
         return venta.Visa > 0  && !venta.EsCredito
       })
     },
+    totalVentas () {
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+    },
     totalVentasMastercard () {
       let total = 0
       this.ventasMastercard.forEach(venta => {
@@ -485,7 +488,7 @@ export default {
           // this.$refs.inputVendedor.$refs.input.disabled = true
           this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
             .then(res => {
-              this.setAlmacen(response.data)
+              this.setAlmacen(res.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
               if(response.data.IdUsuarioPerfil !== 1) {
                 this.$refs.inputAlmacen.$refs.input.disabled = true
@@ -518,12 +521,16 @@ export default {
         this.$toasted.show('Seleccione un Turno')
         return
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
           user: sessionStorage.getItem("User"),
-          idAlmacen: this.almacen.IdAlmacen
+          idAlmacen: this.almacen.IdAlmacen,
+          ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas: this.totalSalidas,
+          total: this.granTotal,
+          totalVentas: this.totalVentas
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
@@ -539,6 +546,7 @@ export default {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     loadDetalles () {
+      if(this.ventas.length!=0){
       this.axios.get(this.API + 'ventas/detalle', {
           params: {
             idDocVentas: this.ventas.map((item) => item.idDocVenta),
@@ -553,6 +561,7 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+      }
     },
     getVentas () {
       let params = {
