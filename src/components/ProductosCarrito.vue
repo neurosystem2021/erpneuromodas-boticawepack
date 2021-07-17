@@ -17,6 +17,7 @@
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
+                  ref="barcodeInput"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
@@ -28,9 +29,10 @@
         </b-input-group>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
+          <h5>Presentaciones</h5>
         </div>
 
         <b-row>
@@ -40,7 +42,14 @@
               class="mb-3 contentCard"
               @click="setProductoUni(objProd)"
             >
-              <b>1 - UNIDAD</b>
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{medicionPro}}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Precio Unitario: </b><br>S/ {{ precioCont }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
 
@@ -55,7 +64,16 @@
                 }
               }"
             >
-              {{d.cantidad}} - UNIDADES
+              <b-row>
+                <b-col md="4" class="nomCart" >
+                  <h5>x{{ d.cantidad }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Precio Unitario: </b>S/ {{ d.precio }}
+                  <br>
+                  <b>Total: </b>S/ {{ $options.filters.redondear(d.precio *  d.cantidad)  }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
         </b-row>
@@ -71,7 +89,7 @@
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             step="0.001"
             min="0"
             @input="(val) => changeCant(val, productos[data.index])"
@@ -85,7 +103,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             step="0.001"
             min="0"
             @input="(val) => {
@@ -109,7 +127,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             min="0"
             step="0.0001"
             placeholder="Precio"
@@ -255,6 +273,8 @@ export default {
       pagocon: 0,
       preciosProd: [],
       objProd: {},
+      precioCont: 0,
+      medicionPro:'UNIDAD',
       cant: 0,
     }
   },
@@ -426,6 +446,8 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
+      this.precioCont = obj.PrecioContado
+      this.medicionPro = obj.ProductoMedicion
 
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
@@ -437,7 +459,8 @@ export default {
       }
 
       this.$refs['modalCant'].show()
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+      this.preciosProd = this.preciosProd.filter(p => p.cantidad !== 0  && p.cantidad !=='0' && p.cantidad !=='')
       this.objProd = obj
     },
     setProductoUni (obj) {
@@ -459,6 +482,7 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -482,10 +506,14 @@ export default {
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
+      this.$refs.barcodeInput.focus()
     },
     showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+        this.preciosProd = this.preciosProd.filter(p => p.cantidad !== 0  && p.cantidad !=='0' && p.cantidad !=='')
+        this.precioCont = obj.PrecioContado
+        this.medicionPro = obj.ProductoMedicion
         this.objProd = obj
         this.$refs['modalCant'].show()
         return
@@ -574,5 +602,11 @@ export default {
   .disabledMouse {
     background: #CECECE;
     cursor: inherit;
+  }
+  .nomCart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px solid black;
   }
 </style>
