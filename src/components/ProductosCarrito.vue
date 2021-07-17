@@ -28,9 +28,10 @@
         </b-input-group>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
+          <h5>Presentaciones</h5>
         </div>
         <hr>
         <b-row>
@@ -41,13 +42,13 @@
               @click="setProductoUni(objProd)"
             >
               <b-row>
-                <b-col md="4" class="nomCart">
-                  <h5 class="text-uppercase">UNI</h5>
+                <b-col md="6" class="nomCart">
+                  <h5 class="text-uppercase">UNIDAD</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
+                <b-col md="6" class="text-left">
                   <b>Cant: </b>1
                   <br>
-                  <b>Pre: </b>S/ {{ precioCont }}
+                  <b>Precio: </b>S/ {{ precioCont }}
                 </b-col>
               </b-row>
             </b-card>
@@ -66,13 +67,13 @@
               }"
             >
               <b-row>
-                <b-col md="4" class="nomCart">
+                <b-col md="6" class="nomCart">
                   <h5 class="text-uppercase">{{ d.nombre }}</h5>
                 </b-col>
-                <b-col md="8" class="text-left">
+                <b-col md="6" class="text-left">
                   <b>Cant: </b>{{ d.cantidad }}
                   <br>
-                  <b>Pre: </b>S/ {{ d.precio }}
+                  <b>Precio: </b>S/ {{ d.precio }}
                 </b-col>
               </b-row>
             </b-card>
@@ -781,6 +782,7 @@ export default {
   }
   .nomCart {
     display: flex;
+    justify-content: center;
     align-items: center;
     border-right: 2px solid black;
   }

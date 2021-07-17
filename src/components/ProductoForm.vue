@@ -277,7 +277,15 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+          <b-card border-variant="light" :header="'Precio '+i" class="text-center">
+            <b-form-group>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
+                ></b-form-input>
+            </b-form-group>
+
             <b-form-group>
               <label>Cantidad:</label>
               <b-form-input
@@ -576,9 +584,9 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'ph', cantidad: 0, precio: 0},
-          {nombre: 'pp', cantidad: 0, precio: 0},
-          {nombre: 'pt', cantidad: 0, precio: 0},
+          {nombre: 'P.HUANUCO', cantidad: 0, precio: 0},
+          {nombre: 'P.PUCALLPA', cantidad: 0, precio: 0},
+          {nombre: 'P.ESPECIAL', cantidad: 0, precio: 0},
           {nombre: 'pd', cantidad: 0, precio: 0}
         ]
       }
