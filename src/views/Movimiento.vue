@@ -226,7 +226,8 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      idPerfil:sessionStorage.getItem('IdPerfil')
     }
   },
   computed: {
@@ -360,6 +361,12 @@ return false
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
+        this.inProgress = false
+        return;
+      }
+
+      if (this.idPerfil!=1 && this.movimiento.movimientoTipo.CodSunat==99) {
+        this.$toasted.error('Solo el administrador puede realizar salidas')
         this.inProgress = false
         return;
       }

@@ -23,7 +23,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -83,14 +83,14 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
-          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
@@ -105,7 +105,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -128,11 +128,12 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            :v-on="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -256,7 +257,8 @@
           />
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -348,6 +350,8 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
+      medicionPro:'UNIDAD',
+      productoSelect: {},
     }
   },
   watch: {
@@ -600,6 +604,32 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    editarProducto(Pro){
+      this.productoSelect = Pro
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarGuardar(id,pxp,obj){
+      this.add([id,false,false,false,false,true,this.isVentas]);
+      setTimeout(() => {
+              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      }, 200); 
+      
+      if(this.isVentas){
+        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
+        if(fPP.length!=4){
+          obj.ProductoMedicion = obj.medicion.ProductoMedicion
+          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
+          obj.IdProductoMarca= obj.marca.IdProductoMarca
+          obj.ProductoMarca= obj.marca.ProductoMarca
+          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
+          obj.ProductoCategoria = obj.categoria.ProductoCategoria
+          this.productoSelect = obj
+          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
+          this.showPresentacion(this.productoSelect)
+        } 
+      }
+    },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
@@ -658,7 +688,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -670,6 +700,7 @@ export default {
     showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
         this.precioCont = obj.PrecioContado
+        obj.estadoPxP = false
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
         this.$refs['modalCant'].show()
@@ -692,8 +723,14 @@ export default {
         precio += (precio * 0.18)
       }
 
+      if(this.isVentas){
+        precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
+       }else{
+        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      }
+
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
 

@@ -762,10 +762,10 @@ export default {
             this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
-            if (cant) {
+        onSetProducto (obj, cant, precio) {
+            if (cant && precio) {
                 obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant && e.precio===precio)
                 obj.precio = preciosPorProducto.precio || 0
                 return obj
             }

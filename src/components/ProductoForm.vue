@@ -375,7 +375,10 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
+        this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+        ).then((response) => {
+        newVal = response.data 
         this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -454,6 +457,11 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+        }).catch((error) => {
+            console.log(error)
+            this.initForm()
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
 
       } else {
 
@@ -569,7 +577,7 @@ export default {
         // Color: '',
         PorcentajeUtilidad: '',
         StockMinimo: 0,
-        PrecioContado: '',
+        PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
         // Botapie: '',
@@ -611,7 +619,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
