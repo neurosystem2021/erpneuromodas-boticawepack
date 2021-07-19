@@ -431,7 +431,7 @@ export default {
       }
 
       if (total <= 0) {
-          alert('El total de un producto no puede ser menor o igual a 0')
+          //alert('El total de un producto no puede ser menor o igual a 0')
           Vue.set(this.productos[index], 'descuento', 0)
 
           //return
