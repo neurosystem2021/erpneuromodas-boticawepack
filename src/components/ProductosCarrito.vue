@@ -109,17 +109,23 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              if(!productos[data.index].PreciosPorProducto) {
+              if(this.ventas){
+                if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
+                }
+
+                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
+                if(reg && reg.cantidad){
+                  productos[data.index].precio = reg.precio
+                  return
+                }
+                
+                productos[data.index].precio = productos[data.index].PrecioContado 
+              }else{
+            
               }
 
-              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-              if(reg && reg.cantidad){
-                productos[data.index].precio = reg.precio
-                return
-              }
-              productos[data.index].precio = productos[data.index].PrecioContado 
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -133,7 +139,7 @@
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)"></b-form-input>
+            ></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -473,6 +479,7 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart',
       actualizarProd : 'actualizarProducto',
+      obtenerStok: 'obtenerStock',
     }),
 
     changeCant (val, prod) {

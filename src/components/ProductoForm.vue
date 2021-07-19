@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -573,6 +573,9 @@ export default {
         ProductoDesc: '',
         ProductoDesc2: '',
         ProductoDesc3: '',
+        _ProductoDesc:'',
+        _ProductoDesc2:'',
+        _ProductoDesc3:'',
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: '',
