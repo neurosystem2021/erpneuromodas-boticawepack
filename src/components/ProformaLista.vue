@@ -24,7 +24,7 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma + '?empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                     </b-table>
@@ -53,6 +53,7 @@ import config from '@/store/config.js'
         mounted () {
             
         },
+        props: ['empresa'],
         watch: {
           items () {
             this.axios.get(this.API + 'proformas/count').then((response) => {
