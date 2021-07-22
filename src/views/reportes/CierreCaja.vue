@@ -2,10 +2,25 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <div>
-          <div class="float-right no-print">
-              <b-row>
-                <b-col cols="2" v-if="!this.$route.params.id">
+      <!--<div>
+          <div class="float-right no-print">-->
+              <b-row align-h="end" class=" no-print">
+                <label v-if="!this.$route.params.id">Almacen:</label>
+                <b-col cols="3" v-if="!this.$route.params.id">
+                  <b-form-group size="sm">
+                    <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                </b-form-group>
+                </b-col>
+                <b-col cols="2" v-if="!this.$route.params.id" v-show="false">
                     <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
                     <b-form-group size="sm" v-show="false">
                         <autocomplete
@@ -20,7 +35,7 @@
                         </autocomplete>
                     </b-form-group>
                 </b-col>
-                <b-col cols="12">
+                <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
                     </b-button-group>
@@ -35,8 +50,8 @@
                     </b-button-group>
                 </b-col>
               </b-row>
-                     </div>
-      </div>
+                     <!--</div>
+      </div>-->
       <br class="no-print" /><br class="no-print" />
 
       <h2 class="text-center">Cierre de Caja</h2> 
@@ -224,7 +239,7 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   mounted () {
-    this.loadData()
+    //this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
     } else {
@@ -245,7 +260,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      almacen: {},
     }
   },
   computed: {
@@ -296,6 +312,9 @@ export default {
         return venta.Visa > 0  && !venta.EsCredito
       })
     },
+    totalVentas () {
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+    },
     totalVentasMastercard () {
       let total = 0
       this.ventasMastercard.forEach(venta => {
@@ -326,9 +345,19 @@ export default {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
-            this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            this.$refs.inputVendedor.$refs.input.disabled = true
+            //this.setVendedor(response.data)
+            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.$refs.input.disabled = true
+            this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(res.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              if(response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+              }
+            }).catch((err)=>{
+              this.$toasted.show('Ha ocurrido un error, actualice la pagina y vuelva a intentarlo')
+            })
         })
         .catch((error) => {
             console.log(error)
@@ -337,6 +366,10 @@ export default {
     },
     imprimir () {
       window.print();
+    },
+    setAlmacen (obj) {
+      this.almacen = obj;
+      this.loadData()
     },
     loadData () {
       this.getVentas()
@@ -352,12 +385,17 @@ export default {
         this.$toasted.show('Seleccione un Turno')
         return
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          //user: sessionStorage.getItem("User")
-          user: this.vendedor.Usuario
+          user: sessionStorage.getItem("User"),
+          //user: this.vendedor.Usuario,
+          idAlmacen: this.almacen.IdAlmacen,
+          ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          salidas: this.totalSalidas,
+          total: this.granTotal,
+          totalVentas: this.totalVentas
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
@@ -380,6 +418,11 @@ export default {
         // params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
       })
@@ -397,6 +440,11 @@ export default {
       if (this.vendedor.Usuario) {
         // params.usuario = this.vendedor.Usuario
       }
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
       })
@@ -414,6 +462,11 @@ export default {
       if (this.vendedor.Usuario) {
         // params.usuario = this.vendedor.Usuario
       }
+
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
+      }
+
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
       })
@@ -430,6 +483,7 @@ export default {
         }
       }).then(res =>{
         this.cierre = res.data[0]
+        this.loadData()
       })
     }
   },
