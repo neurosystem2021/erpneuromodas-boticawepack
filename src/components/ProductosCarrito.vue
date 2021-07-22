@@ -177,6 +177,7 @@
             type="number"
             min="0"
             step="0.01"
+            readonly
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -830,7 +831,7 @@ export default {
   }
   .nomCart {
     display: flex;
-    align-items: center;
+    align-content: center;
     justify-content: center;
     border-right: 2px solid black;
   }
