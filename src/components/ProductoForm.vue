@@ -59,7 +59,7 @@
           </b-form-group>
 
           <b-form-group>
-            <label>Modelo:</label>
+            <label>Cod. P.:</label>
             <b-input-group>
               <autocomplete
                 :url="API + 'productos/modelos'"
