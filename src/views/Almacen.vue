@@ -83,6 +83,12 @@
             <b-row>
               <b-col md="3">
                 <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
@@ -507,7 +513,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      // this.$refs.inputCodigoBarra.setValue('')
+      this.$refs.inputCodigoBarra.value='';
       // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')

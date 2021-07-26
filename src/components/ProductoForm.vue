@@ -172,6 +172,7 @@
             <b-form-input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
+              :disabled="(idPerfil == 1) ? false : true"
               @input.native="actualizarPrecioContado"
               type="number"
               min="0"
@@ -248,6 +249,7 @@
             <label>Precio de Costo:</label>
             <b-form-input
               v-model="producto.PrecioCosto"
+              :disabled="(idPerfil == 1) ? false : true"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -256,6 +258,7 @@
           <b-form-group>
             <label>Precio de Venta:</label>
             <b-form-input v-model="producto.PrecioContado"
+              :disabled="(idPerfil == 1) ? false : true"
               type="number"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
@@ -268,6 +271,7 @@
           <b-form-group>
             <label>Precio Convenio:</label>
             <b-form-input v-model="producto.precioConvenio"
+              :disabled="(idPerfil == 1) ? false : true"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -281,6 +285,7 @@
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
+                :disabled="(idPerfil == 1) ? false : true"
                 type="text"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
                 ></b-form-input>
@@ -290,6 +295,7 @@
               <label>Cantidad:</label>
               <b-form-input
                 v-model="producto.precios[i-1].cantidad"
+                :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 ></b-form-input>
             </b-form-group>
@@ -298,6 +304,7 @@
               <label>Precio:</label>
               <b-form-input 
                 v-model="producto.precios[i-1].precio"
+                :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 ></b-form-input>
             </b-form-group>
@@ -366,6 +373,7 @@ export default {
       producto: {},
       productosDet: [],
       file: '',
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   beforeMount () {
