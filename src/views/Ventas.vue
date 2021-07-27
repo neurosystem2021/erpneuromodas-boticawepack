@@ -7,9 +7,9 @@
             <div>
                 <div class="float-left">
                     <b-button-group size="sm">
-                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold">
-                            <option value="vg">EMPRESA VG</option>
-                            <option value="vg2">EMPRESA VG 2</option>
+                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                            <option value="vg">VIRGEN DE GUADALUPE</option>
+                            <option value="vg2">VIRGEN DE GUADALUPE SF</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -56,6 +56,7 @@
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
+                                        :disabled="true"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
                                         label="writer"
@@ -155,7 +156,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor"
+                                :on-select="setVendedorManual"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -333,10 +334,8 @@ export default {
         this.loadClienteVarios()
     },
     async mounted () {
-        await this.loadFirstAlmacen()
-        await this.loadFirstPuntoVenta()
-        this.getNumeroVenta()
-        //setInterval(this.updateTime, 1000)
+        await this.getVendedor();
+
         if (sessionStorage.getItem('empresa')) {
             this.empresa = sessionStorage.getItem('empresa');
         }
@@ -400,6 +399,18 @@ export default {
                         this.setCliente(res.data)
                     }
                 })
+        },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+            })
         },
         loadFirstAlmacen () {
             return this.axios.get(this.API + 'almacenes/primero')
@@ -469,14 +480,46 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        getVendedor (user) {
+            let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
+
+            return this.axios.get(this.API + 'usuarios/' + usuario)
+            .then(async (response) => {
+                if (response.data) {
+                    this.setVendedor(response.data)
+                    this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                    await this.loadAlmacen(response.data.IdAlmacen)
+                    await this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+
+                    this.$refs.inputAlmacen.$refs.input.disabled = true
+                    this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                } else {
+                    await this.loadFirstAlmacen()
+                    await this.loadFirstPuntoVenta()
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
+        },
+        setVendedorManual (obj) {
+            this.venta.vendedor = obj
+            this.getVendedor(obj.Usuario)
         },
         setCliente (obj, dni = false) {
             let params = {}
