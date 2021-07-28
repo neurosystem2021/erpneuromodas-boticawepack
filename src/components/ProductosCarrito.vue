@@ -268,8 +268,8 @@
         </template>
 
         <template slot="stock" slot-scope="data">
-          <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
+          <!--<img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />-->
+          <div>{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
         </template>
       </b-table>
     </b-col>
