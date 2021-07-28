@@ -115,8 +115,13 @@
                                     </table>
                                     </div>
                                     </b-col> 
-                                </b-row>                          
-                                </div>
+                                </b-row>    
+                                <div class="text-center m-1">
+                                    <b-button v-if="ordenSelect.IdCliente!=null" variant="danger" type="submit" @click="eliminarOrden">
+                                    Eliminar Orden
+                                    </b-button>
+                                </div>                      
+                            </div>
                         </b-row>
                     </b-col>
                 </b-row>
@@ -366,6 +371,23 @@ export default {
             console.log(err)
             this.$toasted.show('Se produjo un error, hay conexion')
             })
+        },
+        eliminarOrden(){
+            let result = confirm("¿Esta seguro de eliminar la orden activa de la mesa : "+this.ordenSelect.Mesa+"? No se podrá revertir la acción." );
+                if (result == true) {
+                    this.axios.post(this.API + 'preorden/eliminar', {
+                    IdPreOrden:  this.ordenSelect.IdPreOrden
+                    }).then(res => {
+                        if(res.data){
+                            this.$toasted.success('Orden de la mesa  '+this.ordenSelect.Mesa+' eliminada, se actualizaron las ordenes!')
+                            this.getOrdenes()
+                        }else{
+                            this.$toasted.show('No se puede elimnar la orden de la '+this.ordenSelect.Mesa+' no tiene cliente!')
+                            this.getOrdenes()
+                        }
+                    }).catch((error)=>{
+                    })
+                }
         },
 		//Fin de metodos restaurante
 		sumProductos() {

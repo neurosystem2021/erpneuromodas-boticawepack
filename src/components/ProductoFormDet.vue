@@ -51,6 +51,14 @@ export default {
     }
   },
   props: ['idProducto'],
+    watch: {
+    show (val) {
+      if(this.show==true){
+        this.getProductosDet ();
+      }
+      
+    }
+  },
   methods: {
     emitUpdate () {
       this.$emit('onUpdateProductos', this.productos)

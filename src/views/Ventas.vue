@@ -491,6 +491,7 @@ export default {
             }).then((response) => {
                 this.mesa=response.data.Mesa
                 this.mesero = response.data.UsuarioReg
+                this.cargarVendedorPreOrden(response.data.UsuarioReg)
                 this.axios.get(this.API + 'preorden/detalle/agrupado', {
                     params: {
                         idPreOrden: this.$route.query.idPreOrden
@@ -511,6 +512,18 @@ export default {
                 this.$toasted.show('Hubo un error, no hay conexion')
             })
 
+        },
+        cargarVendedorPreOrden(user){
+            let usuario = user || sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         anularPago(){
             this.limpiarCart()

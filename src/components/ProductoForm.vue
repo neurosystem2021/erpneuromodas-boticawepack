@@ -123,10 +123,11 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group v-if="false">
+          <b-form-group>
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <small>Nota: La imagen debe ser en formato .png y de 300x300</small>
           </b-form-group>
 
           <b-form-group v-if="false">
@@ -220,7 +221,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -260,7 +261,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
             <b-form-input
@@ -283,7 +284,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
