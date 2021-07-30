@@ -175,7 +175,6 @@
               :disabled="(idPerfil == 1) ? false : true"
               @input.native="actualizarPrecioContado"
               type="number"
-              min="0"
               step="0.0001"
               ></b-form-input>
           </b-form-group>
@@ -250,6 +249,7 @@
             <b-form-input
               v-model="producto.PrecioCosto"
               :disabled="(idPerfil == 1) ? false : true"
+              step="0.0001"
               type="number"
               ></b-form-input>
           </b-form-group>
@@ -260,6 +260,7 @@
             <b-form-input v-model="producto.PrecioContado"
               :disabled="(idPerfil == 1) ? false : true"
               type="number"
+              step="0.0001"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
@@ -273,6 +274,7 @@
             <b-form-input v-model="producto.precioConvenio"
               :disabled="(idPerfil == 1) ? false : true"
               type="number"
+              step="0.0001"
               ></b-form-input>
           </b-form-group>
         </b-col>
@@ -518,10 +520,12 @@ export default {
       }
     },
     actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
+      var precioCosto = Number(this.producto.PrecioCosto)
+      var utilidad = Number(this.producto.PorcentajeUtilidad)
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      //var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+
+      var nuevoPrecioContado = precioCosto *(utilidad / 100) + precioCosto
 
       this.producto.precioContadoNormal = nuevoPrecioContado
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
@@ -529,10 +533,10 @@ export default {
 
     },
     actualizarPorcentajeUtilidad () {
-      var precioContado = this.producto.PrecioContado
-      var precioCosto = this.producto.PrecioCosto
+      var precioContado = Number(this.producto.PrecioContado)
+      var precioCosto = Number(this.producto.PrecioCosto)
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(((precioContado - precioCosto)/precioCosto) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj

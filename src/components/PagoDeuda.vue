@@ -77,7 +77,8 @@
                                     <th>Aplicado</th>
                                     <th>Apli. Nota</th>
                                     <th>Saldo</th>
-                                    <th>Aplicar</th>
+                                    <th class="text-center">Aplicar</th>
+                                    <th class="text-center">Cuenta</th>
                                 </tr>
                             </thead>
                             <tbody v-for="(item, index) in documentos" :key="index">
@@ -100,6 +101,9 @@
                                             min="0"
 
                                             placeholder="0"></b-form-input>
+                                    </td>
+                                    <td>
+                                        <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
                                     </td>   
                                 </tr>
                                 <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
@@ -129,6 +133,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha Pago</th>
+                                     <th>Cuenta</th>
                                     <th>Concepto</th>
                                     <th>Importe</th>
                                     <th></th>
@@ -138,8 +143,9 @@
                                 <tr v-for="(pago, index) in pagos" :key="index">
                                     <td>{{ pago.IdCajaBanco }}</td>
                                     <td>{{ pago.FechaDoc }}</td>
+                                    <td>{{ pago.Cuenta }}</td>
                                     <td>{{ pago.Concepto }}</td>
-                                    <td>{{ pago.Importe }}</td>
+                                    <td>{{ pago.Importe.toFixed(2) }}</td>
                                     <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
                                 </tr>
                             </tbody>
@@ -169,7 +175,8 @@ import config from '@/store/config.js'
                 pagos: [],
                 cajaBanco: {},
                 vendedor: {},
-                show: false
+                show: false,
+                cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
             }
         },
         methods: {
@@ -177,6 +184,7 @@ import config from '@/store/config.js'
                 this.vendedor = {}
                 this.documentos = []
                 this.pagos = []
+                this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
                 this.cajaBanco = {
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
@@ -208,6 +216,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     response.data.map(data=>data.NotasCredito=JSON.parse(data.NotasCredito) )
                     this.documentos = response.data
+                    this.documentos.map(d=>d.cuenta=null)
                 })
                 .catch((error) => {
                     console.log(error)
@@ -215,6 +224,7 @@ import config from '@/store/config.js'
                 })
 
                 this.cargarPagos(cliente)
+                this.cargarCuentas()
             },
             cargarPagos (cliente) {
                 let usuario = sessionStorage.getItem('User')
@@ -227,9 +237,23 @@ import config from '@/store/config.js'
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
+            cargarCuentas(){
+                 this.axios.get(this.API + 'cuentas')
+                .then((response) => {
+                   this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
+                   response.data.map(c=>{
+                       this.cuentas.push({value:c.IdCuenta,text:c.Cuenta})
+                       })
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            },
             guardarPago (evt) {
                 evt.preventDefault()
                 let importe = 0
+                let cuentaSelec= true
                 this.documentos.map(doc => {
                     if (doc.aplicar > 0) {
                         importe += doc.aplicar
@@ -250,10 +274,31 @@ import config from '@/store/config.js'
                     }
                     
                 }
+
+                this.documentos.map(doc => {
+                    if(parseFloat(doc.aplicar)>0 && doc.cuenta == null){
+                        cuentaSelec = false
+                    }
+                });
+
+                if(!cuentaSelec){
+                        this.$toasted.show('Error: Seleccione la cuenta para completar el pago');
+                        this.isLoading = false;
+                        return
+                }
+
+                let cuentasId =[]
+                this.cuentas.map(c=>{
+                        if(c.value!==null){                        
+                        cuentasId.push(c.value)
+                        }
+                })  
+
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
                     documentos: this.documentos,
-                    vendedor: this.vendedor
+                    vendedor: this.vendedor,
+                    cuentas: cuentasId
                 })
                 .then((response) => {
                     console.log(response.data)
@@ -271,5 +316,7 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
-
+#modalConfigVenta .modal-dialog{
+    max-width: 65% !important;
+}
 </style>

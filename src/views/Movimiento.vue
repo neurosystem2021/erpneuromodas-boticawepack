@@ -227,7 +227,8 @@ export default {
       API: config.API,
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
-      idPerfil:sessionStorage.getItem('IdPerfil')
+      idPerfil:sessionStorage.getItem('IdPerfil'),
+      isTraslado:true
     }
   },
   computed: {
@@ -246,7 +247,7 @@ export default {
     }),
     onAddProducto (obj) {
         this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
         })
     },
     afe (e) {
@@ -302,12 +303,15 @@ return false
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.isTraslado = false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = false
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = true
       }
       this.movimiento.movimientoTipo = obj
 
@@ -318,10 +322,15 @@ return false
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      })
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
-      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda

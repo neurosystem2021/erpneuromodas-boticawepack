@@ -132,13 +132,14 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || isVentas?((idPerfil == 1) ? false : true):false"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
             style="width: 80px"
             min="0"
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
+            :v-on="setNuevoPrecioContado(data.index)"
             ></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -187,6 +188,7 @@
             type="number"
             min="0"
             step="0.01"
+            readonly
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -716,8 +718,21 @@ export default {
       }
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        let style = 'ss'
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+      }
       return `
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock}
+         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
+      `
+      }
+      return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
       `
     },
     // setCantidad (index, val) {
@@ -730,21 +745,23 @@ export default {
       if(this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
       }
-
-      if(this.isVentas){
-        precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-       }else{
-        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-      }
+      let precioFinal=0
+      //if(this.isVentas){
+        //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
+       // let precioFinal = 
+      // }else{
+      precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
+       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      //}
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
 
-      let normalPrecio = this.$options.filters.redondear(precio)
+      let normalPrecio = this.$options.filters.redondear(precioFinal)
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precio, 1)
+      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1)
       
       if (this.tipoCambio > 0) {
         normalPrecio *= this.tipoCambio
@@ -828,7 +845,7 @@ export default {
   .nomCart {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-content: center;
     border-right: 2px solid black;
   }
   .form-check-input {
