@@ -292,7 +292,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'ALMACEN 1'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
