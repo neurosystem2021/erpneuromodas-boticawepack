@@ -101,6 +101,7 @@
                                 <b-form-group>
                                     <label>Nº PLACA:</label>
                                     <input v-model="venta.Placa"
+                                            @input="(val) => venta.Placa = val && val.toUpperCase()"
                                             type="text"
                                             required
                                             class="form-control"
@@ -143,6 +144,16 @@
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
 
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="12">
+                                <b-form-group style="margin-top:-20px">
+                                    <label>Descripcion:</label>
+                                    <input v-model="venta.DescripcionEmbarcacion"
+                                            type="text"
+                                            required
+                                            class="form-control"
+                                            placeholder="Descripcion de la embarcación..." />
                                 </b-form-group>
                             </b-col>
                             
@@ -473,7 +484,8 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                CampoDireccion: 'Direccion'
+                CampoDireccion: 'Direccion',
+                DescripcionEmbarcacion: ''
             }
 
             this.loadFirstAlmacen()
@@ -523,11 +535,25 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+            })
         },
         getVendedor () {
             let usuario = sessionStorage.getItem('User')
@@ -536,6 +562,13 @@ export default {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
             })
             .catch((error) => {
                 console.log(error)

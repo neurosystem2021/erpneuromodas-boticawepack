@@ -39,7 +39,6 @@
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 105px"
-            :readonly="(type === 'mov') ? false : true"
             step="0.0001"
             min="0"
             @input="(val) => {
