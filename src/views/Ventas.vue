@@ -101,7 +101,6 @@
                                 <b-form-group>
                                     <label>Nº PLACA:</label>
                                     <input v-model="venta.Placa"
-                                            @input="(val) => venta.Placa = val && val.toUpperCase()"
                                             type="text"
                                             required
                                             class="form-control"
@@ -147,7 +146,7 @@
                                 </b-form-group>
                             </b-col>
                             <b-col md="12">
-                                <b-form-group style="margin-top:-20px">
+                                <b-form-group style="margin-top:-5px">
                                     <label>Descripcion:</label>
                                     <input v-model="venta.DescripcionEmbarcacion"
                                             type="text"
@@ -360,7 +359,7 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        //this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
@@ -488,7 +487,7 @@ export default {
                 DescripcionEmbarcacion: ''
             }
 
-            this.loadFirstAlmacen()
+            //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -676,11 +675,11 @@ export default {
             this.tieneIgv = false
             this.initForm()
             this.limpiarCart()
-            this.getNumeroVenta()
+            this.getVendedor()
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-            this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
-            this.$refs.inputCliente.setValue('')
+           // this.$refs.inputAlmacen.setValue('VENTA')
+            //this.$refs.inputPuntoVenta.setValue('CAJA1')
+            //this.$refs.inputCliente.setValue('')
             // this.$refs.inputVendedor.setValue('')
             this.$refs.carrito.pagocon = ''
         },
