@@ -150,7 +150,6 @@
                                     <label>Descripcion:</label>
                                     <input v-model="venta.DescripcionEmbarcacion"
                                             type="text"
-                                            required
                                             class="form-control"
                                             placeholder="Descripcion de la embarcación..." />
                                 </b-form-group>
