@@ -862,12 +862,12 @@ export default {
                 return;
             }
             
-/*             if (sinStock >= 1) {
+             if (sinStock >= 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false
                 return;
             }
- */
+ 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
