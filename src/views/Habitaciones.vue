@@ -122,7 +122,8 @@
 				<div id="contentModal" >
 				  	<div class="row">
 						<div id="headerCamiones" class="col-md-12">
-
+							<div class="text-right horaFechaImpreso"> Fecha y Hora del impreso: <span id="fechaHoraImp" style="font-weight:bold"></span></div>
+							<div class="text-left" style="margin-bottom: 20px;">Fecha del Proyecto: <b> Inicio: {{ selectProducto.FechaAlquiler }} - Fin: {{ selectProducto.FechaAlquilerFin }}</b></div>
 							<div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
 							<div class="text-left" v-if="proformaTotal">
 								<b style="padding: 4px; background: #ebf0ff;">
@@ -545,8 +546,9 @@ export default {
 			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
 		},
 		imprimir() {
+			document.getElementById("fechaHoraImp").innerHTML = this.$moment().format("YYYY-MM-DD HH:mm:ss");
 			var elem = "contentModal";
-			var cssHead = '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>'
+			var cssHead = '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>';
 
 			var mywindow = window.open('', 'PRINT', 'height=600,width=1000');
 			mywindow.document.write(cssHead);
@@ -629,6 +631,9 @@ export default {
 	.modal-footer {
 		visibility: hidden;
 	}
+	.horaFechaImpreso{
+ 		display: block;
+	}
 }
 </style>
 <style scoped>
@@ -653,6 +658,9 @@ h6 {
 	text-align: left;
 	font-size: 0.8rem;
 	color: #363636;
+}
+.horaFechaImpreso{
+ 	display: none;
 }
 </style>
 
