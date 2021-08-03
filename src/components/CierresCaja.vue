@@ -24,7 +24,7 @@
                         :current-page="currentPage">
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja + '&empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                     </b-table>
@@ -60,6 +60,7 @@ import config from '@/store/config.js'
             })
           }
         },
+        props: ['empresa'],
         data () {
             return {
                 API: config.API,

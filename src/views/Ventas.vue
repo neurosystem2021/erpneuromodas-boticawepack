@@ -1,16 +1,24 @@
 <template>
-    <div>
+    <div :class="{'fondo-empresa': (this.empresa === 'imo')}">
         <Menu v-if="false"></Menu>
 
         <br />
         <b-container class="bv-example-row">
             <div>
+                <div class="float-left">
+                    <b-button-group size="sm">
+                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                            <option value="susy">EMPRESA SUSY</option>
+                            <option value="imo">EMPRESA IMO</option>
+                        </select>
+                    </b-button-group>
+                </div>
                 <div class="float-right">
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas></proformas>
+                        <proformas :empresa="empresa"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
@@ -20,7 +28,7 @@
                     </b-button-group>
                 </div>
             </div>
-            <br /><br />
+            <br /><br /><br />
             <b-form @submit="guardarVenta" @keydown.enter="preventDefault">
                 <b-row>
                     <b-col md="7">
@@ -36,7 +44,7 @@
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setTipoVenta" 
+                                        :on-select="setVendedorManual" 
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -319,7 +327,7 @@
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?empresa=' + this.empresa + '&IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -341,14 +349,31 @@ import Proformas from '@/components/ProformaLista.vue'
 
 export default {
     beforeMount () {
+        // Interceptos XMLHttpRequest
+        let oldXHROpen = window.XMLHttpRequest.prototype.open;
+        window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+            // do something with the method, url and etc.
+            var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
+            newUrl = new URL(newUrl);
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'susy');
+            url = newUrl.toString();
+            arguments[1] = url
+            return oldXHROpen.apply(this, arguments);
+        }
+
         this.initForm()
         this.loadClienteVarios()
     },
-    mounted () {
+    async mounted () {
+        await this.getVendedor();
+        
         // this.getNumeroVenta()
-        this.getVendedor()
+        // this.getVendedor()
         //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
+        // this.loadClienteVarios()
+        if (sessionStorage.getItem('empresa')) {
+            this.empresa = sessionStorage.getItem('empresa');
+        }
     },
     data () {
         return {
@@ -393,7 +418,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            empresa: 'susy'
         }
     },
     watch: {
@@ -415,6 +441,11 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        cambiarEmpresa () {
+            sessionStorage.setItem('empresa', this.empresa)
+            window.location.reload();
+            return false;
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -429,10 +460,17 @@ export default {
             }
         },
         loadFirstAlmacen () {
-            this.axios.get(this.API + 'almacenes/primero')
+            return this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
                     this.$refs.inputAlmacen.setValue(res.data.Almacen)
                     this.venta.almacen = res.data
+                })
+        },
+        loadFirstPuntoVenta () {
+            return this.axios.get(this.API + 'puntoventa/primero')
+                .then(res => {
+                    this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta)
+                    this.setPuntoVenta(res.data)
                 })
         },
         loadClienteBarcode (e) {
@@ -460,12 +498,12 @@ export default {
                     CodSunat: '03',
                 },
                 almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'VENTA'
+                    // IdAlmacen: 1,
+                    // Almacen: 'VENTA'
                 },
                 puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'CAJA1'
+                    // IdDocVentaPuntoVenta: 1,
+                    // PuntoVenta: 'CAJA1'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -579,7 +617,6 @@ export default {
             this.axios.get(this.API + 'puntoventa/id/' + id)
             .then(res => {
                 this.setPuntoVenta(res.data)
-                this.getNumeroVenta()
             })
         },
         setPuntoVenta (obj) {
@@ -592,18 +629,21 @@ export default {
             if (user) {
                 usuario = user
             }
-            this.axios.get(this.API + 'usuarios/' + usuario)
-            .then((response) => {
-                this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
-                this.loadAlmacen(response.data.IdAlmacen)
-                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-                // bloquear ambos inputs
-                this.$refs.inputAlmacen.$refs.input.disabled = true
-                this.$refs.inputPuntoVenta.$refs.input.disabled = true
-                this.$refs.inputVendedor.$refs.input.disabled = true
-                //this.getNumeroVenta()
+            return this.axios.get(this.API + 'usuarios/' + usuario)
+            .then(async (response) => {
+                if (response.data) {
+                    this.setVendedor(response.data)
+                    this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                    this.loadAlmacen(response.data.IdAlmacen)
+                    this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+
+                    this.$refs.inputAlmacen.$refs.input.disabled = true
+                    this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                } else {
+                    await this.loadFirstAlmacen()
+                    await this.loadFirstPuntoVenta()
+                }
+                
             })
             .catch((error) => {
                 console.log(error)
@@ -711,15 +751,17 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
-        limpiarDespuesVenta () {
+        async limpiarDespuesVenta () {
             this.inProgress = false
             this.tieneIgv = false
             this.initForm()
             this.limpiarCart()
+            await this.loadFirstPuntoVenta()
+            await this.loadFirstAlmacen()
             this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
-            this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            // this.$refs.inputTipoVenta.setValue('TICKET')
+            // this.$refs.inputAlmacen.setValue('VENTA')
+            // this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
         },
@@ -746,13 +788,26 @@ export default {
             this.venta.productos = this.productos
             
             this.axios.post(this.API + 'proformas', this.venta)
-            .then((response) => {
+            .then(async (response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
 
-                this.limpiarDespuesVenta()
+                this.inProgress = false
+                this.tieneIgv = false
+                this.ultimaVenta = response.data.insertId
+                this.initForm()
+                this.limpiarCart()
+                await this.loadFirstAlmacen()
+                await this.loadFirstPuntoVenta()
+                this.getNumeroVenta()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                // this.$refs.inputAlmacen.setValue('VENTA')
+                // this.$refs.inputPuntoVenta.setValue('CAJA1')
+                this.$refs.inputCliente.setValue('')
+                this.$refs.inputVendedor.setValue('')
+                // this.limpiarDespuesVenta()
 
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '?empresa=' + this.empresa, '_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -814,7 +869,7 @@ export default {
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
-                return;
+                // return;
             }
 
             this.productos.forEach(pro => {
@@ -852,24 +907,26 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
-            .then((response) => {
+            .then(async (response) => {
                 this.$toasted.show('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                this.getVendedor()
+                await this.loadFirstAlmacen()
+                await this.loadFirstPuntoVenta()
+                // this.getVendedor()
                 this.getNumeroVenta()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
+                // this.$refs.inputAlmacen.setValue('VENTA')
+                // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 this.$refs.carrito.pagocon = 0
                 //this.limpiarDespuesVenta()
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?empresa=' + this.empresa + '&IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -892,12 +949,14 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 .puntos {
     font-size: 52px;
 }
 .big-text {
     font-size: 30px;
 }
-
+.fondo-empresa {
+    background: #eff9ff;
+}
 </style>
