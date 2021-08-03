@@ -122,6 +122,19 @@
                 <template slot="row-details" slot-scope="row">
 
                   <b-card>
+                    <b-row class="m-2" v-if="row.item.CodSunat=='07'" style="font-weight:bold">
+                      <b-col md="12" class="text-center">
+                        <label>DOCUMENTO QUE MODIFICA</label>
+                      </b-col>
+                      <b-col  md="6" class="text-left">
+                        <label>Tipo de Documento: <span style="font-weight:normal">{{row.item.CodSunatModifica=='01'? '01 - FACTURA ELECTRÓNICA':'03 - BOLETA ELECTRÓNICA'}}</span> </label>
+                        <br>
+                        <label>Serie y Número: <span style="font-weight:normal">{{row.item.NroComprobanteModifica}}</span></label>
+                      </b-col>
+                      <b-col md="6" class="text-right">
+                        <label>Motivo: <span style="font-weight:normal">{{row.item.NotaDescMotivo}} - {{row.item.NotaIdMotivo}}</span></label>
+                      </b-col>
+                    </b-row>
                     <b-row class="mb-2">
                   <table class="table b-table table-sm prod-detalle">
                     <thead>
@@ -169,6 +182,7 @@
                       <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
                       <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
                       &nbsp;&nbsp;
+                      <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
                       <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
 
@@ -361,6 +375,13 @@ export default {
         this.loading = false
       })
     },
+    regenerarXML (doc) {
+      this.$refs.tablaVentas.refresh()
+      this.loading = true
+
+      this.emitirElectronico(doc, true);
+
+    },
     setFechaReferencia (value) {
       //this.fechaReferencia = ''
       this.fechaInicio = value
@@ -415,7 +436,7 @@ export default {
 
 
     },*/
-    async emitirElectronico (doc) {
+    async emitirElectronico (doc, generarXml) {
       if(!this.items.length) {
         this.$toasted.show('No hay documentos para emitir');
         return
@@ -424,7 +445,26 @@ export default {
       this.loading = true
       let arr = []
 
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07') { // Factura / boleta
+      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07') { // Factura / boleta // credito
+        if (doc.idDocVenta && generarXml) {
+          arr.push(await this.axios.post(this.API + 'emitirelectronico', {
+            generarXml: true,
+            docVenta: doc
+          }).then((response) => {
+            console.log(response)
+            if(response.data.Estado == 1) {
+              this.$toasted.error('')                  
+            } else {
+              this.$toasted.success('XML Generado')
+              // ocultar el documento emitido
+              // Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+              // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+              // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+            }
+            // Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+
+          }))
+        } else {
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
           console.log(JSON.stringify(item))
@@ -445,6 +485,7 @@ export default {
 
               }))
           }
+        }
         }
         Promise.all(arr).then(values => {
 
@@ -632,13 +673,16 @@ console.log(url)
       })
     },
     cambiarAAnonimo (doc) {
-      this.loading = true
-      this.axios.post(this.API + 'cambiaraanonimo', {
-        idDocVenta: doc.idDocVenta
-      }).then( response => {
-        this.$refs.tablaVentas.refresh()
-        this.loading = false
-      })
+      let r = confirm('¿Desea Cambiar a Cliente Anónimo?')
+      if (r == true) {
+        this.loading = true
+        this.axios.post(this.API + 'cambiaraanonimo', {
+          idDocVenta: doc.idDocVenta
+        }).then( response => {
+          this.$refs.tablaVentas.refresh()
+          this.loading = false
+        })
+      }
     },
     consultaElectronico (doc) {
       console.log(doc)
@@ -656,7 +700,7 @@ console.log(url)
       }
 
       this.imgCaptcha = false
-      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=10401303729&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
+      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20393997681&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
       
       /*this.$nextTick(() => {
         this.imgCaptcha = true
