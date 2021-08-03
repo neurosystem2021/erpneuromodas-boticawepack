@@ -247,10 +247,10 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'susy';
+    let empresa = sessionStorage.getItem('empresa') || 'imo';
 
-    if (this.$route.query.empresa === 'imo') {
-      empresa = 'imo';
+    if (this.$route.query.empresa === 'susy') {
+      empresa = 'susy';
     }
     
     // Interceptos XMLHttpRequest
@@ -295,7 +295,7 @@ export default {
       cierre: {},
       vendedor: {},
       almacen: {},
-      empresa: 'susy'
+      empresa: 'imo'
     }
   },
   computed: {

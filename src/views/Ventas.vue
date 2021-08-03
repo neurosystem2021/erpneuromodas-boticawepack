@@ -355,7 +355,7 @@ export default {
             // do something with the method, url and etc.
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'susy');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'imo');
             url = newUrl.toString();
             arguments[1] = url
             return oldXHROpen.apply(this, arguments);
@@ -419,7 +419,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'susy'
+            empresa: 'imo'
         }
     },
     watch: {
@@ -869,7 +869,7 @@ export default {
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
-                // return;
+                //return;
             }
 
             this.productos.forEach(pro => {
