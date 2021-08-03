@@ -869,7 +869,7 @@ export default {
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
-                // return;
+                return;
             }
 
             this.productos.forEach(pro => {
