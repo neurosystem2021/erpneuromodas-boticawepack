@@ -113,7 +113,7 @@
                   </b-col>
                 </b-row>
 
-                <b-row>
+                <b-row v-if="!isTraslado">
                   <b-col md="6">
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
@@ -349,6 +349,10 @@ return false
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
+      
+      if(this.isTraslado){
+        this.movimiento.alterarProductos = 0
+      }
 
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        

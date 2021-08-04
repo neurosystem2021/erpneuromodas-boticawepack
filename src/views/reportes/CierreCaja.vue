@@ -297,7 +297,7 @@
 
       <b-row>
         <b-col v-if="totalIngresos">
-          <h5>Ingresos</h5><br>
+          <h5>Ingresos Caja Principal</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr>
@@ -349,6 +349,34 @@
       </b-row>
       
 
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos tarjeta</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
 
       <b-row>
           <b-col v-if="totalAdelantos">
@@ -402,6 +430,7 @@ export default {
       API: config.API,
       ventas: [],
       ingresos: [],
+      ingresosTarjeta: [],
       salidas: [],
 	  adelantos: [],
       turno: null,
@@ -432,6 +461,13 @@ export default {
       let total = 0
       this.salidas.forEach(salida => {
         if (!salida.Anulado) total += salida.Importe
+      });
+      return total 
+    },
+    totalIngresosTarjeta () {
+      let total = 0
+      this.ingresosTarjeta.forEach(ingresoTar => {
+        if (!ingresoTar.Anulado) total += ingresoTar.Importe
       });
       return total 
     },
@@ -616,7 +652,8 @@ export default {
         params: params
       })
       .then(res => {
-        this.ingresos = res.data
+        this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
+        this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
       }).catch(err => {
         console.log(err)
       }) 
