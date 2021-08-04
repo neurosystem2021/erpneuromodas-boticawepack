@@ -142,7 +142,7 @@
                         <td>{{ item.CodigoBarra }}</td>
                         <td>{{ item.Producto }}</td>
                         <td>{{ item.Presentacion }}</td>
-                        <td>{{ item.Cantidad }}</td>
+                        <td>{{ item.Cantidad.toFixed(2) }}</td>
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
                         <td v-if="row.item.TieneIgv">
