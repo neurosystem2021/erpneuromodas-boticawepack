@@ -6,6 +6,8 @@ import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
+import Laboratorio from '@/views/Laboratorio.vue'
+import Analisis from '@/views/Analisis.vue'
 import Clientes from '@/views/Clientes.vue'
 import VentaEstrategica from '@/views/VentaEstrategica.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
@@ -82,6 +84,16 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
+    },
+    {
+      path: '/laboratorio',
+      name: 'Laboratorio',
+      component: Laboratorio
+    },
+    {
+      path: '/analisis',
+      name: 'Analisis',
+      component: Analisis
     },
     {
       path: '/traslado',
