@@ -6,7 +6,7 @@
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
-          <b-form-group>
+          <b-form-group v-if="producto.IdProducto!==undefined">
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
@@ -14,6 +14,7 @@
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
+              readonly
               class="form-control upper"
               ></b-form-input>
           </b-form-group>
@@ -277,7 +278,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        //this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
@@ -316,8 +317,7 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        //this.$refs.inputCodigoBarra.$el.disabled = false        
       }
     }
   },
