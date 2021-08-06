@@ -292,7 +292,8 @@ return false
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
-        almacenDestino: { IdAlmacen: -1 }
+        almacenDestino: { IdAlmacen: -1 },
+        user: sessionStorage.getItem("User")
       }
     },
     onReset (evt) {
