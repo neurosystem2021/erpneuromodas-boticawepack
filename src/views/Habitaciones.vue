@@ -117,7 +117,7 @@
       </b-container>
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
-			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
+			<b-modal v-model="show" size="lg" id="carrito"  no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
 
 				<div id="contentModal" >
 				  	<div class="row">
@@ -138,6 +138,7 @@
 									:id-preorden="selectProducto.IdPreOrden"
 									:id-producto="selectProducto.IdProducto"
 									ref="preOrdenProductos"
+									 @onUpdateProductos="calcularManoObra"
 									></pre-orden-form-det>
 
 									<b-row>
@@ -145,9 +146,9 @@
 											<table class="table b-table border table-footer table-sm text-center" >
 											<tbody>
 												<tr><td>Mano de obra bruta</td></tr>
-												<tr><td><h3>{{ totManoObraBruta() }}</h3></td></tr>
+												<tr><td><h3>{{ totalManoObraBruta | redondear }}</h3></td></tr>
 												<tr><td>Mano de obra - Materiales</td></tr>
-												<tr><td><h3 :class="{'text-danger': totManoObraMenoMat() <= 0}">{{ totManoObraMenoMat() }}</h3></td></tr>
+												<tr><td><h3 :class="{'text-danger': totalManoObraMenoMat <= 0}">{{ totalManoObraMenoMat | redondear }}</h3></td></tr>
 											</tbody>
 											</table>
 										</b-col>
@@ -157,7 +158,7 @@
 												<tr><td>Total de Gastos</td></tr>
 												<tr><td><h3>{{ totalGastos | redondear }}</h3></td></tr>
 												<tr><td>Mano de obra neta</td></tr>
-												<tr><td><h3 :class="{'text-danger': totManoObraNeta() <= 0}">{{ totManoObraNeta() | redondear }}</h3></td></tr>
+												<tr><td><h3 :class="{'text-danger': totalManoObraNeta <= 0}">{{ totalManoObraNeta | redondear }}</h3></td></tr>
 											</tbody>
 											</table>
 										</b-col>
@@ -242,7 +243,7 @@
 							</b-row>
 							
 							<div class="text-center">
-								<h4>Gran total: {{ sumProductos() }}</h4> 
+								<h4>Gran total: {{ totalSumaProductos }}</h4> 
 							</div>
 						
 						</div>
@@ -303,13 +304,21 @@ export default {
 			profTotHab: 0,
 			// proformaTotalCard: null,
 			// habitacionesPiso: []
-		}
+
+			//nuevas funciones
+			totalManoObraBruta:0,
+			totalManoObraMenoMat:0,
+			totalManoObraNeta:0,
+			totalSumaProductos:0,
+			totalGastos:0,
+			totalAdelantos:0
+			}
 	},
 	computed: {
 		...mapState({
             productos: state => state.cart.productos
         }),
-		totalAdelantos() {
+/* 		totalAdelantos() {
 			let sumatoria = 0
 			this.adelantos.map(ad => {
 				if (ad.Tipo) {
@@ -328,7 +337,7 @@ export default {
 			})
 
 			return sumatoria;
-		},
+		}, */
 	},
 	methods: {
 		mountedProforma(modal) {
@@ -350,6 +359,7 @@ export default {
 				TipoCajaBanco 	: 0
 			} }).then(res => {
 				this.adelantos = res.data
+				this.calculoGastosAdelantos()
 			})
 		},
 		cargarGastos() {
@@ -358,6 +368,7 @@ export default {
 				TipoCajaBanco 	: 1
 			} }).then(res => {
 				this.gastos = res.data
+				this.calculoGastosAdelantos()
 			})
 		},
 		insertarAdelanto() {
@@ -581,26 +592,63 @@ export default {
 			}
 			return Math.abs(total).toFixed(2)
 		},
-		totManoObraBruta() {
+/* 		totManoObraBruta() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraBruta
 			}
-			return total.toFixed(2)
-		},
-		totManoObraMenoMat() {
+			return total?total.toFixed(2):0
+		}, */
+/* 		totManoObraMenoMat() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraMenosMat
 			}
-			return total.toFixed(2)
-		},
-		totManoObraNeta() {
+			return total?total.toFixed(2):0
+		}, */
+/* 		totManoObraNeta() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraMenosMat - this.totalGastos
 			}
-			return total.toFixed(2)
+			return total?total.toFixed(2):0
+		}, */
+		calcularManoObra(e){
+			let pManoObra = e.find(p => p.CodigoBarra === 'MANODEOBRA');
+      		let precio = pManoObra ? pManoObra.Precio : 0;
+			let cantidad = pManoObra ? (pManoObra.Cantidad==undefined?0:pManoObra.Cantidad) :0;
+			this.totalManoObraBruta = Number(precio*cantidad)
+			this.totalManoObraMenoMat = Number(precio*cantidad)
+			e.map((preorden=>{
+				if(preorden.EsManoDeObra==1){
+					this.totalManoObraMenoMat = this.totalManoObraMenoMat - (preorden.Precio*preorden.Cantidad)
+				}
+			}))
+			this.calculoGastosAdelantos()
+		},
+		calculoGastosAdelantos(){
+			let sumatoriaGas = 0
+			this.gastos.map(ad => {
+				sumatoriaGas += parseFloat(ad.Importe)
+			})
+			this.totalGastos = sumatoriaGas
+			this.totalManoObraNeta = this.totalManoObraMenoMat - this.totalGastos
+			
+
+			let sumatoriaAde = 0
+			this.adelantos.map(ad => {
+				if (ad.Tipo) {
+					sumatoriaAde -= parseFloat(ad.Importe)
+				} else {
+					sumatoriaAde += parseFloat(ad.Importe)
+				}
+			})
+			this.totalAdelantos = sumatoriaAde
+
+			if (this.$refs.preOrdenProductos) {
+			  this.totalSumaProductos =Math.abs(this.$refs.preOrdenProductos.sumProductos + this.totalGastos - this.totalAdelantos).toFixed(2)  
+			}
+			
 		},
 	},
 	components: {

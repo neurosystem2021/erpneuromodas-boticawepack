@@ -40,7 +40,7 @@
           <td>{{ prod.Producto }}</td>
           <td>
             <span class="hideInModal">{{ prod.Precio }}</span>
-            <input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" />
+            <input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
           <td>
             <span class="hideInModal">{{ prod.Cantidad }}</span>
@@ -120,7 +120,7 @@ export default {
               this.productos.push(pc)
             }
           })
-
+          this.emitUpdate();
         }).catch(err => {
           console.log(err)
         })
@@ -177,6 +177,7 @@ export default {
         this.productos[pi].PrecioMOmM += (parseFloat(this.productos[index].Precio) * parseFloat(this.productos[index].Cantidad))
         this.productos[index].disabled = false
       }
+      this.emitUpdate()
     },
     updateManoDeObraNeta (index) {
       let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
