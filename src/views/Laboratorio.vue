@@ -56,13 +56,15 @@
                     <thead>
                       <tr>
                         <th>Codigo</th>
-                        <th>Producto</th>
+                        <th width="45%">Producto</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Descuento</th>
                         <th v-if="row.item.TieneIgv">Subtotal</th>
                         <th v-if="row.item.TieneIgv">IGV</th>
                         <th>Total</th>
+                        <th></th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -79,8 +81,8 @@
                           {{ item.Subtotal * 0.18 | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
-                        <td><b-button style="margin-left: 30px;" variant="primary" size="sm">Ingresar Resultados</b-button></td>
-                        <td><b-button style="margin-left: 30px;" variant="primary" size="sm" ><i class="fas fa-file-excel"></i></b-button></td>
+                        <td><b-button  variant="primary" size="sm">Ingresar Resultados</b-button></td>
+                        <td><b-button  variant="primary" size="sm" ><i class="fas fa-file-excel"></i> DESCARGAR</b-button></td>
                       </tr>
                     </tbody>
                   </table>
