@@ -177,6 +177,7 @@
             type="number"
             min="0"
             step="0.01"
+            readonly
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -208,6 +209,10 @@
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
+        </template>
+
+        <template slot="PrecioCosto" slot-scope="data">
+          {{data.item.PrecioCosto?data.item.PrecioCosto.toFixed(2):data.item.PrecioCosto}}
         </template>
 
         <template slot="FechaAlquiler" slot-scope="data">
