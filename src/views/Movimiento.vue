@@ -297,27 +297,27 @@ export default {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenDestino.setValue(data.Almacen)
-          this.movimiento.almacenDestino = data
-        })
+        //this.loadFirstAlmacen(data => {
+        //  this.$refs.inputAlmacenDestino.setValue(data.Almacen)
+        //  this.movimiento.almacenDestino = data
+        //})
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
-          this.movimiento.almacenOrigen = data
-        })
+        //this.loadFirstAlmacen(data => {
+        //  this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
+        //  this.movimiento.almacenOrigen = data
+        //})
       }else {
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
         // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
-          this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
-          this.movimiento.almacenOrigen = data
+        //this.loadFirstAlmacen(data => {
+        //  this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
+        //  this.movimiento.almacenOrigen = data
 
-          this.$refs.inputAlmacenDestino.setValue(data.Almacen)
-          this.movimiento.almacenDestino = data
-        })
+        //  this.$refs.inputAlmacenDestino.setValue(data.Almacen)
+        //  this.movimiento.almacenDestino = data
+        //})
       }
       this.movimiento.movimientoTipo = obj
 
