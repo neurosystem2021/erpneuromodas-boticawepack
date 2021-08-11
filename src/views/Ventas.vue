@@ -554,6 +554,9 @@ export default {
             })
         },
         getVendedor () {
+            this.$refs.inputAlmacen.$refs.input.disabled = true
+            this.$refs.inputPuntoVenta.$refs.input.disabled = true
+            this.$refs.inputVendedor.$refs.input.disabled = true
             let usuario = sessionStorage.getItem('User')
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
@@ -561,12 +564,10 @@ export default {
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                this.$refs.inputAlmacen.$refs.input.disabled = true
-                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+
             })
             .catch((error) => {
                 console.log(error)
@@ -678,7 +679,7 @@ export default {
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
            // this.$refs.inputAlmacen.setValue('VENTA')
             //this.$refs.inputPuntoVenta.setValue('CAJA1')
-            //this.$refs.inputCliente.setValue('')
+            this.$refs.inputCliente.setValue('')
             // this.$refs.inputVendedor.setValue('')
             this.$refs.carrito.pagocon = ''
         },
