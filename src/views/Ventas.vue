@@ -440,6 +440,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         loadPuntoVenta (id) {
@@ -451,9 +452,13 @@ export default {
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
         getVendedor (user) {
+            this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputAlmacen.$refs.input.disabled = true
+            this.$refs.inputPuntoVenta.$refs.input.disabled = true
             let usuario = sessionStorage.getItem('User')
             if (user) {
                 usuario = user
@@ -462,18 +467,15 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
-                // this.loadAlmacen(response.data.IdAlmacen)
-                this.loadAlmacen(1)
-                this.loadPuntoVenta(1)
+
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                //this.$refs.inputAlmacen.$refs.input.disabled = true
-                //this.$refs.inputPuntoVenta.$refs.input.disabled = true
-                //this.getNumeroVenta()
+
             })
             .catch((error) => {
                 console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.$toasted.show('Ha ocurrido un error, por favor recargue la pagina.')
             })
         },
         setVendedor (obj) {
@@ -702,7 +704,7 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                this.getNumeroVenta()
+                this.getVendedor()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
