@@ -55,6 +55,7 @@
                   <table class="table b-table table-sm prod-detalle">
                     <thead>
                       <tr>
+                        <th>Id</th>
                         <th>Codigo</th>
                         <th width="45%">Producto</th>
                         <th>Cantidad</th>
@@ -69,6 +70,7 @@
                     </thead>
                     <tbody>
                       <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
+                        <td>{{ item.IdDocVentaDet}}</td>
                         <td>{{ item.CodigoBarra }}</td>
                         <td>{{ item.Producto }}</td>
                         <td>{{ item.Cantidad }}</td>
@@ -81,7 +83,7 @@
                           {{ item.Subtotal * 0.18 | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
-                        <td><b-button  variant="primary" size="sm">Ingresar Resultados</b-button></td>
+                        <td><a class="btn btn-success" target="_blank" :href="'/api/index.php/resultado/ingreso/' + item.IdDocVentaDet + ''">Ingresar Resultados</a>
                         <td><b-button  variant="primary" size="sm" ><i class="fas fa-file-excel"></i> DESCARGAR</b-button></td>
                       </tr>
                     </tbody>
