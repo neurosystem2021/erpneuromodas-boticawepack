@@ -220,7 +220,8 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'CodigoBarra', label: 'Código'},
+          { key: 'itemNum', label: '#', variant: 'info', class:'text-center' },
+          { key: 'CodigoBarra', label: 'Código', class:'text-center'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
@@ -352,6 +353,7 @@ export default {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
+      obj.itemNum = this.productos.length+1;
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
