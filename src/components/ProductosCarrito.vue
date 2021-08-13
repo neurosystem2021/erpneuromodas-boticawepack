@@ -7,6 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -199,6 +200,7 @@ export default {
     }
   },
   props: {
+    isVentas: Boolean,
     setPrecio: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
@@ -244,9 +246,9 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      // if (this.idAlmacen) {
-      //   return this.API + 'productos/stock/' + this.idAlmacen
-      // }
+      if (this.idAlmacen) {
+      return this.API + 'productos/stock/' + this.idAlmacen
+      }
       return this.API + 'productos'
     },
     sumatoriaSubTotal () {
@@ -404,9 +406,17 @@ export default {
           data.stock = '---'
         }
 
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+
+        if (data.stock <= 0) {
+          styleBag  = 'secondary'
+        }
 
         return `
         <div class="${style}">
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
           <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
