@@ -18,6 +18,7 @@ import Traslado from '@/views/Traslado.vue'
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import Comisionistas from '@/views/reportes/Comisionistas.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 
 Vue.use(Router)
@@ -109,6 +110,11 @@ export default new Router({
       path: '/productossimilares',
       name: 'ProductosSimilares',
       component: ProductosSimilares
-    }
+    },
+    {
+      path: '/reportes/comisionistas',
+      name: 'comisionistas',
+      component: Comisionistas
+    },
   ]
 })

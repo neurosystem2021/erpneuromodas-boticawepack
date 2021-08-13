@@ -107,6 +107,7 @@ export default {
           this.$toasted.success('Producto guardado correctamente')
           this.$refs.ProductoForm2.hide()
           this.cbGuardar()
+          this.$refs.file.value=null
         })
      
     },
