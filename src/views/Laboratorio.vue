@@ -83,8 +83,8 @@
                           {{ item.Subtotal * 0.18 | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
-                        <td><a class="btn btn-success" target="_blank" :href="'/api/index.php/resultado/ingreso/' + item.IdDocVentaDet + ''">Ingresar Resultados</a>
-                        <td><b-button  variant="primary" size="sm" ><i class="fas fa-file-excel"></i> DESCARGAR</b-button></td>
+                        <td><a class="btn btn-success" target="_blank" :href="'/api/index.php/resultado/ingreso/' + item.IdDocVentaDet + ''">INGRESAR RESULTADO</a></td>
+                        <td><a class="btn btn-info" target="_blank" :href="'/api/index.php/resultado/descarga/' + item.IdDocVentaDet + ''"><i class="fas fa-file-excel"></i> DESCARGAR</a></td>
                       </tr>
                     </tbody>
                   </table>

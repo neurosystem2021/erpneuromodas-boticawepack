@@ -92,11 +92,6 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
-      // this.initForm()
-      // this.producto.talla = {}
-      // this.$refs.inputTalla.setValue('')
-      //INSERTANDO formato
-    
 
       let formData = new FormData();
       formData.append('formato', this.file);
@@ -109,15 +104,17 @@ export default {
         })
         .then((res) => {  
           // console.log(res);
+          this.$toasted.success('Producto guardado correctamente')
+          this.$refs.ProductoForm2.hide()
+          this.cbGuardar()
         })
-      this.$toasted.success('Producto guardado correctamente')
-      this.$refs.ProductoForm2.hide()
      
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+
   },
   computed : {
   },

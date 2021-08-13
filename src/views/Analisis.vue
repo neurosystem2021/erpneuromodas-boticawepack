@@ -102,7 +102,6 @@ export default {
       nuevoProducto () {
           this.productoSelect = {}
           this.$refs.ProductoForm2.show = true
-
       },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
