@@ -211,10 +211,6 @@
             </b-form-text>
         </template>
 
-        <template slot="PrecioCosto" slot-scope="data">
-          {{data.item.PrecioCosto?data.item.PrecioCosto.toFixed(2):data.item.PrecioCosto}}
-        </template>
-
         <template slot="FechaAlquiler" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FechaAlquiler"
@@ -722,6 +718,7 @@ export default {
       return `
       <div style="${style}">
         <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+        / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
       </div>  
       `
     },

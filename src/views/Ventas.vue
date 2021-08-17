@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid style="width: calc(100% - 300px)" class="bv-example-row">
+        <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -429,7 +429,6 @@ export default {
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medición' },
-                    { key: 'PrecioCosto', label: 'Precio Costo', class:'text-center' },
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
