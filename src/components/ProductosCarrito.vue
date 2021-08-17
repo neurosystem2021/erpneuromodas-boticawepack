@@ -74,13 +74,29 @@
             placeholder="Flete"></b-form-input>
         </template>-->
         
-        <!--<template slot="lote" slot-scope="data">
+      <!--  <template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
             type="text"
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
+       <!-- <template slot="Comisionista" slot-scope="data">
+          <input 
+            @change="(e) => addComisionista(data.index, e)"
+            v-if="productos[data.index].CodigoBarra != 'Comisionista' " 
+            :disabled="bloquearInput?true:false"
+            v-model="productos[data.index].EsComisionista"
+            class="form-check-input" type="checkbox" />
+        </template>-->
+         <template slot="comisionista" slot-scope="data">
+          <input 
+             @change="(e) => calcularComisionista(data.index, e)"
+            :disabled="bloquearInput?true:false"
+            v-model="productos[data.index].EsComisionista"
+            class="form-check-input" type="checkbox" />
+        </template>
+
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
@@ -184,6 +200,7 @@ export default {
       loadCode: '',
       pasteCode: false,
       producto: {},
+      ComisionTotal: 0,
       items: [],
       handleKeyDown: false,
       vuelto: 0,
@@ -199,7 +216,7 @@ export default {
     setPrecio: Boolean,
     idAlmacen: Number,
     tipo:  String,
-
+    bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -269,7 +286,12 @@ export default {
       
       this.actualizarTotal(sumatoria)
       return this.$options.filters.redondear(sumatoria)
-    },
+      },
+
+
+   
+
+
     sumatoriaIgv () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -346,6 +368,35 @@ export default {
         this.pasteCode = false
       }
     },*/
+     //  sumatoriaTotalComisionista () {
+    //   let sumaComisionista = 0
+    //   this.productos.map((value) => {
+    //     sumaComisionista += parseFloat((value.total)*10/100)
+    //   })
+      
+    //   this.actualizarTotal(sumaComisionista)
+    //   return this.$options.filters.redondear(sumaComisionista)
+    // },
+    calcularComisionista(index, e) {
+      let comision = 0
+      this.ComisionTotal = 0
+
+      this.axios.get(this.API + 'ventas/comision').then(res => {
+        let valorComision=res.data['valorComision']
+         
+
+        this.productos.map((producto)=>{ 
+
+          if(producto.EsComisionista){
+            let total = parseFloat(producto.total)
+            let comision = total*(valorComision/100)
+            this.ComisionTotal += comision
+          }
+        })
+      })
+  
+    },
+
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -478,6 +529,15 @@ export default {
       this.$toasted.show('Producto quitado del listado')
     }
   },
+  // methods: {
+  //       getValorComision () {
+  //           this.axios.get(this.API + 'ventas/comision')
+  //               .then(res => {
+  //                   // this.$refs.inputvalorComision.setValue(res.data.valorComision)
+  //                   this.venta.valorComision = res.data.valorComision
+  //               })
+  //       }
+  //  },
   components: {
     ProductoForm
   }

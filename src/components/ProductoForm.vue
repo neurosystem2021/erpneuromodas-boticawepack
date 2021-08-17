@@ -400,6 +400,7 @@ export default {
         PrecioContado: '',
         Botapie: '',
         Genero: '',
+        comisionista: '',
         categoria: {},
         marca: {},
         // modelo: {},

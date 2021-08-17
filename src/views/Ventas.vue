@@ -187,6 +187,9 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
+                             <label>Comisionista : S/ <b>{{ $refs.carrito && $refs.carrito.ComisionTotal }}</b></label>
+                              <!---->
+
                         </b-form-group>
                     </b-col>
                 </b-row>
@@ -385,6 +388,7 @@ export default {
             ],
             carrito: {
                 fields: [
+                    { key: 'comisionista', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
