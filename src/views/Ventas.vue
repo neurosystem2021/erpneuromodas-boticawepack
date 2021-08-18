@@ -177,7 +177,6 @@
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
-                                required="required"
                                 :url="API + 'comisionistas'"
                                 anchor="ClienteDniRuc"
                                 label="writer"
@@ -187,7 +186,7 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
-                             <label>Comisionista : S/ <b>{{ $refs.carrito && $refs.carrito.ComisionTotal }}</b></label>
+                             <label>Comisionista: S/ <b>{{ $refs.carrito && $refs.carrito.ComisionTotal }}</b></label>
                         </b-form-group>
                     </b-col>
                 </b-row>
@@ -386,7 +385,7 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'comisionista', label: 'Mano de obra', class:'text-center' },
+                    { key: 'comisionista', label: 'Comisión', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
@@ -735,6 +734,25 @@ export default {
             })
         },
         guardarVenta (evt) {
+
+          
+            if (this.venta.comisionista.IdCliente) {
+                let checkComision = false;
+                
+                this.productos.map(pro => {
+                    if (pro.Comision) {
+                        checkComision = true;
+                    }
+                });
+
+                if (!checkComision) {
+                    this.$toasted.show('Debe seleccionar un producto para la comisión');
+                    this.inProgress = false;
+                    return   
+                }
+            }
+
+
             evt.preventDefault();
 
             this.inProgress = true
