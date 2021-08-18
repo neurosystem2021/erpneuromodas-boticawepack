@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
+                        <pago-deuda v-if="['admin', 'RUBEN', 'ALBERTO'].includes(usuario)"></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
@@ -438,7 +438,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            usuario: sessionStorage.getItem('User')
         }
     },
     watch: {
