@@ -6,7 +6,6 @@
           <b-col md="4" class="my-1">
             <b-form-group>
                   <label>Buscar:</label>
-              
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
                 <b-input-group-append>
@@ -160,22 +159,27 @@ export default {
   },
   methods: {
     pagarAComisionista (e, cliente) {
-      let r = confirm('Desea pagar al comisionista')
-      if (r) {
-        let importe = e.target.parentElement.previousElementSibling.value
-        this.axios.post(this.API + 'cliente/comisionistas/pagar', {
-          cliente: cliente,
-          importe: importe
-        })
-        .then((response) => {
-          this.$toasted.success('Pago a comisionista realizado')
-          Vue.nextTick(() => this.$refs.tablaProductos.refresh())
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
+      let importe = e.target.parentElement.previousElementSibling.value
+       if( importe <= cliente.Comision ){
+          let r = confirm('Desea pagar al comisionista')
+         if (r) {
+            this.axios.post(this.API + 'cliente/comisionistas/pagar', {
+              cliente: cliente,
+              importe: importe
+            })
+            .then((response) => {
+              this.$toasted.success('Pago a comisionista realizado')
+              Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+            })
+            .catch((error) => {
+              console.log(error)
+              this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+          }
+        }else{
+           this.$toasted.show('El pago no puede ser mayor al saldo')
+        }
+     
     },
     rowDblClick (item) {
       this.clienteSelect = item

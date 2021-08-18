@@ -26,7 +26,6 @@
           <b-form-group>
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
@@ -63,6 +62,16 @@
                      :value="1"
                      :unchecked-value="0">
             Marcar si es un cliente VIP
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
+     <b-row>
+        <b-col>
+          <b-form-checkbox id="checkbox2"
+                     v-model="cliente.esComisionista"
+                     :value="1"
+                     :unchecked-value="0">
+            Marcar si es un comisionista
           </b-form-checkbox>
         </b-col>
       </b-row>

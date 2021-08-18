@@ -188,8 +188,6 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                              <label>Comisionista : S/ <b>{{ $refs.carrito && $refs.carrito.ComisionTotal }}</b></label>
-                              <!---->
-
                         </b-form-group>
                     </b-col>
                 </b-row>
@@ -827,7 +825,7 @@ export default {
                 this.$refs.inputComisionista.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
-
+                this.$refs.carrito.ComisionTotal=0;
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
