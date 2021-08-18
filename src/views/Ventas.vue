@@ -783,9 +783,10 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                await this.loadFirstAlmacen()
-                await this.loadFirstPuntoVenta()
-                this.getNumeroVenta()
+                // await this.loadFirstAlmacen()
+                // await this.loadFirstPuntoVenta()
+                 await this.getVendedor()
+                // this.getNumeroVenta()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -894,9 +895,10 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                await this.loadFirstAlmacen()
-                await this.loadFirstPuntoVenta()
-                this.getNumeroVenta()
+                // await this.loadFirstAlmacen()
+                // await this.loadFirstPuntoVenta()
+                await this.getVendedor()
+                // this.getNumeroVenta()
                 this.$refs.carrito.pagocon = 0
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
