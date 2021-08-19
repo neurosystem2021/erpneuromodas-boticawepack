@@ -44,7 +44,7 @@
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
-                                        :on-select="setVendedorManual" 
+                                        :on-select="setTipoVenta" 
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
