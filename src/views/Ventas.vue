@@ -181,8 +181,8 @@
                                 anchor="ClienteDniRuc"
                                 label="writer"
                                 placeholder="Comisionista"
-                                :onInput="(val) => newDniRuc = val"
                                 :on-select="setComisionista" 
+                                :onInput="inputComisionista"
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -588,6 +588,13 @@ export default {
                 this.venta.comisionista = {}
             }
         },
+        inputComisionista(val){
+            this.newDniRuc = val
+            if(!val){
+                this.venta.comisionista = {}
+            }
+             
+        },
         setCliente (obj, dni = false) {
             let params = {}
             if (dni) {
@@ -738,9 +745,9 @@ export default {
           
             if (this.venta.comisionista.IdCliente) {
                 let checkComision = false;
-                
                 this.productos.map(pro => {
-                    if (pro.Comision) {
+                console.log( this.productos)
+                    if (pro.EsComisionista) {
                         checkComision = true;
                     }
                 });
