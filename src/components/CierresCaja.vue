@@ -16,6 +16,8 @@
                         id="my-table" 
                         striped hover 
                         :busy.sync="isBusy" 
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
                         :filter="filter"
                         :items="myProvider" 
                         @row-clicked="selectCierre"
@@ -66,6 +68,8 @@ import config from '@/store/config.js'
                 show: false,
                 filter: '',
                 items: [],
+                sortBy: 'FechaCierre',
+                sortDesc: true,
                 isBusy: false,
                 fields: [ 'IdCierreCaja', 'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
                 totalRows: 50,
@@ -81,7 +85,7 @@ import config from '@/store/config.js'
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'cierrecaja?sortBy='+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter+'&sortBy='+ctx.sortBy+'&sortDesc='+(ctx.sortDesc ? 1 : 0 ))
 
                 return promise.then((result) => {
                 this.items = result.data
