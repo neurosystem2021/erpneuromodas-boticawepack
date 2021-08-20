@@ -78,6 +78,16 @@
           </b-form-checkbox>
         </b-col>
       </b-row>
+          <b-row>
+        <b-col>
+          <b-form-checkbox id="checkbox2"
+                     v-model="cliente.esComisionista"
+                     :value="1"
+                     :unchecked-value="0">
+            Marcar si es un comisionista
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
            Guardar
