@@ -410,6 +410,7 @@ export default {
                     PuntoVenta: 'CAJA1'
                 },
                 vendedor: {},
+                
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -582,7 +583,6 @@ export default {
             this.$refs.inputTipoVenta.setValue('TICKET')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
-            this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
@@ -707,10 +707,10 @@ export default {
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
+                this.loadClienteVarios ()
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
