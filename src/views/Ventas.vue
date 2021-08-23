@@ -843,10 +843,11 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
+                this.loadClienteVarios ()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
+                // this.$refs.inputCliente.setValue('')
                 this.$refs.inputComisionista.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
