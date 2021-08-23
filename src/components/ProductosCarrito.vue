@@ -55,11 +55,11 @@
           </b-col>
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
-            <b-card
+            <b-card 
               v-if="parseFloat(d.cantidad) > 0"
               align="center"
               class="mb-3 contentCard"
-              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+               v-bind:class="[d.nombre=='Oferta' ? 'oferta' : '']"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
                   setProductoCant(d)
@@ -67,8 +67,8 @@
               }"
             >
               <b-row>
-                <b-col md="7" class="nomCart" >
-                  <h5 class="text-uppercase">x{{ d.cantidad }}</h5>
+                <b-col md="7" class="nomCart"  v-bind:class="[d.nombre=='Oferta' ? 'ofertanom' : '']">
+                  <h5 class="text-uppercase">{{ d.nombre=='Oferta'?'OFERTA':'x'+d.cantidad }}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
                   <b>Precio: </b>S/ {{ d.precio }}
@@ -833,7 +833,14 @@ export default {
     display: flex;
     align-content: center;
     justify-content: center;
+    align-items: center;
     border-right: 2px solid black;
+  }
+  .oferta{
+     border: 4px solid #dc3545;
+  }
+  .ofertanom{
+    color: #dc3545;
   }
   .form-check-input {
     margin-left: -0.2rem !important;
