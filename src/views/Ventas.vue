@@ -9,6 +9,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <ordenes-modal @onPagarOrden="onPagarOrden" ></ordenes-modal>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -388,6 +391,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import OrdenesModal from '@/components/OrdenesModal.vue'
 
 export default {
     beforeMount () {
@@ -811,6 +815,15 @@ export default {
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
+        onPagarOrden(obj){
+            console.log(obj);
+            this.$route.query.idPreOrden = obj.IdPreOrden
+            this.$route.query.idCliente = obj.IdCliente
+            if(this.$route.query.idPreOrden && this.$route.query.idCliente) {
+                this.cargarPreOrden()
+                this.setCliente(this.$route.query.idCliente)
+            }
+        },
         actualizarDescuento () {
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
@@ -1063,7 +1076,8 @@ export default {
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
-        Proformas
+        Proformas,
+        OrdenesModal
     }
 }
 </script>
