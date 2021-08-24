@@ -99,7 +99,7 @@
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false"
+             :disabled="true"
             type="number"
             min="0"
             step="0.01"

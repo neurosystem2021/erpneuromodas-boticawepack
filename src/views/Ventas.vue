@@ -201,7 +201,7 @@
                                                 <b-input-group prepend="%" append="Descuento">
                                                     <b-form-input
                                                         v-model="descuentoGeneral"
-                                                        :disabled="bloquearInput?true:false"
+                                                        :disabled="true"
                                                         min="0"
                                                         value="0"
                                                         max="100"
@@ -383,8 +383,8 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
-                    { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
+                    { key: 'ProductoMarca', label: 'Lab.' },
+                    { key: 'ProductoFormaFarmaceutica', label: 'Presentación' }, 
                     { key: 'ProductoMedicion', label: 'Med.' },
                     { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
                     { key: 'StockPorMayor', label: 'Stock x Mayor' },
