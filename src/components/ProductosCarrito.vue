@@ -391,22 +391,57 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
-      let style = 'ss'
-      let color='#080808'
-      if(data.stock <= 0) {
-        style = 'bg-danger'
-        color='#FCFCFC'
-      }
-       
-       let stockElement = `<b  class="${style}" style="color: ${color}";> Stock: ${data.stock} / </b>`;
-       return `
-             ${stockElement}<b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
+        let style = 'ss'
+        let classStock = 'table-info'
+
+        if (data.stock <= 0) {
+          classStock = 'table-danger'
+        }
+        console.log(data)
+        
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+        </style>
+        <div class="${style}">
+          <table id="table-render" style="width: 700px; text-align: center  ">
+            <thead>
+              <tr style>
+                <th class="table-info" style="width: 60px">Stock</th>
+                <th>Código.</th>
+                <th>Producto.</th>
+                <th>Marca.</th>
+                <th>Medición.</th>
+                <th class="table-success" style="width: 65px">Precio.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="${classStock}"><b>${data.stock}</b></td>
+                <td>${data.CodigoBarra}</td>
+                <td>${data.Producto}</td>
+                <td>${data.ProductoMarca}</td>
+                <td>${data.ProductoMedicion}</td>
+                <td class="table-success"><b>${data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
         `
       }
-       return `
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
+      return `
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} 
       `
-      
 
      
     },
