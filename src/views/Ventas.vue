@@ -835,6 +835,12 @@ export default {
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
+            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
+                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+                this.inProgress = false
+                return
+            }
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
