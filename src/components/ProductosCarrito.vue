@@ -21,6 +21,7 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
