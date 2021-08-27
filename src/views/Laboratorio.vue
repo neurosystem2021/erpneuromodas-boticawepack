@@ -66,6 +66,7 @@
                         <th>Total</th>
                         <th></th>
                         <th></th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -85,6 +86,7 @@
                         <td>{{ item.Subtotal | redondear }}</td>
                         <td v-if="item.EsAnalisis" ><a class="btn btn-success" target="_blank" :href="'/api/index.php/resultado/ingreso/' + item.IdDocVentaDet + ''">INGRESAR RESULTADO</a></td>
                         <td v-if="item.EsAnalisis"><a class="btn btn-info" target="_blank" :href="'/api/index.php/resultado/descarga/' + item.IdDocVentaDet + ''"><i class="fas fa-file-excel"></i> DESCARGAR</a></td>
+                        <td v-if="item.EsAnalisis"><a class="btn btn-primary" target="_blank" :href="'/api/index.php/resultado/ingreso/' + item.IdDocVentaDet + '?imprimir=1'"> IMPRIMIR</a></td>
                       </tr>
                     </tbody>
                   </table>
