@@ -266,7 +266,7 @@ export default {
         let totalCero = 0
         this.productos.map(pro => {
             if ((pro.stock <= 0 || pro.stock < pro.cantidad) ) {
-                this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
+                this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock.');
                 sinStock += 1;
             }
             if(parseFloat(pro.total) <= 0) {
