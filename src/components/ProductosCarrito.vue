@@ -357,7 +357,7 @@ export default {
     setProducto (obj) {
       
       if (obj.ControlaStock && obj.stock <= 0) {
-        this.$toasted.show('No esta permitido la venta sin stock!')
+        this.$toasted.show('No puede seleccionar un producto sin stock!')
         return;
       }
 
