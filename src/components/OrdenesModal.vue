@@ -78,23 +78,8 @@
                                 </b-row>
                                 <b-row>
                                     <b-col md="12" id="productosProduccion">
+                                    <br>
                                     <div>
-                                    <b-form-group>
-                                    <label>Agrega Productos:</label>
-                                    <b-input-group>
-                                        <autocomplete
-                                        :url="API + 'productos'"
-                                        ref="inputProducto"
-                                        anchor="Producto"
-                                        :onShouldRenderChild="renderChild"
-                                        label="writer"
-                                        placeholder="Seleccionar Producto"
-                                        :on-select="addProductoModal"
-                                        :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
-                                        :classes="{input: 'form-control upper'}">
-                                        </autocomplete>
-                                    </b-input-group>
-                                    </b-form-group>
                                     <table class="table b-table table-sm">
                                     <thead>
                                         <tr>
@@ -130,7 +115,8 @@
                                     <b-button v-if="ordenSelect.IdCliente!=null" variant="danger" type="submit" @click="eliminarOrden">
                                     Eliminar Orden
                                     </b-button>
-                                </div>                      
+                                </div>  
+                                <br>                    
                             </div>
                         </b-row>
                     </b-col>

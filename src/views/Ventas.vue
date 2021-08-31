@@ -266,7 +266,7 @@
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
-                                                <b-form-checkbox 
+                                                <b-form-checkbox v-if="false"
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
@@ -997,11 +997,11 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+/*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            } */
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
