@@ -313,8 +313,8 @@
                     placeholder="Pagó con"
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
+                  <label v-if="isVentas">Vuelto:</label>
+                  <b v-if="isVentas">S/  {{ vuelto | redondear }}</b>
                 </td>
               </tr>
             </tbody>
@@ -753,7 +753,7 @@ export default {
       }
 
       Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      Vue.set(this.productos[index], 'nuevoPrecioContado', parseFloat(nuevoPrecio).toFixed(2))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
