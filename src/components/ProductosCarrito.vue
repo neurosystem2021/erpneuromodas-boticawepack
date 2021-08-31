@@ -90,7 +90,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="1"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val, productos[data.index])"
@@ -105,6 +105,7 @@
             :disabled="isVentas? true : false"
             type="number"
             style="width: 75px"
+            step="1"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -129,7 +130,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.00001"
+            step="0.001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             :v-on="setNuevoPrecioContado(data.index)">
@@ -305,7 +306,7 @@
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
               <tr>
-                <td  colspan="2">
+                <td  colspan="2" v-if="isVentas">
                   <label>pagó con:</label>
                   <b-form-input
                     :disabled="bloquearInput?true:false"
@@ -313,8 +314,8 @@
                     placeholder="Pagó con"
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
-                  <label v-if="isVentas">Vuelto:</label>
-                  <b v-if="isVentas">S/  {{ vuelto | redondear }}</b>
+                  <label>Vuelto:</label>
+                  <b>S/  {{ vuelto | redondear }}</b>
                 </td>
               </tr>
             </tbody>
@@ -713,12 +714,19 @@ export default {
     },
     renderChild(data) {
       let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+      let styleBag = 'ss'
+
+      if (parseFloat(data.stock) > 0) {
+        styleBag  = 'success'
       }
+      if (parseFloat(data.stock)<= 0) {
+        styleBag  = 'danger'
+      }
+
       return `
       <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+      <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
       </div>  
       `
     },

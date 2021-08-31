@@ -22,7 +22,9 @@ const mutations = {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        let cant = productos[index2].cantxPrecio += 1
         productos.splice(index2, 1)
+        item.cantxPrecio = cant
         productos.splice(index2,0,item)
       }
     }
