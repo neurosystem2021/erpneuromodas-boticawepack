@@ -713,7 +713,7 @@ export default {
       }
     },
     renderChild(data) {
-      let style = '';
+    if (this.idAlmacen) {
       let styleBag = 'ss'
 
       if (parseFloat(data.stock) > 0) {
@@ -724,11 +724,19 @@ export default {
       }
 
       return `
-      <div style="${style}">
+      <div>
       <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
         <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
       </div>  
       `
+    }else{
+      return `
+      <div>
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
+      </div>  
+      `
+    }
+
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
