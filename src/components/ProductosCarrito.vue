@@ -6,7 +6,8 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
+            :customParams="{ limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -27,6 +28,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
@@ -90,7 +92,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="0.001"
+            step="0.01"
             min="0"
             @input="(val) => changeCant(val, productos[data.index])"
             placeholder="Cantidad">
@@ -104,7 +106,7 @@
             :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
             style="width: 80px"
-            step="0.001"
+            step="0.01"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -286,7 +288,7 @@ export default {
   props: {
     isVentas: Boolean,
     setPrecio: Boolean,
-
+    idAlmacen: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -329,6 +331,13 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -458,9 +467,16 @@ export default {
         return
       }
 
-      this.$refs['modalCant'].show()
+      
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       this.preciosProd = this.preciosProd.filter(p => p.cantidad !== 0  && p.cantidad !=='0' && p.cantidad !=='')
+      
+      if(this.preciosProd.length==0){
+        obj.cantxPrecio = 1
+        this.setProductoUni(obj)
+        return
+      }
+      this.$refs['modalCant'].show()
       this.objProd = obj
     },
     setProductoUni (obj) {
@@ -520,9 +536,30 @@ export default {
       }
     },
     renderChild(data) {
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b> S/ ${data.PrecioContado || 0} </b> / <b>${data.ProductoMedicion}</b>
-      `
+      if (this.idAlmacen) {
+        let style = '';
+        let styleBag = 'ss'
+        if (parseFloat(data.stock) > 0) {
+          styleBag  = 'success'
+        }
+        if (parseFloat(data.stock)<= 0) {
+          styleBag  = 'danger'
+        }
+
+        return `
+        <div style="${style}">
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+          <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b>${data.ProductoMedicion}</b> / <b> S/ ${data.PrecioContado || 0} </b>
+        </div>  
+        `;
+      } else {
+
+        return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b>${data.ProductoMedicion}</b> / <b> S/ ${data.PrecioContado || 0} </b>
+        `
+      }
+
+
     },
     setNuevoPrecioContado (index) {
 

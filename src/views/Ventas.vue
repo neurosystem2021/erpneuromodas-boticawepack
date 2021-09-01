@@ -168,6 +168,7 @@
                             :showButton="false"
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
