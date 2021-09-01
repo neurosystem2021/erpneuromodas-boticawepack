@@ -89,7 +89,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="0.01"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val, productos[data.index])"
@@ -128,7 +128,7 @@
             type="number"
             style="width: 75px"
             min="0"
-            step="0.00001"
+            step="0.0001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             :v-on="setNuevoPrecioContado(data.index)">
@@ -711,15 +711,29 @@ export default {
       }
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+      if (this.idAlmacen) {
+        let styleBag = 'ss'
+        if (parseFloat(data.stock) > 0) {
+          styleBag  = 'success'
+        }
+        if (parseFloat(data.stock)<= 0) {
+          styleBag  = 'danger'
+        } 
+
+        return `
+        <div>
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+        </div>  
+        `
+      }else{
+        return `
+        <div>
+          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+        </div>  
+        `
       }
-      return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
-      </div>  
-      `
+
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
