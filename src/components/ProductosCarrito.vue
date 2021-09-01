@@ -724,13 +724,13 @@ export default {
       return `
       <div>
         <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado? Number.isInteger(data.PrecioContado)?data.PrecioContado:data.PrecioContado.toFixed(2):0} </b>
       </div>  
       `
       }else{
         return `
         <div>
-          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} 
         </div>  
         `
       }
