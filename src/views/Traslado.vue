@@ -39,7 +39,7 @@
                 :showButton="false"
                 :showPagoCon="false"
                 :onSetProducto="onSetProducto"
-                :setPrecio="true"
+                :setPrecio="false"
                 :fields="fields"
               ></productos-carrito>
             </b-col>
@@ -125,7 +125,9 @@ export default {
         })
     },
     onAddProducto (obj) {
-        this.axios.get(this.API + 'destino/producto/verificar', {
+      
+      if(obj != undefined){
+                this.axios.get(this.API + 'destino/producto/verificar', {
             params: {
                 producto: obj.Producto
             }
@@ -139,6 +141,7 @@ export default {
         this.obtenerStok({
             IdAlmacen: this.almacenOrigen.IdAlmacen
         })
+      }
     },
     onSetProducto (obj) {
         // obj.cantidad = 1
