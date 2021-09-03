@@ -628,6 +628,7 @@ export default {
       }
     },
     setProducto (obj) {
+      let precios = 1;
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
       this.loadCode = ''
@@ -640,21 +641,23 @@ export default {
       }
       this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
       if(obj.precioConvenio){
+        precios++;
         this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
       }
       if(obj.PrecioEspecial){
+        precios++;
        this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
       }
-      this.objProd = {}
-    
-     // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-     // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
-      
- 
 
-      this.$refs['modalCant'].show()
-      // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
+      if(precios==1){
+        this.setProductoUni(obj,obj.PrecioContado)
+        return
+      }else{
+        this.objProd = {}
+        this.$refs['modalCant'].show()
+        this.objProd = obj
+      }
+
     },  
     setProductoUni (obj, precio) {
       this.objProd.cantxPrecio = 1
@@ -733,15 +736,30 @@ export default {
       //}
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
-      }
-      return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
-      </div>  
-      `
+       if (this.idAlmacen) {
+          let styleBag = 'ss'
+          if (parseFloat(data.stock) > 0) {
+            styleBag  = 'success'
+          }
+          if (parseFloat(data.stock)<= 0) {
+            styleBag  = 'danger'
+          }
+          return `
+          <div>
+            <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+            <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}  / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
+          </div>  
+          `
+
+       } else {
+        return `
+          <div>
+            <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}  / ${data.ProductoMedicion}
+          </div>  
+          `
+       }
+
+
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)

@@ -15,6 +15,7 @@
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
