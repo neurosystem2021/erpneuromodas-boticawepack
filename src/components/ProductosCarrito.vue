@@ -126,7 +126,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 92px"
             min="0"
             step="0.0001"
             placeholder="Precio"
@@ -188,7 +188,7 @@
           <input 
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
-            style="width: 80px"
+            style="width: 70px"
             type="number" 
             step="0.01"
             :disabled="bloquearInput?true:false"
@@ -200,6 +200,7 @@
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
+            style="width: 82px"
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
@@ -690,7 +691,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
