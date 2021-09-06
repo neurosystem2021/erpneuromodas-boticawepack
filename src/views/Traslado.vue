@@ -138,10 +138,10 @@ export default {
                     this.smsAdvertencia += "El producto <b>" + obj.Producto + "</b> no existe en el sistema de destino, se recomienda crearlo antes de trasladar, en caso contrario, el sistema intentara crearlo pero debe ser verificado luego. <br><br>";
                 }
             })
-        this.obtenerStok({
-            IdAlmacen: this.almacenOrigen.IdAlmacen
-        })
       }
+      this.obtenerStok({
+          IdAlmacen: this.almacenOrigen.IdAlmacen
+      })
     },
     onSetProducto (obj) {
         // obj.cantidad = 1
