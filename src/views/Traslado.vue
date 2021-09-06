@@ -39,7 +39,7 @@
                 :showButton="false"
                 :showPagoCon="false"
                 :onSetProducto="onSetProducto"
-                :setPrecio="true"
+                :setPrecio="false"
                 :fields="fields"
               ></productos-carrito>
             </b-col>
@@ -85,8 +85,11 @@ export default {
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
       fields: [
-          { key: 'ProductoCategoria', label: 'Categoria'},
+          { key: 'itemNum', label: '#', class:'text-center' },
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: 'CodigoBarra', label: 'Código', class:'text-center'},
           { key: 'Producto', label: 'Artículo' }, 
+          { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoMedicion', label: 'Medicion' },
           { key: 'cantidad' },
@@ -112,7 +115,8 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       // buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
     loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
@@ -121,6 +125,7 @@ export default {
         })
     },
     onAddProducto (obj) {
+      if(obj != undefined){
         this.axios.get(this.API + 'destino/producto/verificar', {
             params: {
                 producto: obj.Producto
@@ -132,6 +137,10 @@ export default {
                     this.smsAdvertencia += "El producto <b>" + obj.Producto + "</b> no existe en el sistema de destino, se recomienda crearlo antes de trasladar, en caso contrario, el sistema intentara crearlo pero debe ser verificado luego. <br><br>";
                 }
             })
+      }  
+      this.obtenerStok({
+          IdAlmacen: this.almacenOrigen.IdAlmacen
+      }) 
     },
     onSetProducto (obj) {
         // obj.cantidad = 1
@@ -221,6 +230,7 @@ export default {
     },
     setAlmacenOrigen (obj) {
       this.almacenOrigen = obj
+      this.obtenerStok({ IdAlmacen:  this.almacenOrigen.IdAlmacen })
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
