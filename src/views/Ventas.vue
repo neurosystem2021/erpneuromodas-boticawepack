@@ -50,7 +50,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="NOTA DE VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -82,7 +82,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -103,7 +103,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -577,18 +577,18 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'PRINCIPAL'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'PRINCIPAL'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -910,6 +910,7 @@ export default {
             .then((response) => {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
+                this.loadClienteVarios()
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -1040,7 +1041,7 @@ export default {
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
-                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
