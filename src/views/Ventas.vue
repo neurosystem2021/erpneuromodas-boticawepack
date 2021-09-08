@@ -725,7 +725,7 @@ export default {
             let totalCero = 0
             
             this.productos.forEach(pro => {
-                if((parseInt(pro.stock) <= 0 || parseInt(pro.stock) < pro.cantidad) ) {
+                if((parseFloat(pro.stock) <= 0 ||  parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) ) ) {
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
