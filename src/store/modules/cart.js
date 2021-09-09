@@ -82,12 +82,16 @@ const actions = {
     let precio = false
     let setSuma = false
     let setPrecioCosto = false
+    let cantidadPresentacion = false
+    let descripcion = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       precio = obje.precio
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
+      cantidadPresentacion = obje.cantidadPresentacion
+      descripcion = obje.descripcion
     }
 
     if(typeof producto === 'object') {
@@ -150,6 +154,22 @@ const actions = {
             obj.setSuma = true
           }
 
+          if(cantidadPresentacion){
+            obj.estadoPxP = false
+            obj.cantxPrecio = parseFloat(obj.cantidad / cantidadPresentacion).toFixed(2) || 1
+            obj.cantidadPres = cantidadPresentacion || 1
+          }
+
+          if(descripcion){
+            console.log(descripcion);
+            let descripcionObj = JSON.parse(descripcion)
+            obj.precioxcantidaselec = descripcionObj
+            obj.descripcion = descripcionObj.nombre || 'UNIDAD'
+            obj.PorcentajeUtilidadMin = descripcionObj.utilMin || 1
+            obj.PorcentajeUtilidadMax = descripcionObj.utilNeta || 5
+            obj.PorcentajeUtilidad = descripcionObj.utilNeta || 5
+            obj.PrecioCosto = descripcionObj.costoNeto || 0
+          }
 
           if(actualizar){
             let preciosProd = []

@@ -928,7 +928,7 @@ export default {
 
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
-            let totalCero = 0 
+            let totalCero = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -958,8 +958,8 @@ export default {
             }
 
             this.productos.forEach(p => {
-                if(!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)){
-                    this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
+                if(!(p.PorcentajeUtilidadMin < p.PorcentajeUtilidad && p.PorcentajeUtilidad < p.PorcentajeUtilidadMax)){
+                   // this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
                     this.inProgress = false
                     return
                 }
