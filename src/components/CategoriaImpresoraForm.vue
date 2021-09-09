@@ -20,6 +20,14 @@
             <b-form-select v-model="categoria.IdImpresora" :options="impresoraItems" class="mb-3" size="md" required/>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-checkbox
+            v-model="categoria.MostrarDelivery"
+            :value="1"
+            :unchecked-value="0">
+            Mostrar en Delivery
+          </b-form-checkbox>
+        </b-col>
         <div slot="modal-footer">
         <b-btn variant="primary" type="submit">
            Guardar
@@ -69,6 +77,7 @@ export default {
         this.categoria.IdImpresora = newVal.IdImpresora
         this.categoria.ProductoCategoria=newVal.ProductoCategoria
         this.categoria.IdProductoCategoria = newVal.IdProductoCategoria
+        this.categoria.MostrarDelivery = newVal.MostrarDelivery
       } else {
         this.title='Nueva Categoria'
         this.initForm();
@@ -78,8 +87,9 @@ export default {
   methods: {
     initForm () {
       this.categoria = {
-          ProductoCategoria:'',
-          IdImpresora: null
+          ProductoCategoria: '',
+          IdImpresora: null,
+          MostrarDelivery: 0
       }
     },
     guardarCategoriaImpresora(e) {

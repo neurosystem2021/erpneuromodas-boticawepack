@@ -34,6 +34,10 @@
                 <label v-if="data.item.NombreImpresora!=null">{{data.item.NombreImpresora}}</label>
                 <label v-else style="color:red; font-weight:bold">No asignado</label>
               </template>
+              <template slot="Delivery" slot-scope="data">
+                <b-badge v-if="data.item.MostrarDelivery==1" variant="success">SI</b-badge>
+                <b-badge v-else variant="danger">NO</b-badge>
+              </template>
             </b-table>
             <b-row>
               <b-col md="6" class="my-1">
@@ -120,6 +124,7 @@ export default {
             { key: 'IdProductoCategoria', label: 'Codigo', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'NombreImpresora', label: 'Impresora Asignada', sortable: true },
+            { key: 'Delivery', label: 'Mostrar en Delivery', sortable: true , class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
