@@ -463,8 +463,7 @@ export default {
       console.log(this.filter)
     },
     generateFilter (key, value) {
-      this.filters[key] = value
-      
+      this.filters[key] = encodeURIComponent(value)
       let filter = ''
       for (var key in this.filters) {
         filter += '&filter[' + key + ']=' + this.filters[key]
