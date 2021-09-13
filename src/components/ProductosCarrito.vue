@@ -37,6 +37,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="bloquearInput?true:false"
             type="number"
             style="width: 105px"
             step="0.000001"
@@ -71,6 +72,7 @@
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
+            :disabled="bloquearInput?true:false"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
@@ -96,6 +98,7 @@
           <b-form-input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
+            :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
@@ -108,6 +111,7 @@
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
+            :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
@@ -120,11 +124,11 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+           <b-button size="sm" variant="info" :disabled="bloquearInput?true:false" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -167,6 +171,7 @@
                   <b-form-input
                     type="text"
                     placeholder="Pagó con"
+                    :disabled="bloquearInput?true:false"
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
                   <label>Vuelto:</label>
@@ -213,7 +218,7 @@ export default {
     },
     setPrecio: Boolean,
     idAlmacen: Number,
-
+    bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
