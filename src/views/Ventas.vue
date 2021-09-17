@@ -214,6 +214,7 @@
                                             <td>
                                                 <b-input-group prepend="%" append="Descuento">
                                                     <b-form-input
+                                                        :disabled="(idPerfil != 1) ? true : false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"

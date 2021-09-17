@@ -113,6 +113,7 @@
         <template slot="descuento" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].descuento"
+            :disabled="(idPerfil != 1) ? true : false"
             type="number"
             min="0"
             step="0.01"
@@ -204,7 +205,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      idPerfil: sessionStorage.getItem('idPerfil')
     }
   },
   watch: {
