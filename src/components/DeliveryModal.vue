@@ -360,7 +360,7 @@ export default {
                     icon: 'error',
                     title: 'Sin servicio de delivery',
                     text: 'No hay conexión con el servidor de delivery',
-                    footer: 'Por favor cierre sesion e ingrese nuevamente, para reconectar el servicio'
+                    footer: 'Por favor cierre sesion e ingrese nuevamente'
                 })
             })   
         }else{
@@ -370,7 +370,7 @@ export default {
                 icon: 'error',
                 title: 'Error en la autentificación de delivery',
                 text: 'No hay conexión con el servidor de delivery',
-                footer: 'Por favor cierre sesion e ingrese nuevamente, para reconectar el servicio'
+                footer: 'Por favor cierre sesion e ingrese nuevamente'
             })
         }
 
@@ -384,14 +384,31 @@ export default {
             }).then(res => {
                 if(res.data.success==true){
                     this.pedidos = res.data.data;
-                    //console.log(res.data.data);
+
                     this.pedidos.map(p=>{
                         p.showPopover = false
                     });
+
+                    if(this.pedidoIdMapa != null){
+                        let existe = this.pedidos.some(p=>p.IdPedido==this.pedidoIdMapa)
+                        if(!existe){
+                            if (this.mymap) {
+                            this.emitirConsultaMotorizado()
+                            }
+                        }
+
+                    }
+
                 }else if(res.data.success==false){
                     this.pedidos = []
+                    if (this.mymap) {
+                        this.emitirConsultaMotorizado()
+                    }
                 }else{
                     this.pedidos = []
+                    if (this.mymap) {
+                        this.emitirConsultaMotorizado()
+                    }
                 }
             }).catch(err => {
             console.log(err)
@@ -403,7 +420,6 @@ export default {
     escucharCanceladoPedidos(){
         this.sockets.subscribe('cancelado-pedido', (data) => {
            this.$toasted.show('Ha sido cancelado el pedido de '+data.nombre)
-           console.log(this.pedidoMotorizadoId);
             if(this.pedidoIdMapa == data.idPedido){
                this.emitirConsultaMotorizado()
             }
