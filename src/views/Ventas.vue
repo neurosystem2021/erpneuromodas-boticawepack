@@ -9,6 +9,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                      <delivery-modal ref="deliveryModal"></delivery-modal>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <ordenes-modal @onPagarOrden="onPagarOrden" ></ordenes-modal>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -392,16 +395,22 @@ import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import OrdenesModal from '@/components/OrdenesModal.vue'
+import DeliveryModal from '@/components/DeliveryModal.vue'
+import Swal from 'sweetalert2'
 
 export default {
     beforeMount () {
         this.initForm()
+    },
+    beforeDestroy(){
+        this.sockets.unsubscribe('nuevo-pedido');
     },
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
+        this.escucharPedidos()
     },
     data () {
         return {
@@ -487,6 +496,33 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+         //Sockets
+        escucharPedidos(){
+            this.sockets.subscribe('nuevo-pedido', (data) => {
+            if(this.$refs.deliveryModal.show){
+                this.$toasted.success('Nuevo Pedido de' + "<strong>"+data.nombre+"</strong>");  
+                this.$refs.deliveryModal.getPedidos();  
+            }else{
+                this.$swal({
+                    position: 'top-end',
+                    icon: 'info',
+                    title: 'Pedido de Delivery de: <br> ' + "<strong>"+data.nombre+"</strong>",
+                    showConfirmButton: true,
+                    confirmButtonText: 'Mostrar Pedidos',
+                    confirmButtonColor:'#3880ff'
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                this.$refs.deliveryModal.show=true;
+                } else if (result.isDenied) {
+                    console.log("Denegado");
+                }
+                })
+
+            }
+            });
+        },
+        //Fin Sockets
         cargarPreOrden(){
             this.axios.get(this.API + '/preorden/estado', {
                 params: {
@@ -1079,7 +1115,8 @@ export default {
         PagoDeuda,
         PreOrdenLista,
         Proformas,
-        OrdenesModal
+        OrdenesModal,
+        DeliveryModal
     }
 }
 </script>
