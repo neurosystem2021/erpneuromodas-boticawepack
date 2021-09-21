@@ -15,7 +15,7 @@
                 <div>
                 <b-row>
                     <b-col md="7">
-                        <h2>Lista de pedidos: <b-button variant="outline-info" @click="()=>{emitirConsultaMotorizado(); getPedidos();}">Actualizar Lista</b-button></h2>
+                        <h2>Lista de pedidos: <b-button variant="outline-info" @click="getPedidos">Actualizar Lista</b-button></h2>
                         <table class="table table-striped">
                         <thead>
                             <tr>
@@ -191,7 +191,8 @@
                     <b-col md="5">
                         <b-row>
                             <b-col md="12" style="margin-top:10px">
-                                <b-button variant="outline-primary" @click="emitirConsultaMotorizado">Mostrar Motorizados</b-button> 
+                                <b-button variant="outline-primary" @click="emitirConsultaMotorizado">Mostrar Motorizados</b-button>
+                                <b-badge  variant="success" style="font-size:18px;">En Linea: {{motorizadosOnline.length}} </b-badge> 
                             </b-col>
                         </b-row>
                         <hr>
@@ -397,6 +398,10 @@ export default {
                             }
                         }
 
+                    }else{
+                        if (this.mymap) {
+                            this.emitirConsultaMotorizado()
+                        } 
                     }
 
                 }else if(res.data.success==false){
