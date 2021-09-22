@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-button @click="show=true" variant="outline-info" size="md">Delivery</b-button>
-        <b-modal id="modalOrdenes" 
+        <b-modal id="modalPedidos" 
             title="DELIVERY PEDIDOS.PE"
             size="lg" v-model="show"
             header-bg-variant="primary"
@@ -19,7 +19,7 @@
                         <table class="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col" class="text-center">Id.</th>
+                            <th scope="col" class="text-center">Código</th>
                             <th scope="col" class="text-center">Estado</th>
                             <th scope="col" class="text-center">Cliente</th>
                             <th scope="col" class="text-center">Motorizado</th>
@@ -108,22 +108,21 @@
                                                 <table class="table table-striped">
                                                 <thead>
                                                     <tr>
-                                                    <th scope="col" class="text-center">Id. Prod.</th>
+                                                    <th scope="col" class="text-center">#</th>
                                                     <th scope="col" class="text-center">Producto</th>
-                                                    <th scope="col" class="text-center">Descripcion</th>
                                                     <th scope="col" class="text-center">Cantidad</th>
                                                     <th scope="col" class="text-center">Precio</th>
+                                                    <th scope="col" class="text-center">Sub. Total</th>
                                                     <th scope="col" class="text-center">Indicaciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="(detalle, index2) in JSON.parse(pedido.Productos)" :key="index2">
-                                                        <td scope="row" class="text-center font-weight-bold">{{ detalle.IdProducto }}</td>
+                                                        <td scope="row" class="text-center">{{ index2 + 1}}</td>
                                                         <td scope="row" class="text-center">{{ detalle.Producto }}</td>
-                                                        <td scope="row" class="text-center" v-if="detalle.Descripcion=='' || detalle.Descripcion==null || detalle.Descripcion=='null'"><b-badge variant="warning">Sin descripcion</b-badge></td>
-                                                        <td scope="row" class="text-center" v-else>{{ detalle.Descripcion }}</td>
                                                         <td scope="row" class="text-center font-weight-bold" >{{ detalle.Cantidad }}</td>
                                                         <td scope="row" class="text-center font-weight-bold">S/ {{ detalle.Precio.toFixed(2) }}</td>
+                                                        <td scope="row" class="text-center font-weight-bold">S/ {{ (detalle.Precio * detalle.Cantidad ).toFixed(2) }}</td>
                                                         <td scope="row" class="text-center" style=" width: 170px;" v-if="detalle.Indicacion=='' || detalle.Indicacion==null"><b-badge variant="warning">Sin indicaciones</b-badge></td>
                                                         <td scope="row" class="text-center" style=" width: 170px;" v-else>{{ detalle.Indicacion }}</td>
                                                     </tr>
@@ -140,50 +139,12 @@
                                                 <div class="text-center">
                                                     <b-button v-if="pedido.Estado == 'E'" size="lg" variant="success" @click="aceptarPedido(pedido.IdPedido,pedido.IdCliente)">Aceptar</b-button>
                                                     <b-button v-if="pedido.Estado == 'E'" size="lg" variant="danger" @click="rechazarPedido(pedido.IdPedido)">Rechazar</b-button>
-                                                    <b-button v-if="pedido.Estado != 'E'" size="lg" variant="info" @click="imprimirPedido(pedido.IdPedido)">Reimprimir Pedido</b-button>
+                                                    <b-button v-if="pedido.Estado != 'E'" size="lg" variant="info" @click="volverRealizarVenta(pedido.IdPedido)">Volver a Realizar Venta</b-button>
+                                                    <b-form-text v-if="pedido.Estado != 'E'">Si no realizo la venta del pedido, puede intentarlo nuevamente. Previamente el sistema validará que no exista una venta de este pedido.</b-form-text>
                                                 </div>
                                             </b-card>
                                         </b-collapse>
                                     </td>
-                                </tr>
-                                <tr>
-                                <div style="display:none;">
-                                    <div :id="'contenido-'+pedido.IdPedido" class="container-print">
-                                        <br>
-                                        <div style="text-align: right; font-size: 4mm; font-family: monospace; font-weight: bold; color:black">PEDIDO ID: {{pedido.IdPedido}}</div>
-                                        <br>
-                                        <div style="font-size: 4mm; font-family: monospace; color:black">
-                                            <center>
-                                                 <label style="font-weight: bold;">PEDIDO DE DELIVERY</label>
-                                            </center>
-                                        <br>
-                                        <label style="text-align: right; font-weight: bold;">FECHA Y HORA: <span style="font-weight: normal;">{{$moment(pedido.FechaReg).format("YYYY-MM-DD HH:mm:ss")}}</span></label>
-                                        <br>
-                                        <label style="text-align: right; font-weight: bold;">CLIENTE: <span style="font-weight: normal;">{{pedido.Cliente}}</span></label>
-                                        <br>
-                                        <label style="text-align: right; font-weight: bold;">DIRECCION ENTREGA: <span style="font-weight: normal;">{{pedido.Direccion}}</span> </label>
-                                        <br>
-                                        <label style="text-align: right; font-weight: bold;">ACEPTADO POR: <span style="font-weight: normal;">{{pedido.UsuarioReg}} </span></label>
-                                        </div>
-                                        <br>
-                                        <table width="100%">
-                                            <tbody>
-                                            <hr style="font-size: 4mm; font-family: monospace; font-weight: bold; color:black">
-                                                <tr v-for="(detalle, index3) in JSON.parse(pedido.Productos)" :key="index3">
-                                                    <td style="font-size: 3.5mm; font-family: monospace !important;">
-                                                    <label style="font-weight: bold; color:black">PRODUCTO: <span style="font-weight: normal;">{{ detalle.Producto }}</span></label>
-                                                    <br>
-                                                    <label style="font-weight: bold; color:black">CANTIDAD: <span style="font-weight: normal;">{{ detalle.Cantidad }}</span></label>
-                                                    <br>
-                                                    <label v-if="detalle.Indicacion=='' || detalle.Indicacion==null" style="font-weight: bold; color:black">INDICACIONES: <span style="font-weight: normal;">Sin indicaciones</span></label>
-                                                    <label else style="font-weight: bold; color:black" >INDICACIONES: <span style="font-weight: normal;">{{ detalle.Indicacion }}</span></label>
-                                                    <hr style="font-size: 4mm; font-family: monospace; font-weight: bold; color:black">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
                                 </tr>
                             </tbody>
                         </table>
@@ -217,7 +178,6 @@
 import config from '@/store/config.js'
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css"
-import Swal from 'sweetalert2'
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -542,9 +502,15 @@ export default {
                         this.pedidos[pedidoIndex].UsuarioReg = res.data.usuario
                     })
                     setTimeout(()=>{
-                        this.imprimirPedido(idPedido)
+                        //this.imprimirPedido(idPedido)
                         this.emitirConsultaMotorizado()
                     },400);
+
+                    let pedido = this.pedidos.find(p=>p.IdPedido == idPedido)
+                    if(pedido != undefined){
+                        this.$emit('onPagarDelivery', pedido)
+                        this.show = false
+                    }
                 };
             }else if (res.data.success==false){
                 this.getPedidos();
@@ -569,6 +535,7 @@ export default {
                     this.getPedidos();
                 }else if (res.data.success==false){
                     this.getPedidos();
+                    this.$toasted.success("El tiene otro estado, se actualizarán los pedidos!")
                 }
             }).catch(err => {
             console.log(err)
@@ -599,19 +566,48 @@ export default {
 
         }
     },
-    imprimirPedido(idPedido){
-        let pedido = this.pedidos.find(p=>p.IdPedido == idPedido);
-        if(pedido !=undefined){
-            var left = (screen.width/2)-(800/2);
-            var top = (screen.height/2)-(800/2);
-            var myWindow = window.open ('', 'IMPRIMIR COMANDA', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=800, height=800, top='+top+', left='+left);
-            myWindow.document.write(document.getElementById('contenido-'+pedido.IdPedido).innerHTML);
-            myWindow.document.close();
-            myWindow.focus();
-            myWindow.print();
-            myWindow.close(); 
-        }
-   
+    volverRealizarVenta(idpedido){
+        let pedido = this.pedidos.find(p=>p.IdPedido == idpedido)
+        if(pedido != undefined){
+            this.axios.get(this.API + '/venta/pedido/existe', {
+            params: {
+                IdPedido: idpedido
+            }
+            }).then((response) => {
+                if(response.data.idDocVenta){
+                    this.$swal({
+                        icon: 'info',
+                        title: 'Ya existe una venta para este pedido',
+                        html: 'Tipo: <strong>'+response.data.TipoDoc+'</strong> '+
+                        '<br> Comprobante: <strong>'+response.data.Serie+'-'+response.data.Numero+'</strong>'+
+                        '<br> Fecha y Hora <strong>'+response.data.FechaDoc+'</strong>' +
+                        '<br> Realizado por: <strong>'+response.data.UsuarioReg+'</strong>',
+                        showConfirmButton: true,
+                        showDenyButton: true,
+                        confirmButtonText: 'Ir a reimpresión de documentos',
+                        confirmButtonColor:'#3880ff',
+                        denyButtonText:'Ir a registro de ventas',
+                        footer: 'Puede anular la venta en el registro de ventas e intentarlo nuevamente.'
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            window.open('/views/ve_reimpresionDocumentos.php','_blank');
+                        } else if (result.isDenied) {
+                            window.open('/views/ve_regventaform.php','_blank');
+
+                        }
+                    })
+
+                }else{
+                    this.$emit('onPagarDelivery', pedido)
+                    this.show = false
+                }
+            }).catch(error=>{
+                this.$toasted.show('Hubo un error, no hay conexion')
+            })
+
+
+        }  
     },
     emitirEstado(idPedido,idCliente,estado,idmotorizado=null){
         this.$socket.emit('estado-pedido-emitir-plataforma', {IdCliente:idCliente,IdPedido:idPedido, Estado:estado,IdMotorizado:idmotorizado})
@@ -761,7 +757,7 @@ export default {
         })
     },
     cerrarModal(){
-        this.$refs.modalPedido.hide()
+        this.$refs.modalPedidos.hide()
     }
   },
   components: {
@@ -788,4 +784,7 @@ export default {
 .popover {
     max-width: 420px !important;
 }
+#modalPedidos .modal-dialog {
+    max-width: 95% !important;
+   }
 </style>

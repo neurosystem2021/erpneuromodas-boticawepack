@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                      <delivery-modal ref="deliveryModal"></delivery-modal>
+                      <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
                     <b-button-group size="sm">
                         <ordenes-modal @onPagarOrden="onPagarOrden" ></ordenes-modal>
@@ -41,6 +41,13 @@
                                 <div class="form-inline">
                                     <h4>Pago de la mesa: <b-badge variant="danger">{{mesa}}</b-badge> </h4>
                                     <h4 class="ml-3">Atendido por: <b-badge variant="danger">{{mesero}}</b-badge></h4>
+                                </div>
+                            </b-col>
+                        </b-row>
+                        <b-row v-if="this.$route.query.idPedido" class="mb-2">
+                            <b-col md="12">
+                                <div class="form-inline">
+                                    <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
                                 </div>
                             </b-col>
                         </b-row>
@@ -149,7 +156,10 @@
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
-
+                                    <div v-if="venta.EsDelivery">
+                                        <label>Dirección de entrega:</label>
+                                        <h5>{{infoDelivery.Direccion}}</h5>
+                                    </div>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -196,6 +206,11 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
+                        </b-form-group>
+                        <b-form-group>
+                            <label>Es delivery:  </label>
+                            <b-badge v-if="venta.EsDelivery==true" variant="info" style="font-size:20px">SI</b-badge>
+                            <b-badge v-else variant="info" style="font-size:20px">NO</b-badge>
                         </b-form-group>
                         <b-form-group v-show="false">
                             <label>Comisionista</label>
@@ -373,8 +388,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" @click="anularPago" variant="danger" v-if="this.$route.query.idPreOrden">Anular Pago</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPreOrden" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" @click="anularPagoOrden" variant="danger" v-if="this.$route.query.idPreOrden">Anular Pago Orden</b-button>
+                        <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPreOrden && !this.$route.query.idPedido" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -449,7 +465,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'ProductoCategoria', label: 'Categoria'},
-                    { key: 'eventPres', label: '' },
+                   // { key: 'eventPres', label: '' },
                    // { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
@@ -462,7 +478,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            infoDelivery:{}
         }
     },
     watch: {
@@ -565,7 +582,8 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
         },
-        anularPago(){
+        anularPagoOrden(){
+            this.$refs.carrito.pagocon = 0
             this.limpiarCart()
             this.loadClienteVarios()
             this.$router.replace('/ventas')
@@ -640,10 +658,12 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: null,
-                CampoDireccion: ''
+                CampoDireccion: '',
+                EsDelivery:false
             }
             this.isNota = false
-            this.bloquearInput=false
+            this.bloquearInput = false
+            this.infoDelivery = {}
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -852,13 +872,38 @@ export default {
             })
         },
         onPagarOrden(obj){
-            console.log(obj);
+            this.anularPagoDelivery()
             this.$route.query.idPreOrden = obj.IdPreOrden
             this.$route.query.idCliente = obj.IdCliente
             if(this.$route.query.idPreOrden && this.$route.query.idCliente) {
                 this.cargarPreOrden()
                 this.setCliente(this.$route.query.idCliente)
             }
+        },
+        onPagarDelivery(obj){
+            this.anularPagoOrden()
+            this.$route.query.idPedido = obj.IdPedido
+            if(this.$route.query.idPedido){
+                this.infoDelivery = obj
+                this.venta.EsDelivery = true
+                this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
+                let productos = JSON.parse(obj.Productos)
+                productos.map((item) => {
+                    this.add([item.IdProducto, () => {
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                    }, { cantidad: item.Cantidad, precio:item.Precio }, false ])
+                })  
+                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')   
+                 
+            }
+        },
+        anularPagoDelivery(){
+            this.limpiarCart()
+            this.venta.EsDelivery = false
+            this.infoDelivery = {}
+            this.$refs.carrito.pagocon = 0
+            this.loadClienteVarios()
+            this.$router.replace('/ventas')
         },
         actualizarDescuento () {
             if (this.puntosAplicados > 0) {
@@ -1056,6 +1101,8 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.IdPreOrden = this.$route.query.idPreOrden || null
+            this.venta.IdPedido = this.$route.query.idPedido || null 
+            this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.axios.post(this.API + 'ventas', this.venta)
@@ -1084,6 +1131,7 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
+                    this.infoDelivery = {}
                     this.loadClienteVarios()
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
                     this.$router.replace('/ventas')
