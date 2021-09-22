@@ -106,8 +106,11 @@ import ImpresoraForm from '@/components/ImpresoraForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
+    this.axios.get(this.API + 'categorias/count').then((response) => {
       this.totalRows = response.data.total
+    })
+    this.axios.get(this.API + 'impresoras/count').then((response) => {
+      this.totalRowsImpresora = response.data.total
     })
   },
   data() {
@@ -163,10 +166,22 @@ export default {
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
       actualizarTablaCategorias() {
+        this.obtenerTotalCategorias()
         this.$refs.tablaCategorias.refresh()
       },
       actualizarTablaImpresoras() {
+        this.obtenerTotalImpresoras()
         this.$refs.tablaImpresoras.refresh()
+      },
+      obtenerTotalImpresoras(){
+        this.axios.get(this.API + 'impresoras/count').then((response) => {
+          this.totalRows = response.data.total
+        })
+      },
+      obtenerTotalCategorias(){
+        this.axios.get(this.API + 'categorias/count').then((response) => {
+          this.totalRowsImpresora = response.data.total
+        })
       },
       nuevaImpresora () {
           this.impresoraSelect = {}

@@ -80,12 +80,14 @@ const actions = {
     let setPrecio = false
     let cantidad = false
     let precio = false
+    let indicacion = false
     let setSuma = false
     let setPrecioCosto = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       precio = obje.precio
+      indicacion = obje.indicacion
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
     }
@@ -144,6 +146,10 @@ const actions = {
 
           if (precio) {
             obj.precio = precio
+          }
+
+          if(indicacion){
+            obj.indicacion = indicacion
           }
 
           if (setSuma) {

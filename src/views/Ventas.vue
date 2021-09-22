@@ -242,6 +242,7 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :esDelivery="venta.EsDelivery"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -675,6 +676,11 @@ export default {
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
+                if(this.venta.EsDelivery){
+                    this.anularPagoDelivery()
+                }else if(this.$route.query.idPreOrden && this.$route.query.idCliente){
+                    this.anularPagoOrden()
+                }
             }
 
             if (obj.TieneIgv) {
@@ -887,13 +893,48 @@ export default {
                 this.infoDelivery = obj
                 this.venta.EsDelivery = true
                 this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
-                let productos = JSON.parse(obj.Productos)
-                productos.map((item) => {
-                    this.add([item.IdProducto, () => {
-                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                    }, { cantidad: item.Cantidad, precio:item.Precio }, false ])
-                })  
-                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')   
+                //cargar costo de delivery
+                let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2)
+                if (costoDelivery>0) {
+                    this.axios.get(this.API +'costo/delivery')
+                    .then((response) => {
+                        if(response.data){
+                            let costoDeliverObj = response.data
+                                costoDeliverObj.precio = costoDelivery
+                                costoDeliverObj.cantidad = 1
+                                costoDeliverObj.EsCostoDelivery = 1
+                                this.add([response.data, () => {
+                                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                                    validarCostoDelivery = true;
+                                }, { setPrecioCosto: false }, false ,false ])
+                                //Cargar Productos Delivery
+                                let productos = JSON.parse(obj.Productos)
+                                productos.map((item) => {
+                                    this.add([item.IdProducto, () => {
+                                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                                    }, { cantidad: item.Cantidad, precio:item.Precio, indicacion: item.Indicacion  }, false ])
+                                })
+                
+                                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')
+
+                        }else{
+                            this.$toasted.show("PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'")   
+                            this.anularPagoDelivery()
+                        }
+
+                    }).catch(error=>{
+                        this.$toasted.show('HUBO UN ERROR')
+                    })
+                } else {
+                    //Cargar Productos Delivery
+                    let productos = JSON.parse(obj.Productos)
+                    productos.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                        }, { cantidad: item.Cantidad, precio:item.Precio }, false ])
+                    })
+                
+                }
                  
             }
         },
@@ -1070,7 +1111,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                if((pro.CodigoBarra !== 'COSTODELIVERY') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
                 }
 

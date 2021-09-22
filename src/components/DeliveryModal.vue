@@ -569,7 +569,7 @@ export default {
     volverRealizarVenta(idpedido){
         let pedido = this.pedidos.find(p=>p.IdPedido == idpedido)
         if(pedido != undefined){
-            this.axios.get(this.API + '/venta/pedido/existe', {
+            this.axios.get(this.API + 'venta/pedido/existe', {
             params: {
                 IdPedido: idpedido
             }

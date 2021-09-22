@@ -104,6 +104,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
+            :disabled="bloquearInput?true:false || esDelivery"
             type="number"
             style="width: 90px"
             min="0"
@@ -127,7 +128,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
             type="number"
             style="width: 90px"
             min="0"
@@ -268,8 +269,13 @@
         </template>
 
         <template slot="stock" slot-scope="data">
-          <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
+          <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
+            <img src="static/moto-delivery.png" style="width: 24px" />
+          </div>
+          <div v-else>
+            <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+            <div v-if="!data.item.EsPadre">{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
+          </div>
         </template>
       </b-table>
     </b-col>
@@ -373,6 +379,7 @@ export default {
     igvTotal: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
+    esDelivery:Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
