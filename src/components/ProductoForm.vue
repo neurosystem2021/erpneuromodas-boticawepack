@@ -474,10 +474,11 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
-
+        this.$refs.file.value=null
         }).catch((error) => {
             console.log(error)
             this.initForm()
+            this.$refs.file.value=null
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
 
@@ -485,7 +486,7 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
+        this.$refs.file.value=null
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
