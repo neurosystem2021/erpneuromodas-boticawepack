@@ -905,7 +905,6 @@ export default {
                                 costoDeliverObj.EsCostoDelivery = 1
                                 this.add([response.data, () => {
                                     //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                                    validarCostoDelivery = true;
                                 }, { setPrecioCosto: false }, false ,false ])
                                 //Cargar Productos Delivery
                                 let productos = JSON.parse(obj.Productos)
