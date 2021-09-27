@@ -349,7 +349,7 @@ export default {
         this.initForm()
     },
     mounted () {
-        this.getNumeroVenta()
+        //this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
@@ -476,7 +476,7 @@ export default {
                 CampoDireccion: 'Direccion'
             }
 
-            this.loadFirstAlmacen()
+            //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -523,19 +523,37 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+            })
+        },
         getVendedor () {
+            this.$refs.inputAlmacen.$refs.input.disabled = true
+            this.$refs.inputPuntoVenta.$refs.input.disabled = true
+            this.$refs.inputVendedor.$refs.input.disabled = true
             let usuario = sessionStorage.getItem('User')
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
             })
             .catch((error) => {
                 console.log(error)
@@ -643,11 +661,12 @@ export default {
             this.tieneIgv = false
             this.initForm()
             this.limpiarCart()
-            this.getNumeroVenta()
+            //this.getNumeroVenta()
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
+            this.getVendedor()
             // this.$refs.inputVendedor.setValue('')
             this.$refs.carrito.pagocon = ''
         },

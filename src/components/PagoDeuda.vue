@@ -154,7 +154,8 @@ import config from '@/store/config.js'
                 pagos: [],
                 cajaBanco: {},
                 vendedor: {},
-                show: false
+                show: false,
+                idAlmacen:1
             }
         },
         methods: {
@@ -182,6 +183,7 @@ import config from '@/store/config.js'
             },
             setVendedor (obj) {
                 this.vendedor = obj
+                this.idAlmacen = obj.IdAlmacen
             },
             focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
@@ -227,7 +229,8 @@ import config from '@/store/config.js'
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
                     documentos: this.documentos,
-                    vendedor: this.vendedor
+                    vendedor: this.vendedor,
+                    idAlmacen: this.idAlmacen
                 })
                 .then((response) => {
                     console.log(response.data)
