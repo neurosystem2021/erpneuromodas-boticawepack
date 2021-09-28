@@ -2,9 +2,9 @@
   <div>
     <br>
     <b-container class="bv-example-row">
-      <b-row  align-h="end" class=" no-print">
+      <b-row  align-h="center" class=" no-print">
           <label v-if="!this.$route.params.id">Almacen:</label>
-          <b-col cols="3" v-if="!this.$route.params.id">
+          <b-col cols="4" v-if="!this.$route.params.id">
             <b-form-group size="sm">
               <autocomplete
                 required="required"
@@ -19,8 +19,8 @@
           </b-form-group>
           </b-col>
 
-              <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
-          <b-col cols="3" v-if="!this.$route.params.id" v-show="false">
+              <label v-if="!this.$route.params.id">Vendedor:</label>
+          <b-col cols="4" v-if="!this.$route.params.id">
             <b-form-group size="sm">
               <autocomplete
                   required="required"
@@ -34,7 +34,7 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col cols="7">
+          <b-col cols="12" class="text-center">
             <b-button-group size="sm" v-if="!this.$route.params.id">
               <b-form-select v-model="turno" :options="turnos" />
             </b-button-group>
@@ -59,14 +59,13 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
@@ -75,7 +74,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="5"></td>
+              <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
               <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
             </tr>
@@ -89,14 +88,13 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
@@ -105,7 +103,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="5"></td>
+              <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
             </tr>
@@ -120,14 +118,13 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
@@ -136,7 +133,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="5"></td>
+              <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
             </tr>
@@ -149,14 +146,13 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Total }}</td>
@@ -164,7 +160,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="3"></td>
               <td><b>Total Credito</b></td>
               <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
             </tr>
@@ -346,9 +342,10 @@ export default {
       let usuario = sessionStorage.getItem('User')
       this.axios.get(this.API + 'usuarios/' + usuario)
       .then((response) => {
-          //this.setVendedor(response.data)
-          //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          //this.$refs.inputVendedor.$refs.input.disabled = true
+          this.setVendedor(response.data)
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          this.$refs.inputVendedor.$refs.input.disabled = true
+          this.almacen.IdAlmacen = response.data.IdAlmacen
           this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
             .then(res => {
               this.setAlmacen(res.data)
@@ -385,7 +382,7 @@ export default {
         this.$toasted.show('Seleccione un Turno')
         return
       }
-       let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
+       let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - vendedor: "+this.vendedor.Usuario+" - Turno: "+this.turnos[this.turno].text+'?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
@@ -415,11 +412,11 @@ export default {
       }
 
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
 
       if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
+        //params.IdAlmacen = this.almacen.IdAlmacen
       }
 
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -436,11 +433,11 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
 
       if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
+        //params.IdAlmacen = this.almacen.IdAlmacen
       }
 
       this.axios.get(this.API + 'cierrecaja/ingresos',{
@@ -457,11 +454,11 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
 
       if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
+        //params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
