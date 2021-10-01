@@ -107,8 +107,9 @@
             type="number"
             style="width: 90px"
             min="0"
-            step="0.001"
+            step="0.1"
             @input="(val) => {
+              changeCant(false, productos[data.index])
               $emit('onInputCantidad', val)
              /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
