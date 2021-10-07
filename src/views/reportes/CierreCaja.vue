@@ -76,12 +76,12 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
+              <td style="white-space: nowrap;">{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="white-space: nowrap;">{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td style="white-space: nowrap;">{{ estadoVenta(item) }}</td>
+              <td style="white-space: nowrap;">S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -105,12 +105,12 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
+              <td style="white-space: nowrap;">{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="white-space: nowrap;">{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa | redondear }}</td>
+              <td style="white-space: nowrap;">{{ estadoVenta(item) }}</td>
+              <td style="white-space: nowrap;">S/. {{ item.Visa | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -135,12 +135,12 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
+              <td style="white-space: nowrap;">{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="white-space: nowrap;">{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td style="white-space: nowrap;">{{ estadoVenta(item) }}</td>
+              <td style="white-space: nowrap;">S/. {{ item.Mastercard | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -163,11 +163,11 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
+              <td style="white-space: nowrap;">{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="white-space: nowrap;">{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total | redondear }}</td>
+              <td style="white-space: nowrap;">{{ estadoVenta(item) }}</td>
+              <td style="white-space: nowrap;">S/. {{ item.Total | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
