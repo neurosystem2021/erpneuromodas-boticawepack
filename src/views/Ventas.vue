@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pago-deuda v-if="['admin', 'RUBEN', 'ALBERTO'].includes(usuario)"></pago-deuda>
+                        <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
