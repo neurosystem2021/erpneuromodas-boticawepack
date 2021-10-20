@@ -220,7 +220,8 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'itemNum', label: '#', variant: 'info', class:'text-center' },
+          { key: 'itemNum', label: '#', class:'text-center' },
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código', class:'text-center'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
