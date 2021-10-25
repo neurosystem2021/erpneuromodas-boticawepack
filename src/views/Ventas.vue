@@ -243,7 +243,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Izipay</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -264,7 +264,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Depósitos y Transferencias</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
