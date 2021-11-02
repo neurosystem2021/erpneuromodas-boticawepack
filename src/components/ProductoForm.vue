@@ -59,7 +59,7 @@
           </b-form-group>
 
           <b-form-group>
-            <label>Cod. P.:</label>
+            <!-- <label>Cod. P.:</label>
             <b-input-group>
               <autocomplete
                 :url="API + 'productos/modelos'"
@@ -72,7 +72,7 @@
                 :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
-            </b-input-group>
+            </b-input-group>-->
             <!--<b-form-input v-model="producto.ProductoModelo"
               required="required"
               class="upper"
@@ -293,7 +293,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <!--<b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -313,7 +313,7 @@
             </b-form-group>
           </b-card>
         </b-col>
-      </b-row>
+      </b-row>-->
 
       <hr />
       <b-row>
@@ -415,7 +415,7 @@ export default {
           this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
           
           // this.$refs.inputModelo.setValue('')
-          this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+          // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
           this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
           //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
@@ -565,7 +565,7 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
+      // this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')

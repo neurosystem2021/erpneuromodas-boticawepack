@@ -91,9 +91,9 @@
               </tfoot>
             </table>
           </b-row>
-          <b-alert variant="success" class="text-center no-print" show>
+          <!--<b-alert variant="success" class="text-center no-print" show>
             <b>TOTAL GENERAL: S/ {{ totalGeneral | moneda }}</b>
-          </b-alert>
+          </b-alert>-->
         </b-container>
     </div>
 </template>
