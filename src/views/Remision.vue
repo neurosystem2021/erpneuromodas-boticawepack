@@ -147,6 +147,12 @@
                   <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialCliente" placeholder="Razón Social" v-model="remision.razonSocialCliente" required>
                 </div>
               </div>
+              <div class="container">
+                <div class="row">
+                  <label for="direccionCliente" class="col-sm-4">Dirección</label>
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionCliente" placeholder="Dirección" v-model="remision.direccionCliente">
+                </div>
+              </div>
               <!-- <div class="container">
                 <div class="row">
                   <label for="observacion" class="col-sm-4">Dirección</label>
@@ -338,6 +344,7 @@ export default {
           this.remision.direccionOrigen = '';
           this.remision.nroDocumentoCliente = '';
           this.remision.razonSocialCliente = '';
+          this.remision.direccionCliente = '';
           this.remision.codUbigeoDestino = '';
           this.remision.direccionDestino = '';
           this.remision.nroDocumentoTransportista = '';
@@ -369,6 +376,7 @@ export default {
     setMovRef (obj) {
       this.$set(this.remision, 'nroDocumentoCliente', '');
       this.$set(this.remision, 'razonSocialCliente', '');
+      this.$set(this.remision, 'direccionCliente', '');
 
       this.$refs.inputDocRef.setValue('');
       this.remision.documentoReferencia = '';
@@ -392,6 +400,7 @@ export default {
                 if (response.data) {
                   this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
                   this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                  this.$set(this.remision, 'direccionCliente', response.data.Direccion);
 
                   this.cliente = response.data;
                 } else {
@@ -423,6 +432,7 @@ export default {
     setDocRef (obj) {
       this.$set(this.remision, 'nroDocumentoCliente', '');
       this.$set(this.remision, 'razonSocialCliente', '');
+      this.$set(this.remision, 'direccionCliente', '');
 
       this.$refs.inputMovRef.setValue('');
       this.limpiarCart();
@@ -444,6 +454,7 @@ export default {
               if (response.data) {
                 this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
                 this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                this.$set(this.remision, 'direccionCliente', response.data.Direccion);
 
                 this.cliente = response.data;
               } else {
