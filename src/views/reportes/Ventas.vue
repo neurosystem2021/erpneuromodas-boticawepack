@@ -229,7 +229,8 @@ export default {
            usuario: this.vendedor.Usuario,
            fechaInicio: this.fechaInicio,
            fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
          }
        }).then((response) => {
          this.ventasAcumuladas = response.data.total
@@ -239,7 +240,8 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
           }
         }).then((response) => {
           this.ventasAcumuladas = response.data.total
@@ -252,7 +254,8 @@ export default {
     },
     setAlmacen (obj) {
       this.almacen = obj
-      this.limpiarFiltros()
+      // this.limpiarFiltros()
+      this.getVentasAcumuladas()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     rowClick (item) {
@@ -300,7 +303,7 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      // document.location.reload()
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
