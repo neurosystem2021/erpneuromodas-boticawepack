@@ -19,6 +19,23 @@
                 </autocomplete>
               </b-form-group>
             </b-col>
+
+            <b-col md="2" class="my-1">
+              <b-form-group>
+                <label>Marca:</label>
+                <autocomplete
+                    ref="inputMarca"
+                    :url="API + 'marcas'"
+                    anchor="ProductoMarca"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setMarca" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputMarca')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+            </b-col>
+
             <b-col md="2" class="my-1">
               <b-form-group>
                 <label>Fecha Inicio:</label>
@@ -52,6 +69,7 @@
                 <tr>
                   <th>Código</th>
                   <th>Descripcion</th>
+                  <th>Marca</th>
                   <th>U. Medida</th>
                   <th>Total Ventas</th>
                   <th>Total Compras</th>
@@ -61,6 +79,7 @@
                 <tr v-for="(prod, i) in productos" :key="i">
                   <td>{{ prod.CodigoBarra }}</td>
                   <td>{{ prod.Producto | quitarcodigo }} - {{prod.ProductoCategoria + ' - ' + prod.ProductoMarca }}</td>
+                  <td>{{ prod.ProductoMarca }}</td>
                   <td>{{ prod.ProductoMedicion }}</td>
                   <td>{{ prod.TotalVentas }}</td>
                   <td>{{ prod.TotalCompras }}</td>
@@ -81,6 +100,7 @@ export default {
     return {
       API: config.API,
       almacen: {},
+      marca: {},
       productos: [],
       fechaDesde: this.$moment().format("YYYY-01-01"),
       fechaHasta: this.$moment().format("YYYY-MM-DD")
@@ -88,7 +108,7 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/articulosmovimientos?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta;
+      return '/api/index.php/reporte/articulosmovimientos?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta+'&idMarca='+(this.marca.IdProductoMarca || '');
     }
   },
   methods: {
@@ -102,6 +122,9 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
     },
+    setMarca (obj) {
+      this.marca = obj
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -111,7 +134,8 @@ export default {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
               fechaDesde: this.fechaDesde,
-              fechaHasta: this.fechaHasta
+              fechaHasta: this.fechaHasta,
+              idMarca: this.marca.IdProductoMarca
           }
       }).then((response) => {
           this.productos = response.data
