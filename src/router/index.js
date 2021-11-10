@@ -20,6 +20,8 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
+import Remision from '@/views/Remision.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 Vue.use(Router)
 
@@ -115,6 +117,16 @@ export default new Router({
       path: '/porentregar',
       name: 'PorEntregar',
       component: PorEntregar
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
     }
   ]
 })
