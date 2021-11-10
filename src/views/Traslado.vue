@@ -270,10 +270,13 @@ export default {
         return;
       }
 
+      let usuario = sessionStorage.getItem('User');
+
       this.axios.post(this.API + 'traslado', {
         movimiento: this.movimiento,
         productos: this.productos,
-        idAlmacen: this.almacenOrigen.IdAlmacen
+        idAlmacen: this.almacenOrigen.IdAlmacen,
+        usuario: usuario
       })
       .then((response) => {
         if (response.data.error) {

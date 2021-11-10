@@ -6,6 +6,7 @@
                 <th rowspan="2">FECHA</th>
                 <th rowspan="2">COMPROBANTE</th>
                 <th rowspan="2">PROVEEDOR/CLIENTE</th>
+                <th rowspan="2">USUARIO</th>
                 <th colspan="2">INGRESOS</th>
                 <th colspan="2">SALIDAS</th>
                 <th rowspan="2" class="table-danger">SALDO</th>
@@ -22,6 +23,7 @@
                 <td>{{ prod.Fecha }}</td>
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
                 <td>{{ prod.Nombres }}</td>
+                <td>{{ prod.UsuarioReg }}</td>
                 <td :class="{'table-warning': prod.IngresoCantidad > 0}">{{ prod.IngresoCantidad }}</td>
                 <td :class="{'table-warning': prod.IngresoPrecio > 0}">{{ prod.IngresoPrecio | redondear }}</td>
                 <td :class="{'table-warning': prod.SalidaCantidad > 0}">{{ prod.SalidaCantidad }}</td>
