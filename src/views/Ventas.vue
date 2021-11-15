@@ -13,7 +13,7 @@
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
+                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
                 </div>
             </div>
@@ -166,6 +166,20 @@
                                 label="writer"
                                 :on-select="setVendedor" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                :classes="{input: 'form-control'}">
+                            </autocomplete>
+                        </b-form-group>
+                        <b-form-group>
+                            <label>Comisionista</label>
+                            <autocomplete
+                                ref="inputComisionista"
+                                :url="API + 'comisionistas'"
+                                anchor="ClienteDniRuc"
+                                label="writer"
+                                placeholder="Comisionista"
+                                :onInput="(val) => newDniRuc = val"
+                                :on-select="setComisionista" 
+                                :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
@@ -346,6 +360,7 @@ export default {
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
+        this.getValorComision()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
     },
@@ -452,6 +467,7 @@ export default {
                 Serie: '',
                 Numero: '',
                 cliente: {},
+                comisionista: {},
                 tipoVenta: {
                     IdTipoDoc: 7,
                     TipoDoc: 'BOLETA ELEC.',
@@ -478,7 +494,8 @@ export default {
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
-                NotaDescMotivo: ''
+                NotaDescMotivo: '',
+                valorComision: null
             }
 
             this.isNota = false
@@ -611,7 +628,14 @@ export default {
         setVendedor (obj) {
             this.venta.vendedor = obj
         },
-        
+        setComisionista (obj) {
+            if (typeof obj === 'object') {
+                this.$refs.inputComisionista.setValue(obj.Cliente)
+                this.venta.comisionista = obj
+            } else {
+                this.venta.comisionista = {}
+            }
+        },
         setCliente (obj, dni = false) {
             let params = {}
             if (dni) {
@@ -853,6 +877,7 @@ export default {
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
+                this.$refs.inputComisionista.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
 
@@ -867,6 +892,17 @@ export default {
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
             this.venta.cliente = {}
+        },
+        eliminarComisionista () {
+            this.$refs.inputComisionista.setValue('')
+            this.venta.comisionista = {}
+        },
+        getValorComision () {
+            this.axios.get(this.API + 'ventas/comision')
+                .then(res => {
+                    // this.$refs.inputvalorComision.setValue(res.data.valorComision)
+                    this.venta.valorComision = res.data.valorComision
+                })
         }
     },
     components: {
