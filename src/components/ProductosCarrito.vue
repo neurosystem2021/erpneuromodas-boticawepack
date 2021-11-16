@@ -284,7 +284,7 @@
       <slot name="adicional"></slot>
     </b-col>
     <b-col md="3">
-          <table class="table b-table border table-footer">
+          <table class="table b-table border table-footer" v-if="!noSubtotal">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
                 <td class="table-success">SubTotal</td>
@@ -407,7 +407,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
