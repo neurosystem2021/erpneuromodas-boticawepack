@@ -131,8 +131,7 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)">
+            @input="setNuevoPrecioContado(data.index)">
           </b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -431,7 +430,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color'}, 
+          //{ key: 'ProductoModelo', label: 'Modelo/Color'}, 
           //{ key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -799,7 +798,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
       obj.cantidadPres = this.cant
       if(this.indexProdSelect == null){
         this.add([obj, () => {
@@ -829,14 +828,55 @@ export default {
       }
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+       if (this.idAlmacen) {
+        let style = 'ss'
+        // cambiar color los vencidos
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+        }
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 700px; text-align: center  ">
+            <thead>
+              <tr style>
+                <th class="table-info" style="width: 60px">Stock</th>
+                <th>Producto.</th>
+                <th>Marca.</th>
+                <th class="table-success" style="width: 65px">Precio.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-info bg-${style}"><b>
+                ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
+                <td>${data.Producto}</td>
+                <td>${data.ProductoMarca}</td>
+                <td class="table-success"><b>${data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `
       }
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
-      </div>  
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoMarca} 
       `
     },
     // setCantidad (index, val) {
@@ -865,8 +905,8 @@ export default {
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      //Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+      //Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
