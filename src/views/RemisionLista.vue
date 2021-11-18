@@ -74,7 +74,7 @@
                       </tr>
                     </tbody>
                   </table>
-
+                      <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
                       </b-row>
                   </b-card>
                 </template>
@@ -267,8 +267,9 @@ export default {
     },
     moverAEmitidos (doc) {
       this.loading = true
-      this.axios.post(this.API + 'moveraemitidos', {
-        idDocVenta: doc.idDocVenta
+
+      this.axios.post(this.API + 'moveraemitidosguia', {
+        idDocVentaRemision: doc.IdDocVentaRemision
       }).then( response => {
         this.$refs.tablaVentas.refresh()
         this.loading = false
