@@ -130,8 +130,7 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)">
+            @input="setNuevoPrecioContado(data.index)">
           </b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -177,7 +176,6 @@
             type="number"
             min="0"
             step="0.01"
-            readonly
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
