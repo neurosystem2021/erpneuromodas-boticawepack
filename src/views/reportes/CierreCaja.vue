@@ -1,9 +1,18 @@
 <template>
-  <div>
+  <div :class="{'fondo-empresa': (this.empresa === 'dismart')}">
     <br>
     <b-container class="bv-example-row">
       <div>
           <div class="float-right no-print">
+
+            <div class="float-left"  v-if="!this.$route.params.id">
+                    <b-button-group size="sm">
+                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                            <option value="rosmart">EMPRESA ROSMART</option>
+                            <option value="dismart">EMPRESA DISMART</option>
+                        </select>
+                    </b-button-group>
+                </div>
               <b-row>
                 <b-col cols="2" v-if="!this.$route.params.id">
                     <label v-if="!this.$route.params.id" v-show="false">Vendedor:</label>
@@ -28,7 +37,7 @@
                         <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <cierres-caja></cierres-caja>
+                        <cierres-caja :empresa="empresa"></cierres-caja>
                     </b-button-group>
                     <b-button-group size="sm">
                         <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
@@ -223,12 +232,34 @@ import config from '@/store/config.js'
 import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
+  beforeMount () {
+    let empresa = sessionStorage.getItem('empresa') || 'rosmart';
+    if (this.$route.query.empresa === 'dismart') {
+      empresa = 'dismart';
+    }
+    
+    // Interceptos XMLHttpRequest
+    let oldXHROpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+        // do something with the method, url and etc.
+        var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
+        newUrl = new URL(newUrl);
+        newUrl.searchParams.append('empresa', empresa);
+        url = newUrl.toString();
+        arguments[1] = url
+        return oldXHROpen.apply(this, arguments);
+    }
+  },
   mounted () {
     this.loadData()
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
     } else {
         this.getVendedor()
+    }
+
+    if (sessionStorage.getItem('empresa')) {
+      this.empresa = sessionStorage.getItem('empresa');
     }
   },
   data () {
@@ -245,7 +276,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      empresa: 'rosmart'
     }
   },
   computed: {
@@ -322,6 +354,11 @@ export default {
     }
   },
   methods: {
+    cambiarEmpresa () {
+        sessionStorage.setItem('empresa', this.empresa)
+        window.location.reload();
+        return false;
+    },
     getVendedor () {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
@@ -458,6 +495,9 @@ th {
 }
 .si-print {
   display: none;
+}
+.fondo-empresa {
+    background: #eff9ff;
 }
 @media print {
   .no-print {

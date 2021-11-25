@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
+        <b-button @click="show=true" variant="outline-primary">Ver Proformas</b-button>
         
         <b-form >    
             <b-modal id="modalProformas" 
@@ -24,7 +24,7 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                     </b-table>
@@ -60,6 +60,7 @@ import config from '@/store/config.js'
             })
           }
         },
+        props: ['empresa'],
         data () {
             return {
                 API: config.API,
