@@ -832,11 +832,11 @@ export default {
         let style = 'ss'
         // cambiar color los vencidos
         if(data.stock <= 0) {
-          style = 'danger'
+          style = '#d8515e'
         }
         // cambiar color los que faltan 4 meses por vencer
         if (data.stock > 0) {
-          style = 'success'
+          style = '#50b468'
         }
         return `
         <style>
@@ -864,11 +864,11 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="table-info bg-${style}"><b>
+                <td class="table-info" style="background:${style};"><b>
                 ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
                 <td>${data.Producto}</td>
                 <td>${data.ProductoMarca}</td>
-                <td class="table-success"><b>${data.PrecioContado}</b></td>
+                <td class="table-success"><b>${ data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b></td>
               </tr>
             </tbody>
           </table>   
@@ -991,5 +991,12 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+
+
+</style>
+<style>
+  .autocomplete ul li.focus-list a{ 
+    background: #accbe7 !important;
   }
 </style>

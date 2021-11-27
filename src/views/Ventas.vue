@@ -31,7 +31,7 @@
                 <b-row>
                     <b-col md="7">
                         <b-row>
-                            <b-col md="4">
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <label>Tipo de Venta:</label>
                                     <autocomplete
@@ -63,7 +63,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -84,7 +84,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -101,7 +101,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
+                            <b-col md="12" style="margin-top:-15px">
                                 <b-form-group>
                                     <label>Cliente:</label>
                                     
@@ -216,7 +216,7 @@
                             :isNota="isNota"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
+                            :onSetProducto="onSetProducto" style="margin-top:-20px">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -357,7 +357,7 @@
                         </productos-carrito>
                     </b-col>
                 </b-row>
-                <b-row align-h="center" class="text-center">
+                <b-row align-h="center" class="text-center" style="margin-top:-15px">
                     <b-col cols="8">
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
