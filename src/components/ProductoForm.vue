@@ -58,7 +58,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Modelo/Color:</label>
             <b-input-group>
               <autocomplete
@@ -468,7 +468,7 @@ export default {
           this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
           
           // this.$refs.inputModelo.setValue('')
-          this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+          //this.$refs.inputModelo.setValue(newVal.ProductoModelo)
           this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
           //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
           //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
@@ -503,7 +503,7 @@ export default {
           this.producto.StockMinimo           = newVal.StockMinimo
           this.producto.StockPorMayor         = newVal.StockPorMayor
           this.producto.CodigoBarra           = newVal.CodigoBarra
-          this.producto.ProductoModelo        = newVal.ProductoModelo
+          //this.producto.ProductoModelo        = newVal.ProductoModelo
           this.producto.ProductoDesc          = newVal.ProductoDesc
           this.producto.ProductoDesc2         = newVal.ProductoDesc2
           this.producto.ProductoDesc3         = newVal.ProductoDesc3

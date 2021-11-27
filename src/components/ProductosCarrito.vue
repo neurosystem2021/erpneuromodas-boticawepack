@@ -183,7 +183,7 @@
             </b-form-text>
         </template>
 
-        <template slot="utilidad" slot-scope="data">
+        <template slot="utilidad" slot-scope="data" v-if="false">
           <input 
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
@@ -828,55 +828,21 @@ export default {
       }
     },
     renderChild(data) {
-       if (this.idAlmacen) {
+      if (this.idAlmacen) {
         let style = 'ss'
-        // cambiar color los vencidos
         if(data.stock <= 0) {
-          style = '#d8515e'
+          style = 'danger'
         }
         // cambiar color los que faltan 4 meses por vencer
         if (data.stock > 0) {
-          style = '#50b468'
-        }
-        return `
-        <style>
-          #table-render {
-            font-size: 13px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-          }
-          #table-render td, #table-render th {
-            border: 1px solid #eaeaea;
-          }
-          #table-render td, #table-render th {
-            color: #000000 !important;
-          }
-        </style>
-        <div>
-          <table id="table-render" style="width: 700px; text-align: center  ">
-            <thead>
-              <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
-                <th>Producto.</th>
-                <th>Marca.</th>
-                <th class="table-success" style="width: 65px">Precio.</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="table-info" style="background:${style};"><b>
-                ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
-                <td>${data.Producto}</td>
-                <td>${data.ProductoMarca}</td>
-                <td class="table-success"><b>${ data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b></td>
-              </tr>
-            </tbody>
-          </table>   
-        </div>
-        `
+          style = 'success'
       }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoMarca} 
+         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b> 
+      `
+      }
+      return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}
       `
     },
     // setCantidad (index, val) {
@@ -994,9 +960,4 @@ export default {
   }
 
 
-</style>
-<style>
-  .autocomplete ul li.focus-list a{ 
-    background: #accbe7 !important;
-  }
 </style>
