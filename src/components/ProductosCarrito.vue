@@ -42,7 +42,6 @@
         </template>
         <template slot="precio" slot-scope="data">
           <b-form-input
-            disabled
             v-model="productos[data.index].precio"
             type="number"
             style="width: 75px"
