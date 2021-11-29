@@ -45,6 +45,7 @@
             v-model="productos[data.index].precio"
             type="number"
             style="width: 75px"
+            :disabled="tipo == 'mov' ? false : true"
             min="0"
             step="0.0001"
             placeholder="Precio"
@@ -197,7 +198,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    tipo: String,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
