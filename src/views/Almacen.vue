@@ -30,7 +30,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -286,7 +286,7 @@ export default {
       this.totalRows = response.data.total
     })
 
-    this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen
+    this.hrefExcel = '/api/index.php/reporte/stock?almacen='+this.almacen.Almacen+'&idAlmacen=' + this.almacen.IdAlmacen
   },
   data() {
     return {
@@ -300,7 +300,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: 'PRINCIPAL'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -450,7 +450,7 @@ export default {
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
       
-      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
+      this.hrefExcel = '/api/index.php/reporte/stock?almacen='+this.almacen.Almacen+'&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
       console.log(this.hrefExcel);
 
       return promise.then((result) => {
