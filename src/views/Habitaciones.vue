@@ -1,6 +1,20 @@
 <template>
     <div>
       <b-container class="bv-example-row">
+		  <br>
+		  <div>
+			<div class="float-left">
+				<b-button-group>
+					<b-button variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button>
+				</b-button-group>
+			</div>
+			<div class="float-right">
+				<b-button-group>
+					<b-button variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Sucias</b-button>
+				</b-button-group>
+			</div>
+		  </div>
+		  <br>
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>
@@ -10,10 +24,24 @@
         	<b-row>
 
 					<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
-						<b-card :bg-variant="getVariant(hab)"
+						<b-card :bg-variant="getVariant(hab)"  :header-bg-variant="hab.EstaSucio==1?'secondary':'none'" text-variant="white"
 										class="text-center">
-										
-								<h5>{{ hab.Producto }}</h5>
+								<div slot="header">
+									<b-row v-if="hab.EstaSucio==1">
+										<b-col md="2">
+											<b-button variant="info" size="sm" @click="limpiarHabitacion(hab.IdProducto,hab.Producto)"><i class="fas fa-broom"></i></b-button>
+										</b-col>
+										<b-col md="10">
+											<label>{{ hab.Producto }}</label>
+										</b-col>
+									</b-row>
+									<b-row v-else>
+										<b-col md="12">
+											<label>{{ hab.Producto }}</label>
+										</b-col>
+									</b-row>
+								</div>			
+								
 								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
 									<li><b>{{ hab.Cliente }}</b> </li>
@@ -229,6 +257,53 @@ export default {
 		}
 	},
 	methods: {
+		comenzarLimpieza(){
+			let r = confirm('¿Se iniciará la limpieza, está seguro?')
+			if (r) {
+				this.axios.post(this.API + 'habitaciones/iniciar/limpieza', {
+				}).then(res => {
+					if (res.data.updated) {
+						this.getHabitaciones()
+						this.$toasted.success('Se ha comenzado la limpieza')
+					}
+				})
+			}
+		},
+		imprimirHabitacionesSucias(){
+			var left = (screen.width/2)-(800/2);
+			var top = (screen.height/2)-(800/2);
+			var fechaHora = this.$moment().format("YYYY-MM-DD HH:mm:ss");
+			var schema = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h1>Mi Hotel<h1><h3>Reporte de Habitaciones Sucias</h3><label style='font-weight:bold'>Fecha y Hora: "+fechaHora+"</label><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
+			var habita = "";
+			for (let key in [1,2,3,4,5,6,7,8,9,10,11]) {
+				this.habitaciones.forEach(ha => {
+				if(ha.EstaSucio==1 && ha.Piso==key){
+					habita += "<tr style='font-size:0.8rem'><td style='border-top: black 1px dashed;'>"+ha.Producto+"</td><td style='text-align: center; vertical-align: middle; border-top: black 1px dashed;'>"+ha.Piso+"</td><td style='text-align: center; vertical-align: middle; font-weight:bold; border-top: black 1px dashed;'>"+(ha.EstadoHabitacion==3?'SI':'NO')+"</td><td style='border: black 1px dashed;'></td></tr>"; 
+				}
+				}) 
+			}
+			var schemaFinal = "</tbody></table></div>";
+			var myWindow = window.open ('', 'IMPRIMIR COMANDA', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=800, height=800, top='+top+', left='+left);
+			myWindow.document.write(schema+habita+schemaFinal);
+			myWindow.document.close();
+			myWindow.focus();
+			myWindow.print();
+			myWindow.close();
+		},
+		limpiarHabitacion(IdProducto,Producto){
+
+			let r = confirm('¿Se limpió correctamente la: '+Producto+"?")
+			if (r) {
+				this.axios.post(this.API + 'habitaciones/limpiar', {
+					IdProducto: IdProducto,
+				}).then(res => {
+					if (res.data.updated) {
+						this.$toasted.success('¡Limpiado!')
+						this.getHabitaciones()
+					}
+				})
+			}
+		},
 		guardarNuevaFechaFin() {
 			this.axios.post(this.API + 'habitaciones/fecha', {
 				IdProducto: this.selectProducto.IdProducto,
