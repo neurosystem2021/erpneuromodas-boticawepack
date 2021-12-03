@@ -140,7 +140,6 @@
           <b-form-group>
             <label>Precio Convenio:</label>
             <b-form-input   
-              required="required"
               step="0.01"
               v-model="producto.PrecioConvenio"
               type="number"
