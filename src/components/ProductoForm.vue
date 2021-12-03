@@ -136,7 +136,17 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          
+
+          <b-form-group>
+            <label>Precio Convenio:</label>
+            <b-form-input   
+              required="required"
+              step="0.01"
+              v-model="producto.PrecioConvenio"
+              type="number"
+              ></b-form-input>
+          </b-form-group>
+
         </b-col>
       </b-row>
 
@@ -311,6 +321,7 @@ export default {
         // this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
+        this.producto.PrecioConvenio = newVal.PrecioConvenio
         this.producto.CodigoBarra = newVal.CodigoBarra
         //this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion

@@ -42,7 +42,12 @@
             @input="(val) => {
               $emit('onInputCantidad', val)
               if (tipo != 'mov') {
-                productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+                precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+                if (cliente.EsVIP && productos[data.index].PrecioConvenio < precio) {
+                  precio = productos[data.index].PrecioConvenio
+                }
+
+                productos[data.index].precio = precio
               }
             }"
             placeholder="Cantidad"></b-form-input>
@@ -200,7 +205,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      cliente: {},
     }
   },
   watch: {
@@ -321,7 +327,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
+        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true, this.cliente.EsVIP])
       }
     },
     /*alterarBuscadorProductos() {
@@ -368,7 +374,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }, { setPrecioCosto: this.tipo == 'mov' ? true : false }])
+      }, { setPrecioCosto: this.tipo == 'mov' ? true : false }, false, this.cliente.EsVIP])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },

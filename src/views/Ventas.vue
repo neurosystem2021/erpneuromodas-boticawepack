@@ -669,6 +669,8 @@ export default {
                     console.log(error)
                 })
             }
+
+            this.$refs.carrito.cliente = obj;
         },
         onSetProducto (obj) {
             obj.cantidad = 1

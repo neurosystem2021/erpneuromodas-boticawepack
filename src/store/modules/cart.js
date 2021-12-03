@@ -58,7 +58,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip]) {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
@@ -74,6 +74,10 @@ const actions = {
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+      }
+
+      if (isClienteVip) {
+        producto.precio = producto.PrecioConvenio || producto.precio;
       }
 
       commit('AGREGAR_PRODUCTO', producto)
@@ -95,6 +99,10 @@ const actions = {
           } else {
             obj.cantidad = 0
             obj.precio = 0
+          }
+
+          if (isClienteVip) {
+            producto.precio = producto.precioConvenio || producto.precio;
           }
 
           if (cantidad) {
