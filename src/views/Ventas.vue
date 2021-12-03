@@ -30,6 +30,11 @@
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
+                        <b-row  v-if="venta.EsConsumo==1">
+                            <b-col md="12" >
+                                <h4>Venta: <b-badge variant="warning">POR CONSUMO</b-badge></h4>
+                            </b-col>
+                        </b-row>
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
@@ -262,6 +267,14 @@
                                                     :unchecked-value="0">
                                                     Por entregar
                                                 </b-form-checkbox>
+                                                <hr>
+                                                <b-form-checkbox 
+                                                    :disabled="bloquearInput?true:false"
+                                                    v-model="venta.EsConsumo"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por Consumo
+                                                </b-form-checkbox>   
                                             </td>
                                         </tr>
                                     </tbody>
@@ -562,7 +575,8 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: 'Direccion'
+                CampoDireccion: 'Direccion',
+                EsConsumo: 0
             }
             this.isNota = false
             this.bloquearInput=false
