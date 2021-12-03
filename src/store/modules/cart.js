@@ -76,7 +76,7 @@ const actions = {
         producto.precio = producto.PrecioCosto
       }
 
-      if (isClienteVip) {
+      if (producto.PrecioConvenio > 0 && isClienteVip) {
         producto.precio = producto.PrecioConvenio || producto.precio;
       }
 

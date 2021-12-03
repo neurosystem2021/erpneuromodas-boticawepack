@@ -43,7 +43,7 @@
               $emit('onInputCantidad', val)
               if (tipo != 'mov') {
                 precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
-                if (cliente.EsVIP && productos[data.index].PrecioConvenio < precio) {
+                if (cliente.EsVIP && productos[data.index].PrecioConvenio < precio && productos[data.index].PrecioConvenio > 0) {
                   precio = productos[data.index].PrecioConvenio
                 }
 
