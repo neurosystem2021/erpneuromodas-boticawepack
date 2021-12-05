@@ -220,7 +220,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -283,7 +283,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <b-form-input v-model="producto.precioConvenio"
@@ -462,7 +462,7 @@ export default {
         this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
-        this.producto.precioConvenio        = newVal.precioConvenio
+        //this.producto.precioConvenio        = newVal.precioConvenio
         this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
