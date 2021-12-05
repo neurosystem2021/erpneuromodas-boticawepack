@@ -108,8 +108,8 @@
                 </template>
 
                 <template slot="Entregar" slot-scope="data">
-                  <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
-                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
+                  <button class="btn btn-success" @click="() => entregarVehiculo(data.item)">ENTREGAR</button>
+                  <!--<button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>-->
                 </template>
 
               </b-table>
@@ -234,8 +234,9 @@ export default {
             { key: 'Serie', label: 'Serie', sortable: true },
             { key: 'Numero', sortable: true },
             { key: 'Cliente', sortable: true },
+            { key: 'Placa', sortable: true },
             { key: 'Anulado', label: 'Anulado', sortable: true },
-            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
+            //{ key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
             { key: 'Reimprimir', label: 'Ver' },
             { key: 'Entregar' }
@@ -270,6 +271,17 @@ export default {
     }  
   },
   methods: {
+    entregarVehiculo(venta){
+        let r = confirm('¿Esta seguro de entregar el vehiculo?')
+        if (r) {
+            this.axios.post(this.API + 'ventas/entregar/vehiculo', {
+                idDocVenta: venta.idDocVenta
+            }).then((response) => {
+                this.$toasted.success('Vehículo entregado correctamente')
+                this.$refs.tablaVentas.refresh()
+            })
+        }
+    },
     entregarVenta (venta) {
         let r = confirm('¿Esta seguro de entregar esta venta?')
 

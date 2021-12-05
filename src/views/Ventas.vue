@@ -39,7 +39,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="NOTA DE VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -71,7 +71,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="COCHERA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -92,7 +92,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="COCHERA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -101,7 +101,19 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
+
+                            <b-col md="3">
+                                <b-form-group>
+                                    <label>Nº Placa:</label>
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            required
+                                            class="form-control"
+                                            placeholder="Placa" />
+                                </b-form-group>
+                            </b-col>
+
+                            <b-col md="9">
                                 <b-form-group>
                                     <label>Cliente:</label>
                                     
@@ -260,7 +272,7 @@
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
                                                     :unchecked-value="0">
-                                                    Por entregar
+                                                    Por entregar vehículo
                                                 </b-form-checkbox>
                                             </td>
                                         </tr>
@@ -344,7 +356,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center" v-if="false" >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -357,11 +369,14 @@
                     </b-col>
                 </b-row>
                 <b-row align-h="center" class="text-center">
+                    <b-col cols="8" v-if="venta.puntoVenta.Ip=='' || venta.puntoVenta.Puerto=='' ">
+                        <label>No se cargo la impresora del punto de venta ,porfavor actualice la pagina antes de vender</label>
+                    </b-col>
                     <b-col cols="8">
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress || venta.puntoVenta.Ip=='' || venta.puntoVenta.Puerto==''  " variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button v-if="ultimaVenta"  variant="primary" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -398,6 +413,7 @@ export default {
             gasto: 0,
             newDniRuc: '',
             ultimaVenta: '',
+            ultimaVentaData:{},
             inProgress: false,
             API: config.API,
             puntosAplicados: 0,
@@ -421,21 +437,21 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'Producto' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'Producto', label: 'Vehículo' , class:'text-center centrar' },
                     //{ key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'eventPres', label: '' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
-                    { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+                    { key: 'cantidad' , class:'centrar' },
+                    { key: 'precio', label: 'Precio', class:'centrar' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center centrar' }, 
+                    { key: 'descuento', label: 'Descuento', class:'text-center centrar'},
+                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center centrar' },
                     { key: 'acciones', label: ''}
                 ]
             },
@@ -444,7 +460,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+               this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -537,18 +553,20 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'COCHERA'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'COCHERA',
+                    Ip:'',
+                    Puerto:''
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -564,7 +582,9 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: ''
+                CampoDireccion: '',
+                Placa: '',
+                PorEntregar:1
             }
             this.isNota = false
             this.bloquearInput=false
@@ -766,11 +786,13 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+             this.venta.pago.visa.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -869,12 +891,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
-
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -942,12 +979,12 @@ export default {
                     totalCero += 1
                 }
             });
-
+            /*
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
@@ -975,24 +1012,71 @@ export default {
                     this.$toasted.show(response.data.msg)
                     return; 
                 }else{
-                // limpiar preorden seleccionado
+                                     try {
+                        this.venta.productos.map((pro)=>{
+                            delete pro.nuevoPrecioContado
+                            delete pro.Descripcion
+                            delete pro.disabledProf
+                            delete pro.normalPrecioContado
+                        });
+                        delete this.venta.cliente.Anulado
+                        delete this.venta.cliente.FechaReg
+                        delete this.venta.cliente.UsuarioReg
+                        delete this.venta.cliente.FechaMod
+                        delete this.venta.cliente.UsuarioMod
+                        delete this.venta.cliente.FechaNacimiento
+                        delete this.venta.cliente.Nacionalidad
+                        delete this.venta.cliente.Direccion3
+                        delete this.venta.cliente.Telefono
+                        delete this.venta.cliente.Email
+                        delete this.venta.cliente.Puntos
+                        delete this.venta.cliente.EsVIP
+                        delete this.venta.cliente.Direccion2
+                        delete this.venta.cliente.Sexo
+                        delete this.venta.cliente.Ocupacion
+                        delete this.venta.cliente.NombreComercial
+                        delete this.venta.cliente.esComisionista
+                        delete this.venta.idProductos
+                        delete this.venta.vendedor.APPTOKEN
+                        delete this.venta.vendedor.APPURL
+                        delete this.venta.vendedor.Anulado
+                        delete this.venta.vendedor.FechaReg
+                        delete this.venta.vendedor.UsuarioReg
+                        delete this.venta.vendedor.FechaMod
+                        delete this.venta.vendedor.UsuarioMod
+                        let dataInfoDocVenta = {
+                          Serie:  response.data.serie,
+                          Numero: response.data.numero,
+                          Fecha: response.data.fecha,
+                        }
+                        this.venta.dataInfoDocVenta = dataInfoDocVenta
+                         let ventaJson= JSON.stringify(this.venta)
+                         var left = (screen.width/2)-(800/2)
+                         var top = (screen.height/2)-(800/2)
+                         let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                         window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    } catch (error) {
+  
+                    }
+                    // limpiar preorden seleccionado
                     this.$router.replace('/ventas')
-                    this.$toasted.success('Venta realizada con exito')
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
+                    this.ultimaVentaData = this.venta
                     this.initForm()
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
-                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                    this.$refs.inputAlmacen.setValue('VENTA')
-                    this.$refs.inputPuntoVenta.setValue('CAJA1')
+                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                    this.$refs.inputAlmacen.setValue('COCHERA')
+                    this.$refs.inputPuntoVenta.setValue('COCHERA')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    this.$toasted.success('Venta realizada con exito')
+                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
                 }
                  
@@ -1004,6 +1088,16 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
+        },
+        imprimirUltimaVenta(){
+            try {
+               let ventaJson= JSON.stringify(this.ultimaVentaData)
+               var left = (screen.width/2)-(800/2)
+               var top = (screen.height/2)-(800/2)
+               let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+               window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+            } catch (error) {
+            }
         },
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
@@ -1035,4 +1129,10 @@ export default {
     font-size: 30px;
 }
 
+</style>
+<style>
+    td.centrar{
+        text-align: center;
+      vertical-align: middle !important;
+    }
 </style>

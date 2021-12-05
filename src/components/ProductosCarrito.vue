@@ -2,7 +2,7 @@
   <b-row>
     <b-col md="12">
       <b-form-group>
-        <label>Agregar Productos:</label>
+        <label>Tipo de Vehículo:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -11,7 +11,7 @@
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
-            placeholder="Agregar Producto"
+            placeholder="Tipo de Vehículo"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
@@ -27,7 +27,6 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,obj) =>{agregarGuardar(id,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -104,13 +103,13 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
             type="number"
             style="width: 90px"
             min="0"
-            step="0.001"
+            step="1"
             @input="(val) => {
               $emit('onInputCantidad', val)
+                changeCant(false, productos[data.index])
              /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -132,7 +131,7 @@
             type="number"
             style="width: 90px"
             min="0"
-            step="0.00001"
+            step="0.001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             :v-on="setNuevoPrecioContado(data.index)"
@@ -166,7 +165,7 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         
-        <template slot="manoobra" slot-scope="data">
+        <template slot="manoobra" slot-scope="data" v-if="false">
           <input  :disabled="bloquearInput?true:false"
             @change="(e) => addManoDeObra(data.index, e)"
             v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
@@ -187,7 +186,7 @@
             </b-form-text>
         </template>
 
-        <template slot="utilidad" slot-scope="data">
+        <template slot="utilidad" slot-scope="data" v-if="false">
           <input 
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
@@ -631,7 +630,7 @@ export default {
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
+      obj.estadoPxP = true
       this.loadCode = ''
       this.preciosProd = []
       if (!this.isVentas) {
@@ -680,7 +679,7 @@ export default {
           }
           
         }else{
-          this.$toasted.success('Producto añadido correctamente')
+          this.$toasted.success('Vehículo añadido correctamente')
         }
         
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
@@ -707,7 +706,7 @@ export default {
       obj = this.onSetProducto(obj, prod.cantidad)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
+        this.$toasted.success('Vehículo añadido correctamente')
       }, false, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
@@ -735,13 +734,9 @@ export default {
       //}
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
-      }
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+      <div>
+        <b>${data.Producto} - S/ ${data.PrecioContado}</b>
       </div>  
       `
     },
