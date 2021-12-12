@@ -69,7 +69,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -91,7 +91,7 @@ export default {
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [ 5, 10, 15, 50, 100, 200  ],
       filter: '',
       sortBy: 'IdDocVenta',
       sortDesc: false,
@@ -103,6 +103,7 @@ export default {
             { key: 'Correlativo', label: 'Serie', sortable: true },
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
+            { key: 'NotaCreApli', label: 'Apli. Nota Cred.', sortable: true},
             { key: 'Saldo', label: 'Saldo', sortable: true },
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
