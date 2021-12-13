@@ -857,7 +857,7 @@ export default {
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.carrito.pagocon = ''
+                this.$refs.carrito.pagocon = 0
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
 
