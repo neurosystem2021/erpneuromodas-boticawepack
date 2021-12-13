@@ -335,6 +335,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -375,8 +376,8 @@ export default {
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'Ancho', label: 'Corte Ancho.', class:'text-center' }, 
-                    { key: 'Largo', label: 'Corte Largo.', class:'text-center' }, 
+                    //{ key: 'Ancho', label: 'Corte Ancho.', class:'text-center' }, 
+                    { key: 'Largo', label: 'Corte Largo (mts)', class:'text-center' }, 
                     { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -390,7 +391,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+              this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -418,6 +419,14 @@ export default {
                 .then(res => {
                     this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta)
                     this.setPuntoVenta(res.data)
+                })
+        },
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientesdni/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
                 })
         },
         loadClienteBarcode (e) {
@@ -637,11 +646,13 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+            this.venta.pago.visa.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -708,6 +719,30 @@ export default {
                 return
             }
 
+            let sinStock = 0
+            let totalCero = 0 
+            this.productos.forEach(pro => {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*(pro.SoloLargo==1?pro.Largo:1)) )) {
+                    sinStock += 1
+                }
+
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+            });
+
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede enviar una proforma con productos en S/. 0.00');
+                this.inProgress = false
+                return;
+            }
+
+            if (sinStock >= 1) {
+                this.$toasted.error('No se puede crear una proforma con productos sin stock');
+                this.inProgress = false            
+                return;
+            }
+
             this.venta.productos = this.productos
             
             this.axios.post(this.API + 'proformas', this.venta)
@@ -733,12 +768,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -761,7 +811,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*(pro.SoloLargo==1?pro.Largo:1)) )) {
                     sinStock += 1
                 }
 
@@ -773,6 +823,12 @@ export default {
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
+                return;
+            }
+
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false            
                 return;
             }
 

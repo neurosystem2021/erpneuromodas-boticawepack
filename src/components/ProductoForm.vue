@@ -3,19 +3,19 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
@@ -64,6 +64,7 @@
             <b-form-input v-model="producto.Producto"
               ref="inputProducto"
               required="required"
+              autocomplete="off"
               type="text"
               @input="(val) => producto.Producto = val && val.toUpperCase()"
               :value="producto.Producto"
@@ -141,54 +142,22 @@
                      v-model="producto.SoloLargo"
                      :value="1"
                      :unchecked-value="0">
-                     Solo Largo
+                     Tiene dimensiones
             </b-form-checkbox>
           </b-form-group>
           
         </b-col>
       </b-row>
 
-      <b-row class="rendimiento">
-        <!-- <b-col md="4">
-          <b-form-group>
-            <label>Rendimiento (M²):</label>
-            <b-form-input
-              v-model="producto.Rendimiento"
-              type="number"
-              :readonly="!producto.EsPadre"
-              ></b-form-input>
-          </b-form-group>
-        </b-col> -->
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Ancho (cm):</label>
-            <b-form-input
-              v-model="producto.Ancho"
-              type="number"
-              :readonly="!!producto.EsPadre"
-               @input="val => calcularm2()"
-              ></b-form-input>
-          </b-form-group>
-        </b-col>
+      <b-row class="rendimiento" v-if="producto.SoloLargo==1">
         <b-col md="6">
           <b-form-group>
-            <label>Largo (cm):</label>
+            <label>Largo (mts):</label>
             <b-form-input
               v-model="producto.Largo"
+              autocomplete="off"
               type="number"
-              :readonly="!!producto.EsPadre"
-               @input="val => calcularm2()"
               ></b-form-input>
-          </b-form-group>
-        </b-col>
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Calculo de Pie<sup>2</sup> : {{ pie2total.toFixed(1) }}</label>
-          </b-form-group>
-        </b-col>
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Precio por Pie<sup>2</sup> : {{ (producto.PrecioContado/pie2total).toFixed(2) }}</label>
           </b-form-group>
         </b-col>
       </b-row>
@@ -198,19 +167,20 @@
       <b-row v-if="producto.IdProducto || producto.EsPadre">
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Costo:</label>
+            <label>Precio de Costo: <span style="font-weight:bold" v-if="producto.SoloLargo==1">(POR METRO)</span></label>
             <b-form-input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
+              autocomplete="off"
               type="number"
               ></b-form-input>
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Venta:</label>
+            <label>Precio de Venta: <span style="font-weight:bold" v-if="producto.SoloLargo==1">(POR METRO)</span></label>
             <b-form-input v-model="producto.PrecioContado"
               type="number"
+              autocomplete="off"
               @input.native="actualizarPorcentajeUtilidad"
               ></b-form-input>
               <b-form-text v-if="producto.precioContadoNormal">
@@ -280,9 +250,6 @@ export default {
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
-      pie2total:0,
-      pie:900,
-      preciototal:0
     }
   },
   beforeMount () {
@@ -322,7 +289,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        //this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
@@ -368,10 +335,6 @@ export default {
     }
   },
   methods: {
-    calcularm2(){
-      this.pie2total = Math.round((this.producto.Ancho*this.producto.Largo/this.pie)*10)/10
-      this.preciototal = this.pie2total*this.precioContado
-    },
     calcularPreciosPaquete (prodDetalles) {
       let sumatoriaCosto = 0
       let sumatoriaContado = 0
@@ -467,10 +430,10 @@ export default {
         Producto: '',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         Rendimiento: '',
-        Ancho: '',
-        Largo: '',
+        Ancho: 0,
+        Largo: 0,
         StockMinimo: 0,
         PrecioContado: '',
         // Botapie: '',
@@ -493,7 +456,10 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
+      if(this.producto.SoloLargo==0){
+        this.producto.Largo = 0
+      }
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {

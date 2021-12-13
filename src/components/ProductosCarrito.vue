@@ -32,7 +32,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             min="0"
             step="0.01"
             @input="(val) => {$emit('onInputCantidad', val);  getSubtotal(data.index)}"
@@ -43,7 +43,7 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -98,6 +98,7 @@
             type="number"
             min="0"
             step="0.01"
+            style="width: 85px"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -119,7 +120,7 @@
 
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock?data.item.stock.toFixed(2):data.item.stock }}</div>
+          <div v-else>{{ data.item.stock?data.item.stock.toFixed(2):data.item.stock }}</div>
         </template>
       </b-table>
     </b-col>
@@ -172,28 +173,13 @@
     
      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
       <div class="d-block ">
-        <b>{{ productoSelect.Producto }}</b>
+        <div class="text-center">
+          <h3><b>{{ productoSelect.Producto }}</b></h3>
+          <h4><b>S/ {{ productoSelect.PrecioContado }} x METRO </b></h4>
+        </div>
         <br/>
         <br/>
-          <b-col md="12" style="text-align:center" v-show="!productoSelect.SoloLargo">
-              <b-button @click="accionFactor(0)" :variant="indexFactor == 0 ? 'primary' : 'outline-primary'">Público</b-button>
-              <b-button @click="accionFactor(1)" :variant="indexFactor == 1 ? 'primary' : 'outline-primary'">Vidriero</b-button>
-          </b-col><br/>
-        <div v-if="mostrarInputs">
-          <b-col md="12">
-            <b-form-group label="Pulgadas:">
-              <b-form-radio-group id="Pulgadas"
-              button-variant="outline-primary" 
-              v-model="esPulgadas"
-              @input="() => esPulgadas ? accionFactor(2) : accionFactor(indexFactor) "
-              buttons
-              :options="[
-              { text: 'Pulgada', value: 1 },
-              { text: 'Centimetro', value: 0 }
-              ]"/>
-            </b-form-group>
-          </b-col>
-          <hr />
+        <div>
           <label>Cantidad:</label>
           <b-form-input
             type="number"
@@ -202,21 +188,8 @@
             placeholder="Cantidad">
           </b-form-input>
           <br>
-          <label>Medida de corte en (
-            <span v-if="esPulgadas">Pulgadas</span>
-            <span v-else>Centímetros</span>
-            ):</label>
+          <label>Medida de corte en (Metros):</label>
           <br />
-          <div v-show="!productoSelect.SoloLargo">
-          <label>Ancho:</label>
-          <b-form-input
-            type="number"
-            ref="inputAncho"
-            v-model="ancho"
-            placeholder="Ancho"
-            @input="val => calcularm2()"></b-form-input>
-          <br />
-          </div>
           <label>Largo:</label>
           <b-form-input
             type="number"
@@ -225,20 +198,6 @@
             placeholder="Largo"
             @input="val => calcularm2()">
           </b-form-input>
-          <br>
-          <div v-show="!productoSelect.SoloLargo">
-          <label>Factor ({{factorNombre}}):</label>  
-          <b-form-input
-            type="number"
-            ref="inputFactor"
-            v-model="factor"
-            placeholder="factor"
-            @input="val => calcularm2()">
-          </b-form-input>
-          <br>
-          <label>Pie<sup>2</sup> del corte ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
-          </div>
-
           <br>
         </div>
         <hr />
@@ -264,7 +223,6 @@ export default {
       API: config.API,
       loadCode: '',
       pasteCode: false,
-      esPulgadas:'0',
       producto: {},
       items: [],
       productosDet: [],
@@ -274,13 +232,7 @@ export default {
       productoSelect: {},
       mensajeM2: '',
       M2: '',
-      ancho: 0,
       largo: 0,
-      factorNombre: '',
-      factor: 0,
-      pie2corte: 0,
-      mostrarInputs:false,
-      indexFactor: null,
       precioCorte:0
     }
   },
@@ -312,7 +264,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'cantidad' },
+          { key: 'cantidad', label:'Cantidad (mts)' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
           { key: 'igv', label: 'IGV' },
@@ -383,46 +335,10 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
-    accionFactor(val){
-    this.mostrarInputs=true
-      switch (val) {
-        case 0:
-          this.indexFactor = val
-          this.factorNombre="Público"
-          this.esPulgadas=0
-          this.factor = 620
-          break;
-        case 1:
-          this.indexFactor = val
-          this.factorNombre="Vidriero"
-          this.esPulgadas=0
-          this.factor = 900
-          break;
-        case 2:
-          this.factorNombre="Pulgadas"
-          this.factor = 144
-          break;
-        default:
-          break;
-      }
-
-      
-    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
 
-    setPulgadas(esPulgadas){
-      if(!esPulgadas){
-        this.$refs.inputFactor.setValue('');
-        this.factor = {}
-        this.$refs.inputFactor.$refs.input.disable = true
-        this.$refs.inputFactor.$refs.input.required = false
-      }else{
-        this.$refs.inputFactor.$refs.input.disable = false
-        this.$refs.inputFactor.$refs.input.required = true
-      }
-    },
     loadBarcode (e) {
       e.preventDefault()
       let idProducto = this.loadCode;
@@ -474,14 +390,8 @@ export default {
     abrirCalcularM2 (obj) {
       if(this.isVentas){   
           this.largo = 0
-          this.ancho = 0
-          this.pie2corte = 0 
           this.precioCorte = 0
-        if (obj.Ancho && obj.Largo) {
-          this.mostrarInputs = false
-          this.$refs.modalCalcularM2.show()
-        } else if (obj.SoloLargo) {
-          this.accionFactor(0);
+        if (obj.SoloLargo) {
           this.$refs.modalCalcularM2.show()
           //this.setProducto(obj)
         } else{
@@ -500,71 +410,11 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
+        let precio = this.productoSelect.PrecioContado *this.largo
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
         return;
       }
-
-      // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
-      //halla el pie2
-      let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/900
-      // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
-      // let largo = (largo == '0' ) ? false : prod.Largo;
-
-      if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
-        this.pie2corte = ((this.ancho*this.largo/this.factor)*10)/10
-        let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
-        this.precioCorte = precio.toFixed(2);
-        this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
-      }
-      
-      // if (!ancho || !largo) {
-      //   alert('El producto no cuenta con un ancho o largo establecido');
-      //   return;
-      // }
-
-      // this.productoSelect.precio = 133
-
-      // var cantidad = 0
-      // var mensaje = 0
-      // // console.log(rendimiento)
-      // if(rendimiento && rendimiento != '0') {
-      //   cantidad = (m2 / rendimiento).toFixed(1);
-      //   cantidad = Math.ceil(cantidad)
-      //   mensaje = "Total de cajas requeridas: " + cantidad
-      // } else {
-        // console.log(ancho)
-        // console.log(largo)
-      //   cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
-      //   cantidad = Math.ceil(cantidad)
-      //   mensaje = "Total de unidades requeridas: " + cantidad
-      // }
-
-      // if (cantidad > 0) {
-      //   var mensajeAdicional = ''
-      //   if (productoDetCantidad) {
-      //     if (cantidad > productoDetCantidad) {
-      //       var cajas = Math.floor(cantidad / productoDetCantidad);
-      //       var unidades = cantidad%productoDetCantidad;
-      //       mensajeAdicional += '(Cajas: ' + cajas;
-      //       if (unidades > 0) {
-      //         mensajeAdicional += ', Unidades: ' + unidades + ')';
-      //       }else {
-      //         mensajeAdicional += ')';
-      //       }
-      //     }
-      //   } 
-      //   this.mensajeM2 = mensaje;
-      //   this.mensajeM2 += " <br /> " + mensajeAdicional
-      //   this.productoSelect.cantidad = cantidad
-      // }
-      
-      // if(!m2) {
-      //   this.mensajeM2 = ''
-      //   this.productoSelect.cantidad = 1
-      // }
-
     },
     seleccionarCalcularM2 () {
       if(this.productoSelect.SoloLargo==1 && (this.largo == 0 || this.largo=='')){
@@ -572,16 +422,11 @@ export default {
          return
       }
 
-      if(this.precioCorte==0 && this.productoSelect.Ancho>0 && this.productoSelect.Largo>0 ){
-         this.$toasted.show('Necesita asignar una medida de corte largo y ancho')
-         return
-      }
 
       let objCalculado = {...this.productoSelect} 
 
       if (this.precioCorte) {
         objCalculado.precio = this.precioCorte;
-        objCalculado.Ancho = this.ancho
         objCalculado.Largo = this.largo
       }else{
         objCalculado.precio = this.PrecioContado
@@ -591,10 +436,8 @@ export default {
       let precio = parseFloat(objCalculado.precio)
       this.productoSelect.cantidad = 1
       this.setProducto (objCalculado, cantidad , precio )
-      this.ancho = 0
       this.largo = 0
       this.precioCorte = 0
-      this.pie2corte = 0
       this.mensajeM2 = ''; 
     },
     setProducto (obj2, cant, precio) {
@@ -614,10 +457,11 @@ export default {
       }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
+      this.$refs.modalCalcularM2.hide()
     },
     renderChild(data) {
       return `
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / <b>S/. ${data.PrecioContado}</b>
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b>S/. ${data.PrecioContado}</b>
       `
     },
     setNuevoPrecioContado (index) {
