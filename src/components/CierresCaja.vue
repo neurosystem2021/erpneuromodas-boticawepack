@@ -67,7 +67,7 @@ import config from '@/store/config.js'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdCierreCaja', 'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
+                fields: [ 'IdCierreCaja','Almacen','FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -81,7 +81,7 @@ import config from '@/store/config.js'
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter+'&sortBy=IdCierreCaja&sortDesc=1')
 
                 return promise.then((result) => {
                 this.items = result.data
