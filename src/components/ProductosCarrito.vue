@@ -1,7 +1,29 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-row v-if="(type === 'mov') ? false : true">
+        <b-col md="12">
+          <label>Agregar Productos:</label>
+          <b-row class="contenedor bg-light" style="border-radius:10px; border: 2px solid #E9ECEF;">
+            <b-col id="productoPunto" class="columna m-2 text-center bg-white p-2" cols="2" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; max-width:120px" v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
+                <b-row class="mb-1">
+                    <b-col md="4" class="text-left" v-if="false">
+                        <b-badge :variant="parseFloat(producto.stock)<=0?'danger':'success'" style="font-size: 0.8rem;">{{producto.stock? Number.isInteger(producto.stock)?producto.stock:producto.stock.toFixed(2):producto.stock}}</b-badge>
+                    </b-col>
+                    <b-col md="12" class="text-center">
+                        <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                    </b-col>
+                </b-row>
+                <b-img style="border-radius: 10px;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                <label class="font-weight-bold" style="font-size:0.83rem; cursor:pointer">
+                    {{producto.Producto}}
+                </label>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+
+      <b-form-group v-if="(type === 'mov') ? true : false">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -21,14 +43,12 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
-          <!--<b-badge variant="danger">Productos Vencidos</b-badge>
-          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>-->
       </b-form-group>
+      <br>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         
         <template slot="stock" slot-scope="data">
@@ -44,7 +64,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              //productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -194,6 +214,9 @@ export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
+  beforeMount(){
+    this.cargarProductos()
+  },
   data () {
     return {
       API: config.API,
@@ -203,7 +226,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      productosData:[]
     }
   },
   watch: {
@@ -314,6 +338,19 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
+    cargarProductos(){
+      this.axios.get(this.API+'productos/lineal')
+      .then((response) => {
+        this.productosData = response.data
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -366,7 +403,10 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      this.$refs.autocompleteProducto.setValue('')
+      obj = Object.assign({}, obj);
+      if(this.type==='mov'){
+        this.$refs.autocompleteProducto.setValue('') 
+      }
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
@@ -377,7 +417,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      },{ setPrecioCosto: (this.type === 'mov' ? true : false) }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
@@ -507,6 +547,20 @@ export default {
 }
 .tabla-carrito .table-sm td  {
   font-size: .8rem!important;
+}
+#productoPunto:hover{
+  transform: scale(1.02);
+  transition: 0.5s all;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.25);
+}
+/* The heart of the matter */
+.contenedor {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.columna {
+  flex: 0 0 auto;
 }
 </style>
 

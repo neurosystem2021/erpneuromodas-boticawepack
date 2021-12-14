@@ -16,6 +16,7 @@
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
@@ -393,7 +394,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
         // console.log(JSON.stringify(this.producto))
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         console.log(response)

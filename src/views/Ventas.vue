@@ -103,6 +103,7 @@
                                     <input v-model="venta.Placa"
                                             type="text"
                                             required
+                                            style="text-transform:uppercase;"
                                             class="form-control"
                                             placeholder="Placa" />
                                 </b-form-group>
@@ -145,7 +146,7 @@
 
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
+                            <b-col md="12" v-if="false">
                                 <b-form-group style="margin-top:-5px">
                                     <label>Descripcion:</label>
                                     <input v-model="venta.DescripcionEmbarcacion"
@@ -178,6 +179,10 @@
                             1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                             </b-form-text>
                         </div>
+                        <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center" style="border: dashed 2px #0275d8;  border-radius:10px; ">
+                            <h4>Última compra del cliente</h4>
+                            <h5 style="font-weight:bold; color:#0275d8;">{{ultimaVentaCliente}}</h5>
+                        </div>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
@@ -203,7 +208,7 @@
                 </b-row>
                 <b-row>
                     <b-col> 
-                        <productos-carrito 
+                        <productos-carrito style="margin-top:-15px"
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
@@ -387,6 +392,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
+            ultimaVentaCliente:'',
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -403,7 +409,7 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'CodigoBarra', label: 'Código' }, 
+                    //{ key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' },
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -654,6 +660,7 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                this.getUltimaVentaCliente(this.venta.cliente.IdCliente)
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -663,7 +670,7 @@ export default {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
                         this.venta.CampoDireccion = this.venta.cliente.Direccion
-                        console.log(this.venta.cliente)
+                        this.getUltimaVentaCliente(this.venta.cliente.IdCliente)
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
@@ -673,6 +680,24 @@ export default {
                 })
             }
         },
+        getUltimaVentaCliente(idCliente){
+            let params = {
+                IdCliente:idCliente
+            };
+            this.axios.get(this.API + 'cliente/ultima/venta', {
+                params: params
+            })
+            .then((response) => {
+                if (response.data) {
+                    this.ultimaVentaCliente = response.data.FechaDoc
+                }else{
+                    this.ultimaVentaCliente = ''
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        },
         onSetProducto (obj) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
@@ -680,11 +705,13 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+            this.venta.pago.visa.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -786,12 +813,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -866,6 +908,7 @@ export default {
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)
+                this.ultimaVentaCliente=''
                 this.$toasted.show('Venta realizada con exito')
                 this.ultimaVenta = response.data.insertId
                 this.limpiarDespuesVenta()
