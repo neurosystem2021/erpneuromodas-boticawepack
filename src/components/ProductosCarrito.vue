@@ -555,12 +555,12 @@ export default {
 }
 /* The heart of the matter */
 .contenedor {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
 }
 .columna {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
 }
 </style>
 

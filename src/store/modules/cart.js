@@ -18,9 +18,9 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      // if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
-      // }
+      }
     }
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {

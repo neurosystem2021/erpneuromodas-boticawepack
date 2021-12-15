@@ -412,7 +412,7 @@ export default {
                     //{ key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
                     { key: 'ProductoCategoria', label: 'Categoría' },
-                    { key: 'ProductoMarca', label: 'Marca' },
+                    //{ key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medicion' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
@@ -905,6 +905,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)
