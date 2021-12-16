@@ -71,7 +71,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -92,7 +92,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -1028,9 +1028,10 @@ export default {
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
+                    this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
-                    this.$refs.inputPuntoVenta.setValue('TUPAC')
+                    this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
