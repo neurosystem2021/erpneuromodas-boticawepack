@@ -1,7 +1,8 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-row v-if="(type === 'mov') ? false : true">
+
+      <!--<b-row v-if="(type === 'mov') ? false : true">
         <b-col md="12">
           <label>Agregar Productos:</label>
           <b-row class="contenedor bg-light" style="border-radius:10px; border: 2px solid #E9ECEF;">
@@ -21,7 +22,7 @@
             </b-col>
           </b-row>
         </b-col>
-      </b-row>
+      </b-row>-->
 
       <b-form-group v-if="(type === 'mov') ? true : false">
         <label>Agregar Productos:</label>

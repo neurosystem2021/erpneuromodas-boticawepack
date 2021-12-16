@@ -3,64 +3,13 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
-            <div class="d-none d-lg-block d-xl-block">
-                <div class="float-right">
-                    <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                    </b-button-group>
-                    
-                </div>
-            </div>
-            <br class="d-none d-lg-block d-xl-block"/><br class="d-none d-lg-block d-xl-block"/>
-            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
-                <b-row>
-                    <b-col md="7">
+        <b-container fluid class="bv-example-row">
+            <b-row>
+                <b-col md="9" style="border-right: 3px solid #C0C0C0; background: white">
+                    <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                         <b-row>
-                            <b-col md="4">
-                                <b-form-group>
-                                    <label>Tipo de Venta:</label>
-                                    <autocomplete
-                                        required="required"
-                                        ref="inputTipoVenta"
-                                        :url="API + 'ventas/tipos'"
-                                        anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
-                                        label="writer"
-                                        placeholder=""
-                                        :on-select="setTipoVenta" 
-                                        :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
-                                        :classes="{input: 'form-control'}">
-                                    </autocomplete>
-                                </b-form-group>
-                                <b-form-group v-if="isNota">
-                                    <label>Doc. Referencia:</label>
-                                    <autocomplete
-                                        required="required"
-                                        ref="inputDocRef"
-                                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
-                                        anchor="NroComprobante"
-                                        initValue=""
-                                        label="writer"
-                                        placeholder=""
-                                        :on-select="setDocRef" 
-                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
-                                        :classes="{input: 'form-control'}">
-                                    </autocomplete>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" class="d-none d-lg-block d-xl-block">
-                                <b-form-group>
-                                    <label>Almacen:</label>
+                            <b-col md="4" class="docInfo mt-2">
+                                <b-input-group prepend="Alm.">
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -73,15 +22,10 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
-                                </b-form-group>
-                                <b-form-group v-if="isNota">
-                                    <label>Motivo :</label>
-                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
-                                </b-form-group>
+                                </b-input-group>
                             </b-col>
-                            <b-col md="4" class="d-none d-lg-block d-xl-block">
-                                <b-form-group>
-                                    <label>Punto de Venta:</label>
+                            <b-col md="4"  class="docInfo mt-2">
+                                 <b-input-group prepend="P. Venta">
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -94,273 +38,370 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
-                                </b-form-group>
+                                </b-input-group>
                             </b-col>
-
-                            <b-col md="3">
-                                <b-form-group>
-                                    <label>Nº PLACA:</label>
-                                    <input v-model="venta.Placa"
-                                            type="text"
-                                            required
-                                            style="text-transform:uppercase;"
-                                            class="form-control"
-                                            placeholder="Placa" />
-                                </b-form-group>
+                            <b-col md="3" class="docInfo mt-2">
+                                <b-input-group prepend="Vend.">
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputVendedor"
+                                        :url="API + 'usuarios'"
+                                        anchor="NombreUsuario"
+                                        label="writer"
+                                        :on-select="setVendedor" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-input-group>
                             </b-col>
-                            
-                            <b-col md="9">
-                                <b-form-group>
-                                    <label>Cliente:</label>
-
-                                    <b-input-group>
-                                             <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
-                                        <autocomplete
-                                            required="required"
-                                            ref="inputCliente"
-                                            :url="API + 'clientes'"
-                                            anchor="ClienteDniRuc"
-                                            label="writer"
-                                            placeholder=""
-                                            :onInput="(val) => newDniRuc = val"
-                                            :on-select="setCliente" 
-                                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                                            :classes="{input: 'form-control'}">
-                                        </autocomplete>
-                                        <input v-model="dni"
-                                            @keydown.enter.prevent="loadClienteBarcode"
-                                            type="text"
-                                            class="form-control"
-                                            placeholder="Codigo de Barra" />
-                                        <b-input-group-append>
-                                            <!--<proveedores-tabla></proveedores-tabla>-->
-                                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-
-                                        </b-input-group-append>
-                                    </b-input-group>
-                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                        <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
-                                        <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                        <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                                    </b-form-select>
-
-                                </b-form-group>
+                            <b-col md="1"  class="docInfo mt-2">
+                                <b-button @click="ocultarNav()"><i class="fas fa-eye"></i></b-button>
                             </b-col>
-                            <b-col md="12" v-if="false">
-                                <b-form-group style="margin-top:-5px">
-                                    <label>Descripcion:</label>
-                                    <input v-model="venta.DescripcionEmbarcacion"
-                                            type="text"
-                                            class="form-control"
-                                            placeholder="Descripcion de la embarcación..." />
-                                </b-form-group>
-                            </b-col>
-                            
                         </b-row>
-                    </b-col>
-                    <b-col md="3">
-                        <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
-                            <b-form-group class="text-center" v-if="venta.cliente.Cliente">
-                                <div class="puntos">
-                                    {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
-                                </div>
-                                Puntos del cliente
-                            </b-form-group>
-                            <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
-                                <b-form-input
-                                    v-model="puntosAplicados"
-                                    min="0"
-                                    :max="venta.cliente.Puntos"
-                                    @input="aplicarPuntos"
-                                    type="number"
-                                ></b-form-input>
-                            </b-input-group>
-                            <b-form-text v-if="descuentoPuntos.ValorPunto">
-                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
-                            </b-form-text>
-                        </div>
-                        <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center" style="border: dashed 2px #0275d8;  border-radius:10px; ">
-                            <h4>Última compra del cliente</h4>
-                            <h5 style="font-weight:bold; color:#0275d8;">{{ultimaVentaCliente}}</h5>
-                        </div>
-                    </b-col>
-                    <b-col md="2" >
-                        <b-form-group class="text-center">
-                            <div class="big-text">
-                                {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
-                            </div>
-                            {{ venta.FechaDoc }}
-                        </b-form-group>
-                        <b-form-group class="d-none d-lg-block d-xl-block">
-                            <label>Vendedor:</label>
-                            <autocomplete
-                                required="required"
-                                ref="inputVendedor"
-                                :url="API + 'usuarios'"
-                                anchor="NombreUsuario"
-                                label="writer"
-                                :on-select="setVendedor" 
-                                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row>
-                    <b-col> 
-                        <productos-carrito style="margin-top:-15px"
-                            @onInputCantidad="actualizarDescuento"
-                            @onAddProducto="onAddProducto"
-                            @onRemoveProducto="actualizarDescuento"
-                            :igvTotal="tieneIgv"
-                            :setPrecio="true"
-                            ref="carrito" 
-                            :showButton="false" 
-                            :bloquearInput="bloquearInput" 
-                            :fields="carrito.fields"
-                            :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
+                        <b-row>
+                            <b-col md="5"  class="docInfo mt-2">
+                                <b-input-group prepend="Doc. Venta">
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputTipoVenta"
+                                        :url="API + 'ventas/tipos'"
+                                        anchor="TipoDoc"
+                                        initValue="BOLETA ELEC."
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setTipoVenta" 
+                                        readonly
+                                        :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-input-group>
+                            </b-col>
+                            <b-col md="3" class="docInfo mt-2">
+                                 <b-input-group prepend="Doc. Referenc" v-if="isNota">
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRef"
+                                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
+                                        anchor="NroComprobante"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRef" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-input-group>
+                            </b-col>
+                            <b-col md="4" class="docInfo mt-2">
+                                <b-input-group v-if="isNota" style="margin-bottom:-20px">
+                                    <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
+                                </b-input-group>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col md="6">
+                                <b-row>
+                                    <b-col md="4" class="docInfo mt-2">
+                                        <b-input-group prepend="N° Placa">
+                                            <input v-model="venta.Placa"
+                                                    type="text"
+                                                    required
+                                                    style="text-transform:uppercase;"
+                                                    class="form-control"
+                                                    placeholder="Placa" />
+                                         </b-input-group>
+                                    </b-col>
+                                    
+                                    <b-col md="8">
+                                        <b-form-group>
+                                            <b-input-group class="mt-2">            
+                                                <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                                <autocomplete
+                                                    required="required"
+                                                    ref="inputCliente"
+                                                    :url="API + 'clientes'"
+                                                    anchor="ClienteDniRuc"
+                                                    label="writer"
+                                                    placeholder=""
+                                                    :onInput="(val) => newDniRuc = val"
+                                                    :on-select="setCliente" 
+                                                    :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                                                    :classes="{input: 'form-control'}">
+                                                </autocomplete>
+                                                
+                                                <input v-model="dni"
+                                                    @keydown.enter.prevent="loadClienteBarcode"
+                                                    type="text"
+                                                    class="form-control"
+                                                    placeholder="Codigo de Barra" />
+                                                <b-input-group-append>
+                                                    <!--<proveedores-tabla></proveedores-tabla>-->
+                                                    <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
 
-                            <template slot="operaciones" >
-                                <table class="table b-table border table-footer d-none d-lg-block d-xl-block">
-                                    <tbody>
-                                        <tr>
-                                            <td  class="text-center">Opciones</td>
-                                        </tr>
-                                        <tr v-if="puntosAplicados == 0">
-                                            <td>
-                                                <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
-                                                        v-model="descuentoGeneral"
-                                                        :disabled="bloquearInput?true:false"
-                                                        min="0"
-                                                        value="0"
-                                                        @input="aplicarDescuentoGeneral"
-                                                        type="number"
-                                                    ></b-form-input>
-                                                </b-input-group>
-                                                <b-form-text>
-                                                    Descuento general a toda la venta.
-                                                </b-form-text>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <b-form-checkbox 
-                                                    v-model="venta.EsCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
-                                                    :value="1"
-                                                    :unchecked-value="0">
-                                                    Venta a credito
-                                                </b-form-checkbox>
-                                                <b-form-input 
-                                                    v-if="venta.EsCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
-                                                    v-model="venta.FechaCredito"
-                                                    type="date">
-                                                </b-form-input>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </template>    
-                            <template slot="metodopago" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm">
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="3" class="text-center">Metodo de Pago</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Efectivo</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.efectivo.descripcion"
-                                                    :disabled="bloquearInput?true:false"
+                                                </b-input-group-append>
+                                            </b-input-group>
+                                            <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                                <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
+                                                <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
+                                                <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                            </b-form-select>
+
+                                        </b-form-group>
+                                    </b-col>
+                                    <b-col md="12" v-if="false">
+                                        <b-form-group style="margin-top:-5px">
+                                            <label>Descripcion:</label>
+                                            <input v-model="venta.DescripcionEmbarcacion"
                                                     type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.efectivo.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                ></b-form-input>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Visa</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.visa.descripcion"
-                                                    :disabled="bloquearInput?true:false"
-                                                    type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <input
                                                     class="form-control"
-                                                    v-model="venta.pago.visa.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Mastercard</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.mastercard.descripcion"
-                                                    :disabled="bloquearInput?true:false"
-                                                    type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    class="form-control"
-                                                    v-model="venta.pago.mastercard.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
-                                                />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </productos-carrito>
-                    </b-col>
-                </b-row>
-                <b-row align-h="center" class="text-center">
-                    <b-col cols="8">
-                        <br />
-                        <b-button class="d-none d-lg-block d-xl-inline" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
-                        <br />
-                        <br />
-                    </b-col>
-                </b-row>
-            </b-form>
+                                                    placeholder="Descripcion de la embarcación..." />
+                                        </b-form-group>
+                                    </b-col>
+                                    
+                                </b-row>
+                            </b-col>
+                            <b-col md="3">
+                                <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
+                                    <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                                        <div class="puntos">
+                                            {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
+                                        </div>
+                                        Puntos del cliente
+                                    </b-form-group>
+                                    <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
+                                        <b-form-input
+                                            v-model="puntosAplicados"
+                                            min="0"
+                                            :max="venta.cliente.Puntos"
+                                            @input="aplicarPuntos"
+                                            type="number"
+                                        ></b-form-input>
+                                    </b-input-group>
+                                    <b-form-text v-if="descuentoPuntos.ValorPunto">
+                                    1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
+                                    </b-form-text>
+                                </div>
+                                <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center" style="border: dashed 2px #0275d8;  border-radius:10px; ">
+                                    <h4>Última compra del cliente</h4>
+                                    <h5 style="font-weight:bold; color:#0275d8;">{{ultimaVentaCliente}}</h5>
+                                </div>
+                            </b-col>
+                            <b-col md="3" >
+                                <b-form-group class="text-center">
+                                    <div class="big-text">
+                                        {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
+                                    </div>
+                                    {{ venta.FechaDoc }}
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col> 
+                                <productos-carrito-nuevo style="margin-top:-15px"
+                                    @onInputCantidad="actualizarDescuento"
+                                    @onAddProducto="onAddProducto"
+                                    @onRemoveProducto="actualizarDescuento"
+                                    :igvTotal="tieneIgv"
+                                    :setPrecio="true"
+                                    ref="carrito" 
+                                    :showButton="false" 
+                                    :bloquearInput="bloquearInput" 
+                                    :fields="carrito.fields"
+                                    :idAlmacen="venta.almacen.IdAlmacen"
+                                    :onSetProducto="onSetProducto">
+
+                                    <template slot="operaciones">
+                                        <table class="table b-table border table-footer">
+                                            <tbody>
+                                                <tr v-if="puntosAplicados == 0">
+                                                    <td>
+                                                        <b-input-group prepend="S/" append="Descuento">
+                                                            <b-form-input
+                                                                :disabled="bloquearInput?true:false"
+                                                                v-model="descuentoGeneral"
+                                                                min="0"
+                                                                value="0"
+                                                                @input="aplicarDescuentoGeneral"
+                                                                type="number"
+                                                            ></b-form-input>
+                                                        </b-input-group>
+                                                        <b-form-text style="color:black !important; font-weight:bold">
+                                                            Descuento general a toda la venta.
+                                                        </b-form-text>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <b-form-checkbox
+                                                            :disabled="bloquearInput?true:false || isNota"
+                                                            v-model="venta.EsCredito"
+                                                            :value="1"
+                                                            :unchecked-value="0">
+                                                            Venta a credito
+                                                        </b-form-checkbox>
+                                                        <b-form-input 
+                                                            :disabled="bloquearInput?true:false || isNota"
+                                                            v-if="venta.EsCredito"
+                                                            v-model="venta.FechaCredito"
+                                                            type="date">
+                                                        </b-form-input>
+                                                        <b-form-checkbox v-if="false"
+                                                            :disabled="bloquearInput?true:false"
+                                                            v-model="venta.PorEntregar"
+                                                            :value="1"
+                                                            :unchecked-value="0">
+                                                            Por entregar
+                                                        </b-form-checkbox>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </template>    
+                                    <template slot="metodopago" v-if="!venta.EsCredito">
+                                        <table class="table b-table border table-footer table-sm">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Efectivo</td>
+                                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
+                                                    <td>
+                                                        <b-form-input
+                                                            :disabled="bloquearInput?true:false"
+                                                            v-model="venta.pago.efectivo.descripcion"
+                                                            type="text"
+                                                            placeholder="Descripcion"
+                                                        ></b-form-input>
+                                                    </td>
+                                                    <td>
+                                                        <b-form-input
+                                                            :disabled="bloquearInput?true:false"
+                                                            v-model="venta.pago.efectivo.monto"
+                                                            min="0"
+                                                            step="0.01"
+                                                            type="number"
+                                                            placeholder="S/."
+                                                        ></b-form-input>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Visa</td>
+                                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
+                                                    <td>
+                                                        <b-form-input
+                                                            :disabled="bloquearInput?true:false"
+                                                            v-model="venta.pago.visa.descripcion"
+                                                            type="text"
+                                                            placeholder="Descripcion"
+                                                        ></b-form-input>
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            :disabled="bloquearInput?true:false"
+                                                            class="form-control"
+                                                            v-model="venta.pago.visa.monto"
+                                                            min="0"
+                                                            step="0.01"
+                                                            type="number"
+                                                            placeholder="S/."
+                                                            @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Mastercard</td>
+                                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
+                                                    <td>
+                                                        <b-form-input
+                                                            :disabled="bloquearInput?true:false"
+                                                            v-model="venta.pago.mastercard.descripcion"
+                                                            type="text"
+                                                            placeholder="Descripcion"
+                                                        ></b-form-input>
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            :disabled="bloquearInput?true:false"
+                                                            class="form-control"
+                                                            v-model="venta.pago.mastercard.monto"
+                                                            min="0"
+                                                            step="0.01"
+                                                            type="number"
+                                                            placeholder="S/."
+                                                            @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </template>
+                                </productos-carrito-nuevo>
+                            </b-col>
+                        </b-row>
+                        <b-row align-h="center" class="text-center">
+                            <b-col cols="8">
+                                <br />
+                                <b-button class="d-none d-lg-block d-xl-inline" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                                <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
+                                <br />
+                                <br />
+                            </b-col>
+                        </b-row>
+                    </b-form>
+                </b-col>
+                <b-col md="3">
+                    <b-row>
+                        <b-col class="text-center">
+                            <b-button v-b-toggle.collapse-1 variant="primary">ACCESOS DIRECTOS</b-button>
+                            <b-collapse id="collapse-1" class="mt-2">
+                                <b-col md="12" class="mt-1">
+                                    <pago-deuda></pago-deuda>
+                                </b-col>
+                                <b-col md="12" class="mt-1">
+                                    <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
+                                </b-col>
+                                <b-col md="12" class="mt-1">
+                                    <proformas></proformas>
+                                </b-col>
+                                <b-col md="12" class="mt-1">
+                                    <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
+                                </b-col>        
+                            </b-collapse>
+                        </b-col>
+                    </b-row>
+                    <br>
+                    <b-row  style="position: relative; height:89vh; overflow-y: scroll; background: #E6E6E6;"> 
+                        <b-col class="text-center">
+                            <b-row id="productoPunto" class="m-2 text-center bg-white p-2" cols="2" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer;" v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
+                                <b-col md="12" class="text-center mb-1">
+                                    <b-row>
+                                        <b-col>
+                                            <label class="font-weight-bold" style="font-size:1.0rem; cursor:pointer">{{producto.Producto}}</label>
+                                        </b-col>
+                                        <b-col>
+                                            <b-badge variant="dark" style="font-size: 1.0rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row class="text-center" style="border-top: 1px solid #E6E6E6;">
+                                        <b-col>
+                                            <b-img style="border-radius: 10px; width:40%; object-fit: contain;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                        </b-col>               
+                                    </b-row>
+                                </b-col>
+                            </b-row>
+                        </b-col>
+                    </b-row>
+                </b-col>
+            </b-row>
+            
+            <br class="d-none d-lg-block d-xl-block"/><br class="d-none d-lg-block d-xl-block"/>
+
         </b-container>
     </div>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'
 import config from '@/store/config.js'
-import ProductosCarrito from '@/components/ProductosCarrito'
+import ProductosCarritoNuevo from '@/components/ProductosCarritoNuevo'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
@@ -371,6 +412,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.cargarProductos()
     },
     mounted () {
         //this.getNumeroVenta()
@@ -393,6 +435,8 @@ export default {
             venta: {},
             bloquearInput:false,
             ultimaVentaCliente:'',
+            productosData:[],
+            navDisabled:false,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -408,18 +452,18 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'stock', label: 'Stock', variant: 'info', class:'fontsize thsize' },
                     //{ key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto' }, 
-                    { key: 'ProductoCategoria', label: 'Categoría' },
+                    { key: 'Producto', class:'fontsize thsize productosize'  }, 
+                    //{ key: 'ProductoCategoria', label: 'Categoría' },
                     //{ key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoMedicion', label: 'Medicion' },
-                    { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
-                    { key: 'acciones', label: ''}
+                    //{ key: 'ProductoMedicion', label: 'Medicion' },
+                    { key: 'cantidad',class:'thsize' },
+                    { key: 'precio', label: 'Precio',class:'thsize'  },
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center thsize' }, 
+                    { key: 'descuento', label: 'Descuento',  class:'thsize'},
+                    { key: 'total', label: 'Total', variant: 'danger',class:'fontsize thsize' },
+                    { key: 'acciones', label: '', class:'thsize'}
                 ]
             }
         }
@@ -442,6 +486,50 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        setAltImg(event) { 
+            event.target.src = "static/no-photo.png" 
+        },
+        cargarProductos(){
+            this.axios.get(this.API+'productos/lineal')
+            .then((response) => {
+                this.productosData = response.data
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+        },
+        ocultarNav(){
+            this.navDisabled=!this.navDisabled
+            console.log(this.navDisabled);
+            if(this.navDisabled){
+                window.parent.document.getElementById('NavegadorParent').style.display = 'none'
+            }else{
+                window.parent.document.getElementById('NavegadorParent').style.display = 'block'
+            }
+        },
+        setProducto (obj) {
+        obj = Object.assign({}, obj);
+        //obj.FLETE = 0
+        obj.precio = 0
+        obj.cantidad = 0
+        //obj.IdLote = 0
+        //obj.TieneIgv = 0
+        obj.descuento = 0
+        obj.nuevoPrecioContado = 0
+        obj = this.onSetProducto(obj)
+        let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
+        if(existe==undefined){
+                this.$toasted.info('Producto agregado')
+        }else{
+                this.$toasted.error('El producto ya esta agregado')
+        }
+        this.add([obj, () => {
+            this.onAddProducto(obj)
+        }])
+
+        // Vue.set(this.productos, obj.IdProducto, obj)
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -928,7 +1016,7 @@ export default {
         }
     },
     components: {
-        ProductosCarrito,
+        ProductosCarritoNuevo,
         ClientesForm,
         ConfigVenta,
         Proformas,
@@ -947,4 +1035,77 @@ export default {
 #modalConfigVenta .modal-dialog{
     max-width: 65% !important;
 }
+.contenedor {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-y: auto !important;
+}
+.columna {
+  flex: 0 0 auto !important;
+}
+</style>
+<style>
+    td.fontsize{
+      font-size: 0.8rem !important;
+      font-weight: bold;
+      text-align: center; 
+      vertical-align: middle !important;
+    }
+    td.stocksize{
+      text-align: center !important; 
+      vertical-align: middle !important;
+    }
+    th.stocksize{
+      font-size: 0.8rem !important;
+      text-align: center;
+    }
+    th.thsize{
+      font-size: 0.85rem !important;
+      text-align: center;
+    }
+    td.thsize{
+      vertical-align: middle !important;
+    }
+    td.productosize{
+        width: 200px;
+    }
+    .popover-body{
+      background-color: #C1C1C1;
+    }
+</style>
+<style>
+    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link{
+        background-color: #E6E6E6;
+        border-bottom: none;
+    }
+    .headerInfo .input-group-text{
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    .headerInfo input{
+        font-size: 0.8rem;
+    }
+    .buscador .input-group-text{
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    .buscador input{
+        font-size: 0.8rem;
+    }
+    .docInfo .input-group-text{
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    .docInfo input{
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    .docInfo select{
+        font-size: 0.9rem;
+        height: auto !important;
+    }
+    .clienteInfo *{
+        font-size: 0.8rem;
+        height: auto !important;
+    }
 </style>
