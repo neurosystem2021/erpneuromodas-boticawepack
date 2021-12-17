@@ -76,7 +76,7 @@
                                     </autocomplete>
                                 </b-input-group>
                             </b-col>
-                            <b-col md="3" class="docInfo mt-2">
+                            <b-col md="4" class="docInfo mt-2">
                                  <b-input-group prepend="Doc. Referenc" v-if="isNota">
                                     <autocomplete
                                         required="required"
@@ -92,17 +92,17 @@
                                     </autocomplete>
                                 </b-input-group>
                             </b-col>
-                            <b-col md="4" class="docInfo mt-2">
+                            <b-col md="3" class="docInfo mt-2">
                                 <b-input-group v-if="isNota" style="margin-bottom:-20px">
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-input-group>
                             </b-col>
                         </b-row>
                         <b-row>
-                            <b-col md="6">
+                            <b-col md="9">
                                 <b-row>
                                     <b-col md="4" class="docInfo mt-2">
-                                        <b-input-group prepend="N° Placa">
+                                        <b-input-group prepend="Placa">
                                             <input v-model="venta.Placa"
                                                     type="text"
                                                     required
@@ -119,6 +119,7 @@
                                                 <autocomplete
                                                     required="required"
                                                     ref="inputCliente"
+                                                     style="width: 25%"
                                                     :url="API + 'clientes'"
                                                     anchor="ClienteDniRuc"
                                                     label="writer"
@@ -160,7 +161,7 @@
                                     
                                 </b-row>
                             </b-col>
-                            <b-col md="3">
+                            <!--<b-col md="3">
                                 <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
                                     <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                                         <div class="puntos">
@@ -185,7 +186,7 @@
                                     <h4>Última compra del cliente</h4>
                                     <h5 style="font-weight:bold; color:#0275d8;">{{ultimaVentaCliente}}</h5>
                                 </div>
-                            </b-col>
+                            </b-col>-->
                             <b-col md="3" >
                                 <b-form-group class="text-center">
                                     <div class="big-text">
@@ -196,7 +197,7 @@
                             </b-col>
                         </b-row>
                         <b-row>
-                            <b-col> 
+                        
                                 <productos-carrito-nuevo style="margin-top:-15px"
                                     @onInputCantidad="actualizarDescuento"
                                     @onAddProducto="onAddProducto"
@@ -333,18 +334,20 @@
                                             </tbody>
                                         </table>
                                     </template>
+                                    <template slot="infoLlevar">
+                                        <b-row style="justify-content: center;">
+                                            <b-col>
+                                                <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                                            </b-col>
+                                        </b-row>
+                                        <b-row style="justify-content: center; margin-top:10px">
+                                            <b-col>
+                                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                                            </b-col>
+                                        </b-row>
+                                    </template>
                                 </productos-carrito-nuevo>
-                            </b-col>
-                        </b-row>
-                        <b-row align-h="center" class="text-center">
-                            <b-col cols="8">
-                                <br />
-                                <b-button class="d-none d-lg-block d-xl-inline" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                                <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
-                                <br />
-                                <br />
-                            </b-col>
+                            
                         </b-row>
                     </b-form>
                 </b-col>
@@ -369,24 +372,22 @@
                         </b-col>
                     </b-row>
                     <br>
-                    <b-row  style="position: relative; height:89vh; overflow-y: scroll; background: #E6E6E6;"> 
-                        <b-col class="text-center">
-                            <b-row id="productoPunto" class="m-2 text-center bg-white p-2" cols="2" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer;" v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
-                                <b-col md="12" class="text-center mb-1">
-                                    <b-row>
-                                        <b-col>
-                                            <label class="font-weight-bold" style="font-size:1.0rem; cursor:pointer">{{producto.Producto}}</label>
-                                        </b-col>
-                                        <b-col>
-                                            <b-badge variant="dark" style="font-size: 1.0rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
-                                        </b-col>
-                                    </b-row>
-                                    <b-row class="text-center" style="border-top: 1px solid #E6E6E6;">
-                                        <b-col>
-                                            <b-img style="border-radius: 10px; width:40%; object-fit: contain;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
-                                        </b-col>               
-                                    </b-row>
+                    <b-row  style="height:100%; overflow-y: scroll; background: #E6E6E6; place-content: flex-start;">     
+                        <b-col md="6" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
+                            <b-row>
+                                <b-col md="12">
+                                    <label class="font-weight-bold" style="font-size:0.95rem; cursor:pointer">{{producto.Producto}}</label>
                                 </b-col>
+                            </b-row>
+                            <b-row style="margin-top:-10px">
+                                <b-col md="12">
+                                    <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                                </b-col>
+                            </b-row>
+                            <b-row class="text-center" style="margin-top:2px; border-top: 1px solid #E6E6E6;">
+                                <b-col>
+                                    <b-img style="border-radius: 10px; width:40%; object-fit: contain;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                </b-col>               
                             </b-row>
                         </b-col>
                     </b-row>
@@ -470,7 +471,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -506,6 +507,28 @@ export default {
                 window.parent.document.getElementById('NavegadorParent').style.display = 'none'
             }else{
                 window.parent.document.getElementById('NavegadorParent').style.display = 'block'
+            }
+        },
+        metodoPagoCambio(opc){
+            switch (opc) {
+                case 1:
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = this.totalCart;
+                    break;
+                case 2:
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto =this.totalCart;
+                    break;
+                case 3:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = this.totalCart;
+                    break;
+            
+                default:
+                    break;
             }
         },
         setProducto (obj) {
@@ -794,12 +817,14 @@ export default {
         onAddProducto (obj) {
             this.actualizarDescuento()
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -1107,5 +1132,10 @@ export default {
     .clienteInfo *{
         font-size: 0.8rem;
         height: auto !important;
+    }
+    #productoPunto:hover{
+        transform: scale(1.02);
+        transition: 0.5s all;
+        box-shadow: 0 20px 80px rgba(0,0,0,0.25);
     }
 </style>

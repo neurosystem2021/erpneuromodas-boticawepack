@@ -1,6 +1,6 @@
 <template>
     <b-col md="12">
-      <b-row style="height:34vh; overflow-y: scroll; background: #FFFFFF;">
+      <b-row style="height:40vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
@@ -110,10 +110,38 @@
       </b-table>
       </b-col>
     </b-row>
-    <b-row style="border-top: 3px solid #C0C0C0">
-          <b-col md="3">
+    <b-row style="border-top: 3px solid #C0C0C0;">
+          <b-col md="3" style="text-align:center">
+            <br>
             <b-row>
-              <slot name="botones"></slot>
+              <table class="calc__numbers" style="margin-left:10px">
+                <tbody>
+                    <tr>
+                        <td class="botones" @click="foldNumbers('7');">7</td>
+                        <td class="botones" @click="foldNumbers('8');">8</td>
+                        <td class="botones" @click="foldNumbers('9');">9</td>
+                        <td class="botones" @click="accionBoton=1" v-bind:class="{ accionActiva: accionBoton==1 }"><span>Cant.</span></td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="foldNumbers('4');">4</td>
+                        <td class="botones" @click="foldNumbers('5');">5</td>
+                        <td class="botones" @click="foldNumbers('6');">6</td>
+                        <td class="botones" @click="accionBoton=2" v-bind:class="{ 'accionActiva': accionBoton==2 }">Desc.</td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="foldNumbers('1');">1</td>
+                        <td class="botones" @click="foldNumbers('2');">2</td>
+                        <td class="botones" @click="foldNumbers('3');">3</td>
+                        <td class="botones" @click="accionBoton=3" v-bind:class="{ 'accionActiva': accionBoton==3 }">Precio</td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="foldNumbers('0');">0</td>
+                        <td class="botones" @click="pushNumbers('-');">-</td>
+                        <td class="botones" @click="pushNumbers('+');">+</td>
+                        <td class="botones" @click="result();"><i class="fas fa-backspace"></i></td>
+                    </tr>
+                </tbody>
+              </table>
             </b-row>
           </b-col>
           <b-col cols="4" class="text-center mt-1">
@@ -148,39 +176,7 @@
                   <td class="table-danger" style="vertical-align: middle !important;">{{ sumatoriaIgv }}</td>
                 </tr>
                 <tr>
-                  <td>
-                    <b-button class="p-1 ml-1 mt-1" id="popover-num" variant="primary"><i class="fas fa-calculator" ></i></b-button>
-                    <b-popover target="popover-num" triggers="focus" placement='bottom'>
-                        <table class="calc__numbers">
-                        <tbody>
-                            <tr>
-                                <td class="botones" @click="foldNumbers('7');">7</td>
-                                <td class="botones" @click="foldNumbers('8');">8</td>
-                                <td class="botones" @click="foldNumbers('9');">9</td>
-                                <td class="botones" @click="accionBoton=1" v-bind:class="{ accionActiva: accionBoton==1 }"><span>Cant.</span></td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="foldNumbers('4');">4</td>
-                                <td class="botones" @click="foldNumbers('5');">5</td>
-                                <td class="botones" @click="foldNumbers('6');">6</td>
-                                <td class="botones" @click="accionBoton=2" v-bind:class="{ 'accionActiva': accionBoton==2 }">Desc.</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="foldNumbers('1');">1</td>
-                                <td class="botones" @click="foldNumbers('2');">2</td>
-                                <td class="botones" @click="foldNumbers('3');">3</td>
-                                <td class="botones" @click="accionBoton=3" v-bind:class="{ 'accionActiva': accionBoton==3 }">Precio</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="foldNumbers('0');">0</td>
-                                <td class="botones" @click="pushNumbers('-');">-</td>
-                                <td class="botones" @click="pushNumbers('+');">+</td>
-                                <td class="botones" @click="result();"><i class="fas fa-backspace"></i></td>
-                            </tr>
-                        </tbody>
-                      </table>
-                    </b-popover>
-                  </td>
+                  <td></td>
                   <td style="vertical-align: middle !important;"><b>TOTAL</b></td>
                   <td class="table-danger  font-weight-bold" style="vertical-align: middle !important;">{{ sumatoriaTotal }}</td>
                 </tr>
@@ -619,11 +615,6 @@ export default {
 }
 .tabla-carrito .table-sm td  {
   font-size: .8rem!important;
-}
-#productoPunto:hover{
-  transform: scale(1.02);
-  transition: 0.5s all;
-  box-shadow: 0 20px 80px rgba(0,0,0,0.25);
 }
 /* The heart of the matter */
 .contenedor {
