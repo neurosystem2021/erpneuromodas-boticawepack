@@ -123,7 +123,7 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group v-if="false">
+          <b-form-group>
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
@@ -468,7 +468,7 @@ export default {
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
-
+        this.$refs.file.value=null
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -476,6 +476,7 @@ export default {
         }).catch((error) => {
             console.log(error)
             this.initForm()
+            this.$refs.file.value=null
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
 
@@ -483,7 +484,7 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
+        this.$refs.file.value=null
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
