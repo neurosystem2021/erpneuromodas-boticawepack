@@ -70,6 +70,12 @@
               :value="producto.Producto"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <small>Nota: La imagen debe ser en formato .png y de 300x300</small>
+          </b-form-group>
 
           
           
@@ -288,20 +294,24 @@ export default {
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
+        this.producto.Imagen = newVal.Imagen
         // this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
-
+        this.$refs.file.value=null
       } else {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
+        this.$refs.file.value=null
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
   methods: {
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0]
+    },
     eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de eliminar este producto?')
@@ -377,6 +387,7 @@ export default {
         // Botapie: '',
         // Genero: '',
         categoria: {},
+        Imagen: null,
         marca: {},
         modelo: {},
         //talla: {},
@@ -411,6 +422,18 @@ export default {
         // this.initForm()
         // this.producto.talla = {}
         // this.$refs.inputTalla.setValue('')
+                //INSERTANDO IMAGEN
+        let formData = new FormData();
+        formData.append('imagen', this.file);
+        this.axios({
+            method    : 'post',
+            url       : this.API + 'producto/imagen/' + response.data.insertId,
+            data      : formData,
+            headers   : { 'Content-Type': 'multipart/form-data' }
+        })
+        .then((res) => {
+          // console.log(res);
+        })
 
         this.$refs.productoForm.hide()
       })

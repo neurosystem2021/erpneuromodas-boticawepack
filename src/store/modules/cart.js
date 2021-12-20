@@ -46,6 +46,11 @@ const mutations = {
   ACTUALIZAR_TOTAL (state, total) {
     state.totalCart = total
   },
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    let prod2 = Object.assign({}, prod);
+    productos.splice(index, 1, prod2)
+  },
   OBTENER_STOCK (state, items) {
     state.productos = state.productos.map((prod) => {
       let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
@@ -133,6 +138,9 @@ const actions = {
   },
   actualizarTotalCart ({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
+  },
+  actualizarProducto ({ commit }, prod) {
+    commit('ACTUALIZAR_PRODUCTO', prod)
   },
   obtenerStock({ commit, state }, obj) {
     axios.get(API + 'productos/stock', {

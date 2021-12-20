@@ -110,6 +110,18 @@
                                                     class="form-control"
                                                     placeholder="Placa" />
                                          </b-input-group>
+                                        <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center mt-1">
+                                            <b-row>
+                                                <b-col md="3">
+                                                    <b-img style="width:50px" src="static/last-buy.png"></b-img>
+                                                </b-col>
+                                                <b-col md="8" style="align-items: center; justify-content: end; display: flex;">
+                                                    <label style="font-weight:bold; font-size:0.95rem">
+                                                        {{ultimaVentaCliente}}
+                                                    </label>
+                                                </b-col>
+                                            </b-row>
+                                        </div>
                                     </b-col>
                                     
                                     <b-col md="8">
@@ -130,7 +142,7 @@
                                                     :classes="{input: 'form-control'}">
                                                 </autocomplete>
                                                 
-                                                <input v-model="dni"
+                                                <input v-model="dni" v-if="false"
                                                     @keydown.enter.prevent="loadClienteBarcode"
                                                     type="text"
                                                     class="form-control"
@@ -161,7 +173,17 @@
                                     
                                 </b-row>
                             </b-col>
-                            <!--<b-col md="3">
+                            <b-col md="3" >
+                                <b-form-group class="text-center">
+                                    <div class="big-text">
+                                        {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
+                                    </div>
+                                    {{ venta.FechaDoc }}
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
+                        <b-row class="text-center">
+                            <b-col md="3" >
                                 <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
                                     <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                                         <div class="puntos">
@@ -182,20 +204,9 @@
                                     1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                                     </b-form-text>
                                 </div>
-                                <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center" style="border: dashed 2px #0275d8;  border-radius:10px; ">
-                                    <h4>Última compra del cliente</h4>
-                                    <h5 style="font-weight:bold; color:#0275d8;">{{ultimaVentaCliente}}</h5>
-                                </div>
-                            </b-col>-->
-                            <b-col md="3" >
-                                <b-form-group class="text-center">
-                                    <div class="big-text">
-                                        {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
-                                    </div>
-                                    {{ venta.FechaDoc }}
-                                </b-form-group>
                             </b-col>
                         </b-row>
+                        <br>
                         <b-row>
                         
                                 <productos-carrito-nuevo style="margin-top:-15px"
@@ -453,9 +464,10 @@ export default {
             ],
             carrito: {
                 fields: [
+                    { key: 'selec',label:'Selec.',class:'fontsize thsize'},
                     { key: 'stock', label: 'Stock', variant: 'info', class:'fontsize thsize' },
                     //{ key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto', class:'fontsize thsize productosize'  }, 
+                    { key: 'Producto', class:'productosize thsize'  }, 
                     //{ key: 'ProductoCategoria', label: 'Categoría' },
                     //{ key: 'ProductoMarca', label: 'Marca' },
                     //{ key: 'ProductoMedicion', label: 'Medicion' },
@@ -771,8 +783,10 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                this.ultimaVentaCliente = ''
                 this.getUltimaVentaCliente(this.venta.cliente.IdCliente)
             } else {
+                this.ultimaVentaCliente = ''
                 this.axios.get(this.API + 'cliente', {
                     params: params
                 })
@@ -877,6 +891,7 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getVendedor()
+            this.loadClienteVarios()
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
            // this.$refs.inputAlmacen.setValue('VENTA')
             //this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -1092,7 +1107,10 @@ export default {
       vertical-align: middle !important;
     }
     td.productosize{
-        width: 200px;
+      font-size: 1.5rem !important;
+      font-weight: bold;
+      text-align: center; 
+      vertical-align: middle !important;
     }
     .popover-body{
       background-color: #C1C1C1;

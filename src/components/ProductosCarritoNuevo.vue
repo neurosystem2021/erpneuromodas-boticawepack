@@ -3,11 +3,20 @@
       <b-row style="height:40vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="selec" slot-scope="data">
+          <div v-if="productoSelectIndex==data.index">
+            <i class="fas fa-arrow-right fa-2x" style="color:  green; font-weight:bold"></i>
+          </div>
+          <div v-else>
+             <b-button variant="info" @click="cambiarSeleccion(data.index)"><i class="fas fa-hand-pointer"></i></b-button>
+          </div>
+        </template>
         <template slot="stock" slot-scope="data">
           {{ $options.filters.redondear(data.item.stock, 4) }}
         </template>
         <template slot="cantidad" slot-scope="data">
           <b-form-input
+            v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==2 }"
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -32,14 +41,19 @@
             @input="setNuevoPrecioContado(data.index)"></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
-          <b-form-input
-            type="number"
-            min="0"
-            step="0.00001"
-            style="width: 105px"
-            placeholder="Subtotal"
-            @input="val => setSubtotal(data.index, val)"></b-form-input> 
-           <b>{{ getSubtotal(data.index) }}</b>
+          <div class="text-center">
+            <b-form-input
+              v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
+              v-model="productos[data.index].sutotal"
+              type="number"
+              min="0"
+              step="0.00001"
+              style="width: 105px"
+              placeholder="Subtotal"
+              @input="val => setSubtotal(data.index, val)"></b-form-input> 
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
+
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -82,6 +96,7 @@
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
+            v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==3 }"
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -111,40 +126,39 @@
       </b-col>
     </b-row>
     <b-row style="border-top: 3px solid #C0C0C0;">
-          <b-col md="3" style="text-align:center">
+          <b-col md="4">
             <br>
-            <b-row>
-              <table class="calc__numbers" style="margin-left:10px">
+            <b-row style="justify-content: center;">
+              <table class="calc__numbers">
                 <tbody>
                     <tr>
-                        <td class="botones" @click="foldNumbers('7');">7</td>
-                        <td class="botones" @click="foldNumbers('8');">8</td>
-                        <td class="botones" @click="foldNumbers('9');">9</td>
-                        <td class="botones" @click="accionBoton=1" v-bind:class="{ accionActiva: accionBoton==1 }"><span>Cant.</span></td>
+                        <td class="botones" @click="addNumber('7');">7</td>
+                        <td class="botones" @click="addNumber('8');">8</td>
+                        <td class="botones" @click="addNumber('9');">9</td>
+                        <td class="botones" @click="accionBoton=1" v-bind:class="{ 'accionActiva': accionBoton==1 }">Precio</td>
                     </tr>
                     <tr>
-                        <td class="botones" @click="foldNumbers('4');">4</td>
-                        <td class="botones" @click="foldNumbers('5');">5</td>
-                        <td class="botones" @click="foldNumbers('6');">6</td>
-                        <td class="botones" @click="accionBoton=2" v-bind:class="{ 'accionActiva': accionBoton==2 }">Desc.</td>
+                        <td class="botones" @click="addNumber('4');">4</td>
+                        <td class="botones" @click="addNumber('5');">5</td>
+                        <td class="botones" @click="addNumber('6');">6</td>
+                        <td class="botones" @click="accionBoton=2" v-bind:class="{ accionActiva: accionBoton==2 }"><span>Cant.</span></td>
                     </tr>
                     <tr>
-                        <td class="botones" @click="foldNumbers('1');">1</td>
-                        <td class="botones" @click="foldNumbers('2');">2</td>
-                        <td class="botones" @click="foldNumbers('3');">3</td>
-                        <td class="botones" @click="accionBoton=3" v-bind:class="{ 'accionActiva': accionBoton==3 }">Precio</td>
+                        <td class="botones" @click="addNumber('1');">1</td>
+                        <td class="botones" @click="addNumber('2');">2</td>
+                        <td class="botones" @click="addNumber('3');">3</td>
+                        <td class="botones" @click="accionBoton=3" v-bind:class="{ 'accionActiva': accionBoton==3 }">Desc.</td>
                     </tr>
                     <tr>
-                        <td class="botones" @click="foldNumbers('0');">0</td>
-                        <td class="botones" @click="pushNumbers('-');">-</td>
-                        <td class="botones" @click="pushNumbers('+');">+</td>
-                        <td class="botones" @click="result();"><i class="fas fa-backspace"></i></td>
+                        <td class="botones" @click="addNumber(0);">0</td>
+                        <td class="botones" @click="addPoint('.');">.</td>
+                        <td colspan="2"  class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
                     </tr>
                 </tbody>
               </table>
             </b-row>
           </b-col>
-          <b-col cols="4" class="text-center mt-1">
+          <b-col cols="3" class="text-center mt-1">
               <slot name="infoLlevar"></slot>
           </b-col>
           <b-col md="5" class="text-center mt-1">
@@ -212,6 +226,7 @@
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
+import Vue from 'vue'
 
 export default {
   mounted() {
@@ -232,6 +247,7 @@ export default {
       pagocon: 0,
       productosData:[],
       accionBoton: 1,
+      productoSelectIndex:null,
     }
   },
   watch: {
@@ -340,10 +356,70 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      actualizarProd : 'actualizarProducto',
     }),
+    addNumber(number){
+      if(this.productos.length==0){
+          this.productoSelectIndex=null
+          return;
+      }
+      if(this.productoSelectIndex!=null){
+        if(this.accionBoton==1){
+          this.productos[this.productoSelectIndex].sutotal = Number((this.productos[this.productoSelectIndex].sutotal==undefined?'':(this.productos[this.productoSelectIndex].sutotal.toString()=='0'?'':this.productos[this.productoSelectIndex].sutotal.toString())) + number)
+          this.setSubtotal(this.productoSelectIndex, this.productos[this.productoSelectIndex].sutotal )   
+        }else if (this.accionBoton==2){
+           this.productos[this.productoSelectIndex].cantidad = Number(this.productos[this.productoSelectIndex].cantidad.toString() + number)
+          
+        }else if(this.accionBoton==3){
+          this.productos[this.productoSelectIndex].descuento = Number(this.productos[this.productoSelectIndex].descuento.toString() + number)
+        }
+        
+      }
+    },
+    cambiarSeleccion(index){
+      this.productoSelectIndex=index;
+    },
+    addPoint(){
+        if(this.productos.length==0){
+          this.productoSelectIndex=null
+          return;
+         }
+        if(this.accionBoton==1 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
+          this.$nextTick(()=>{
+            this.productos[this.productoSelectIndex].sutotal = this.productos[this.productoSelectIndex].sutotal + '.'
+          }) 
+        }else if (this.accionBoton==2 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
+          this.$nextTick(()=>{
+            this.productos[this.productoSelectIndex].cantidad = this.productos[this.productoSelectIndex].cantidad + '.'
+          })
+          
+        }else if(this.accionBoton==3 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
+          this.$nextTick(()=>{
+            this.productos[this.productoSelectIndex].descuento = this.productos[this.productoSelectIndex].descuento + '.'
+          })
+        }
+    },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
+    },
+    deleteNumber(){
+      if(this.productos.length==0){
+          this.productoSelectIndex=null
+          return;
+      }
+      if(this.productoSelectIndex!=null){
+          if(this.accionBoton==1){
+          this.productos[this.productoSelectIndex].sutotal =(this.productos[this.productoSelectIndex].sutotal==undefined?'':(this.productos[this.productoSelectIndex].sutotal.toString()=='0'?'':this.productos[this.productoSelectIndex].sutotal.toString().slice(0,-1)))
+          this.actualizarProd(this.productos[this.productoSelectIndex])         
+        }else if (this.accionBoton==2){
+          this.productos[this.productoSelectIndex].cantidad =(this.productos[this.productoSelectIndex].cantidad==undefined?'':(this.productos[this.productoSelectIndex].cantidad.toString()=='0'?'':this.productos[this.productoSelectIndex].cantidad.toString().slice(0,-1)))
+          this.actualizarProd(this.productos[this.productoSelectIndex])
+        }else if(this.accionBoton==3){
+          this.productos[this.productoSelectIndex].descuento =(this.productos[this.productoSelectIndex].descuento==undefined?'':(this.productos[this.productoSelectIndex].descuento.toString()=='0'?'':this.productos[this.productoSelectIndex].descuento.toString().slice(0,-1)))
+          this.actualizarProd(this.productos[this.productoSelectIndex])
+        }
+      }
     },
     cargarProductos(){
       this.axios.get(this.API+'productos/lineal')
@@ -480,6 +556,11 @@ export default {
       // return nuevoPrecio 
     },
     setSubtotal(index, val) {
+
+      if(val.toString().slice(-1)=='.'){
+        return
+      }
+
       let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 5)
       //let cantidad=2
       // Vue.set(this.productos[index], 'subtotal', val)
@@ -488,7 +569,7 @@ export default {
     },
 
     getSubtotal(index) {
-      
+
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
@@ -554,18 +635,17 @@ export default {
   }
  
     .calc__numbers {
-        width:  15vw;
-        height: 15vw;
+        width:  15.5vw;
+        height: 15.5vw;
     }
     .calc__numbers td {
-    min-width: 40px;
-    min-height: 40px;
-    border: 0.5px solid #A3A3A3;
+    min-width: 65px;
+    min-height: 65px;
+    border: 0.7px solid #A3A3A3;
     cursor: pointer;
     text-align: center;
     vertical-align: middle;
-    padding:1.8% 1.8%;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: bold;
     font-family: Arial;
     color: black;
@@ -605,6 +685,10 @@ export default {
     }
 </style>
 <style>
+.selectionProducto{
+  background-color: #f9f964 !important;
+  font-weight: bold;
+}
 .danger {
   background-color:#ff7675;
   color: #ffffff;
