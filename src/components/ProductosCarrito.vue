@@ -216,7 +216,7 @@ export default {
     // this.alterarBuscadorProductos()
   },
   beforeMount(){
-    this.cargarProductos()
+    //this.cargarProductos()
   },
   data () {
     return {
