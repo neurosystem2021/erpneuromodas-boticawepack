@@ -18,6 +18,8 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import Remision from '@/views/Remision.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 Vue.use(Router)
 
@@ -73,6 +75,16 @@ export default new Router({
       path: '/reportes/proforma/:id',
       name: 'Proforma',
       component: Proforma
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
     },
     {
       path: '/reportes/stockminimo',

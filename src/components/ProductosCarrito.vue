@@ -120,7 +120,7 @@
 
       </b-table>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" offset-md="2" v-if="!noSubtotal">
       <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
@@ -232,7 +232,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
