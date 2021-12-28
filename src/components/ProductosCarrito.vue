@@ -33,7 +33,7 @@
           <b-form-input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -48,7 +48,7 @@
             v-model="productos[data.index].precio"
             :disabled="true"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -117,6 +117,7 @@
             type="number"
             min="0"
             step="0.01"
+            style="width: 100px"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
