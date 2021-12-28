@@ -5,9 +5,12 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row"  id="conten">
             <div>
                 <div class="float-right">
+                    <b-button-group size="sm">
+                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                    </b-button-group>
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
@@ -27,6 +30,13 @@
                 </div>
             </div>
             <br /><br />
+            <b-row>
+                <b-col md="12" v-if="this.$route.query.idPedido">
+                    <div class="form-inline">
+                        <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
+                    </div>
+                </b-col>
+            </b-row>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
@@ -136,6 +146,20 @@
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
 
+                                    <b-row v-if="this.$route.query.idPedido">
+                                        <b-col>
+                                            <b-form-group>
+                                                <label style="font-weight:bold">Cliente (Delivery):</label>
+                                                <b-form-input required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese cliente" autocomplete="off" v-model="venta.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar" readonly></b-form-input>
+                                            </b-form-group>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-group>
+                                                <label style="font-weight:bold">Direccion Entrega (Delivery):</label>
+                                                <b-form-textarea required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese direccion" rows="3" autocomplete="off" v-model="venta.DireccionEntrega" ref="inputDireccionEntrega" type="text" name="DireccionEntrega" id="DireccionEntrega" readonly></b-form-textarea>
+                                            </b-form-group>
+                                        </b-col>
+                                    </b-row>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -216,7 +240,8 @@
                             :fields="carrito.fields"
                             :isVentas="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
+                            :onSetProducto="onSetProducto"
+                            :esDelivery="venta.EsDelivery">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -244,20 +269,20 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || venta.EsDelivery"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -360,7 +385,8 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -380,7 +406,8 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-
+import DeliveryModal from '@/components/DeliveryModal.vue'
+import Swal from 'sweetalert2'
 export default {
     beforeMount () {
         this.initForm()
@@ -390,6 +417,7 @@ export default {
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
+        this.escucharPedidos()
     },
     data () {
         return {
@@ -567,11 +595,15 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
+                EsDelivery: false,
+                nombreLlevar: '',
+                DireccionEntrega: ''
             }
             this.isNota = false
             this.bloquearInput=false
             this.adelantosPreOrden=[]
             this.adelanto = 0
+            this.infoDelivery = {}
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -935,7 +967,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
                 }
 
@@ -967,6 +999,9 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.adelantosPreOrden = this.adelantosPreOrden
+            this.venta.IdPedido = this.$route.query.idPedido || null
+            this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
+            this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
@@ -1003,6 +1038,101 @@ export default {
             this.$refs.inputComisionista.setValue('')
             this.venta.comisionista = {}
         },
+        onPagarDelivery(obj){
+            this.$route.query.idPedido = obj.IdPedido
+            if(this.$route.query.idPedido){
+                console.log(obj);
+                this.infoDelivery = obj
+                this.venta.EsDelivery = true
+                this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
+                //cargar costo de delivery
+                let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2)
+                if (costoDelivery>0) {
+                    this.axios.get(this.API +'costo/delivery')
+                    .then((response) => {
+                        if(response.data){
+                            let costoDeliverObj = response.data
+                                costoDeliverObj.precio = costoDelivery
+                                costoDeliverObj.cantidad = 1
+                                costoDeliverObj.EsCostoDelivery = 1
+                                costoDeliverObj.IdImpresora = 0
+                                costoDeliverObj.descuento = 0
+                                costoDeliverObj.indicacion = ''
+                                this.add([response.data, () => {
+                                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                                }, { setPrecioCosto: false }, false ,false ])
+                                //Cargar Productos Delivery
+                                let productos = JSON.parse(obj.Productos)
+                                console.log(productos);
+                                productos.map((item) => {
+                                    this.add([item.IdProducto, () => {
+                                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                                    }, { cantidad: item.Cantidad, precio:item.Precio, indicacion: item.Indicacion  }, false ])
+                                })
+                                this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
+                                this.venta.DireccionEntrega = obj.Direccion
+                                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')
+                        }else{
+                            this.$toasted.show("PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'")   
+                            this.anularPagoDelivery()
+                        }
+                    }).catch(error=>{
+                        this.$toasted.show('HUBO UN ERROR')
+                    })
+                } else {
+                    //Cargar Productos Delivery
+                    let productos = JSON.parse(obj.Productos)
+                    productos.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
+                        }, { cantidad: item.Cantidad, precio:item.Precio, indicacion: item.Indicacion, isDelivery:true  }, false ])
+                    })
+                    this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
+                    this.venta.DireccionEntrega = obj.Direccion
+                }
+                 
+            }
+        },
+        anularPagoDelivery(){
+            this.limpiarCart()
+            this.venta.EsDelivery = false
+            this.infoDelivery = {}
+            this.$refs.carrito.pagocon = ''
+            this.loadClienteVarios()
+            this.venta.nombreLlevar = ''
+            this.venta.selectOpcionVenta = 0
+            this.venta.nombreLlevar = ''
+            this.venta.DireccionEntrega = ''
+            this.$router.replace('/ventas')
+        },
+        //Sockets
+        escucharPedidos(){
+            this.sockets.subscribe('nuevo-pedido', (data) => {
+            if(this.$refs.deliveryModal.show){
+                this.$toasted.success('Nuevo Pedido de' + "<strong>"+data.nombre+"</strong>");  
+                this.$refs.deliveryModal.getPedidos();  
+            }else{
+                this.$refs.deliveryModal.getPedidos();
+                this.$swal({
+                    position: 'top-end',
+                    icon: 'info',
+                    target: document.getElementById('conten'),
+                    title: 'Pedido de Delivery de: <br> ' + "<strong>"+data.nombre+"</strong>",
+                    showConfirmButton: true,
+                    confirmButtonText: 'Mostrar Pedidos',
+                    confirmButtonColor:'#3880ff'
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                this.$refs.deliveryModal.show=true;
+                } else if (result.isDenied) {
+                    console.log("Denegado");
+                }
+                })
+            }
+            });
+        },
+        //Fin Sockets
     },
     components: {
         ProductosCarrito,
@@ -1010,7 +1140,8 @@ export default {
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
-        Proformas
+        Proformas,
+        DeliveryModal,
     }
 }
 </script>

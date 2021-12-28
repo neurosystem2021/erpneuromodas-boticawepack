@@ -83,6 +83,7 @@ const actions = {
     let setSuma = false
     let setPrecioCosto = false
     let setPreOr = false
+    let isDelivery = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
@@ -90,6 +91,7 @@ const actions = {
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
       setPreOr =obje.setPreOr
+      isDelivery = obje.isDelivery
     }
 
     if(typeof producto === 'object') {

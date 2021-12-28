@@ -103,7 +103,7 @@
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false"
+            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
             type="number"
             style="width: 80px"
             min="0"
@@ -132,9 +132,9 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 80px"
+            style="width: 90px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -197,7 +197,7 @@
 
         <template slot="utilidad" slot-scope="data">
           <input 
-            :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true"
+            :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
             style="width: 80px"
@@ -211,7 +211,7 @@
 
         <template slot="descuento" slot-scope="data">
           <b-form-input
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
@@ -277,8 +277,13 @@
         </template>
 
         <template slot="stock" slot-scope="data">
-          <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
+              <img src="static/moto-delivery.png" style="width: 24px" />
+          </div>
+          <div v-else>
+            <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+            <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          </div>
         </template>
       </b-table>
     </b-col>
@@ -291,7 +296,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3" offset-md="2" v-if="!noSubtotal">
+    <b-col md="3">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -383,6 +388,7 @@ export default {
     igvTotal: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
+    esDelivery:Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -416,8 +422,7 @@ export default {
         ]
       },
       type: Array
-    },
-    noSubtotal: Boolean
+    }
   },
   computed: {
     ...mapState({

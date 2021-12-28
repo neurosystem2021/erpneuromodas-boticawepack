@@ -9,6 +9,7 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
+import Impresoras from '@/views/Impresoras.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -151,6 +152,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
-    }
+    },
+    {
+      path: '/impresoras',
+      name: 'Impresoras',
+      component: Impresoras
+    },
   ]
 })
