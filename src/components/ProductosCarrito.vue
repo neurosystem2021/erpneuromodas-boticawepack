@@ -36,7 +36,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -48,7 +48,7 @@
             disabled
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -102,6 +102,7 @@
              :disabled="true"
             type="number"
             min="0"
+            style="width: 100px"
             step="0.01"
             :value="0"></b-form-input>
             <b-form-text>
