@@ -163,6 +163,7 @@
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
+                            :isVentas="true"
                             ref="carrito" 
                             :showButton="false" 
                             :fields="carrito.fields"
@@ -342,9 +343,11 @@ export default {
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
-                    /*{ key: 'PrecioDocena', label: 'Present.' },*/
                     { key: 'ProductoMedicion', label: 'Med.' },
-                    { key: 'precioMayor', label: 'Pre. Mayor' },
+                    /*{ key: 'PrecioDocena', label: 'Present.' },*/
+                    { key: 'eventPres', label: '' },
+                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'precioMayor', label: 'Pre. Mayor' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -527,7 +530,12 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, cant, precio) {
+            if (cant) {
+                obj.cantidad = cant
+                obj.precio = precio || obj.PrecioContado
+                return obj
+            }
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             return obj
@@ -703,10 +711,12 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
-                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.loadClienteVarios()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
+                this.$refs.carrito.pagocon = 0
+                //this.$refs.inputCliente.setValue('')
                 // this.$refs.inputVendedor.setValue('')
 
 

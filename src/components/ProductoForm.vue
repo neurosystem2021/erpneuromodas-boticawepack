@@ -172,7 +172,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="3">
+        <b-col md="3" v-if="false">
           <b-form-group>
             <label>Precio por 12:</label>
             <b-form-input
@@ -182,7 +182,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="3">
+        <b-col md="3" v-if="false">
           <b-form-group>
             <label>Precio por 100:</label>
             <b-form-input
@@ -191,6 +191,29 @@
               step="0.01"
               ></b-form-input>
           </b-form-group>
+        </b-col>
+      </b-row>
+
+      <hr>
+      <b-row>
+        <b-col md="3" v-for="i in 4" :key="i.id">
+          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+            <b-form-group>
+              <label>Cantidad:</label>
+              <b-form-input
+                v-model="producto.precios[i-1].cantidad"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+            
+            <b-form-group>
+              <label>Precio:</label>
+              <b-form-input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                ></b-form-input>
+            </b-form-group>
+          </b-card>
         </b-col>
       </b-row>
 
@@ -328,6 +351,17 @@ export default {
         this.producto.PrecioDocena = newVal.PrecioDocena
         this.producto.PrecioCentena = newVal.PrecioCentena
 
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }else{
+          this.producto.precios = [
+          {nombre: 'Precio 1', cantidad: 0, precio: 0},
+          {nombre: 'Precio 2', cantidad: 0, precio: 0},
+          {nombre: 'Precio 3', cantidad: 0, precio: 0},
+          {nombre: 'Precio 4', cantidad: 0, precio: 0}
+        ]
+        }
+
       } else {
 
         this.title = 'Nuevo Producto'
@@ -447,7 +481,13 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
-        }
+        },
+        precios: [
+          {nombre: 'Precio 1', cantidad: 0, precio: 0},
+          {nombre: 'Precio 2', cantidad: 0, precio: 0},
+          {nombre: 'Precio 3', cantidad: 0, precio: 0},
+          {nombre: 'Precio 4', cantidad: 0, precio: 0}
+        ]
       }
     },
     guardarProducto(e) {
@@ -459,7 +499,17 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
-      this.axios.post(this.API + 'productos', this.producto)
+      this.producto.precios.map((pre)=>{
+        if(pre.cantidad==''){
+          pre.cantidad=0
+        }
+        if(pre.precio==''){
+          pre.precio=0
+        }
+      })
+
+      this.axios.post(this.API + 'productos',{ ...this.producto,
+      PreciosPorProducto: this.producto.precios} )
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
