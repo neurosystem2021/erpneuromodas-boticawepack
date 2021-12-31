@@ -613,6 +613,7 @@ export default {
       Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
+      this.actualizarProd(this.productos[index])
     },
     ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');
