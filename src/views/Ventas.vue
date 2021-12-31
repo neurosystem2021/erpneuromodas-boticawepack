@@ -472,7 +472,10 @@ export default {
             }
 
             this.isNota = false
-            this.bloquearInput = false 
+            this.bloquearInput = false
+            this.puntosAplicados = 0
+            this.descuentoPuntos = {}
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
