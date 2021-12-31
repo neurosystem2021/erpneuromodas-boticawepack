@@ -127,7 +127,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -203,6 +203,7 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
+            style="width: 100px"
             step="0.01"
             @input="(val)=>ActualizarDesc(data.index,val)"        
             :value="0"></b-form-input>
@@ -256,8 +257,8 @@
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
           <div style="text-align:center" v-if="!isNota">
-          <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
-          <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
+          <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small>
+          <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small>
           </div>
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
