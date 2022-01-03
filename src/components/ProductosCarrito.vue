@@ -56,7 +56,7 @@
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
-              v-if="parseFloat(d.cantidad) > 0"
+              v-if="parseFloat(d.cantidad) > 0 && parseFloat(d.precio) > 0"
               align="center"
               class="mb-3 contentCard"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
@@ -126,12 +126,11 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)">
+            @input="setNuevoPrecioContado(data.index)">
           </b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -177,7 +176,6 @@
             type="number"
             min="0"
             step="0.01"
-            readonly
             placeholder="Precio Venta"></b-form-input>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -203,6 +201,7 @@
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
+             style="width: 90px"
             min="0"
             step="0.01"
             @input="(val)=>ActualizarDesc(data.index,val)" 
@@ -690,7 +689,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -711,14 +710,21 @@ export default {
       }
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+      if (this.idAlmacen) {
+        let style = 'ss'
+        if(parseFloat(data.stock) <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (parseFloat(data.stock) > 0) {
+          style = 'success'
       }
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
-      </div>  
+         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
+      `
+      }
+      return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
       `
     },
     // setCantidad (index, val) {
@@ -751,8 +757,8 @@ export default {
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      //Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+      //Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio

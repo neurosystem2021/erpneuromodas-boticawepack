@@ -433,7 +433,7 @@ export default {
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    { key: 'utilidad', label: 'Porc. Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -567,7 +567,10 @@ export default {
                 CampoDireccion: ''
             }
             this.isNota = false
-            this.bloquearInput=false
+            this.bloquearInput = false
+            this.puntosAplicados = 0
+            this.descuentoPuntos = {}
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -754,11 +757,10 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
+        onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
+                obj.precio = precio || obj.PrecioContado
                 return obj
             }
             obj.cantidad = 1
@@ -986,12 +988,13 @@ export default {
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
+                    this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
-                    this.$refs.inputComisionista.setValue('')
+                    //this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
