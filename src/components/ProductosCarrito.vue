@@ -27,7 +27,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
+        <b-badge v-if="isVentas && false" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -710,6 +710,7 @@ export default {
       }
     },
     renderChild(data) {
+      /*
       if (this.idAlmacen) {
         let style = 'ss'
         if(parseFloat(data.stock) <= 0) {
@@ -722,9 +723,9 @@ export default {
       return `
          <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
       `
-      }
+      }*/
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
       `
     },
     // setCantidad (index, val) {
@@ -837,7 +838,7 @@ export default {
   }
   .nomCart {
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
     border-right: 2px solid black;
   }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
+        <b-button @click="show=true" variant="outline-info">Ver Proformas</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
@@ -26,7 +26,7 @@
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
-                      <template slot="ver" slot-scope="data">
+                      <template slot="ver" slot-scope="data" v-if="false">
                         <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
@@ -79,7 +79,7 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver' ,'verTicket'],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'update','verTicket'],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -101,7 +101,7 @@ import { mapActions } from 'vuex'
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+                        }, { precio: item.Precio, cantidad: item.Cantidad, proforma:true } ])
 
                         this.filter = ''
                         this.show = false

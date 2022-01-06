@@ -14,13 +14,13 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="false">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="false">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -141,13 +141,13 @@
                         </b-row>
                     </b-col>
                     <b-col md="3">
-                        <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                        <b-form-group class="text-center" v-if="venta.cliente.Cliente && false">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
                             </div>
                             Puntos del cliente
                         </b-form-group>
-                        <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
+                        <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0 &&  false">
                             <b-form-input
                                 v-model="puntosAplicados"
                                 min="0"
@@ -156,10 +156,10 @@
                                 type="number"
                             ></b-form-input>
                         </b-input-group>
-                        <b-form-text v-if="descuentoPuntos.ValorPunto">
+                        <b-form-text v-if="descuentoPuntos.ValorPunto &&  false">
                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                         </b-form-text>
-                        <b-form-text v-if="venta.cliente.EsVIP">
+                        <b-form-text v-if="venta.cliente.EsVIP &&  false">
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
@@ -255,7 +255,7 @@
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
-                                                <b-form-checkbox 
+                                                <b-form-checkbox  v-if="false"
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
@@ -422,7 +422,7 @@ export default {
             carrito: {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
