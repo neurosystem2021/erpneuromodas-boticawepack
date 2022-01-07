@@ -264,6 +264,19 @@
                                                 </b-form-checkbox>
                                             </td>
                                         </tr>
+                                        <tr>
+                                                <td>
+                                                    <b-input-group prepend="Proforma válido por:" append="días">
+                                                    <b-form-input
+                                                        :disabled="bloquearInput?true:false"
+                                                        v-model="diasValidosProf"
+                                                        min="0"
+                                                        value="0"
+                                                        type="number"
+                                                    ></b-form-input>
+                                                </b-input-group>
+                                                </td>
+                                            </tr>
                                     </tbody>
                                 </table>
                             </template>    
@@ -406,6 +419,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
+            diasValidosProf:0,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -564,7 +578,8 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: ''
+                CampoDireccion: '',
+                diasValidosProf: 0
             }
             this.isNota = false
             this.bloquearInput=false
@@ -832,7 +847,7 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
@@ -851,12 +866,21 @@ export default {
                 return
             }
 
+            if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
+                this.$toasted.show('Debe ingresar los días de validez de la proforma')
+                this.inProgress = false
+                return
+            }
+
             this.venta.productos = this.productos
+            this.venta.diasValidosProf = this.diasValidosProf
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
+                this.loadClienteVarios()
+                this.diasValidosProf=0;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -986,6 +1010,7 @@ export default {
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
+                    this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
