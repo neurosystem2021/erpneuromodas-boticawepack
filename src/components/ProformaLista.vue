@@ -22,7 +22,7 @@
                         :per-page="perPage"
                         :current-page="currentPage">
 
-                      <template slot="update" slot-scope="data">
+                      <template slot="update" slot-scope="data" v-if="false">
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
