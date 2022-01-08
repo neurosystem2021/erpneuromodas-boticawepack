@@ -7,6 +7,9 @@
 				<b-button-group>
 					<b-button variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button>
 				</b-button-group>
+				<b-button-group>
+					<b-button variant="success" @click="getHabitaciones">Actualizar Habitaciones</b-button>
+				</b-button-group>
 			</div>
 			<div class="float-right">
 				<b-button-group>
@@ -44,11 +47,12 @@
 								
 								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
-									<li><b>{{ hab.Cliente }}</b> </li>
+									<li><b style="color:white">{{ hab.Cliente }}</b><li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
 									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 								</ul>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+									<li><b style="color:white">{{ hab.Cliente }}</b><li>
 									<li><b>Inicio: {{ hab.FechaAlquiler }}</b></li>
 									<li><b>Fin: {{ hab.FechaAlquilerFin }}</b></li>
 								</ul>
@@ -78,7 +82,7 @@
 										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
 									</b-popover>
 									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
-									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Alquilar Habitación">
+									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Alquilar Habitación" triggers="click">
 										<label>Seleccione un cliente:</label>
 										<b-input-group>
 											<autocomplete
@@ -88,12 +92,13 @@
 													anchor="ClienteDniRuc"
 													label="writer"
 													placeholder=""
+													 :onInput="(val) => newDniRuc = val"
 													:on-select="setCliente" 
 													:classes="{input: 'form-control'}">
 											</autocomplete>
 											<b-input-group-append>
 												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
+												<clientes-form :ruc="newDniRuc" @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 											</b-input-group-append>
 										</b-input-group>
 										<br />
@@ -242,8 +247,9 @@ export default {
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
 			pisos: [1, 2, 3, 4, 5],
 			adelantos: [],
-			nuevaFechaFin: ''
+			nuevaFechaFin: '',
 			// habitacionesPiso: []
+			newDniRuc: ''
 		}
 	},
 	computed: {
@@ -454,6 +460,7 @@ export default {
 				console.log(index)
 				console.log('inputCliente2' + index)
 				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
+				this.newDniRuc=''
 			}
 			this.selectCliente = obj
 		},
@@ -497,5 +504,15 @@ h5 {
 	font-size: 0.8rem;
 	color: #363636;
 }
+
+</style>
+<style>
+.popover{
+    max-width: 420px !important;
+}
+#modal1{
+overflow-y: scroll;
+}
+
 </style>
 
