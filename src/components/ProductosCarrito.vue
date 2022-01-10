@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25' }"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1,limit: '25'}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -735,14 +735,24 @@ export default {
       //}
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
-      }
+     if (this.idAlmacen) {
+        let style = 'ss'
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+        }
+        return `
+        <div>
+          <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
+          <b>${data.Producto}</b> / ${data.CodigoBarra} / ${data.ProductoCategoria} / ${data.ProductoMedicion}
+        </div>
+        `
+            }
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
-      </div>  
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
       `
     },
     // setCantidad (index, val) {

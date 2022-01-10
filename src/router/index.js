@@ -26,6 +26,7 @@ import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Formato from '@/views/reportes/Formato.vue'
 
 Vue.use(Router)
 
@@ -151,6 +152,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
-    }
+    },
+    {
+      path: '/reportes/formato',
+      name: 'formato',
+      component: Formato
+    },
   ]
 })

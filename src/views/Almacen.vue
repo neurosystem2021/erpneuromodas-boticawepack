@@ -302,7 +302,43 @@
         <p>{{kardexSelect}}</p>-->
 
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
+                <b-row>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="kardex.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="kardex.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+        <b-row>
+          <b-col class="text-center">
+              <b-button variant="success" size="sm" :href="hrefXls" target="_blank">Exportar Excel</b-button>
+          </b-col>
+        </b-row>
+        <br>
       </b-modal>
   </div>
 </template>
@@ -336,6 +372,10 @@ export default {
       sortBy: 'IdProducto',
       sortDesc: false,
       productoSelect: {},
+      kardex: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
       kardexSelect: [],
       items: [],
       itemsStock: [],
@@ -401,7 +441,10 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
-    }
+    },
+    hrefXls () {
+      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
+    },
   },
   methods: {
     clickVerValorizado() {
@@ -465,15 +508,32 @@ export default {
     rowDblClick (item) {
       this.productoSelect = item
       this.showKardex = true
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01")
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD")  
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
           }
       }).then((response) => {
           this.kardexSelect = response.data
       })
+    },
+    kardexFechaRango(){
+      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
+          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
+          }
+          }).then((response) => {
+              this.kardexSelect = response.data
+          })
+      }
+     
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
