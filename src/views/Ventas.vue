@@ -150,6 +150,7 @@
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedor"
+                                :disabled ="true"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -461,13 +462,13 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 // this.loadAlmacen(response.data.IdAlmacen)
-                this.loadAlmacen(1)
-                this.loadPuntoVenta(1)
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                //this.$refs.inputAlmacen.$refs.input.disabled = true
-                //this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
             })
             .catch((error) => {
@@ -701,12 +702,15 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
-                this.getNumeroVenta()
+                //this.getNumeroVenta()
+                this.getVendedor();
+                this.loadClienteVarios();
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
+                this.$refs.carrito.pagocon = 0
                 //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
