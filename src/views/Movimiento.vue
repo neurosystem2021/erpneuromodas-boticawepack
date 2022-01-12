@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
+                        initValue="NUEVO ALMACEN"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -289,13 +289,13 @@ return false
     setTipoMovimiento (obj) {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.movimiento.almacenDestino = { IdAlmacen: 2 }
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.movimiento.almacenOrigen = { IdAlmacen: 2 }
       }else {
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.movimiento.almacenDestino = { IdAlmacen: 2 }
+        this.movimiento.almacenOrigen = { IdAlmacen: 2 }
       }
       this.movimiento.movimientoTipo = obj
 
