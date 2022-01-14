@@ -83,7 +83,7 @@
 									</b-popover>
 									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Alquilar</b-btn>	
 									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Alquilar Habitación" triggers="click">
-										<label>Seleccione un cliente:</label>
+										<label>Seleccione un cliente <b>Titular</b>:</label>
 										<b-input-group>
 											<autocomplete
 													required="required"
@@ -101,6 +101,46 @@
 												<clientes-form :ruc="newDniRuc" @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 											</b-input-group-append>
 										</b-input-group>
+										<br />
+										<label>Seleccione <b>Huésped 1</b>:</label>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente3' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													 :onInput="(val1) => newDniRuc1 = val1"
+													:on-select="setHuesped1" 
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form-h-1 :ruc="newDniRuc1" @onAddCliente="(obj) => { setHuesped1(obj, index) }"></clientes-form-h-1>
+											</b-input-group-append>
+										</b-input-group>
+										<b-form-text>Dejar en blanco si no hay huésped 1</b-form-text>
+										<br />
+										<label>Seleccione <b>Huésped 2</b>:</label>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente4' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													 :onInput="(val) => newDniRuc2 = val"
+													:on-select="setHuesped2" 
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form-h-2 :ruc="newDniRuc2" @onAddCliente="(obj) => { setHuesped2(obj, index) }"></clientes-form-h-2>
+											</b-input-group-append>
+										</b-input-group>
+										<b-form-text>Dejar en blanco si no hay huésped 2</b-form-text>
 										<br />
 										<label>Lugar Procedencia:</label>
 										<b-input-group>
@@ -138,7 +178,7 @@
 										</b-input-group>
 										<br>
 
-										<b-button variant="success" size="sm" @click="alquilarHab(hab)">Alquilar Habitación</b-button>	
+										<b-button variant="success" size="sm" @click="alquilarHab(hab,index)">Alquilar Habitación</b-button>	
 									</b-popover>
 									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
 								</div>
@@ -230,6 +270,8 @@
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 import ClientesForm from '@/components/ClientesForm'
+import ClientesFormH1 from '@/components/ClientesFormH1'
+import ClientesFormH2 from '@/components/ClientesFormH2'
 
 export default {
   	mounted () {
@@ -249,7 +291,11 @@ export default {
 			adelantos: [],
 			nuevaFechaFin: '',
 			// habitacionesPiso: []
-			newDniRuc: ''
+			newDniRuc: '',
+			newDniRuc1: '',
+			newDniRuc2: '',
+			IdHuesped1: null,
+			IdHuesped2:null
 		}
 	},
 	computed: {
@@ -430,7 +476,15 @@ export default {
 				})
 			}
 		},
-		alquilarHab(hab) {
+		alquilarHab(hab,index) {
+
+			if(this.$refs['inputCliente3' + index][0].$refs.input.value == ''){
+				this.IdHuesped1 = null
+			}
+			if(this.$refs['inputCliente4' + index][0].$refs.input.value == ''){
+				this.IdHuesped2 = null
+			}
+
 			if (!this.selectCliente.Cliente) {
 				this.$toasted.error('Seleccione un cliente.');
 			}
@@ -441,7 +495,9 @@ export default {
 				this.axios.post(this.API + 'habitaciones/alquilar', {
 					IdProducto: hab.IdProducto,
 					IdCliente: this.selectCliente.IdCliente,
-					cliente: this.selectCliente
+					cliente: this.selectCliente,
+					IdHuesped1: this.IdHuesped1,
+					IdHuesped2: this.IdHuesped2,
 				}).then(res => {
 					this.getHabitaciones()
 					this.limpiarPopover()
@@ -464,6 +520,24 @@ export default {
 			}
 			this.selectCliente = obj
 		},
+		setHuesped1(obj, index) {
+			if (index >= 0) {
+				console.log('inputCliente3' + index)
+				this.$refs['inputCliente3' + index][0].setValue(obj.Cliente)
+				this.newDniRuc1=''
+			}
+			this.IdHuesped1 = obj.IdCliente
+		
+		},
+		setHuesped2(obj, index) {
+			if (index >= 0) {
+				console.log('inputCliente4' + index)
+				this.$refs['inputCliente4' + index][0].setValue(obj.Cliente)
+				this.newDniRuc2=''
+			}
+			this.IdHuesped2 = obj.IdCliente
+			
+		},
 		/*focusAutocomplete (ref) {
 			this.$refs[ref][0].handleDoubleClick()
 		},*/
@@ -474,6 +548,8 @@ export default {
 		limpiarDespues() {
 			this.selectCliente = {}
 			this.selectProducto = {}
+			this.IdHuesped1 = null
+			this.IdHuesped2 = null
 		},
 		formatFecha(fecha) {
 			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
@@ -481,7 +557,9 @@ export default {
 	},
 	components: {
 		PreOrdenFormDet,
-		ClientesForm
+		ClientesForm,
+		ClientesFormH1,
+		ClientesFormH2
 	}
 }
 </script>
@@ -513,6 +591,14 @@ h5 {
 #modal1{
 overflow-y: scroll;
 }
+#modal2{
+overflow-y: scroll;
+}
+#modal3{
+overflow-y: scroll;
+}
+
+
 
 </style>
 

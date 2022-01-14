@@ -39,9 +39,9 @@
             <thead>
               <tr>
                 <th>Habitación</th>
-                <th>Apellidos y Nombres</th>
+                <th>Apellidos y Nombres <b>(Titular)</b></th>
                 <th>Sexo</th>
-                <th>Ocupacion</th>
+                <!--<th>Ocupacion</th>-->
                 <th>F. Nacimiento</th>
                 <th>Nacionalidad</th>
                 <th>Documento de Identidad</th>
@@ -53,6 +53,7 @@
                 <th>Fecha de salida</th>
                 <th>Tipo</th>
                 <th>Tarifa</th>
+                <th>Huespedes</th>
 
               </tr>
             </thead>
@@ -61,7 +62,7 @@
                 <td>{{ item.Producto }}</td>
                 <td>{{ item.Cliente }}</td>
                 <td>{{ item.Sexo }}</td>
-                <td>{{ item.Ocupacion }}</td>
+                <!--<td>{{ item.Ocupacion }}</td>-->
                 <td>{{ item.FechaNacimiento }}</td>
                 <td>{{ item.Nacionalidad }}</td>
                 <td>{{ item.DniRuc }}</td>
@@ -73,12 +74,29 @@
                 <td>{{ item.FechaAlquilerFin }}</td>
                 <td>{{ item.ProductoMarca }}</td>
                 <td>{{ item.Tarifa }}</td>
+                <td><b-button @click="abrirHuespedes(item)" size="sm" variant="info"><i class="fas fa-eye"></i></b-button></td>
               </tr>
             </tbody>
           </table>
         </b-row>
         </div>
         <br /><br />
+      <b-modal size="md" ref="modalHuespedes" hide-footer :title="'HUESPEDES DE: '+itemSelect.Producto" no-close-on-esc no-close-on-backdrop>
+        <div class="d-block ">
+          <b-row>
+            <b-col md="12">
+              <b>TITULAR: </b>{{ itemSelect.Cliente }}
+            </b-col>
+            <b-col md="12">
+              <b>HUESPED 1: </b>{{ itemSelect.IdClienteH1==null?'----':itemSelect.Huesped1 }}
+            </b-col>
+            <b-col md="12">
+              <b>HUESPED 2: </b>{{ itemSelect.IdClienteH2==null?'----':itemSelect.Huesped2 }}
+            </b-col>
+          </b-row>
+        </div>
+        <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalHuespedes.hide()}">Cerrar</b-btn>
+      </b-modal>
       </b-container>
   </div>
 </template>
@@ -98,7 +116,8 @@ export default {
       fechaRegistroFin: this.$moment().format("YYYY-MM-DD"),
 			almacen: {
 				IdAlmacen: 1
-			}
+			},
+      itemSelect:{}
     }
   },
   methods: {
@@ -114,6 +133,10 @@ export default {
       this.axios.get(this.API + 'reporte/habitaciones?idAlmacen='+this.almacen.IdAlmacen+'&fechaInicio='+this.fechaRegistroInicio+'&fechaFin='+this.fechaRegistroFin).then((response) => {
         this.huespedes = response.data
       })
+    },
+    abrirHuespedes(item){
+      this.itemSelect = item
+      this.$refs.modalHuespedes.show()
     }
   },
   components: {
