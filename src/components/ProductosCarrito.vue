@@ -135,7 +135,6 @@
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)"
             ></b-form-input>
         </template>
         <template slot="subtotal" slot-scope="data">
