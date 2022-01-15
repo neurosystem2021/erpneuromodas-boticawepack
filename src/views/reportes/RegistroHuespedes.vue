@@ -39,7 +39,7 @@
             <thead>
               <tr>
                 <th>Habitación</th>
-                <th>Apellidos y Nombres <b>(Titular)</b></th>
+                <th>Apellidos y Nombres</th>
                 <th>Sexo</th>
                 <!--<th>Ocupacion</th>-->
                 <th>F. Nacimiento</th>
@@ -53,29 +53,43 @@
                 <th>Fecha de salida</th>
                 <th>Tipo</th>
                 <th>Tarifa</th>
-                <th>Huespedes</th>
-
               </tr>
             </thead>
-            <tbody>
-              <tr v-for="(item, index) in huespedes" :key="index">
-                <td>{{ item.Producto }}</td>
-                <td>{{ item.Cliente }}</td>
-                <td>{{ item.Sexo }}</td>
-                <!--<td>{{ item.Ocupacion }}</td>-->
-                <td>{{ item.FechaNacimiento }}</td>
-                <td>{{ item.Nacionalidad }}</td>
-                <td>{{ item.DniRuc }}</td>
-                <td>{{ item.Direccion }}</td>
-                <td>{{ item.FechaAlquilerInicio }}</td>
-                <td>{{ item.LugarProcedencia }}</td>
-                <td>{{ item.MedioTransporte }}</td>
-                <td>{{ item.ProximoDestino }}</td>
-                <td>{{ item.FechaAlquilerFin }}</td>
-                <td>{{ item.ProductoMarca }}</td>
-                <td>{{ item.Tarifa }}</td>
-                <td><b-button @click="abrirHuespedes(item)" size="sm" variant="info"><i class="fas fa-eye"></i></b-button></td>
+            <tbody v-for="(item, index) in huespedes" :key="index">
+              <tr class="table-info">
+              <td :rowspan="item.HuespedesHabitacion.length+1" style="vertical-align: middle !important;">{{ item.Producto }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>{{ item.Sexo }}</td>
+              <!--<td>{{ item.Ocupacion }}</td>-->
+              <td>{{ item.FechaNacimiento }}</td>
+              <td>{{ item.Nacionalidad }}</td>
+              <td>{{ item.DniRuc }}</td>
+              <td>{{ item.Direccion }}</td>
+              <td>{{ item.FechaAlquilerInicio }}</td>
+              <td>{{ item.LugarProcedencia }}</td>
+              <td>{{ item.MedioTransporte }}</td>
+              <td>{{ item.ProximoDestino }}</td>
+              <td>{{ item.FechaAlquilerFin }}</td>
+              <td>{{ item.ProductoMarca }}</td>
+              <td><b>{{ item.Tarifa }}</b></td>
               </tr>
+              <tr v-for="(item2, index2) in item.HuespedesHabitacion" :key="index2">
+                  <td>{{ item2.Cliente }}</td>
+                  <td>{{ item2.Sexo }}</td>
+                  <!--<td>{{ item.Ocupacion }}</td>-->
+                  <td>{{ item2.FechaNacimiento }}</td>
+                  <td>{{ item2.Nacionalidad }}</td>
+                  <td>{{ item2.DniRuc }}</td>
+                  <td>{{ item2.Direccion }}</td>
+                  <td>{{ item2.FechaAlquilerInicio }}</td>
+                  <td>{{ item2.LugarProcedencia }}</td>
+                  <td>{{ item2.MedioTransporte }}</td>
+                  <td>{{ item2.ProximoDestino }}</td>
+                  <td>{{ item2.FechaAlquilerFin }}</td>
+                  <td>{{ item.ProductoMarca }}</td>
+                  <td></td>
+              </tr> 
+              <div style="margin-bottom:6px"></div>
             </tbody>
           </table>
         </b-row>
@@ -131,7 +145,27 @@ export default {
     },
     getRegistroHuespedes () {
       this.axios.get(this.API + 'reporte/habitaciones?idAlmacen='+this.almacen.IdAlmacen+'&fechaInicio='+this.fechaRegistroInicio+'&fechaFin='+this.fechaRegistroFin).then((response) => {
-        this.huespedes = response.data
+        let arregloId = response.data.map((h)=> h.IdPreOrden)
+        if(arregloId.length==0){
+        return
+        }
+
+        let params = {
+        IdsPreOrden: arregloId
+        }
+        // cierre de caja enviar el vendedor
+        this.axios.get(this.API + 'habitacion/huespedes', {
+          params: params
+        })
+        .then(res => {
+          response.data.map((hab)=>{
+            hab.HuespedesHabitacion = []
+            hab.HuespedesHabitacion = res.data.filter((dh)=>dh.IdPreOrden==hab.IdPreOrden)
+          })
+          this.huespedes = response.data
+        }).catch(err => {
+          console.log(err)
+        })
       })
     },
     abrirHuespedes(item){

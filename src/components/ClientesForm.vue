@@ -138,7 +138,7 @@ export default {
       }
     }
   },
-  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton', 'newDniRuc2'],
   /*watch: {
     show (val) {
       console.log(this.editCliente)
@@ -158,7 +158,7 @@ export default {
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
       } else {
-        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc || this.$parent.$parent.newDniRuc2  
       }
     },
     consultarDNIRUC () {

@@ -55,6 +55,50 @@
 									<li><b style="color:white">{{ hab.Cliente }}</b><li>
 									<li><b>Inicio: {{ hab.FechaAlquiler }}</b></li>
 									<li><b>Fin: {{ hab.FechaAlquilerFin }}</b></li>
+									<li style="margin-top:5px"><b style="font-size:15px">Total Personas:</b>  <b-badge variant="light" style="font-size:15px">{{ hab.Hospedados}}</b-badge> <b-button :id="i + 'popover-agregar' + index" size="sm" variant="light" style="margin-top:-5px"><i class="fas fa-user-plus"></i></b-button></li>
+									<b-popover  v-if="showPopover" :target="i + 'popover-agregar' + index" title="Agregar Huesped a la Habitación" triggers="click">
+										<label>Seleccione un cliente:</label>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente3' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													 :onInput="(val) => newDniRuc2 = val"
+													:on-select="setHuesped" 
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form :ruc="newDniRuc2" idModal="modal2" @onAddCliente="(obj) => { setHuesped(obj, index) }"></clientes-form>
+											</b-input-group-append>
+										</b-input-group>
+										<br />
+										<label>Lugar Procedencia:</label>
+										<b-input-group>
+											<b-form-input v-model="selectHuesped.LugarProcedencia"
+												type="text"
+												placeholder="Lugar Procedencia"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Medio de transporte:</label>
+										<b-input-group>
+											<b-form-input v-model="selectHuesped.MedioTransporte"
+												type="text"
+												placeholder="Medio de transporte"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Próximo destino:</label>
+										<b-input-group>
+											<b-form-input v-model="selectHuesped.ProximoDestino"
+												type="text"
+												placeholder="Próximo destino"></b-form-input>
+										</b-input-group>
+										<br>
+										<b-button variant="success" size="sm" @click="agregarHuesped(hab,index)">Agregar Huesped</b-button>	
+									</b-popover>
 								</ul>
 								<div slot="footer">
 									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
@@ -101,46 +145,6 @@
 												<clientes-form :ruc="newDniRuc" @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 											</b-input-group-append>
 										</b-input-group>
-										<br />
-										<label>Seleccione <b>Huésped 1</b>:</label>
-										<b-input-group>
-											<autocomplete
-													required="required"
-													:ref="'inputCliente3' + index"
-													:url="API + 'clientes'"
-													anchor="ClienteDniRuc"
-													label="writer"
-													placeholder=""
-													 :onInput="(val1) => newDniRuc1 = val1"
-													:on-select="setHuesped1" 
-													:classes="{input: 'form-control'}">
-											</autocomplete>
-											<b-input-group-append>
-												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form-h-1 :ruc="newDniRuc1" @onAddCliente="(obj) => { setHuesped1(obj, index) }"></clientes-form-h-1>
-											</b-input-group-append>
-										</b-input-group>
-										<b-form-text>Dejar en blanco si no hay huésped 1</b-form-text>
-										<br />
-										<label>Seleccione <b>Huésped 2</b>:</label>
-										<b-input-group>
-											<autocomplete
-													required="required"
-													:ref="'inputCliente4' + index"
-													:url="API + 'clientes'"
-													anchor="ClienteDniRuc"
-													label="writer"
-													placeholder=""
-													 :onInput="(val) => newDniRuc2 = val"
-													:on-select="setHuesped2" 
-													:classes="{input: 'form-control'}">
-											</autocomplete>
-											<b-input-group-append>
-												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form-h-2 :ruc="newDniRuc2" @onAddCliente="(obj) => { setHuesped2(obj, index) }"></clientes-form-h-2>
-											</b-input-group-append>
-										</b-input-group>
-										<b-form-text>Dejar en blanco si no hay huésped 2</b-form-text>
 										<br />
 										<label>Lugar Procedencia:</label>
 										<b-input-group>
@@ -191,17 +195,30 @@
 
 		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
 			<b-modal v-model="show" size="lg" id="carrito" :title="'Cesta de compras - Habitación ' + selectProducto.Producto " ref="modalCarrito">
-				<div class="text-center"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
-				<div class="text-center">Inicio: {{ selectProducto.FechaAlquiler }}</div>
-				<div class="text-center">Fin: {{ selectProducto.FechaAlquilerFin }} </div>
+				<div><b>Titular: {{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+				<div>Inicio: {{ selectProducto.FechaAlquiler }}</div>
+				<div>Fin: {{ selectProducto.FechaAlquilerFin }} </div>
 				<div class="text-center">
 					Nueva Fecha Fin: 
 					<input class="form-control" style="width: 210px; display: inline" type="datetime-local" v-model="nuevaFechaFin" />
 					<button @click="guardarNuevaFechaFin" style="width: 100px" type="button" class="form-control btn btn-primary">Actualizar</button>
 				</div>
-				<br>
-				<br>
-				
+				<hr>
+				<b-row>
+					<b-col md="12" style="display: flex; align-items: center;"><b style="margin-right:10px">Huespedes secundarios:</b></b-col>
+					<b-col md="12">
+						<table>
+							<tbody>
+								<tr v-for="(prod, index) in HuespedesSec" :key="index">
+									<td><b>{{ prod.DniRuc }}</b></td>
+									<td> - {{ prod.Cliente }} </td>
+									<td><b-button variant="danger" size="sm" @click="quitarHuesped(prod.IdHuespedDet,prod.Cliente)"><i class="fas fa-times fa-lg"></i></b-button></td>
+								</tr>
+							</tbody>
+						</table>
+					</b-col>
+				</b-row>
+				<hr>
 				<b-row>
 					<b-col md="8">
 						<pre-orden-form-det v-if="show"
@@ -270,8 +287,6 @@
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 import ClientesForm from '@/components/ClientesForm'
-import ClientesFormH1 from '@/components/ClientesFormH1'
-import ClientesFormH2 from '@/components/ClientesFormH2'
 
 export default {
   	mounted () {
@@ -292,10 +307,9 @@ export default {
 			nuevaFechaFin: '',
 			// habitacionesPiso: []
 			newDniRuc: '',
-			newDniRuc1: '',
 			newDniRuc2: '',
-			IdHuesped1: null,
-			IdHuesped2:null
+			HuespedesSec:[],
+			selectHuesped: {},
 		}
 	},
 	computed: {
@@ -420,9 +434,73 @@ export default {
 			
 		},
 		openCarrito(hab) {
-			this.selectProducto = hab
-			this.$refs.modalCarrito.show()
-			this.cargarAdelantos()
+			this.HuespedesSec=[]
+			this.axios.get(this.API + 'habitacion/huespedes/det', {
+				params: {idPreOrden: hab.IdPreOrden}
+			}).then(res => {
+				this.selectProducto = hab
+				this.HuespedesSec=res.data
+				this.$refs.modalCarrito.show()
+				this.cargarAdelantos()
+			}).catch(err => {
+				this.selectProducto = {}
+				console.log(err)
+			})
+		},
+		cargarHuespedes(){
+			this.axios.get(this.API + 'habitacion/huespedes/det', {
+				params: {idPreOrden: this.selectProducto.IdPreOrden}
+			}).then(res => {
+				this.HuespedesSec=res.data
+			}).catch(err => {
+				this.selectProducto = {}
+				console.log(err)
+			})
+		},
+		quitarHuesped(IdHuespedDet, Cliente){
+			let r = confirm('¿Se quitará '+Cliente+' de la habitación, está seguro?')
+      		if (r) {
+			this.axios.post(this.API + 'habitacion/huespedes/delete', {
+				IdHuespedDet: IdHuespedDet,
+			}).then(res => {
+				this.cargarHuespedes();
+				this.$toasted.success('Huesped quitado correctamente')
+			}) 
+			}
+		},
+		agregarHuesped(hab,index){
+			if(this.$refs['inputCliente3' + index][0].$refs.input.value == ''){
+				this.selectHuesped.IdCliente = null
+				this.$toasted.error('Seleccione un cliente')
+				return
+			}
+			console.log(hab);
+			this.selectHuesped.FechaAlquilerInicio = hab.FechaAlquiler
+			this.selectHuesped.FechaAlquilerFin = hab.FechaAlquilerFin
+			this.axios.post(this.API + 'habitacion/agregar/huesped', {
+				IdPreOrden: hab.IdPreOrden,
+				IdCliente: this.selectHuesped.IdCliente,
+				cliente: this.selectHuesped,
+			}).then(res => {
+				if(res.data.insertId){
+				this.getHabitaciones();
+				this.limpiarDespues()
+				this.showPopover = false
+				this.$nextTick(() => {
+					this.showPopover = true
+				})	
+				this.$toasted.success('Huesped agregado correctamente')
+				}
+
+			}) 
+		},
+		setHuesped(obj,index){
+			if (index >= 0) {
+				console.log('inputCliente3' + index)
+				this.$refs['inputCliente3' + index][0].setValue(obj.Cliente)
+				this.newDniRuc2=''
+			}
+			this.selectHuesped = obj
 		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
@@ -477,13 +555,13 @@ export default {
 			}
 		},
 		alquilarHab(hab,index) {
-
+			/*
 			if(this.$refs['inputCliente3' + index][0].$refs.input.value == ''){
 				this.IdHuesped1 = null
 			}
 			if(this.$refs['inputCliente4' + index][0].$refs.input.value == ''){
 				this.IdHuesped2 = null
-			}
+			}*/
 
 			if (!this.selectCliente.Cliente) {
 				this.$toasted.error('Seleccione un cliente.');
@@ -496,8 +574,6 @@ export default {
 					IdProducto: hab.IdProducto,
 					IdCliente: this.selectCliente.IdCliente,
 					cliente: this.selectCliente,
-					IdHuesped1: this.IdHuesped1,
-					IdHuesped2: this.IdHuesped2,
 				}).then(res => {
 					this.getHabitaciones()
 					this.limpiarPopover()
@@ -520,24 +596,6 @@ export default {
 			}
 			this.selectCliente = obj
 		},
-		setHuesped1(obj, index) {
-			if (index >= 0) {
-				console.log('inputCliente3' + index)
-				this.$refs['inputCliente3' + index][0].setValue(obj.Cliente)
-				this.newDniRuc1=''
-			}
-			this.IdHuesped1 = obj.IdCliente
-		
-		},
-		setHuesped2(obj, index) {
-			if (index >= 0) {
-				console.log('inputCliente4' + index)
-				this.$refs['inputCliente4' + index][0].setValue(obj.Cliente)
-				this.newDniRuc2=''
-			}
-			this.IdHuesped2 = obj.IdCliente
-			
-		},
 		/*focusAutocomplete (ref) {
 			this.$refs[ref][0].handleDoubleClick()
 		},*/
@@ -548,8 +606,7 @@ export default {
 		limpiarDespues() {
 			this.selectCliente = {}
 			this.selectProducto = {}
-			this.IdHuesped1 = null
-			this.IdHuesped2 = null
+			this.selectHuesped = {}
 		},
 		formatFecha(fecha) {
 			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
@@ -558,8 +615,6 @@ export default {
 	components: {
 		PreOrdenFormDet,
 		ClientesForm,
-		ClientesFormH1,
-		ClientesFormH2
 	}
 }
 </script>
