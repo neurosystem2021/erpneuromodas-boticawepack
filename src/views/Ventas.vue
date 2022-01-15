@@ -105,7 +105,7 @@
                                         <b-input-group prepend="Placa">
                                             <input v-model="venta.Placa"
                                                     type="text"
-                                                    required
+                                                    ref="inputPlaca"
                                                     style="text-transform:uppercase;"
                                                     class="form-control"
                                                     placeholder="Placa" />
@@ -383,19 +383,19 @@
                         </b-col>
                     </b-row>
                     <br>
-                    <b-row  style="height:100%; overflow-y: scroll; background: #E6E6E6; place-content: flex-start;">     
-                        <b-col md="6" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
+                    <b-row  style="height:90%; overflow-y: scroll; background: #E6E6E6; place-content: flex-start;">     
+                        <b-col md="12" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
                             <b-row >
                                 <b-col md="5">
-                                    <label class="font-weight-bold" style="font-size:0.7rem; cursor:pointer">{{producto.Producto}}</label>
+                                    <label class="font-weight-bold" style="font-size:0.8rem; cursor:pointer">{{producto.Producto}}</label>
                                 </b-col>
                                 <b-col md="7" style="align-items: center; justify-content: center; display: flex;">
-                                    <b-badge variant="dark" style="font-size: 0.7rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                                    <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
                                 </b-col>
                             </b-row>
                             <b-row class="text-center" style="margin-top:2px; border-top: 1px solid #E6E6E6;">
                                 <b-col>
-                                    <b-img style="border-radius: 10px; width:80%; object-fit: contain; margin-bottom:5px" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                    <b-img style="border-radius: 10px; width:80%; object-fit: contain; margin-bottom:5px; width:180px" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
                                 </b-col>               
                             </b-row>
                         </b-col>
@@ -1024,6 +1024,26 @@ export default {
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
+                return;
+            }
+
+            if(parseFloat(totalPagos) >= 600 && this.venta.tipoVenta.CodSunat == '03' && this.venta.cliente.DniRuc == '00000000' ){
+                this.$toasted.error('Venta con boleta mayor a 600 soles, no puede ser emitida con cliente varios');
+                this.inProgress = false
+                return;
+            }
+
+            if(parseFloat(totalPagos) >= 600 && this.venta.tipoVenta.CodSunat == '03' && (''+this.venta.Placa).trim()=='' ){
+                this.$toasted.error('Venta con boleta mayor a 600 soles, por favor ingrese la placa del vehiculo');
+                this.inProgress = false
+                this.$refs.inputPlaca.focus()
+                return;
+            }
+
+            if(this.venta.tipoVenta.CodSunat == '01' && (''+this.venta.Placa).trim()=='' ){
+                this.$toasted.error('Venta con factura, por favor ingrese la placa del vehiculo');
+                this.inProgress = false
+                this.$refs.inputPlaca.focus()
                 return;
             }
             
