@@ -167,6 +167,7 @@ import config from '@/store/config.js'
                 vendedor: {},
                 show: false,
                 cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
+                idAlmacen:2
             }
         },
         methods: {
@@ -195,6 +196,7 @@ import config from '@/store/config.js'
             },
             setVendedor (obj) {
                 this.vendedor = obj
+                this.idAlmacen = obj.IdAlmacen
             },
             focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
@@ -280,7 +282,8 @@ import config from '@/store/config.js'
                     cajaBanco: this.cajaBanco,
                     documentos: this.documentos,
                     vendedor: this.vendedor,
-                    cuentas: cuentasId
+                    cuentas: cuentasId,
+                    idAlmacen: this.idAlmacen
                 })
                 .then((response) => {
                     console.log(response.data)
