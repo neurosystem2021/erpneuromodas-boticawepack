@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="VENTA"
+                        initValue=""
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
+                        initValue=""
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -189,7 +189,10 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito  @onAddProducto="onAddProducto" ref="carrito" tipo="mov"></productos-carrito>
+              <productos-carrito  @onAddProducto="onAddProducto" ref="carrito" tipo="mov" 
+                :movTipo = "movimiento.movimientoTipo.Tipo"
+                :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
+                :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -297,23 +300,40 @@ return false
     setTipoMovimiento (obj) {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.movimiento.almacenDestino = { IdAlmacen: null }
         this.isTraslado = false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.movimiento.almacenOrigen = { IdAlmacen: null }
         this.isTraslado = false
       }else {
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.movimiento.almacenDestino = { IdAlmacen: null }
+        this.movimiento.almacenOrigen = { IdAlmacen: null }
         this.isTraslado = true
       }
       this.movimiento.movimientoTipo = obj
 
+      if(this.movimiento.movimientoTipo.Tipo==0){
+        setTimeout(() => {
+          this.$refs.inputAlmacenDestino.setValue('')
+        }, 200);
+        
+      }else if(obj.Tipo==1){
+        setTimeout(() => {
+        this.$refs.inputAlmacenOrigen.setValue('')
+        }, 200);
+        
+      }else if(obj.Tipo==2){
+        setTimeout(() => {
+        this.$refs.inputAlmacenDestino.setValue('')
+        this.$refs.inputAlmacenOrigen.setValue('')
+        }, 300);
+      }
+
       this.cargarNumero()
-      this.obtenerStok({
-        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
-      })
+      //this.obtenerStok({
+       // IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      //})
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
@@ -366,6 +386,22 @@ return false
         this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
         return;
+      }
+
+      if(this.movimiento.movimientoTipo.Tipo==0 && this.movimiento.almacenDestino.IdAlmacen==null){
+        this.$toasted.show('Primero Seleccione almacen de destino')
+        this.inProgress = false
+        return
+      }else if(this.movimiento.movimientoTipo.Tipo==1 && this.movimiento.almacenOrigen.IdAlmacen==null){
+        this.$toasted.show('Primero Seleccione almacen de destino')
+        this.inProgress = false
+        return
+      }else if(this.movimiento.movimientoTipo.Tipo==2){
+        if(this.movimiento.almacenOrigen.IdAlmacen==null || this.movimiento.almacenDestino.IdAlmacen==null){
+          this.$toasted.show('Primero Seleccione almacen de origen y destino')
+          this.inProgress = false
+          return
+        }
       }
 
       this.axios.post(this.API + 'movimientos', {

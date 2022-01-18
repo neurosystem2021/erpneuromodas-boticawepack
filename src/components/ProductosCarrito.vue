@@ -215,6 +215,9 @@ export default {
     }
   },
   props: {
+    movTipo: Number,
+    almacenDestino:Number,
+    almacenOrigen:Number,
     setPrecio: Boolean,
     tipo: String,
     bloquearInput:Boolean,
@@ -237,7 +240,7 @@ export default {
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Present.' }, 
+          //{ key: 'ProductoPresentacion', label: 'Present.' }, 
           { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -364,6 +367,30 @@ export default {
     },  
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
+      if (this.tipo=='mov') {
+        if(this.movTipo==undefined){
+          this.$toasted.show('Primero seleccione un tipo de movimiento')
+          return
+        }else{
+          if(this.movTipo==0){
+            if(this.almacenDestino==null){
+              this.$toasted.show('Primero Seleccione almacen de destino')
+              return
+            }
+          }else if(this.movTipo==1){
+            if(this.almacenOrigen==null){
+              this.$toasted.show('Primero Seleccione almacen de destino')
+              return
+            }
+          }else if(this.movTipo==2){
+            if(this.almacenOrigen==null || this.almacenDestino==null){
+              this.$toasted.show('Primero Seleccione almacen de origen y destino')
+              return
+            }
+        
+        }
+        }
+        }
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
