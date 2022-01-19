@@ -129,6 +129,10 @@
                   </div>
                 </template>
 
+                <template slot="Reimprimir" slot-scope="data">
+                  <b-button @click="reimprimir(data.item.idDocVenta)"> <i class="fas fa-print"></i></b-button>
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -201,6 +205,7 @@ export default {
             { key: 'Anulado', label: 'Anulado', sortable: true },
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+            { key: 'Reimprimir', sortable: false, class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
@@ -214,6 +219,9 @@ export default {
         this.tipoDoc = obj || {}
         this.getVentasAcumuladas()
         this.$refs.tablaVentas.refresh()
+    },
+    reimprimir(idDocVenta){
+      window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta+'&redirect=1','_blank');
     },
     setVendedor (obj) {
       this.currentPage = 1
