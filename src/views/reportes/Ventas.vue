@@ -129,6 +129,10 @@
                   </div>
                 </template>
 
+                <template slot="Reimprimir" slot-scope="data">
+                  <b-button @click="reimprimir(data.item.idDocVenta)"> <i class="fas fa-print"></i></b-button>
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -214,6 +218,9 @@ export default {
         this.tipoDoc = obj || {}
         this.getVentasAcumuladas()
         this.$refs.tablaVentas.refresh()
+    },
+    reimprimir(idDocVenta){
+      window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta,'_blank');
     },
     setVendedor (obj) {
       this.currentPage = 1

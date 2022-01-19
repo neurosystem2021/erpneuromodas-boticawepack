@@ -128,7 +128,7 @@
     <b-row style="border-top: 3px solid #C0C0C0;">
           <b-col md="4">
             <br>
-            <b-row style="justify-content: center;">
+            <b-row style="justify-content: center;" v-if="false">
               <table class="calc__numbers">
                 <tbody>
                     <tr>

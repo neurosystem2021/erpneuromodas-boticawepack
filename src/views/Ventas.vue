@@ -462,7 +462,7 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'selec',label:'Selec.',class:'fontsize thsize'},
+                    //{ key: 'selec',label:'Selec.',class:'fontsize thsize'},
                     { key: 'stock', label: 'Stock', variant: 'info', class:'fontsize thsize' },
                     //{ key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto', class:'productosize thsize'  }, 
