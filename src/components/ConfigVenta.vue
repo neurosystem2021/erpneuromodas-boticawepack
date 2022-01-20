@@ -4,14 +4,14 @@
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 
-                title="Configurar Venta ( Solo para clientes VIP )" 
+                title="Configurar Venta" 
                 size="md" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">
 
-                <b-row class="mb-1">
+                <b-row class="mb-1" v-if="false">
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
@@ -24,7 +24,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-1">
+                <b-row class="mb-1" v-if="false">
                     <b-col><label for="input-porcada">El cliente VIP gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
@@ -37,7 +37,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-1">
+                <b-row class="mb-1" v-if="false">
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
@@ -50,8 +50,22 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
+                <b-row class="mb-1">
+                    <b-col><label for="input-porcada">Texto promocion del comprobante:</label></b-col>
+                    <b-col>
+                     <textarea 
+                    class="form-control"
+                    placeholder="Descripción"
+                    cols="9" rows="4"
+                    v-model="textoPromo">
+                    </textarea>
+                    <b-btn class="mt-1" size="sm" variant="success"  @click="guardarConfigTexto">
+                        Guardar Texto
+                    </b-btn>  
+                    </b-col>
+                </b-row>
                 <div slot="modal-footer" >
-                    <b-btn size="sm" variant="success" type="submit">
+                    <b-btn size="sm" variant="success" type="submit" v-if="false">
                         Guardar
                     </b-btn>
                     <b-btn size="sm" variant="secondary" @click="show=false">
@@ -70,13 +84,23 @@ import config from '@/store/config.js'
         mounted () {
             this.obtenerDescuento()
         },
+        watch:{
+            show(){
+                if(this.show){
+                 //this.obtenerDescuento()
+                 //this.obtenerComision() 
+                 this.getTextoPromo()
+                }
+            }
+        },
         data () {
             return {
                 API: config.API,
                 show: false,
                 porCada: 20,
                 puntos: 1,
-                valorPunto: 1
+                valorPunto: 1,
+                textoPromo: ''
             }
         },
         methods: {
@@ -103,7 +127,34 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.$emit('onUpdateConfig', response.data)
                     this.obtenerDescuento()
-                    this.$toasted.show('Se actualizó la configuración')
+                    this.$toasted.success('Se actualizó la configuración')
+                    this.show = false
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            },
+            getTextoPromo(){
+                this.axios.get(this.API + 'ventas/promo')
+                    .then((response) => {
+                        this.textoPromo = response.data.TEXTO_PROMO
+                })
+                    .catch((error) => {
+                        console.log(error)
+                        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                 })
+            
+            },
+            guardarConfigTexto() {
+                // Comision
+                this.axios.post(this.API + 'ventas/promo', {
+                    TextoPromo: this.textoPromo
+                }).then((response) => {
+                    //this.$emit('onUpdateConfigComision', response.data)
+                    //this.obtenerComision()
+                    this.textoPromo = response.data.textoPromo
+                    this.$toasted.show('Se actualizó el texto promoción del comprobante')
                     this.show = false
                 })
                 .catch((error) => {
