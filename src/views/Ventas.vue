@@ -7,6 +7,9 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
+                        <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -385,7 +388,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            navDisabled:false,
         }
     },
     watch: {
@@ -469,6 +473,14 @@ export default {
             this.isNota = false
             this.bloquearInput = false 
             this.descuentoGeneral = 0
+        },
+        setScreen() {
+            this.navDisabled=!this.navDisabled
+            if(this.navDisabled){
+                window.parent.document.getElementById('NavegadorParent').style.display = 'none'
+            }else{
+                window.parent.document.getElementById('NavegadorParent').style.display = 'block'
+            }
         },
         setTipoVenta (obj) {
             this.isNota = false
