@@ -832,7 +832,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad).toFixed(2) )) {
                     sinStock += 1
                 }
 
@@ -843,6 +843,12 @@ export default {
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en cero');
+                this.inProgress = false
+                return;
+            }
+
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender, stock insuficiente');
                 this.inProgress = false
                 return;
             }
