@@ -95,7 +95,7 @@ import { mapActions } from 'vuex'
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+                        }, { precio: item.Precio, cantidad: item.Cantidad } ])
 
                         this.filter = ''
                         this.show = false
