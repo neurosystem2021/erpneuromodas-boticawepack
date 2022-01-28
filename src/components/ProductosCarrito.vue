@@ -256,7 +256,8 @@ export default {
       },
       type: Array
     },
-    noSubtotal: Boolean
+    noSubtotal: Boolean,
+    clienteInfo: Object
   },
   computed: {
     ...mapState({
@@ -392,6 +393,11 @@ export default {
         }
         }
         }
+
+      if(this.padre!="mov" && Object.keys(this.clienteInfo || {dato:0}).length==0){
+        this.$toasted.show('Para agregar primero seleccione un cliente')
+        return;
+      } 
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0

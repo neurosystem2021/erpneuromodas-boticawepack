@@ -198,7 +198,8 @@
                             :bloquearInput="bloquearInput" 
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
+                            :onSetProducto="onSetProducto"
+                            :clienteInfo="venta.cliente">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
