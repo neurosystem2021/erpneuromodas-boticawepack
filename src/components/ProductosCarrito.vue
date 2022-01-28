@@ -89,7 +89,7 @@
           <b-form-input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
@@ -104,7 +104,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="isVentas? true : false"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -127,7 +127,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -203,6 +203,7 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
+            style="width:100px"
             step="0.01"
             @input="(val)=>ActualizarDesc(data.index,val)"        
             :value="0"></b-form-input>
@@ -304,7 +305,7 @@
       </b-table>
     </b-col>
     <b-col md="3">
-      <slot name="operaciones"></slot>
+      <slot name="operaciones" v-if="!noSubtotal"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
@@ -402,6 +403,7 @@ export default {
     isVentas: Boolean,
     isNota:Boolean,
     tipo: String,
+    padre: String,
     setPrecio: Boolean,
     tipoCambio: Number,
     igvTotal: Boolean,
@@ -445,7 +447,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({

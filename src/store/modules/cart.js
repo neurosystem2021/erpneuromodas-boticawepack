@@ -82,12 +82,14 @@ const actions = {
     let precio = false
     let setSuma = false
     let setPrecioCosto = false
+    let proforma = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       precio = obje.precio
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
+      proforma = obje.proforma
     }
 
     if(typeof producto === 'object') {
@@ -147,6 +149,11 @@ const actions = {
             obj.precio = precio
           }
 
+          if (proforma) {
+            obj.cantxPrecio = obj.cantidad
+            obj.cantidadPres = 1
+          }
+          
           if (setSuma) {
             obj.setSuma = true
           }
