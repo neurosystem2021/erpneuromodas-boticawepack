@@ -9,16 +9,16 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
+                        <!--<pago-deuda></pago-deuda>-->
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @onLoadMovimiento="cargarLotes"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <pre-orden-lista 
+                        <!--<pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"></pre-orden-lista>
+                            @onPreOrden="selectPreOrden"></pre-orden-lista>-->
                     </b-button-group>
                     <b-button-group size="sm">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
@@ -241,7 +241,7 @@
                                                 </b-form-text>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="false">
                                             <td>
                                                 <b-form-checkbox
                                                     :disabled="bloquearInput?true:false || isNota"
@@ -898,7 +898,7 @@ export default {
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -961,12 +961,11 @@ export default {
             }
 
             //No permitir la venta con Ruc si es boleta
-            /*
             if (esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
                 this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
                 this.inProgress = false
                 return
-            }*/
+            }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

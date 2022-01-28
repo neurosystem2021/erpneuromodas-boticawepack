@@ -742,7 +742,7 @@ export default {
       this.objProd = {}
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
-      if(!this.isVentas){
+      if(!this.isVentas && this.padre=="compra"){
         if(this.movTipo==undefined){
           this.$toasted.show('Primero seleccione un tipo de movimiento')
           return
