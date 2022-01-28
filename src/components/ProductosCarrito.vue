@@ -120,7 +120,7 @@
 
       </b-table>
     </b-col>
-    <b-col md="3" offset-md="2" v-if="!noSubtotal">
+    <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
