@@ -196,7 +196,7 @@
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
                 :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
-                tipo="mov"></productos-carrito>
+                tipo="mov" padre="compra"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
