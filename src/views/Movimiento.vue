@@ -189,7 +189,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito  @onAddProducto="onAddProducto" ref="carrito" tipo="mov" 
+              <productos-carrito  @onAddProducto="onAddProducto" ref="carrito" tipo="mov" padre="mov"
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
                 :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"></productos-carrito>

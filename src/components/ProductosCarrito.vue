@@ -220,6 +220,7 @@ export default {
     almacenOrigen:Number,
     setPrecio: Boolean,
     tipo: String,
+    padre: String,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -367,7 +368,7 @@ export default {
     },  
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
-      if (this.tipo=='mov') {
+      if (this.tipo=='mov' && this.padre=='mov') {
         if(this.movTipo==undefined){
           this.$toasted.show('Primero seleccione un tipo de movimiento')
           return
