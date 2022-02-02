@@ -728,11 +728,11 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id,pxp,obj){
-     /* this.add([id,false,false,false,false,true,this.isVentas]);
+     this.add([id,false,false,false,false,true,this.isVentas]);
       setTimeout(() => {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
-      */
+    
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
