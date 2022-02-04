@@ -167,6 +167,7 @@
               v-model="producto.PrecioCosto"
               type="number"
               class="form-control"
+              step="0.000001"
               />
           </b-form-group>
         </b-col>
@@ -176,6 +177,7 @@
             <input v-model="producto.PrecioContado"
               type="number"
               class="form-control"
+              step="0.000001"
               @input.native="actualizarPorcentajeUtilidad"
               />
               <b-form-text v-if="producto.precioContadoNormal">
