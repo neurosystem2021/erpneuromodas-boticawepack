@@ -50,6 +50,22 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
+                <b-row v-if="tienePuntos != null">
+                    <b-col md="6"><label for="input-porcada">Puntos al final del comprobante:</label></b-col>
+                    <b-col md="3">
+                    <b-btn v-if="tienePuntos==0" class="mt-1" size="sm" variant="success"  @click="accionPuntos(1)">
+                        Habilitar
+                    </b-btn> 
+                    <b-btn v-if="tienePuntos==1" class="mt-1" size="sm" variant="danger"  @click="accionPuntos(0)">
+                        Deshabilitar
+                    </b-btn> 
+                    </b-col>
+                    <b-col md="3">
+                        <b-form-text v-if="tienePuntos==1" text-variant="success">Los puntos están habilitados</b-form-text>
+                        <b-form-text v-if="tienePuntos==0" text-variant="danger">Los puntos están deshabilitados</b-form-text>
+                    </b-col>
+                </b-row>
+                <hr>
                 <b-row class="mb-1">
                     <b-col><label for="input-porcada">Texto promocion del comprobante:</label></b-col>
                     <b-col>
@@ -100,7 +116,8 @@ import config from '@/store/config.js'
                 porCada: 20,
                 puntos: 1,
                 valorPunto: 1,
-                textoPromo: ''
+                textoPromo: '',
+                tienePuntos: null
             }
         },
         methods: {
@@ -139,9 +156,11 @@ import config from '@/store/config.js'
                 this.axios.get(this.API + 'ventas/promo')
                     .then((response) => {
                         this.textoPromo = response.data.TEXTO_PROMO
+                        this.tienePuntos = response.data.TIENE_PUNTOS
                 })
                     .catch((error) => {
                         console.log(error)
+                        this.tienePuntos = null
                         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                  })
             
@@ -154,8 +173,26 @@ import config from '@/store/config.js'
                     //this.$emit('onUpdateConfigComision', response.data)
                     //this.obtenerComision()
                     this.textoPromo = response.data.textoPromo
-                    this.$toasted.show('Se actualizó el texto promoción del comprobante')
+                    this.$toasted.success('Se actualizó el texto promoción del comprobante')
                     this.show = false
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            },
+            accionPuntos(opcion){
+                this.axios.post(this.API + 'ventas/promo/puntos', {
+                    Habilitar: opcion
+                }).then((response) => {
+                    //this.$emit('onUpdateConfigComision', response.data)
+                    //this.obtenerComision()
+                    this.tienePuntos = response.data.tienePuntos
+                    if(this.tienePuntos==1){
+                        this.$toasted.success('Se habilito los puntos del comprobante')
+                    }else if(this.tienePuntos==0){
+                        this.$toasted.error('Se desahabilito los puntos del comprobante')
+                    }
                 })
                 .catch((error) => {
                     console.log(error)
