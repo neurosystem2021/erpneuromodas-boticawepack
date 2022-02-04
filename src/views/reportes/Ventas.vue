@@ -179,7 +179,9 @@ export default {
   data() {
     return {
       API: config.API,
-      vendedor: '',
+      vendedor: {
+        Usuario:''
+      },
       hrefExportar: config.API + 'reporte/ventadevendedor',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
@@ -251,7 +253,8 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
           }
         }).then((response) => {
           this.ventasAcumuladas = response.data.total
@@ -266,6 +269,18 @@ export default {
       this.almacen = obj
       this.limpiarFiltros()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+      if(!this.filters.vendedor) {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
+      }
     },
     rowClick (item) {
       this.ventaSelect = item
@@ -314,9 +329,24 @@ export default {
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
+      this.$refs.inputTipoVenta.setValue('')
       this.ventasAcumuladas = 0
+      this.tipoDoc = {}
+      this.vendedor.Usuario = ''
       // document.location.reload()
      //  this.getVentasAcumuladas()
+      if(!this.filters.vendedor) {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
+      }
     },
     generateFilter (key, value) {
       this.filters[key] = value
