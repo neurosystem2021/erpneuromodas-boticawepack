@@ -28,7 +28,7 @@
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -36,10 +36,11 @@
             min="0"
             step="0.01"
             @input="(val) => {$emit('onInputCantidad', val);  getSubtotal(data.index)}"
-            placeholder="Cantidad"></b-form-input>
+            class="form-control"
+            placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -47,7 +48,8 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="()=>{setNuevoPrecioContado(data.index); getSubtotal(data.index)}"></b-form-input>
+            @input="()=>{setNuevoPrecioContado(data.index); getSubtotal(data.index)}"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -78,27 +80,29 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            class="form-control"
+            placeholder="Precio Venta"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -195,12 +199,12 @@
           </b-col>
           <hr />
           <label>Cantidad:</label>
-          <b-form-input
+          <input
             type="number"
             ref="inputCantidadPro"
             v-model="productoSelect.cantidad"
-            placeholder="Cantidad">
-          </b-form-input>
+            class="form-control"
+            placeholder="Cantidad"/>
           <br>
           <label>Medida de corte en (
             <span v-if="esPulgadas">Pulgadas</span>
@@ -209,32 +213,36 @@
           <br />
           <div v-show="!productoSelect.SoloLargo">
           <label>Ancho:</label>
-          <b-form-input
+          <input
             type="number"
             ref="inputAncho"
             v-model="ancho"
             placeholder="Ancho"
-            @input="val => calcularm2()"></b-form-input>
+            class="form-control"
+            step="0.0001"
+            @input="val => calcularm2()"/>
           <br />
           </div>
           <label>Largo:</label>
-          <b-form-input
+          <input
             type="number"
             ref="inputLargo"
             v-model="largo"
             placeholder="Largo"
-            @input="val => calcularm2()">
-          </b-form-input>
+            class="form-control"
+            step="0.0001"
+            @input="val => calcularm2()"/>
           <br>
           <div v-show="!productoSelect.SoloLargo">
           <label>Factor ({{factorNombre}}):</label>  
-          <b-form-input
+          <input
             type="number"
             ref="inputFactor"
             v-model="factor"
             placeholder="factor"
-            @input="val => calcularm2()">
-          </b-form-input>
+            class="form-control"
+            step="0.0001"
+            @input="val => calcularm2()"/>
           <br>
           <label>Pie<sup>2</sup> del corte ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
           </div>

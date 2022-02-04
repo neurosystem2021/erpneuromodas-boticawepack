@@ -108,22 +108,25 @@
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
               @input.native="actualizarPrecioContado"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
           </b-form-group>
           <b-form-group>
             <label>Activar SubProductos:</label>
@@ -162,23 +165,27 @@
         <b-col md="6" v-show="!producto.SoloLargo">
           <b-form-group>
             <label>Ancho (cm):</label>
-            <b-form-input
+            <input
               v-model="producto.Ancho"
               type="number"
               :readonly="!!producto.EsPadre"
                @input="val => calcularm2()"
-              ></b-form-input>
+               class="form-control"
+               step="0.0001"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Largo (cm):</label>
-            <b-form-input
+            <input
               v-model="producto.Largo"
               type="number"
               :readonly="!!producto.EsPadre"
                @input="val => calcularm2()"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6" v-show="!producto.SoloLargo">
@@ -199,20 +206,24 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCosto"
               readonly="readonly"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Venta:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
               @input.native="actualizarPorcentajeUtilidad"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
