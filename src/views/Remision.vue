@@ -293,7 +293,7 @@ export default {
       return false
     },
     motivoTrasladoChange (e) {
-      descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
+      let descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
       this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado
     },
     onReset (evt) {
