@@ -252,7 +252,7 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <input
+                                                    <b-form-input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
@@ -260,8 +260,7 @@
                                                         @input="aplicarDescuentoGeneral"
                                                         type="number"
                                                         class="form-control"
-                                                        step="0.01"
-                                                    />
+                                                    ></b-form-input>
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.

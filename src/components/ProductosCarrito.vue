@@ -221,7 +221,8 @@
             min="0"
             step="0.01"
             class="form-control"
-            value="0"/>
+            value="0"
+            @input="actualizarDescu(data.index)"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -786,6 +787,10 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
       this.updateManoDeObraNeta(index)
+    },
+    actualizarDescu(index){
+      let obj = this.productos[index];
+       this.actualizarProd(obj)
     },
     getSubtotal(index) {
       
