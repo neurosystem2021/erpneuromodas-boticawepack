@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary">Configurar</b-button>
+        <b-button @click="MostrarConfiguracion" variant="outline-primary">Configurar</b-button>
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 
@@ -15,12 +15,13 @@
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="porCada"
+                        <input v-model="porCada"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.1"
-                            placeholder=""></b-form-input>
+                            class="form-control"
+                            placeholder=""/>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -28,12 +29,13 @@
                     <b-col><label for="input-porcada">El cliente VIP gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
-                        <b-form-input v-model="puntos"
+                        <input v-model="puntos"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="1"
-                            placeholder=""></b-form-input>
+                            class="form-control"
+                            placeholder=""/>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -41,12 +43,13 @@
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="valorPunto"
+                        <input v-model="valorPunto"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.1"
-                            placeholder=""></b-form-input>
+                            class="form-control"
+                            placeholder=""/>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -70,6 +73,13 @@ import config from '@/store/config.js'
         mounted () {
             this.obtenerDescuento()
         },
+        watch:{
+            show(){
+                if(this.show){
+                    this.obtenerDescuento()
+                }
+            }
+        },
         data () {
             return {
                 API: config.API,
@@ -92,6 +102,24 @@ import config from '@/store/config.js'
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
+            MostrarConfiguracion(){
+                let pass = window.prompt('Escriba su contraseña de administrador')
+                if (pass) {
+                    this.axios.post(this.API + 'login', {
+                    user: 'admin',
+                    password: pass
+                    }).then(r => {
+                        if (r.data) {
+                            this.show = true;
+                        }else{
+                            this.$toasted.show('Contraseña incorrecta, no autorizado.')
+                        }
+                    }).catch((error) => {
+                        console.log(error)
+                        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    })
+                }
+            },
             guardarConfigVenta (evt) {
                 evt.preventDefault()
 
@@ -103,7 +131,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.$emit('onUpdateConfig', response.data)
                     this.obtenerDescuento()
-                    this.$toasted.show('Se actualizó la configuración')
+                    this.$toasted.info('Se actualizó la configuración')
                     this.show = false
                 })
                 .catch((error) => {
