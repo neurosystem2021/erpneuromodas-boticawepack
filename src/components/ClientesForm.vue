@@ -150,16 +150,27 @@ export default {
               numero: this.cliente.DniRuc
           }
       }).then((response) => {
-            if (response.data) {
-                this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-                var data = response.data
+            if (response.data.success) {                
+                var data = response.data.result
                 if (tipo == 'DNI') {
-                    this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+                  if(data.Nombre==null || data.Nombre==''){
+                    this.$toasted.show('No se encontró el Usuario')   
+                  }else{
+                    this.$toasted.success('Cliente encontrado, se llenarán sus datos')  
+                    this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
                     this.cliente.Direccion = ''
+                  }
+
                 } else {
-                    this.cliente.Cliente = data.razonSocial
-                    this.cliente.Direccion = data.direccion
+                  if(data.RazonSocial==null || data.RazonSocial==''){
+                    this.$toasted.show('No se encontró la empresa')   
+                  }else{
+                    this.$toasted.success('Cliente encontrado, se llenarán sus datos')  
+                    this.cliente.Cliente = data.RazonSocial
+                    this.cliente.Direccion = data.Direccion
                     // this.cliente.Telefono = data.Telefono
+                  }
+
                 }
             } else {
                 this.$toasted.show('No se encontró el Usuario')                
