@@ -106,7 +106,7 @@ import config from '@/store/config.js'
                 let pass = window.prompt('Escriba su contraseña de administrador')
                 if (pass) {
                     this.axios.post(this.API + 'login', {
-                    user: 'admin',
+                    user: 'adminn',
                     password: pass
                     }).then(r => {
                         if (r.data) {
