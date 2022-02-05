@@ -227,13 +227,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -312,7 +313,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
-        this.loadClienteVarios()
+        //this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -682,12 +683,13 @@ export default {
                 }
             });
 
+            /*
             if (sinStock >= 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
             }
-
+            */
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
@@ -725,7 +727,7 @@ export default {
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
