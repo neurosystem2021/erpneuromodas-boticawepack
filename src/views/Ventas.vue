@@ -252,14 +252,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
                                                         :disabled="bloquearInput?true:false"
                                                         @input="aplicarDescuentoGeneral"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -310,14 +312,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     :disabled="bloquearInput?true:false"
                                                     step="0.01"
                                                     type="number"
+                                                    class="form-control"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                />
                                             </td>
                                         </tr>
                                         <tr>

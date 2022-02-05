@@ -54,12 +54,13 @@
                     <b-col><label for="input-porcada">% Pago de comision:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="% ">
-                        <b-form-input v-model="valorComision"
+                        <input v-model="valorComision"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.01"
-                            placeholder=""></b-form-input>
+                            class="form-control"
+                            placeholder=""/>
                             <b-button size="sm" text="Button" variant="success" @click="guardarConfigComision">Ok</b-button>
                         </b-input-group>
                     </b-col>

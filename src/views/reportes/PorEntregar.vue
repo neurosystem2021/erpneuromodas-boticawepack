@@ -147,6 +147,7 @@
                 <input 
                   type="number" 
                   class="form-control"
+                  step="0.001"
                   :disabled="end.entregar === 0"
                   v-model="end.cantEntregar"
                 >

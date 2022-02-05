@@ -168,10 +168,12 @@
 								<b-col md="4">
 
 									<label><b>Gastos</b></label>
-									<b-form-input v-model="selectProducto.Gasto"
+									<input v-model="selectProducto.Gasto"
 											size="sm"
 											type="number"
-											placeholder="Gasto S/."></b-form-input>
+											class="form-control"
+											step="0.01"
+											placeholder="Gasto S/."/>
 									<b-input-group>
 										<b-form-input v-model="selectProducto.GastoDesc"
 											size="sm"
@@ -205,10 +207,12 @@
 									<hr />
 
 									<label><b>Adelantos</b></label>
-									<b-form-input v-model="selectProducto.Adelanto"
+									<input v-model="selectProducto.Adelanto"
 											size="sm"
 											type="number"
-											placeholder="Adelanto S/."></b-form-input>
+											class="form-control"
+											step="0.01"
+											placeholder="Adelanto S/."/>
 									<b-input-group>
 										<b-form-input v-model="selectProducto.AdelantoDesc"
 											size="sm"
