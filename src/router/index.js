@@ -17,6 +17,7 @@ import ReporteVentas from '@/views/reportes/Ventas.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import ClientesVip from '@/views/reportes/ClientesVip.vue'
 
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
@@ -110,6 +111,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
-    }
+    },
+    {
+      path: '/reportes/clientesvip',
+      name: 'ClientesVip',
+      component: ClientesVip
+    },
   ]
 })
