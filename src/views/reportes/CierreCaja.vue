@@ -7,8 +7,8 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="indiram">INDIRA MEZA CAMPOS</option>
                             <option value="fiorellam">FIORELLA MEZA CAMPOS</option>
+                            <option value="indiram">INDIRA MEZA CAMPOS</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -276,7 +276,7 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'indiram';
+    let empresa = sessionStorage.getItem('empresa') || 'fiorellam';
 
     if (this.$route.query.empresa === 'fiorellam') {
       empresa = 'fiorellam';
@@ -325,7 +325,7 @@ export default {
       cierre: {},
       vendedor: {},
       almacen: {},
-      empresa: 'indiram'
+      empresa: 'fiorellam'
     }
   },
   computed: {

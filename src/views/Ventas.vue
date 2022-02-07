@@ -8,8 +8,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="indiram">INDIRA MEZA CAMPOS</option>
                             <option value="fiorellam">FIORELLA MEZA CAMPOS</option>
+                            <option value="indiram">INDIRA MEZA CAMPOS</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -355,7 +355,7 @@ export default {
             // do something with the method, url and etc.
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'indiram');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'fiorellam');
             url = newUrl.toString();
             arguments[1] = url
 
@@ -414,7 +414,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'indiram'
+            empresa: 'fiorellam'
         }
     },
     watch: {
