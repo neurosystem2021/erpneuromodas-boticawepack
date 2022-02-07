@@ -83,14 +83,14 @@ import {API} from '@/store/config.js'
 export default {
   beforeMount () {
     console.log(this.$route.query);
-    if (this.$route.query.empresa === 'vg2') {
+    if (this.$route.query.empresa === 'fiorellam') {
       // Interceptos XMLHttpRequest
       let oldXHROpen = window.XMLHttpRequest.prototype.open;
       window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
         // do something with the method, url and etc.
         var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
         newUrl = new URL(newUrl);
-        newUrl.searchParams.append('empresa', 'vg2');
+        newUrl.searchParams.append('empresa', 'fiorellam');
         url = newUrl.toString();
         arguments[1] = url
 

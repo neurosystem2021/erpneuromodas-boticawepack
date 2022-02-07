@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'fondo-empresa': (this.empresa === 'vg2')}">
+  <div :class="{'fondo-empresa': (this.empresa === 'fiorellam')}">
     <br>
     <b-container class="bv-example-row">
       <!--<div>
@@ -7,8 +7,8 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="vg">VIRGEN DE GUADALUPE</option>
-                            <option value="vg2">VIRGEN DE GUADALUPE SF</option>
+                            <option value="indiram">INDIRA MEZA CAMPOS</option>
+                            <option value="fiorellam">FIORELLA MEZA CAMPOS</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -276,10 +276,10 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'vg';
+    let empresa = sessionStorage.getItem('empresa') || 'indiram';
 
-    if (this.$route.query.empresa === 'vg2') {
-      empresa = 'vg2';
+    if (this.$route.query.empresa === 'fiorellam') {
+      empresa = 'fiorellam';
     }
     
     // Interceptos XMLHttpRequest
@@ -325,7 +325,7 @@ export default {
       cierre: {},
       vendedor: {},
       almacen: {},
-      empresa: 'vg'
+      empresa: 'indiram'
     }
   },
   computed: {
