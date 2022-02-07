@@ -51,8 +51,8 @@
             min="0"
             step="0.01"
             @input="(val) => {
-              $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              $emit('onInputCantidad', val.target.value)
+              productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"/>
         </template>
