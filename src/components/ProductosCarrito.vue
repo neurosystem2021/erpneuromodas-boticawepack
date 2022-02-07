@@ -498,9 +498,9 @@ export default {
     }),
 
     changeCant (val, prod) {
-      if (val) {
+      if (val.target.value>0) {
         prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
+        prod.cantidad *= val.target.value
       }
       this.$nextTick(() => {
         this.actualizarProd(prod)
