@@ -88,12 +88,12 @@
                                     <td class="text-center">{{ item.Aplicado }}</td>
                                     <td>{{ item.Saldo }}</td>
                                     <td>
-                                        <b-form-input v-model="item.aplicar"
+                                        <input v-model="item.aplicar"
                                             type="number"
                                             step="0.01"
                                             min="0"
-
-                                            placeholder="0"></b-form-input>
+                                            class="form-control"
+                                            placeholder="0" />
                                     </td>
                                 </tr>
                             </tbody>
