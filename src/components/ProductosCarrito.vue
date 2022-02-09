@@ -101,7 +101,7 @@
             class="form-control"
             min="0"
             step="0.01"
-            value="0">
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
