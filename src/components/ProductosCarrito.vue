@@ -36,8 +36,8 @@
             step="0.001"
             min="0"
             @input="(val) => {
-                $emit('onInputCantidad', val)
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                $emit('onInputCantidad', val.target.value)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 if (type === 'mov') {
                   productos[data.index].precio = productos[data.index].PrecioCosto
                 }
