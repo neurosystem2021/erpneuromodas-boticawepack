@@ -35,21 +35,22 @@
           {{ $options.filters.redondear(data.item.stock, 4) }}
         </template>
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             type="number"
+            class="form-control"
             style="width: 105px"
             :readonly="(type === 'mov') ? false : true"
             step="0.0001"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
-              productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              $emit('onInputCantidad', val.target.value)
+              productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             type="number"
             style="width: 105px"
@@ -57,16 +58,18 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
-          <b-form-input
+          <input
             type="number"
             style="width: 95px"
             min="0"
             step="0.00001"
             placeholder="Subtotal"
-            @input="val => setSubtotal(data.index, val)"></b-form-input> 
+            @input="val => setSubtotal(data.index, val.target.value)"
+            class="form-control"/>
            <b>{{ getSubtotal(data.index) }}</b>
         </template>
         <template slot="igv" slot-scope="data">
@@ -94,25 +97,27 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
