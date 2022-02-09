@@ -38,7 +38,7 @@
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
 
             }"
-            step="0.01"
+            step="0"
             class="form-control"
             placeholder="Cantidad"/>
         </template>
