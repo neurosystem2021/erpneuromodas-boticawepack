@@ -39,7 +39,7 @@
 
             }"
             class="form-control"
-            step="0.001"
+            step="0"
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
