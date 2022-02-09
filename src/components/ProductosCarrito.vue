@@ -33,7 +33,7 @@
             type="number"
             style="width: 80px"
             min="0"
-            step="0.0001"
+            step="0"
             class="form-control"
             @input="(val) => {
                 $emit('onInputCantidad', val.target.value)
