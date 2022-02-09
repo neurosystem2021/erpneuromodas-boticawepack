@@ -94,7 +94,7 @@
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val, productos[data.index])"
+            @input="(val) => changeCant(val.target.value, productos[data.index])"
             placeholder="Cantidad"
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -110,10 +110,10 @@
             step="0.001"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
               if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
                 }
 
@@ -498,9 +498,9 @@ export default {
     }),
 
     changeCant (val, prod) {
-      if (val.target.value>0) {
+      if (val>0) {
         prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val.target.value
+        prod.cantidad *= val
       }
       this.$nextTick(() => {
         this.actualizarProd(prod)
