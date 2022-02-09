@@ -199,14 +199,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         :disabled="bloquearInput?true:false"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        step="0.01"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -250,14 +252,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
