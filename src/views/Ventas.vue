@@ -228,14 +228,16 @@
                                                 <tr v-if="puntosAplicados == 0">
                                                     <td>
                                                         <b-input-group prepend="S/" append="Descuento">
-                                                            <b-form-input
+                                                            <input
                                                                 :disabled="bloquearInput?true:false"
                                                                 v-model="descuentoGeneral"
                                                                 min="0"
                                                                 value="0"
-                                                                @input="aplicarDescuentoGeneral"
+                                                                step="0.01"
+                                                                @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                                 type="number"
-                                                            ></b-form-input>
+                                                                class="form-control"
+                                                            />
                                                         </b-input-group>
                                                         <b-form-text style="color:black !important; font-weight:bold">
                                                             Descuento general a toda la venta.
@@ -284,14 +286,15 @@
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
-                                                        <b-form-input
+                                                        <input
                                                             :disabled="bloquearInput?true:false"
                                                             v-model="venta.pago.efectivo.monto"
                                                             min="0"
                                                             step="0.01"
                                                             type="number"
                                                             placeholder="S/."
-                                                        ></b-form-input>
+                                                            class="form-control"
+                                                        />
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -1061,6 +1064,7 @@ export default {
                 this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$refs.carrito.pagocon = 0
             })
             .catch((error) => {
                 console.log(error)
