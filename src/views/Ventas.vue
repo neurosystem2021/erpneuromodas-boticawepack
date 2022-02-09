@@ -182,10 +182,10 @@
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
                                                         class="form-control"
-                                                    >
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -551,7 +551,7 @@ export default {
         },
         aplicarDescuentoGeneral (val) {
             this.puntosAplicados = 0
-            this.aplicarDescuento(val.target.value)
+            this.aplicarDescuento(val)
         },
         getNumeroVenta () {
             this.axios.get(this.API + 'ventas/numero', {
