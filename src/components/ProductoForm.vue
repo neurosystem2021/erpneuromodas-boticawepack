@@ -168,23 +168,25 @@
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               min="0"
+              class="form-control"
               step="0.0001"
-              ></b-form-input>
+              />
           </b-form-group>
           <b-form-group v-if="false">
             <label>Precio X Mayor:</label>
-            <b-form-input 
+            <input 
               v-model="producto.PrecioPorMayor"
               type="number"
+              class="form-control"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              />
           </b-form-group>
           <b-form-group v-if="false">
             <label>Stock X Mayor:</label>
@@ -196,11 +198,13 @@
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
+              class="form-control"
               type="number"
-              ></b-form-input>
+              step="0.001"
+              />
           </b-form-group>
           <b-form-group>
             <b-form-checkbox
@@ -253,30 +257,34 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCosto"
-              step="0.01"
+              step="0.001"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioEspecial"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.01"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Precio Público:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
+              class="form-control"
               step="0.01"
-              @input.native="actualizarPorcentajeUtilidad"
-              ></b-form-input>
+              @input="actualizarPorcentajeUtilidad"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
@@ -285,9 +293,11 @@
         <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
-            <b-form-input v-model="producto.precioConvenio"
+            <input v-model="producto.precioConvenio"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.001"
+              />
           </b-form-group>
         </b-col>
       </b-row>
@@ -306,10 +316,12 @@
             
             <b-form-group>
               <label>Precio:</label>
-              <b-form-input 
+              <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
-                ></b-form-input>
+                class="form-control"
+                step="0.01"
+                />
             </b-form-group>
           </b-card>
         </b-col>
