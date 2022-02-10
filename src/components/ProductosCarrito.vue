@@ -32,7 +32,7 @@
           <small v-show="productos[data.index].PrecioCentena">Por 100 -> S/{{productos[data.index].PrecioCentena}}</small>
         </template>
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -40,9 +40,9 @@
             min="0"
             step="0.001"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
               if (tipo != 'mov') {
-                precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+                precio = (val.target.value >= 12 && val.target.value < 100) ? productos[data.index].PrecioDocena : ((val.target.value >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
                 if (cliente.EsVIP && productos[data.index].PrecioConvenio < precio && productos[data.index].PrecioConvenio > 0) {
                   precio = productos[data.index].PrecioConvenio
                 }
@@ -50,10 +50,11 @@
                 productos[data.index].precio = precio
               }
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -61,7 +62,8 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -92,28 +94,30 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             style="width:80px"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            value="0"
+            class="form-control"/>
             <b-form-text>
             </b-form-text>
         </template>
