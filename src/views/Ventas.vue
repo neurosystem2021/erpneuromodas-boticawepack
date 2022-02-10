@@ -258,6 +258,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
+                                                    class="form-control"
                                                 />
                                             </td>
                                         </tr>
