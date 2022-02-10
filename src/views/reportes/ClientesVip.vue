@@ -68,7 +68,7 @@
         <b-modal id="ventasCliente" size="lg" modal-class="modal-xl" v-model="showKardex" 
         ok-title="Cerrar" ok-only title="HISTORIAL DE PUNTOS APLICADOS DEL CLIENTE">
         <b-alert show variant="warning" class="font-weight-bold">{{ titleVentasPuntos }}</b-alert>
-        <b-alert show variant="warning" class="font-weight-bold">Puntos Actuales: {{ clienteSelect.Puntos }} - Puntos Aplicados: {{ clienteSelect.PuntosAplicados }} </b-alert>
+        <b-alert show variant="warning" class="font-weight-bold"><b-button  style="margin-right:10px" variant="danger" @click="resetPuntos">Resetear Puntos Actuales</b-button> Puntos Actuales: <span style="color:black">{{ clienteSelect.Puntos }}</span>   -  Puntos Aplicados: <span style="color:black">{{ clienteSelect.PuntosAplicados }}</span> </b-alert>
         <b-row>
           <b-col md="5">
             <b-form-group>
@@ -326,7 +326,7 @@ export default {
         return ('/api/index.php/reporte/clientes/puntos');
        },
        hrefXlsHistorialCliente () {
-        return ('/api/index.php/reporte/cliente/puntos?idCliente=' + this.clienteSelect.IdCliente + '&fechaDesde='+this.ventasCliente.fechaDesde+'&fechaHasta='+this.ventas.fechaHasta).replace('#','');
+        return ('/api/index.php/reporte/cliente/puntos?idCliente=' + this.clienteSelect.IdCliente + '&fechaDesde='+this.ventasCliente.fechaDesde+'&fechaHasta='+this.ventasCliente.fechaHasta).replace('#','');
        },
        hrefXlsHistorialVenta () {
         return ('/api/index.php/reporte/ventas/puntos?fechaDesde='+this.ventas.fechaDesde+'&fechaHasta='+this.ventas.fechaHasta).replace('#','');
@@ -396,6 +396,22 @@ export default {
       },
       actualizarTabla() {
         this.$refs.tablaClientes.refresh()
+      },
+      resetPuntos(){
+        let r = confirm('¿Se reseteará los puntos de '+this.clienteSelect.Cliente+', está seguro?');
+        if (r) {
+          this.axios.post(this.API + 'reset/puntos/cliente', {
+            IdCliente: this.clienteSelect.IdCliente
+          }).then(res => {
+            console.log(res.data)
+            if(res.data.updated){
+              this.clienteSelect.Puntos = 0
+              this.$toasted.info('¡Se reseteo los puntos de '+this.clienteSelect.Cliente+'!')   
+              this.actualizarTabla();
+            }
+            
+          })
+        }
       },
       nuevoCliente () {
           this.clienteSelect = {}

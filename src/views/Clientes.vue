@@ -34,13 +34,26 @@
             :sort-desc.sync="sortDesc"
             striped
             hover
-            @row-clicked="rowClick"
             id="my-table" 
             :busy.sync="isBusy" 
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+
+              <template slot="Editar" slot-scope="data">
+                <div>
+                    <b-button size="sm" variant="primary" @click="verInfo(data.item)">Editar</b-button>
+                </div>
+              </template>
+
+              <template slot="Reporte" slot-scope="data">
+                <div>
+                    <b-button size="sm" variant="success" @click="verVentas(data.item)">Ventas</b-button>
+                </div>
+              </template>
+                      
+            </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -56,6 +69,103 @@
         </b-row>
         <br /><br />
       </b-container>
+        <b-modal id="historialCliente" size="lg" modal-class="modal-xl" v-model="showVentas" 
+        ok-title="Cerrar" ok-only title="HISTORIAL DE VENTAS DEL CLIENTE">
+        <b-alert show variant="warning" class="font-weight-bold">{{ titleCliente }}</b-alert>
+        <b-row>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="ventasCliente.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="ventasCliente.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button :disabled="estadoGenerarCliente" @click="ventasClienteFechaRango" variant="primary" size="lg">Generar</b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+            <b-col md="12" class="text-center">
+                <div class="table-responsive">
+                    <table class="table table-striped b-table table-sm">
+                    <thead>
+                        <tr>
+                            <th>ID VENTA</th>
+                            <th>FECHA</th>
+                            <th>VENDEDOR</th>
+                            <th>DOC.</th>
+                            <th>SERIE</th>
+                            <th>NUMERO</th>
+                            <th>ANULADO</th>  
+                            <th>MONTO VENTA</th>
+                            <th>DESCUENTO</th>
+                            <th>MONTO PAGADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(venta, i) in historialCliente" :key="i" :class="{'table-danger': venta.Anulado == 1}">
+                            <td>{{ venta.idDocVenta }}</td>
+                            <td>{{ venta.FechaDoc }}</td>
+                            <td style="text-transform:uppercase">{{ venta.UsuarioReg }}</td>
+                            <td style="text-transform:uppercase">{{ venta.TipoDoc }}</td>
+                            <td>{{ venta.Serie }}</td>
+                            <td>{{ venta.Numero }}</td>
+                            <td>
+                              <b-badge v-if="venta.Anulado==0" variant="success">NO</b-badge>
+                              <b-badge v-else variant="danger">SI</b-badge>
+                            </td> 
+                            <td class="table-primary">{{ venta.IdTipoDoc==9?'-':''}}{{ venta.TotalVenta }}</td>
+                            <td class="table-info">{{ venta.DescuentoAplicado }}</td>
+                            <td class="table-success">{{ venta.IdTipoDoc==9?'-':''}}{{ venta.Pagado }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot v-if="historialCliente.length>0">
+                        <td colspan="7" class="font-weight-bold table-secondary">SUMATORIA</td>
+                        <td class="font-weight-bold table-primary">S/ {{ totalClienteHistorial | moneda }}</td>
+                        <td class="font-weight-bold table-info">S/ {{ totalClienteDescuento | moneda }}</td>
+                        <td class="font-weight-bold table-success">S/ {{ totalClientePagado | moneda }}</td>
+                    </tfoot>
+                </table>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row v-if="estadoGenerarCliente">
+            <b-col class="text-center">
+                <b-form-text style="font-size:20px" text-variant="success">... GENERANDO DATOS, ESPERE POR FAVOR ...</b-form-text>
+                <br>
+            </b-col>
+        </b-row>
+        <b-row v-if="historialCliente.length==0 && estadoGenerarCliente==false  ">
+            <b-col class="text-center">
+                <b-form-text style="font-size:20px" text-variant="danger">... EL CLIENTE NO TIENE VENTAS, PORFAVOR SELECCIONE FECHAS ANTERIORES ...</b-form-text>
+                <br>
+            </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12" class="text-center">
+              <b-button variant="success" size="md" :href="hrefXlsHistorialCliente" target="_blank">Exportar Excel Ventas del Cliente</b-button>
+          </b-col>
+        </b-row>
+        <br>
+      </b-modal>
   </div>
 </template>
 
@@ -85,18 +195,111 @@ export default {
             { key: 'Direccion', sortable: true },
             { key: 'Puntos', sortable: true },
             { key: 'EsVIP', sortable: true },
+            'Editar',
+            'Reporte' 
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      showVentas:false,
+      ventasCliente: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
+      estadoGenerarCliente:true,
+      historialCliente:[],
+      totalClienteHistorial: 0,
+      totalClienteDescuento: 0,
+      totalClientePagado: 0,
     }
   },
+  computed: {
+       titleCliente () {
+         return 'CLIENTE: ' + this.clienteSelect.DniRuc + ' - ' + this.clienteSelect.Cliente
+       },
+       hrefXlsHistorialCliente () {
+        return ('/api/index.php/reporte/cliente/ventas?idCliente=' + this.clienteSelect.IdCliente + '&fechaDesde='+this.ventasCliente.fechaDesde+'&fechaHasta='+this.ventasCliente.fechaHasta).replace('#','');
+       },
+  },
   methods: {
-      rowClick (item, index) {
+      verInfo(item){
         this.clienteSelect = item
         this.$refs.clienteForm.show = true;
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
+      },
+      verVentas (item) {
+        this.clienteSelect = item
+        this.showVentas = true
+        this.estadoGenerarCliente = true
+        this.historialCliente = []
+        this.totalClienteHistorial = 0
+        this.totalClienteDescuento = 0
+        this.totalClientePagado = 0
+        this.ventasCliente.fechaDesde = this.$moment().format("YYYY-MM-01")
+        this.ventasCliente.fechaHasta = this.$moment().format("YYYY-MM-DD")        
+            
+        this.axios.get(this.API + 'ventas/cliente', {
+            params: {
+                idCliente:  this.clienteSelect.IdCliente,
+                fechaHasta: this.ventasCliente.fechaHasta,
+                fechaDesde: this.ventasCliente.fechaDesde
+            }
+        }).then((response) => {
+            this.estadoGenerarCliente = false
+            this.historialCliente = response.data
+            this.historialCliente.map((historia)=>{
+                if(historia.Anulado==0){
+                  if(historia.IdTipoDoc==9){
+                    this.totalClienteHistorial -= historia.TotalVenta || 0
+                    this.totalClienteDescuento -= historia.DescuentoAplicado || 0
+                    this.totalClientePagado -= historia.Pagado || 0
+                  }else{
+                    this.totalClienteHistorial += historia.TotalVenta || 0
+                    this.totalClienteDescuento += historia.DescuentoAplicado || 0
+                    this.totalClientePagado += historia.Pagado || 0
+                  }
+
+                }
+            })
+
+        }).catch((error)=>{
+            this.$toasted.error("Ha ocurrido un error, vuelva a intentarlo")
+        })
+      },
+      ventasClienteFechaRango(){
+        if(this.ventasCliente.fechaDesde !='' && this.ventasCliente.fechaHasta != ''){
+            this.estadoGenerarCliente = true
+            this.historialCliente = []
+            this.totalClienteHistorial = 0
+            this.totalClienteDescuento = 0
+            this.totalClientePagado = 0
+            this.axios.get(this.API + 'ventas/cliente', {
+            params: {
+                idCliente:  this.clienteSelect.IdCliente,
+                fechaHasta: this.ventasCliente.fechaHasta,
+                fechaDesde: this.ventasCliente.fechaDesde
+            }
+            }).then((response) => {
+                this.estadoGenerarCliente = false
+                this.historialCliente = response.data
+                this.historialCliente.map((historia)=>{
+                if(historia.Anulado==0){
+                  if(historia.IdTipoDoc==9){
+                    this.totalClienteHistorial -= historia.TotalVenta || 0
+                    this.totalClienteDescuento -= historia.DescuentoAplicado || 0
+                    this.totalClientePagado -= historia.Pagado || 0
+                  }else{
+                    this.totalClienteHistorial += historia.TotalVenta || 0
+                    this.totalClienteDescuento += historia.DescuentoAplicado || 0
+                    this.totalClientePagado += historia.Pagado || 0
+                  }
+                }
+            })
+            }).catch((error)=>{
+                this.$toasted.error("Ha ocurrido un error, vuelva a intentarlo")
+            })
+        }else{
+            this.$toasted.error('Por favor complete las fechas.')
+        }
       },
       actualizarTabla() {
         this.$refs.tablaClientes.refresh()
@@ -134,5 +337,7 @@ export default {
 </script>
 
 <style>
-
+    #historialCliente .modal-dialog{
+        max-width: 65% !important;
+    }
 </style>
