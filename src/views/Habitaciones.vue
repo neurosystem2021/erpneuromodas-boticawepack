@@ -304,7 +304,7 @@ export default {
 			selectProducto: {},
 			vuelo: '',
 			fechaReserva: this.$moment().format("YYYY-MM-DD"),
-			pisos: [1, 2, 3, 4, 5],
+			pisos: [1, 2, 3, 4, 5, 6, 7 , 8],
 			adelantos: [],
 			nuevaFechaFin: '',
 			// habitacionesPiso: []
