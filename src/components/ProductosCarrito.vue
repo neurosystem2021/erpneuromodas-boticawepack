@@ -68,7 +68,7 @@
             class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div style="font-size:17px">{{ getSubtotal(data.index) }}</div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -114,8 +114,7 @@
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
           <div style="text-align:center;" v-if="!isNota">
-                <small style="font-size:14px;">Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
-                <small style="font-size:14px;">Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
+                <small style="font-size:14px;">S. <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D.: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
           <div style="font-size:17px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
         </template>
@@ -157,7 +156,7 @@
         </template>
 
         <template slot="total" slot-scope="data">
-          {{ getTotal(data.index) }}
+          <div style="font-size:17px">{{ getTotal(data.index) }}</div>
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
@@ -403,7 +402,7 @@ export default {
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
               }
             }
-             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>F. Venci.: ${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
+             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
           this.$nextTick(() => {
@@ -559,6 +558,14 @@ export default {
           style = 'ambar'
         }
 
+        let styleStock = ''
+
+        if(data.stock>0){
+          styleStock = 'table-success'
+        }else{
+          styleStock = 'table-danger'
+        }
+
         // if (!data.ControlaStock) {
         //   data.stock = '---'
         // }
@@ -594,13 +601,13 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="table-info"><b>${data.stock}</b></td>
+                <td class="${styleStock}"><b>${data.stock}</b></td>
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td>${data.ProductoMedicion}</td>
                 <td>${data.Producto}</td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
-                <td rowspan="3"><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
+                <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
             </tbody>
           </table>   
