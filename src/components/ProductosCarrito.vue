@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{'limit': 25}"
+            :customParams="{'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 , 'limit':15}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -506,8 +506,8 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
-      
-      this.obtenerStockCaja(obj)
+ 
+      //this.obtenerStockCaja(obj)
 
       if(!this.isVentas){
         if(this.movTipo==undefined){
@@ -589,6 +589,7 @@ export default {
                 <th>Medición.</th>
                 <th>Producto.</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
+                <th>V.E.</th>
               </tr>
             </thead>
             <tbody>
@@ -599,6 +600,7 @@ export default {
                 <td>${data.ProductoMedicion}</td>
                 <td>${data.Producto}</td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
+                <td rowspan="3"><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
             </tbody>
           </table>   
