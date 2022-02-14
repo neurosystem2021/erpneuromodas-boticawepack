@@ -177,13 +177,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -224,13 +226,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -461,7 +464,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -714,6 +717,7 @@ export default {
                 //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$refs.carrito.pagocon = 0
             })
             .catch((error) => {
                 console.log(error)
