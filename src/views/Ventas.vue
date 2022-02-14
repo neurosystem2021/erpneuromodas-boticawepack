@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -184,6 +184,8 @@
                             :setPrecio="true"
                             ref="carrito" 
                             :showButton="false" 
+                            :isVentas="true"
+                            :isNota="isNota"
                             :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
@@ -198,16 +200,18 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="%" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         :disabled="bloquearInput?true:false"
                                                         min="0"
                                                         value="0"
                                                         max="100"
                                                         :readonly="(idPerfil == 3) ? true : false"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -251,14 +255,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -389,20 +394,21 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'CodigoBarra', label: 'Código' }, 
-                    { key: 'Producto' }, 
-                    { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
-                    { key: 'ProductoMedicion', label: 'Med.' },
-                    { key: 'PrecioPorMayor', label: 'Precio x Mayor' },
-                    { key: 'StockPorMayor', label: 'Stock x Mayor' },
-                    { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
-                    { key: 'acciones', label: ''}
+                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
+                    { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
+                    { key: 'CodigoBarra', label: 'Código', class:'stocksize' }, 
+                    { key: 'Producto', class:'stocksize' }, 
+                    { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
+                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.', class:'stocksize' }, 
+                    { key: 'ProductoMedicion', label: 'Med.', class:'stocksize' },
+                    //{ key: 'PrecioPorMayor', label: 'Precio x Mayor' },
+                    //{ key: 'StockPorMayor', label: 'Stock x Mayor' },
+                    { key: 'cantidad', class:'stocksize' },
+                    { key: 'precio', label: 'Precio', class:'stocksize stocksize' },
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center stocksize' }, 
+                    { key: 'descuento', label: 'Descuento', class:'stocksize'},
+                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center stocksize' },
+                    { key: 'acciones', label: '', class:'stocksize'}
                 ]
             },
             idPerfil: sessionStorage.getItem('idPerfil')
@@ -410,7 +416,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -500,6 +506,9 @@ export default {
             this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
+            if(this.isNota==true){
+                this.limpiarCart();
+            }
             this.isNota = false
             this.bloquearInput=false
             this.venta.NroComprobanteModifica = ''
@@ -510,6 +519,7 @@ export default {
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
 
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                this.limpiarCart();
                 this.isNota = true
             }
 
@@ -675,11 +685,13 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+            this.venta.pago.visa.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -780,12 +792,26 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
-
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                  if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -799,14 +825,30 @@ export default {
             }
 
             var sinStock = 0;
+            let igualLote = 0
             this.productos.map(pro => {
-                if (pro.stock <= 0 && pro.ControlaStock && this.venta.tipoVenta.CodSunat != '07') {
+                if ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
+                }
+
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+
+                                let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
+                if(lote > 1){
+                    igualLote += 1 
                 }
             })
             if (sinStock) {
                 this.inProgress = false
+                return;
+            }
+
+            if (igualLote >= 1) {
+                this.$toasted.error('Debe seleccionar diferente lote por producto');
+                this.inProgress = false            
                 return;
             }
 

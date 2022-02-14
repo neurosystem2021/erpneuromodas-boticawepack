@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'stock': 1}"
+            :customParams="{'limit': 25}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -17,7 +17,7 @@
             :classes="{input: 'form-control'}">
           </autocomplete>
           <input v-model="loadCode"
-                  :disabled="bloquearInput?true:false"
+                  :disabled="bloquearInput?true:false || isNota"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
@@ -31,40 +31,41 @@
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="stock" slot-scope="data" >
-          <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" >
+        <template slot="stock" slot-scope="data">
+          <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" style="font-size:17px; font-weight:bold">
             {{productosCaja[data.item.IdProducto].stock}}
           </div>
-          <div v-if="data.item.ControlaStock" >
+          <div v-if="data.item.ControlaStock" style="font-size:17px; font-weight:bold">
             {{ data.item.stock }}
           </div>
           
         </template>
         
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
             style="width: 75px"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
-              productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              $emit('onInputCantidad', val.target.value)
+              productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
             min="0"
             step="0.00001"
-            :readonly="(idPerfil != 1) ? true : false"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -94,28 +95,63 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
-        <template slot="precioVenta" slot-scope="data">
+
+        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+          <div v-if="isNota" style="width: 135px; text-align:center">
+            <div>
+              {{productos[data.index].hashMovimiento}}
+            </div>
+            <small>Doc: <span style="font-weight:bold;"> {{productos[data.index].Serie}}-{{productos[data.index].Numero}}</span></small><br />
+
+            <div>
+              {{productos[data.index].FechaVen}}
+            </div>
+          </div>
+          <b-form-select v-if="!isNota"
+            style="width: 135px;"
+            :disabled="bloquearInput?true:false"
+            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+            v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+          <br>
+          <div style="text-align:center;" v-if="!isNota">
+                <small style="font-size:14px;">Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
+                <small style="font-size:14px;">Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
+          </div>
+          <div style="font-size:17px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+        </template>
+
+        <template slot="fechavencimiento" slot-scope="data" >
           <b-form-input
+            required="required"
+            v-model="productos[data.index].FechaVen"
+            type="date"
+            ></b-form-input>
+        </template>
+
+        <template slot="precioVenta" slot-scope="data">
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            value="0"
+            class="form-control"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -209,7 +245,8 @@ export default {
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      movimientoLotes: {},
     }
   },
   watch: {
@@ -222,6 +259,11 @@ export default {
     idAlmacen: Number,
     bloquearInput:Boolean,
     igvTotal: Boolean,
+    isVentas: Boolean,
+    isNota:Boolean,
+    movTipo: Number,
+    almacenDestino:Number,
+    almacenOrigen:Number,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -235,23 +277,26 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
+          { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
+          //{ key: 'ProductoCategoria', label: 'Categoria'},
+          { key: 'Producto', label: 'Artículo', class:'stocksize' }, 
+          { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
+          //{ key: 'ProductoModelo', label: 'Modelo' }, 
+          //{ key: 'Color', label: 'Color' }, 
+          //{ key: 'ProductoTalla', label: 'Talla' },
+          //{ key: 'Genero' },
+          //{ key: 'Botapie' },
+          { key: 'cantidad', class:'stocksize' },
+          { key: 'precio', label: 'P/U', class:'stocksize' },
+          { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'stocksize' },
+          { key: 'igv', label: 'IGV', class:'stocksize' },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
+          { key: 'precioVenta', label: 'Precio venta', class:'stocksize' },
+          { key: 'total', label: 'Total', variant: 'danger', class:'stocksize' },
+          { key: 'fechavencimiento', label: 'Vencimiento', class:'stocksize' },
+          { key: 'acciones', label: '', class:'stocksize'}
         ]
       },
       type: Array
@@ -320,6 +365,80 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    changeMovimiento(hash, idProducto, index) {
+      if  (hash) {
+        // Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
+        if (stock) {
+          // this.productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', stock)
+            Vue.set(this.productos[index], 'SerieNumero', serieNumero)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', 0)
+            Vue.set(this.productos[index], 'SerieNumero', '----')
+          })
+        }
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+        let hoy      = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en4meses  = this.$moment().add(4,'months').unix();
+        let style = 'bg-success'
+        if(fechaVenUnix && fechaVenUnix < hoy) {
+          style = 'bg-danger text-white'
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
+          style = 'bg-warning'
+        }
+        if (fechaVen) {
+          this.$nextTick(() => {
+            if(!this.isVentas){
+              if(this.movTipo!=0 &&  this.movTipo!=undefined ){
+               this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+                //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
+                //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
+              }
+            }
+             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>F. Venci.: ${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'fechaVenMovimiento', '')
+          })
+        }
+          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+    loadMovimientoLotes ($idProducto) {
+      this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
+        .then((response) => {
+          let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+          // Cargar por defecto lote próximo a vencer.
+          let primeroVencer = response.data.reduce((a,b) => {
+            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+          })
+          
+          this.$nextTick(() => {
+            Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+            this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
+          })
+          
+          this.movimientoLotes[$idProducto] = response.data.map(l => ({
+            value: l.hashMovimiento,
+            text : l.hashMovimiento,
+            Stock : l.Stock,
+            FechaVen: l.FechaVen,
+            SerieNumero: l.Serie + '-' + l.Numero
+          }))
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
@@ -388,12 +507,14 @@ export default {
     },  
     setProducto (obj) {
       
-      if (obj.ControlaStock && obj.stock <= 0) {
-        this.$toasted.show('No esta permitido la venta sin stock!')
-        return;
-      }
-
       this.obtenerStockCaja(obj)
+
+      if(!this.isVentas){
+        if(this.movTipo==undefined){
+          this.$toasted.show('Primero seleccione un tipo de movimiento')
+          return
+        }
+      }
 
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -406,6 +527,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
+        this.loadMovimientoLotes(obj.IdProducto)
       }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
@@ -538,7 +660,6 @@ export default {
       }
 
       if (total <= 0) {
-        alert('El total de un producto no puede ser menor o igual a 0')
         Vue.set(this.productos[index], 'descuento', 0)
         return
       }
@@ -574,6 +695,11 @@ export default {
 }
 .tabla-carrito .table-sm td  {
   font-size: .8rem!important;
+}
+
+td.stocksize{
+  text-align: center !important; 
+  vertical-align: middle !important;
 }
 </style>
 

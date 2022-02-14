@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="VENTA"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -99,7 +99,7 @@
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Credito: ">
-                      <b-form-checkbox id="checkbox1"
+                      <b-form-checkbox 
                         v-model="movimiento.EsCredito"
                         :value="1"
                         :unchecked-value="0">
@@ -166,7 +166,7 @@
                         type="datetime-local"
                         step="1"
                         placeholder="Fecha Contable"
-                        disabled="disabled"></b-form-input>
+                        ></b-form-input>
 
                     </b-form-group>
                     <b-form-group>
@@ -175,13 +175,15 @@
                         v-model="movimiento.FechaStock"
                         type="date"
                         placeholder="Fecha Stock"
-                        disabled="disabled"></b-form-input>
+                        ></b-form-input>
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
-                      <b-form-input v-model="movimiento.TipoCambio"
+                      <input v-model.number="movimiento.TipoCambio"
                         type="number"
-                        placeholder="Tipo de cambio"></b-form-input>
+                        class="form-control"
+                        style="0.00001"
+                        placeholder="Tipo de cambio"/>
                     </b-form-group>
                   </b-col>
                 </b-row>
@@ -189,13 +191,20 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito 
+                ref="carrito"
+                @onAddProducto="onAddProducto" 
+                :tipoCambio="movimiento.TipoCambio"
+                :movTipo = "movimiento.movimientoTipo.Tipo"
+                :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
+                :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
+                tipo="mov" padre="compra"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
             <b-col cols="4">
               <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-              <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
+              <b-button v-if="ultimoMovimiento && false" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -212,7 +221,6 @@ import ProductosCarrito from '@/components/ProductosCarrito'
 import ProveedoresForm from '@/components/ProveedoresForm'
 import { mapState, mapActions } from 'vuex'
 import config from '@/store/config.js'
-
 export default {
   mounted () {
   },
@@ -236,8 +244,15 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock',
+      limpiarCart: 'limpiarCarrito',
     }),
+    onAddProducto (obj) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+        })
+    },
     afe (e) {
 return false
     },
@@ -293,25 +308,34 @@ return false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+         this.limpiarCart()
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+         this.limpiarCart()
       }
       this.movimiento.movimientoTipo = obj
-
       this.cargarNumero()
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
     },
     setAlmacenOrigen (obj) {
+      this.limpiarCart()
       this.movimiento.almacenOrigen = obj
     },
     setAlmacenDestino (obj) {
+      console.log(obj);
       this.movimiento.almacenDestino = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
+      if (obj.Moneda === 'USD') {
+        this.movimiento.TipoCambio = 3.7
+      } else {
+        this.movimiento.TipoCambio = 1
+      }
     },
     getProveedores (value) {
       this.buscarProveedores(value)
@@ -322,26 +346,53 @@ return false
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
-
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
         this.inProgress = false            
         return
       }
-
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
           this.inProgress = false            
           return          
       }
-
       let faltaLlenar = false
+      let faltaFechaVen = false
+      let igualProducto = false
+      let faltaStock = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
         }
+        if (prod.FechaVen == undefined || prod.FechaVen=='' ) {
+          faltaFechaVen = true
+        }
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
+        if(pro > 1){
+        igualProducto = true
+        }
+        if(this.movimiento.movimientoTipo.Tipo!=0){
+          if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stockMovimiento){
+           faltaStock=true
+          }
+        }
+        
       })
-
+      if (faltaStock) {
+          this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
+          this.inProgress = false            
+          return;
+      }
+      if (igualProducto) {
+          this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
+          this.inProgress = false            
+          return;
+      }
+      if (faltaFechaVen) {
+        this.$toasted.show('Ingrese la fecha de vencimiento del producto')
+        this.inProgress = false
+        return;
+      }
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
