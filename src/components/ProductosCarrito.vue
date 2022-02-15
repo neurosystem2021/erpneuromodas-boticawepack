@@ -118,7 +118,15 @@
           <div style="text-align:center;" v-if="!isNota">
                 <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
-          <div style="font-size:17px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+          <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+        </template>
+
+        <template slot="Lote" slot-scope="data" >
+          <b-form-input
+            required="required"
+            v-model="productos[data.index].Lote"
+            type="text"
+            ></b-form-input>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data" >
@@ -296,6 +304,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta', class:'stocksize' },
           { key: 'total', label: 'Total', variant: 'danger', class:'stocksize' },
+          { key: 'Lote', label: 'C. Lote', class:'stocksize' },
           { key: 'fechavencimiento', label: 'Vencimiento', class:'stocksize' },
           { key: 'acciones', label: '', class:'stocksize'}
         ]
@@ -371,6 +380,8 @@ export default {
         // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
         let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
+        let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -400,10 +411,14 @@ export default {
             if(!this.isVentas){
               if(this.movTipo!=0 &&  this.movTipo!=undefined ){
                this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+               this.productos[index].IdLote = IdLote 
+               this.productos[index].Lote = Lote 
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
               }
-            }
+            }else{
+                 this.productos[index].Lote = Lote 
+              }
              Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
@@ -430,8 +445,10 @@ export default {
           
           this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
-            text : l.hashMovimiento,
+            text : l.Lote,
             Stock : l.Stock,
+            IdLote: l.IdLote,
+            Lote: l.Lote,
             FechaVen: l.FechaVen,
             SerieNumero: l.Serie + '-' + l.Numero
           }))
@@ -590,14 +607,15 @@ export default {
         </style>
 
         <div class="${style}">
-          <table id="table-render" style="width: 700px; text-align: center  ">
+          <table id="table-render" style="width: 830px; text-align: center  ">
             <thead>
               <tr style>
                 <th class="table-info" style="width: 60px">Stock</th>
                 <th>Lab.</th>
                 <th>Forma.</th>
                 <th>Medición.</th>
-                <th>Producto.</th>
+                <th style="width: 200px">Producto.</th>
+                <th style="width: 200px">Compuestos</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
                 <th>V.E.</th>
               </tr>
@@ -608,7 +626,8 @@ export default {
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td>${data.ProductoMedicion}</td>
-                <td>${data.Producto}</td>
+                <td><b>${data.Producto}</b></td>
+                <td style="font-size:10px">${data.CompuestosProducto}</td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
                 <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
