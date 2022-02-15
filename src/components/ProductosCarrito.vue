@@ -24,7 +24,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form  v-if="false" :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
           <b-badge variant="danger">Productos Vencidos</b-badge>
@@ -46,11 +46,13 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              if(isVentas){
+                productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              }   
             }"
             placeholder="Cantidad"
             class="form-control"/>
@@ -77,7 +79,7 @@
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
-            <div>{{ getIgv(data.index) }}</div>
+            <div style="font-size:15px">{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
         <!--<template slot="flete" slot-scope="data">
@@ -114,7 +116,7 @@
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
           <div style="text-align:center;" v-if="!isNota">
-                <small style="font-size:14px;">S. <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D.: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
+                <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
           <div style="font-size:17px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
         </template>
@@ -137,7 +139,7 @@
             step="0.01"
             placeholder="Precio Venta"
             class="form-control"/>
-            <b-form-text>
+            <b-form-text style="font-size:16px;">
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
@@ -449,12 +451,13 @@ export default {
         this.add([idProducto, (obj) => {
           if (obj) {
             this.$emit('onAddProducto')
+            this.loadMovimientoLotes(obj.IdProducto)
             this.$toasted.show('Producto añadido correctamente')
           } else {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
+        }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
       }
     },
     /*alterarBuscadorProductos() {
@@ -527,7 +530,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.loadMovimientoLotes(obj.IdProducto)
-      }])
+      },{ setPrecioCosto: (this.isVentas ? false : true)}])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
