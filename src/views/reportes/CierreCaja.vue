@@ -296,8 +296,8 @@
 
 
       <b-row>
-        <b-col v-if="totalIngresos">
-          <h5>Ingresos</h5><br>
+        <b-col v-if="totalIngresosEfectivo">
+          <h5>Ingresos (Efectivo)</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr>
@@ -305,7 +305,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresosEfectivo" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -316,7 +316,7 @@
               <tr>
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+                <td class="total"><b>S/. {{ totalIngresosEfectivo | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -342,6 +342,34 @@
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col v-if="totalIngresosDeposito">
+          <h5>Ingresos (Deposito)</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosDeposito" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresosDeposito | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -429,7 +457,8 @@ export default {
     return {
       API: config.API,
       ventas: [],
-      ingresos: [],
+      ingresosEfectivo: [],
+      ingresosDeposito: [],
       salidas: [],
 	    adelantosEfectivo: [],
       adelantosDeposito: [],
@@ -449,7 +478,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosEfectivo - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -461,10 +490,17 @@ export default {
       });
       return total 
     },
-    totalIngresos () {
+    totalIngresosEfectivo () {
       let total = 0
-      this.ingresos.forEach(ingreso => {
+      this.ingresosEfectivo.forEach(ingreso => {
         if (!ingreso.Anulado && ingreso.EsTarjeta==0) total += ingreso.Importe
+      });
+      return total 
+    },
+    totalIngresosDeposito () {
+      let total = 0
+      this.ingresosDeposito.forEach(ingreso => {
+        if (!ingreso.Anulado && ingreso.EsTarjeta==1) total += ingreso.Importe
       });
       return total 
     },
@@ -624,6 +660,8 @@ export default {
       })
     },
     getIngresos () {
+      this.ingresosEfectivo = []
+      this.ingresosDeposito = []
       let params = {
         idCierre: this.$route.params.id
       }
@@ -634,7 +672,16 @@ export default {
         params: params
       })
       .then(res => {
-        this.ingresos = res.data
+        //this.ingresos = res.data
+        if(res.data){
+          res.data.map((ade)=>{
+            if(ade.EsTarjeta == 0){
+              this.ingresosEfectivo.push(ade)
+            }else if(ade.EsTarjeta == 1){
+              this.ingresosDeposito.push(ade)
+            }
+          })
+        }
       }).catch(err => {
         console.log(err)
       }) 
@@ -656,6 +703,8 @@ export default {
       }) 
     },
     getAdelantos() {
+        this.adelantosEfectivo = []
+        this.adelantosDeposito = []
         let params = {
           idDocVentas: this.ventas.map(v => v.idDocVenta)
         }
