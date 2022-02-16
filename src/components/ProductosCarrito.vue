@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-form-group v-if="!isOrden">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -91,7 +91,7 @@
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
@@ -136,7 +136,6 @@
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)"
             class="form-control"
             />
         </template>
@@ -234,23 +233,23 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <!--<template slot="Descripcion" slot-scope="data">
+        <template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
             placeholder="Descripción"
-            cols="9" rows="3"
+            cols="11" rows="3"
             v-model="productos[data.index].Descripcion"></textarea>
-          <b-form-input
+          <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>
-        </template>--> 
+            placeholder="Descripción"></b-form-input>-->
+        </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6 v-if="isVentas"><i>Prof.</i></h6>
-          <input v-if="isVentas"
+          <h6 v-if="isVentas && false"><i>Prof.</i></h6>
+          <input v-if="isVentas && false"
             class="form-check-input" 
             type="checkbox" 
             :disabled="bloquearInput?true:false"
@@ -310,7 +309,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-if="isOrden">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -372,6 +371,7 @@ export default {
   },
   props: {
     isVentas: Boolean,
+    isOrden: Boolean,
     tipo: String,
     setPrecio: Boolean,
     tipoCambio: Number,
@@ -395,7 +395,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          //{ key: 'Descripcion', label: 'Descripción'},
+          { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           //{ key: 'ProductoPresentacion', label: 'Present.' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
@@ -641,6 +641,7 @@ export default {
       if (!this.isVentas) {
         obj.estadoPxP = true
         obj.PreciosPorProducto = ''
+        obj.Descripcion = ''
         this.setProductoUni(obj)
         return
       }

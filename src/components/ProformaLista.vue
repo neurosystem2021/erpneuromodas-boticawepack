@@ -1,10 +1,10 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
+        <b-button @click="show=true" variant="outline-info" size="md">Ver Ordenes</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
-                title="Buscar Proforma"
+                title="Buscar Orden de Servicio"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
@@ -23,7 +23,7 @@
                         :current-page="currentPage">
 
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button v-if="!noSelect" @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
@@ -79,13 +79,13 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver' ,'verTicket'],
+                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'update', label: 'Selec.' }, 'ver' ,'verTicket'],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
             }
         },
-        props: ['idAlmacen'],
+        props: ['idAlmacen','noSelect'],
         methods: {
             ...mapActions({
                 add         : 'agregarProducto',

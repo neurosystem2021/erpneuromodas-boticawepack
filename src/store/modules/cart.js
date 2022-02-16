@@ -95,6 +95,7 @@ const actions = {
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado
       }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
@@ -109,7 +110,7 @@ const actions = {
         if (arr[i].desc == null) {
           arr[i].desc = ''
         }
-        producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
+       //producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
       }
 
       // console.log(producto);
