@@ -229,11 +229,12 @@
 					</b-col> 
 					<b-col md="4">
 						<label><b>Adelantos</b></label>
+						<b-form-select v-model="idMetodoPago" :options="metodosPago" size="md"/>
                         <input v-model="selectProducto.Adelanto"
                                 size="sm"
                                 type="number"
 								class="form-control"
-								step="0.00"
+								step="0.01"
                                 placeholder="Adelanto S/."/>
       					<b-input-group>
 							<b-form-input v-model="selectProducto.AdelantoDesc"
@@ -312,6 +313,8 @@ export default {
 			newDniRuc2: '',
 			HuespedesSec:[],
 			selectHuesped: {},
+			metodosPago:[{ value: null, text: '-- SELECCIONE --' }, { value: 1, text: 'EFECTIVO' }, { value: 2, text: 'DEPOSITO' }],
+			idMetodoPago: null
 		}
 	},
 	computed: {
@@ -398,7 +401,13 @@ export default {
 		insertarAdelanto() {
 			let usuario = sessionStorage.getItem('User')
 
-			if(this.selectProducto.Adelanto <= 0) {
+			if(this.selectProducto.Adelanto <= 0 || this.selectProducto.Adelanto == undefined) {
+				this.$toasted.show('Debe insertar un monto')
+				return;
+			}
+
+			if(this.idMetodoPago==null) {
+				this.$toasted.show('Seleccione un metodo de pago')
 				return;
 			}
 
@@ -411,10 +420,14 @@ export default {
 					IdPreOrden: this.selectProducto.IdPreOrden,
 					IdHabitacion: this.selectProducto.IdProducto,
 					Adelanto: this.selectProducto.Adelanto,
-					Usuario: usuario
+					Usuario: usuario,
+					MetodoPago: this.idMetodoPago
 				}).then(res => {
 					// this.adelantos.push(res.data)
 					this.cargarAdelantos();
+					this.selectProducto.Adelanto = 0
+					this.selectProducto.AdelantoDesc = ''
+					this.idMetodoPago = null
 				})
 			}
 		},

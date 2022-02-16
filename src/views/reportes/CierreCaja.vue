@@ -351,8 +351,8 @@
 
 
       <b-row>
-          <b-col v-if="totalAdelantos">
-            <h5>Descontar Adelantos</h5><br>
+          <b-col v-if="totalAdelantosEfectivo">
+            <h5>Descontar Adelantos <b>(Efectivo)</b></h5><br>
             <table class="table b-table table-sm adelantos">
               <thead>
                 <tr>
@@ -360,7 +360,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in adelantos" :key="index">
+                <tr v-for="(item, index) in adelantosEfectivo" :key="index">
                   <td>{{ item.IdCajaBanco }}</td>
                   <td>{{ item.FechaDoc }}</td>
                   <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
@@ -371,7 +371,35 @@
                 <tr>
                   <td colspan="2"></td>
                   <td class="total"><b>Total Adelantos</b></td>
-                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantosEfectivo | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+      </b-row>
+
+      <b-row>
+          <b-col v-if="totalAdelantosDeposito">
+            <h5>Descontar Adelantos <b>(Deposito)</b></h5><br>
+            <table class="table b-table table-sm adelantos">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in adelantosDeposito" :key="index">
+                  <td>{{ item.IdCajaBanco }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
+                  <td>S/. {{ item.Importe | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="total"><b>Total Adelantos</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantosDeposito | redondear }}</b></td>
                 </tr>
               </tfoot>
             </table>
@@ -403,7 +431,8 @@ export default {
       ventas: [],
       ingresos: [],
       salidas: [],
-	  adelantos: [],
+	    adelantosEfectivo: [],
+      adelantosDeposito: [],
       turno: null,
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
@@ -420,7 +449,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -435,13 +464,20 @@ export default {
     totalIngresos () {
       let total = 0
       this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe
+        if (!ingreso.Anulado && ingreso.EsTarjeta==0) total += ingreso.Importe
       });
       return total 
     },
-  	totalAdelantos () {
+  	totalAdelantosEfectivo () {
   		let total = 0
-  		this.adelantos.forEach(ade => {
+  		this.adelantosEfectivo.forEach(ade => {
+  			if (!ade.Anulado) total += ade.Importe
+  		})
+  		return total
+  	},
+    totalAdelantosDeposito () {
+  		let total = 0
+  		this.adelantosDeposito.forEach(ade => {
   			if (!ade.Anulado) total += ade.Importe
   		})
   		return total
@@ -627,7 +663,16 @@ export default {
           params: params
         })
         .then(res => {
-          this.adelantos = res.data
+          //this.adelantos = res.data
+          if(res.data){
+            res.data.map((ade)=>{
+              if(ade.EsTarjeta == 0){
+                this.adelantosEfectivo.push(ade)
+              }else if(ade.EsTarjeta == 1){
+                this.adelantosDeposito.push(ade)
+              }
+            })
+          }
         }).catch(err => {
           console.log(err)
         })
