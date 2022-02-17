@@ -160,7 +160,7 @@
                             {{ venta.FechaDoc }}
                         </b-form-group>
                         <b-form-group>
-                            <label>Vendedor:</label>
+                            <label>Orden por:</label>
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
@@ -202,6 +202,7 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :isOrden="true"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -418,7 +419,7 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -682,7 +683,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs

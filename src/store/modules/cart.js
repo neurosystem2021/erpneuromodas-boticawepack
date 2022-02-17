@@ -83,6 +83,8 @@ const actions = {
     let setSuma = false
     let setPrecioCosto = false
     let proforma = false
+    let descuento = false
+    let descripcion = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
@@ -90,6 +92,8 @@ const actions = {
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
       proforma = obje.proforma
+      descuento = obje.descuento
+      descripcion = obje.descripcion
     }
 
     if(typeof producto === 'object') {
@@ -172,7 +176,18 @@ const actions = {
             }
           }
 
-          obj.descuento = 0
+          if(descuento){
+            obj.descuento = descuento
+          }else{
+            obj.descuento = 0
+          }
+          
+          if(descripcion){
+            obj.Descripcion = descripcion
+          }else{
+            obj.Descripcion = ''
+          }
+
           obj.nuevoPrecioContado = 0
           
           let arr2 = [
@@ -184,7 +199,7 @@ const actions = {
             if (arr2[i].desc == null) {
               arr2[i].desc = ''
             }
-            obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
+            //obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
           }
 
           commit('AGREGAR_PRODUCTO', obj)

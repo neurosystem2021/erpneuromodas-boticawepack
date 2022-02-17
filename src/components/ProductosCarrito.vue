@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group v-if="!isOrden">
+      <b-form-group v-if="isOrden || !isVentas">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -237,7 +237,7 @@
           <textarea 
             class="form-control"
             placeholder="Descripción"
-            cols="11" rows="3"
+            cols="15" rows="3"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -309,7 +309,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr v-if="isOrden">
+              <tr v-if="!isOrden">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input

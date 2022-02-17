@@ -136,7 +136,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" v-if="false">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -158,6 +158,23 @@
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
                         </b-form-text>
+                    </b-col>
+                    <b-col md="3">
+                        <b-form-group class="text-center" v-if="venta.idProforma">
+                            <div class="big-text text-danger">
+                                {{ venta.anioProforma }} - <b>{{ venta.numeroProforma }}</b>
+                            </div>
+                            {{venta.fechaRegProforma}}
+                        </b-form-group>
+                        <b-form-group v-if="venta.idProforma">
+                            <label>Orden por:</label>
+                            <b-form-input
+                                readonly
+                                v-model="venta.usuarioOrden"
+                                type="text"
+                                placeholder="Sin Orden"
+                            ></b-form-input>
+                        </b-form-group>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
@@ -209,7 +226,6 @@
                             :showButton="false" 
                             :fields="carrito.fields"
                             :isVentas="true"
-                            :isOrden="true"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -360,6 +376,7 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" v-if="false" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" v-if="venta.idProforma!=null" :disabled="inProgress" variant="danger" size="md" @click="cancelarVentaOrden">Anular Venta</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -425,7 +442,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
+                    //{ key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
@@ -444,7 +461,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -564,10 +581,16 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: ''
+                CampoDireccion: '',
+                usuarioOrden: '',
+                idProforma: null,
+                anioProforma:'',
+                numeroProforma:'',
+                fechaRegProforma:'',
             }
             this.isNota = false
             this.bloquearInput=false
+            this.descuentoGeneral = 0 
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -690,8 +713,8 @@ export default {
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.setValue(response.data.Usuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -710,6 +733,10 @@ export default {
             if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
             this.venta.vendedor = obj
+        },
+        setUsuarioOrden(user){
+            //if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+            this.venta.usuarioOrden = user
         },
         setComisionista (obj) {
             if (typeof obj === 'object') {
@@ -752,7 +779,14 @@ export default {
                     console.log(error)
                 })
             }
-            
+            console.log(obj)
+            if(obj.IdProforma){
+                this.venta.usuarioOrden = obj.UsuarioReg
+                this.venta.idProforma = obj.IdProforma
+                this.venta.numeroProforma = obj.Numero
+                this.venta.anioProforma = obj.Anio
+                this.venta.fechaRegProforma = obj.FechaReg
+            }
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
@@ -867,17 +901,48 @@ export default {
                 this.inProgress = false
             })
         },
+        cancelarVentaOrden(){
+            this.$router.replace('/ventas')
+            this.inProgress = false
+            this.tieneIgv = false
+            this.initForm()
+            this.limpiarCart()
+            this.getVendedor()
+            this.loadClienteVarios()
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputAlmacen.setValue('VENTA')
+            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.$refs.inputCliente.setValue('')
+            this.$refs.inputVendedor.setValue('')
+            this.$refs.inputComisionista.setValue('')
+            this.$refs.carrito.pagocon = 0
+        },
         guardarVenta (evt) {
             evt.preventDefault();
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                 if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
