@@ -30,6 +30,34 @@
           <b-badge variant="danger">Productos Vencidos</b-badge>
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
+
+      <b-modal size="lg" ref="modalCant" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3>Productos relacionados</h3>
+          <h5>Codigo de Barra: {{codeBar}}</h5>
+        </div>
+        <hr>
+        <b-row>
+
+          <b-col cols="6" v-for="objPro in ProductosCodigoBarra" :key="objPro.IdProducto">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              @click="() => {setProducto(objPro)}"
+            >
+              <b-row>
+                <b-col md="6" class="nomCart">
+                  <h6 class="text-uppercase">{{ objPro.Producto }}</h6>
+                </b-col>
+                <b-col md="6" class="precioCart text-left">
+                  <h5><b>Precio: </b>S/ {{ objPro.PrecioContado }}</h5>
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
           <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" style="font-size:17px; font-weight:bold">
@@ -256,6 +284,8 @@ export default {
       pagocon: 0,
       idPerfil: sessionStorage.getItem('IdPerfil'),
       movimientoLotes: {},
+      ProductosCodigoBarra: [],
+      codeBar:''
     }
   },
   watch: {
@@ -430,28 +460,30 @@ export default {
       }
     },
     loadMovimientoLotes ($idProducto) {
-      this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
+      this.axios.get(this.API + 'movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
         .then((response) => {
-          let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
-          // Cargar por defecto lote próximo a vencer.
-          let primeroVencer = response.data.reduce((a,b) => {
-            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
-          })
-          
-          this.$nextTick(() => {
-            Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
-            this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
-          })
-          
-          this.movimientoLotes[$idProducto] = response.data.map(l => ({
-            value: l.hashMovimiento,
-            text : l.Lote,
-            Stock : l.Stock,
-            IdLote: l.IdLote,
-            Lote: l.Lote,
-            FechaVen: l.FechaVen,
-            SerieNumero: l.Serie + '-' + l.Numero
-          }))
+          if(response.data.length > 0){
+            let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a,b) => {
+              return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+            })
+            
+            this.$nextTick(() => {
+              Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+              this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
+            })
+            
+            this.movimientoLotes[$idProducto] = response.data.map(l => ({
+              value: l.hashMovimiento,
+              text : l.Lote,
+              Stock : l.Stock,
+              IdLote: l.IdLote,
+              Lote: l.Lote,
+              FechaVen: l.FechaVen,
+              SerieNumero: l.Serie + '-' + l.Numero
+            }))
+          }
         })
         .catch((error) => {
           console.log(error)
@@ -462,19 +494,44 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode;
+      let idProducto = this.loadCode
+      this.codeBar = this.loadCode
 
-      if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.loadMovimientoLotes(obj.IdProducto)
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
+      if(this.isVentas && idProducto){
+
+        let params = {codigoBarra: idProducto}
+        this.loadCode = ''
+        axios.get(this.API + 'productos/codigobarra', {params: params})
+        .then((response) => {
+          let productos = response.data
+          if (productos) {
+            if(productos.length==1){
+              this.setProducto(productos[0])
+            }else if(productos.length > 1){
+              this.ProductosCodigoBarra = productos
+              this.$refs['modalCant'].show()
+            }else{
+              this.$toasted.show('No se encontró ningun producto')
+              this.loadCode = ''
+            }
+          }else{
             this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
           }
-          this.loadCode = ''
-        }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
+        })
+      }else{
+        if (idProducto) {
+          this.add([idProducto, (obj) => {
+          if (obj) {
+              this.$emit('onAddProducto')
+              this.loadMovimientoLotes(obj.IdProducto)
+              this.$toasted.show('Producto añadido correctamente')
+            } else {
+              this.$toasted.show('No se encontró ningun producto')
+            }
+            this.loadCode = ''
+          }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
+        }
       }
     },
     /*alterarBuscadorProductos() {
@@ -550,6 +607,8 @@ export default {
       },{ setPrecioCosto: (this.isVentas ? false : true)}])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
+      this.$refs['modalCant'].hide()
+      this.loadCode = ''
     },
     renderChild(data) {
       if (this.idAlmacen) {
@@ -731,6 +790,20 @@ export default {
 td.stocksize{
   text-align: center !important; 
   vertical-align: middle !important;
+}
+.contentCard {
+  cursor: pointer;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid black;
+}
+.precioCart{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
 
