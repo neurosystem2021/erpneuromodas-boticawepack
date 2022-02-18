@@ -504,6 +504,7 @@ export default {
             this.bloquearInput = false 
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
+            this.descuentoPuntos = {}
         },
         setTipoVenta (obj) {
             if(this.isNota==true){

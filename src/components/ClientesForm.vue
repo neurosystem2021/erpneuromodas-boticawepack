@@ -145,8 +145,10 @@ export default {
                 if (tipo == 'DNI') {
                     this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
                     this.cliente.Direccion = ''
+                    this.cliente.NombreComercial =  data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
                 } else {
                     this.cliente.Cliente = data.razonSocial
+                    this.cliente.NombreComercial = data.razonSocial
                     this.cliente.Direccion = data.direccion
                     // this.cliente.Telefono = data.Telefono
                 }
