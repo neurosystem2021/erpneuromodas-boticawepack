@@ -889,7 +889,7 @@ export default {
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -982,7 +982,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) )) {
                     sinStock += 1
                 }
 
@@ -991,11 +991,11 @@ export default {
                 }
             });
 
-/*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            } */
+            }
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
