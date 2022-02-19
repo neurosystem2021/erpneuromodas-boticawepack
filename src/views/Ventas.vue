@@ -8,13 +8,13 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="false">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="false">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
@@ -226,21 +226,23 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
                                                 </b-form-text>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="false">
                                             <td>
                                                 <b-form-checkbox
                                                     :disabled="bloquearInput?true:false || isNota"
@@ -272,6 +274,7 @@
                                                         v-model="diasValidosProf"
                                                         min="0"
                                                         value="0"
+                                                        step="1"
                                                         type="number"
                                                     ></b-form-input>
                                                 </b-input-group>
@@ -297,14 +300,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -447,7 +451,7 @@ export default {
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -458,7 +462,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -583,6 +587,9 @@ export default {
             }
             this.isNota = false
             this.bloquearInput=false
+            this.puntosAplicados = 0
+            this.descuentoPuntos = {}
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -769,11 +776,10 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant) {
+        onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
+                obj.precio = precio || obj.PrecioContado
                 return obj
             }
             obj.cantidad = 1
@@ -782,11 +788,13 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+            this.venta.pago.visa.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -894,12 +902,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                 if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -1016,7 +1039,7 @@ export default {
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
-                    this.$refs.inputComisionista.setValue('')
+                    //this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 

@@ -56,7 +56,7 @@
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
-              v-if="parseFloat(d.cantidad) > 0"
+              v-if="parseFloat(d.cantidad) > 0 && parseFloat(d.precio) > 0"
               align="center"
               class="mb-3 contentCard"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
@@ -85,28 +85,28 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val, productos[data.index])"
-            placeholder="Cantidad">
-          </b-form-input>
+            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            placeholder="Cantidad"
+            class="form-control"/>
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="isVentas? true : false"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
              /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -119,20 +119,20 @@
               }
               productos[data.index].precio = productos[data.index].PrecioContado */
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)">
-          </b-form-input>
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -171,14 +171,14 @@
         </template>
 
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            readonly
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
@@ -199,14 +199,16 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
+            style="width: 90px"
             min="0"
             step="0.01"
-            @input="(val)=>ActualizarDesc(data.index,val)" 
-            :value="0"></b-form-input>
+            @input="(val)=>ActualizarDesc(data.index,val.target.value)" 
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -272,7 +274,7 @@
       </b-table>
     </b-col>
     <b-col md="3">
-      <slot name="operaciones"></slot>
+      <slot name="operaciones" v-if="!noSubtotal"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
@@ -367,6 +369,7 @@ export default {
   props: {
     isVentas: Boolean,
     tipo: String,
+    padre: String,
     setPrecio: Boolean,
     tipoCambio: Number,
     igvTotal: Boolean,
@@ -405,7 +408,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
@@ -690,7 +694,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -761,8 +765,8 @@ export default {
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      //Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+      //Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
@@ -841,7 +845,7 @@ export default {
   }
   .nomCart {
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
     border-right: 2px solid black;
   }
