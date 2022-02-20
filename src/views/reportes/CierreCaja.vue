@@ -47,14 +47,14 @@
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
-              <td>Total Pago S/.</td>
+              <td>Total En Caja S/.</td>
               <td>{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
         </table>          
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
-            <tr>
+            <tr v-if="false">
               <td>Salida S/.</td>
               <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
             </tr>
@@ -83,8 +83,12 @@
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
-              <td>Pagos de Creditos S/.</td>
+              <td>Ingresos S/.</td>
               <td>{{ totalIngresos | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Salidas S/.</td>
+              <td>{{ totalSalidas | moneda }} </td>
             </tr>
           </tbody>
         </table>
@@ -237,7 +241,7 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
+      </b-row>-->
 
 
       <b-row>
@@ -291,7 +295,7 @@
             </tfoot>
           </table>
         </b-col>
-      </b-row>-->
+      </b-row>
       
 
       <br>
@@ -337,7 +341,7 @@ export default {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
     },
     totalSalidas () {
       let total = 0

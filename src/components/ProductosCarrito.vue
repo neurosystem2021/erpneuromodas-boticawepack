@@ -30,6 +30,34 @@
           <b-badge variant="danger">Productos Vencidos</b-badge>
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
       </b-form-group>
+
+      <b-modal size="lg" ref="modalCant" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3>Productos relacionados</h3>
+          <h5>Codigo de Barra: {{codeBar}}</h5>
+        </div>
+        <hr>
+        <b-row>
+
+          <b-col cols="6" v-for="objPro in ProductosCodigoBarra" :key="objPro.IdProducto">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              @click="() => {setProducto(objPro)}"
+            >
+              <b-row>
+                <b-col md="6" class="nomCart">
+                  <h6 class="text-uppercase">{{ objPro.Producto }}</h6>
+                </b-col>
+                <b-col md="6" class="precioCart text-left">
+                  <h5><b>Precio: </b>S/ {{ objPro.PrecioContado }}</h5>
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
           <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" style="font-size:17px; font-weight:bold">
@@ -118,7 +146,15 @@
           <div style="text-align:center;" v-if="!isNota">
                 <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
-          <div style="font-size:17px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+          <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+        </template>
+
+        <template slot="Lote" slot-scope="data" >
+          <b-form-input
+            required="required"
+            v-model="productos[data.index].Lote"
+            type="text"
+            ></b-form-input>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data" >
@@ -248,6 +284,8 @@ export default {
       pagocon: 0,
       idPerfil: sessionStorage.getItem('IdPerfil'),
       movimientoLotes: {},
+      ProductosCodigoBarra: [],
+      codeBar:''
     }
   },
   watch: {
@@ -296,6 +334,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta', class:'stocksize' },
           { key: 'total', label: 'Total', variant: 'danger', class:'stocksize' },
+          { key: 'Lote', label: 'C. Lote', class:'stocksize' },
           { key: 'fechavencimiento', label: 'Vencimiento', class:'stocksize' },
           { key: 'acciones', label: '', class:'stocksize'}
         ]
@@ -371,6 +410,8 @@ export default {
         // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
         let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
+        let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -400,10 +441,14 @@ export default {
             if(!this.isVentas){
               if(this.movTipo!=0 &&  this.movTipo!=undefined ){
                this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+               this.productos[index].IdLote = IdLote 
+               this.productos[index].Lote = Lote 
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
               }
-            }
+            }else{
+                 this.productos[index].Lote = Lote 
+              }
              Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
@@ -415,26 +460,30 @@ export default {
       }
     },
     loadMovimientoLotes ($idProducto) {
-      this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
+      this.axios.get(this.API + 'movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
         .then((response) => {
-          let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
-          // Cargar por defecto lote próximo a vencer.
-          let primeroVencer = response.data.reduce((a,b) => {
-            return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
-          })
-          
-          this.$nextTick(() => {
-            Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
-            this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
-          })
-          
-          this.movimientoLotes[$idProducto] = response.data.map(l => ({
-            value: l.hashMovimiento,
-            text : l.hashMovimiento,
-            Stock : l.Stock,
-            FechaVen: l.FechaVen,
-            SerieNumero: l.Serie + '-' + l.Numero
-          }))
+          if(response.data.length > 0){
+            let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a,b) => {
+              return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+            })
+            
+            this.$nextTick(() => {
+              Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+              this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
+            })
+            
+            this.movimientoLotes[$idProducto] = response.data.map(l => ({
+              value: l.hashMovimiento,
+              text : l.Lote,
+              Stock : l.Stock,
+              IdLote: l.IdLote,
+              Lote: l.Lote,
+              FechaVen: l.FechaVen,
+              SerieNumero: l.Serie + '-' + l.Numero
+            }))
+          }
         })
         .catch((error) => {
           console.log(error)
@@ -445,19 +494,44 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode;
+      let idProducto = this.loadCode
+      this.codeBar = this.loadCode
 
-      if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.loadMovimientoLotes(obj.IdProducto)
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
+      if(this.isVentas && idProducto){
+
+        let params = {codigoBarra: idProducto}
+        this.loadCode = ''
+        axios.get(this.API + 'productos/codigobarra', {params: params})
+        .then((response) => {
+          let productos = response.data
+          if (productos) {
+            if(productos.length==1){
+              this.setProducto(productos[0])
+            }else if(productos.length > 1){
+              this.ProductosCodigoBarra = productos
+              this.$refs['modalCant'].show()
+            }else{
+              this.$toasted.show('No se encontró ningun producto')
+              this.loadCode = ''
+            }
+          }else{
             this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
           }
-          this.loadCode = ''
-        }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
+        })
+      }else{
+        if (idProducto) {
+          this.add([idProducto, (obj) => {
+          if (obj) {
+              this.$emit('onAddProducto')
+              this.loadMovimientoLotes(obj.IdProducto)
+              this.$toasted.show('Producto añadido correctamente')
+            } else {
+              this.$toasted.show('No se encontró ningun producto')
+            }
+            this.loadCode = ''
+          }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
+        }
       }
     },
     /*alterarBuscadorProductos() {
@@ -533,6 +607,8 @@ export default {
       },{ setPrecioCosto: (this.isVentas ? false : true)}])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
+      this.$refs['modalCant'].hide()
+      this.loadCode = ''
     },
     renderChild(data) {
       if (this.idAlmacen) {
@@ -590,14 +666,15 @@ export default {
         </style>
 
         <div class="${style}">
-          <table id="table-render" style="width: 700px; text-align: center  ">
+          <table id="table-render" style="width: 830px; text-align: center  ">
             <thead>
               <tr style>
                 <th class="table-info" style="width: 60px">Stock</th>
                 <th>Lab.</th>
                 <th>Forma.</th>
                 <th>Medición.</th>
-                <th>Producto.</th>
+                <th style="width: 200px">Producto.</th>
+                <th style="width: 200px">Compuestos</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
                 <th>V.E.</th>
               </tr>
@@ -608,7 +685,8 @@ export default {
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td>${data.ProductoMedicion}</td>
-                <td>${data.Producto}</td>
+                <td><b>${data.Producto}</b></td>
+                <td style="font-size:10px">${data.CompuestosProducto}</td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
                 <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
@@ -712,6 +790,20 @@ export default {
 td.stocksize{
   text-align: center !important; 
   vertical-align: middle !important;
+}
+.contentCard {
+  cursor: pointer;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid black;
+}
+.precioCart{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
 

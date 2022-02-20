@@ -360,6 +360,7 @@ return false
       let faltaFechaVen = false
       let igualProducto = false
       let faltaStock = false
+      let faltaLote = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
@@ -379,6 +380,11 @@ return false
            faltaStock=true
           }
         }
+
+        if((''+prod.IdLote).trim()==''){
+          faltaLote = true
+          this.$toasted.error('Por favor especifique un LOTE del producto: '+prod.Producto);
+        }
         
       })
       if (faltaStock) {
@@ -386,6 +392,12 @@ return false
           this.inProgress = false            
           return;
       }
+
+      if (faltaLote) {
+          this.inProgress = false            
+          return;
+      }
+
       if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
           this.inProgress = false            
