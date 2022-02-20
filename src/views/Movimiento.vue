@@ -345,7 +345,7 @@ return false
     },
     guardarMovimiento (evt) {
       evt.preventDefault();
-      this.inProgress = true
+      //this.inProgress = true
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
         this.inProgress = false            
@@ -364,7 +364,10 @@ return false
         if (prod.total <= 0) {
           faltaLlenar = true
         }
-        if (prod.FechaVen == undefined || prod.FechaVen=='' ) {
+        if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
+          if(prod.FechaVen.length>10){
+             this.$toasted.show('La fecha de vencimiento del producto '+prod.Producto+' no tiene el formato correcto')
+          }
           faltaFechaVen = true
         }
         let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
@@ -389,7 +392,7 @@ return false
           return;
       }
       if (faltaFechaVen) {
-        this.$toasted.show('Ingrese la fecha de vencimiento del producto')
+        this.$toasted.show('Ingrese la fecha correcta de vencimiento del producto')
         this.inProgress = false
         return;
       }
