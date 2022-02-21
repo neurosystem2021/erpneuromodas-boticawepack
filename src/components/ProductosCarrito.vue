@@ -412,7 +412,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
+        }, { setPrecio: this.setPrecio,  setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
       }
     },
     /*alterarBuscadorProductos() {
@@ -519,7 +519,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
+      obj = this.onSetProducto(obj, parseFloat(prod.cantidad),prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')

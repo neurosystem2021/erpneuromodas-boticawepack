@@ -78,6 +78,7 @@ const actions = {
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado
       }
 
       commit('AGREGAR_PRODUCTO', producto)
@@ -96,9 +97,13 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.cantxPrecio = 1
+            obj.cantidadPres = 1
+            obj.nuevoPrecioContado = 0
           } else {
             obj.cantidad = 0
-            obj.precio = 0
+            obj.precio = obj.PrecioCosto || 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if (cantidad) {
@@ -110,7 +115,7 @@ const actions = {
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
