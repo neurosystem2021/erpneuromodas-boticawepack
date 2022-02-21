@@ -62,13 +62,21 @@ const actions = {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
+    let setPrecioCosto = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      setPrecioCosto = obje.setPrecioCosto
     }
 
     if(typeof producto === 'object') {
+
+      if (setPrecioCosto) {
+        producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado
+      }
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -79,9 +87,12 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
           } else {
+            console.log("hola");
             obj.cantidad = 0
-            obj.precio = 0
+            obj.precio = obj.PrecioCosto || 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if (cantidad) {
@@ -93,7 +104,7 @@ const actions = {
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
