@@ -727,12 +727,12 @@ export default {
         return `
         <div>
           <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
+          <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}  - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
         </div>
         `
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}
       `
     },
     // setCantidad (index, val) {

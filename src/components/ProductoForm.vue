@@ -59,7 +59,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Cod. P.:</label>
             <b-input-group>
               <autocomplete
@@ -109,7 +109,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Presentación:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
@@ -431,8 +431,8 @@ export default {
           this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
           
           // this.$refs.inputModelo.setValue('')
-          this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-          this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+          //this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+          //this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
           //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
           //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
@@ -581,8 +581,8 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      //this.$refs.inputModelo.setValue('')
+      //this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
