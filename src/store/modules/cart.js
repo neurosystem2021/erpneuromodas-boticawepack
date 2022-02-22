@@ -62,10 +62,12 @@ const actions = {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
+    let AlquilerInicio = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      AlquilerInicio = obje.AlquilerInicio
     }
 
     if(typeof producto === 'object') {
@@ -94,6 +96,9 @@ const actions = {
             obj.cantidad = cantidad
           }
 
+          if(AlquilerInicio){
+            obj.FechaAlquiler = AlquilerInicio
+          }
           if (setSuma) {
             obj.setSuma = true
           }

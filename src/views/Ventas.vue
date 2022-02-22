@@ -155,8 +155,8 @@
                             </autocomplete>
                         </b-form-group>
 
-                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
-                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ totalCart - adelanto }} </b-badge>
+                        <b-badge style="font-size:15px" variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
+                        <b-badge style="font-size:15px" variant="success" v-if="adelanto">Total a pagar: S/ {{ totalCart - adelanto }} </b-badge>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -611,6 +611,11 @@ export default {
                 return
             }
 
+            if(this.$route.query.idPreOrden && (this.totalCart - this.adelanto)<0){
+                this.$toasted.show('El cliente tiene adelantos de S/ '+this.adelanto+', verifique los dias de hospedaje. EL TOTAL A PAGAR NO DEBE SER NEGATIVO.')
+                this.inProgress = false
+                return  
+            }
             var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
             if (!esNumerico) {
                 this.$toasted.show('El RUC debe ser numérico, editar cliente.')
@@ -665,7 +670,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
