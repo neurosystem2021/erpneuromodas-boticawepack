@@ -2,7 +2,7 @@
   <b-row>
     <b-col md="12">
       <b-form-group v-if="isOrden || !isVentas">
-        <label>Agregar Productos:</label>
+        <label>Agregar Repuestos:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -11,7 +11,7 @@
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
-            placeholder="Agregar Producto"
+            placeholder="Agregar repuesto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
@@ -27,7 +27,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,obj) =>{agregarGuardar(id,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
+        <b-badge v-if="isVentas" variant="danger">Sin stock</b-badge>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -104,7 +104,6 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
             type="number"
             style="width: 90px"
             min="0"
@@ -233,6 +232,18 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
+        <template slot="modelo" slot-scope="data">
+          <textarea 
+            class="form-control"
+            placeholder="Modelo"
+            cols="15" rows="3"
+            v-model="productos[data.index].Modelo"></textarea>
+          <!--<b-form-input
+            v-model="productos[data.index].Descripcion"
+            type="text"
+            placeholder="Descripción"></b-form-input>-->
+        </template>
+
         <template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
@@ -286,7 +297,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="false">
           <table class="table b-table border table-footer" v-if="!noSubtotal">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -309,7 +320,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr v-if="!isOrden">
+              <tr>
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -395,6 +406,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
+          { key: 'modelo', label: 'Modelo'},
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           //{ key: 'ProductoPresentacion', label: 'Present.' }, 
@@ -638,13 +650,13 @@ export default {
       obj.estadoPxP = false
       this.loadCode = ''
       this.preciosProd = []
-      if (!this.isVentas) {
+      //if (!this.isVentas) {
         obj.estadoPxP = true
         obj.PreciosPorProducto = ''
         obj.Descripcion = ''
         this.setProductoUni(obj)
         return
-      }
+     // }
       this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
       if(obj.precioConvenio){
         this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})

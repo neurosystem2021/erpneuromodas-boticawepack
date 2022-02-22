@@ -8,7 +8,7 @@
         <b-container class="bv-example-row">
             <b-row>
                 <b-col  style="text-align: left">
-                    <h2>Punto de Venta</h2>
+                    <h2>PROCESAR ORDEN DE SERVICIO</h2>
                 </b-col>
                 <b-col  style="text-align: right">
                     <b-button-group size="sm">
@@ -29,13 +29,13 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <label>Operación:</label>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="ORDEN DE SERVICIO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -43,7 +43,7 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
-                                <b-form-group v-if="isNota">
+                                <b-form-group v-if="isNota && false">
                                     <label>Doc. Referencia:</label>
                                     <autocomplete
                                         required="required"
@@ -59,7 +59,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" v-if="false">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -80,7 +80,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" v-if="false">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -233,10 +233,10 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr>
+                                        <tr v-if="false">
                                             <td  class="text-center">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0">
+                                        <tr v-if="puntosAplicados == 0 && false">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <input
@@ -255,7 +255,7 @@
                                                 </b-form-text>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="false">
                                             <td>
                                                 <b-form-checkbox
                                                     :disabled="bloquearInput?true:false || isNota"
@@ -282,7 +282,7 @@
                                     </tbody>
                                 </table>
                             </template>    
-                            <template slot="metodopago" v-if="!venta.EsCredito">
+                            <template slot="metodopago" v-if="!venta.EsCredito && false">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
                                         <tr>
@@ -376,9 +376,9 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" v-if="false" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="button" v-if="venta.idProforma!=null" :disabled="inProgress" variant="danger" size="md" @click="cancelarVentaOrden">Anular Venta</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button type="button" v-if="venta.idProforma!=null" :disabled="inProgress" variant="danger" size="md" @click="cancelarVentaOrden">Cancelar</b-button>
+                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">PROCESAR ORDEN</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Orden</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -441,19 +441,21 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
+                    { key: 'modelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
+                    { key: 'ProductoMarca', label: 'Marca'},
                     //{ key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
+                   // { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
-                    { key: 'acciones', label: ''}
+                    // { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+                    //{ key: 'descuento', label: 'Descuento'},
+                    //{ key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+                    //{ key: 'acciones', label: ''}
                 ]
             },
             usuario: sessionStorage.getItem('User')
@@ -530,7 +532,7 @@ export default {
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
-                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    //this.$refs.inputAlmacen.setValue(res.data.Almacen)
                     this.venta.almacen = res.data
                 })
         },
@@ -554,10 +556,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'ORDEN DE SERVICIO',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -682,7 +684,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
-            this.$refs.inputAlmacen.setValue(obj.Almacen)
+            //this.$refs.inputAlmacen.setValue(obj.Almacen)
             if (this.productos.length) {
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
@@ -705,7 +707,7 @@ export default {
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
-            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
+            //this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
         getVendedor () {
@@ -718,8 +720,8 @@ export default {
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                this.$refs.inputAlmacen.$refs.input.disabled = true
-                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.$refs.inputAlmacen.$refs.input.disabled = true
+                //this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
             })
@@ -909,9 +911,9 @@ export default {
             this.limpiarCart()
             this.getVendedor()
             this.loadClienteVarios()
-            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-            this.$refs.inputAlmacen.setValue('VENTA')
-            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.$refs.inputTipoVenta.setValue('ORDEN DE SERVICIO')
+            //this.$refs.inputAlmacen.setValue('VENTA')
+            //this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
             this.$refs.inputComisionista.setValue('')
@@ -921,6 +923,7 @@ export default {
             evt.preventDefault();
 
             this.inProgress = true
+            /*
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
@@ -991,6 +994,7 @@ export default {
 
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
+            */  
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
@@ -1012,11 +1016,12 @@ export default {
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
-                this.$toasted.error('No se puede vender un producto sin stock');
+                this.$toasted.error('No se puede procesar una orden sin stock del articulo');
                 this.inProgress = false            
                 return;
             }
 
+            /*
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
@@ -1027,7 +1032,7 @@ export default {
                 this.$toasted.show('La venta en S/. 0.00 no está permitido')
                 this.inProgress = false            
                 return 
-            }
+            }*/
 
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
@@ -1054,13 +1059,13 @@ export default {
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.loadClienteVarios()
-                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                    this.$refs.inputAlmacen.setValue('VENTA')
-                    this.$refs.inputPuntoVenta.setValue('CAJA1')
+                    this.$refs.inputTipoVenta.setValue('ORDEN DE SERVICIO')
+                    //this.$refs.inputAlmacen.setValue('VENTA')
+                    //this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
-                    this.$refs.carrito.pagocon = 0
+                    //this.$refs.carrito.pagocon = 0
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
                 }

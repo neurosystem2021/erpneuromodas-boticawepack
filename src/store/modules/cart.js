@@ -85,6 +85,7 @@ const actions = {
     let proforma = false
     let descuento = false
     let descripcion = false
+    let modelo = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
@@ -94,6 +95,7 @@ const actions = {
       proforma = obje.proforma
       descuento = obje.descuento
       descripcion = obje.descripcion
+      modelo = obje.modelo
     }
 
     if(typeof producto === 'object') {
@@ -186,6 +188,12 @@ const actions = {
             obj.Descripcion = descripcion
           }else{
             obj.Descripcion = ''
+          }
+
+          if(modelo){
+            obj.Modelo = modelo
+          }else{
+            obj.Modelo = modelo
           }
 
           obj.nuevoPrecioContado = 0

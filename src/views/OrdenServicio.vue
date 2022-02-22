@@ -52,7 +52,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" v-if="false">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -73,7 +73,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" v-if="false">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -92,7 +92,7 @@
                             </b-col>
                             <b-col md="12">
                                 <b-form-group>
-                                    <label>Cliente:</label>
+                                    <label>Mecanico:</label>
                                     
                                     <b-input-group>
                                              <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
@@ -210,10 +210,10 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr>
+                                        <tr v-if="false">
                                             <td  class="text-center">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0">
+                                        <tr v-if="puntosAplicados == 0 && false">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <input
@@ -419,18 +419,20 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
+                    { key: 'modelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    { key: 'ProductoMarca', label: 'Marca'},
+                    //{ key: 'eventPres', label: '' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
+                    //{ key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+                    //{ key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+                    //{ key: 'descuento', label: 'Descuento'},
+                    //{ key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
             },
@@ -508,7 +510,7 @@ export default {
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
-                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                    //this.$refs.inputAlmacen.setValue(res.data.Almacen)
                     this.venta.almacen = res.data
                 })
         },
@@ -654,7 +656,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
-            this.$refs.inputAlmacen.setValue(obj.Almacen)
+            //this.$refs.inputAlmacen.setValue(obj.Almacen)
             if (this.productos.length) {
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
@@ -674,7 +676,7 @@ export default {
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
-            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
+            //this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             //this.getNumeroVenta()
         },
         getVendedor () {
@@ -687,8 +689,8 @@ export default {
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                this.$refs.inputAlmacen.$refs.input.disabled = true
-                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.$refs.inputAlmacen.$refs.input.disabled = true
+                //this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 //this.getTipoDoc(response.data.IdTipoDoc)
                 this.getOrden()
@@ -856,6 +858,8 @@ export default {
             }
 
             this.venta.productos = this.productos
+            console.log(this.venta.productos)
+
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
@@ -995,8 +999,8 @@ export default {
                     //this.getNumeroVenta()
                     this.loadClienteVarios()
                     //this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                    this.$refs.inputAlmacen.setValue('PRINCIPAL')
-                    this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
+                    //this.$refs.inputAlmacen.setValue('PRINCIPAL')
+                    //this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     //this.$refs.inputComisionista.setValue('')
