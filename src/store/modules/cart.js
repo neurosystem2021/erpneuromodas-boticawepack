@@ -110,7 +110,7 @@ const actions = {
         if (arr[i].desc == null) {
           arr[i].desc = ''
         }
-        producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
+        //producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
       }
 
       // console.log(producto);
@@ -180,7 +180,7 @@ const actions = {
             if (arr2[i].desc == null) {
               arr2[i].desc = ''
             }
-            obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
+            //obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
           }
 
           commit('AGREGAR_PRODUCTO', obj)

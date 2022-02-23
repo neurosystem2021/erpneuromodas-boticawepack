@@ -201,8 +201,7 @@
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <input   
-              required="required"
+            <input
               v-model="producto.StockMinimo"
               type="number"
               class="form-control"
@@ -308,7 +307,15 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+          <b-card border-variant="light" class="text-center">
+            <b-form-group>
+              <input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                style="text-transform:uppercase"
+                class="form-control"
+                />
+            </b-form-group>
             <b-form-group>
               <label>Cantidad:</label>
               <input
@@ -356,7 +363,7 @@
                   ref="inputAlmacen"
                   :url="API + 'almacenes'"
                   anchor="Almacen"
-                  initValue="HUANUCO"
+                  initValue="PRINCIPAL"
                   label="writer"
                   placeholder=""
                   :on-select="setAlmacen" 
@@ -734,10 +741,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'Precio 1', cantidad: 0, precio: 0},
-          {nombre: 'Precio 2', cantidad: 0, precio: 0},
-          {nombre: 'Precio 3', cantidad: 0, precio: 0},
-          {nombre: 'Precio 4', cantidad: 0, precio: 0}
+          {nombre: 'PRESENT. 1', cantidad: 0, precio: 0},
+          {nombre: 'PRESENT. 2', cantidad: 0, precio: 0},
+          {nombre: 'PRESENT. 3', cantidad: 0, precio: 0},
+          {nombre: 'PRESENT. 4', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -754,6 +761,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      let errorPre = 0
       this.producto.precios.map((pre)=>{
         if(pre.cantidad==''){
           pre.cantidad=0
@@ -761,7 +769,16 @@ export default {
         if(pre.precio==''){
           pre.precio=0
         }
+        pre.nombre = (""+pre.nombre).toUpperCase()
+        if( ((pre.precio > 0) ||(pre.cantidad > 0)) && (pre.nombre+"").trim()=='' ){
+          errorPre++;
+        }
       })
+
+      if(errorPre>=1){
+         this.$toasted.error("Si tiene precio y cantidad, debe tener un nombre de presentacion")
+         return
+      }
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 

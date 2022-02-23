@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25' }"
+            :customParams="{'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 , 'limit':15}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -69,7 +69,7 @@
             >
               <b-row>
                 <b-col md="7" class="nomCart" >
-                  <h5>x{{ d.cantidad }}</h5>
+                  <h5>{{ d.nombre }} x{{ d.cantidad }}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
                   <b>Precio: </b>S/ {{ d.precio }}
@@ -260,8 +260,7 @@
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
           <div style="text-align:center" v-if="!isNota">
-          <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
-          <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
+          <small style="font-size:15px">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> - D: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
@@ -639,7 +638,7 @@ export default {
               }
             }
 
-            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>F. Venci: ${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
+            Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
           this.$nextTick(() => {
@@ -738,6 +737,7 @@ export default {
       */
     },
     setProducto (obj) {
+      this.indexProdSelect = null
       this.precioCont = obj.PrecioContado
       this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
@@ -758,7 +758,6 @@ export default {
         this.setProductoUni(obj)
         return
       }
-      this.indexProdSelect = null
       this.$refs['modalCant'].show()
       this.objProd = obj
     },  
@@ -771,6 +770,7 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
+      obj.Descripcion = obj.ProductoMedicion
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
       obj.cantidadPres = obj.cantidad
@@ -803,6 +803,7 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
+      obj.Descripcion = prod.nombre +" x"+prod.cantidad
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
       obj.cantidadPres = this.cant
