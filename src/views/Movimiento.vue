@@ -369,7 +369,10 @@ return false
           faltaLlenar = true
         }
 
-        if (prod.FechaVen == undefined || prod.FechaVen=='' ) {
+        if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
+          if(prod.FechaVen.length>10){
+             this.$toasted.show('La fecha de vencimiento del producto '+prod.Producto+' no tiene el formato correcto')
+          }
           faltaFechaVen = true
         }
 
@@ -400,7 +403,7 @@ return false
       }
 
       if (faltaFechaVen) {
-        this.$toasted.show('Ingrese la fecha de vencimiento del producto')
+        this.$toasted.show('Ingrese la fecha correcta de vencimiento del producto')
         this.inProgress = false
         return;
       }
