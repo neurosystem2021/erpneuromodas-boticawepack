@@ -65,10 +65,11 @@
           </tr>
         </tfoot>
       </table>
+        <img src="/resources/images/cuentas.jpg">
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Esta proforma esta sujeto a cambios sin previo aviso.</div>
       </div>
     </main>
     <!--<footer>
