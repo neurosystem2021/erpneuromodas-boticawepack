@@ -345,7 +345,7 @@ return false
     },
     guardarMovimiento (evt) {
       evt.preventDefault();
-      //this.inProgress = true
+      this.inProgress = true
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
         this.inProgress = false            
