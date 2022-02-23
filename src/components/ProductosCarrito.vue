@@ -104,6 +104,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
+            :disabled="!isOrden && isVentas"
             type="number"
             style="width: 90px"
             min="0"
@@ -235,6 +236,7 @@
         <template slot="modelo" slot-scope="data">
           <textarea 
             class="form-control"
+            :disabled="!isOrden && isVentas"
             placeholder="Modelo"
             cols="15" rows="3"
             v-model="productos[data.index].Modelo"></textarea>
@@ -247,6 +249,7 @@
         <template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
+            :disabled="!isOrden && isVentas"
             placeholder="Descripción"
             cols="15" rows="3"
             v-model="productos[data.index].Descripcion"></textarea>
@@ -798,8 +801,8 @@ export default {
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      //Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+      //Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio

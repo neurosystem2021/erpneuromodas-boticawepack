@@ -77,9 +77,9 @@ import { mapActions } from 'vuex'
                 isBusy: false,
                 fields: [ 
                     { key: 'IdProforma', label: 'Id' }, 
-                    { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
-                    { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'update', label: 'Selec.' }, 'ver' ,'verTicket'],
+                    { key: 'Anio', label: 'Año' } , { key: 'Numero', class:'text-center' },{ key: 'Cliente', label: 'Mecanico' , class:'text-center' }, 
+                    { key: 'Nombre', label: 'Equipo', class:'text-center' },{ key: 'FechaReg', class:'text-center' }, 
+                    { key: 'UsuarioReg', label: 'Generado Por:', class:'text-center' }, { key: 'update', label: 'Selec.' }, 'ver' ,'verTicket'],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -112,6 +112,8 @@ import { mapActions } from 'vuex'
                     // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.$emit('onSelectProforma', proforma)
                     this.limpiarCarrito()
+                }).catch(err=>{
+                    console.log(err)
                 })
             },
             myProvider (ctx) {
@@ -137,6 +139,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 65% !important;
+    max-width: 80% !important;
    }
 </style>

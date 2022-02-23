@@ -3,7 +3,7 @@
     <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente" ref="form">    
-    <b-modal :id="idModal || 'modal1'" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
+    <b-modal :id="idModal || 'modal1'" title="Nuevo Mecanico" size="lg" ref="clienteForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -18,7 +18,7 @@
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Nombre del Cliente:</label>
+            <label>Nombre del Mecanico:</label>
             <b-form-input 
                 required="required"
                 v-model="cliente.Cliente"
@@ -87,7 +87,7 @@
           </b-col>
       </b-row>
       <b-row>
-        <b-col>
+        <b-col v-if="false">
           <b-form-checkbox 
                      v-model="cliente.EsVIP"
                      :value="1"

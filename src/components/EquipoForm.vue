@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
+    <b-btn v-b-modal="idModal || 'modal2'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarMaquina" ref="form">    
-    <b-modal :id="idModal || 'modal1'" title="Nueva maquina" size="lg" ref="maquinaForm" v-model="show" @shown="shownClienteForm">
+    <b-form @submit="guardarEquipo" ref="form">    
+    <b-modal :id="idModal || 'modal2'" title="Nueva equipo" size="lg" ref="equipoForm" v-model="show" @shown="shownClienteForm">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -73,7 +73,7 @@ export default {
     shownClienteForm () {
 
     },
-    guardarMaquina(evt) {
+    guardarEquipo(evt) {
       evt.preventDefault();
 
       if((this.equipo.Nombre+'').trim()=='' && (this.equipo.Placa+'').trim()==''){

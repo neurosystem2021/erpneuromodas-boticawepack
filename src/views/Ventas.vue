@@ -14,9 +14,9 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                     <!--<b-button-group size="sm">
                         <pago-deuda></pago-deuda>
-                    </b-button-group>
+                    </b-button-group>-->
                     <b-button-group size="sm">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
@@ -99,10 +99,9 @@
                             </b-col>
                             <b-col md="12">
                                 <b-form-group>
-                                    <label>Cliente:</label>
+                                    <label>Mecanico Responsable:</label>
                                     
                                     <b-input-group>
-                                             <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -115,26 +114,19 @@
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
-                                        <input v-model="dni"
-                                            @keydown.enter.prevent="loadClienteBarcode"
-                                            type="text"
-                                            class="form-control"
-                                            placeholder="Codigo de Barra" />
-                                        <b-input-group-append>
-                                            <!--<proveedores-tabla></proveedores-tabla>-->
-                                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-                                            
-                                        </b-input-group-append>
                                     </b-input-group>
-                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                        <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
-                                        <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                        <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                                    </b-form-select>
-
                                 </b-form-group>
+                                <label>Equipo:</label>
+                                <b-input-group>
+                                    <b-form-input
+                                        v-model="venta.NombreEquipo"
+                                        readonly
+                                        type="text"
+                                    ></b-form-input>
+                                </b-input-group>
                             </b-col>
                         </b-row>
+                        <br>
                     </b-col>
                     <b-col md="3" v-if="false">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
@@ -167,10 +159,10 @@
                             {{venta.fechaRegProforma}}
                         </b-form-group>
                         <b-form-group v-if="venta.idProforma">
-                            <label>Orden por:</label>
+                            <label>Orden generada por:</label>
                             <b-form-input
                                 readonly
-                                v-model="venta.usuarioOrden"
+                                v-model="venta.usuarioOrdenNombre"
                                 type="text"
                                 placeholder="Sin Orden"
                             ></b-form-input>
@@ -184,7 +176,7 @@
                             {{ venta.FechaDoc }}
                         </b-form-group>
                         <b-form-group>
-                            <label>Vendedor:</label>
+                            <label>Orden procesada por:</label>
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
@@ -405,7 +397,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
+        this.$refs.inputCliente.$refs.input.disabled = true
     },
     data () {
         return {
@@ -440,7 +432,7 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'Producto' },
+                    { key: 'Producto', label:'Articulo' },
                     { key: 'modelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca'},
@@ -589,6 +581,8 @@ export default {
                 anioProforma:'',
                 numeroProforma:'',
                 fechaRegProforma:'',
+                idEquipo: null,
+                NombreEquipo:'',
             }
             this.isNota = false
             this.bloquearInput=false
@@ -715,7 +709,7 @@ export default {
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.Usuario)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
@@ -784,10 +778,13 @@ export default {
             console.log(obj)
             if(obj.IdProforma){
                 this.venta.usuarioOrden = obj.UsuarioReg
+                this.venta.usuarioOrdenNombre = obj.NombreUsuario
                 this.venta.idProforma = obj.IdProforma
                 this.venta.numeroProforma = obj.Numero
                 this.venta.anioProforma = obj.Anio
                 this.venta.fechaRegProforma = obj.FechaReg
+                this.venta.idEquipo = obj.IdEquipo
+                this.venta.NombreEquipo = obj.Nombre
             }
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
@@ -878,13 +875,13 @@ export default {
             }
 
             if(!this.venta.cliente.IdCliente) {
-                this.$toasted.show('Debe seleccionar un cliente')
+                this.$toasted.show('Debe haber un mecanico responsable')
                 this.inProgress = false
                 return
             }
 
             if(!this.venta.vendedor.Usuario) {
-                this.$toasted.show('Debe seleccionar un vendedor')
+                this.$toasted.show('Debe seleccionar un usuario')
                 this.inProgress = false
                 return
             }
@@ -910,7 +907,7 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getVendedor()
-            this.loadClienteVarios()
+            //this.loadClienteVarios()
             this.$refs.inputTipoVenta.setValue('ORDEN DE SERVICIO')
             //this.$refs.inputAlmacen.setValue('VENTA')
             //this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -1050,7 +1047,7 @@ export default {
                 }else{
                 // limpiar preorden seleccionado
                     this.$router.replace('/ventas')
-                    this.$toasted.success('Venta realizada con exito')
+                    this.$toasted.success('Orden procesada con exito')
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
@@ -1058,7 +1055,7 @@ export default {
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
-                    this.loadClienteVarios()
+                    //this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('ORDEN DE SERVICIO')
                     //this.$refs.inputAlmacen.setValue('VENTA')
                     //this.$refs.inputPuntoVenta.setValue('CAJA1')

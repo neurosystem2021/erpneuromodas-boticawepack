@@ -16,15 +16,15 @@
         <div id="client">
           <br>
           <div class="to">ORDEN A</div>
-          <h2 class="name">SR(ES): <b>{{ proforma.Cliente }}</b></h2>
-          <h2 class="name">RUC/DNI: <b>{{ proforma.DniRuc }}</b></h2>
+          <h2 class="name">MECANICO: <b>{{ proforma.Cliente }}</b></h2>
+          <h2 class="name">EQUIPO: <b>{{ proforma.Nombre }}</b></h2>
           <div class="address">{{ proforma.ClienteDireccion }}</div>
           <div class="email"><a :href="'mailto:' + proforma.ClienteEmail">{{ proforma.ClienteEmail }}</a></div>
         </div>
         <div id="invoice">
-          <h1>ORDEN DE SERVICIO: <b>{{ proforma.Anio }}-{{ proforma.Numero }}</b> </h1>
+          <h1>ORDEN DE GENERADA: <b>{{ proforma.Anio }}-{{ proforma.Numero }}</b> </h1>
           <div class="date">Fecha de Orden: <b>{{ proforma.FechaReg }}</b> </div>
-          <div class="date">Orden generada por: <b>{{ proforma.UsuarioReg }}</b> </div>
+          <div class="date">Orden generada por: <b>{{ proforma.NombreUsuario }}</b> </div>
           <!--<div class="date">Due Date: 30/06/2014</div>-->
         </div>
       </div>

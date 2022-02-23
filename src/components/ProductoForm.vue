@@ -281,7 +281,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
             <input

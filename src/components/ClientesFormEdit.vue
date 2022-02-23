@@ -2,7 +2,7 @@
   <div>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Editar Cliente" size="lg" ref="clienteForm" v-model="show">
+    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show">
       <b-row>
         <b-col md="12">
           <b-form-group>
@@ -17,16 +17,15 @@
             </b-input-group>
           </b-form-group>
           <b-form-group>
-            <label>Nombre del Cliente:</label>
+            <label>Nombre del Mecanico:</label>
             <b-form-input 
                 required="required"
                 v-model="cliente.Cliente"
                 type="text"></b-form-input>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
@@ -56,7 +55,7 @@
             </b-form-group>
           </b-col>
       </b-row>
-      <b-row>
+      <b-row v-if="false">
         <b-col>
           <b-form-checkbox id="checkbox1"
                      v-model="cliente.EsVIP"

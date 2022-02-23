@@ -92,7 +92,7 @@
                             </b-col>
                             <b-col md="12">
                                 <b-form-group>
-                                    <label>Mecanico:</label>
+                                    <label>Mecanico Responsable:</label>
                                     
                                     <b-input-group>
                                              <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
@@ -119,12 +119,28 @@
                                             
                                         </b-input-group-append>
                                     </b-input-group>
-                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                                        <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
-                                        <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                        <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                                    </b-form-select>
-
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="12">
+                                <b-form-group>
+                                    <label>Equipos:</label>
+                                    <b-input-group>
+                                        <autocomplete
+                                            required="required"
+                                            ref="inputEquipo"
+                                            :url="API + 'equipos'"
+                                            anchor="NombrePlaca"
+                                            label="writer"
+                                            placeholder=""
+                                            :on-select="setEquipo" 
+                                            :onFocus="focusAutocomplete.bind(null, 'inputEquipo')"
+                                            :classes="{input: 'form-control'}">
+                                        </autocomplete>
+                                        <b-input-group-append>
+                                            <!--<proveedores-tabla></proveedores-tabla>-->
+                                            <!--<equipo-form @onAddCliente="setEquipo"></equipo-form>-->
+                                        </b-input-group-append>
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -160,7 +176,7 @@
                             {{ venta.FechaDoc }}
                         </b-form-group>
                         <b-form-group>
-                            <label>Orden por:</label>
+                            <label>Orden generada por:</label>
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
@@ -373,6 +389,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import EquipoForm from '@/components/EquipoForm'
 
 export default {
     beforeMount () {
@@ -382,7 +399,7 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
+        //this.loadClienteVarios()
     },
     data () {
         return {
@@ -418,7 +435,7 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'Producto' },
+                    { key: 'Producto', label: 'Articulo' },
                     { key: 'modelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca'},
@@ -561,7 +578,8 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: ''
+                CampoDireccion: '',
+                equipo:{}
             }
             this.isNota = false
             this.bloquearInput=false
@@ -760,6 +778,38 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
+        setEquipo (obj, dni = false) {
+            let params = {}
+            if (dni) {
+                params = {
+                    dni: dni
+                }
+            }else {
+                params = {
+                    idEquipo: obj.idEquipo
+                }
+            }
+
+            if (typeof obj === 'object') {
+                this.$refs.inputEquipo.setValue(obj.Nombre)
+                this.venta.equipo = obj
+            } else {
+                this.axios.get(this.API + 'equipo', {
+                    params: params
+                })
+                .then((response) => {
+                    if (response.data) {
+                        this.$refs.inputEquipo.setValue(response.data.Cliente)
+                        this.venta.equipo = response.data
+                    } else {
+                        this.$toasted.show('No se encontro al cliente')
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            }
+        },
         onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
@@ -830,7 +880,8 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getVendedor()
-            //this.$refs.inputCliente.setValue('')
+            this.$refs.inputCliente.setValue('')
+            this.$refs.inputEquipo.setValue('')
             // this.getNumeroVenta()
             // this.$refs.inputTipoVenta.setValue('TICKET')
             // this.$refs.inputAlmacen.setValue('VENTA')
@@ -840,19 +891,25 @@ export default {
         guardarProforma () {
 
             if(!this.productos.length) {
-                this.$toasted.show('No hay productos para crear la proforma')
+                this.$toasted.show('No hay repuestos para crear la orden')
                 this.inProgress = false            
                 return          
             }
 
             if(!this.venta.cliente.IdCliente) {
-                this.$toasted.show('Debe seleccionar un cliente')
+                this.$toasted.show('Debe seleccionar un mecanico')
+                this.inProgress = false
+                return
+            }
+
+            if(!this.venta.equipo.IdEquipo) {
+                this.$toasted.show('Debe seleccionar un equipo')
                 this.inProgress = false
                 return
             }
 
             if(!this.venta.vendedor.Usuario) {
-                this.$toasted.show('Debe seleccionar un vendedor')
+                this.$toasted.show('Debe seleccionar un usuario')
                 this.inProgress = false
                 return
             }
@@ -863,9 +920,9 @@ export default {
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                this.$toasted.success('Orden creada con exito')
+                this.$toasted.success('Orden generada con exito')
                 this.limpiarDespuesVenta()
-                this.loadClienteVarios()
+                //this.loadClienteVarios()
                 this.ultimaOrden = response.data.insertId
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -997,7 +1054,7 @@ export default {
                     this.getVendedor()
                     this.getOrden()
                     //this.getNumeroVenta()
-                    this.loadClienteVarios()
+                    //this.loadClienteVarios()
                     //this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     //this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     //this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
@@ -1033,7 +1090,8 @@ export default {
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
-        Proformas
+        Proformas,
+        EquipoForm
     }
 }
 </script>
