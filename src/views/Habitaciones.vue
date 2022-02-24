@@ -19,7 +19,7 @@
 					</thead>
 					<tbody>
 							<tr v-for="(inf, i) in arregloInfo" :key="i">
-								<td class="text-center">{{ i+1 }}</td>
+								<td class="text-center">{{ inf.Piso }}</td>
 								<td class="table-success text-center">{{ inf.Libres }}</td>
 								<td class="table-warning text-center">{{ inf.Reservadas }}</td>
 								<td class="table-danger text-center">{{ inf.Ocupadas }}</td>
@@ -27,6 +27,16 @@
 								<td class="table-secondary text-center">{{ inf.Sucias }}</td>
 							</tr>
 					</tbody>
+					<tfoot>
+							<tr>
+								<td class="text-center" style="background:#6B472F; color:white; font-weight:bold">T.</td>
+								<td class="table-dark text-center" style="background:#6B472F; color:white; font-weight:bold">{{ LibresTotal }}</td>
+								<td class="table-dark text-center" style="background:#6B472F; color:white; font-weight:bold">{{ ReservadasTotal }}</td>
+								<td class="table-dark text-center" style="background:#6B472F; color:white; font-weight:bold">{{ OcupadasTotal }}</td>
+								<td class="table-dark text-center" style="background:#6B472F; color:white; font-weight:bold">{{ PagadasTotal  }}</td>
+								<td class="table-dark text-center" style="background:#6B472F; color:white; font-weight:bold">{{  SuciasTotal }}</td>
+							</tr>
+					</tfoot>
 				</table>
 			  </b-col>
 			  <b-col md="6" class="text-center">
@@ -358,7 +368,12 @@ export default {
 			selectHuesped: {},
 			metodosPago:[{ value: null, text: '-- SELECCIONE --' }, { value: 1, text: 'EFECTIVO' }, { value: 2, text: 'DEPOSITO' }],
 			idMetodoPago: null,
-			arregloInfo:[]
+			arregloInfo:[],
+			LibresTotal: 0,
+			ReservadasTotal: 0,
+			OcupadasTotal: 0,
+			PagadasTotal: 0,
+			SuciasTotal: 0,
 		}
 	},
 	computed: {
@@ -649,6 +664,11 @@ export default {
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
 				this.arregloInfo = []
+				this.LibresTotal = 0
+				this.ReservadasTotal = 0
+				this.OcupadasTotal = 0
+				this.PagadasTotal = 0
+				this.SuciasTotal = 0
 				this.habitaciones = res.data
 				this.pisos.map(p=>{
 					let HabitacionesPiso = this.habitaciones.filter(hab => {
@@ -678,10 +698,18 @@ export default {
 								sucias++
 							}
 						})
-						this.arregloInfo.push({Libres:libres,Reservadas:reservadas,Pagadas:pagadas,Ocupadas:ocupadas,Sucias:sucias})
+						this.arregloInfo.push({Piso:p,Libres:libres,Reservadas:reservadas,Pagadas:pagadas,Ocupadas:ocupadas,Sucias:sucias})
 					}
 				})
-				console.log(this.arregloInfo)
+
+				this.arregloInfo.map((arr)=>{
+					this.LibresTotal += arr.Libres
+					this.ReservadasTotal += arr.Reservadas
+					this.PagadasTotal += arr.Pagadas
+					this.OcupadasTotal += arr.Ocupadas
+					this.SuciasTotal += arr.Sucias
+				})
+	
 			}).catch(err=>{
 				this.habitaciones = []
 				this.arregloInfo = []
@@ -716,20 +744,52 @@ export default {
 			})
 		},
 		liberarHab(hab) {
-			let r = confirm('¿Está seguro que desea liberar la habitación? Asegurese de haber realizado la venta')
+			if(hab.IdPreOrden){
+				this.axios.get(this.API + 'preorden/venta', { params: {
+					IdPreOrden: hab.IdPreOrden
+				} }).then(res => {
+					if(res.data){
+						if(res.data.IdDocVenta == null){
+							this.$toasted.show("La habitacion no tiene un venta asociada, no puede liberarlo")
+							this.getHabitaciones()
+						}else{
+							let r = confirm('¿Está seguro que desea liberar la habitación? Asegurese de haber realizado la venta')
 
-			if (r) {
-				this.axios.post(this.API + 'habitaciones/liberar', {
-					IdProducto: hab.IdProducto
-				}).then(res => {
-					this.getHabitaciones()
-					this.limpiarPopover()
-					this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
-					this.showPopover = false
-					this.$nextTick(() => {
-						this.showPopover = true
-					})
+							if (r) {
+								this.axios.post(this.API + 'habitaciones/liberar', {
+									IdProducto: hab.IdProducto,
+									EstaSucio: hab.EstaSucio
+								}).then(res => {
+									this.getHabitaciones()
+									this.limpiarPopover()
+									this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
+									this.showPopover = false
+									this.$nextTick(() => {
+										this.showPopover = true
+									})
+								})
+							}
+						}
+					}
+				}).catch(err=>{
+					this.$toasted.show("Ah ocurrido un error")
 				})
+			}else{
+				let r = confirm('¿Está seguro que desea liberar la habitación? Asegurese de haber realizado la venta')
+
+				if (r) {
+					this.axios.post(this.API + 'habitaciones/liberar', {
+						IdProducto: hab.IdProducto
+					}).then(res => {
+						this.getHabitaciones()
+						this.limpiarPopover()
+						this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
+						this.showPopover = false
+						this.$nextTick(() => {
+							this.showPopover = true
+						})
+					})
+				}
 			}
 		},
 		alquilarHab(hab,index) {
