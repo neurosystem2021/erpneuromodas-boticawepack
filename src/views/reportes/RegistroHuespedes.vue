@@ -27,6 +27,7 @@
               <label>Buscar:</label>
               <b-input-group>
                 <b-btn variant="success" @click="getRegistroHuespedes">Buscar</b-btn>
+                <b-btn style="margin-left:7px" variant="success" :href="'/api/index.php/reporte/habitacion/excel?fechaInicio=' + fechaRegistroInicio +'&fechaFin='+fechaRegistroFin" target="_blank">Exportar</b-btn>
               </b-input-group>
             </b-form-group>
           </b-col>

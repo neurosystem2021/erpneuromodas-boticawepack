@@ -77,20 +77,33 @@ export default {
       `
     },
     addProducto (data) {
-      let index = this.productos.findIndex(el => el.IdProducto == data.IdProducto)
+      this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.idPreorden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+            let index = this.productos.findIndex(el => el.IdProducto == data.IdProducto)
 
-      if (index >= 0) {
-        this.$toasted.show('El producto ya está agregado')
-        return
-      }
+            if (index >= 0) {
+              this.$toasted.show('El producto ya está agregado')
+              return
+            }
 
-      if (data.EsHabitacion) {
-        this.$toasted.show('No puede ingresar este producto')
-        return
-      }
+            if (data.EsHabitacion) {
+              this.$toasted.show('No puede ingresar este producto')
+              return
+            }
 
-      this.productos.push(data)
-      this.emitUpdate()
+            this.productos.push(data)
+            this.emitUpdate()
+          }else{
+						this.$toasted.show("No puede agregar productos, La habitacion ya fue pagada, puede renovarla si se trata del mismo cliente")
+            this.$refs.inputProducto.setValue('')
+          }
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
+			})
 
     },
     quitarProducto (prod) {

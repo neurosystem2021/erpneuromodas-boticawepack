@@ -1,10 +1,10 @@
 <template>
     <div>
-        <b-button @click="cargarPreOrden" variant="outline-success">Cargar Pre Orden</b-button>
+        <b-button @click="cargarPreOrden" variant="outline-success">Pagos Pendientes</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
-                title="Seleccionar Pre Orden"
+                title="Seleccionar Pendiente"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
@@ -96,7 +96,7 @@ import { mapActions } from 'vuex'
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio: true, cantidad: item.Cantidad, AlquilerInicio: item.FechaAlquiler?item.FechaAlquiler.substring(0,10):'' } ])
+                        }, { setPrecio: true, cantidad: item.Cantidad, AlquilerFin: item.FechaAlquilerFin?item.FechaAlquilerFin.substring(0,10):'', AlquilerInicio: item.FechaAlquiler?item.FechaAlquiler.substring(0,10):'' } ])
 
                         this.filter = ''
                         this.show = false
@@ -109,7 +109,7 @@ import { mapActions } from 'vuex'
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'preorden?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'preorden/anulados?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
 
                 return promise.then((result) => {
                 this.items = result.data
@@ -128,5 +128,7 @@ import { mapActions } from 'vuex'
     }
 </script>
 <style>
-
+#modalPreOrden .modal-dialog{
+    max-width: 65% !important;
+}
 </style>

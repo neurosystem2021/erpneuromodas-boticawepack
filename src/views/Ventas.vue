@@ -686,6 +686,7 @@ export default {
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
                 this.$refs.carrito.pagocon = 0
+                this.adelanto = 0
             })
             .catch((error) => {
                 console.log(error)

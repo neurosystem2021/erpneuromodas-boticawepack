@@ -3,19 +3,41 @@
       <b-container class="bv-example-row">
 		  <br>
 		  <div>
-			<div class="float-left">
-				<b-button-group>
-					<b-button variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button>
-				</b-button-group>
-				<b-button-group>
-					<b-button variant="success" @click="getHabitaciones">Actualizar Habitaciones</b-button>
-				</b-button-group>
-			</div>
-			<div class="float-right">
-				<b-button-group>
-					<b-button variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Sucias</b-button>
-				</b-button-group>
-			</div>
+		  <b-row>
+			  <b-col md="6" class="text-center">
+				<h4>Resumen</h4>
+				<table class="table table-striped b-table table-sm">
+					<thead>
+							<tr>
+								<td class="table-light text-center font-weight-bold">Piso</td>
+								<td class="table-success text-center font-weight-bold">Libres</td>
+								<td class="table-warning text-center font-weight-bold">Reservadas</td>
+								<td class="table-danger text-center font-weight-bold">Ocupadas</td>
+								<td class="table-info text-center font-weight-bold">Pagadas</td>
+								<td class="table-secondary text-center font-weight-bold">Sucias</td>
+							</tr>
+					</thead>
+					<tbody>
+							<tr v-for="(inf, i) in arregloInfo" :key="i">
+								<td class="text-center">{{ i+1 }}</td>
+								<td class="table-success text-center">{{ inf.Libres }}</td>
+								<td class="table-warning text-center">{{ inf.Reservadas }}</td>
+								<td class="table-danger text-center">{{ inf.Ocupadas }}</td>
+								<td class="table-info text-center">{{ inf.Pagadas }}</td>
+								<td class="table-secondary text-center">{{ inf.Sucias }}</td>
+							</tr>
+					</tbody>
+				</table>
+			  </b-col>
+			  <b-col md="6" class="text-center">
+				<h4>Acciones</h4>
+				<b-row>
+					<b-col md="12" class="mt-2"><b-button block variant="success" @click="getHabitaciones">Actualizar Habitaciones</b-button></b-col>
+					<b-col md="12" class="mt-2"><b-button block variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button></b-col>
+					<b-col md="12" class="mt-2"><b-button block variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Sucias</b-button></b-col>
+				</b-row>
+			  </b-col>
+		  </b-row>
 		  </div>
 		  <br>
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
@@ -52,10 +74,10 @@
 									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 								</ul>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-									<li><b style="color:white">{{ hab.Cliente }}</b><li>
-									<li><b>Inicio: {{ hab.FechaAlquiler }}</b></li>
-									<li><b>Fin: {{ hab.FechaAlquilerFin }}</b></li>
-									<li style="margin-top:5px"><b style="font-size:15px">Total Personas:</b>  <b-badge variant="light" style="font-size:15px">{{ hab.Hospedados}}</b-badge> <b-button :id="i + 'popover-agregar' + index" size="sm" variant="light" style="margin-top:-5px"><i class="fas fa-user-plus"></i></b-button></li>
+									<li><b style="color:white; font-size:15px">{{ hab.Cliente }}</b><li>
+									<li><b style="color:white">INICIO: {{ hab.FechaAlquiler }}</b></li>
+									<li><b style="color:white">FIN: {{ hab.FechaAlquilerFin }}</b></li>
+									<li style="margin-top:5px"><b style="font-size:15px; color:white">Total Personas:</b>  <b-badge variant="light" style="font-size:15px">{{ hab.Hospedados}}</b-badge> <b-button :id="i + 'popover-agregar' + index" size="sm" variant="light" style="margin-top:-5px"><i class="fas fa-user-plus"></i></b-button></li>
 									<b-popover  v-if="showPopover" :target="i + 'popover-agregar' + index" title="Agregar Huesped a la Habitación" triggers="click">
 										<label>Seleccione un cliente:</label>
 										<b-input-group>
@@ -185,6 +207,27 @@
 										<b-button variant="success" size="sm" @click="alquilarHab(hab,index)">Alquilar Habitación</b-button>	
 									</b-popover>
 									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
+								
+									<div style="margin-top:10px" v-if="hab.DocVenta && hab.EstadoHabitacion == 3">
+										<b-btn :id="i + 'popover-renovar' + index" variant="info" size="sm">Renovar</b-btn>	
+										<b-popover  v-if="showPopover" :target="i + 'popover-renovar' + index" title="Renovar Alquiler Habitación" triggers="click">
+											<label>Nueva Fecha Inicio:</label>
+											<b-input-group>
+												<b-form-input v-model="selectCliente.FechaAlquilerInicioRe"
+													type="datetime-local"
+													placeholder="Fecha Inicio"></b-form-input>
+											</b-input-group>
+											<br>
+											<label>Nueva Fecha Fin:</label>
+											<b-input-group>
+												<b-form-input v-model="selectCliente.FechaAlquilerFinRe"
+													type="datetime-local"
+													placeholder="Fecha Fin"></b-form-input>
+											</b-input-group>
+											<br>
+											<b-button variant="success" size="sm" @click="renovarHabitacion(hab,index)">Renovar Alquiler</b-button>	
+										</b-popover>
+									</div>
 								</div>
 						</b-card>
 					</b-col>
@@ -271,7 +314,7 @@
 
 				<div slot="modal-footer" >
 					<div style="left: 1rem;position: absolute;">
-						<b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
+						<b-btn @click="verificarPago" variant="info">
 						Pagar Ahora
 						</b-btn>
 					</div>
@@ -314,7 +357,8 @@ export default {
 			HuespedesSec:[],
 			selectHuesped: {},
 			metodosPago:[{ value: null, text: '-- SELECCIONE --' }, { value: 1, text: 'EFECTIVO' }, { value: 2, text: 'DEPOSITO' }],
-			idMetodoPago: null
+			idMetodoPago: null,
+			arregloInfo:[]
 		}
 	},
 	computed: {
@@ -328,6 +372,51 @@ export default {
 		}
 	},
 	methods: {
+		verificarPago(){
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+						window.open('/views/V_VentaForm.php?idPreOrden=' + this.selectProducto.IdPreOrden + '&idCliente=' + this.selectProducto.IdClienteReserva,'_blank');
+					}else{
+						this.$toasted.show("La habitacion ya fue pagada, puede renovarla si se trata del mismo cliente")
+						this.getHabitaciones()
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
+			})
+		},
+		renovarHabitacion(hab,index){
+			console.log(hab)
+			console.log(index)
+
+			if(this.selectCliente.FechaAlquilerInicioRe=='' || this.selectCliente.FechaAlquilerFinRe=='' || this.selectCliente.FechaAlquilerInicioRe == undefined || this.selectCliente.FechaAlquilerFinRe == undefined ){
+				this.$toasted.show("Por favor ingrese fechas inicio/fin correctas para renovar")
+				return
+			}
+
+			let r = confirm('¿Está seguro que desea renovar la habitación a '+hab.Cliente+'?')
+
+			if (r) {
+				this.axios.post(this.API + 'habitaciones/renovar', {
+					IdProducto: hab.IdProducto,
+					IdCliente: hab.IdClienteReserva,
+					cliente: this.selectCliente,
+					IdPreOrden: hab.IdPreOrden
+				}).then(res => {
+					this.getHabitaciones()
+					this.limpiarPopover()
+					this.limpiarDespues()
+					this.$toasted.info('El alquiler de la Habitación: ' + hab.Producto + ' ha sido renovada')
+					this.showPopover = false
+					this.$nextTick(() => {
+						this.showPopover = true
+					})
+				})
+			}
+		},
 		comenzarLimpieza(){
 			let r = confirm('¿Se iniciará la limpieza, está seguro?')
 			if (r) {
@@ -376,15 +465,28 @@ export default {
 			}
 		},
 		guardarNuevaFechaFin() {
-			this.axios.post(this.API + 'habitaciones/fecha', {
-				IdProducto: this.selectProducto.IdProducto,
-				fechaAlquilerFin: this.nuevaFechaFin
-			}).then(res => {
-				if (res.data.updated) {
-					this.selectProducto.FechaAlquilerFin = this.nuevaFechaFin.replace('T', ' ')
-					this.$toasted.success('Fecha fin actualizad')
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+						this.axios.post(this.API + 'habitaciones/fecha', {
+							IdProducto: this.selectProducto.IdProducto,
+							fechaAlquilerFin: this.nuevaFechaFin
+						}).then(res => {
+							if (res.data.updated) {
+								this.selectProducto.FechaAlquilerFin = this.nuevaFechaFin.replace('T', ' ')
+								this.$toasted.success('Fecha fin actualizad')
+							}
+						
+						})
+					}else{
+						this.$toasted.show("No puede actualizar la fecha fin, la habitacion ya fue pagada, puede renovarla si se trata del mismo cliente")
+						this.getHabitaciones()
+					}
 				}
-			
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
 			})
 		},
 		openImprimir(adelanto) {
@@ -399,37 +501,50 @@ export default {
 
 		},
 		insertarAdelanto() {
-			let usuario = sessionStorage.getItem('User')
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+						let usuario = sessionStorage.getItem('User')
 
-			if(this.selectProducto.Adelanto <= 0 || this.selectProducto.Adelanto == undefined) {
-				this.$toasted.show('Debe insertar un monto')
-				return;
-			}
+						if(this.selectProducto.Adelanto <= 0 || this.selectProducto.Adelanto == undefined) {
+							this.$toasted.show('Debe insertar un monto')
+							return;
+						}
 
-			if(this.idMetodoPago==null) {
-				this.$toasted.show('Seleccione un metodo de pago')
-				return;
-			}
+						if(this.idMetodoPago==null) {
+							this.$toasted.show('Seleccione un metodo de pago')
+							return;
+						}
 
-			let r = confirm("¿Desea Insertar un adelanto?")
+						let r = confirm("¿Desea Insertar un adelanto?")
 
-			if (r) {
-				this.axios.post(this.API + 'preorden/cajaybanco', {
-					producto: this.selectProducto,
-                    concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + (this.selectProducto.AdelantoDesc || ''),
-					IdPreOrden: this.selectProducto.IdPreOrden,
-					IdHabitacion: this.selectProducto.IdProducto,
-					Adelanto: this.selectProducto.Adelanto,
-					Usuario: usuario,
-					MetodoPago: this.idMetodoPago
-				}).then(res => {
-					// this.adelantos.push(res.data)
-					this.cargarAdelantos();
-					this.selectProducto.Adelanto = 0
-					this.selectProducto.AdelantoDesc = ''
-					this.idMetodoPago = null
-				})
-			}
+						if (r) {
+							this.axios.post(this.API + 'preorden/cajaybanco', {
+								producto: this.selectProducto,
+								concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + (this.selectProducto.AdelantoDesc || ''),
+								IdPreOrden: this.selectProducto.IdPreOrden,
+								IdHabitacion: this.selectProducto.IdProducto,
+								Adelanto: this.selectProducto.Adelanto,
+								Usuario: usuario,
+								MetodoPago: this.idMetodoPago
+							}).then(res => {
+								// this.adelantos.push(res.data)
+								this.cargarAdelantos();
+								this.selectProducto.Adelanto = 0
+								this.selectProducto.AdelantoDesc = ''
+								this.idMetodoPago = null
+							})
+						}
+					}else{
+						this.$toasted.show("No puede ingresar adelantos, la habitacion ya fue pagada, puede renovarla si se trata del mismo cliente")
+						this.getHabitaciones()
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
+			})
 		},
 		getHabitacionesPiso (piso) {
 			return this.habitaciones.filter(hab => {
@@ -437,18 +552,32 @@ export default {
 			})
 		},
 		guardarProductos() {
-			this.axios.post(this.API + 'preorden/detalle', {
-				IdPreOrden: this.selectProducto.IdPreOrden,
-				IdHabitacion: this.selectProducto.IdProducto,
-				productos: this.$refs.preOrdenProductos.productos
-			}).then(res => {
-				this.$toasted.success('Guardado correctamente')
-				this.show = false
-			})
-
-			
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+						this.axios.post(this.API + 'preorden/detalle', {
+							IdPreOrden: this.selectProducto.IdPreOrden,
+							IdHabitacion: this.selectProducto.IdProducto,
+							productos: this.$refs.preOrdenProductos.productos
+						}).then(res => {
+							this.$toasted.success('Guardado correctamente')
+							this.show = false
+						})
+						
+					}else{
+						this.$toasted.show("No se guardará cambios, La habitacion ya fue pagada, puede renovarla si se trata del mismo cliente")
+						this.getHabitaciones()
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
+			})	
 		},
 		openCarrito(hab) {
+			this.selectProducto = {}
+			this.idMetodoPago = null
 			this.HuespedesSec=[]
 			this.axios.get(this.API + 'habitacion/huespedes/det', {
 				params: {idPreOrden: hab.IdPreOrden}
@@ -519,10 +648,44 @@ export default {
 		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
+				this.arregloInfo = []
 				this.habitaciones = res.data
-				/* this.pisos.forEach(piso => {
-					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
-				}) */
+				this.pisos.map(p=>{
+					let HabitacionesPiso = this.habitaciones.filter(hab => {
+						return hab.Piso === p
+					})
+					if(HabitacionesPiso.length != 0){
+						let libres = 0
+						let ocupadas = 0
+						let reservadas = 0
+						let sucias = 0
+						let pagadas = 0
+
+						HabitacionesPiso.map(hab=>{
+							if(hab.EstadoHabitacion == 1){
+								libres++
+							}else if(hab.EstadoHabitacion==2){
+								reservadas++
+							}
+							
+							if(hab.EstadoHabitacion==3 && hab.DocVenta != null){
+								pagadas++
+							}else if(hab.EstadoHabitacion==3 && hab.DocVenta == null){
+								ocupadas++
+							}
+
+							if(hab.EstadoHabitacion==3 && hab.EstaSucio==1){
+								sucias++
+							}
+						})
+						this.arregloInfo.push({Libres:libres,Reservadas:reservadas,Pagadas:pagadas,Ocupadas:ocupadas,Sucias:sucias})
+					}
+				})
+				console.log(this.arregloInfo)
+			}).catch(err=>{
+				this.habitaciones = []
+				this.arregloInfo = []
+				this.$toasted.show("Ocurrio un error")
 			})
 		},
 		getVariant(hab) {
