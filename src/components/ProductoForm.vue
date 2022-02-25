@@ -169,49 +169,55 @@
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad Min:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidadMin"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad Max:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group v-if="false">
             <label>Precio X Mayor:</label>
-            <b-form-input 
+            <input 
               v-model="producto.PrecioPorMayor"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group v-if="false">
             <label>Stock X Mayor:</label>
-            <b-form-input 
+            <input 
               v-model="producto.StockPorMayor"
               type="number"
+              class="form-control"
               min="0"
-              ></b-form-input>
+              />
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
-              ></b-form-input>
+              step="0.0001"
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group>
             <b-form-checkbox
@@ -264,19 +270,23 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio sin impuesto a la Renta</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCostoSinImp"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCosto"
               type="number"
-              ></b-form-input>
+              step="0.0001"
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
         <!--<b-col md="6">
@@ -291,10 +301,12 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio Público:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
-              @input.native="actualizarPorcentajeUtilidad"
-              ></b-form-input>
+              @input="actualizarPorcentajeUtilidad"
+              class="form-control"
+              step="0.0001"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
@@ -326,18 +338,22 @@
 
             <b-form-group>
               <label>Cantidad:</label>
-              <b-form-input
+              <input
                 v-model="producto.precios[i-1].cantidad"
                 type="number"
-                ></b-form-input>
+                class="form-control"
+                step="0.001"
+                />
             </b-form-group>
             
             <b-form-group>
               <label>Precio:</label>
-              <b-form-input 
+              <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
-                ></b-form-input>
+                class="form-control"
+                step="0.0001"
+                />
             </b-form-group>
           </b-card>
         </b-col>
