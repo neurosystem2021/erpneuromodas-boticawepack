@@ -432,7 +432,7 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -957,13 +957,13 @@ export default {
                 return 
             }
 
-            this.productos.forEach(p => {
+            /*this.productos.forEach(p => {
                 if(!(p.PorcentajeUtilidadMin < p.PorcentajeUtilidad && p.PorcentajeUtilidad < p.PorcentajeUtilidadMax)){
                    // this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
                     this.inProgress = false
                     return
                 }
-            });
+            });*/
 
 /*             let cantidadstock = false;
             this.productos.map(pro=>{
