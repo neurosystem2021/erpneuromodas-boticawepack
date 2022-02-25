@@ -170,7 +170,6 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               step="0.001"
               class="form-control"
