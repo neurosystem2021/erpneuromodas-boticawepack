@@ -690,11 +690,17 @@ export default {
 							
 							if(hab.EstadoHabitacion==3 && hab.DocVenta != null){
 								pagadas++
-							}else if(hab.EstadoHabitacion==3 && hab.DocVenta == null){
+							}
+							
+							if(hab.EstadoHabitacion==3){
 								ocupadas++
 							}
 
 							if(hab.EstadoHabitacion==3 && hab.EstaSucio==1){
+								sucias++
+							}
+							
+							if(hab.EstadoHabitacion==1 && hab.EstaSucio==1){
 								sucias++
 							}
 						})
