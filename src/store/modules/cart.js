@@ -22,10 +22,21 @@ const mutations = {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
-        let cant = productos[index2].cantxPrecio += 1
-        productos.splice(index2, 1)
-        item.cantxPrecio = cant
-        productos.splice(index2,0,item)
+        if(item.SumaBarra == 1 && index2 != -1 ){
+          let cant = productos[index2].cantxPrecio = parseFloat(productos[index2].cantxPrecio) + 1
+          productos.splice(index2, 1)
+          item.cantxPrecio = cant
+          item.cantidad = cant
+          item.cantidadPres = 1
+          productos.splice(index2,0,item)
+        }else if(item.Actualizar == 1 && index2 != -1){
+          productos.splice(index2, 1)
+          item.cantxPrecio = 1
+          item.cantidad = 1
+          item.cantidadPres = 1
+          item.Actualizar = 0
+          productos.splice(index2,0,item)
+        }
       }
     }
   },
@@ -95,6 +106,7 @@ const actions = {
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
@@ -153,6 +165,7 @@ const actions = {
           }
 
           if(actualizar){
+            obj.Actualizar = 1
             obj.cantidad = 1
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
@@ -160,11 +173,16 @@ const actions = {
             if(!isVentas){
               obj.cantidad = 0
               obj.precio = obj.PrecioCosto
+              obj.nuevoPrecioContado = obj.PrecioContado || 0
+            }else{
+              obj.nuevoPrecioContado = 0
             }
+          }else{
+            obj.nuevoPrecioContado = 0
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
           
           let arr2 = [
             {"desc": obj.ProductoDesc},
