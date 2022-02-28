@@ -671,7 +671,9 @@ export default {
             let sinStock = 0
             let totalCero = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                console.log(pro.stock);
+                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined ) && this.venta.tipoVenta.CodSunat != '07') {
+                    this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
@@ -686,11 +688,11 @@ export default {
             }
             
             if (sinStock >= 1) {
-                if (this.venta.tipoVenta.IdTipoDoc !== 3) { // NOTA DE VENTA
-                    this.$toasted.error('No se puede vender un producto sin stock');
+                //if (this.venta.tipoVenta.IdTipoDoc !== 3) { // NOTA DE VENTA
+                    //this.$toasted.error('No se puede vender un producto sin stock');
                     this.inProgress = false
                     return;
-                }
+                //}
             }
 
 
