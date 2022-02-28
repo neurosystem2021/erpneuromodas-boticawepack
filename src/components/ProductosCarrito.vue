@@ -151,7 +151,6 @@
 
         <template slot="Lote" slot-scope="data" >
           <b-form-input
-            required="required"
             v-model="productos[data.index].Lote"
             type="text"
             v-bind:class="{ ventasAncho: isVentas }"
