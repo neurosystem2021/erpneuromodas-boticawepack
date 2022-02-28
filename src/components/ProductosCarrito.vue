@@ -226,6 +226,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' }, 
+          { key: 'ProductoMedicion', label: 'Med.' }, 
           // { key: 'Color', label: 'Color' }, 
           // { key: 'ProductoTalla', label: 'Talla' },
           // { key: 'Genero' },
@@ -370,7 +371,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / <b> Precio: S/. ${data.PrecioContado || ''}</b>
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoMedicion} / <b> Precio: S/. ${data.PrecioContado || ''}</b>
       `
     },
     setNuevoPrecioContado (index) {
