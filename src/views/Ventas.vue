@@ -395,7 +395,8 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-                    { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
+                    { key: 'Lote', class:'text-center stocksize' },
+                    //{ key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
                     //{ key: 'CodigoBarra', label: 'Código', class:'stocksize' }, 
                     { key: 'Producto', class:'text-center stocksize' }, 
                     { key: 'ProductoFormaFarmaceutica', label: 'Forma F.', class:'text-center stocksize' }, 
@@ -828,7 +829,7 @@ export default {
             var sinStock = 0;
             let igualLote = 0
             this.productos.map(pro => {
-                if ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) && this.venta.tipoVenta.CodSunat != '07') {
+                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) ) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
@@ -837,21 +838,21 @@ export default {
                     totalCero += 1
                 }
 
-                                let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
+                /*let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
                 if(lote > 1){
                     igualLote += 1 
-                }
+                }*/
             })
             if (sinStock) {
                 this.inProgress = false
                 return;
             }
 
-            if (igualLote >= 1) {
+            /*if (igualLote >= 1) {
                 this.$toasted.error('Debe seleccionar diferente lote por producto');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

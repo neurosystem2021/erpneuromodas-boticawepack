@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 , 'limit':15}"
+            :customParams="{'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 , 'limit':10}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -126,7 +126,7 @@
             placeholder="Lote"></b-form-input>
         </template>-->
 
-        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+        <!--<template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].hashMovimiento}}
@@ -147,13 +147,15 @@
                 <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
           <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
-        </template>
+        </template>-->
 
         <template slot="Lote" slot-scope="data" >
           <b-form-input
             required="required"
             v-model="productos[data.index].Lote"
             type="text"
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
             ></b-form-input>
         </template>
 
@@ -317,7 +319,7 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-          { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
+          //{ key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo', class:'stocksize' }, 
           { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
@@ -349,7 +351,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       } else {
         return this.API + 'productos'
       }
@@ -524,7 +526,7 @@ export default {
           this.add([idProducto, (obj) => {
           if (obj) {
               this.$emit('onAddProducto')
-              this.loadMovimientoLotes(obj.IdProducto)
+              //this.loadMovimientoLotes(obj.IdProducto)
               this.$toasted.show('Producto añadido correctamente')
             } else {
               this.$toasted.show('No se encontró ningun producto')
@@ -583,7 +585,7 @@ export default {
     },  
     setProducto (obj) {
  
-      //this.obtenerStockCaja(obj)
+    
 
       if(!this.isVentas){
         if(this.movTipo==undefined){
@@ -591,6 +593,10 @@ export default {
           return
         }
       }
+      
+    setTimeout(() => {
+      this.obtenerStockCaja(obj)   
+    }, 100);
 
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -603,7 +609,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.loadMovimientoLotes(obj.IdProducto)
+        //this.loadMovimientoLotes(obj.IdProducto)
       },{ setPrecioCosto: (this.isVentas ? false : true)}])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
@@ -804,6 +810,9 @@ td.stocksize{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.ventasAncho{
+  width: 180px ;
 }
 </style>
 
