@@ -43,7 +43,7 @@
 				<h4>Acciones</h4>
 				<b-row>
 					<b-col md="12" class="mt-2"><b-button block variant="success" @click="getHabitaciones">Actualizar Habitaciones</b-button></b-col>
-					<b-col md="12" class="mt-2"><b-button block variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button></b-col>
+					<b-col v-if="false" md="12" class="mt-2"><b-button block variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button></b-col>
 					<b-col md="12" class="mt-2"><b-button block variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Sucias</b-button></b-col>
 				</b-row>
 			  </b-col>
@@ -682,7 +682,7 @@ export default {
 						let pagadas = 0
 
 						HabitacionesPiso.map(hab=>{
-							if(hab.EstadoHabitacion == 1){
+							if(hab.EstadoHabitacion == 1 && hab.EstaSucio==0 ){
 								libres++
 							}else if(hab.EstadoHabitacion==2){
 								reservadas++
