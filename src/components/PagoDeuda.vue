@@ -94,12 +94,12 @@
                                     <td>{{(item.NotaCreApli).toFixed(2)}}</td>
                                     <td>{{ (item.Saldo).toFixed(2) }}</td>
                                     <td>
-                                        <b-form-input v-model="item.aplicar"
+                                        <input v-model="item.aplicar"
                                             type="number"
                                             step="0.01"
                                             min="0"
-
-                                            placeholder="0"></b-form-input>
+                                            class="form-control"
+                                            placeholder="0"/>
                                     </td>
                                 </tr>
                                 <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
@@ -243,7 +243,7 @@ import config from '@/store/config.js'
                 }
                 
                 for (let index = 0; index < this.documentos.length; index++) {
-                    if (this.documentos[index].aplicar>this.documentos[index].Saldo){
+                    if (Math.round(this.documentos[index].aplicar* 100) / 100 > Math.round(this.documentos[index].Saldo * 100) / 100){
                         this.isLoading = false;
                         this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo');
                         return;
