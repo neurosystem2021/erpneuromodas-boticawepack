@@ -30,21 +30,22 @@
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 90px"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
               if (tipo != 'mov') {
-                productos[data.index].precio = (val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor > 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado            
+                productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor > 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado            
               }
               }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="true"
             type="number"
@@ -52,7 +53,8 @@
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -98,27 +100,29 @@
         </template>
 
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             :disabled="(idPerfil != 1) ? true : false"
             type="number"
             min="0"
             step="0.01"
             style="width: 100px"
-            :value="0"></b-form-input>
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>

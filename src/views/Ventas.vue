@@ -213,16 +213,18 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="%" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         :disabled="(idPerfil != 1) ? true : false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
                                                         max="100"
                                                         :readonly="(idPerfil == 3) ? true : false"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -263,13 +265,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -854,6 +857,7 @@ export default {
 
                 this.$refs.carrito.ComisionTotal=0;
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$refs.carrito.pagocon = 0
             })
             .catch((error) => {
                 console.log(error)
