@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 , 'limit':10}"
+            :customParams="{'sortBy':isVentas?'IdProductoMarca':'IdProducto', 'sortDesc': 0 , 'limit':10}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
