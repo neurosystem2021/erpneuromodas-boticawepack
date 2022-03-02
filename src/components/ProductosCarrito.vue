@@ -138,7 +138,7 @@
       </b-table>
     </b-col>
     <b-col md="3">
-      <slot name="operaciones"></slot>
+      <slot v-if="!noSubtotal" name="operaciones"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
@@ -249,7 +249,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
