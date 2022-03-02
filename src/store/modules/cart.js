@@ -18,13 +18,13 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-     // if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
-    //  }else{
-      //  let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
-     //   productos.splice(index2, 1)
-      //  productos.splice(index2,0,item)
-     // }
+      }else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2,0,item)
+      }
     }
   },
   ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
@@ -166,10 +166,15 @@ const actions = {
             if(!isVentas){
               obj.cantidad = 0
               obj.precio = obj.PrecioCosto
+              obj.nuevoPrecioContado = obj.PrecioContado || 0
+            }else{
+              obj.nuevoPrecioContado = 0
             }
+          }else{
+            obj.nuevoPrecioContado = 0
           }
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          
           
           let arr2 = [
             {"desc": obj.ProductoDesc},

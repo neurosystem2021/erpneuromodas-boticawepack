@@ -376,13 +376,13 @@ return false
           faltaFechaVen = true
         }
 
-        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
-        if(pro > 1){
-        igualProducto = true
-        }
+        //let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
+        //if(pro > 1){
+        //igualProducto = true
+        //}
 
         if(this.movimiento.movimientoTipo.Tipo!=0){
-          if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stockMovimiento){
+          if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stock){
            faltaStock=true
           }
         }
@@ -396,11 +396,11 @@ return false
           return;
       }
 
-      if (igualProducto) {
+      /*if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
           this.inProgress = false            
           return;
-      }
+      }*/
 
       if (faltaFechaVen) {
         this.$toasted.show('Ingrese la fecha correcta de vencimiento del producto')

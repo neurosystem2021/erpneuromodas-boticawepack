@@ -60,7 +60,7 @@
               v-if="parseFloat(d.cantidad) > 0"
               align="center"
               class="mb-3 contentCard"
-              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+              v-bind:class="[d.nombre=='OFERTA' ? 'oferta' : '']"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
                   setProductoCant(d)
@@ -68,8 +68,8 @@
               }"
             >
               <b-row>
-                <b-col md="7" class="nomCart" >
-                  <h5>{{ d.nombre }} x{{ d.cantidad }}</h5>
+                <b-col md="7" class="nomCart" v-bind:class="[d.nombre=='OFERTA' ? 'ofertanom' : '']" >
+                  <h5>{{ d.nombre }} {{  d.nombre=='OFERTA'?'':' x'+d.cantidad }}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
                   <b>Precio: </b>S/ {{ d.precio }}
@@ -242,7 +242,7 @@
             placeholder="Descripción"></b-form-input>
         </template>--> 
 
-        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+         <!--<template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].hashMovimiento}}
@@ -264,7 +264,7 @@
           </div>
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
-        </template>
+        </template>-->
 
         <template slot="fechavencimiento" slot-scope="data" >
           <b-form-input
@@ -428,7 +428,7 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
+          //{ key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
           { key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
@@ -730,11 +730,10 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id,pxp,obj){
-     /* this.add([id,false,false,false,false,true,this.isVentas]);
+     this.add([id,false,false,false,false,true,this.isVentas]);
       setTimeout(() => {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
-      */
     },
     setProducto (obj) {
       this.indexProdSelect = null
@@ -778,7 +777,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-        this.loadMovimientoLotes(obj.IdProducto)
+        //this.loadMovimientoLotes(obj.IdProducto)
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       }else{
         this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
@@ -803,7 +802,7 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
-      obj.Descripcion = prod.nombre +" x"+prod.cantidad
+      obj.Descripcion = prod.nombre=='OFERTA'? 'OFERTA': prod.nombre +" x"+prod.cantidad
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
       obj.cantidadPres = this.cant
@@ -811,7 +810,7 @@ export default {
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-        this.loadMovimientoLotes(obj.IdProducto)
+        //this.loadMovimientoLotes(obj.IdProducto)
       }, false, false, this.cliente.EsVIP])
 
       }else{

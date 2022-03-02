@@ -307,11 +307,12 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" class="text-center">
+          <b-card border-variant="light" class="text-center"  v-bind:class="[i==4 ? 'ofertaPro' : '']">
             <b-form-group>
               <input
                 v-model="producto.precios[i-1].nombre"
                 type="text"
+                :readonly = "i==4"
                 style="text-transform:uppercase"
                 class="form-control"
                 />
@@ -744,7 +745,7 @@ export default {
           {nombre: 'PRESENT. 1', cantidad: 0, precio: 0},
           {nombre: 'PRESENT. 2', cantidad: 0, precio: 0},
           {nombre: 'PRESENT. 3', cantidad: 0, precio: 0},
-          {nombre: 'PRESENT. 4', cantidad: 0, precio: 0}
+          {nombre: 'OFERTA', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -910,5 +911,8 @@ export default {
 }
 </script>
 <style>
-
+.ofertaPro {
+  background: #dc3545;
+  font-weight: bold;
+}
 </style>
