@@ -378,6 +378,7 @@ export default {
             ],
             carrito: {
                 fields: [
+                    { key: 'itemNum', label: '#', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Modelo' },

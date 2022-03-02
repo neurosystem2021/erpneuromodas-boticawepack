@@ -14,22 +14,34 @@ const mutations = {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
         productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       } else {
         productos[index].cantidad += 1
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       }
     }
   },
   ACTUALIZAR_PRODUCTO ({ productos }, prod) {
     let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
     productos.splice(index, 1, prod)
+    productos.map((pro, index)=>{
+    pro.itemNum=(index+1)
+    })
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
+    productos.map((pro, index)=>{
+    pro.itemNum=(index+1)
+    })
   },
   LLENAR_PRODUCTOS_FILTRADOS (state, items) {
     state.productosFiltrados = items

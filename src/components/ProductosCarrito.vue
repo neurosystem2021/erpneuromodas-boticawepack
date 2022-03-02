@@ -107,7 +107,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput || tipo == 'mov' ? false : true"
             type="number"
             class="form-control"
             style="width: 80px"
@@ -274,6 +274,7 @@ export default {
   props: {
     isVentas: Boolean,
     setPrecio: Boolean,
+    tipo: String,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -289,6 +290,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'itemNum', label: '#', class:'text-center' },
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' },
@@ -434,6 +436,8 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
+
+      obj.itemNum = this.productos.length+1;
 
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
