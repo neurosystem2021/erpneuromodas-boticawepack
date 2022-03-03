@@ -206,11 +206,13 @@
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.0001"
+              />
           </b-form-group>
           <b-form-group>
             <b-form-checkbox
@@ -362,12 +364,12 @@
                 Costo Prov.:
               </td>
               <td v-for="i in numPresentacion" :key="i.id">
-                <b-form-input
+                <input
                 v-model="producto.precios[i-1].costoProv"
                 @input="calcularValores(i-1)"
                 step="0.01"
-                type="number">
-                </b-form-input>
+                type="number"
+                class="form-control"/>
               </td>
             </tr>
             <tr>
@@ -399,13 +401,13 @@
                 Utilidad Min.:
               </td>
               <td v-for="i in numPresentacion" :key="i.id">
-                <b-form-input 
+                <input 
                 v-model="producto.precios[i-1].utilMin"
                 :min="0.00"
                 :max="producto.precios[i-1].utilNeta"
                 step="0.01"
-                type="number">
-                </b-form-input>
+                class="form-control"
+                type="number"/>
               </td>
             </tr>
             <tr>
@@ -413,11 +415,12 @@
                 Valor Venta:
               </td>
               <td v-for="i in numPresentacion" :key="i.id">
-                <b-form-input 
+                <input 
                 v-model="producto.precios[i-1].valorVenta"
                 @input="calcularValores(i-1)"
-                type="number">
-                </b-form-input>
+                type="number"
+                step="0.001"
+                class="form-control"/>
               </td>
             </tr>
             <!--<tr>

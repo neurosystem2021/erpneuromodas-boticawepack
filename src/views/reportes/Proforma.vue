@@ -42,12 +42,12 @@
             <td class="no">{{ index+1 }}</td>
             <td></td>
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
-            <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
-            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
-            <td class="qty">{{ prod.Cantidad }}</td>
-            <td class="total">
+            <td class="desc"><h3>{{ prod.Producto }}</h3>({{ prod.DescripcionPresentacion!='' || prod.DescripcionPresentacion!=null? JSON.parse(prod.DescripcionPresentacion).nombre : '' }})<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td class="unit text-center" style="font-size:15px">S/. {{ prod.Precio | moneda }}</td>
+            <td class="qty text-center" style="font-size:15px">{{ (prod.Cantidad / prod.CantidadPresentacion) }}</td>
+            <td class="total" style="font-size:15px">
               <div v-if="prod.DisabledTotal === 0">
-                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+                S/. {{ (prod.Precio *  (prod.Cantidad / prod.CantidadPresentacion)) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
@@ -106,7 +106,7 @@ export default {
 		subTotal () {
 			let sumatoria = 0
 			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
+				sumatoria += (prod.Cantidad / prod.CantidadPresentacion * prod.Precio) - prod.Descuento
 			})
       return sumatoria
 		}
