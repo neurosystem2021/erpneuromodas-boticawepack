@@ -127,7 +127,7 @@
         <template slot="precio" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || tipo == 'mov' ? false : true"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
             style="width: 80px"
             min="0"
