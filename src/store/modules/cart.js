@@ -74,6 +74,7 @@ const actions = {
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
 
       commit('AGREGAR_PRODUCTO', producto)
