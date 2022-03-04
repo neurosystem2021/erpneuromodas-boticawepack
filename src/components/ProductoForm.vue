@@ -95,6 +95,23 @@
               </b-input-group-append>
             </b-input-group> -->
           </b-form-group>
+
+          <b-form-group>
+            <label>Equipo:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'equipos'"
+                ref="inputEquipo"
+                anchor="NombrePlaca"
+                label="writer"
+                :placeholder.sync="producto.equipo.Nombre"
+                :on-select="setEquipo"
+                :onFocus="focusAutocomplete.bind(null, 'inputEquipo')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
           
           <b-form-group>
             <label>Artículo:</label>
@@ -107,8 +124,19 @@
               ></b-form-input>
           </b-form-group>
 
-         
+          
           <b-form-group>
+            <label>Peso (Kilos):</label>
+            <input
+              v-model="producto.Peso"
+              type="number"
+              step="0.01"
+              class="form-control"
+              />
+          </b-form-group>
+
+         
+          <b-form-group v-if="false">
             <label>Presentación:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
@@ -416,6 +444,14 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
+        if(newVal.IdProductoEquipo != null && newVal.IdProductoEquipo !=undefined){
+          this.producto.equipo = {
+            IdEquipo: newVal.IdProductoEquipo,
+            ProductoEquipo: newVal.ProductoEquipo
+          }
+          this.$refs.inputEquipo.setValue(newVal.ProductoEquipo)
+        }
+
        
        // this.$refs.inputCategoria.setValue('')
         this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
@@ -428,7 +464,7 @@ export default {
         
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+        //this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
         //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
@@ -476,6 +512,7 @@ export default {
         this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
+        this.producto.Peso                  = newVal.Peso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
 
@@ -571,13 +608,18 @@ export default {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
     },*/
+    setEquipo (obj) {
+      this.producto.equipo = obj
+      this.$refs.inputEquipo.setValue(obj.Nombre)
+    },
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
-      this.$refs.inputPresentacion.setValue('')
+      this.$refs.inputEquipo.setValue('')
+      //this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
@@ -592,6 +634,7 @@ export default {
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
+        IdProductoEquipo: null,
         // IdProductoModelo: null,
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
@@ -612,6 +655,8 @@ export default {
         // Genero: '',
         categoria: {},
         marca: {},
+        equipo: {},
+        Peso: 0,
         // modelo: {},
         //talla: {},
         medicion: {

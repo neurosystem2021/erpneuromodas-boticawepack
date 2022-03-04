@@ -123,6 +123,20 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
+              <b-col md="3">
+                <b-form-group>
+                  <label>Equipo:</label>
+                  <autocomplete
+                    :url="API + 'equipos'"
+                    ref="inputEquipo"
+                    anchor="Nombre"
+                    label="writer"
+                    :on-select="val => generateFilter('equipo', val.Nombre)"
+                    :onInput="(val) => !val ? generateFilter('equipo', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
               <!--<b-col md="3">
                 <b-form-group>
                   <label>Codigo de Barra:</label>
@@ -440,7 +454,7 @@ export default {
   computed: {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
+      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoEquipo
     },
     hrefXls () {
       return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');

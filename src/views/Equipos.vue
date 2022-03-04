@@ -1,6 +1,12 @@
 <template>
   <div>
       <b-container class="bv-example-row">
+        <b-row class="text-center">
+          <b-col>
+            <h1>Equipos</h1>
+          </b-col>
+        </b-row>
+        <hr>
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -22,13 +28,13 @@
               </b-form-group>
             </b-col>
             <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Clientes</p>
+              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Equipos</p>
             </b-col>
             </b-row>
           </b-col>
 
           <b-table small
-            ref="tablaClientes"
+            ref="tablaEquipos"
             :filter="filter"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
@@ -47,11 +53,11 @@
                 </b-col>
             </b-row>
         </b-row>
-        <equipo-form ref="clienteForm" :clienteSelect="clienteSelect" @onAddCliente="actualizarTabla"></equipo-form>
+        <equipo-form ref="equipoForm" :equipoSelect="equipoSelect" @onAddEquipo="actualizarTabla"></equipo-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoCliente">Nuevo</b-button>
+              <b-button variant="success" size="lg" @click="nuevoEquipo">Nuevo Equipo</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -65,7 +71,7 @@ import EquipoForm from '@/components/EquipoForm.vue'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'clientes/count').then((response) => {
+    this.axios.get(this.API + 'equipos/count').then((response) => {
       this.totalRows = response.data.total
     })
   },
@@ -76,10 +82,11 @@ export default {
       filter: null,
       sortBy: 'IdEquipo',
       sortDesc: false,
-      clienteSelect: {},
+      equipoSelect: {},
       items: [],
       isBusy: false,
       fields: [
+            { key: 'IdEquipo',label:'Id', sortable: true },
             { key: 'Nombre', sortable: true },
             { key: 'Placa',  },
             { key: 'Tipo', },
@@ -93,17 +100,17 @@ export default {
   },
   methods: {
       rowClick (item, index) {
-        this.clienteSelect = item
-        this.$refs.clienteForm.show = true;
+        this.equipoSelect = item
+        this.$refs.equipoForm.show = true;
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
       actualizarTabla() {
-        this.$refs.tablaClientes.refresh()
+        this.$refs.tablaEquipos.refresh()
       },
-      nuevoCliente () {
-          this.clienteSelect = {}
-          this.$refs.clienteForm.show = true
+      nuevoEquipo () {
+          this.equipoSelect = {}
+          this.$refs.equipoForm.show = true
 
       },
       myProvider (ctx) {

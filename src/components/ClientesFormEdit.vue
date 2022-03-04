@@ -2,7 +2,7 @@
   <div>
     <!-- Modal Component -->
     <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Nuevo Cliente" size="lg" ref="clienteForm" v-model="show">
+    <b-modal id="modal1" title="Nuevo Mecanico" size="lg" ref="clienteForm" v-model="show">
       <b-row>
         <b-col md="12">
           <b-form-group>

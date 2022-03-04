@@ -51,7 +51,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
+              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo Articulo</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -81,11 +81,12 @@ export default {
       isBusy: false,
       fields: [
             { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
+            { key: 'Producto', label:'Articulo', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
+            { key: 'ProductoEquipo', label: 'Equipo', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

@@ -28,6 +28,7 @@
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Sin stock</b-badge>
+        <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por equipo</b-badge>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -233,18 +234,18 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <template slot="modelo" slot-scope="data">
+        <!--<template slot="modelo" slot-scope="data">
           <textarea 
             class="form-control"
             :disabled="!isOrden && isVentas"
             placeholder="Modelo"
             cols="15" rows="3"
-            v-model="productos[data.index].Modelo"></textarea>
+            v-model="productos[data.index].Modelo"></textarea>-->
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
             placeholder="Descripción"></b-form-input>-->
-        </template>
+        <!--</template>-->
 
         <template slot="Descripcion" slot-scope="data">
           <textarea 
@@ -409,7 +410,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          { key: 'modelo', label: 'Modelo'},
+          { key: 'ProductoModelo', label: 'Modelo'},
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           //{ key: 'ProductoPresentacion', label: 'Present.' }, 
@@ -767,12 +768,12 @@ export default {
         return `
         <div>
           <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
-          <b>${data.Producto}</b> / ${data.CodigoBarra} / ${data.ProductoCategoria} / ${data.ProductoMedicion}
+          <b>${data.Producto}</b> / ${data.CodigoBarra} / ${data.ProductoCategoria} / ${data.ProductoMedicion} / ${data.ProductoEquipo}
         </div>
         `
             }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / ${data.ProductoEquipo}
       `
     },
     // setCantidad (index, val) {

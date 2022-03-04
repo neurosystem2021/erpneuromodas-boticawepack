@@ -436,7 +436,7 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto', label: 'Articulo' },
-                    { key: 'modelo', label: 'Modelo'},
+                    { key: 'ProductoModelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca'},
                     //{ key: 'eventPres', label: '' },
