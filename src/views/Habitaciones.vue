@@ -1,6 +1,6 @@
 <template>
     <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row" id="conten">
 		  <br>
 		  <div>
 		  <b-row>
@@ -217,7 +217,10 @@
 										<b-button variant="success" size="sm" @click="alquilarHab(hab,index)">Alquilar Habitación</b-button>	
 									</b-popover>
 									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
-								
+
+									<div style="margin-top:10px" v-if="!hab.DocVenta && hab.EstadoHabitacion == 3">
+										<b-btn variant="dark" size="sm" @click="liberarForzado(hab)">Liberar Forzado</b-btn>
+									</div>
 									<div style="margin-top:10px" v-if="hab.DocVenta && hab.EstadoHabitacion == 3">
 										<b-btn :id="i + 'popover-renovar' + index" variant="info" size="sm">Renovar</b-btn>	
 										<b-popover  v-if="showPopover" :target="i + 'popover-renovar' + index" title="Renovar Alquiler Habitación" triggers="click">
@@ -343,6 +346,7 @@
 import config from '@/store/config.js'
 import PreOrdenFormDet from '@/components/PreOrdenFormDet'
 import ClientesForm from '@/components/ClientesForm'
+import Swal from 'sweetalert2'
 
 export default {
   	mounted () {
@@ -749,6 +753,51 @@ export default {
 				})		
 			})
 		},
+		liberarForzado(hab){
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: hab.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta != null){
+						this.$toasted.show("La habitacion ya tiene venta asociada, puede usar el boton verde para liberar")
+						this.getHabitaciones()
+					}else{
+						this.$swal({
+						target: document.getElementById('conten'),
+						title: 'Liberación forzada',
+						html: 'Se liberará la habitación: <strong> '+hab.Producto+'</strong> ¿Está seguro? <br>'+
+						' <div style="text-align:left"><strong>Solo use esta opción en los siguientes casos: </strong> <br> '+
+						' <ul><li>Confusión de habitación.</li><li>Cliente erroneo</li><li>Fechas inicio / fin ingresadas erroneas.</li><li>No debe tener adelantos, y si los tiene eliminarlos desde <strong>caja y banco</strong> antes de proceder.</li></ul> '+
+						' <strong>Adicional: </strong> <ul><li>Esta opción solo se mostrará cuando no haya ventas asociadas a la habitación.</li> '+
+						' <li>Por favor libere la habitacion (botón verde) solo <strong>cuando el cliente abandone el establecimiento y este deacuerdo con su comprobante.</strong></li> </ul> </div>',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#3085d6',
+						cancelButtonColor: '#d33',
+						confirmButtonText: 'Sí, liberar forzadamente',
+						cancelButtonText: 'No, atrás'
+						}).then((result) => {
+							if (result.isConfirmed) {
+								this.axios.post(this.API + 'habitaciones/liberar', {
+									IdProducto: hab.IdProducto,
+									EstaSucio: 0
+								}).then(res => {
+									this.getHabitaciones()
+									this.limpiarPopover()
+									this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
+									this.showPopover = false
+									this.$nextTick(() => {
+										this.showPopover = true
+									})
+								})
+							}
+						}) 
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ah ocurrido un error")
+			})
+		},
 		liberarHab(hab) {
 			if(hab.IdPreOrden){
 				this.axios.get(this.API + 'preorden/venta', { params: {
@@ -764,7 +813,7 @@ export default {
 							if (r) {
 								this.axios.post(this.API + 'habitaciones/liberar', {
 									IdProducto: hab.IdProducto,
-									EstaSucio: hab.EstaSucio
+									EstaSucio: 1
 								}).then(res => {
 									this.getHabitaciones()
 									this.limpiarPopover()
@@ -785,7 +834,8 @@ export default {
 
 				if (r) {
 					this.axios.post(this.API + 'habitaciones/liberar', {
-						IdProducto: hab.IdProducto
+						IdProducto: hab.IdProducto,
+						EstaSucio: 0
 					}).then(res => {
 						this.getHabitaciones()
 						this.limpiarPopover()
