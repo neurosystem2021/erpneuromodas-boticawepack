@@ -175,7 +175,12 @@ const actions = {
               obj.estadoPxP = true
               obj.cantidad = 0
               obj.precio = obj.PrecioCosto
+              obj.nuevoPrecioContado = obj.PrecioContado
+            }else{
+              obj.nuevoPrecioContado = 0
             }
+          }else{
+            obj.nuevoPrecioContado = 0
           }
 
           if(descuento){
@@ -196,7 +201,7 @@ const actions = {
             obj.Modelo = modelo
           }
 
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
           
           let arr2 = [
             {"desc": obj.ProductoDesc},

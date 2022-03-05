@@ -36,6 +36,8 @@
             <th class="desc">ARTICULO</th>
             <th class="unit">MODELO</th>
             <th class="qty">DESCRIPCION</th>
+            <th class="unit">EQUIPO</th>
+            <th class="unit">PESO</th>
             <th class="total">CANTIDAD</th>
           </tr>
         </thead>
@@ -44,9 +46,11 @@
             <td class="no">{{ index+1 }}</td>
             <td></td>
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
-            <td class="desc"><h3>{{ prod.Producto }}</h3><!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
-            <td class="unit" style="font-size:1rem !important">{{ prod.ModeloProducto }}</td>
-            <td class="qty" style="font-size:1rem !important">{{ prod.ProductoDescripcion  }}</td>
+            <td class="desc text-left"><h3>{{ prod.Producto }}</h3><!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td class="unit text-center" style="font-size:1rem !important">{{ prod.ModeloProducto }}</td>
+            <td class="qty text-center" style="font-size:1rem !important">{{ prod.ProductoDescripcion  }}</td>
+            <td class="unit text-center" style="font-size:1rem !important">{{ prod.ProductoEquipo  }}</td>
+            <td class="qty text-center" style="font-size:1rem !important">{{ prod.Peso  }}</td>
             <td class="total" style="font-size:1rem !important">
               <div>
                  {{ prod.Cantidad }}<br>

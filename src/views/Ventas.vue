@@ -436,6 +436,8 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo'},
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca'},
+                    { key: 'ProductoEquipo', label: 'Equipo'},
+                    { key: 'Peso', label: 'Peso'},
                     //{ key: 'eventPres', label: '' },
                     //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },

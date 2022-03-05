@@ -399,6 +399,7 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoEquipo', label: 'Equipo'},
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,

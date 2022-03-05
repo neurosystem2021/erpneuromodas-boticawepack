@@ -444,6 +444,8 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
+
+        this.$refs.inputEquipo.setValue('')
         if(newVal.IdProductoEquipo != null && newVal.IdProductoEquipo !=undefined){
           this.producto.equipo = {
             IdEquipo: newVal.IdProductoEquipo,

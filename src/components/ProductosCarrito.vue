@@ -413,6 +413,8 @@ export default {
           { key: 'ProductoModelo', label: 'Modelo'},
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoEquipo', label: 'Equipo'},
+          { key: 'Peso', label: 'Peso'},
           //{ key: 'ProductoPresentacion', label: 'Present.' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
