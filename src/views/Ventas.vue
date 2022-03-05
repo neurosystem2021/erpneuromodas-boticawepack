@@ -178,13 +178,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -225,13 +227,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -313,7 +316,8 @@ export default {
         this.loadClienteVarios()
     },
     mounted () {
-        this.getNumeroVenta()
+        this.getVendedor()
+        //this.getNumeroVenta()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -513,6 +517,27 @@ export default {
             this.puntosAplicados = 0
             this.aplicarDescuento(val)
         },
+        getVendedor () {
+            let usuario = sessionStorage.getItem('User')
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                this.getNumeroVenta()
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+                //this.loadAlmacen(response.data.IdAlmacen)
+                //this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+                //this.getTipoDoc(response.data.IdTipoDoc)
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+        },
         getNumeroVenta () {
             this.axios.get(this.API + 'ventas/numero', {
                 params: {
@@ -537,7 +562,9 @@ export default {
             this.tieneIgv = false
             this.initForm()
             this.limpiarCart()
-            this.getNumeroVenta()
+            this.getVendedor()
+            this.loadClienteVarios()
+            //this.getNumeroVenta()
             this.$refs.inputTipoVenta.setValue('TICKET')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -655,20 +682,22 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
