@@ -287,7 +287,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        //this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
@@ -326,7 +326,7 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
 
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        //this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
@@ -450,7 +450,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
