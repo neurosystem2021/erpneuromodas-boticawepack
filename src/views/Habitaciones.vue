@@ -44,7 +44,7 @@
 				<b-row>
 					<b-col md="12" class="mt-2"><b-button block variant="success" @click="getHabitaciones">Actualizar Habitaciones</b-button></b-col>
 					<b-col v-if="false" md="12" class="mt-2"><b-button block variant="primary" @click="comenzarLimpieza">Comenzar Limpieza</b-button></b-col>
-					<b-col md="12" class="mt-2"><b-button block variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Sucias</b-button></b-col>
+					<b-col md="12" class="mt-2"><b-button block variant="secondary" @click="imprimirHabitacionesSucias">Imprimir Habitaciones Ocupadas / Sucias</b-button></b-col>
 				</b-row>
 			  </b-col>
 		  </b-row>
@@ -217,9 +217,21 @@
 										<b-button variant="success" size="sm" @click="alquilarHab(hab,index)">Alquilar Habitación</b-button>	
 									</b-popover>
 									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
+									<div style="margin-top:10px">
+										<b-btn v-if="!hab.DocVenta && hab.EstadoHabitacion == 3" variant="dark" size="sm" @click="liberarForzado(hab)">Liberar Forzado</b-btn>
+										<span v-if="hab.EstadoHabitacion == 3">
+											<b-btn :id="i + 'popover-cambiar' + index" variant="light" size="sm" @click="selectDefectoCambio" >Cambiar Hab.</b-btn>
+											<b-popover :target="i + 'popover-cambiar' + index"  v-if="showPopover" title="Cambiar Habitación" triggers="click">
+												<label>Habitaciones Disponibles:</label>
+												<b-form-text text-variant="info" style="margin-top:-10px">(Las habitaciones sucias, ocupadas y reservadas no se mostrarán.)</b-form-text>
+												<b-input-group style="margin-top:-10px">
+													<b-form-select style="font-weight:bold; font-size:12px" v-model="selectHabCambio" :options="options" size="sm" class="mt-3"></b-form-select>
+												</b-input-group>
+												<br>
+												<b-button variant="success" size="sm" @click="cambiarHab(hab,index)">Cambiar Habitación</b-button>	
+											</b-popover>
+										</span>
 
-									<div style="margin-top:10px" v-if="!hab.DocVenta && hab.EstadoHabitacion == 3">
-										<b-btn variant="dark" size="sm" @click="liberarForzado(hab)">Liberar Forzado</b-btn>
 									</div>
 									<div style="margin-top:10px" v-if="hab.DocVenta && hab.EstadoHabitacion == 3">
 										<b-btn :id="i + 'popover-renovar' + index" variant="info" size="sm">Renovar</b-btn>	
@@ -378,6 +390,8 @@ export default {
 			OcupadasTotal: 0,
 			PagadasTotal: 0,
 			SuciasTotal: 0,
+			options: [{ value: null, text: 'SELECCIONE LA NUEVA HABITACIÓN' }],
+			selectHabCambio:null,
 		}
 	},
 	computed: {
@@ -452,7 +466,7 @@ export default {
 			var left = (screen.width/2)-(800/2);
 			var top = (screen.height/2)-(800/2);
 			var fechaHora = this.$moment().format("YYYY-MM-DD HH:mm:ss");
-			var schema = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h1>Mi Hotel<h1><h3>Reporte de Habitaciones Sucias</h3><label style='font-weight:bold'>Fecha y Hora: "+fechaHora+"</label><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
+			var schema = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h1>Hotel San Francisco<h1><h2>Reporte de Habitaciones<h2><h3 style='font-weight:bold'>Fecha y Hora: "+fechaHora+"</h3><h3>Habitaciones Sucias</h3><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
 			var habita = "";
 			for (let key in [1,2,3,4,5,6,7,8,9,10,11]) {
 				this.habitaciones.forEach(ha => {
@@ -462,8 +476,18 @@ export default {
 				}) 
 			}
 			var schemaFinal = "</tbody></table></div>";
+			var schemaOcupada = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h3>Habitaciones Ocupadas</h3><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
+			var habitaOcupada = "";
+			for (let key in [1,2,3,4,5,6,7,8,9,10,11]) {
+				this.habitaciones.forEach(ha => {
+				if(ha.EstadoHabitacion==3 && ha.Piso==key){
+					habitaOcupada += "<tr style='font-size:0.8rem'><td style='border-top: black 1px dashed;'>"+ha.Producto+"</td><td style='text-align: center; vertical-align: middle; border-top: black 1px dashed;'>"+ha.Piso+"</td><td style='text-align: center; vertical-align: middle; font-weight:bold; border-top: black 1px dashed;'>"+(ha.EstadoHabitacion==3?'SI':'NO')+"</td><td style='border: black 1px dashed;'></td></tr>"; 
+				}
+				}) 
+			}
+			var schemaFinalOcupada = "</tbody></table></div>";
 			var myWindow = window.open ('', 'IMPRIMIR COMANDA', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=800, height=800, top='+top+', left='+left);
-			myWindow.document.write(schema+habita+schemaFinal);
+			myWindow.document.write(schema+habita+schemaFinal+schemaOcupada+habitaOcupada+schemaFinalOcupada);
 			myWindow.document.close();
 			myWindow.focus();
 			myWindow.print();
@@ -665,6 +689,9 @@ export default {
 			}
 			this.selectHuesped = obj
 		},
+		selectDefectoCambio(){
+			this.selectHabCambio = null
+		},
 		getHabitaciones() {
 			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
 				this.arregloInfo = []
@@ -674,6 +701,13 @@ export default {
 				this.PagadasTotal = 0
 				this.SuciasTotal = 0
 				this.habitaciones = res.data
+				this.options = []
+				this.options.push({ value: null, text: 'SELECCIONE LA NUEVA HABITACIÓN' })
+				this.habitaciones.map(hab=>{
+					if(hab.EstadoHabitacion == 1 && hab.EstaSucio == 0){
+						this.options.push({ value: hab.IdProducto, text: hab.Producto })
+					}
+				})
 				this.pisos.map(p=>{
 					let HabitacionesPiso = this.habitaciones.filter(hab => {
 						return hab.Piso === p
@@ -792,6 +826,76 @@ export default {
 								})
 							}
 						}) 
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ah ocurrido un error")
+			})
+		},
+		cambiarHab(hab){
+			console.log(hab);
+			let habCambio = this.selectHabCambio;
+			if(habCambio == null){
+				this.$toasted.show('Seleccione la habitacion nueva a cambiar')
+				return
+			}
+
+			this.showPopover = false
+			this.$nextTick(() => {
+				this.showPopover = true
+			})
+
+			this.axios.get(this.API + 'preorden/estadohab', { params: {
+				IdProducto: hab.IdProducto,
+			} }).then(res => {
+				if(res.data){
+					if(res.data.EstadoHabitacion == 3 && res.data.IdPreOrden != null){
+						this.$swal({
+						target: document.getElementById('conten'),
+						title: '<div style="text-align:left; font-size:18.5px; text-align:center">El Cliente <strong>'+ hab.Cliente+'</strong> se cambiará a: <br> <strong>'+ this.options.find((opc)=>opc.value == habCambio).text+'</strong>, está seguro?</div>',
+						html: ' <div style="text-align:left"><strong>Información: </strong> <br> '+
+						' <ul><li>Sí tiene una venta, se cambiará el detalle <strong>(Nombre de la habitación)</strong>. El <strong>precio</strong> se mantendrá.</li><li>Sí el precio de la nueva habitación es mayor a la que estaba y tiene una venta se tiene que <strong>anular la venta</strong>. Posteriormente agregar la diferencia y realizar una nueva venta.</li><li>Toda la información pasará a la nueva habitación.</li></ul></div>',
+						icon: 'question',
+						showCancelButton: true,
+						confirmButtonColor: '#28a745',
+						cancelButtonColor: '#d33',
+						confirmButtonText: 'Sí, cambiar habitación',
+						cancelButtonText: 'No, atrás'
+						}).then((result) => {
+							if (result.isConfirmed) {
+								this.axios.post(this.API + 'habitaciones/cambiar', {
+									IdCliente:hab.IdCliente,
+									IdPreOrden:hab.IdPreOrden,
+									IdProductoAnterior:hab.IdProducto,
+									IdProductoNuevo:habCambio,
+									FechaAlquiler:hab.FechaAlquiler,
+									FechaAlquilerFin:hab.FechaAlquilerFin
+								}).then(res => {
+									if(res.data.updated==true){
+										this.getHabitaciones()
+										this.limpiarPopover()
+										this.$toasted.info('El cliente '+hab.Cliente+' se cambió a: ' + res.data.Producto);
+										this.showPopover = false
+										this.$nextTick(() => {
+											this.showPopover = true
+										})
+									}else{
+										if(res.data.msg){
+											this.$toasted.show(res.data.msg)
+											this.getHabitaciones()
+											this.limpiarPopover()
+											this.showPopover = false
+											this.$nextTick(() => {
+												this.showPopover = true
+											})
+										}
+									}
+								})
+							}
+						})
+					}else{
+						this.$toasted.info("La habitacion ya no está disponible se actualizará la lista")
+						this.getHabitaciones()
 					}
 				}
 			}).catch(err=>{
