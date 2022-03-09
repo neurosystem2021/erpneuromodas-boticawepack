@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -179,9 +179,11 @@
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
-                      <b-form-input v-model.number="movimiento.TipoCambio"
+                      <input v-model.number="movimiento.TipoCambio"
                         type="number"
-                        placeholder="Tipo de cambio"></b-form-input>
+                        class="form-control"
+                        step="0.0001"
+                        placeholder="Tipo de cambio"/>
                     </b-form-group>
                   </b-col>
                 </b-row>
