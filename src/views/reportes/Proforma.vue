@@ -68,7 +68,7 @@
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Proforma valida por 3 días posteriores, precios sujetos a cambios sin previo aviso.</div>
       </div>
     </main>
     <!--<footer>
