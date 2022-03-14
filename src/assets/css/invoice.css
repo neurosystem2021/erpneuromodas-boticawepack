@@ -122,7 +122,7 @@
   }
   
   table td h3{
-    color: #57B223;
+    color: #000000;
     font-size: 1em;
     font-weight: normal;
     margin: 0 0 0.2em 0;
@@ -131,7 +131,7 @@
   table .no {
     color: #FFFFFF;
     font-size: 1em;
-    background: #57B223;
+    background: #4a69bd;
   }
   
   table .desc {
@@ -147,7 +147,7 @@
   }
   
   table .total {
-    background: #57B223;
+    background: #4a69bd;
     color: #FFFFFF;
     text-align: right;
   }
@@ -179,9 +179,9 @@
   }
   
   table tfoot tr:last-child td {
-    color: #57B223;
+    color: #4a69bd;
     font-size: 1.4em;
-    border-top: 1px solid #57B223; 
+    border-top: 1px solid #4a69bd; 
   
   }
   
