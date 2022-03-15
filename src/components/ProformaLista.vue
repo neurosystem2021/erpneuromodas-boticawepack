@@ -96,7 +96,7 @@ import { mapActions } from 'vuex'
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
                         }, { setPrecio: true, cantidad: item.Cantidad } ])
-
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen })
                         this.filter = ''
                         this.show = false
                     })
