@@ -83,8 +83,8 @@ export default {
             { key: 'DniRuc', sortable: true },
             { key: 'Direccion', sortable: true },
             { key: 'NombreComercial', sortable: true },
-            // { key: 'Puntos', sortable: true },
-            // { key: 'EsVIP', sortable: true },
+            { key: 'esComisionista', sortable: true },
+            { key: 'EsVIP', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
@@ -113,6 +113,11 @@ export default {
         let promise = this.axios.get( url )
         return promise.then((result) => {
           this.items = result.data
+          this.items.map(r=>{
+            if(r.EsVIP==1 || r.esComisionista==1){
+                    r._rowVariant='info'
+            }
+          })
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
