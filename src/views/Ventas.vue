@@ -101,6 +101,7 @@
                                             ref="inputCliente"
                                             :url="API + 'clientes'"
                                             anchor="ClienteDniRuc"
+                                            :onShouldRenderChild="renderChildCliente"
                                             label="writer"
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
@@ -432,6 +433,15 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        renderChildCliente(data) {
+         let style = false;
+         if(data.EsVIP==1 || data.esComisionista==1){
+            style = true
+         }
+         return `
+         <div ${style?'style="background:#00ff83;"':''} ><b>${data.DniRuc} - ${data.Cliente}</b></div>
+        `
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
             .then(res => {
