@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{'sortBy':isVentas?'IdProductoMarca':'IdProducto', 'sortDesc': 0 , 'limit':10}"
+            :customParams="{'sortBy':isVentas?'IdProductoMarca':'IdProducto', 'sortDesc': 0 , 'limit':20}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -29,6 +29,7 @@
         </b-input-group>
           <b-badge variant="danger">Productos Vencidos</b-badge>
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
+          <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
       </b-form-group>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
@@ -686,6 +687,7 @@ export default {
                 <th>Medición.</th>
                 <th style="width: 200px">Producto.</th>
                 <th style="width: 200px">Compuestos</th>
+                <th style="width: 100px">Bloque</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
                 <th>V.E.</th>
               </tr>
@@ -698,6 +700,7 @@ export default {
                 <td>${data.ProductoMedicion}</td>
                 <td><b>${data.Producto}</b></td>
                 <td style="font-size:10px">${data.CompuestosProducto}</td>
+                <td style="font-size:10px"><b>${data.Bloque}</b></td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
                 <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
