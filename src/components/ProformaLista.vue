@@ -24,9 +24,10 @@
                         :current-page="currentPage">
                         
                         <template slot="ver" slot-scope="data">
-                        <div style="width: 150px">
-                            <b-button size="sm" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <div style="width: 180px">
                             <b-button size="sm" variant="success" @click="() => selectProforma(data.item)">Selec.</b-button>
+                            <b-button size="sm" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                            <b-button size="sm"  :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Tick.</b-button>
                         </div>
                       </template>
 
@@ -105,7 +106,7 @@ import { mapActions } from 'vuex'
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                         }, { setPrecio:true, setPreOr: item.Precio, cantidad: item.Cantidad , ancho: item.Ancho , largo: item.Largo } ])
+                         }, { setPrecio:true, setPreOr: item.Precio, cantidad: item.Cantidad , ancho: item.Ancho , largo: item.Largo, setDescripcion: item.Descripcion } ])
 
                         this.filter = ''
                         this.show = false

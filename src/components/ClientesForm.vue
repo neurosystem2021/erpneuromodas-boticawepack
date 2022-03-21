@@ -112,6 +112,12 @@ export default {
 */
       if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
+      }else {
+        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
+        this.cliente.Direccion = ''
+        this.cliente.Cliente = ''
+        this.cliente.Telefono = ''
+        this.cliente.Email = ''
       }
     },
     consultarDNIRUC () {

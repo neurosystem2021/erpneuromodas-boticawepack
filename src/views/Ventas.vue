@@ -118,7 +118,7 @@
                                             placeholder="Codigo de Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
-                                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                            <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                             
                                         </b-input-group-append>
                                     </b-input-group>
@@ -377,6 +377,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
+                    { key: 'Descripcion', label: 'Descripcion' },
                     { key: 'ProductoCategoria', label: 'Categoría' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Ancho', label: 'Corte Ancho.', class:'text-center' }, 
@@ -702,7 +703,7 @@ export default {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
@@ -732,7 +733,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.$refs.inputCliente.setValue('')
-
+                this.inProgress = false
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -809,7 +810,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
