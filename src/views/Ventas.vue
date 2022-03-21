@@ -374,7 +374,7 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
                     { key: 'Descripcion', label: 'Descripcion' },
@@ -555,7 +555,7 @@ export default {
                     })     
                     this.venta.NotaIdMotivo=null
                     this.bloquearInput=true
-                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+                    //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
                 })
         },
         setMotivo(ev){
@@ -574,7 +574,7 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -651,9 +651,9 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
-            this.obtenerStok({
-                IdAlmacen: this.venta.almacen.IdAlmacen
-            })
+            //this.obtenerStok({
+            //    IdAlmacen: this.venta.almacen.IdAlmacen
+            //})
         },
         actualizarDescuento () {
             if (this.puntosAplicados > 0) {
