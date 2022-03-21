@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen}"
+            :customParams="{idAlmacen: idAlmacen, esVenta: 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -463,6 +463,9 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      if(obj.IdProducto==null){
+        return
+      }
       this.precioCont = obj.PrecioContado
       this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
@@ -565,24 +568,14 @@ export default {
         </style>
         <div class="${style}">
           <table id="table-render" style="width: 700px; text-align: center  ">
-            <thead>
-              <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
-                <th>Código.</th>
-                <th>Producto.</th>
-                <th>Marca.</th>
-                <th>Medición.</th>
-                <th class="table-success" style="width: 65px">Precio.</th>
-              </tr>
-            </thead>
             <tbody>
-              <tr>
-                <td class="${classStock}"><b>${data.stock}</b></td>
-                <td>${data.CodigoBarra}</td>
-                <td>${data.Producto}</td>
-                <td>${data.ProductoMarca}</td>
-                <td>${data.ProductoMedicion}</td>
-                <td class="table-success"><b>${data.PrecioContado}</b></td>
+              <tr ${data.IdProducto == null?'class="table-primary" style="font-weight:bold; font-size:12px;"':''}>
+                <td class="${classStock}" style="width: 80px"><b>${data.stock}</b></td>
+                <td style="width: 85px">${data.CodigoBarra}</td>
+                <td style="width: 300px; ${data.IdProducto == null?'':' text-align:left'}">${data.Producto}</td>
+                <td style="width: 150px">${data.ProductoMarca}</td>
+                <td style="width: 120px">${data.ProductoMedicion}</td>
+                <td class="table-success" style="width: 80px"><b>${data.PrecioContado}</b></td>
               </tr>
             </tbody>
           </table>   
