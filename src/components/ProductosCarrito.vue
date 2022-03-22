@@ -28,23 +28,25 @@
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
-            placeholder="Cantidad"></b-form-input>
+            @input="(val) => $emit('onInputCantidad', val.target.value)"
+            placeholder="Cantidad"
+            class="form-control" />
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            class="form-control"
+            @input="setNuevoPrecioContado(data.index)" />
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -74,25 +76,27 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            class="form-control"
+            placeholder="Precio Venta"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            class="form-control"
+            value="0" />
             <b-form-text>
             </b-form-text>
         </template>
@@ -168,11 +172,12 @@
         <b>{{ productoSelect.Producto }}</b>
         <hr />
         <label>Metros Cuadrados (M²):</label>
-        <b-form-input
+        <input
             type="number"
             ref="inputM2"
             placeholder="M²"
-            @input="val => calcularm2(val, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo, productoSelect.ProductoDetCantidad )"></b-form-input><br>
+            class="form-control"
+            @input="val => calcularm2(val.target.value, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo, productoSelect.ProductoDetCantidad )"/><br>
         <hr />
         <p v-html="mensajeM2"></p>
       </div>
@@ -363,7 +368,7 @@ export default {
       this.productoSelect = obj
       this.productoSelect.cantidad = 1
       this.mensajeM2 = ''
-      this.$refs.inputM2.$refs.input.value = ''
+      this.$refs.inputM2.value = ''
     },
     calcularm2 (m2, rendimiento = 0, ancho = 0, largo = 0, productoDetCantidad = 0) {
       rendimiento = (rendimiento == '0' ) ? false : rendimiento;

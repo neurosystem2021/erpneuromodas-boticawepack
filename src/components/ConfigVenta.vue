@@ -15,12 +15,13 @@
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="porCada"
+                        <input v-model="porCada"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.1"
-                            placeholder=""></b-form-input>
+                            placeholder=""
+                            class="form-control" />
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -41,12 +42,13 @@
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="valorPunto"
+                        <input v-model="valorPunto"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.1"
-                            placeholder=""></b-form-input>
+                            class="form-control"
+                            placeholder=""/>
                         </b-input-group>
                     </b-col>
                 </b-row>
