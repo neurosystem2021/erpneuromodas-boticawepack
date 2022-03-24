@@ -116,7 +116,6 @@
         <template slot="descuento" slot-scope="data">
           <input
             v-model="productos[data.index].descuento"
-            :disabled="(idPerfil != 1) ? true : false"
             type="number"
             min="0"
             step="0.01"
