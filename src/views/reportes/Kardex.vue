@@ -58,10 +58,9 @@
               </b-form-group>
             </b-col>
             <b-col md="3" class="my-1">
-                <br>
-              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Generar</b-button>
-              <!--<b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>-->
-              <!--<hr>-->
+              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
+              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
+              <hr>
               <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
             </b-col>
           </b-row>
@@ -113,8 +112,7 @@
 import config from '@/store/config.js'
 export default {
   mounted () {
-    // this.loadFirstAlmacen()
-    this.getUsuario();
+    this.loadFirstAlmacen()
   },
   data () {
     return {
@@ -152,7 +150,7 @@ export default {
           } else {
             // la salida Precio es el ultimo costo unitario de saldo
             item.SalidaPrecio = saldoCostoUnitario
-
+            
             saldoCostoTotal = saldo * item.SalidaPrecio
             saldoCostoUnitario = item.SalidaPrecio
           }
@@ -194,45 +192,26 @@ export default {
     }
   },
   methods: {
-    /*loadFirstAlmacen () {
+    loadFirstAlmacen () {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
           this.$refs.inputAlmacen.setValue(res.data.Almacen)
           this.almacen = res.data
         })
-    },*/
-    loadAlmacen(id) {
-        this.axios.get(this.API + 'almacenes/id/' + id)
-        .then(res => {
-            this.setAlmacen(res.data)
-        })
-    },
-    getUsuario () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            this.loadAlmacen(response.data.IdAlmacen)
-            this.$refs.inputAlmacen.$refs.input.disabled = true
-        })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
     },
     setAlmacen (obj) {
       this.almacen = obj
-      this.$refs.inputAlmacen.setValue(obj.Almacen)
     },
     setProducto (obj) {
       this.producto = obj
     },
     focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
+      this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoMedicion}
       `
     },
     verKardex () {
