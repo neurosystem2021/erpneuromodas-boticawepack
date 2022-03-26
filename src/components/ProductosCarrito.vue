@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25' }"
+            :customParams="{ limit: '20', 'sortBy':isVentas?'stock':'IdProducto','sortDesc': 1  }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -85,28 +85,29 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val, productos[data.index])"
-            placeholder="Cantidad">
-          </b-form-input>
+            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            placeholder="Cantidad"
+            class="form-control"/>
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="isVentas? true : false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
+            step="0.001"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
              /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -119,19 +120,20 @@
               }
               productos[data.index].precio = productos[data.index].PrecioContado */
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)">
-          </b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -170,13 +172,14 @@
         </template>
 
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
@@ -197,14 +200,15 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.01"
-            @input="(val)=>ActualizarDesc(data.index,val)" 
-            :value="0"></b-form-input>
+            @input="(val)=>ActualizarDesc(data.index,val.target.value)"
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -688,7 +692,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad)
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -709,15 +713,61 @@ export default {
       }
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+      if (this.idAlmacen) {
+        let style = 'ss'
+
+        let styleStock = ''
+        if(data.stock>0){
+          styleStock = 'table-success'
+        }else{
+          styleStock = 'table-danger'
+        }
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+        </style>
+        <div class="${style}">
+          <table id="table-render" style="width: 830px; text-align: center  ">
+            <thead>
+              <tr style>
+                <th class="table-info" style="width: 60px">Stock</th>
+                <th style="width: 200px">Producto.</th>
+                <th style="width: 130px">Categoria</th>
+                <th style="width: 130px">Marca</th>
+                <th style="width: 100px">Medición.</th>
+                <th class="table-success" style="width: 65px">Precio.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
+                <td><b>${data.Producto}</b></td>
+                <td>${data.ProductoCategoria}</td>
+                <td>${data.ProductoMarca}</td>
+                <td>${data.ProductoMedicion}</td>
+                <td class="table-success"><b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `
       }
+
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+      <div>
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
         / <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b>
-      </div>  
+      </div> 
       `
     },
     // setCantidad (index, val) {
