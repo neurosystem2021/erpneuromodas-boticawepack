@@ -107,7 +107,6 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput || tipo == 'mov' ? false : true"
             type="number"
             class="form-control"
             style="width: 80px"
