@@ -127,7 +127,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 85px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -172,7 +172,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:100px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
