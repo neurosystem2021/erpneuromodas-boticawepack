@@ -12,7 +12,7 @@
               <b-form-group class="ml-2">
                 <label>Buscar por nombre:</label>
                 <b-input-group>
-                  <b-form-input v-model="filter" placeholder="Ingrese nombre del producto" @input="currentPage = 1" />
+                  <b-form-input v-model="filter" placeholder="Ingrese nombre" @input="currentPage = 1" />
                   <b-input-group-append>
                   <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
                 </b-input-group-append>
@@ -103,10 +103,10 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'StockMinimo', label: 'Stock Minimo', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
-            { key: 'PrecioContado', label: 'Proveedor Ult.'},
-            { key: 'PrecioCosto', label: 'Telf. Proveedor Ult.' },
-            { key: 'PrecioContado', label: 'Proveedor Sec.'},
-            { key: 'PrecioCosto', label: 'Telf. Proveedor Sec.' },
+            { key: 'ProveedorUlt', label: 'Proveedor Ult.' , sortable: true},
+            { key: 'ProveedorUltTelf', label: 'Telf. Proveedor Ult.' },
+            { key: 'ProveedorSec', label: 'Proveedor Sec.' , sortable: true},
+            { key: 'ProveedorSecTelf', label: 'Telf. Proveedor Sec.' },
       ],
       totalRows: 50,
       perPage: 10,

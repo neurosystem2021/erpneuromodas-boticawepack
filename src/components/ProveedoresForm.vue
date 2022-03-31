@@ -27,6 +27,12 @@
               v-model="proveedor.Direccion"
               type="text"></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Teléfono:</label>
+            <b-form-input 
+              v-model="proveedor.Telefono"
+              type="text"></b-form-input>
+          </b-form-group>
         </b-col>
       </b-row>
       <div slot="modal-footer" >
@@ -51,6 +57,7 @@ export default {
         Proveedor: '',
         Ruc: '',
         Direccion: '',
+        Telefono: '',
         Observacion: '',
         FechaReg: null
       }
@@ -62,6 +69,7 @@ export default {
       this.proveedor.Ruc = this.$parent.$parent.newRuc
       this.proveedor.Direccion = ''
       this.proveedor.Proveedor = ''
+      this.proveedor.Telefono = ''
     },
     consultarRUC() {
       this.axios.get(this.API + 'consultarRUC', {
@@ -83,7 +91,7 @@ export default {
     guardarProveedor() {
       this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
-        this.$toasted.show('Proveedor guardado correctamente')
+        this.$toasted.success('Proveedor guardado correctamente')
         this.$refs.proveedorForm.hide()
       })
       .catch((error) => {
