@@ -265,6 +265,15 @@
                   </div>
                 </template>
 
+                <template slot="ImagenProducto" slot-scope="data">
+                  <b-button style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                  <b-popover placement="top" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
+                    <div style="text-align:center">
+                      <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+                    </div>
+                  </b-popover>
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -349,6 +358,7 @@ export default {
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
@@ -410,6 +420,9 @@ export default {
     }
   },
   methods: {
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     clickVerValorizado() {
       let pass = window.prompt('Escriba su contraseña')
       if (pass) {
@@ -582,4 +595,9 @@ export default {
         max-width: 1200px;
     }
 }
+</style>
+<style>
+  .popover{
+    max-width: 420px !important;
+  }
 </style>

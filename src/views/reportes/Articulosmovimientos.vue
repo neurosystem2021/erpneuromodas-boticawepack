@@ -1,7 +1,7 @@
 <template>
     <div>
       <br>
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
             <b-col md="2" class="my-1">
               <b-form-group>
@@ -50,20 +50,28 @@
             <table class="table b-table table-striped table-hover table-sm">
               <thead>
                 <tr>
-                  <th>Código</th>
-                  <th>Descripcion</th>
-                  <th>U. Medida</th>
-                  <th>Total Ventas</th>
-                  <th>Total Compras</th>
+                  <th style="width: 5% !important">Código</th>
+                  <th>Producto</th>
+                  <th>Categoria</th>
+                  <th class="table-success">Total Ventas</th>
+                  <th class="table-success">Cantidad Ventas</th>
+                  <th class="table-success">Monto Ventas</th>
+                  <th class="table-info">Total Compras</th>
+                  <th class="table-info">Cantidad Compras</th>
+                  <th class="table-info">Monto Compras</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(prod, i) in productos" :key="i">
-                  <td>{{ prod.CodigoBarra }}</td>
-                  <td>{{ prod.Producto | quitarcodigo }} - {{prod.ProductoCategoria + ' - ' + prod.ProductoMarca }}</td>
-                  <td>{{ prod.ProductoMedicion }}</td>
-                  <td>{{ prod.TotalVentas }}</td>
-                  <td>{{ prod.TotalCompras }}</td>
+                  <td style="width: 5% !important">{{ prod.CodigoBarra }}</td>
+                  <td>{{ prod.Producto }}</td>
+                  <td>{{ prod.ProductoCategoria }}</td>
+                  <td class="table-success">{{ prod.TotalVentas ? prod.TotalVentas.toFixed(2):0 }}</td>
+                  <td class="table-success">{{ prod.CantidadVentas ? prod.CantidadVentas.toFixed(2):0 }}</td>
+                  <td class="table-success">{{ prod.MontoVentas ? prod.MontoVentas.toFixed(2):0 }}</td>
+                  <td class="table-info">{{ prod.TotalCompras ? prod.TotalCompras.toFixed(2):0 }}</td>
+                  <td class="table-info">{{ prod.CantidadCompras ? prod.CantidadCompras.toFixed(2):0 }}</td>
+                  <td class="table-info">{{ prod.MontoCompras ? prod.MontoCompras.toFixed(2):0 }}</td>
                 </tr>
               </tbody>
             </table>
@@ -107,6 +115,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     verArticulos () {
+      this.productos = []
       this.axios.get(this.API + 'productos/masrotacion?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,

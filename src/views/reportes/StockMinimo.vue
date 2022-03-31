@@ -2,18 +2,23 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="4" class="my-1">
-            <b-form-group>
-                  <label>Buscar:</label>
-							
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
+          <b-col md="6" class="my-1">  
+            <b-row>
+              <b-form-group>
+                <label>Código de barra:</label>
+                <input ref="inputCodigoBarra" class="form-control"/>
+              </b-form-group>  
+                 
+              <b-form-group class="ml-2">
+                <label>Buscar por nombre:</label>
+                <b-input-group>
+                  <b-form-input v-model="filter" placeholder="Ingrese nombre del producto" @input="currentPage = 1" />
+                  <b-input-group-append>
                   <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
                 </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
+                </b-input-group>
+              </b-form-group>
+            </b-row>
           </b-col>
 					<b-col md="4">
 						<b-form-group>
@@ -23,7 +28,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue=""
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -32,7 +37,7 @@
                   </autocomplete>
                 </b-form-group>
 					</b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="2" class="my-1">
             <b-row>
             <b-col md="8">
 
@@ -93,11 +98,15 @@ export default {
       fields: [
             { key: 'IdProducto', label: 'ID', sortable: true },
             { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
+            { key: 'StockMinimo', label: 'Stock Minimo', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
+            { key: 'PrecioContado', label: 'Proveedor Ult.'},
+            { key: 'PrecioCosto', label: 'Telf. Proveedor Ult.' },
+            { key: 'PrecioContado', label: 'Proveedor Sec.'},
+            { key: 'PrecioCosto', label: 'Telf. Proveedor Sec.' },
       ],
       totalRows: 50,
       perPage: 10,
@@ -119,7 +128,7 @@ export default {
 		myProvider (ctx) {
 			// Here we don't set isBusy prop, so busy state will be handled by table itself
 			// this.isBusy = true
-			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
+			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&stockminimo=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
 			url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 			let promise = this.axios.get( url )
 
@@ -128,6 +137,11 @@ export default {
 				//this.totalRows = this.items.length
 				// Here we could override the busy state, setting isBusy to false
 				// this.isBusy = false
+        this.items.map(r=>{
+          if(r.stock < r.StockMinimo){
+            r._rowVariant='danger'
+          }
+        })
 				return(this.items)
 			}).catch(error => {
 				// Here we could override the busy state, setting isBusy to false

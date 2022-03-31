@@ -84,6 +84,13 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <br>
+          <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <div style="text-align:center">
+              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+            </div>
+          </b-popover>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
@@ -142,7 +149,6 @@
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
-            :v-on="setNuevoPrecioContado(data.index)"
             />
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -191,7 +197,6 @@
             type="number"
             min="0"
             step="0.01"
-            readonly
             class="form-control"
             placeholder="Precio Venta"/>
             <b-form-text>
@@ -496,7 +501,9 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
-
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     changeCant (val, prod) {
       if (val>0) {
         prod.cantidad = prod.cantidadPres
@@ -858,13 +865,19 @@ export default {
     background: #CECECE;
     cursor: inherit;
   }
+  .form-check-input {
+    margin-left: -0.2rem !important;
+  }
+</style>
+<style>
+  .popover{
+    max-width: 420px !important;
+  }
   .nomCart {
     display: flex;
     justify-content: center;
     align-content: center;
+    align-items: center;
     border-right: 2px solid black;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
   }
 </style>
