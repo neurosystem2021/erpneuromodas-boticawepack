@@ -37,7 +37,7 @@
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
