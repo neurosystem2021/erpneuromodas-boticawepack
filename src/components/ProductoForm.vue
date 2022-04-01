@@ -367,7 +367,7 @@
                 <input
                 v-model="producto.precios[i-1].costoProv"
                 @input="calcularValores(i-1)"
-                step="0.01"
+                step="0.000001"
                 type="number"
                 class="form-control"/>
               </td>
