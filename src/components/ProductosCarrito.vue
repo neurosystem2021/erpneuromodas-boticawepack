@@ -32,7 +32,7 @@
           <b-form-input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
@@ -45,7 +45,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -80,7 +80,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"

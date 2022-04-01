@@ -80,7 +80,7 @@
                                     <label>Cliente:</label>
                                     
                                     <b-input-group>
-                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -311,6 +311,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -366,6 +367,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -415,6 +424,8 @@ export default {
                 },
                 CampoDireccion: 'Direccion'
             }
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -681,7 +692,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -689,12 +700,14 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('NOTA DE VENTA.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
+                this.$refs.carrito.pagocon = 0
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
