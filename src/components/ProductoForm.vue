@@ -115,6 +115,7 @@
               type="number"
               min="0"
               step="0.0001"
+              class="form-control"
               />
           </b-form-group>
           <b-form-group v-if="!producto.EsPadre">

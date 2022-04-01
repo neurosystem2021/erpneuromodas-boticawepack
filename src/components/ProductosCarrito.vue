@@ -313,7 +313,7 @@ export default {
       if (idProducto) {
         this.add([idProducto, (obj) => {
           if (obj) {
-            this.$emit('onAddProducto')
+            this.$emit('onAddProducto', obj)
             this.$toasted.show('Producto añadido correctamente')
           } else {
             this.$toasted.show('No se encontró ningun producto')
