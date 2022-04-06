@@ -4,7 +4,7 @@
         <b-row>
           <b-col md="6" class="my-1">  
             <b-row>
-              <b-form-group>
+              <b-form-group v-if="false">
                 <label>Código de barra:</label>
                 <input ref="inputCodigoBarra" class="form-control"/>
               </b-form-group>  
@@ -28,7 +28,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="PRINCIPAL"
+                      initValue="HUANUCO"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -72,6 +72,11 @@
             </b-row>
         </b-row>
         <br /><br />
+        <b-row align-h="center" class="text-center">
+            <b-col cols="4">
+              <b-button variant="success" :href="urlExportar" target="_blank" size="lg" >Exportar (Con Condición)</b-button>
+            </b-col>
+        </b-row>
       </b-container>
   </div>
 </template>
@@ -91,7 +96,7 @@ export default {
       API: config.API,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
-      sortBy: 'Gen_Producto.IdProducto',
+      sortBy: 'ProveedorUltimo',
       sortDesc: false,
       items: [],
       isBusy: false,
@@ -103,8 +108,8 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'StockMinimo', label: 'Stock Minimo', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
-            { key: 'ProveedorUlt', label: 'Proveedor Ult.' , sortable: true},
-            { key: 'ProveedorUltTelf', label: 'Telf. Proveedor Ult.' },
+            { key: 'ProveedorUltimo', label: 'Proveedor Ult.' , sortable: true},
+            { key: 'TelefonoUltimo', label: 'Telf. Proveedor Ult.' },
             { key: 'ProveedorSec', label: 'Proveedor Sec.' , sortable: true},
             { key: 'ProveedorSecTelf', label: 'Telf. Proveedor Sec.' },
       ],
@@ -113,7 +118,8 @@ export default {
 			currentPage: 1,
 			almacen: {
 				IdAlmacen: 1
-			}
+			},
+      urlExportar:''
     }
   },
   methods: {
@@ -128,9 +134,10 @@ export default {
 		myProvider (ctx) {
 			// Here we don't set isBusy prop, so busy state will be handled by table itself
 			// this.isBusy = true
-			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&stockminimo=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
+			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&stockminimo=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
 			url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-			let promise = this.axios.get( url )
+      this.urlExportar  = this.API + 'reporte/stock/minimo?idAlmacen='+this.almacen.IdAlmacen+'&sortBy='+ctx.sortBy+'&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      let promise = this.axios.get( url )
 
 			return promise.then((result) => {
 				this.items = result.data
