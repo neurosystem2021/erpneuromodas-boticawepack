@@ -4,7 +4,7 @@
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>
-			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'Huánuco' : 'Pucallpa' }}</b></b-alert>
+			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS HUÁNUCO' : 'PROYECTOS PUCALLPA' }}</b></b-alert>
 			  <br>
 			</div>
         	<b-row>
@@ -465,7 +465,7 @@ export default {
 			}
 		},
 		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
+			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto&pisoAlm='+this.$route.query.id).then(res => {
 				this.habitaciones = res.data
 				/* this.pisos.forEach(piso => {
 					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
