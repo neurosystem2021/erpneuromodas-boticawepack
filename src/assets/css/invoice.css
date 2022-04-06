@@ -134,6 +134,10 @@
     background: #bf0918;
   }
   
+  table .cod {
+    text-align: left;
+  }
+  
   table .desc {
     text-align: left;
   }
