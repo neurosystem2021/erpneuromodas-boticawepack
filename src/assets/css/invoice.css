@@ -138,6 +138,10 @@
     text-align: left;
   }
   
+  table .cod {
+    text-align: left;
+  }
+  
   table .unit {
     font-size: 1em;
     background: #DDDDDD;
