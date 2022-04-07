@@ -465,7 +465,7 @@ export default {
 			}
 		},
 		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto&pisoAlm='+this.$route.query.id).then(res => {
+			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.IdProducto&pisoAlm='+this.$route.query.id).then(res => {
 				this.habitaciones = res.data
 				/* this.pisos.forEach(piso => {
 					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
