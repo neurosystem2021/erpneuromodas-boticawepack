@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25' }"
+            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -738,17 +738,50 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let style = 'ss'
-        if(data.stock <= 0) {
-          style = 'danger'
+        let styleStock = ''
+        if(data.stock <= 0){
+          styleStock = 'table-danger'
+        }else{
+          styleStock = 'table-success'
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (data.stock > 0) {
-          style = 'success'
-      }
-      return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
-      `
+
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px; text-align: center  ">
+            <thead>
+              <tr style>
+                <th class="table-info" style="width: 60px">Stock</th>
+                <th style="width: 200px">Producto</th>
+                <th style="width: 100px">Categoría</th>
+                <th style="width: 100px">Marca</th>
+                <th class="table-primary" style="width: 65px">Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
+                <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td>${data.ProductoCategoria}</td>
+                <td>${data.ProductoMarca}</td>
+                <td class="table-primary"><b>${data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `
       }
       return `
         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
