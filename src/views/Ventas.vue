@@ -837,6 +837,7 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
+            this.inProgress = true
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
@@ -860,9 +861,11 @@ export default {
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
+                this.inProgress = false
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                 this.loadClienteVarios()
+                window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
