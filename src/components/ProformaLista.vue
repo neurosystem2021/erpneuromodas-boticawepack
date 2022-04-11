@@ -106,6 +106,7 @@ import { mapActions } from 'vuex'
                         this.filter = ''
                         this.show = false
                     })
+                    this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
                     proforma.productos = response.data
                     // console.log(proforma);
 
