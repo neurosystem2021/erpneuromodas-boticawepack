@@ -78,17 +78,20 @@ const actions = {
     let precio = false
     let setSuma = false
     let setPrecioCosto = false
+    let proforma = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       precio = obje.precio
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
+      proforma = obje.proforma
     }
 
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
@@ -140,6 +143,12 @@ const actions = {
 
           if (precio) {
             obj.precio = precio
+          }
+
+          if (proforma) {
+            obj.estadoPxP = false
+            obj.cantxPrecio = obj.cantidad
+            obj.cantidadPres = 1
           }
 
           if (setSuma) {
