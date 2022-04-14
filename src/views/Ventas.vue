@@ -333,7 +333,7 @@ export default {
             venta: {},
             carrito: {
                 fields: [
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -350,7 +350,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2)
         }
     },
     computed: {
@@ -441,7 +441,7 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -524,12 +524,14 @@ export default {
             return obj
         },
         onAddProducto (obj) {
+            this.venta.pago.visa.monto = 0
             this.actualizarDescuento()
-            this.obtenerStok({
+            /*this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
-            })
+            })*/
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -630,12 +632,28 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false
                     return
@@ -672,10 +690,10 @@ export default {
             let totalCero = 0
             this.productos.forEach(pro => {
                 console.log(pro.stock);
-                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined ) && this.venta.tipoVenta.CodSunat != '07') {
+                /*if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined ) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1
-                }
+                }*/
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
@@ -687,13 +705,13 @@ export default {
                 return;
             }
             
-            if (sinStock >= 1) {
+            /*if (sinStock >= 1) {
                 //if (this.venta.tipoVenta.IdTipoDoc !== 3) { // NOTA DE VENTA
                     //this.$toasted.error('No se puede vender un producto sin stock');
                     this.inProgress = false
                     return;
                 //}
-            }
+            }*/
 
 
 
@@ -703,7 +721,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -711,6 +729,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')

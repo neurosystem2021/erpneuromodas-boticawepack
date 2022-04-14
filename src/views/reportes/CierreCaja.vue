@@ -37,7 +37,7 @@
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
@@ -60,7 +60,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -89,7 +89,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -119,7 +119,7 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
