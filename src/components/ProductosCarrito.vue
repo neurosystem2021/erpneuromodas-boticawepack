@@ -27,6 +27,18 @@
         </b-input-group>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="obsequio" slot-scope="data">
+          <div class="obsequio" v-if="tipoMov==0">
+            <b-form-checkbox
+              button-variant="primary"
+              v-model="productos[data.index].EsObsequio"
+              :value="1"
+              @input="setObsequio(data.index)"
+              :unchecked-value="0">
+            </b-form-checkbox>
+          </div>
+        </template>
+
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
@@ -38,7 +50,12 @@
                 if (!esMovimiento) {
                   productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 } else {
-                  productos[data.index].precio = productos[data.index].PrecioCosto;
+                  if(productos[data.index].EsObsequio==1){
+                    productos[data.index].precio = 0
+                    productos[data.index].nuevoPrecioContado = 0
+                  }else{
+                    productos[data.index].precio = productos[data.index].PrecioCosto; 
+                  }
                 }
 
             }"
@@ -48,8 +65,9 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
+            :disabled = "productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false"
             type="number"
-            style="width: 90px"
+            style="width: 95px"
             min="0"
             step="0.000001"
             placeholder="Precio"
@@ -62,6 +80,7 @@
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
+            :disabled = "productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
@@ -85,8 +104,9 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
+            :disabled="productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false"
             type="number"
             min="0"
             step="0.01"
@@ -124,7 +144,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ data.item.stock?data.item.stock.toFixed(2):data.item.stock }}</div>
         </template>
 
       </b-table>
@@ -206,7 +226,9 @@ export default {
   props: {
     setPrecio: Boolean,
     esMovimiento: Boolean,
+    isVentas: Boolean,
     igvTotal: Boolean,
+    tipoMov: Number,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -229,6 +251,7 @@ export default {
           // { key: 'ProductoTalla', label: 'Talla' },
           // { key: 'Genero' },
           // { key: 'Botapie' },
+          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -365,6 +388,10 @@ export default {
         this.pasteCode = false
       }
     },*/
+    setObsequio(index){
+      this.productos[index].precio = 0
+      this.productos[index].nuevoPrecioContado = 0
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -378,6 +405,8 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.EsObsequio = 0
+      obj.EsVenta = this.isVentas
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
@@ -465,4 +494,9 @@ export default {
 </script>
 
 <style>
+.obsequio{
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
 </style>

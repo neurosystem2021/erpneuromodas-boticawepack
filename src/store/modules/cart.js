@@ -18,7 +18,7 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
         productos.push(item)
       }
     }
@@ -100,6 +100,7 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
+          obj.EsObsequio = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   

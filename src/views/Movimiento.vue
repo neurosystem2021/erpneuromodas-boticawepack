@@ -191,7 +191,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" @onAddProducto="onAddProducto" :esMovimiento="true"></productos-carrito>
+              <productos-carrito ref="carrito" @onAddProducto="onAddProducto" :esMovimiento="true" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -359,14 +359,25 @@ return false
       }
 
       let faltaLlenar = false
+      let faltaCantidad = false
       this.productos.forEach((prod, index) => {
-        if (prod.total <= 0) {
+        if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true
+        }
+
+        if(!(prod.cantidad > 0)){
+          faltaCantidad = true
         }
       })
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
+        this.inProgress = false
+        return;
+      }
+
+      if (faltaCantidad) {
+        this.$toasted.show('Complete la cantidad de los productos ingresados')
         this.inProgress = false
         return;
       }

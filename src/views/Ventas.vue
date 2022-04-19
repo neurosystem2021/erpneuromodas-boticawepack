@@ -165,6 +165,7 @@
                             :setPrecio="true"
                             ref="carrito"
                             :showButton="false"
+                            :isVentas="true"
                             :fields="carrito.fields"
                             :onSetProducto="onSetProducto">
 
