@@ -49,9 +49,9 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 100px"
+            style="width: 120px"
             min="0"
-            step="0.0001"
+            step="0.0000000001"
             placeholder="Precio"
             class="form-control"
             @input="setNuevoPrecioContado(data.index)"/>
