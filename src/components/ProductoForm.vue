@@ -107,7 +107,7 @@
             <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               class="form-control"
               min="0"
@@ -142,6 +142,7 @@
               v-model="producto.StockMinimo"
               type="number"
               class="form-control"
+              step="0.00001"
               />
           </b-form-group>
           <b-form-group>
@@ -178,7 +179,7 @@
               type="number"
               class="form-control"
               step="0.000001"
-              @input.native="actualizarPorcentajeUtilidad"
+              @input="actualizarPorcentajeUtilidad"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}

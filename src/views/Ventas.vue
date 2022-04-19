@@ -41,7 +41,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="TICKET SEPARACIÓN"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta"
@@ -191,9 +191,10 @@
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
                                                         class="form-control"
+                                                        step="0.01"
                                                     />
                                                 </b-input-group>
                                                 <b-form-text>
@@ -448,10 +449,10 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
-                    LimitItems: 8,
-                    CodSunat: '03',
+                    IdTipoDoc: 10,
+                    TipoDoc: 'TICKET SEPARACIÓN',
+                    LimitItems: 0,
+                    CodSunat: '12',
                 },
                 almacen: {
                     // IdAlmacen: 1,
@@ -666,7 +667,7 @@ export default {
                 // await this.loadFirstPuntoVenta()
                 await this.getVendedor()
                 // this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('TICKET SEPARACIÓN')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
@@ -756,7 +757,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async (response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -766,13 +767,13 @@ export default {
                 // await this.loadFirstPuntoVenta()
                 await this.getVendedor()
                 // this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('TICKET SEPARACIÓN')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?empresa=' + this.empresa + '&IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {

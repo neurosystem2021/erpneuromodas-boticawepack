@@ -182,7 +182,8 @@
                       <input v-model="movimiento.TipoCambio"
                         type="number"
                         class="form-control"
-                        placeholder="Tipo de cambio"/>
+                        placeholder="Tipo de cambio"
+                        step="0.000001"/>
                     </b-form-group>
                   </b-col>
                 </b-row>
