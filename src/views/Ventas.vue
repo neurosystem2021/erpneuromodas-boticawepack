@@ -378,7 +378,7 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -477,6 +477,8 @@ export default {
             }
             this.isNota = false
             this.bloquearInput = false 
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -550,7 +552,7 @@ export default {
                     })     
                     this.venta.NotaIdMotivo=null
                     this.bloquearInput=true
-                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+                    //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
                 })
         },
         setMotivo(ev){
@@ -570,7 +572,7 @@ export default {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
             if (this.productos.length) {
-                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+                //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
         },
         loadPuntoVenta (id) {
@@ -661,9 +663,9 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
-            this.obtenerStok({
+            /*this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
-            })
+            })*/
         },
         actualizarDescuento () {
             if (this.puntosAplicados > 0) {
@@ -725,7 +727,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -749,6 +751,7 @@ export default {
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 console.log(response)
+                this.inProgress = false
                 this.$toasted.show('Proforma Guardada con exito')
 
                 this.limpiarDespuesVenta()
@@ -848,7 +851,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -856,6 +859,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
