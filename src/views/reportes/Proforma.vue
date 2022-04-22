@@ -120,7 +120,7 @@
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <h3 style="font-weight:bold">Información de pago</h3>
         <div style="margin-bottom:10px;">
-          CTA AHORROS SOLES 
+          <img style="max-width: 100%" src="/resources/images/cuentas.png" />
         </div>
       </div>
       <br>
