@@ -85,30 +85,30 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 80px"
+            style="width: 85px"
             step="0.001"
             min="0"
-            @input="(val) => changeCant(val, productos[data.index])"
-            placeholder="Cantidad">
-          </b-form-input>
+            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            placeholder="Cantidad"
+            class="form-control"/>
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].PreciosPorProducto !== ''"
             type="number"
-            style="width: 80px"
+            style="width: 85px"
             step="0.001"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
               if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 return
               }
 
@@ -119,18 +119,19 @@
               }
               productos[data.index].precio = productos[data.index].PrecioContado 
             }"
-            placeholder="Cantidad">
-          </b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 80px"
+            style="width: 95px"
             min="0"
             step="0.0001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -160,25 +161,28 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
-            style="width:80px"
+          <input
+            style="width:85px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            value="0"
+            @input="actualizarDescu(data.index)"
+            class="form-control"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -489,6 +493,10 @@ export default {
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
+    },
+    actualizarDescu(index){
+      let obj = this.productos[index];
+      this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1

@@ -178,13 +178,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -225,13 +227,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -422,6 +425,8 @@ export default {
                 },
                 CampoDireccion: 'Direccion'
             }
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -597,7 +602,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -622,7 +627,7 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false
                 this.limpiarDespuesVenta()
 
                 // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -708,7 +713,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -722,6 +727,7 @@ export default {
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
+                this.$refs.carrito.pagocon = 0
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })

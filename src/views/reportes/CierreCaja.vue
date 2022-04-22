@@ -33,6 +33,9 @@
                     <b-button-group size="sm">
                         <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
                     </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-info" @click="imprimirTicket">IMPRIMIR TICKET</b-button>
+                    </b-button-group>
                 </b-col>
               </b-row>
                      </div>
@@ -41,8 +44,64 @@
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      <br>
+      <div class="no-print">
+        <b-row id="contentModal">
+          <b-col cols="4" style="margin-left:-12px">
+          <table id="tablaRes1" class="table b-table table-sm table-striped table-bordered">
+            <tbody>
+              <tr>
+                <td>Total En Caja S/.</td>
+                <td>{{ granTotal | moneda }}</td>
+              </tr>
+            </tbody>
+          </table>          
+          <table id="tablaRes2" class="table b-table table-sm table-striped table-bordered">
+            <tbody>
+              <tr v-if="false">
+                <td>Salida S/.</td>
+                <td>{{ (granTotalSinPagoCliente + totalVentasCredito) | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Credito S/.</td>
+                <td>{{ totalVentasCredito | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Contado S/.</td>
+                <td>{{ granTotalSinPagoCliente | moneda }} </td>
+              </tr>
+            </tbody>
+          </table>
+          <table id="tablaRes3" class="table b-table table-sm table-striped table-bordered">
+            <tbody>
+              <tr>
+                <td>Efectivo S/.</td>
+                <td>{{ totalVentasEfectivo | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Visa S/.</td>
+                <td>{{ totalVentasVisa | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Mastercard S/.</td>
+                <td>{{ totalVentasMastercard | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Ingresos S/.</td>
+                <td>{{ totalIngresos | moneda }} </td>
+              </tr>
+              <tr>
+                <td>Salidas S/.</td>
+                <td>{{ totalSalidas | moneda }} </td>
+              </tr>
+            </tbody>
+          </table>
+          </b-col>
+        </b-row>
+      </div>
+
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
@@ -338,6 +397,29 @@ export default {
     imprimir () {
       window.print();
     },
+    imprimirTicket() {
+			var left = (screen.width/2)-(800/2);
+			var top = (screen.height/2)-(800/2);
+			var myWindow = window.open ('', 'Imprimir Ticket', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=800, height=800, top='+top+', left='+left);
+      myWindow.document.write("<div style='text-align:center'><h2> Cierre de Caja </h2></div>");
+      if(this.cierre.FechaCierre){
+        myWindow.document.write("<label><b> Fecha: "+this.cierre.FechaCierre+"</b></label><br>");
+      }
+      if(this.cierre.IdTurno){
+        myWindow.document.write("<label><b> Turno: "+(this.cierre.IdTurno == 1 ? 'MAÑANA' : (this.cierre.IdTurno == 2? 'TARDE':'NOCHE'))+"</b></label><br>");
+      }
+      if(this.cierre.UsuarioReg){
+        myWindow.document.write("<label><b> Empleado: "+this.cierre.UsuarioReg+"</b></label><br><br>");
+      }
+      
+      myWindow.document.write("<table style='border: 1px solid; width:230px'>"+document.getElementById('tablaRes1').innerHTML+"</table><br>");
+      myWindow.document.write("<table style='border: 1px solid; width:230px'>"+document.getElementById('tablaRes2').innerHTML+"</table><br>");
+      myWindow.document.write("<table style='border: 1px solid; width:230px'>"+document.getElementById('tablaRes3').innerHTML+"</table><br>");
+			myWindow.document.close();
+			myWindow.focus();
+			myWindow.print();
+			myWindow.close();
+		},
     loadData () {
       this.getVentas()
       this.getIngresos()
