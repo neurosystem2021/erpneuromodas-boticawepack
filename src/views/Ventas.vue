@@ -463,6 +463,8 @@ export default {
                 },
                 CampoDireccion: 'Direccion'
             }
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -640,7 +642,7 @@ export default {
         //     this.$refs.inputVendedor.setValue('')
         // },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -763,7 +765,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async (response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
