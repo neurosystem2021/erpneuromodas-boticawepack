@@ -5,7 +5,7 @@
         <br />
         <b-container class="bv-example-row">
             <div>
-                <div class="float-left">
+                <div class="float-left" v-if="false">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                             <option value="vg">VIRGEN DE GUADALUPE</option>
@@ -403,9 +403,10 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    { key: 'ProductoModelo', label: 'Modelo' },
+                    //{ key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Producto' },
+                    { key: 'eventPres', label:'' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
@@ -608,7 +609,9 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }  
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
@@ -682,9 +685,9 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, precio) {
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || obj.PrecioContado
             return obj
         },
         onAddProducto (obj) {
@@ -755,7 +758,7 @@ export default {
             // this.$refs.inputPuntoVenta.setValue('CAJA1')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -900,14 +903,15 @@ export default {
                 this.limpiarCart()
                 // await this.loadFirstAlmacen()
                 // await this.loadFirstPuntoVenta()
+                this.$refs.inputCliente.setValue('')
+                this.$refs.inputVendedor.setValue('')
                 await this.getVendedor()
+                this.loadClienteVarios();
                 // this.getNumeroVenta()
                 this.$refs.carrito.pagocon = 0
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?empresa=' + this.empresa + '&IdDocVenta=' + response.data.insertId,'_blank');

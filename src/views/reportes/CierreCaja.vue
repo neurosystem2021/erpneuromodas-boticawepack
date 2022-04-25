@@ -4,7 +4,7 @@
     <b-container class="bv-example-row">
       <!--<div>
           <div class="float-right no-print">-->
-              <div class="float-left"  v-if="!this.$route.params.id">
+              <div class="float-left"  v-if="false">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                             <option value="vg">VIRGEN DE GUADALUPE</option>

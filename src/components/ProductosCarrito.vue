@@ -18,16 +18,54 @@
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
+                  ref="barcodeInput"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline !important">{{ objProd.Producto }}</h3>
+          <h6>PRECIOS DISPONIBLES</h6>
+        </div>
+        <hr>
+        <b-row>
+          <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+            <b-card
+              v-if="d.cantidad != 0"
+              align="center"
+              class="mb-3 contentCard"
+              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+              @click="() => {
+                if ( parseFloat(d.cantidad) ) {
+                  setProductoUni(objProd, d.precio)
+                }
+              }"
+            >
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-center">
+                  <b>Precio: </b><br> S/ {{ d.precio }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="eventPres" slot-scope="data" v-if="isVentas">
+          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+        </template>
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
@@ -108,6 +146,7 @@
             style="width:100px"
             step="0.01"
             class="form-control"
+            @input="(val)=>ActualizarDesc(productos[data.index])" 
             value="0"/>
             <b-form-text>
             </b-form-text>
@@ -202,7 +241,12 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      preciosProd: [],
+      objProd: {},
+      cant: 0,
+      precioCont: 0,
+      productoSelect: {},
     }
   },
   watch: {
@@ -312,27 +356,30 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      actualizarProd : 'actualizarProducto',
     }),
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
     loadBarcode (e) {
       e.preventDefault()
-      // let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
-      let idProducto = this.loadCode
-
+      let idProducto = this.loadCode;
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.setProducto(response.data)
           } else {
-            this.$toasted.show('No se encontró ningun producto')
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
           }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
+        })
       }
+    },
+    ActualizarDesc(obj){
+      this.actualizarProd(obj)
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
@@ -367,23 +414,72 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },  
     setProducto (obj) {
+      this.precioCont = obj.PrecioContado
+      this.loadCode = ''
+      this.preciosProd = []
+      if (!this.isVentas) {
+        this.setProductoUni(obj)
+        return
+      }
+      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+      if(obj.PrecioDistribuidor){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.PrecioDistribuidor})
+      }
+      if(obj.PrecioEspecial){
+       this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
+      }
+
+      if(this.preciosProd.length == 1){
+        this.setProductoUni(obj)
+        return
+      }
+      this.objProd = {}
+      this.$refs['modalCant'].show()
+      this.objProd = obj
+    },
+    setProductoUni (obj, precio) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
-      if(obj.EsPadre == 1){
-        obj.stock = undefined
-      }
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,precio)
+      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
-
-      // Vue.set(this.productos, obj.IdProducto, obj)
+        if(existe){
+          if(this.isVentas){
+            this.$toasted.success('Precio Modificado')
+          }else{
+            this.$toasted.success('El producto ya está en la lista')
+          }
+          
+        }else{
+          this.$toasted.success('Producto añadido correctamente')
+        }
+        
+      }, { setPrecio: (this.isVentas ? false : true) }])
+      this.$refs['modalCant'].hide()
+      this.$refs.barcodeInput.focus()
+      this.actualizarProd(obj)
+    },
+    showPresentacion (obj) {
+       if(this.isVentas){
+        this.preciosProd = []
+        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+        if(obj.PrecioDistribuidor){
+          this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.PrecioDistribuidor})
+        }
+        if(obj.PrecioEspecial){
+        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+        }
+        this.objProd = obj
+        this.$refs['modalCant'].show()
+        return
+       }
     },
     renderChild(data) {
       /* return `
@@ -480,5 +576,26 @@ export default {
 }
 </script>
 
+<style scoped>
+  .contentCard {
+    cursor: pointer;
+  }
+  .disabledMouse {
+    background: #CECECE;
+    cursor: inherit;
+  }
+  .nomCart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px solid black;
+  }
+  .form-check-input {
+    margin-left: -0.2rem !important;
+  }
+</style>
 <style>
+  #modalCantidad .modal-dialog{
+    max-width: 45% !important;
+  }
 </style>

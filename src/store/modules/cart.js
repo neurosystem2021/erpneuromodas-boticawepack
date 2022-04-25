@@ -23,6 +23,10 @@ const mutations = {
       }
     }
   },
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(index, 1, prod)
+  },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
@@ -70,6 +74,11 @@ const actions = {
 
     if(typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
+      if(setPrecio){
+        producto.cantidad = 0
+        producto.precio = producto.PrecioCosto || 0
+        producto.nuevoPrecioContado = producto.PrecioContado || 0
+      }
       if (cb) cb(producto)
     } else {
       let params = {}
@@ -85,9 +94,11 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
           } else {
             obj.cantidad = 0
-            obj.precio = 0
+            obj.precio = obj.PrecioCosto
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if (cantidad) {
@@ -99,7 +110,7 @@ const actions = {
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
@@ -108,6 +119,9 @@ const actions = {
         }
       })
     }
+  },
+  actualizarProducto ({ commit }, prod) {
+    commit('ACTUALIZAR_PRODUCTO', prod)
   },
   eliminarProducto ({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)

@@ -185,6 +185,27 @@
               </b-form-text>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Especial:</label>
+            <input
+              v-model="producto.PrecioEspecial"
+              type="number"
+              step="0.01"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Distribuidor:</label>
+            <input v-model="producto.PrecioDistribuidor"
+              type="number"
+              step="0.01"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
       </b-row>
 
       <hr />
@@ -320,6 +341,8 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.PrecioDistribuidor = newVal.PrecioDistribuidor
+        this.producto.PrecioEspecial  = newVal.PrecioEspecial
 
       } else {
 
@@ -428,6 +451,8 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        PrecioDistribuidor: 0,
+        PrecioEspecial: 0,
         PrecioPorMayor: 0,
         StockPorMayor: 0,
         // Botapie: '',
@@ -437,7 +462,7 @@ export default {
         // modelo: {},
         //talla: {},
         medicion: {
-          IdProductoMedicion:6,
+          IdProductoMedicion:1,
           ProductoMedicion:"UNIDAD"
         }
       }
@@ -450,7 +475,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
