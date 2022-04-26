@@ -18,43 +18,47 @@
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
-                  type="text"
+                  type="none"
+                  inputmode="none"
                   class="form-control"
                   ref="barcodeInput"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
-      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+      <b-modal ref="modalCant" size="lg" id="modalCantidad" hide-footer hide-header no-close-on-backdrop>
         <div class="d-block text-center">
-          <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
-          <h5>{{objProd.Producto}}</h5>
+          <h4 style="text-decoration: underline;">{{objProd.Producto}}</h4>
         </div>
         <hr>
         <b-row>
-          <b-col cols="6">
-            <b-card
-              align="center"
-              class="mb-3 contentCard"
-              @click="setProductoUni(objProd)"
-            >
-              <b-row>
-                <b-col md="7" class="nomCart">
-                  <h5 class="text-uppercase">{{medicionPro}}</h5>
-                </b-col>
-                <b-col md="5" class="text-left">
-                  <b>Precio: </b><br>S/ {{ precioCont }}
-                </b-col>
-              </b-row>
-            </b-card>
-          </b-col>
-
-          <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+          <b-col cols="5">
+            <b-row>
+              <b-col cols="12">
+                <b-card
+                  align="center"
+                  class="mb-3 contentCard"
+                  @click="setProductoUni(objProd)"
+                >
+                  <b-row>
+                    <b-col cols="6" class="nomCart">
+                      <h6 class="text-uppercase">{{medicionPro}}</h6>
+                    </b-col>
+                    <b-col cols="6" class="text-left" style="font-size:15px">
+                      <b>Precio <br>S/ {{ precioCont }}</b>
+                    </b-col>
+                  </b-row>
+                </b-card>
+              </b-col>
+            </b-row>
+            <b-row v-for="d in preciosProd" :key="d.id">
+          <b-col cols="12">
             <b-card
               v-if="parseFloat(d.cantidad) > 0"
               align="center"
@@ -67,16 +71,63 @@
               }"
             >
               <b-row>
-                <b-col md="7" class="nomCart" >
-                  <h5 class="text-uppercase">x{{ d.cantidad }}</h5>
+                <b-col cols="6" class="nomCart" >
+                  <h6 class="text-uppercase">x{{ d.cantidad }}</h6>
                 </b-col>
-                <b-col md="5" class="text-left">
-                  <b>Precio: </b>S/ {{ d.precio }}
+                <b-col cols="6" class="text-left" style="font-size:15px">
+                  <b>Precio 
+                  <br>S/ {{ d.precio }} </b>
                 </b-col>
               </b-row>
             </b-card>
           </b-col>
         </b-row>
+
+          </b-col>
+          <b-col cols="7" style="border-left: 2px dashed black;">
+            <b-row style="justify-content: left; margin-left:23px">
+              <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:25px; width:230px;text-align:center; font-weight:bold; color:#1266F1" class="form-control" placeholder="Ingrese Cant."/>
+            </b-row>
+            <br>
+            <b-row style="justify-content: left; margin-left:20px">
+              <table class="calc__numbers">
+                <tbody>
+                    <tr>
+                        <td class="botones" @click="addNumber('7');">7</td>
+                        <td class="botones" @click="addNumber('8');">8</td>
+                        <td class="botones" @click="addNumber('9');">9</td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="addNumber('4');">4</td>
+                        <td class="botones" @click="addNumber('5');">5</td>
+                        <td class="botones" @click="addNumber('6');">6</td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="addNumber('1');">1</td>
+                        <td class="botones" @click="addNumber('2');">2</td>
+                        <td class="botones" @click="addNumber('3');">3</td>
+                    </tr>
+                    <tr>
+                        <td class="botones" @click="addNumber(0);">0</td>
+                        <td class="botones" @click="addPoint('.');">.</td>
+                        <td class="botones" style="background-color: #EAEAEA;" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                    </tr>
+                </tbody>
+              </table>
+            </b-row>
+            <br>
+            <br>
+            <b-row style="text-align:center;">
+              <b-col cols="2"></b-col>
+              <b-col cols="8">
+                <b-button style="margin-left:-16px" block size="md" variant="danger" @click="cerrarModalCant()">CERRAR</b-button>
+              </b-col>
+              <b-col cols="2"></b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+
+
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
@@ -350,7 +401,8 @@ export default {
       precioCont: 0,
       medicionPro:'UNIDAD',
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      cantidadInput:''
     }
   },
   watch: {
@@ -556,6 +608,7 @@ export default {
 
     loadBarcode (e) {
       e.preventDefault()
+      this.cantidadInput = ''
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -632,8 +685,26 @@ export default {
       }
 //miley 1
     },
+    addNumber(number){
+       this.cantidadInput = this.cantidadInput + number
+    },
+    addPoint(){
+     if (!(''+this.cantidadInput).includes('.')){
+          this.$nextTick(()=>{
+            this.cantidadInput = this.cantidadInput + '.'
+          })
+     }
+    },
+    deleteNumber(){
+      this.cantidadInput = this.cantidadInput.toString().slice(0,-1)
+    },
+    verificar(e){
+      if((e.key=='.' && (''+this.cantidadInput).includes('.')) || e.key==' '){
+        e.preventDefault()
+      }
+    },
     setProducto (obj) {
-      this.precioCont = obj.PrecioContado
+      this.precioCont = obj.PrecioContado || 0
       this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
       this.preciosProd = []
@@ -649,15 +720,19 @@ export default {
 
       if(fPP.length==4){
         obj.cantxPrecio=1
-        this.setProductoUni(obj)
-        return
+       // this.setProductoUni(obj)
+        //return
       }
 
       this.$refs['modalCant'].show()
       this.objProd = obj
     },  
     setProductoUni (obj) {
-      this.objProd.cantxPrecio = 1
+      if((''+this.cantidadInput).trim()=='' && this.isVentas){
+        this.$toasted.show("Ingrese cantidad")
+        return
+      }
+      this.objProd.cantxPrecio = (''+this.cantidadInput).trim()==''?1:parseFloat(this.cantidadInput)
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
@@ -666,19 +741,24 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,(''+this.cantidadInput).trim()==''?1:parseFloat(this.cantidadInput),obj.PrecioContado)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
-      obj.cantidadPres = obj.cantidad
+      obj.cantidadPres = 1
+      this.cantidadInput = ''
       this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
-      this.objProd.cantxPrecio = 1
+      if((''+this.cantidadInput).trim()=='' && this.isVentas){
+        this.$toasted.show("Ingrese cantidad")
+        return
+      }
+      this.objProd.cantxPrecio = (''+this.cantidadInput).trim()==''?1:parseFloat(this.cantidadInput)
       this.cant = prod.cantidad
       let obj = this.objProd
       this.$refs.autocompleteProducto.setValue('')
@@ -691,18 +771,20 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
+      obj = this.onSetProducto(obj, (''+this.cantidadInput).trim()==''?1:parseFloat(this.cantidadInput)*parseFloat(this.cant), prod.precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
       }, false, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
+      this.cantidadInput = ''
       this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
     showPresentacion (obj) { 
       if (!obj.PreciosPorProducto !== '') {
+        this.cantidadInput = ''
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
         this.precioCont = obj.PrecioContado
@@ -710,6 +792,10 @@ export default {
         this.$refs['modalCant'].show()
         return
       }
+    },
+    cerrarModalCant(){
+      this.cantidadInput = ''
+      this.$refs['modalCant'].hide()
     },
     renderChild(data) {
       if (this.idAlmacen) {
@@ -849,5 +935,36 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+      .calc__numbers {
+        width:  130px;
+        height: 230px;
+    }
+    .calc__numbers td {
+    min-width: 80px;
+    min-height: 80px;
+    border: 0.7px solid #A3A3A3;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    font-weight: bold;
+    font-family: Arial;
+    color: black;
+    background-color: #fff;
+    }
+    .calc__numbers .botones:hover {
+    color: #fff;
+    background: #65BA9B;
+    border-radius: 10px !important;
+    }
+    .calc__numbers .accionActiva{
+        color: #fff !important;
+        background: #65BA9B !important;
+    }
+</style>
+<style>
+    #modalCantidad .modal-dialog{
+    width: 600px !important;
   }
 </style>
