@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="BOLETA/IGV ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta"
@@ -329,7 +329,7 @@ export default {
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
-            tieneIgv: false,
+            tieneIgv: true,
             venta: {},
             carrito: {
                 fields: [
@@ -400,7 +400,7 @@ export default {
                 cliente: {},
                 tipoVenta: {
                     IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    TipoDoc: 'BOLETA/IGV ELEC.',
                     LimitItems: 8,
                     CodSunat: '03',
                 },
@@ -422,6 +422,7 @@ export default {
                 },
                 CampoDireccion: 'Direccion'
             }
+            this.tieneIgv = true
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -589,7 +590,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -614,7 +615,7 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false    
                 this.limpiarDespuesVenta()
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -699,7 +700,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -707,7 +708,8 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.loadClienteVarios()
+                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
