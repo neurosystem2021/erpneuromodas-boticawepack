@@ -12,7 +12,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @onLoadMovimiento="cargarLotes"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista 
@@ -227,14 +227,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -265,6 +267,19 @@
                                                 </b-form-checkbox>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>
+                                                <b-input-group prepend="Proforma válidez: " append="días">
+                                                <b-form-input
+                                                    :disabled="bloquearInput?true:false"
+                                                    v-model="diasValidosProf"
+                                                    min="0"
+                                                    value="0"
+                                                    type="number"
+                                                ></b-form-input>
+                                            </b-input-group>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </template>    
@@ -285,14 +300,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -407,6 +423,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
+            diasValidosProf:0,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -489,6 +506,9 @@ export default {
                 evt.preventDefault();
             }
         },
+        cargarLotes(lote){
+            this.$refs.carrito.loadMovimientoLotes(lote)
+        },
         selectPreOrden (orden) {
             // console.log(orden)
            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
@@ -567,10 +587,14 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
-                CampoDireccion: ''
+                CampoDireccion: '',
+                diasValidosProf: 0
             }
             this.isNota = false
             this.bloquearInput=false
+            this.puntosAplicados = 0
+            this.descuentoPuntos = {}
+            this.descuentoGeneral = 0
         },
         setTipoVenta (obj) {
             console.log(obj);
@@ -843,6 +867,13 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
+            this.inProgress = true
+
+            if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
+                this.$toasted.show('Debe ingresar los días de validez de la proforma')
+                this.inProgress = false
+                return
+            }
 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
@@ -863,11 +894,13 @@ export default {
             }
 
             this.venta.productos = this.productos
-
+            this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
+                this.loadClienteVarios()
+                this.diasValidosProf=0;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -931,11 +964,12 @@ export default {
             }
 
             //No permitir la venta con Ruc si es boleta
+            /*
             if (esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
                 this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
                 this.inProgress = false
                 return
-            }
+            }*/
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

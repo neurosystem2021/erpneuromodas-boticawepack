@@ -9,6 +9,8 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
+import Remision from '@/views/Remision.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -139,6 +141,16 @@ export default new Router({
       path: '/porentregar',
       name: 'PorEntregar',
       component: PorEntregar
-    }
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
+    },
   ]
 })
