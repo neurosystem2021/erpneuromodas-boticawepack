@@ -75,6 +75,14 @@
           </b-col>
         </b-row>
         <b-row>
+          <b-col md="3">
+                <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
           <b-col md="6">
             <b-row>
               <b-col md="3">
@@ -472,6 +480,7 @@ export default {
       this.$refs.inputTalla.setValue('')
       this.$refs.inputGenero.setValue('')
       this.$refs.inputBotapie.setValue('')
+      this.$refs.inputCodigoBarra.value='';
 
       this.productoSelect = {}
       this.limpiarClassRows()
