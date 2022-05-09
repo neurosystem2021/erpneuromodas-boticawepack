@@ -364,7 +364,7 @@
                   ref="inputAlmacen"
                   :url="API + 'almacenes'"
                   anchor="Almacen"
-                  initValue="PRINCIPAL"
+                  initValue="TIENDA"
                   label="writer"
                   placeholder=""
                   :on-select="setAlmacen" 
@@ -442,7 +442,7 @@ export default {
       title: 'Nuevo Producto',
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'PRINCIPAL'
+        Almacen: 'TIENDA'
       },
       API: config.API,
       nuevo:false,
