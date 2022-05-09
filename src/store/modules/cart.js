@@ -20,6 +20,10 @@ const mutations = {
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
+      }else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2,0,item)
       }
     }
   },
@@ -71,6 +75,7 @@ const actions = {
     }
 
     if(typeof producto === 'object') {
+      producto.nuevoPrecioContado =  producto.PrecioContado || 0
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -97,10 +102,13 @@ const actions = {
           if (setPrecioCosto) {
             obj.cantidad = 1
             obj.precio = obj.PrecioCosto || 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
+          }else{
+            obj.nuevoPrecioContado = 0
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   

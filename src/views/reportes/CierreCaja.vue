@@ -344,6 +344,10 @@ export default {
       this.getSalidas()
     },
     cerrarCaja () {
+      if(this.granTotal==0){
+        alert("No se puede cerrar caja sin ninguna operación")
+        return
+      }
       if (!this.turno) {
         this.$toasted.show('Seleccione un Turno')
         return

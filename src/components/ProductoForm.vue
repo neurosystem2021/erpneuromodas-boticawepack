@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
@@ -185,41 +185,46 @@
 
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group>
             <label>Precio X Mayor:</label>
-            <b-form-input 
+            <input 
               v-model="producto.PrecioPorMayor"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group>
             <label>Stock X Mayor:</label>
-            <b-form-input 
+            <input 
               v-model="producto.StockPorMayor"
               type="number"
               min="0"
               step="0.0001"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
 
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.00001"
+              />
           </b-form-group>
           <b-form-group>
             <label>Activar SubProductos:</label>
@@ -250,19 +255,23 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCosto"
               type="number"
-              ></b-form-input>
+              step="0.001"
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Venta:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
-              @input.native="actualizarPorcentajeUtilidad"
-              ></b-form-input>
+              @input="actualizarPorcentajeUtilidad"
+              class="form-control"
+              step="0.01"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
@@ -326,6 +335,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -339,7 +349,7 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -407,7 +417,7 @@ export default {
       } else {
 
         this.title = 'Nuevo Producto'
-        // this.clearForm()
+        this.clearForm()
 
         this.$refs.inputCodigoBarra.$el.disabled = false
       }

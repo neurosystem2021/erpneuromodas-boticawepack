@@ -22,34 +22,36 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form ref="productoFormEdit" :producto-update="productoSelect" :showButton="showButton" :cbGuardar="(id) =>{agregarGuardar(id)}"></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo, Talla)</b-form-text>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             @input="(val) => {
-              $emit('onInputCantidad', val)
+              $emit('onInputCantidad', val.target.value)
               if (isVentas)
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 90px"
             min="0"
             step="0.01"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -79,25 +81,27 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.001"
-            :value="0"></b-form-input>
+            value="0"
+            class="form-control"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -106,7 +110,10 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <div style="display:inline-flex">
+            <b-button style="margin-right:5px" v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+            <b-button variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          </div>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -196,7 +203,9 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      productoSelect: {},
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
@@ -351,6 +360,19 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
+    editarProducto(Pro){
+      this.productoSelect = Pro
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarGuardar(id){
+      this.productoSelect = {}
+        this.add([id, (obj) => {
+          if (obj) {
+            this.$emit('onAddProducto',obj)
+          }
+        }, { setPrecio: this.setPrecio, setPrecioCosto: this.setPrecioCosto }])
+    },
     setProducto (obj) {
       this.$nextTick(() => {
         var lista = this.$refs.autocompleteProducto.$el.children[1]
