@@ -315,7 +315,7 @@ import Proformas from '@/components/ProformaLista.vue'
 export default {
     beforeMount () {
         this.initForm()
-        //this.loadClienteVarios()
+        this.loadClienteVarios()
     },
     mounted () {
         // this.getNumeroVenta()
@@ -597,7 +597,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+             this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -624,7 +624,8 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
 
                 this.limpiarDespuesVenta()
-
+                this.loadClienteVarios()
+                this.inProgress = false
                 // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
                 window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
@@ -723,6 +724,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
