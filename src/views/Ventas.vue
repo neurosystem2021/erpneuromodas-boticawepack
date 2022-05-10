@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                        <!--<delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>-->
                     </b-button-group>
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
@@ -81,7 +81,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -102,7 +102,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -590,11 +590,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'PRINCIPAL'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'PRINCIPAL'
                 },
                 vendedor: {},
                 adelantosPreOrden:[],
@@ -621,6 +621,8 @@ export default {
             this.adelantosPreOrden=[]
             this.adelanto = 0
             this.infoDelivery = {}
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false

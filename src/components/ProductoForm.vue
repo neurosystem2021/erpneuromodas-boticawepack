@@ -226,7 +226,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -629,10 +629,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'P.HUANUCO', cantidad: 0, precio: 0},
-          {nombre: 'P.PUCALLPA', cantidad: 0, precio: 0},
-          {nombre: 'P.ESPECIAL', cantidad: 0, precio: 0},
-          {nombre: 'pd', cantidad: 0, precio: 0}
+          {nombre: 'PRECIO 1', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 4', cantidad: 0, precio: 0}
         ]
       }
     },
