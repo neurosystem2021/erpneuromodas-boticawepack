@@ -397,7 +397,7 @@ export default {
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie} - <b> S/ ${data.PrecioContado>0?data.PrecioContado:0}</b>
       `
     },
     setNuevoPrecioContado (index) {

@@ -46,6 +46,7 @@
                                     <th class="text-center">TALLA</th>
                                     <th class="text-center">GENERO</th>
                                     <th class="text-center">BOTAPIE</th>
+                                    <th class="text-center">PRECIO</th>
                                     <th></th>
                                 </tr>
                                 
@@ -60,6 +61,7 @@
                                     <td class="text-center">{{prod.ProductoTalla}}</td>
                                     <td class="text-center">{{prod.Genero}}</td>
                                     <td class="text-center">{{prod.Botapie}}</td>
+                                    <td class="text-center">{{prod.PrecioContado>0?prod.PrecioContado:0}}</td>
                                     <td><b-button variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button></td>
                                 </tr>
                             </tbody>
@@ -104,7 +106,7 @@ import config from '@/store/config.js'
         methods: {
             renderChild(data) {
                 return `
-                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie}
+                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie} - <b> S/ ${data.PrecioContado>0?data.PrecioContado:0}</b>
                 `
             },
             focusAutocomplete (ref) {

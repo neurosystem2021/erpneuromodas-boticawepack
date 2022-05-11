@@ -6,6 +6,9 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
+                    <b-button-group>
+                       <b-button variant="outline-danger" @click="testImpresora()">Probar Impresora</b-button>
+                    </b-button-group>
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
@@ -790,7 +793,7 @@ export default {
                     var left = (screen.width/2)-(800/2)
                     var top = (screen.height/2)-(800/2)
                     let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                    window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)
                    
                 } catch (error) {
                     console.log(error)
@@ -829,6 +832,12 @@ export default {
                window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
             } catch (error) {
             }
+        },
+        testImpresora(){
+            var left = (screen.width/2)-(800/2)
+            var top = (screen.height/2)-(800/2)
+            let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+            window.open('http://localhost:5000/imprimir/test.php', "Impresión", params)
         },
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
