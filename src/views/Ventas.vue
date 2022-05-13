@@ -626,7 +626,7 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.inProgress = false
                 this.limpiarDespuesVenta()
-
+                this.loadClienteVarios()
                 // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
                 window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
@@ -724,6 +724,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('TICKET SEPARACIÓN')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
