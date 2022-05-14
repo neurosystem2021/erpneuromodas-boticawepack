@@ -8,6 +8,7 @@ import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Prestamos from '@/views/Prestamos.vue'
 import Repartidores from '@/views/Repartidores.vue'
+import Kardex from '@/views/reportes/Kardex.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -97,6 +98,11 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
-    }
+    },
+    {
+      path: '/reportes/kardex',
+      name: 'Kardex',
+      component: Kardex
+    },
   ]
 })
