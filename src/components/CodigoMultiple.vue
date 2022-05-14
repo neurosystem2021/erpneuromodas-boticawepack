@@ -62,7 +62,7 @@
                                     <td class="text-center">{{prod.Genero}}</td>
                                     <td class="text-center">{{prod.Botapie}}</td>
                                     <td class="text-center">{{prod.PrecioContado>0?prod.PrecioContado:0}}</td>
-                                    <td><b-button variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button></td>
+                                    <td><b-button variant="danger" size="sm" @click="quitarProducto(index)"><i class="fas fa-times fa-lg"></i></b-button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -123,8 +123,8 @@ import config from '@/store/config.js'
                 this.productos.push(obj)
                 this.$refs.autocompleteProductoCode.setValue('') 
             },
-            quitarProducto(){
-
+            quitarProducto(index){
+                this.productos.splice(index, 1)
             },
             imprimirCodigoMulti(evt){
                 evt.preventDefault()
