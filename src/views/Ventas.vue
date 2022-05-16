@@ -207,7 +207,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group v-if="false">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -770,7 +770,7 @@ export default {
         },
         setComisionista (obj) {
             if (typeof obj === 'object') {
-                this.$refs.inputComisionista.setValue(obj.Cliente)
+                //this.$refs.inputComisionista.setValue(obj.Cliente)
                 this.venta.comisionista = obj
             } else {
                 this.venta.comisionista = {}
@@ -1035,7 +1035,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -1049,7 +1049,7 @@ export default {
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-                this.$refs.inputComisionista.setValue('')
+                //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
@@ -1064,7 +1064,7 @@ export default {
             this.venta.cliente = {}
         },
         eliminarComisionista () {
-            this.$refs.inputComisionista.setValue('')
+            //this.$refs.inputComisionista.setValue('')
             this.venta.comisionista = {}
         },
         onPagarDelivery(obj){
