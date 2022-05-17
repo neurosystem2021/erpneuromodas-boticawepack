@@ -64,7 +64,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="isVentas">
-          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
+          <!--<b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>-->
         </template>
         <template slot="cantidad" slot-scope="data">
           <input
@@ -146,7 +146,7 @@
             style="width:100px"
             step="0.01"
             class="form-control"
-            @input="(val)=>ActualizarDesc(productos[data.index])" 
+            @input="(val)=>ActualizarDesc(data.index,val.target.value)"
             value="0"/>
             <b-form-text>
             </b-form-text>
@@ -378,8 +378,9 @@ export default {
         })
       }
     },
-    ActualizarDesc(obj){
-      this.actualizarProd(obj)
+    ActualizarDesc(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
@@ -437,7 +438,8 @@ export default {
       this.$refs['modalCant'].show()
       this.objProd = obj
     },
-    setProductoUni (obj, precio) {
+    setProductoUni (obj2, precio) {
+      let obj= {...obj2}
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
@@ -449,22 +451,11 @@ export default {
       obj = this.onSetProducto(obj,precio)
       let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        if(existe){
-          if(this.isVentas){
-            this.$toasted.success('Precio Modificado')
-          }else{
-            this.$toasted.success('El producto ya está en la lista')
-          }
-          
-        }else{
-          this.$toasted.success('Producto añadido correctamente')
-        }
-        
+        this.$emit('onAddProducto', obj)        
       }, { setPrecio: (this.isVentas ? false : true) }])
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     showPresentacion (obj) {
        if(this.isVentas){
