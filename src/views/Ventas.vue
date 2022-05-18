@@ -67,7 +67,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -88,7 +88,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -557,11 +557,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'PRINCIPAL'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'PRINCIPAL'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),

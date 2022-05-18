@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="HUANUCO"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -125,6 +125,30 @@
                     </b-form-group>
                   </b-col>
                 </b-row>
+                <b-row>
+                  <b-col md="6">
+                    <b-form-group>
+                      <label>Equipo:</label>
+                      <b-input-group>
+                          <autocomplete
+                              required="required"
+                              ref="inputEquipo"
+                              :url="API + 'equipos'"
+                              anchor="NombrePlaca"
+                              label="writer"
+                              placeholder=""
+                              :on-select="setEquipo" 
+                              :onFocus="focusAutocomplete.bind(null, 'inputEquipo')"
+                              :classes="{input: 'form-control'}">
+                          </autocomplete>
+                          <b-input-group-append>
+                              <!--<proveedores-tabla></proveedores-tabla>-->
+                              <!--<equipo-form @onAddCliente="setEquipo"></equipo-form>-->
+                          </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
             
               </b-col>
               <b-col md="4">
@@ -136,6 +160,7 @@
                         required="required"
                         @input="cargarNumero"
                         type="text"
+                        autocomplete="off"
                         placeholder=""></b-form-input>
                     </b-form-group>
                     <b-form-group>
@@ -284,8 +309,41 @@ return false
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
-        almacenDestino: { IdAlmacen: -1 }
+        almacenDestino: { IdAlmacen: -1 },
+        equipo:{}
       }
+    },
+    setEquipo (obj, dni = false) {
+        let params = {}
+        if (dni) {
+            params = {
+                dni: dni
+            }
+        }else {
+            params = {
+                idEquipo: obj.idEquipo
+            }
+        }
+
+        if (typeof obj === 'object') {
+            this.$refs.inputEquipo.setValue(obj.Nombre)
+            this.movimiento.equipo = obj
+        } else {
+            this.axios.get(this.API + 'equipo', {
+                params: params
+            })
+            .then((response) => {
+                if (response.data) {
+                    this.$refs.inputEquipo.setValue(response.data.Cliente)
+                    this.movimiento.equipo = response.data
+                } else {
+                    this.$toasted.show('No se encontro al equipo')
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        }
     },
     onReset (evt) {
       evt.preventDefault();
@@ -347,6 +405,12 @@ return false
         return
       }
 
+      if(!this.movimiento.equipo.IdEquipo) {
+          this.$toasted.show('Debe seleccionar un equipo')
+          this.inProgress = false
+          return
+      }
+
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
           this.inProgress = false            
@@ -379,7 +443,8 @@ return false
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$refs.inputEquipo.setValue('')
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })
