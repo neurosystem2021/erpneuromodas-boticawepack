@@ -10,7 +10,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
@@ -167,6 +167,7 @@
                             :showButton="false"
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -336,7 +337,7 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    { key: 'ProductoModelo', label: 'Modelo' },
+                    //{ key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'eventPres', label: '' },
@@ -595,11 +596,11 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
-            this.$refs.inputVendedor.setValue('')
+            //this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
             this.inProgress = true
@@ -629,7 +630,7 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.inProgress = false
                 this.limpiarDespuesVenta()
-
+                this.loadClienteVarios()
                 // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
                 window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
             })
@@ -721,11 +722,12 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
+                //this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
                 this.$refs.carrito.pagocon = 0
 

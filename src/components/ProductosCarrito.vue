@@ -6,7 +6,8 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':'Producto', 'sortDesc': 0, 'limit':40}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -290,7 +291,7 @@ export default {
   props: {
     isVentas: Boolean,
     setPrecio: Boolean,
-
+    idAlmacen: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -333,6 +334,13 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock'
+      } else {
+        return this.API + 'productos'
+      }
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -534,8 +542,24 @@ export default {
       }
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        let style = 'ss'
+        let styleBag = 'ss'
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+        if (data.stock <= 0) {
+          styleBag  = 'danger'
+        }
+        return `
+        <div class="${style}">
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
+          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):0}</b>
+        </div>
+        `
+      }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b> S/ ${data.PrecioContado || 0} </b> / <b>${data.ProductoMedicion}</b>
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b> S/ ${data.PrecioContado || 0} </b> 
       `
     },
     setNuevoPrecioContado (index) {

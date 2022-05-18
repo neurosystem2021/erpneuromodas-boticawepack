@@ -22,7 +22,11 @@
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
-                        
+
+                      <template slot="update" slot-scope="data">
+                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                      </template>
+
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
                       </template>
@@ -48,7 +52,7 @@
 </template>
 <script>
 import config from '@/store/config.js'
-
+import { mapActions } from 'vuex'
     export default {
         mounted () {
             
@@ -71,13 +75,39 @@ import config from '@/store/config.js'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
             }
         },
+        props: ['idAlmacen'],
         methods: {
+            ...mapActions({
+                add         : 'agregarProducto',
+                obtenerStok : 'obtenerStock',
+                limpiarCarrito: 'limpiarCarrito'
+            }),
+            selectProformas (proforma) {
+                this.axios.get(this.API + 'proformas/detalle', {
+                    params: {
+                        idProforma: proforma.IdProforma
+                    }
+                }).then((response) => {
+                    response.data.map((item) => {
+                        this.add([item.IdProducto, () => {
+                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+                        }, { setPrecio: true, setPreOr: item.Precio, cantidad: item.Cantidad } ])
+                        this.filter = ''
+                        this.show = false
+                    })
+                    proforma.productos = response.data
+                    // console.log(proforma);
+                    // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+                    this.$emit('onSelectProforma', proforma)
+                    this.limpiarCarrito()
+                })
+            },
             selectCierre (item) {
                // console.log(item)
                 
