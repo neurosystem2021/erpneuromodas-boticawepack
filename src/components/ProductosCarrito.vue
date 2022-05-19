@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':'stock', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -270,9 +270,9 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      // if (this.idAlmacen) {
-      //   return this.API + 'productos/stock/' + this.idAlmacen
-      // }
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock/' + this.idAlmacen
+      }
       return this.API + 'productos'
     },
     sumatoriaSubTotal () {
@@ -419,7 +419,7 @@ export default {
     renderChild(data) {
       if (this.idAlmacen) {
         let style = 'ss'
-
+        let styleBag = 'ss'
         // cambiar color los vencidos
         var dt = new Date()
         var anio = dt.getFullYear()
@@ -444,13 +444,22 @@ export default {
         }
 
         if (!data.ControlaStock) {
-          data.stock = '---'
+          data.stock = '--'
+          styleBag  = 'dark'
+        }
+
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+        if (data.stock <= 0) {
+          styleBag  = 'secondary'
         }
 
 //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
         return `
         <div class="${style}">
-           <b>${data.CodigoBarra}</b> / 
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock>0? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+          <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
         </div>
