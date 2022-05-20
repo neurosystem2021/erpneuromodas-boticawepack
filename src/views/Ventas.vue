@@ -1000,7 +1000,7 @@ export default {
             this.productos.forEach(pro => {
                 console.log(pro);
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) )) {
-                    sinStock += 1
+                    //sinStock += 1
                 }
 
                 if(parseFloat(pro.total) <= 0) {
@@ -1014,11 +1014,11 @@ export default {
                 
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            /*if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if (igualLote >= 1) {
                 this.$toasted.error('Debe seleccionar diferente lote por producto');
