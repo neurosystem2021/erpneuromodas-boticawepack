@@ -299,12 +299,13 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="'Precio '+i" class="text-center">
+          <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
                 :disabled="(idPerfil == 1) ? false : true"
                 type="text"
+                style="text-transform:uppercase"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
                 ></b-form-input>
             </b-form-group>
@@ -583,11 +584,11 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
-
+      this.$refs.inputProductoDesc.$el.value = ''
       this.initForm()
     },
     initForm () {
@@ -632,7 +633,7 @@ export default {
           {nombre: 'P.HUANUCO', cantidad: 0, precio: 0},
           {nombre: 'P.PUCALLPA', cantidad: 0, precio: 0},
           {nombre: 'P.ESPECIAL', cantidad: 0, precio: 0},
-          {nombre: 'pd', cantidad: 0, precio: 0}
+          {nombre: 'OFERTA', cantidad: 0, precio: 0}
         ]
       }
     },
@@ -780,5 +781,8 @@ export default {
 }
 </script>
 <style>
-
+.oferta .card-header{
+  background: #dc3545;
+  font-weight: bold;
+}
 </style>

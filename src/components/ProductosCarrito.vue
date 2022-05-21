@@ -59,7 +59,7 @@
               v-if="d.cantidad != 0"
               align="center"
               class="mb-3 contentCard"
-              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+              v-bind:class="[d.nombre=='OFERTA' ? 'oferta' : '']"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
                   setProductoCant(d)
@@ -67,7 +67,7 @@
               }"
             >
               <b-row>
-                <b-col md="6" class="nomCart">
+                <b-col md="6" class="nomCart" v-bind:class="[d.nombre=='OFERTA' ? 'ofertanom' : '']">
                   <h5 class="text-uppercase">{{ d.nombre }}</h5>
                 </b-col>
                 <b-col md="6" class="text-left">
@@ -192,7 +192,7 @@
         <template slot="precioVenta" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false"
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -254,6 +254,7 @@
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
+            style="width: 150px"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -900,6 +901,13 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+  .oferta{
+     border: 4px solid #dc3545;
+  }
+  .ofertanom{
+    color: #dc3545;
+    border-right: 2px solid #dc3545;
   }
 </style>
 <style>
