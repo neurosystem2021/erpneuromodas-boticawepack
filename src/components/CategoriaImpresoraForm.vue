@@ -46,6 +46,14 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-checkbox
+            v-model="categoria.EsOferta"
+            :value="1"
+            :unchecked-value="0">
+            Es Oferta
+          </b-form-checkbox>
+        </b-col>
         <div slot="modal-footer">
         <b-btn variant="primary" type="submit">
            Guardar
@@ -95,6 +103,7 @@ export default {
         this.categoria.MostrarDelivery = newVal.MostrarDelivery
         this.categoria.MostrarPuntoVenta = newVal.MostrarPuntoVenta
         this.categoria.Orden = newVal.Orden
+        this.categoria.EsOferta = newVal.EsOferta
       } else {
         this.title='Nueva Categoria'
         this.initForm();
@@ -109,6 +118,7 @@ export default {
           MostrarDelivery: 0,
           MostrarPuntoVenta:0,
           Orden:0,
+          EsOferta:0,
       }
     },
     guardarCategoriaImpresora(e) {

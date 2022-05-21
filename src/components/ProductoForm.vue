@@ -241,6 +241,11 @@
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
 
+          <b-form-group>
+            <label>Categoria Oferta en APP:</label>
+            <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md" required/>
+          </b-form-group>
+
           <b-form-group v-if="false">
             <label>2da Descripción:</label>
             <b-form-textarea 
@@ -396,7 +401,8 @@ export default {
       producto: {},
       productosDet: [],
       file: '',
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      categoriaItems:[]
     }
   },
   beforeMount () {
@@ -405,6 +411,10 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     show (val) {
+      if(val){
+        this.cargarCatOferta()
+      }
+
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto && !this.nuevo) {
         this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
@@ -485,7 +495,7 @@ export default {
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
-
+        this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -505,6 +515,22 @@ export default {
     }
   },
   methods: {
+    cargarCatOferta(){
+      this.categoriaItems = []
+      this.axios.get(this.API + 'categorias/oferta')
+      .then((response) => {
+        if(response.data){
+            response.data.map((cat)=>{
+                this.categoriaItems.push({value:null,text:'=== SIN OFERTA ==='})
+                this.categoriaItems.push({value:cat.IdProductoCategoria,text:cat.ProductoCategoria})
+            })
+        }else{
+          this.categoriaItems.push({value:null,text:'=== SIN OFERTA ==='})
+        }
+      }).catch((error)=>{
+        
+      })
+    },
     handleFileUpload() {
       this.file = this.$refs.file.files[0]
     },
@@ -622,6 +648,7 @@ export default {
         // Genero: '',
         categoria: {},
         marca: {},
+        IdOfertaCategoria: null,
         // modelo: {},
         //talla: {},
         medicion: {

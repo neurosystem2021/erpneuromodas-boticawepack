@@ -46,6 +46,10 @@
                 <b-badge v-if="data.item.MostrarPuntoVenta==1" variant="info">{{data.item.Orden}}</b-badge>
                 <label v-else>---</label>
               </template>
+              <template slot="EsOferta" slot-scope="data">
+                <b-badge v-if="data.item.EsOferta==1" variant="success">SI</b-badge>
+                <label v-else>---</label>
+              </template>
             </b-table>
             <b-row>
               <b-col md="6" class="my-1">
@@ -143,6 +147,7 @@ export default {
             { key: 'Delivery', label: 'Mostrar en Delivery', sortable: true , class:'text-center'},
             { key: 'PuntoVenta', label: 'Mostrar en P. de Venta', sortable: true , class:'text-center'},
             { key: 'OrdenPuntoVenta', label: 'Orden P. de Venta', sortable: true , class:'text-center'},
+            { key: 'EsOferta', label: 'Oferta APP', class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
