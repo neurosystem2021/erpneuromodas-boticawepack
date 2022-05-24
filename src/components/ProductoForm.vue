@@ -283,7 +283,7 @@
             <label>Precio Público:</label>
             <input v-model="producto.PrecioContado"
               type="number"
-              step="0.01"
+              step="0.001"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
             />
@@ -322,7 +322,7 @@
                 v-model="producto.precios[i-1].precio"
                 type="number"
                 class="form-control"
-                step="0.01"
+                step="0.001"
                 />
             </b-form-group>
           </b-card>

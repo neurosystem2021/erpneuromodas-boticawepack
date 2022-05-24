@@ -105,6 +105,7 @@
             type="number"
             style="width: 85px"
             min="0"
+            step="0.001"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
              /* if(!productos[data.index].PreciosPorProducto) {
