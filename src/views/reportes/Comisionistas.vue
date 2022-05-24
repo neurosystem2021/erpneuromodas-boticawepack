@@ -156,21 +156,40 @@ export default {
   },
   methods: {
     pagarAComisionista (e, cliente) {
-      let r = confirm('Desea pagar al comisionista')
-      if (r) {
-        let importe = e.target.parentElement.previousElementSibling.value
-        this.axios.post(this.API + 'cliente/comisionistas/pagar', {
-          cliente: cliente,
-          importe: importe
-        })
-        .then((response) => {
-          this.$toasted.success('Pago a comisionista realizado')
-          Vue.nextTick(() => this.$refs.tablaProductos.refresh())
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+      let pass = window.prompt('Escriba su contraseña del usuario PAGO')
+      if (pass) {
+          this.axios.post(this.API + 'login', {
+          user: 'PAGO',
+          password: pass
+          }).then(r => {
+            if (r.data) {
+                let r = confirm('Desea pagar al comisionista')
+                if (r) {
+                  let importe = e.target.parentElement.previousElementSibling.value
+                  if(importe>0){
+                    this.axios.post(this.API + 'cliente/comisionistas/pagar', {
+                      cliente: cliente,
+                      importe: importe
+                    })
+                    .then((response) => {
+                      this.$toasted.success('Pago a comisionista realizado')
+                      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+                    })
+                    .catch((error) => {
+                      console.log(error)
+                      this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    })
+                  }else{
+                    this.$toasted.show('No existe monto ingresado.')
+                  }
+                }
+            }else{
+                this.$toasted.show('Contraseña incorrecta, no autorizado.')
+            }
+          }).catch((error) => {
+              console.log(error)
+              this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
       }
     },
     rowDblClick (item) {

@@ -200,6 +200,7 @@
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto"
+                            :isVentas="true"
                             :clienteInfo="venta.cliente">
 
                             <template slot="operaciones">
@@ -830,6 +831,13 @@ export default {
                 this.inProgress = false
                 return
             }
+
+            if (esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
+                this.$toasted.show('La boleta no puede ser emitida a un cliente con RUC, solicite su DNI')
+                this.inProgress = false
+                return
+            }
+
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
                 this.inProgress = false            
@@ -846,7 +854,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) )) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined)) {
                     sinStock += 1
                 }
 
