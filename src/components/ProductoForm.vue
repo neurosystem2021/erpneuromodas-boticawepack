@@ -243,7 +243,7 @@
 
           <b-form-group>
             <label>Categoria Oferta en APP:</label>
-            <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md" required/>
+            <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md"/>
           </b-form-group>
 
           <b-form-group v-if="false">
