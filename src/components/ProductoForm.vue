@@ -651,7 +651,7 @@ export default {
           pre.precio=0
         }
       })
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
         PreciosPorProducto: this.producto.precios 
