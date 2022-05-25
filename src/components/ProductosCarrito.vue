@@ -127,7 +127,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 85px"
+            style="width: 90px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -172,7 +172,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:85px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -229,17 +229,19 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <!--<template slot="Descripcion" slot-scope="data">
+        <template slot="Descripcion" slot-scope="data">
           <textarea 
+            :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
+            style="width: 170px"
             v-model="productos[data.index].Descripcion"></textarea>
-          <b-form-input
+          <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>
-        </template>--> 
+            placeholder="Descripción"></b-form-input>-->
+        </template>  
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}

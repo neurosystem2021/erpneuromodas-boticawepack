@@ -39,7 +39,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -427,7 +427,7 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'Descripcion', label: 'Descripción'},
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -436,7 +436,7 @@ export default {
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porc. Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porc. Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -540,10 +540,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '03'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -995,7 +995,7 @@ export default {
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.loadClienteVarios()
-                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
