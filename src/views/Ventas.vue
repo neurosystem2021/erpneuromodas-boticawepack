@@ -39,7 +39,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA"
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -540,10 +540,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '03'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -995,7 +995,7 @@ export default {
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.loadClienteVarios()
-                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
