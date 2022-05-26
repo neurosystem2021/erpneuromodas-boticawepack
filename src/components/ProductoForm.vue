@@ -110,7 +110,7 @@
 
          
           <b-form-group>
-            <label>Presentación:</label>
+            <label>Anaquel:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
@@ -134,7 +134,7 @@
             <label>1ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
-              rows="6"
+              rows="2"
               v-model="producto._ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
               />
@@ -241,7 +241,7 @@
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Categoria Oferta en APP:</label>
             <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md"/>
           </b-form-group>
@@ -515,7 +515,7 @@ export default {
     }
   },
   methods: {
-    cargarCatOferta(){
+    /*cargarCatOferta(){
       this.categoriaItems = []
       this.axios.get(this.API + 'categorias/oferta')
       .then((response) => {
@@ -530,7 +530,7 @@ export default {
       }).catch((error)=>{
         
       })
-    },
+    },*/
     handleFileUpload() {
       this.file = this.$refs.file.files[0]
     },
@@ -657,9 +657,9 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'P.HUANUCO', cantidad: 0, precio: 0},
-          {nombre: 'P.PUCALLPA', cantidad: 0, precio: 0},
-          {nombre: 'P.ESPECIAL', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 1', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
           {nombre: 'OFERTA', cantidad: 0, precio: 0}
         ]
       }
@@ -677,7 +677,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
         PreciosPorProducto: this.producto.precios 

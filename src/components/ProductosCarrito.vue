@@ -420,7 +420,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Present.' }, 
+          { key: 'ProductoPresentacion', label: 'Anaquel' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },

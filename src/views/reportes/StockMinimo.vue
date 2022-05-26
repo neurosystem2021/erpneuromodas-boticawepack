@@ -28,7 +28,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="HUANUCO"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 

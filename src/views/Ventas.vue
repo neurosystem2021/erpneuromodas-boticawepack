@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                        <!--<delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>-->
                     </b-button-group>
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
@@ -81,7 +81,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -102,7 +102,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="PRINCIPAL"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -207,7 +207,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group v-show="false">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -385,7 +385,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center" v-if="false">
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -467,18 +467,18 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
+                    { key: 'ProductoPresentacion', label: 'Anaquel' },
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -590,11 +590,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'PRINCIPAL'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'PRINCIPAL'
                 },
                 vendedor: {},
                 adelantosPreOrden:[],
