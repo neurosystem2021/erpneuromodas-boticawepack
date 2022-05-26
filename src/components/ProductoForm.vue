@@ -412,7 +412,7 @@ export default {
   watch: {
     show (val) {
       if(val){
-        this.cargarCatOferta()
+        //this.cargarCatOferta()
       }
 
       let newVal = this.productoUpdate  || {}
