@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
     <b-modal :no-close-on-esc="true" 
@@ -88,6 +88,23 @@
               ></b-form-input>
           </b-form-group>
 
+          <b-form-group>
+            <label>Anaquel:</label>
+            <b-input-group>
+              <autocomplete
+                :url="API + 'productos/anaqueles'"
+                ref="inputAnaquel"
+                anchor="Anaquel"
+                label="writer"
+                :placeholder.sync="producto.Anaquel"
+                :on-select="val => producto.Anaquel = val.Anaquel && val.Anaquel.toUpperCase()"
+                :onInput="val => producto.Anaquel = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputAnaquel')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
+
           
           
         </b-col>
@@ -164,8 +181,8 @@
         </b-col>
       </b-row>
 
-      <hr>
-      <b-row v-for="i in 5" :key="i.id">
+      <hr v-show="false">
+      <b-row v-for="i in 5" :key="i.id" v-show="false">
         <b-col md="6">
           <b-form-group>
             <label>Cantidad:</label>
@@ -215,6 +232,26 @@
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
+          </b-form-group>
+        </b-col>
+                <b-col md="6">
+          <b-form-group>
+            <label>Precio Distribuidor:</label>
+            <input v-model="producto.PrecioConvenio"
+              type="number"
+              class="form-control"
+              step="0.001"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Especial:</label>
+            <input v-model="producto.PrecioEspecial"
+              type="number"
+              class="form-control"
+              step="0.001"
+              />
           </b-form-group>
         </b-col>
       </b-row>
@@ -275,6 +312,7 @@ export default {
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
       API: config.API,
+      nuevo:false,
       show: false, 
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
@@ -288,7 +326,7 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
         this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
@@ -311,6 +349,7 @@ export default {
 
        // this.$refs.inputMedicion.setValue('')
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
+        this.$refs.inputAnaquel.setValue(newVal.Anaquel)
         
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
@@ -352,6 +391,9 @@ export default {
         this.producto.ProductoPresentacion  = newVal.ProductoPresentacion
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
+        this.producto.PrecioConvenio        = newVal.PrecioConvenio
+        this.producto.PrecioEspecial        = newVal.PrecioEspecial
+        this.producto.Anaquel               = newVal.Anaquel
         
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
@@ -440,6 +482,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
+      this.$refs.inputAnaquel.setValue('')
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
       //this.$refs.inputPresentacion.setValue('')
@@ -464,8 +507,11 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        PrecioConvenio:0,
+        PrecioEspecial:0,
         PrecioPorMayor: 0,
         StockPorMayor: 0,
+        Anaquel:'',
         // Botapie: '',
         // Genero: '',
         categoria: {},

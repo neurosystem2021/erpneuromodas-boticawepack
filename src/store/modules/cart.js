@@ -26,6 +26,13 @@ const mutations = {
         productos.map((pro, index)=>{
           pro.itemNum=(index+1)
         })
+      } else {
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2,0,item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       }
     }
   },
@@ -78,13 +85,19 @@ const actions = {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
+    let setPrecioCosto = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      setPrecioCosto = obje.setPrecioCosto
     }
 
     if(typeof producto === 'object') {
+      if (setPrecioCosto) {
+        producto.precio = producto.PrecioCosto
+        producto.nuevoPrecioContado = producto.PrecioContado
+      }
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -113,9 +126,18 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-
-          obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          
+          if (setPrecioCosto) {
+            obj.descuento = 0
+            obj.cantidad = 0
+            obj.precio = obj.PrecioCosto || 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
+          }else{
+            obj.descuento = 0
+            obj.cantidad = 1
+            obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
+          }
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   

@@ -6,7 +6,8 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos()"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1, 'limit':25}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -23,39 +24,59 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form ref="productoFormEdit" :producto-update="productoSelect" :showButton="showButton" :cbGuardar="(id) =>{agregarGuardar(id)}"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
+          <h5>Precios Disponibles</h5>
         </div>
-
+        <hr>
         <b-row>
-          <b-col cols="6">
+          <b-col cols="6" v-if="false">
             <b-card
               align="center"
               class="mb-3 contentCard"
               @click="setProductoUni(objProd)"
             >
-              <b>1 - UNIDAD</b>
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">UNI</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>1
+                  <br>
+                  <b>Pre: </b>S/ {{ precioCont }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
+              v-if="d.cantidad != 0"
               align="center"
               class="mb-3 contentCard"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
-                  setProductoCant(d)
+                  setProductoUni(objProd, d.precio)
                 }
               }"
             >
-              {{d.cantidad}} - UNIDADES
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>{{ d.cantidad }}
+                  <br>
+                  <b>Precio: </b>S/ {{ d.precio }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
         </b-row>
@@ -66,7 +87,7 @@
           <b-button size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+        <template slot="cantxPrecio" slot-scope="data" v-if="false">
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -82,34 +103,38 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].PreciosPorProducto !== '' || (bloquearInput?true:false)"
             type="number"
-            style="width: 80px"
+            :disabled="bloquearInput?true:false"
+            style="width: 95px"
             step="0.1"
             min="0"
             class="form-control"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              if(!productos[data.index].PreciosPorProducto) {
+              changeCant(val.target.value, productos[data.index])
+              if(false){
+                if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 return
-              }
+                }
 
-              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-              if(reg && reg.cantidad){
-                productos[data.index].precio = reg.precio
-                return
+                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
+                if(reg && reg.cantidad){
+                  productos[data.index].precio = reg.precio
+                  return
+                }
+                productos[data.index].precio = productos[data.index].PrecioContado
               }
-              productos[data.index].precio = productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
+            :disabled="bloquearInput?true:false"
             type="number"
             class="form-control"
-            style="width: 80px"
+            style="width: 95px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -145,7 +170,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -166,6 +191,7 @@
             min="0"
             step="0.01"
             value="0"
+            @input="(val)=>ActualizarDesc(data.index,val.target.value)"   
             class="form-control"/>
             <b-form-text>
             </b-form-text>
@@ -175,7 +201,10 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <div style="display:inline-flex">
+            <b-button style="margin-right:5px" :disabled="bloquearInput?true:false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+            <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          </div>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -197,7 +226,7 @@
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2">
+    <b-col md="3" offset-md="2" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -263,6 +292,8 @@ export default {
       preciosProd: [],
       objProd: {},
       cant: 0,
+      precioCont: 0,
+      productoSelect: {},
     }
   },
   watch: {
@@ -271,6 +302,8 @@ export default {
     }
   },
   props: {
+    idAlmacen:Number,
+    noSubtotal: Boolean,
     isVentas: Boolean,
     setPrecio: Boolean,
     tipo: String,
@@ -311,7 +344,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    
   },
   computed: {
     ...mapState({
@@ -370,11 +404,18 @@ export default {
       eliminar            : 'eliminarProducto',
       actualizarTotal     : 'actualizarTotalCart'
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/stock'
+      } else {
+        return this.API + 'productos'
+      }
+    },
     changeCant (val, prod) {
-      if (val) {
+      /*if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
-      }
+      }*/
       this.$nextTick(() => {
         this.actualizarProd(prod)
       })
@@ -431,28 +472,45 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    editarProducto(Pro){
+      this.productoSelect = Pro
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarGuardar(id){
+      this.productoSelect = {}
+        this.add([id, (obj) => {
+          if (obj) {
+            this.$emit('onAddProducto',obj)
+          }
+        }, { setPrecioCosto:(this.isVentas?false:true) }])
+    },
     setProducto (obj) {
+      this.precioCont = obj.PrecioContado
       this.loadCode = ''
       this.preciosProd = []
-      this.objProd = {}
-
-      obj.itemNum = this.productos.length+1;
-
       if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
-      }
-
-      if (!obj.PreciosPorProducto) {
+        obj.PreciosPorProducto = ''
         this.setProductoUni(obj)
         return
       }
-
-      this.$refs['modalCant'].show()
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+      if(obj.PrecioConvenio){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.PrecioConvenio})
+      }
+      if(obj.PrecioEspecial){
+       this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+      }
+      this.objProd = {}
       this.objProd = obj
-      console.log(obj);
+      if(this.preciosProd.length == 1){
+        this.setProductoUni(obj,obj.PrecioContado)
+      }else{
+        this.$refs['modalCant'].show()
+      }
     },
-    setProductoUni (obj) {
+    setProductoUni (obj, precio) {
+      console.log(precio);
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -460,17 +518,17 @@ export default {
       obj.cantidad = 0
       //obj.IdLote = 0
       // //obj.TieneIgv = 0
-      // obj.descuento = 0
+      obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,false,precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }])
+      },{setPrecioCosto:(this.isVentas?false:true)}])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -495,17 +553,45 @@ export default {
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
     },
+    ActualizarDesc(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
+    },
     showPresentacion (obj) {
-      if (!obj.PreciosPorProducto !== '') {
-        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+      if(this.isVentas){
+        this.preciosProd = []
+        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+        if(obj.PrecioConvenio){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.PrecioConvenio})
+        }
+        if(obj.PrecioEspecial){
+        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+        }
         this.objProd = obj
         this.$refs['modalCant'].show()
         return
       }
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        let style = 'ss'
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+        }
+        return `
+        <div>
+          <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock>0?data.stock.toFixed(2):data.stock}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b>${data.ProductoMedicion}</b> -  <b> S/ ${data.PrecioContado || 0} </b> 
+        </div>
+        `
+      }
+
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b> S/ ${data.PrecioContado || 0} </b> / <b>${data.ProductoMedicion}</b>
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / <b>${data.ProductoMedicion}</b> -  <b> S/ ${data.PrecioContado || 0} </b>
       `
     },
     setNuevoPrecioContado (index) {
@@ -585,5 +671,16 @@ export default {
   .disabledMouse {
     background: #CECECE;
     cursor: inherit;
+  }
+  .nomCart {
+    display: flex;
+    align-items: center;
+    border-right: 2px solid black;
+  }
+  .form-check-input {
+    margin-left: -0.2rem !important;
+  }
+  #modalCantidad .modal-dialog{
+    max-width: 45% !important;
   }
 </style>

@@ -188,6 +188,7 @@
                             :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :isVentas="true"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -384,8 +385,9 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Medición' },
+                    { key: 'Anaquel', label: 'Anaquel' },
                     { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
@@ -478,6 +480,8 @@ export default {
             }
             this.isNota = false
             this.bloquearInput = false 
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -649,15 +653,15 @@ export default {
                 })
             }
         },
-        onSetProducto (obj, cant) {
-            if (cant) {
+        onSetProducto (obj, cant,precio) {
+        if (cant) {
                 obj.cantidad = cant
                 let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
                 obj.precio = preciosPorProducto.precio || 0
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || 0
             return obj
         },
         onAddProducto (obj) {
@@ -726,7 +730,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -751,7 +755,7 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false
                 this.limpiarDespuesVenta()
 
                 // window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -824,7 +828,7 @@ export default {
             let sinStock = 0
             let totalCero = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined)) {
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
@@ -838,11 +842,11 @@ export default {
                 return;
             }
             
-            // if (sinStock >= 1  && this.venta.tipoVenta.CodSunat != '07') {
-            //     this.$toasted.error('No se puede vender un producto sin stock');
-            //     this.inProgress = false
-            //     return;
-            // }
+            if (sinStock >= 1  && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false
+                return;
+            }
 
 
 
@@ -852,7 +856,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
