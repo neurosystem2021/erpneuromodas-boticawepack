@@ -672,7 +672,7 @@ export default {
       }
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-      let fPP = this.preciosProd.filter(p => p.cantidad === 0)
+      let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       
       if (!obj.PreciosPorProducto || fPP.length === 4) {
         obj.estadoPxP = true
