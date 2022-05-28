@@ -168,6 +168,7 @@
                             :showButton="false"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
+                            :isVentas="true"
                             :onSetProducto="onSetProducto">
 
                             <template slot="operaciones">
@@ -179,13 +180,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -226,13 +229,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -586,7 +590,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -611,7 +615,8 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false
+                this.loadClienteVarios()
                 this.limpiarDespuesVenta()
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -668,7 +673,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined )) {
                     sinStock += 1
                 }
 
@@ -684,12 +689,11 @@ export default {
             }
 
 
-            // if (sinStock >= 1) {
-            //     this.$toasted.error('No se puede vender un producto sin stock');
-            //     this.inProgress = false
-            //     return;
-            // }
-
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender un producto sin stock');
+                this.inProgress = false
+                return;
+            }
 
 
             this.venta.productos = this.productos
@@ -698,13 +702,14 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -713,6 +718,7 @@ export default {
                 //this.limpiarDespuesVenta()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$refs.carrito.pagocon = 0
             })
             .catch((error) => {
                 console.log(error)
