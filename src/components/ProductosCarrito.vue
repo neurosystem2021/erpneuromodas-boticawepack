@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'stock': 1}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1, 'stock': 1 }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -29,6 +29,7 @@
         </b-input-group>
           <b-badge variant="danger">Productos Vencidos</b-badge>
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
+          <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data" >
@@ -218,6 +219,7 @@ export default {
     }
   },
   props: {
+    isVentas:Boolean,
     setPrecio: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
@@ -264,7 +266,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       } else {
         return this.API + 'productos'
       }
@@ -466,6 +468,7 @@ export default {
                 <th>Forma.</th>
                 <th>Medición.</th>
                 <th>Producto.</th>
+                <th style="width: 200px">Compuestos</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
               </tr>
             </thead>
@@ -476,6 +479,7 @@ export default {
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td>${data.ProductoMedicion}</td>
                 <td>${data.Producto}</td>
+                <td style="font-size:10px">${data.CompuestosProducto}</td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
               </tr>
             </tbody>
