@@ -131,6 +131,16 @@
 
                                 </b-form-group>
                             </b-col>
+                            <b-col md="4">
+                                <b-form-group>
+                                    <label>Nº Placa:</label>
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            class="form-control"
+                                            style="text-transform:uppercase"
+                                            placeholder="Placa" />
+                                </b-form-group>
+                            </b-col>
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -449,6 +459,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
+                Placa: '',
                 cliente: {},
                 tipoVenta: {
                     IdTipoDoc: 7,
@@ -531,7 +542,6 @@ export default {
                     }
                 }).then((response) => {
                     this.venta.Placa = response.data[0].Placa
-                    this.venta.DescripcionEmbarcacion = response.data[0].DescripcionEmbarcacion
                 this.axios.get(this.API + 'cliente', {
                     params: {
                         idCliente: response.data[0].IdCliente
@@ -854,6 +864,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
