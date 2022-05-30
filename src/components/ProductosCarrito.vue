@@ -125,6 +125,7 @@
         </template>
         <template slot="precio" slot-scope="data">
           <input
+            v-show="!noSubtotal || consignacionPrecio"
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
@@ -201,6 +202,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
+            v-show="!noSubtotal || consignacionPrecio"
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
@@ -307,7 +309,7 @@
       </b-table>
     </b-col>
     <b-col md="3">
-      <slot name="operaciones" v-if="!noSubtotal"></slot>
+      <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
@@ -315,7 +317,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3"  v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -402,6 +404,7 @@ export default {
     }
   },
   props: {
+    consignacionPrecio:Boolean,
     isVentas: Boolean,
     isNota:Boolean,
     tipo: String,

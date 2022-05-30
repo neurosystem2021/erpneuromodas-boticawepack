@@ -61,20 +61,24 @@
                       <tr>
                         <th>Codigo</th>
                         <th>Producto</th>
-                        <th>Cantidad</th>
                         <th>Unidad</th>
+                        <th>Cantidad</th>
+                        <th v-if="estadoVenta==3">Precio</th>
+                        <th v-if="estadoVenta==3">Descuento</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="(item, index) in getDetalles(row.item.IdDocVentaRemision)" :key="index">
                         <td>{{ item.CodigoBarra }}</td>
                         <td>{{ item.Producto }}</td>
-                        <td>{{ item.Cantidad }}</td>
                         <td>{{ item.CodigoMedicion }}</td>
+                        <td>{{ item.Cantidad }}</td>
+                        <td v-if="estadoVenta==3">{{ item.Precio }}</td>
+                        <td v-if="estadoVenta==3">{{ item.Descuento }}</td>
                       </tr>
                     </tbody>
                   </table>
-                        <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                        <b-button v-if="row.item.Estado != '2' && row.item.Estado != '3'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
                       </b-row>
                   </b-card>
                 </template>
@@ -85,7 +89,7 @@
                       &nbsp;&nbsp;
                       <img v-b-tooltip.hover v-if="data.item.Msj_sunat && data.item.Estado != 2" :title="data.item.Msj_sunat"  src="static/error.png" height="32"/>
                       &nbsp;&nbsp;
-                      <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
+                      <b-button v-if="estadoVenta != 2 && estadoVenta != 3" :disabled="data.item.CodMotivoTraslado=='66'" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
                       &nbsp;&nbsp;
                       <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
@@ -116,7 +120,8 @@ export default {
       estadoVenta: 1,
       optionsEstado: [
         { value: '1', text: 'PENDIENTE'},
-        { value: '2', text: 'EMITIDOS' }
+        { value: '2', text: 'EMITIDOS' },
+        { value: '3', text: 'CONSIGNACION' }
       ],
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),

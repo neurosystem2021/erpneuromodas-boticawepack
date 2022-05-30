@@ -58,6 +58,7 @@
                     <option value="08">IMPORTACION</option>
                     <option value="09">EXPORTACION</option>
                     <option value="19">TRASLADO A ZONA PRIMARIA</option>
+                    <option value="66">CONSIGNACION</option>
                     <option value="13">OTROS</option>
                   </select>
                 </div>
@@ -237,7 +238,7 @@
 
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true"></productos-carrito>
+              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true" :consignacionPrecio="(remision.codMotivoTraslado=='66'?true:false)"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -266,6 +267,7 @@ export default {
         codUndPesoBruto: 'KGM',
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
+        descripcionMotivoTraslado:'VENTA',
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
@@ -274,6 +276,8 @@ export default {
           { key: 'CodigoBarra', label: 'Código' }, 
           { key: 'Producto' }, 
           { key: 'cantidad' },
+          { key: 'precio', label: 'Precio' },
+          { key: 'descuento', label: 'Descuento'},
           { key: 'acciones', label: ''}
         ]
       }
@@ -380,14 +384,14 @@ export default {
         }).then((response) => {
           
           if (response.data[0]) {
-            this.axios.get(this.API + 'cliente', {
+            this.axios.get(this.API + 'proveedor', {
               params: {
-                  idCliente: response.data[0].IdProveedor
+                  idProveedor: response.data[0].IdProveedor
               }})
               .then((response) => {
                 if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
+                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
                   this.$set(this.remision, 'direccionCliente', response.data.Direccion);
                   this.cliente = response.data;
                 } else {
