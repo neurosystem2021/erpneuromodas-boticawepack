@@ -235,7 +235,7 @@
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
-            style="width: 170px"
+            style="width: 120px"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"

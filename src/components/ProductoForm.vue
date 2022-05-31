@@ -226,17 +226,17 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group  v-if="false">
-            <label>Activar Proyecto:</label>
+          <b-form-group >
+            <label>Es habitación:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
                      :value="1"
                      :unchecked-value="0"
                      >
-              Seleccione esta opción si es un proyecto
+              Seleccione esta opción si es una habitación
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group v-if="producto.EsHabitacion">
+          <b-form-group v-if="false">
             <label>Lugar:</label>
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>

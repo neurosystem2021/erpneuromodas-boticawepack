@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 180px)" class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -428,10 +428,10 @@ export default {
                     //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
-                    // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+                    { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+                    { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoMedicion', label: 'Medición' },
+                    //{ key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
