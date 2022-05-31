@@ -6,6 +6,12 @@
             <b-row>
               <b-col md="2">
                 <div class="suma-stock text-center">
+                  <b>Stock Valorizado Sin Utili.</b>
+                  <div> S/. {{ sumaValorizadoSin | moneda }} </div>
+                </div>
+              </b-col>
+              <b-col md="2">
+                <div class="suma-stock text-center">
                   <b>Stock Valorizado</b>
                   <div> S/. {{ sumaValorizado | moneda }} </div>
                 </div>
@@ -16,7 +22,7 @@
                   <div> {{ sumaStock | redondear(4) }} </div>
                 </div>
               </b-col>
-              <b-col md="2">
+              <b-col md="1">
                 <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -24,7 +30,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="TUPAC"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -60,7 +66,7 @@
                   </b-form-checkbox>
                 </b-form-group>
               </b-col>
-              <b-col md="2">
+              <b-col md="1">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
@@ -233,6 +239,7 @@ export default {
       API: config.API,
       sumaStock: '...',
       sumaValorizado: '...',
+      sumaValorizadoSin:'...',
       APISTOCK: 'productos',
       tipoStock: '',
       showKardex: false,
@@ -286,6 +293,7 @@ export default {
         // Cargar la sumatoria
         this.getSumaStock()
         this.getSumaValorizado()
+        this.getSumaValorizadoSin()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -317,6 +325,12 @@ export default {
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
+        })
+    },
+    getSumaValorizadoSin () {
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizadoSin=1')
+        .then( response => {
+          this.sumaValorizadoSin = (response.data[0].sumaValorizadoSin);
         })
     },
     getSumaStock () {
