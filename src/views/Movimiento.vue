@@ -194,6 +194,7 @@
               <productos-carrito 
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
+                :onSetProducto="onSetProducto"
                 :tipoCambio="movimiento.TipoCambio"
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
@@ -338,6 +339,20 @@ return false
         this.movimiento.TipoCambio = 1
       }
     },
+    onSetProducto (obj, cant, precio) {
+        if (cant) {
+            obj.cantidad = cant
+            //let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+            //obj.precio = preciosPorProducto.precio || 0
+            obj.precio = precio || obj.PrecioContado
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
+            return obj
+        }
+        obj.cantidad = 1
+        obj.precio = obj.PrecioContado || 0
+        obj.nuevoPrecioContado = obj.PrecioContado || 0
+        return obj
+    },
     getProveedores (value) {
       this.buscarProveedores(value)
     },
@@ -369,7 +384,10 @@ return false
           faltaLlenar = true
         }
 
-        if (prod.FechaVen == undefined || prod.FechaVen=='' ) {
+        if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
+          if(prod.FechaVen.length>10){
+             this.$toasted.show('La fecha de vencimiento del producto '+prod.Producto+' no tiene el formato correcto')
+          }
           faltaFechaVen = true
         }
 
@@ -424,7 +442,7 @@ return false
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })

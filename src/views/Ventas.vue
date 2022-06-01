@@ -789,8 +789,8 @@ export default {
         onSetProducto (obj, cant, precio) {
             if (cant) {
                 obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
+                //let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
+                //obj.precio = preciosPorProducto.precio || 0
                 obj.precio = precio || obj.PrecioContado
                 return obj
             }
@@ -999,7 +999,7 @@ export default {
             let igualLote = 0
             this.productos.forEach(pro => {
                 console.log(pro);
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) )) {
+                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined )) {
                     //sinStock += 1
                 }
 
