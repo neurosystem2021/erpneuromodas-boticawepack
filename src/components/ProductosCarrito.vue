@@ -785,6 +785,7 @@ export default {
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       }else{
         this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+        this.indexProdSelect = null
       }
       // Vue.set(this.productos, obj.IdProducto, obj)
       
@@ -818,6 +819,7 @@ export default {
 
       }else{
         this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+        this.indexProdSelect = null
       }
 
       this.$refs['modalCant'].hide()
