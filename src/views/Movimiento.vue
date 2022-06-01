@@ -344,12 +344,12 @@ return false
             obj.cantidad = cant
             //let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
             //obj.precio = preciosPorProducto.precio || 0
-            obj.precio = precio || obj.PrecioContado
+            obj.precio = obj.PrecioCosto || 0
             obj.nuevoPrecioContado = obj.PrecioContado || 0
             return obj
         }
         obj.cantidad = 1
-        obj.precio = obj.PrecioContado || 0
+        obj.precio = obj.PrecioCosto || 0
         obj.nuevoPrecioContado = obj.PrecioContado || 0
         return obj
     },
