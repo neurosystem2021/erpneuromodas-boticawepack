@@ -601,7 +601,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
@@ -625,6 +625,7 @@ export default {
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 console.log(response)
+                this.inProgress = false
                 this.$toasted.show('Proforma Guardada con exito')
 
                 this.limpiarDespuesVenta()
@@ -697,11 +698,11 @@ export default {
                 return;
             }
             
-            if (sinStock >= 1) {
+            /*if (sinStock >= 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
 
 
