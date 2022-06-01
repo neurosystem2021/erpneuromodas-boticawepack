@@ -102,7 +102,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
+            :disabled="!noSubtotal"
             type="number"
             style="width: 90px"
             min="0"
@@ -173,7 +173,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -437,13 +437,15 @@ export default {
           { key: 'ProductoMarca', label: 'Marca' },
           //{ key: 'ProductoModelo', label: 'Modelo/Color'}, 
           //{ key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'eventPres', label: '' },
+          { key: 'cantxPrecio', variant: 'warning' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
           { key: 'igv', label: 'IGV' },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
+          { key: 'precioVenta', label: 'Precio Venta' },
           { key: 'total', label: 'Total', variant: 'danger' },
           { key: 'fechavencimiento', label: 'Vencimiento' },
           { key: 'acciones', label: ''}
@@ -650,6 +652,7 @@ export default {
       }
     },
     loadMovimientoLotes ($idProducto) {
+      this.movimientoLotes[$idProducto]=[]
       this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
         .then((response) => {
           let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
@@ -750,8 +753,8 @@ export default {
           this.$toasted.show('Primero seleccione un tipo de movimiento')
           return
         }
-        this.setProductoUni(obj)
-        return
+        //this.setProductoUni(obj)
+        //return
       }
       if(fPP.length==4){
         obj.cantxPrecio=1
