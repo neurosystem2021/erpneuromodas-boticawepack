@@ -1047,7 +1047,7 @@ export default {
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-                this.$refs.inputComisionista.setValue('')
+                //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
