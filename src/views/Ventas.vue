@@ -207,7 +207,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group v-show="false">
+                        <b-form-group v-if="false">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
