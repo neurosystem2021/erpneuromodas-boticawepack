@@ -15,6 +15,9 @@
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
@@ -62,7 +65,6 @@
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -201,7 +203,6 @@
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
             <input   
-              required="required"
               v-model="producto.StockMinimo"
               type="number"
               class="form-control"
@@ -454,7 +455,7 @@ export default {
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        //this.$refs.inputCodigoBarra.$el.disabled = true
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
@@ -510,7 +511,7 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
 
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        //this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
@@ -626,6 +627,7 @@ export default {
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
+        ProductoModelo:'',
         // IdProductoModelo: null,
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
@@ -638,7 +640,7 @@ export default {
         _ProductoDesc3:'',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         ControlaStockMinimo:0,
         StockMinimo: 0,
         PrecioContado: 0,
