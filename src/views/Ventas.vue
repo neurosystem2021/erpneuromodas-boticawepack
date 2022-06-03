@@ -432,6 +432,7 @@ export default {
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
+        this.loadComisionista()
         this.escucharPedidos()
     },
     data () {
@@ -523,6 +524,14 @@ export default {
                 .then(res => {
                     if (res.data.IdCliente) {
                         this.setCliente(res.data)
+                    }
+                })
+        },
+        loadComisionista () {
+            this.axios.get(this.API + 'comisionista/0000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setComisionista(res.data)
                     }
                 })
         },
@@ -922,6 +931,7 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
+                this.loadComisionista()
                 this.diasValidosProf=0;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -1033,7 +1043,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -1042,6 +1052,7 @@ export default {
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
+                this.loadComisionista()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -1126,6 +1137,7 @@ export default {
             this.infoDelivery = {}
             this.$refs.carrito.pagocon = ''
             this.loadClienteVarios()
+            this.loadComisionista()
             this.venta.nombreLlevar = ''
             this.venta.selectOpcionVenta = 0
             this.venta.nombreLlevar = ''
