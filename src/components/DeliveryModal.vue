@@ -55,18 +55,18 @@
                                                         <td class="text-center font-weight-bold">{{motorizado.Motorizado}}</td>
 
                                                         <td v-if="motorizado.ContadorViajes>0">
-                                                            <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="primary" class="text-center">EN ESTE VIAJE</b-badge>
+                                                            <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="danger" class="text-center">EN ESTE VIAJE</b-badge>
                                                             <b-badge v-else variant="warning" class="text-center">EN OTRO VIAJE</b-badge>
                                                         </td>
 
                                                         <td v-else>
-                                                            <b-badge variant="info" class="text-center">DISPONIBLE</b-badge>       
+                                                            <b-badge variant="success" class="text-center">LIBRE</b-badge>     
                                                         </td>
 
                                                         <td v-if="motorizado.online" class="text-center"><b-badge variant="success">online</b-badge></td>
                                                         <td v-else><b-badge variant="secondary" class="text-center">offline</b-badge></td>
 
-                                                        <td v-if="motorizado.ContadorViajes>0" class="text-center"> 
+                                                        <td v-if="motorizado.IdMotorizado==pedido.IdMotorizado" class="text-center">
                                                             <label>-------</label>
                                                         </td>
                                                         <td v-else>
@@ -340,6 +340,7 @@ export default {
     },
     getPedidos(){
         if(this.idEmpresa != null){
+            this.pedidos = []
             this.axios.get(this.APINODE + '/api/plataforma/pedidos', {
                 params: { 
                     IdEmpresa:this.idEmpresa
@@ -772,7 +773,7 @@ export default {
     font-family: monospace;
 }
 .popover {
-    max-width: 420px !important;
+    max-width: 450px !important;
 }
 #modalPedidos .modal-dialog {
     max-width: 95% !important;
