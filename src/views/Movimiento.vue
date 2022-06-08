@@ -148,6 +148,21 @@
                       </b-input-group>
                     </b-form-group>
                   </b-col>
+                  <b-col md="6">
+                      <b-form-group>
+                      <label>Responsable de Movimiento:</label>
+                          <autocomplete
+                              required="required"
+                              ref="inputVendedor"
+                              :url="API + 'usuarios'"
+                              anchor="NombreUsuario"
+                              label="writer"
+                              :on-select="setVendedor" 
+                              :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                              :classes="{input: 'form-control'}">
+                          </autocomplete>
+                      </b-form-group>
+                  </b-col>
                 </b-row>
             
               </b-col>
@@ -246,6 +261,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+    this.getVendedor()
   },
   data () {
     return {
@@ -253,7 +269,9 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      isTraslado:true,
+      isSalida:false
     }
   },
   computed: {
@@ -272,11 +290,23 @@ export default {
     }),
     onAddProducto (obj) {
         this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1)
         })
     },
     afe (e) {
 return false
+    },
+    getVendedor () {
+      let usuario = sessionStorage.getItem('User')
+      this.axios.get(this.API + 'usuarios/' + usuario)
+      .then((response) => {
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          this.$refs.inputVendedor.$refs.input.disabled = true
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
     },
     cargarNumero () {
       this.axios.get(this.API + 'movimientos/numero', {
@@ -310,7 +340,8 @@ return false
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
-        equipo:{}
+        equipo:{},
+        user: sessionStorage.getItem("User"),
       }
     },
     setEquipo (obj, dni = false) {
@@ -360,12 +391,18 @@ return false
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.isTraslado = false
+        this.isSalida = false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = false
+        this.isSalida = true
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = true
+        this.isSalida = false
       }
       this.movimiento.movimientoTipo = obj
 
@@ -376,10 +413,22 @@ return false
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      if(this.isSalida){
+        this.obtenerStok({
+          IdAlmacen: (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }else{
+        this.obtenerStok({
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }
+
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
-      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
@@ -418,7 +467,12 @@ return false
       }
 
       let faltaLlenar = false
+      let sinStock = 0
       this.productos.forEach((prod, index) => {
+        if(((prod.stock <= 0) || (parseFloat(prod.cantidad) > prod.stock) || prod.stock == undefined)){
+          sinStock += 1
+        }
+
         if (prod.total <= 0) {
           faltaLlenar = true
         }
@@ -426,6 +480,12 @@ return false
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
+        this.inProgress = false
+        return;
+      }
+
+      if (sinStock>=1 && (this.isTraslado==true || this.isSalida==true)) {
+        this.$toasted.show('No tiene stock para realizar el movimiento')
         this.inProgress = false
         return;
       }

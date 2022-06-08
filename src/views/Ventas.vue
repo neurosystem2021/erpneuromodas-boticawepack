@@ -59,7 +59,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" v-if="false">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -680,7 +680,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
-            //this.$refs.inputAlmacen.setValue(obj.Almacen)
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             if (this.productos.length) {
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
@@ -714,9 +714,9 @@ export default {
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
-                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                this.loadPuntoVenta(response.data.IdAlmacen)
                 // bloquear ambos inputs
-                //this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputAlmacen.$refs.input.disabled = true
                 //this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
@@ -1005,7 +1005,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock == undefined)) {
                     sinStock += 1
                 }
 

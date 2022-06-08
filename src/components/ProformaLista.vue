@@ -77,7 +77,7 @@ import { mapActions } from 'vuex'
                 isBusy: false,
                 fields: [ 
                     { key: 'IdProforma', label: 'Id' }, 
-                    { key: 'Anio', label: 'Año' } , { key: 'Numero', class:'text-center' },{ key: 'Cliente', label: 'Mecanico' , class:'text-center' }, 
+                    { key: 'Almacen' },{ key: 'Anio', label: 'Año' } , { key: 'Numero', class:'text-center' },{ key: 'Cliente', label: 'Mecanico' , class:'text-center' }, 
                     { key: 'Nombre', label: 'Equipo', class:'text-center' },{ key: 'FechaReg', class:'text-center' }, 
                     { key: 'UsuarioReg', label: 'Generado Por:', class:'text-center' }, { key: 'update', label: 'Selec.' }, 'ver' ,'verTicket'],
                 totalRows: 50,
@@ -98,6 +98,7 @@ import { mapActions } from 'vuex'
                         idProforma: proforma.IdProforma
                     }
                 }).then((response) => {
+                    this.limpiarCarrito()
                     response.data.map((item) => {
                         this.add([item.IdProducto, () => {
                             this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
@@ -106,6 +107,9 @@ import { mapActions } from 'vuex'
                         this.filter = ''
                         this.show = false
                     })
+                    setTimeout(() => {
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+                    }, 2000);
                     proforma.productos = response.data
                     // console.log(proforma);
 

@@ -52,7 +52,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" v-if="false">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -676,7 +676,7 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
-            //this.$refs.inputAlmacen.setValue(obj.Almacen)
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
             if (this.productos.length) {
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
@@ -707,9 +707,9 @@ export default {
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
-                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                this.loadPuntoVenta(response.data.IdAlmacen)
                 // bloquear ambos inputs
-                //this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputAlmacen.$refs.input.disabled = true
                 //this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 //this.getTipoDoc(response.data.IdTipoDoc)
@@ -891,7 +891,7 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay repuestos para crear la orden')
                 this.inProgress = false            
@@ -917,14 +917,13 @@ export default {
             }
 
             this.venta.productos = this.productos
-            console.log(this.venta.productos)
-
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.success('Orden generada con exito')
                 this.limpiarDespuesVenta()
                 //this.loadClienteVarios()
+                this.inProgress = false
                 this.ultimaOrden = response.data.insertId
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
