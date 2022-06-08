@@ -268,6 +268,7 @@ export default {
         codUndPesoBruto: 'KGM',
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
+        descripcionMotivoTraslado: 'VENTA',
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
