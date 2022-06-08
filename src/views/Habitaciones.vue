@@ -139,10 +139,12 @@
 					</b-col> 
 					<b-col md="4">
 						<label><b>Adelantos</b></label>
-                        <b-form-input v-model="selectProducto.Adelanto"
+                        <input v-model="selectProducto.Adelanto"
                                 size="sm"
                                 type="number"
-                                placeholder="Adelanto S/."></b-form-input>
+                                placeholder="Adelanto S/."
+								step="0.01"
+								class="form-control"/>
       					<b-input-group>
 							<b-form-input v-model="selectProducto.AdelantoDesc"
                                 size="sm"

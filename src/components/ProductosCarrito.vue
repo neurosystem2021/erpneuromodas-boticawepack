@@ -28,23 +28,25 @@
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
-            placeholder="Cantidad"></b-form-input>
+            @input="(val) => $emit('onInputCantidad', val.target.value)"
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -74,25 +76,27 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
-            style="width:80px"
+          <input
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            value="0"
+            class="form-control"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -231,6 +235,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 

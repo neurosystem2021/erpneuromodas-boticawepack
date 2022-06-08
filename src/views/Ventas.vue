@@ -182,13 +182,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -229,13 +231,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -442,6 +445,8 @@ export default {
                 IdPreOrden: [],
                 CampoDireccion: 'Direccion'
             }
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -639,7 +644,7 @@ export default {
             let sinStock = 0
             let totalCero = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad))) {
                     sinStock += 1
                 }
 
@@ -647,6 +652,12 @@ export default {
                     totalCero += 1
                 }
             });
+
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender, stock insuficiente');
+                this.inProgress = false
+                return;
+            }
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en cero');
@@ -663,7 +674,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -676,8 +687,8 @@ export default {
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$refs.carrito.pagocon = ''
             })
             .catch((error) => {
                 console.log(error)

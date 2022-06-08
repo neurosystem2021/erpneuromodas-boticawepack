@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -179,9 +179,11 @@
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
-                      <b-form-input v-model="movimiento.TipoCambio"
+                      <input v-model="movimiento.TipoCambio"
                         type="number"
-                        placeholder="Tipo de cambio"></b-form-input>
+                        placeholder="Tipo de cambio"
+                        step="0.000001"
+                        class="form-control"/>
                     </b-form-group>
                   </b-col>
                 </b-row>
@@ -189,7 +191,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito ref="carrito" @onAddProducto="onAddProducto"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -236,8 +238,14 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
+    onAddProducto (obj) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+        })
+    },
     afe (e) {
 return false
     },
@@ -309,6 +317,7 @@ return false
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
