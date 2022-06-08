@@ -204,6 +204,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
+    tipo: String,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -361,7 +362,7 @@ export default {
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-      }])
+      },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
