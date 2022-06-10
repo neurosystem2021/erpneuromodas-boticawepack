@@ -5,8 +5,8 @@
       <div>
           <div class="no-print">
               <b-row align-h="end" class=" no-print">
-                    <label v-if="!this.$route.params.id" >Vendedor:</label>
-                <b-col cols="3" v-if="!this.$route.params.id">
+                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
+                <b-col cols="3" v-if="false">
                     <b-form-group size="sm" >
                         <autocomplete
                             required="required"
@@ -19,7 +19,7 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>
+                </b-col>-->
                 <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
@@ -41,7 +41,7 @@
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno:  {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
@@ -288,7 +288,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -441,7 +441,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      cargaCorrecta:false
     }
   },
   computed: {
@@ -549,18 +550,21 @@ export default {
       return detalles
     },
     getVendedor () {
+       this.cargaCorrecta = false
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
             // this.$refs.inputVendedor.$refs.input.disabled = true
 
             if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              //this.$refs.inputVendedor.$refs.input.disabled = true
             }
+            this.cargaCorrecta = true
         })
         .catch((error) => {
+            this.cargaCorrecta = false
             console.log(error)
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
@@ -578,6 +582,10 @@ export default {
         this.loadData()
     },
     cerrarCaja () {
+      if(!this.cargaCorrecta){
+        alert("No se cargó correctamente los datos, porfavor actualice la pagina")
+        return
+      }
       if (!this.turno) {
         this.$toasted.show('Seleccione un Turno')
         return
@@ -626,9 +634,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      //if (this.vendedor.Usuario) {
+      //  params.usuario = this.vendedor.Usuario
+      //}
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
         params: params
@@ -645,9 +653,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      //if (this.vendedor.Usuario) {
+      //  params.usuario = this.vendedor.Usuario
+      //}
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
       })
@@ -662,9 +670,9 @@ export default {
       let params = {
         idCierre: this.$route.params.id
       }
-      if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
-      }
+      //if (this.vendedor.Usuario) {
+      //  params.usuario = this.vendedor.Usuario
+      //}
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
       })
