@@ -189,13 +189,18 @@
               <div class="container">
                 <div class="row">
                   <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                  <div class="input-group input-group-sm col-sm-8">
+                    <input autocomplete="off" type="text" class="form-control form-control-sm col-sm-12" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                    <div class="input-group-append">
+                      <a class="btn btn-outline-secondary" @click="buscarEmpresaTrans">Buscar</a>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="container">
                 <div class="row">
                   <label for="razonSocialTransportista" class="col-sm-4">Razón Social</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista">
+                  <input autocomplete="off" type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista">
                 </div>
               </div>
 
@@ -272,9 +277,11 @@ export default {
       cliente: {},
       carrito: {
         fields: [
-          { key: 'CodigoBarra', label: 'Código' }, 
-          { key: 'Producto' }, 
-          { key: 'cantidad' },
+          { key: 'itemNum', label: '#', class:'tdclass' },
+          { key: 'Descripcion', label: 'Descripción'},
+          { key: 'ProductoMedicion', label: 'Medición', class:'tdclassmed' },
+          { key: 'eventPres', label: '' },
+          { key: 'cantidad', label: 'Cantidad' },
           { key: 'acciones', label: ''}
         ]
       }
@@ -309,16 +316,29 @@ export default {
           return
       }
       let faltaLlenar = false
+      let sinDescripcion = 0
       this.productos.forEach((prod, index) => {
         if (prod.cantidad <= 0) {
           faltaLlenar = true
         }
+        if((''+prod.Descripcion).trim()==''){
+            sinDescripcion += 1
+        }
+
+        prod.Descripcion = (''+ prod.Descripcion).trim().toUpperCase();
       })
       if (faltaLlenar) {
         this.$toasted.show('Falta llenar cantidad')
         this.inProgress = false
         return;
       }
+
+      if(sinDescripcion >= 1) {
+          this.$toasted.error('No se puede enviar un producto sin descripcion');
+          this.inProgress = false
+          return;
+      }
+
       this.axios.post(this.API + 'remision', {
         remision: this.remision,
         productos: this.productos
@@ -352,7 +372,7 @@ export default {
           this.remision.totalBultos = '';
           this.$refs.inputDocRef.setValue('');
           this.$refs.inputMovRef.setValue('');
-          this.$toasted.success('Movimiento guardado correctamente ')          
+          this.$toasted.success('Guia de Remision guardada correctamente ')          
         }
         this.inProgress = false
       })
@@ -364,6 +384,39 @@ export default {
     focusAutocomplete (ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
+    },
+    buscarEmpresaTrans(){
+      var esNumerico = Number.isInteger(parseInt(this.remision.nroDocumentoTransportista))
+      if (!esNumerico) {
+          this.$toasted.show('El DNI/RUC debe ser numérico')
+          return
+      }
+      
+      let tipo = this.remision.nroDocumentoTransportista.length > 8 ? 'RUC' : 'DNI'
+
+      this.axios.get(this.API + 'consultarRUC', {
+          params: {
+              type: tipo,
+              numero: this.remision.nroDocumentoTransportista
+          }
+      }).then((response) => {
+          if (response.data) {
+              this.$toasted.info('Transportista encontrado, se llenarán sus datos')                  
+              var data = response.data
+              if (tipo == 'DNI') {
+                this.$set(this.remision, 'razonSocialTransportista', data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno);
+              } else {
+                this.$set(this.remision, 'razonSocialTransportista', data.razonSocial);
+              }
+          } else {
+              this.$toasted.show('No se encontró al transportista')                
+          }
+          
+      })
+      .catch((error) => {
+          this.$toasted.show('No se encontró el Usuario')        
+          console.log(error)
+      })
     },
     setMovRef (obj) {
       this.$set(this.remision, 'nroDocumentoCliente', '');

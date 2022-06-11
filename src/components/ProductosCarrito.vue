@@ -80,14 +80,14 @@
         </b-row>
       </b-modal>
 
-      <b-modal size="lg" ref="modalUnidad" hide-footer hide-header>
+      <b-modal size="md" ref="modalUnidad" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;text-transform:uppercase">{{objProd.Descripcion}}</h3>
-          <h5>UNIDAD DE MEDIDA</h5>
+          <h5>SELECCIONE UNIDAD DE MEDIDA</h5>
         </div>
         <hr>
         <b-row>
-          <b-col style="margin-bottom:10px" cols="6" v-for="u in unidades" :key="u.id">
+          <!--<b-col style="margin-bottom:10px" cols="6" v-for="u in unidades" :key="u.id">
             <b-card
               class="contentCard"
               @click="() => {
@@ -103,13 +103,34 @@
                 </b-col>
               </b-row>
             </b-card>
+          </b-col>-->
+          <b-col md="12">
+            <b-form-group>
+              <label>Unidad de Medida:</label>
+              <b-input-group>
+                <autocomplete
+                  :url="API + 'unidades'"
+                  ref="inputMedicion"
+                  anchor="ProductoMedicion"
+                  label="writer"
+                  :placeholder.sync="objProd.ProductoMedicion"
+                  :on-select="cambiarUnidad"
+                  :onFocus="focusAutocomplete.bind(null, 'inputMedicion')"                
+                  :classes="{input: 'form-control upper'}">
+                </autocomplete>
+                <b-input-group-append>
+                  <b-btn variant="primary" @click="crearUnidad"><b>Guardar</b></b-btn>                
+                  <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
           </b-col>
         </b-row>
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="cambiarUnidadOpen(data.index,productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="cambiarUnidadOpen(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
           <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <br>-->
           <!--<b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
@@ -336,7 +357,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -386,7 +407,6 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.cargarUnidades();
     // this.alterarBuscadorProductos()
   },
   data () {
@@ -407,7 +427,6 @@ export default {
       medicionPro:'UNIDAD',
       productoSelect: {},
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      unidades:[]
     }
   },
   watch: {
@@ -424,6 +443,7 @@ export default {
   },
   props: {
     isVentas: Boolean,
+    noSubtotal: Boolean,
     tipo: String,
     setPrecio: Boolean,
     tipoCambio: Number,
@@ -703,50 +723,44 @@ export default {
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0)
-      
-      if (!obj.PreciosPorProducto || fPP.length === 4) {
-        obj.estadoPxP = true
-        this.setProductoUni(obj)
-        return
-      }
-
-      this.$refs['modalCant'].show()
-      // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      obj.estadoPxP = true
+      this.setProductoUni(obj)
+      return
+    },
+    cambiarUnidadOpen(obj){
       this.objProd = obj
+      this.$refs.inputMedicion.setValue(this.objProd.ProductoMedicion)
+      this.$refs['modalUnidad'].show()
     },
-    cargarUnidades(){
-      this.axios.get(this.API + 'unidades')
-      .then((response) => {
-        if(response.data){
-          this.unidades = response.data
-        }
-      })
-      .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
-    },  
-    cambiarUnidadOpen(index, obj){
-      this.axios.get(this.API + 'unidades')
-      .then((response) => {
-        if(response.data){
-          this.unidades = response.data
-          this.objProd = obj
-          this.$refs['modalUnidad'].show()
-          return
-        }
-      })
-      .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
-    },
-    cambiarUnidad(uni){
+    cambiarUnidad(objUni){
       let obj = this.objProd
-      obj.IdProductoMedicion = uni.IdProductoMedicion
-      obj.ProductoMedicion = uni.ProductoMedicion
+      obj.IdProductoMedicion = objUni.IdProductoMedicion
+      obj.ProductoMedicion = objUni.ProductoMedicion
       this.$refs['modalUnidad'].hide()
       //this.actualizarProd(obj)
+    },
+    crearUnidad(){
+      if (this.$refs.inputMedicion.type) {
+        let unidad = {}
+        unidad.ProductoMedicion = this.$refs.inputMedicion.type.toUpperCase().trim()
+        this.axios.post(this.API + 'unidades', unidad)
+        .then((response) => {
+          if (response.data.error) {
+          this.$toasted.show(response.data.error)
+          return
+          } else {
+            this.$toasted.show('Unidad guardada correctamente')
+            this.cambiarUnidad({
+              IdProductoMedicion: response.data.insertId,
+              ProductoMedicion: response.data.ProductoMedicion
+            })
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      }
     },
     setProductoUni (obj2) {
        let obj= {...obj2}

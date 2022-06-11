@@ -139,8 +139,7 @@
                   <table class="table b-table table-sm prod-detalle">
                     <thead>
                       <tr>
-                        <th>Codigo</th>
-                        <th>Producto</th>
+                        <th>Descripcion</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Descuento</th>
@@ -151,8 +150,7 @@
                     </thead>
                     <tbody>
                       <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
-                        <td>{{ item.CodigoBarra }}</td>
-                        <td>{{ item.Producto }}</td>
+                        <td>{{ item.Descripcion }}</td>
                         <td>{{ item.Cantidad }}</td>
                         <td>{{ item.Precio }}</td>
                         <td>{{ item.Descuento }}</td>
