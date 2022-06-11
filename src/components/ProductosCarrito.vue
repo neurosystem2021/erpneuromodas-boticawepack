@@ -7,7 +7,6 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -81,16 +80,44 @@
         </b-row>
       </b-modal>
 
+      <b-modal size="lg" ref="modalUnidad" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;text-transform:uppercase">{{objProd.Descripcion}}</h3>
+          <h5>UNIDAD DE MEDIDA</h5>
+        </div>
+        <hr>
+        <b-row>
+          <b-col style="margin-bottom:10px" cols="6" v-for="u in unidades" :key="u.id">
+            <b-card
+              class="contentCard"
+              @click="() => {
+                cambiarUnidad(u)
+              }"
+            >
+              <b-row>
+                <b-col md="6" class="nomCart">
+                  <h6 class="text-uppercase">{{ u.ProductoMedicion }}</h6>
+                </b-col>
+                <b-col md="6" class="text-left">
+                  <b>Código: </b>{{ u.Codigo }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
-          <br>
-          <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click="cambiarUnidadOpen(data.index,productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <br>-->
+          <!--<b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
               <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
             </div>
-          </b-popover>
+          </b-popover>-->
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
@@ -112,13 +139,13 @@
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 80px"
+            style="width: 120px"
             class="form-control"
             step="0.001"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              if(this.ventas){
+              /*if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -133,7 +160,7 @@
                 productos[data.index].precio = productos[data.index].PrecioContado 
               }else{
             
-              }
+              }*/
 
             }"
             placeholder="Cantidad"/>
@@ -143,7 +170,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 90px"
+            style="width: 120px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -227,7 +254,7 @@
             step="0.01"
             class="form-control"
             value="0"
-            @input="actualizarDescu(data.index)"/>
+            @input="actualizarDescu(data.index,val.target.value)"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -252,8 +279,9 @@
           <textarea 
             :disabled="bloquearInput?true:false"
             class="form-control"
-            placeholder="Descripción"
-            cols="9" rows="3"
+            placeholder="Descripción del producto"
+            cols="12" rows="4"
+            style="width:400px; text-transform:uppercase"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -264,10 +292,11 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
+          <h6  v-if="false"><i>Prof.</i></h6>
           <input 
             class="form-check-input" 
             type="checkbox" 
+            v-if="false"
             :disabled="bloquearInput?true:false"
             @change="(e) => {
               $emit('onCheckProf', e)
@@ -277,7 +306,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <!--<b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>-->
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -357,6 +386,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
+    this.cargarUnidades();
     // this.alterarBuscadorProductos()
   },
   data () {
@@ -376,7 +406,8 @@ export default {
       precioCont: 0,
       medicionPro:'UNIDAD',
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      unidades:[]
     }
   },
   watch: {
@@ -442,7 +473,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos'
       } else {
         return this.API + 'productos'
       }
@@ -665,7 +696,7 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
-
+      obj.itemNum = this.productos.length+1;
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
       }
@@ -682,8 +713,43 @@ export default {
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
+    },
+    cargarUnidades(){
+      this.axios.get(this.API + 'unidades')
+      .then((response) => {
+        if(response.data){
+          this.unidades = response.data
+        }
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
     },  
-    setProductoUni (obj) {
+    cambiarUnidadOpen(index, obj){
+      this.axios.get(this.API + 'unidades')
+      .then((response) => {
+        if(response.data){
+          this.unidades = response.data
+          this.objProd = obj
+          this.$refs['modalUnidad'].show()
+          return
+        }
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
+    cambiarUnidad(uni){
+      let obj = this.objProd
+      obj.IdProductoMedicion = uni.IdProductoMedicion
+      obj.ProductoMedicion = uni.ProductoMedicion
+      this.$refs['modalUnidad'].hide()
+      //this.actualizarProd(obj)
+    },
+    setProductoUni (obj2) {
+       let obj= {...obj2}
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -701,7 +767,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -737,13 +803,14 @@ export default {
       }
     },
     renderChild(data) {
-      if (this.idAlmacen) {
+      if (this.isVentas) {
+        /*
         let styleStock = ''
         if(data.stock <= 0){
           styleStock = 'table-danger'
         }else{
           styleStock = 'table-success'
-        }
+        }*/
 
         return `
         <style>
@@ -763,7 +830,6 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center  ">
             <thead>
               <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
                 <th style="width: 200px">Producto</th>
                 <th style="width: 100px">Categoría</th>
                 <th style="width: 100px">Marca</th>
@@ -772,7 +838,6 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
                 <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
                 <td>${data.ProductoCategoria}</td>
                 <td>${data.ProductoMarca}</td>
@@ -828,9 +893,9 @@ export default {
       // return nuevoPrecio 
       this.updateManoDeObraNeta(index)
     },
-    actualizarDescu(index){
-      let obj = this.productos[index];
-       this.actualizarProd(obj)
+    actualizarDescu(index,val){
+      Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(val))
     },
     getSubtotal(index) {
       
@@ -912,5 +977,6 @@ export default {
     align-content: center;
     align-items: center;
     border-right: 2px solid black;
+    text-align: center;
   }
 </style>

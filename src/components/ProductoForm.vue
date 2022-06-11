@@ -296,7 +296,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="false">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="'Precio '+i" class="text-center">
             <b-form-group>

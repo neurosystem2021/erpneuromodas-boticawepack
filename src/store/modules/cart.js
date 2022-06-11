@@ -13,18 +13,24 @@ const mutations = {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
-        productos.unshift(item)
+        productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       } else {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.unshift(item)
-      }else{
+      //if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+        productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
+      /*}else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
         productos.splice(index2,0,item)
-      }
+      }*/
     }
   },
   ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
@@ -40,10 +46,16 @@ const mutations = {
   ACTUALIZAR_PRODUCTO ({ productos }, prod) {
     let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
     productos.splice(index, 1, prod)
+    productos.map((pro, index)=>{
+      pro.itemNum=(index+1)
+    })
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
+    productos.map((pro, index)=>{
+      pro.itemNum=(index+1)
+    })
   },
   LLENAR_PRODUCTOS_FILTRADOS (state, items) {
     state.productosFiltrados = items
@@ -102,7 +114,7 @@ const actions = {
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
-
+      /*
       let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},
@@ -113,8 +125,11 @@ const actions = {
           arr[i].desc = ''
         }
         producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
+      }*/
+      if(producto.Descripcion){
+      }else{
+        producto.Descripcion = '' 
       }
-
       // console.log(producto);
       producto.disabledProf = 0
       
@@ -180,7 +195,7 @@ const actions = {
           obj.descuento = 0
           //obj.nuevoPrecioContado = 0
           
-          let arr2 = [
+          /*let arr2 = [
             {"desc": obj.ProductoDesc},
             {"desc": obj.ProductoDesc2},
             {"desc": obj.ProductoDesc3}
@@ -189,9 +204,9 @@ const actions = {
             if (arr2[i].desc == null) {
               arr2[i].desc = ''
             }
-            obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
-          }
-
+            obj.Descripcion = 'arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc'
+          }*/
+          obj.Descripcion = '';
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {

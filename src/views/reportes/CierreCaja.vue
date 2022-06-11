@@ -41,7 +41,7 @@
 
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <b-row>
         <h5>Ventas Efectivo</h5><br>
@@ -60,7 +60,7 @@
                   <table class="tabla-detalle">
                   <thead>
                     <tr>
-                      <th>Codigo</th>
+                      <!--<th>Codigo</th>-->
                       <th>Producto</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
@@ -72,8 +72,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <!--<td>{{ prod.CodigoBarra }}</td>-->
+                      <td class="detalle-producto">{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -123,7 +123,7 @@
                   <table class="tabla-detalle">
                   <thead>
                     <tr>
-                      <th>Codigo</th>
+                      <!--<th>Codigo</th>-->
                       <th>Producto</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
@@ -135,8 +135,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <!--<td>{{ prod.CodigoBarra }}</td>-->
+                      <td class="detalle-producto">{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -187,7 +187,7 @@
                   <table class="tabla-detalle">
                   <thead>
                     <tr>
-                      <th>Codigo</th>
+                      <!--<th>Codigo</th>-->
                       <th>Producto</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
@@ -199,8 +199,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <!--<td>{{ prod.CodigoBarra }}</td>-->
+                      <td class="detalle-producto">{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -249,7 +249,7 @@
                   <table class="tabla-detalle">
                   <thead>
                     <tr>
-                      <th>Codigo</th>
+                      <!--<th>Codigo</th>-->
                       <th>Producto</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
@@ -261,8 +261,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <!--<td>{{ prod.CodigoBarra }}</td>-->
+                      <td class="detalle-producto">{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -288,7 +288,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -301,45 +301,52 @@
           <table class="table b-table table-sm">
             <thead>
               <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Fecha</th><th>Doc</th><th>Proveedor</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.DocRef }}</td>
+                <td>{{ item.Proveedor }}</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="4"></td>
                 <td class="total"><b>Total Ingresos</b></td>
                 <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
         </b-col>
+      </b-row>
+
+      <b-row>
         <b-col v-if="totalSalidas">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>ID</th><th>Fecha</th><th>Doc</th><th>Proveedor</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.DocRef }}</td>
+                <td>{{ item.Proveedor }}</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="4"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>

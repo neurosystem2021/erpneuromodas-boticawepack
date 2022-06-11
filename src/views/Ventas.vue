@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row"  id="conten">
+        <b-container fluid style="width: calc(100% - 300px)" class="bv-example-row"  id="conten">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -384,7 +384,7 @@
                                     </tbody>
                                 </table>
                             </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                            <template slot="adicional" v-if="false">
                                 <table class="table b-table border table-footer table-sm text-center" >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -467,18 +467,19 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'Producto' },
+                    { key: 'itemNum', label: '#', class:'tdclass' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    //{ key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
+                    { key: 'ProductoMedicion', label: 'Medición', class:'tdclassmed' },
+                    { key: 'eventPres', label: '' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -810,7 +811,7 @@ export default {
                 })
             }
             
-            this.actualizarPrecioConvenio(obj)
+            //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
         onSetProducto (obj, cant, precio) {
@@ -993,6 +994,7 @@ export default {
 
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
+            let sinDescripcion = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
@@ -1002,13 +1004,26 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                if((''+pro.Descripcion).trim()==''){
+                    sinDescripcion += 1
+                }
+
+                pro.Descripcion = (''+ pro.Descripcion).trim().toUpperCase();
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            /*if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
+            }*/
+
+            if(sinDescripcion >= 1) {
+                this.$toasted.error('No se puede enviar un producto sin descripcion');
+                this.inProgress = false
+                return;
             }
+
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
@@ -1185,4 +1200,15 @@ export default {
     font-size: 30px;
 }
 
+</style>
+<style>
+td.tdclass{
+   vertical-align: middle !important;
+   font-size: 1.3rem !important;
+   font-weight: bold;
+}
+td.tdclassmed{
+   font-size: 0.9rem !important;
+   font-weight: bold;
+}
 </style>
