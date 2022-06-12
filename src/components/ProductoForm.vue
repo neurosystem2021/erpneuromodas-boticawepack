@@ -111,7 +111,7 @@
             <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               min="0"
               step="0.0001"
@@ -220,7 +220,7 @@
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
               type="number"
-              @input.native="actualizarPorcentajeUtilidad"
+              @input="actualizarPorcentajeUtilidad"
               class="form-control"
               step="0.0001"
               />
@@ -504,7 +504,10 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
-
+      if(this.producto.SoloLargo==1){
+        this.producto.Ancho = 0
+      }
+      
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {

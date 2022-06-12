@@ -32,7 +32,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
             step="0.01"
             @input="(val) => {$emit('onInputCantidad', val);  getSubtotal(data.index)}"
@@ -44,7 +44,7 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 85px"
+            style="width: 90px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -89,7 +89,7 @@
         </template>
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -494,7 +494,7 @@ export default {
           this.pie2corte = 0 
           this.precioCorte = 0
         if (obj.Ancho && obj.Largo) {
-          this.mostrarInputs = false
+          this.mostrarInputs = true
           this.$refs.modalCalcularM2.show()
         } else if (obj.SoloLargo) {
           this.accionFactor(0);

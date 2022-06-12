@@ -200,14 +200,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         :disabled="bloquearInput?true:false"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                         @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -382,7 +384,7 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Ancho', label: 'Corte Ancho.', class:'text-center' }, 
                     { key: 'Largo', label: 'Corte Largo.', class:'text-center' }, 
-                    { key: 'ProductoMedicion', label: 'Medición' },
+                    //{ key: 'ProductoMedicion', label: 'Medición' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -475,6 +477,7 @@ export default {
             this.isNota = false
             this.bloquearInput = false 
             this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setScreen() {
             this.navDisabled=!this.navDisabled
