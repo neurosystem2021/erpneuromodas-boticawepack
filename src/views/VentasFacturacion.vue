@@ -328,7 +328,7 @@ export default {
       ],
       notaIdMotivo: null,
       notaCredito: {},
-      idPuntoVentaSiste: 1
+      idPuntoVentaSiste: 2
     }
   },
   watch: {

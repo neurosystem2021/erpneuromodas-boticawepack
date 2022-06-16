@@ -90,7 +90,7 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      idPuntoVentaSiste: 1
+      idPuntoVentaSiste: 2
     }
   },
   methods: {

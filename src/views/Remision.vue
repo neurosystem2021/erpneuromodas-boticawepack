@@ -278,7 +278,7 @@ export default {
           { key: 'acciones', label: ''}
         ]
       },
-      idPuntoVentaSiste: 1
+      idPuntoVentaSiste: 2
     }
   },
   computed: {
