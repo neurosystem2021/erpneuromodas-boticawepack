@@ -516,7 +516,8 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
+        let precio = this.productoSelect.PrecioContado*1.2/(this.productoSelect.Largo/99.17)*this.largo/100
+        //let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
         return;
