@@ -71,7 +71,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="HUANUCO"
+                                        initValue="KM6"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -92,7 +92,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="HUANUCO"
+                                        initValue="KM6"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -561,11 +561,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'KM6'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'KM6'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -1015,7 +1015,7 @@ export default {
                     this.getNumeroVenta()
                     this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
-                    this.$refs.inputAlmacen.setValue('PRINCIPAL')
+                    this.$refs.inputAlmacen.setValue('KM6')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')

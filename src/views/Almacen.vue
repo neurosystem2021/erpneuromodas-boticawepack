@@ -34,7 +34,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="PRINCIPAL"
+                      initValue="KM6"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -328,7 +328,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'PRINCIPAL'
+        Almacen: 'KM6'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
