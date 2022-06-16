@@ -266,6 +266,7 @@ export default {
         codUndPesoBruto: 'KGM',
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
+        descripcionMotivoTraslado:'VENTA',
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
@@ -276,7 +277,8 @@ export default {
           { key: 'cantidad' },
           { key: 'acciones', label: ''}
         ]
-      }
+      },
+      idPuntoVentaSiste: 1
     }
   },
   computed: {
@@ -320,7 +322,8 @@ export default {
       }
       this.axios.post(this.API + 'remision', {
         remision: this.remision,
-        productos: this.productos
+        productos: this.productos,
+        idPuntoVenta: this.idPuntoVentaSiste
       })
       .then((response) => {
         console.log(response);

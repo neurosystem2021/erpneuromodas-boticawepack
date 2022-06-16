@@ -63,7 +63,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count').then((response) => {
+    this.axios.get(this.API + 'ventas/count?idPuntoVenta='+this.idPuntoVentaSiste).then((response) => {
       this.totalRows = response.data.total
     })
   },
@@ -89,7 +89,8 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      idPuntoVentaSiste: 1
     }
   },
   methods: {
@@ -109,7 +110,7 @@ export default {
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'ventas?idPuntoVenta='+this.idPuntoVentaSiste+'&noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
