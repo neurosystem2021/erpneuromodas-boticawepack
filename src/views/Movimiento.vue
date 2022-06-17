@@ -191,7 +191,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito :isVentas="false" ref="carrito"></productos-carrito>
+              <productos-carrito :isVentas="false" ref="carrito" tipo="mov"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">

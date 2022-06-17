@@ -147,6 +147,15 @@
                      Solo Largo
             </b-form-checkbox>
           </b-form-group>
+
+          <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.TienePerdida"
+                     :value="1"
+                     :unchecked-value="0">
+                     Tiene Perdida
+            </b-form-checkbox>
+          </b-form-group>
           
         </b-col>
       </b-row>
@@ -351,6 +360,7 @@ export default {
 
         this.producto.EsPadre = newVal.EsPadre
         this.producto.SoloLargo = newVal.SoloLargo
+        this.producto.TienePerdida = newVal.TienePerdida
         Vue.nextTick(() => {
            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
         })
@@ -467,6 +477,7 @@ export default {
       this.producto = {
         EsPadre: 0,
         SoloLargo: 0,
+        TienePerdida:0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,

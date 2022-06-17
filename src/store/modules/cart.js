@@ -65,6 +65,7 @@ const actions = {
     let setLargo = false
     let setSuma = false
     let setPreOr = false
+    let setPrecioCosto = false
     let setDescripcion = false
     if (obje) {
       setPrecio = obje.setPrecio
@@ -74,9 +75,14 @@ const actions = {
       setSuma = obje.setSuma
       setPreOr =obje.setPreOr
       setDescripcion = obje.setDescripcion
+      setPrecioCosto = obje.setPrecioCosto
     }
 
     if(typeof producto === 'object') {
+      if (setPrecioCosto) {
+        producto.precio = producto.PrecioCosto || 0
+        producto.nuevoPrecioContado = producto.PrecioContado || 0
+      }
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -93,9 +99,11 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
           } else {
             obj.cantidad = 0
-            obj.precio = 0
+            obj.precio = obj.PrecioCosto || 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if(setPreOr){
@@ -126,7 +134,7 @@ const actions = {
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   

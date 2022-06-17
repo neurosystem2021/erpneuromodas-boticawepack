@@ -306,6 +306,7 @@ export default {
     }
   },
   props: {
+    tipo: String,
     setPrecio: Boolean,
     bloquearInput:Boolean,
     isVentas: Boolean,
@@ -516,7 +517,7 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = this.productoSelect.PrecioContado*1.2/(this.productoSelect.Largo/99.17)*this.largo/100
+        let precio = this.productoSelect.PrecioContado*(this.productoSelect.TienePerdida==1?1.2:1)/(this.productoSelect.Largo/100)*this.largo/100
         //let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
@@ -629,7 +630,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto agregado correctamente')
-      }])
+      },{setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
