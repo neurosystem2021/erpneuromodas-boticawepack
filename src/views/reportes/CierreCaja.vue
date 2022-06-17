@@ -545,10 +545,10 @@ export default {
           this.correcto = true
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            this.$refs.inputVendedor.$refs.input.disabled = true
+            //this.$refs.inputVendedor.$refs.input.disabled = true
 
             if(response.data.IdUsuarioPerfil !== 1) {
-             // this.$refs.inputVendedor.$refs.input.disabled = true
+              this.$refs.inputVendedor.$refs.input.disabled = true
             }
         })
         .catch((error) => {
