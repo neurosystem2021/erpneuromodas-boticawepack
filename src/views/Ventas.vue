@@ -869,6 +869,12 @@ export default {
                 return
             }
 
+            if(this.venta.EsCredito==1 && this.venta.FechaCredito==''){
+                this.$toasted.show('Debe ingresar la fecha de pago de la proforma a credito')
+                this.inProgress = false
+                return
+            }
+
             if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
                 this.$toasted.show('Debe ingresar los días de validez de la proforma')
                 this.inProgress = false
@@ -880,7 +886,7 @@ export default {
 
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                this.$toasted.show('Proforma Guardada con exito')
+                this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;

@@ -56,7 +56,11 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito==1?'CREDITO':'CONTADO' }}</td>
+              </tr>
+              <tr v-if="proforma.EsCredito==1">
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha de Pago</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCredito }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
@@ -120,7 +124,7 @@
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <h3 style="font-weight:bold">Información de pago</h3>
         <div style="margin-bottom:10px;">
-          CTA AHORROS SOLES 
+           <img style="max-width: 100%" src="/resources/images/cuentas.png" />
         </div>
       </div>
       <br>
