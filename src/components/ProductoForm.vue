@@ -10,12 +10,14 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
               class="form-control upper"
               ></b-form-input>
+              <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text>
           </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
@@ -517,7 +519,7 @@ export default {
       if(this.producto.SoloLargo==1){
         this.producto.Ancho = 0
       }
-      
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
