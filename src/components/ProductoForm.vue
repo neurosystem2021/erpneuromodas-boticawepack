@@ -7,6 +7,19 @@
       <b-row>
         <b-col md="6">
           <b-form-group>
+            <label>Código barra:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.CodigoBarra"
+              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+              <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -177,20 +190,24 @@
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <b-form-input 
+            <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
+              step="0.00001"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              />
           </b-form-group>
           <b-form-group>
             <label>Stock Minimo:</label>
-            <b-form-input   
+            <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
-              ></b-form-input>
+              step="0.00001"
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
       </b-row>
@@ -200,19 +217,22 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
-            <b-form-input
+            <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
-              ></b-form-input>
+              step="0.001"
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Venta:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
-              ></b-form-input>
+              class="form-control"
+              step="0.01"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
@@ -455,13 +475,15 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
 
+      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)
         }
         if (response.data.error) {
-          this.$toasted.show('Producto insertado correctamente - ' + response.data.codigoBarra)
+          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
+          return
         } else {
           this.$toasted.show('Producto guardado correctamente')
         }

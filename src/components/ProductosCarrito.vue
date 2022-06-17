@@ -29,25 +29,27 @@
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 80px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val)"
-            placeholder="Cantidad"></b-form-input>
+            @input="(val) => $emit('onInputCantidad', val.target.value)"
+            class="form-control"
+            placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.01"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            class="form-control"
+            @input="setNuevoPrecioContado(data.index)"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -78,27 +80,29 @@
             placeholder="Lote"></b-form-input>
         </template>-->
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
-            style="width:80px"
+          <input
+            style="width:85px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            class="form-control"
+            value="0"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -298,7 +302,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+      let idProducto = this.loadCode;
 
       if (idProducto) {
         this.add([idProducto, (obj) => {

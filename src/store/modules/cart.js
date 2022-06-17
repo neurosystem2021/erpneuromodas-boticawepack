@@ -70,6 +70,7 @@ const actions = {
 
     if(typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
+      producto.nuevoPrecioContado = producto.PrecioContado || 0
       if (cb) cb(producto)
     } else {
       axios.get(API + 'productos/id/' + producto).then((response) => {
@@ -79,9 +80,11 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
           } else {
             obj.cantidad = 0
             obj.precio = 0
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if (cantidad) {
@@ -93,7 +96,7 @@ const actions = {
           }
 
           obj.descuento = 0
-          obj.nuevoPrecioContado = 0
+          //obj.nuevoPrecioContado = 0
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
