@@ -408,16 +408,19 @@ export default {
           this.factorNombre="Público"
           this.esPulgadas=0
           this.factor = 620
+          this.calcularm2()
           break;
         case 1:
           this.indexFactor = val
           this.factorNombre="Vidriero"
           this.esPulgadas=0
           this.factor = 900
+          this.calcularm2()
           break;
         case 2:
           this.factorNombre="Pulgadas"
           this.factor = 144
+          this.calcularm2()
           break;
         default:
           break;
