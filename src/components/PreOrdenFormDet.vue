@@ -9,11 +9,18 @@
           anchor="Producto"
           :onShouldRenderChild="renderChild"
           label="writer"
+          style="width:200px"
           placeholder="Seleccionar Producto"
           :on-select="addProducto"
           :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
           :classes="{input: 'form-control upper'}">
         </autocomplete>
+        <input v-model="loadCode"
+        @keydown.enter.prevent="loadBarcode"
+        type="text"
+        style="width:20px"
+        class="form-control"
+        placeholder="Codigo de Barra" />
       </b-input-group>
     </b-form-group>
     <table class="table b-table table-sm">
@@ -64,7 +71,8 @@ export default {
     return {
       API: config.API,
       productosACargar: [],
-      productos: []
+      productos: [],
+      loadCode: '',
     }
   },
   props: ['idPreorden', 'idProducto'],
@@ -131,6 +139,24 @@ export default {
         <b>${data.IdProducto} - ${data.Producto} - ${data.CodigoBarra}</b>
       `
     },
+    loadBarcode (e) {
+      e.preventDefault()
+      let idProducto = this.loadCode;
+
+      if (idProducto) {
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.addProducto(response.data)
+            this.loadCode=''
+          } else {
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
+          }
+        })
+      }
+    },
     addProducto (data) {
       let index = this.productos.findIndex(el => el.IdProducto == data.IdProducto)
 
@@ -147,6 +173,7 @@ export default {
       data.Precio = data.PrecioContado
       
       this.productos.push(data)
+      this.$toasted.success('Producto agregado')
       this.emitUpdate()
 
     },

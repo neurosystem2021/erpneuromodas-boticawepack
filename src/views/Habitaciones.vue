@@ -69,6 +69,16 @@
 											<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
 										</b-input-group-append>
 									</b-input-group>
+									<br>
+									<label>Descripcion:</label>
+									<textarea 
+										class="form-control"
+										placeholder="Descripción"
+										cols="12" rows="3"
+										style="width: 100%"
+										v-model="selectCliente.Descripcion">
+									</textarea>
+
 									<!--<br />
 									<label>Lugar Procedencia:</label>
 									<b-input-group>
@@ -125,6 +135,25 @@
 							<div class="text-right horaFechaImpreso"> Fecha y Hora del impreso: <span id="fechaHoraImp" style="font-weight:bold"></span></div>
 							<div class="text-left" style="margin-bottom: 20px;">Fecha del Proyecto: <b> Inicio: {{ selectProducto.FechaAlquiler }} - Fin: {{ selectProducto.FechaAlquilerFin }}</b></div>
 							<div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
+							<div style="margin-bottom: 20px;">
+								<label>Descripción de Proyecto:</label>
+								<b-row>
+									<b-col md="9">
+										<textarea
+										:disabled="!editarDescripcion"
+										class="form-control"
+										placeholder="Descripción"
+										cols="12" rows="3"
+										style="width: 100%"
+										v-model="selectProducto.Descripcion">
+								</textarea>
+									</b-col>
+									<b-col md="3">
+										<b-button v-if="!editarDescripcion" style="margin-top:5px" variant="primary" size="sm" @click="editarDescripcionFun()"><i class="fas fa-pencil-alt fa-sm"></i> Editar Descripcion</b-button>
+										<b-button v-if="editarDescripcion" style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
+									</b-col>
+								</b-row>
+							</div>
 							<div class="text-left" v-if="proformaTotal">
 								<b style="padding: 4px; background: #ebf0ff;">
 									<b>PROFORMA:</b> {{ codProforma }} <br> S/ {{ proformaTotal }}
@@ -315,7 +344,8 @@ export default {
 			totalManoObraNeta:0,
 			totalSumaProductos:0,
 			totalGastos:0,
-			totalAdelantos:0
+			totalAdelantos:0,
+			editarDescripcion:false
 			}
 	},
 	computed: {
@@ -654,6 +684,20 @@ export default {
 			}
 			
 		},
+		editarDescripcionFun(){
+			this.editarDescripcion = !this.editarDescripcion
+		},
+		guardarDescripcion(){
+			this.axios.post(this.API + 'proyecto/descripcion', {
+				IdPreOrden: this.selectProducto.IdPreOrden,
+				Descripcion: this.selectProducto.Descripcion
+			}).then(res => {
+				this.editarDescripcion = false
+				this.$toasted.info('Descripcion guardada correctamente')
+			}).catch(error=>{
+				this.$toasted.show('No se guardo la descripcion, hubo un error')
+			})
+		}
 	},
 	components: {
 		PreOrdenFormDet,
