@@ -73,7 +73,7 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td><span v-if="item.CodSunat=='07'">-</span> S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -88,7 +88,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Ventas Tarjeta</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -118,7 +118,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -166,7 +166,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -291,7 +291,11 @@ export default {
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado  && venta.CodSunat!='07') total += venta.Efectivo
+        if (!venta.Anulado  && venta.CodSunat!='07'){
+          total += venta.Efectivo
+        }else if(!venta.Anulado  && venta.CodSunat=='07'){
+          total -= venta.Efectivo
+        } 
       });
       return total
     },
@@ -508,7 +512,7 @@ th {
 }
 .credito {
   background: #f9f9f9;
-  padding: 10px;
+  /*padding: 10px;*/
 }
 .si-print {
   display: none;

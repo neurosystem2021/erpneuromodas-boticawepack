@@ -44,7 +44,7 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 80px"
+            style="width: 95px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -81,7 +81,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
