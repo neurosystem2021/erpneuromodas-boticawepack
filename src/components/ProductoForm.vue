@@ -124,7 +124,22 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group v-if="false">
+          <b-form-group>
+            <label>Anaquel:</label>
+            <autocomplete
+                :url="API + 'productos/anaquel'"
+                ref="inputAnaquel"
+                anchor="Anaquel"
+                label="writer"
+                :placeholder.sync="producto.Anaquel"
+                :on-select="val => producto.Anaquel = val.Anaquel && val.Anaquel.toUpperCase()"
+                :onInput="val => producto.Anaquel = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputAnaquel')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+          </b-form-group>
+
+          <b-form-group>
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
@@ -356,7 +371,7 @@
                   ref="inputAlmacen"
                   :url="API + 'almacenes'"
                   anchor="Almacen"
-                  initValue="HUANUCO"
+                  initValue="CENTRO"
                   label="writer"
                   placeholder=""
                   :on-select="setAlmacen" 
@@ -434,7 +449,7 @@ export default {
       title: 'Nuevo Producto',
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'PRINCIPAL'
+        Almacen: 'CENTRO'
       },
       API: config.API,
       nuevo:false,
@@ -487,6 +502,7 @@ export default {
           // this.$refs.inputModelo.setValue('')
           //this.$refs.inputModelo.setValue(newVal.ProductoModelo)
           this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+          this.$refs.inputAnaquel.setValue(newVal.Anaquel)
           //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
           //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
           //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
@@ -536,9 +552,11 @@ export default {
           if (newVal.PreciosPorProducto) {
             this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
           }
+          this.$refs.file.value=null
           }).catch((error) => {
             console.log(error)
             this.initForm()
+            this.$refs.file.value=null
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
           })
 
@@ -692,6 +710,7 @@ export default {
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
+      this.$refs.inputAnaquel.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
@@ -738,7 +757,8 @@ export default {
           {nombre: 'Precio 2', cantidad: 0, precio: 0},
           {nombre: 'Precio 3', cantidad: 0, precio: 0},
           {nombre: 'Precio 4', cantidad: 0, precio: 0}
-        ]
+        ],
+        Anaquel:''
       }
     },
     keyDownInput(e) {
@@ -763,6 +783,7 @@ export default {
         }
       })
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
+      this.producto.Anaquel=(''+this.producto.Anaquel).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
         PreciosPorProducto: this.producto.precios 

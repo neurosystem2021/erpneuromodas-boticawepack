@@ -83,6 +83,13 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+          <br>
+          <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover placement="left" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <div style="text-align:center">
+              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+            </div>
+          </b-popover>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
@@ -740,6 +747,9 @@ export default {
       }, 200); 
       */
     },
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
       this.medicionPro = obj.ProductoMedicion
@@ -953,6 +963,9 @@ export default {
 </script>
 
 <style scoped>
+  .popover{
+    max-width: 420px !important;
+  }
   .contentCard {
     cursor: pointer;
   }

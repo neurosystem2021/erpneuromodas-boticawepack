@@ -34,7 +34,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="PRINCIPAL"
+                      initValue="CENTRO"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -259,6 +259,15 @@
                   </div>
                 </template>
 
+                <template slot="ImagenProducto" slot-scope="data">
+                  <b-button style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                  <b-popover placement="top" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
+                    <div style="text-align:center">
+                      <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+                    </div>
+                  </b-popover>
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -302,7 +311,43 @@
         <p>{{kardexSelect}}</p>-->
 
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
+        <b-row>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="kardex.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="kardex.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+        <b-row>
+          <b-col class="text-center">
+              <b-button variant="success" size="sm" :href="hrefXls" target="_blank">Exportar Excel</b-button>
+          </b-col>
+        </b-row>
+        <br>
       </b-modal>
   </div>
 </template>
@@ -328,7 +373,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'PRINCIPAL'
+        Almacen: 'CENTRO'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -337,12 +382,17 @@ export default {
       sortDesc: false,
       productoSelect: {},
       kardexSelect: [],
+      kardex: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
       items: [],
       itemsStock: [],
       isBusy: false,
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
@@ -401,9 +451,15 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
-    }
+    },
+    hrefXls () {
+      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
+    },
   },
   methods: {
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     clickVerValorizado() {
       let pass = window.prompt('Escriba su contraseña')
       if (pass) {
@@ -465,15 +521,31 @@ export default {
     rowDblClick (item) {
       this.productoSelect = item
       this.showKardex = true
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01")
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD")  
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
           }
       }).then((response) => {
           this.kardexSelect = response.data
       })
+    },
+    kardexFechaRango(){
+      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
+          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
+          }
+          }).then((response) => {
+              this.kardexSelect = response.data
+          })
+      }
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
@@ -576,4 +648,9 @@ export default {
         max-width: 1200px;
     }
 }
+</style>
+<style>
+  .popover{
+    max-width: 420px !important;
+  }
 </style>

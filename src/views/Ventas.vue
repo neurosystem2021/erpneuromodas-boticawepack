@@ -71,7 +71,7 @@
                                         ref="inputAlmacen"
                                         :url="API + 'almacenes'"
                                         anchor="Almacen"
-                                        initValue="PRINCIPAL"
+                                        initValue="CENTRO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
@@ -92,7 +92,7 @@
                                         ref="inputPuntoVenta"
                                         :url="API + 'ventas/puntos'"
                                         anchor="PuntoVenta"
-                                        initValue="PRINCIPAL"
+                                        initValue="CENTRO"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
@@ -445,6 +445,7 @@ export default {
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca' },
+                    { key: 'Anaquel' },
                     //{ key: 'ProductoModelo', label: 'Modelo/Color' , tdClass: 'widthTable'}, 
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
@@ -567,11 +568,11 @@ export default {
                 },
                 almacen: {
                     IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
+                    Almacen: 'CENTRO'
                 },
                 puntoVenta: {
                     IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
+                    PuntoVenta: 'CENTRO'
                 },
                 vendedor: {},
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -721,7 +722,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -1064,8 +1065,8 @@ export default {
                     this.getNumeroVenta()
                     this.loadClienteVarios()
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
-                    this.$refs.inputAlmacen.setValue('PRINCIPAL')
-                    this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
+                    this.$refs.inputAlmacen.setValue('CENTRO')
+                    this.$refs.inputPuntoVenta.setValue('CENTRO')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')

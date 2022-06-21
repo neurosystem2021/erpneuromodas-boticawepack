@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container  fluid style="width: calc(100% - 300px)" class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -86,6 +86,7 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'Anaquel', label: 'Anaquel', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

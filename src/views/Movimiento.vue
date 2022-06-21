@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue="CENTRO"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue="CENTRO"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -232,7 +232,9 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      isTraslado:true,
+      isSalida:false
     }
   },
   computed: {
@@ -251,9 +253,15 @@ export default {
       limpiarCart: 'limpiarCarrito',
     }),
     onAddProducto (obj) {
+      if(this.isSalida){
         this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+          IdAlmacen: (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
         })
+      }else{
+        this.obtenerStok({
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }
     },
     afe (e) {
 return false
@@ -307,13 +315,19 @@ return false
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.isTraslado = false
+        this.isSalida = false
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = false
+        this.isSalida = true
          this.limpiarCart()
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.isTraslado = true
+        this.isSalida = false
          this.limpiarCart()
       }
       this.movimiento.movimientoTipo = obj
@@ -326,10 +340,22 @@ return false
     setAlmacenOrigen (obj) {
       this.limpiarCart()
       this.movimiento.almacenOrigen = obj
+      if(this.isSalida){
+        this.obtenerStok({
+          IdAlmacen: (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }else{
+        this.obtenerStok({
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
-      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      })
+    
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
@@ -378,10 +404,10 @@ return false
       let faltaLlenar = false
       let faltaFechaVen = false
       let igualProducto = false
-      let faltaStock = false
+      let sinStock = 0
       this.productos.forEach((prod, index) => {
-        if (prod.total <= 0) {
-          faltaLlenar = true
+        if(((prod.stock <= 0) || (parseFloat(prod.cantidad) > prod.stock) || prod.stock == undefined)){
+          sinStock += 1
         }
 
         if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
@@ -405,9 +431,9 @@ return false
         
       })
 
-      if (faltaStock) {
-          this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
-          this.inProgress = false            
+      if (sinStock>=1 && (this.isTraslado==true || this.isSalida==true)) {
+          this.$toasted.show('No tiene stock para realizar el movimiento')
+          this.inProgress = false
           return;
       }
 
