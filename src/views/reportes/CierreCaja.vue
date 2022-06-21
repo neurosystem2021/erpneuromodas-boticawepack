@@ -5,7 +5,7 @@
       <div>
           <div class="no-print">
               <b-row align-h="end" class=" no-print">
-                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
+                <label v-if="!this.$route.params.id" >Vendedor:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
                     <b-form-group size="sm" >
                         <autocomplete
@@ -19,8 +19,8 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>-->
-                <b-col cols="9">
+                </b-col>
+                <b-col cols="8">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
                     </b-button-group>
@@ -560,11 +560,10 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
-
+            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.$refs.input.disabled = true
             if(response.data.IdUsuarioPerfil !== 1) {
-              //this.$refs.inputVendedor.$refs.input.disabled = true
+              this.$refs.inputVendedor.$refs.input.disabled = true
             }
         })
         .catch((error) => {
@@ -593,8 +592,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
+          //user: sessionStorage.getItem("User"),
+          user:         this.vendedor.Usuario,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -634,7 +633,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -653,7 +652,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -670,7 +669,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params

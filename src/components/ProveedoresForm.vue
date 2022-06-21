@@ -6,7 +6,7 @@
       <b-row>
         <b-col md="12">
           <b-form-group>
-            <label>RUC:</label>
+            <label>RUC / DNI:</label>
             <b-input-group>
               <b-form-input 
                 v-model="proveedor.Ruc"></b-form-input>
@@ -72,16 +72,22 @@ export default {
       this.proveedor.Telefono = ''
     },
     consultarRUC() {
+      let tipo = this.proveedor.Ruc.length > 8 ? 'RUC' : 'DNI'
       this.axios.get(this.API + 'consultarRUC', {
           params: {
-            type: 'RUC',
+            type: tipo,
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
+          this.$toasted.success('Proveedor encontrado, se llenarán sus datos')                  
           var data = response.data
-          this.proveedor.Proveedor = data.razonSocial
-          this.proveedor.Direccion = data.direccion
+          if (tipo == 'DNI') {
+            this.proveedor.Proveedor = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+            this.proveedor.Direccion = ''
+          } else {
+            this.proveedor.Proveedor = data.razonSocial
+            this.proveedor.Direccion = data.direccion
+          }
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el RUC')        
