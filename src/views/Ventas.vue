@@ -8,6 +8,9 @@
         <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
             <div>
                 <div class="float-right">
+                    <b-button-group>
+                       <b-button variant="outline-danger" @click="testImpresora()">Probar Impresora</b-button>
+                    </b-button-group>
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
@@ -370,6 +373,26 @@
                                     </tbody>
                                 </table>
                             </template>
+                            <template slot="tipoVenta">
+                                <b-row class="m-1">
+                                    <b-col md="12" class="text-left">
+                                       <h6>Opción Comanda</h6>
+                                    </b-col>
+                                    <b-col md="12" class="text-left">
+                                        <b-form-radio-group id="radios1"
+                                            v-model="venta.selectOpcionVenta"
+                                            :options="opcionesVenta"
+                                            name="radioOptions">
+                                        </b-form-radio-group>
+                                    </b-col>
+                                    <b-col md="12">
+                                        <b-form-group>
+                                            <label style="font-weight:bold">Nombre:</label>
+                                            <b-form-input style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese cliente" autocomplete="off" v-model="venta.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar"></b-form-input>
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                            </template>
                         </productos-carrito>
                     </b-col>
                 </b-row>
@@ -378,7 +401,7 @@
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir Comprobante</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -422,6 +445,7 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
+            ultimaVentaData:{},
             bloquearInput:false,
             diasValidosProf:0,
             itemsMotivoNota: [
@@ -443,7 +467,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'Descripcion', label: 'Indicacion'},
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Anaquel' },
                     //{ key: 'ProductoModelo', label: 'Modelo/Color' , tdClass: 'widthTable'}, 
@@ -460,7 +484,11 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            opcionesVenta: [
+                { text: 'Normal', value: 0 },
+                { text: 'Para llevar', value: 1 },
+            ],
         }
     },
     watch: {
@@ -589,7 +617,9 @@ export default {
                 NotaDescMotivo: '',
                 IdPreOrden: [],
                 CampoDireccion: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                nombreLlevar: '',
+                selectOpcionVenta: 0,
             }
             this.isNota = false
             this.bloquearInput=false
@@ -999,7 +1029,7 @@ export default {
             let totalCero = 0 
             let igualLote = 0
             this.productos.forEach(pro => {
-                console.log(pro);
+                //console.log(pro);
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
                     sinStock += 1
                 }
@@ -1013,6 +1043,7 @@ export default {
                     igualLote += 1 
                 }
                 
+                pro.Descripcion = (''+pro.Descripcion).trim().toUpperCase();
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
@@ -1043,6 +1074,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.nombreLlevar=(''+this.venta.nombreLlevar).trim().toUpperCase();
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
@@ -1054,16 +1086,133 @@ export default {
                     return; 
                 }else{
                 // limpiar preorden seleccionado
-                    this.$router.replace('/ventas')
                     this.$toasted.success('Venta realizada con exito')
+                    try {
+                    this.venta.productos.map((pro)=>{
+                        delete pro.nuevoPrecioContado
+                        delete pro.disabledProf
+                        delete pro.normalPrecioContado
+                        delete pro.Anulado
+                        delete pro.Botapie
+                        delete pro.Codigo
+                        delete pro.CodigoBarra
+                        delete pro.Color
+                        delete pro.ControlaStock
+                        delete pro.Dosis
+                        delete pro.EsPadre
+                        delete pro.FechaMod
+                        delete pro.FechaReg
+                        delete pro.Genero
+                        delete pro.Hash
+                        delete pro.IdBloque
+                        delete pro.IdProducto
+                        delete pro.IdProductoCategoria
+                        delete pro.IdProductoFormaFarmaceutica
+                        delete pro.IdProductoMarca
+                        delete pro.IdProductoMedicion
+                        delete pro.IdProductoTalla
+                        delete pro.PorcentajeUtilidad
+                        delete pro.PrecioContado
+                        delete pro.PrecioCosto
+                        delete pro.PrecioPorMayor
+                        delete pro.ProductoCategoria
+                        delete pro.ProductoDesc
+                        delete pro.ProductoDescCorto
+                        delete pro.ProductoMarca
+                        delete pro.ProductoMedicion
+                        delete pro.ProductoModelo
+                        delete pro.ProductoTalla
+                        delete pro.StockMinimo
+                        delete pro.StockPorMayor
+                        delete pro.UsuarioMod
+                        delete pro.UsuarioReg
+                        delete pro.VentaEstrategica
+                        delete pro.stock
+                        delete pro.ProductoDesc2
+                        delete pro.ProductoDesc3
+                        delete pro.PrecioEspecial
+                        delete pro.ProductoPresentacion
+                        delete pro.precioConvenio
+                        delete pro.EsHabitacion
+                        delete pro.Piso
+                        delete pro.EstadoHabitacion
+                        delete pro.IdPreOrden
+                        delete pro.IdClienteReserva
+                        delete pro.FechaReserva
+                        delete pro.FechaAlquiler
+                        delete pro.Vuelo
+                        delete pro.FechaAlquilerFin
+                        delete pro.EstaSucio
+                        delete pro.PreciosPorProducto
+                        delete pro.Imagen
+                        delete pro.Anaquel
+                        delete pro.StockIngresoUnd
+                        delete pro.StockSalidaUnd
+                        delete pro.StockSalidaVentaUnd
+                        delete pro.StockSalidaVentaCaja
+                        delete pro.cantxPrecio
+                        delete pro.cantidadPres 
+                        delete pro.subtotal
+                        delete pro.total 
+                        delete pro.hashMovimiento
+                        delete pro.stockMovimiento
+                        delete pro.SerieNumero
+                        delete pro.fechaVenMovimiento
+
+                    });
+                    delete this.venta.cliente.Anulado
+                    delete this.venta.cliente.FechaReg
+                    delete this.venta.cliente.UsuarioReg
+                    delete this.venta.cliente.FechaMod
+                    delete this.venta.cliente.UsuarioMod
+                    delete this.venta.cliente.FechaNacimiento
+                    delete this.venta.cliente.Nacionalidad
+                    delete this.venta.cliente.Direccion3
+                    delete this.venta.cliente.Telefono
+                    delete this.venta.cliente.Email
+                    delete this.venta.cliente.Puntos
+                    delete this.venta.cliente.EsVIP
+                    delete this.venta.cliente.Direccion2
+                    delete this.venta.cliente.Sexo
+                    delete this.venta.cliente.Ocupacion
+                    delete this.venta.cliente.NombreComercial
+                    delete this.venta.cliente.esComisionista
+                    delete this.venta.idProductos
+                    delete this.venta.vendedor.APPTOKEN
+                    delete this.venta.vendedor.APPURL
+                    delete this.venta.vendedor.Anulado
+                    delete this.venta.vendedor.FechaReg
+                    delete this.venta.vendedor.UsuarioReg
+                    delete this.venta.vendedor.FechaMod
+                    delete this.venta.vendedor.UsuarioMod
+                    delete this.venta.vendedor.Password
+                    delete this.venta.puntoVenta
+                    delete this.venta.almacen
+                    let dataInfoDocVenta = {
+                        Serie:  response.data.serie,
+                        Numero: response.data.numero,
+                        Fecha: response.data.fecha,
+                    }
+                    this.venta.dataInfoDocVenta = dataInfoDocVenta
+                    let ventaJson= JSON.stringify(this.venta)
+                    var left = (screen.width/2)-(800/2)
+                    var top = (screen.height/2)-(800/2)
+                    let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                    window.open('http://localhost:5000/imprimir/getcmd.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                   
+                    } catch (error) {
+                        console.log(error)
+                    }
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
+                    this.ultimaVentaData = this.venta
                     this.initForm()
                     this.limpiarCart()
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.loadClienteVarios()
+                    this.$router.replace('/ventas')
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('CENTRO')
                     this.$refs.inputPuntoVenta.setValue('CENTRO')
@@ -1083,6 +1232,22 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
+        },
+        imprimirUltimaVenta(){
+            try {
+               let ventaJson= JSON.stringify(this.ultimaVentaData)
+               var left = (screen.width/2)-(800/2)
+               var top = (screen.height/2)-(800/2)
+               let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+               window.open('http://localhost:5000/imprimir/getcmd.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+            } catch (error) {
+            }
+        },
+        testImpresora(){
+            var left = (screen.width/2)-(800/2)
+            var top = (screen.height/2)-(800/2)
+            let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+            window.open('http://localhost:5000/imprimir/test.php', "Impresión", params)
         },
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')

@@ -237,17 +237,14 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <!--<template slot="Descripcion" slot-scope="data">
+        <template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
-            placeholder="Descripción"
-            cols="9" rows="3"
+            placeholder="Ingrese indicación"
+            cols="10" rows="3"
+            style="text-transform:uppercase; width:170px"
             v-model="productos[data.index].Descripcion"></textarea>
-          <b-form-input
-            v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>
-        </template>--> 
+        </template>
 
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
@@ -321,7 +318,7 @@
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="2">
-      <slot name="adicional"></slot>
+      <slot name="tipoVenta"></slot>
     </b-col>
     <b-col md="3">
           <table class="table b-table border table-footer">
@@ -751,6 +748,21 @@ export default {
         event.target.src = "static/no-photo.png" 
     },
     setProducto (obj) {
+
+      if(this.isVentas && obj.EsPaquete){
+        let params = {idProducto:  obj.IdProducto}
+        this.axios.get(this.API + 'productos/paquete', {params: params})
+        .then((response) => {
+          if (response.data) {
+            response.data.map(pro=>{
+              this.setProductoUni(pro)
+            })
+          } else {
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
+          }
+        })
+      }else{
       this.precioCont = obj.PrecioContado
       this.medicionPro = obj.ProductoMedicion
       this.loadCode = ''
@@ -774,6 +786,7 @@ export default {
       this.indexProdSelect = null
       this.$refs['modalCant'].show()
       this.objProd = obj
+      }
     },  
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
@@ -785,7 +798,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,1,obj.precioPaquete)
       obj.cantidadPres = obj.cantidad
       if(this.indexProdSelect == null){
       this.add([obj, () => {
@@ -857,9 +870,13 @@ export default {
         // cambiar color los que faltan 4 meses por vencer
         if (data.stock > 0) {
           style = 'success'
-      }
+        }
+
+        if (data.EsPaquete == 1) {
+          style = ''
+        }
       return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b> 
+         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.EsPaquete==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado}</b> 
       `
       }
       return `

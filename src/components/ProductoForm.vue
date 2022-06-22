@@ -214,7 +214,7 @@
               step="0.001"
               />
           </b-form-group>
-          <b-form-group v-if="!producto.EsPadre">
+          <b-form-group v-if="!producto.EsPadre && !producto.EsPaquete">
             <label>Stock Minimo:</label>
             <input   
               required="required"
@@ -232,7 +232,7 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -240,6 +240,16 @@
                      :unchecked-value="0"
                      @input="checkIsHijo">
               Seleccione esta opción si el producto contiene mas productos
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
+            <label>Activar Paquete de Productos:</label>
+            <b-form-checkbox
+                     v-model="producto.EsPaquete"
+                     :value="1"
+                     :unchecked-value="0"
+                     @input="checkIsPaquete">
+              Seleccione esta opción si paquete de productos
             </b-form-checkbox>
           </b-form-group>
           <b-form-group  v-if="false">
@@ -358,6 +368,16 @@
             ></producto-form-det>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col>
+          <producto-form-det-paq 
+            @onUpdateProductos="calcularPreciosPaqueteUlt"
+            :id-producto="producto.IdProducto" 
+            v-if="showProductoDetPaquete && show" 
+            ref="productoDetPaquete"
+            ></producto-form-det-paq>
+        </b-col>
+      </b-row>
       <hr />
       <b-row v-if="producto.IdProducto">
         <b-col md="12">
@@ -434,12 +454,14 @@ import config from '@/store/config.js'
 import CategoriaForm from '@/components/CategoriaForm'
 import MarcaForm from '@/components/MarcaForm'
 import ProductoFormDet from '@/components/ProductoFormDet'
+import ProductoFormDetPaq from '@/components/ProductoFormDetPaq'
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
   data () {
     return {
       showProductoDet: true,
+      showProductoDetPaquete: true,
       cantidadCodigoBarra: 1,
       hashMovimiento:'',
       movimientoLotes: [],
@@ -524,9 +546,11 @@ export default {
           this.producto.Producto = newVal.Producto
           this.producto.IdProducto = newVal.IdProducto
           this.producto.EsPadre = newVal.EsPadre
+          this.producto.EsPaquete = newVal.EsPaquete
           this.loadAlmacen(1);
           Vue.nextTick(() => {
             if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+            if (this.$refs.productoDetPaquete) this.$refs.productoDetPaquete.show = parseInt(newVal.EsPaquete)
           })
           // this.producto.Genero = newVal.Genero
           // this.producto.Botapie = newVal.Botapie
@@ -580,6 +604,22 @@ export default {
         if (prod.Cantidad) {
           sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
           sumatoriaContado += prod.PrecioContado * prod.Cantidad
+        }
+      });
+      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
+      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado)
+      
+      Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
+      Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
+      this.actualizarPorcentajeUtilidad()
+    },
+    calcularPreciosPaqueteUlt (prodDetalles) {
+      let sumatoriaCosto = 0
+      let sumatoriaContado = 0
+      prodDetalles.forEach(prod => {
+        if (prod.Cantidad) {
+          sumatoriaCosto += prod.Precio * prod.Cantidad
+          sumatoriaContado += prod.Precio * prod.Cantidad
         }
       });
       sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
@@ -719,6 +759,7 @@ export default {
     initForm () {
       this.producto = {
         EsPadre: 0,
+        EsPaquete: 0,
         Anulado: 0,
         EsHabitacion: 0,
         Piso: 1,
@@ -772,6 +813,9 @@ export default {
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
+      }
+      if (this.showProductoDetPaquete) {
+        this.producto.productosDetPaquete = this.$refs.productoDetPaquete.productos
       }
       // console.log(JSON.stringify(this.producto))
       this.producto.precios.map((pre)=>{
@@ -904,12 +948,31 @@ export default {
       } else {
         if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
       }
+    },
+    checkIsPaquete (val) {
+      console.log(val)
+      if (val && this.producto.IdProducto) {
+        this.axios.get(this.API + 'productos/espaquete', {params: {
+          idProducto: this.producto.IdProducto
+        }})
+        .then(res => {
+          let esHijo = res.data.esPaquete
+          if(esHijo) {
+            this.$toasted.show('Este producto no puede contener productos ya que es un producto paquete')
+            this.producto.EsPaquete = false      
+          }else {
+            this.$refs.productoDetPaquete.show = parseInt(this.producto.EsPaquete)
+          }
+        })
+      } else {
+        if (this.$refs.productoDetPaquete) this.$refs.productoDetPaquete.show = parseInt(this.producto.EsPaquete)
+      }
     }
   },
   computed : {
   },
   components: {
-    CategoriaForm, MarcaForm, ProductoFormDet
+    CategoriaForm, MarcaForm, ProductoFormDet, ProductoFormDetPaq
   }
 }
 </script>
