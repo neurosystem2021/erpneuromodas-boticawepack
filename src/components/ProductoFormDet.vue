@@ -88,7 +88,7 @@ export default {
         idProducto: data.IdProducto
       }}).then(res => {
         let esPadre = res.data.esPadre
-        if  (esPadre) {
+        if  (esPadre || data.EsPadre==1) {
           this.$toasted.show('No puede agregar un producto padre')
         } else {
           data.IdProductoDet = data.IdProducto

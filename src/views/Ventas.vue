@@ -1029,9 +1029,14 @@ export default {
             let totalCero = 0 
             let igualLote = 0
             this.productos.forEach(pro => {
-                //console.log(pro);
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
-                    sinStock += 1
+                if(pro.EsPadre){
+                    if((pro.stockMovimiento <= 0) || parseFloat(pro.cantidad) > pro.stockMovimiento || pro.stockMovimiento == undefined)  {
+                        sinStock += 1
+                    }
+                }else{
+                    if( ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
+                        sinStock += 1
+                    }
                 }
 
                 if(parseFloat(pro.total) <= 0) {

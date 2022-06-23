@@ -232,7 +232,7 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group v-if="false">
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -242,7 +242,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar Paquete de Productos:</label>
             <b-form-checkbox
                      v-model="producto.EsPaquete"
