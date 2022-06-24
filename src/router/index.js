@@ -11,6 +11,7 @@ import VentaEstrategica from '@/views/VentaEstrategica.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import ProductosSimilares from '@/views/ProductosSimilares.vue'
 import Configuraciones from '@/views/Configuraciones.vue'
+import ProductosVencer from '@/views/ProductosVencer.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -116,6 +117,11 @@ export default new Router({
       path: '/reportes/clientesvip',
       name: 'ClientesVip',
       component: ClientesVip
+    },
+    {
+      path: '/productosvencer',
+      name: 'ProductosVencer',
+      component: ProductosVencer
     },
   ]
 })
