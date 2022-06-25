@@ -81,7 +81,7 @@
                                     <label>Cliente:</label>
                                     
                                     <b-input-group>
-                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -178,13 +178,15 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -225,13 +227,14 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -314,6 +317,7 @@ export default {
     mounted () {
         this.getNumeroVenta()
         this.getVendedor()
+        this.loadClienteVarios()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -332,7 +336,7 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    { key: 'ProductoModelo', label: 'Modelo' },
+                    //{ key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoMedicion', label: 'Producto' },
                     { key: 'cantidad' },
@@ -362,6 +366,14 @@ export default {
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock'
         }),
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -411,6 +423,8 @@ export default {
                 },
                 CampoDireccion: 'Direccion'
             }
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0 
         },
         setTipoVenta (obj) {
             if (obj.TieneIgv) {
@@ -439,8 +453,8 @@ export default {
                 // this.loadAlmacen(response.data.IdAlmacen)
                 // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
-                // this.$refs.inputAlmacen.$refs.input.disabled = true
-                // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
             })
             .catch((error) => {
@@ -554,7 +568,7 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false
@@ -579,8 +593,9 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false
                 this.limpiarDespuesVenta()
+                this.loadClienteVarios()
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -595,12 +610,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2) ) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false
                     return
@@ -654,20 +684,22 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 // this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
