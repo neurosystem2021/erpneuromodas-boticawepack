@@ -78,13 +78,19 @@ export default {
       }
     },
     guardarFechaVen(e) {
-        e.preventDefault();
+        e.preventDefault();       
         if (this.producto.FechaVen == undefined || this.producto.FechaVen=='' || this.producto.FechaVen.length>10 ) {
           if(this.producto.FechaVen.length>10){
             this.$toasted.show('La fecha de vencimiento no tiene formato correcto')
             return
           }
           this.$toasted.show('Ingrese fecha de vencimiento')
+          return
+        }
+        let anioActual = new Date().getFullYear();
+        let anioIntPro = parseInt(this.producto.FechaVen.substring(0,4))
+        if (anioIntPro < anioActual || anioIntPro > (anioActual+11)) {
+          this.$toasted.show("La fecha de vencimiento del producto esta fuera del rango de año: ("+anioActual+" - "+(anioActual+10)+") " );
           return
         }
         this.producto.IdLote = (''+this.producto.IdLote).trim();
@@ -98,7 +104,7 @@ export default {
             } else {
                 this.$toasted.success('Fecha actualizada correctamente')
                 if (this.cbGuardar) {
-                    this.cbGuardar(response.data.insertId)
+                    this.cbGuardar()
                 }
                 this.$refs.productoForm.hide()
             }

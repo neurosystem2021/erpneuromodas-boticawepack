@@ -48,6 +48,12 @@
               <b-button @click="generarFechaVen" variant="primary" size="lg">Generar</b-button>
             </b-form-group>
           </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="exportarFechaVen" variant="success" size="lg">Exportar</b-button>
+            </b-form-group>
+          </b-col>
         </b-row>
         <hr>
         <b-row>
@@ -223,6 +229,25 @@ export default {
       cambiarMayor(val){
         Vue.nextTick(() => this.$refs.tablaProductos.refresh())
       },
+      exportarFechaVen(){
+        if (this.fechaDesde == undefined || this.fechaDesde=='' || this.fechaDesde.length>10 ) {
+          if(this.fechaDesde.length>10){
+            this.$toasted.show('La fecha de inicio no tiene formato correcto')
+            return
+          }
+          this.$toasted.show('Ingrese fecha de inicio')
+          return
+        }
+        if (this.fechaHasta == undefined || this.fechaHasta=='' || this.fechaHasta.length>10 ) {
+          if(this.fechaHasta.length>10){
+            this.$toasted.show('La fecha de fin no tiene formato correcto')
+            return
+          }
+          this.$toasted.show('Ingrese fecha de fin')
+          return
+        }
+        window.open('/api/index.php/reporte/fechaven/nuevo?idAlmacen='+this.almacen.IdAlmacen+'&fechaIni='+this.fechaDesde+'&fechaFin='+this.fechaHasta,'_blank');
+      },
       EditarFechaVen(item){
         this.productoSelect = item
         this.productoSelect.IdAlmacen = this.almacen.IdAlmacen
@@ -261,7 +286,6 @@ export default {
         }
       },
       setAlmacen (obj) {
-        console.log(obj)
         this.almacen = obj
         Vue.nextTick(() => this.$refs.tablaProductos.refresh())
       },
@@ -271,7 +295,7 @@ export default {
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos/stock/'+this.almacen.IdAlmacen+'?fechaIni='+this.fechaDesde+'&fechaFin='+this.fechaHasta+(this.condicionStock==1?'&condiStock=1':'')+((('')+this.filter).trim()==''?'&fven=1':'')+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+        let url = this.API + 'productos/stock/'+this.almacen.IdAlmacen+'?fechaIni='+this.fechaDesde+'&fechaFin='+this.fechaHasta+(this.condicionStock==1?'&condiStock=1':'')+((('')+this.filter).trim()==''?'&fven=1':'')+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ encodeURIComponent(ctx.filter||'')+'&sortBy='+ctx.sortBy
         url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
         let promise = this.axios.get( url )
 
