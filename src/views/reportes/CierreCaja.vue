@@ -171,7 +171,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Plin, Yape y Transferencias</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
