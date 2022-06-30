@@ -32,7 +32,8 @@
 
       <b-modal id="modalPresent" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration:underline">{{objProd.Producto}}</h3>
+          <h5>PRESENTACIONES</h5>
         </div>
         <hr>
         <b-row>
@@ -189,7 +190,7 @@
             </b-form-text>
         </template>
 
-        <!--<template slot="utilidad" slot-scope="data">
+        <template slot="utilidad" slot-scope="data">
           <input 
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
@@ -206,7 +207,7 @@
             <b-badge variant="danger">{{productos[data.index].PorcentajeUtilidadMin}}</b-badge> - <b-badge variant="success">{{productos[data.index].PorcentajeUtilidadMax}}</b-badge>
               <br>
             <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
-        </template>-->
+        </template>
 
         <template slot="descuento" slot-scope="data">
           <input
@@ -757,7 +758,6 @@ export default {
       } else {
           precio = parseFloat(this.productos[index].precio)+ parseFloat(this.productos[index].preciocontado)*1.5/100
       }
-      console.log(this.productos[index].preciocontado);
       if(this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
       }

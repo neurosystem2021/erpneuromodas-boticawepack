@@ -435,7 +435,7 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -610,11 +610,11 @@ export default {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
-
            //Cargar producto del documento afectado nota credito
              this.axios.get(this.API + 'venta/detalle/comprobante', {
                     params: {
-                        NroComprobante: obj.NroComprobante
+                        NroComprobante: obj.NroComprobante,
+                        idDocVenta: obj.IdDocVenta
                     }
                 }).then((response) => {
 
@@ -626,6 +626,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
@@ -635,6 +636,18 @@ export default {
                     })
                      this.limpiarCart()
                      response.data.map((item) => {
+                        try {
+                            if(item.DescripcionPre!=null && item.DescripcionPre!=''){
+                                let present = JSON.parse(item.DescripcionPre)
+                                item.cantidadPres = present.cantidad
+                                item.cantxPrecio = item.cantidad / item.cantidadPres
+                                item.descripcion = present.nombre
+                                item.precioxcantidaselec = present
+                                console.log(present)
+                            }
+                        } catch (error) {
+                            
+                        }
                         this.add([item, () => {
                         }, false ])
                     })     
@@ -932,6 +945,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0
+            let porcentError = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -960,13 +974,17 @@ export default {
                 return 
             }
 
-            /*this.productos.forEach(p => {
-                if(!(p.PorcentajeUtilidadMin < p.PorcentajeUtilidad && p.PorcentajeUtilidad < p.PorcentajeUtilidadMax)){
-                   // this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado'+ p.PorcentajeUtilidad );
-                    this.inProgress = false
-                    return
+            this.productos.forEach(p => {
+                if((!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)) && this.venta.tipoVenta.CodSunat != '07'){
+                   this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado '+ p.PorcentajeUtilidad );
+                    porcentError +=1
                 }
-            });*/
+            });
+
+            if(porcentError >=1 && this.venta.tipoVenta.CodSunat != '07'){
+                this.inProgress = false
+                return
+            }
 
 /*             let cantidadstock = false;
             this.productos.map(pro=>{
@@ -991,7 +1009,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -999,6 +1017,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
