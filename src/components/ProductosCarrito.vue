@@ -29,7 +29,8 @@
 
       <b-modal ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h3 style="text-decoration:underline">{{objProd.Producto}}</h3>
+          <h6>PRESENTACIONES</h6>
         </div>
 
         <b-row>
