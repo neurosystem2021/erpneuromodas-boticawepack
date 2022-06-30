@@ -395,13 +395,16 @@ export default {
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-                    { key: 'Lote', class:'text-center stocksize' },
-                    //{ key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
+                    //{ key: 'Lote', class:'text-center stocksize' },
+                    { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
                     //{ key: 'CodigoBarra', label: 'Código', class:'stocksize' }, 
                     { key: 'Producto', class:'text-center stocksize' }, 
                     { key: 'ProductoFormaFarmaceutica', label: 'Forma F.', class:'text-center stocksize' }, 
                     { key: 'ProductoMarca', label: 'Lab.', class:'text-center stocksize' },
-                    { key: 'ProductoMedicion', label: 'Med.', class:'text-center stocksize' },
+                    //{ key: 'ProductoMedicion', label: 'Med.', class:'text-center stocksize' },
+                    { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
+                    { key: 'eventPres', label: '', class:'text-center stocksize' },
+                    { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
                     //{ key: 'PrecioPorMayor', label: 'Precio x Mayor' },
                     //{ key: 'StockPorMayor', label: 'Stock x Mayor' },
                     { key: 'cantidad', class:'stocksize' },
@@ -675,14 +678,13 @@ export default {
                 })
             }
         },
-        onSetProducto (obj) {
+        onSetProducto (obj,presentacion) {
             obj.cantidad = 1
-            console.log(obj)
-            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
-                obj.precio = obj.PrecioPorMayor
-            } else {
-                obj.precio = obj.PrecioContado || 0
+            if(presentacion){
+                obj.precio = presentacion.precioventa || 0
+                return obj
             }
+            obj.precio = obj.PrecioContado || 0
             return obj
         },
         onAddProducto (obj) {
@@ -829,7 +831,7 @@ export default {
             var sinStock = 0;
             let igualLote = 0
             this.productos.map(pro => {
-                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) ) && this.venta.tipoVenta.CodSunat != '07') {
+                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stockMovimiento).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
@@ -838,21 +840,21 @@ export default {
                     totalCero += 1
                 }
 
-                /*let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
+                let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
                 if(lote > 1){
                     igualLote += 1 
-                }*/
+                }
             })
             if (sinStock) {
                 this.inProgress = false
                 return;
             }
 
-            /*if (igualLote >= 1) {
+            if (igualLote >= 1) {
                 this.$toasted.error('Debe seleccionar diferente lote por producto');
                 this.inProgress = false            
                 return;
-            }*/
+            }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

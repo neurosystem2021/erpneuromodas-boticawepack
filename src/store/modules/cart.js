@@ -18,9 +18,9 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.push(item)
-      }
+      //if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+        productos.unshift(item)
+      //}
     }
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
@@ -46,6 +46,10 @@ const mutations = {
   },
   ACTUALIZAR_TOTAL (state, total) {
     state.totalCart = total
+  },
+  ACTUALIZAR_PRODUCTO ({ productos }, obj) {
+    //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(obj.Pos, 1, obj.Producto)
   },
   OBTENER_STOCK (state, items) {
     state.productos = state.productos.map((prod) => {
@@ -146,6 +150,9 @@ const actions = {
   },
   actualizarTotalCart ({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
+  },
+  actualizarProducto ({ commit }, obj) {
+    commit('ACTUALIZAR_PRODUCTO', obj)
   },
   obtenerStock({ commit, state }, obj) {
     axios.get(API + 'productos/puntoventa/stock', {

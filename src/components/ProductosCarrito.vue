@@ -20,6 +20,7 @@
                   :disabled="bloquearInput?true:false || isNota"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
+                  ref="barcodeInput"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
@@ -34,24 +35,56 @@
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>Productos relacionados</h3>
-          <h5>Codigo de Barra: {{codeBar}}</h5>
+          <h3 style="text-decoration:underline">{{ objProd.Producto}}</h3>
+          <h5>Presentaciones</h5>
         </div>
         <hr>
         <b-row>
 
-          <b-col cols="6" v-for="objPro in ProductosCodigoBarra" :key="objPro.IdProducto">
+          <b-col cols="6">
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="() => {setProducto(objPro)}"
+              @click="() => {setProductoUni(objProd)}"
             >
               <b-row>
                 <b-col md="6" class="nomCart">
-                  <h6 class="text-uppercase">{{ objPro.Producto }}</h6>
+                  <div>
+                    <b-row class="nomCart2">
+                      <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
+                    </b-row>
+                    <b-row class="nomCart2">
+                       <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="objProd.stock<=0" variant="danger">{{ objProd.stock }}</b-badge>
+                       <b-badge v-else variant="success">{{ objProd.stock }}</b-badge></h5>
+                    </b-row>
+                  </div>
                 </b-col>
                 <b-col md="6" class="precioCart text-left">
-                  <h5><b>Precio: </b>S/ {{ objPro.PrecioContado }}</h5>
+                  <h6><b>Precio: </b>S/ {{ objProd.PrecioContado }}</h6>
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+          <b-col cols="6" v-for="objPro in PresentacionesProd" :key="objPro.IdProducto">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              @click="() => {setProductoUni(objProd,objPro)}"
+            >
+              <b-row>
+                <b-col md="6" class="nomCart">
+                  <div>
+                    <b-row class="nomCart2">
+                      <h6 class="text-uppercase">{{ objPro.nombre }}</h6>
+                    </b-row>
+                    <b-row class="nomCart2">
+                       <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge>
+                       <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge></h5>
+                    </b-row>
+                  </div>
+                </b-col>
+                <b-col md="6" class="precioCart text-left">
+                  <h6><b>Precio: </b>S/ {{ objPro.precioventa }}</h6>
                 </b-col>
               </b-row>
             </b-card>
@@ -61,13 +94,28 @@
 
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
-          <div v-if="!data.item.ControlaStock && productosCaja[data.item.IdProducto]" style="font-size:17px; font-weight:bold">
-            {{productosCaja[data.item.IdProducto].stock}}
-          </div>
           <div v-if="data.item.ControlaStock" style="font-size:17px; font-weight:bold">
-            {{ data.item.stock }}
+            {{ (data.item.stock/(data.item.cantidadPress || 1)).toFixed(2) }}
+          </div>
+          <div v-else>
+            ---
           </div>
           
+        </template>
+        <template slot="cantxPrecio" slot-scope="data">
+          <input
+            v-model="productos[data.index].cantxPrecio"
+            type="number"
+            style="width: 100px"
+            step="0.001"
+            min="0"
+            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
+            placeholder="Cantidad"
+            class="form-control"/>
+          <span>x{{productos[data.index].cantidadPress}}</span>
+        </template>
+        <template slot="eventPres" slot-scope="data">
+          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
         </template>
         
         <template slot="cantidad" slot-scope="data">
@@ -75,12 +123,13 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 85px"
+            style="width: 90px"
             min="0"
+            readonly
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
               if(isVentas){
-                productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                //productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
               }   
             }"
             placeholder="Cantidad"
@@ -127,7 +176,7 @@
             placeholder="Lote"></b-form-input>
         </template>-->
 
-        <!--<template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].hashMovimiento}}
@@ -139,16 +188,16 @@
             </div>
           </div>
           <b-form-select v-if="!isNota"
-            style="width: 135px;"
+            style="width: 155px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
           <br>
           <div style="text-align:center;" v-if="!isNota">
-                <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
+                <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
           <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
-        </template>-->
+        </template>
 
         <template slot="Lote" slot-scope="data" >
           <b-form-input
@@ -156,6 +205,16 @@
             type="text"
             v-bind:class="{ ventasAncho: isVentas }"
             autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Presentacion" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Presentacion"
+            type="text"
+            style="text-align:center; font-weight:bold"
+            autocomplete="false"
+            readonly
             ></b-form-input>
         </template>
 
@@ -287,7 +346,11 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       movimientoLotes: {},
       ProductosCodigoBarra: [],
-      codeBar:''
+      codeBar:'',
+      PresentacionesProd:[],
+      objProd: {},
+      objProdMedicion:'',
+      indexProdSelect: null
     }
   },
   watch: {
@@ -319,7 +382,7 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-          //{ key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
+          { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo', class:'stocksize' }, 
           { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
@@ -405,8 +468,18 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      actualizarProd : 'actualizarProducto',
     }),
+    changeCant (val, prod, index) {
+      if (val) {
+        prod.cantidad = prod.cantidadPress
+        prod.cantidad *= val
+      }
+      this.$nextTick(() => {
+        this.actualizarProd({Producto:prod,Pos:index})
+      })
+    },
     changeMovimiento(hash, idProducto, index) {
       if  (hash) {
         // Stock
@@ -462,6 +535,7 @@ export default {
       }
     },
     loadMovimientoLotes ($idProducto) {
+      this.movimientoLotes[$idProducto]=[]
       this.axios.get(this.API + 'movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
         .then((response) => {
           if(response.data.length > 0){
@@ -526,7 +600,7 @@ export default {
           this.add([idProducto, (obj) => {
           if (obj) {
               this.$emit('onAddProducto')
-              //this.loadMovimientoLotes(obj.IdProducto)
+              this.loadMovimientoLotes(obj.IdProducto)
               this.$toasted.show('Producto añadido correctamente')
             } else {
               this.$toasted.show('No se encontró ningun producto')
@@ -589,21 +663,40 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
-    setProducto (obj) {
- 
-    
-
+    setProducto(obj){
       if(!this.isVentas){
         if(this.movTipo==undefined){
           this.$toasted.show('Primero seleccione un tipo de movimiento')
           return
         }
       }
-      
-    setTimeout(() => {
-      this.obtenerStockCaja(obj)   
-    }, 100);
-
+      try {
+        if(obj.Presentaciones !='' && obj.Presentaciones !=null){
+          this.PresentacionesProd = JSON.parse(obj.Presentaciones)
+          if(this.PresentacionesProd.length==0){
+             this.setProductoUni(obj)
+          }
+        }else{
+          this.setProductoUni(obj)
+        }
+      } catch (error) {
+        
+      }
+      this.objProd = {}
+      this.objProd = obj
+      this.indexProdSelect = null
+      this.$refs['modalCant'].show()
+    },
+    setProductoUni (objIni,presentacion = false) {
+      let obj = {...objIni}
+      obj.cantxPrecio = 1
+      if(presentacion){
+        obj.Presentacion = presentacion.nombre
+        obj.cantidadPress = Number(presentacion.cantidad || 1)
+      }else{
+        obj.Presentacion = obj.ProductoMedicion
+        obj.cantidadPress = 1
+      }
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
@@ -612,15 +705,29 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,presentacion)
+      if(this.indexProdSelect == null){
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        //this.loadMovimientoLotes(obj.IdProducto)
+        this.loadMovimientoLotes(obj.IdProducto)
       },{ setPrecioCosto: (this.isVentas ? false : true)}])
-
+      }else{
+        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+        this.indexProdSelect = null
+      }
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       this.loadCode = ''
+      this.$refs.barcodeInput.focus() 
+    },
+    showPresentacion (obj, index=null) {
+      if (!obj.Presentaciones !== '' && index!=null) {
+        this.PresentacionesProd = obj.Presentaciones ? JSON.parse(obj.Presentaciones) : []
+        this.objProd = obj
+        this.indexProdSelect = index
+        this.$refs['modalCant'].show()
+        return
+      }
     },
     renderChild(data) {
       if (this.idAlmacen) {
@@ -735,7 +842,7 @@ export default {
     },
     getSubtotal(index) {
       
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
+      let subtotal = this.$options.filters.redondear(this.productos[index].cantxPrecio * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
       return subtotal
@@ -813,6 +920,11 @@ td.stocksize{
   align-items: center;
   justify-content: center;
   border-right: 2px solid black;
+}
+.nomCart2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .precioCart{
   display: flex;
