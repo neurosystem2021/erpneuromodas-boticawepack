@@ -790,11 +790,11 @@ export default {
                         Fecha: response.data.fecha,
                     }
                     this.venta.dataInfoDocVenta = dataInfoDocVenta
-                    let ventaJson= JSON.stringify(this.venta)
+                    /*let ventaJson= JSON.stringify(this.venta)
                     var left = (screen.width/2)-(800/2)
                     var top = (screen.height/2)-(800/2)
                     let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)*/
                    
                 } catch (error) {
                     console.log(error)
@@ -825,6 +825,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank');
+            return
             try {
                let ventaJson= JSON.stringify(this.ultimaVentaData)
                var left = (screen.width/2)-(800/2)
