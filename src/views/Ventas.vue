@@ -815,7 +815,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
