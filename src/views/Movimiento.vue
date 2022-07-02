@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
+        <b-container fluid class="bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -194,6 +194,7 @@
               <productos-carrito 
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
+                :onSetProducto="onSetProducto"
                 :tipoCambio="movimiento.TipoCambio"
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
@@ -301,6 +302,18 @@ return false
       /*this.show = false;
       this.$nextTick(() => { this.show = true });*/
     },
+    onSetProducto (obj,presentacion) {
+        if(presentacion){
+            obj.cantidad = presentacion.cantidad || 1
+            obj.nuevoPrecioContado = presentacion.precioventa || 0
+            obj.precio = presentacion.preciocosto || 0
+            return obj
+        }
+        obj.cantidad = 1
+        obj.precio = obj.PrecioCosto || 0
+        obj.nuevoPrecioContado = obj.PrecioContado || 0
+        return obj
+    },
     setTipoMovimiento (obj) {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
@@ -362,7 +375,8 @@ return false
       let faltaStock = false
       let faltaLote = false
       this.productos.forEach((prod, index) => {
-        if (prod.total <= 0) {
+        if ((((prod.cantidad || 0)  * (prod.precio || 0)) <= 0 ) || ((prod.nuevoPrecioContado || 0) <= 0)) {
+          this.$toasted.show('Se requiere los precios del producto '+prod.Producto)
           faltaLlenar = true
         }
         if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
@@ -371,17 +385,18 @@ return false
           }
           faltaFechaVen = true
         }
-        //let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
-        //if(pro > 1){
-        //igualProducto = true
-        //}
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
+          if(pro > 1){
+          igualProducto = true
+        }
+
         if(this.movimiento.movimientoTipo.Tipo!=0){
-          if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stock){
+          if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stockMovimiento).toFixed(2) < parseFloat(prod.cantidad) || prod.stock == undefined) ){
            faltaStock=true
           }
         }
 
-        if((''+prod.IdLote).trim()==''){
+        if((''+prod.Lote).trim()=='' || prod.Lote== undefined){
           faltaLote = true
           this.$toasted.error('Por favor especifique un LOTE del producto: '+prod.Producto);
         }
@@ -398,18 +413,19 @@ return false
           return;
       }
 
-      /*if (igualProducto) {
+      if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
           this.inProgress = false            
           return;
-      }*/
+      }
+
       if (faltaFechaVen) {
         this.$toasted.show('Ingrese la fecha correcta de vencimiento del producto')
         this.inProgress = false
         return;
       }
       if (faltaLlenar && this.movimiento.alterarProductos) {
-        this.$toasted.show('Falta llenar cantidad / precio')
+        //this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
         return;
       }

@@ -53,7 +53,7 @@
                     <b-row class="nomCart2">
                       <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
                     </b-row>
-                    <b-row class="nomCart2">
+                    <b-row class="nomCart2" v-if="isVentas">
                        <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="objProd.stock<=0" variant="danger">{{ objProd.stock }}</b-badge>
                        <b-badge v-else variant="success">{{ objProd.stock }}</b-badge></h5>
                     </b-row>
@@ -69,6 +69,7 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
+              v-if="objPro.cantidad>0"
               @click="() => {setProductoUni(objProd,objPro)}"
             >
               <b-row>
@@ -77,7 +78,7 @@
                     <b-row class="nomCart2">
                       <h6 class="text-uppercase">{{ objPro.nombre }}</h6>
                     </b-row>
-                    <b-row class="nomCart2">
+                    <b-row class="nomCart2" v-if="isVentas">
                        <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge>
                        <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge></h5>
                     </b-row>
@@ -203,6 +204,7 @@
           <b-form-input
             v-model="productos[data.index].Lote"
             type="text"
+            required
             v-bind:class="{ ventasAncho: isVentas }"
             autocomplete="false"
             ></b-form-input>
@@ -228,7 +230,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:95px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -391,6 +393,9 @@ export default {
           //{ key: 'ProductoTalla', label: 'Talla' },
           //{ key: 'Genero' },
           //{ key: 'Botapie' },
+          { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
+          { key: 'eventPres', label: '', class:'text-center stocksize' },
+          { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
           { key: 'cantidad', class:'stocksize' },
           { key: 'precio', label: 'P/U', class:'stocksize' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'stocksize' },
@@ -523,6 +528,11 @@ export default {
               }
             }else{
                  this.productos[index].Lote = Lote 
+                 try {
+                  this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+                 } catch (error) {
+                  
+                 }
               }
              Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
@@ -693,9 +703,11 @@ export default {
       if(presentacion){
         obj.Presentacion = presentacion.nombre
         obj.cantidadPress = Number(presentacion.cantidad || 1)
+        obj.EsPresentacion = 1
       }else{
         obj.Presentacion = obj.ProductoMedicion
         obj.cantidadPress = 1
+        obj.EsPresentacion = 0
       }
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0

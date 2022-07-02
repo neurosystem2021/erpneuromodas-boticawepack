@@ -399,9 +399,9 @@ export default {
                     { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
                     //{ key: 'CodigoBarra', label: 'Código', class:'stocksize' }, 
                     { key: 'Producto', class:'text-center stocksize' }, 
-                    { key: 'ProductoFormaFarmaceutica', label: 'Forma F.', class:'text-center stocksize' }, 
+                    { key: 'ProductoFormaFarmaceutica', label: 'For. F.', class:'text-center stocksize' }, 
                     { key: 'ProductoMarca', label: 'Lab.', class:'text-center stocksize' },
-                    //{ key: 'ProductoMedicion', label: 'Med.', class:'text-center stocksize' },
+                    { key: 'ProductoDescCorto', label: 'Anaquel', class:'text-center stocksize' },
                     { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
                     { key: 'eventPres', label: '', class:'text-center stocksize' },
                     { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
@@ -679,11 +679,12 @@ export default {
             }
         },
         onSetProducto (obj,presentacion) {
-            obj.cantidad = 1
             if(presentacion){
+                obj.cantidad = presentacion.cantidad || 1
                 obj.precio = presentacion.precioventa || 0
                 return obj
             }
+            obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             return obj
         },
@@ -749,7 +750,7 @@ export default {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
         guardarProforma () {
-
+        this.inProgress = true 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
