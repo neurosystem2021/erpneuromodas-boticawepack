@@ -42,7 +42,7 @@
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             <td class="qty">{{ prod.Cantidad }}</td>
             <td class="total">
-              S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+              S/. {{ ((prod.Precio * prod.Cantidad) - prod.Descuento | redondear) | moneda }}<br>
               <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
             </td>
           </tr>
@@ -51,7 +51,7 @@
           <tr>
             <td colspan="2"></td>
             <td colspan="2">SUBTOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
+            <td>S/. {{ (subTotal | redondear) | moneda }}</td>
           </tr>
           <!--<tr>
             <td colspan="2"></td>
@@ -61,7 +61,7 @@
           <tr>
             <td colspan="2"></td>
             <td colspan="2">GRAN TOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
+            <td>S/. {{ (subTotal | redondear) | moneda }}</td>
           </tr>
         </tfoot>
       </table>
