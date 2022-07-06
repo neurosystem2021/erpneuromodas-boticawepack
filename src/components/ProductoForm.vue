@@ -6,7 +6,7 @@
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
-          <b-form-group>
+          <b-form-group class="ocularMovil">
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
@@ -58,7 +58,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group class="ocularMovil">
             <label>Cod. P.:</label>
             <b-input-group>
               <autocomplete
@@ -108,7 +108,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <b-form-group class="ocularMovil">
             <label>Presentación:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
@@ -168,8 +168,7 @@
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
-            <input 
-              required="required"
+            <input
               v-model="producto.PorcentajeUtilidad"
               @input="actualizarPrecioContado"
               type="number"
@@ -201,7 +200,6 @@
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
             <input   
-              required="required"
               v-model="producto.StockMinimo"
               type="number"
               step="0.0001"
@@ -254,8 +252,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row >
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -305,7 +303,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="false">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -605,6 +603,7 @@ export default {
         ProductoDesc2: '',
         ProductoDesc3: '',
         CodigoBarra: '',
+        PrecioCosto: 0,
         // Color: '',
         PorcentajeUtilidad: 0,
         StockMinimo: 0,
@@ -783,6 +782,11 @@ export default {
   }
 }
 </script>
-<style>
-
+<style scoped>
+  @media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+  }
 </style>

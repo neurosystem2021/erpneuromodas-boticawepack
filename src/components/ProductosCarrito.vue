@@ -5,6 +5,7 @@
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
+            style="width:55%"
             ref="autocompleteProducto"
             :url="APIProductos"
             :customParams="{ limit: '25' }"
@@ -21,9 +22,10 @@
                   type="text"
                   class="form-control"
                   ref="barcodeInput"
-                  placeholder="Codigo de Barra" />
+                  placeholder="C. Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -101,7 +103,6 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
             type="number"
             style="width: 85px"
             min="0"
@@ -234,7 +235,7 @@
             :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
-            cols="9" rows="3"
+            cols="9" rows="2"
             style="width: 170px"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
@@ -245,9 +246,9 @@
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
-          <br>
-          <h6 v-if="isVentas"><i>Prof.</i></h6>
-          <input v-if="isVentas"
+          
+          <h6 v-if="false"><i>Prof.</i></h6>
+          <input v-if="false"
             class="form-check-input" 
             type="checkbox" 
             :disabled="bloquearInput?true:false"
@@ -307,7 +308,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr class="ocularMovil">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -645,19 +646,19 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
 
-      if(!this.isVentas){
+     // if(!this.isVentas){
         this.setProductoUni(obj)
-        return
-      }
+     //   return
+     // }
 
-      if(fPP.length==4){
+      /*if(fPP.length==4){
         obj.cantxPrecio=1
         this.setProductoUni(obj)
         return
       }
 
       this.$refs['modalCant'].show()
-      this.objProd = obj
+      this.objProd = obj*/
     },  
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
@@ -670,15 +671,21 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
+      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       this.add([obj, () => {
+        if(existe){
+            this.$toasted.info('El producto ya está en la lista')
+        }else{
+          this.$toasted.success('Producto añadido correctamente')
+        }
         this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
+  
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
-      this.$refs.barcodeInput.focus()
+      //this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -849,5 +856,11 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+  @media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
   }
 </style>

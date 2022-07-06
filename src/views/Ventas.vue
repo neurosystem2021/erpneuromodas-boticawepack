@@ -6,7 +6,7 @@
 
         <br />
         <b-container class="bv-example-row">
-            <div>
+            <div class="ocularMovil">
                 <div class="float-right">
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
@@ -26,14 +26,14 @@
                     </b-button-group>
                 </div>
             </div>
-            <br /><br />
+            <br class="ocularMovil" /><br class="ocularMovil"/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -63,7 +63,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -84,7 +84,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -120,6 +120,7 @@
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
                                         <input v-model="dni"
+                                            v-show="false"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
                                             class="form-control"
@@ -140,7 +141,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente && false">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -163,7 +164,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil" >
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -220,10 +221,10 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr>
+                                        <tr class="ocularMovil">
                                             <td  class="text-center">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0">
+                                        <tr v-if="puntosAplicados == 0" class="ocularMovil">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <input
@@ -270,7 +271,7 @@
                                 </table>
                             </template>    
                             <template slot="metodopago" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm">
+                                <table class="table b-table border table-footer table-sm ocularMovil">
                                     <tbody>
                                         <tr>
                                             <td colspan="3" class="text-center">Metodo de Pago</td>
@@ -362,7 +363,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="ocularMovil" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -430,10 +431,10 @@ export default {
                     { key: 'Descripcion', label: 'Descripción'},
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoMedicion', label: 'Medición' },
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'ProductoMarca', label: 'Marca' },
+                    //{ key: 'ProductoMedicion', label: 'Medición' },
+                    //{ key: 'eventPres', label: '' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porc. Utilidad %' },
@@ -950,6 +951,7 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+                pro.Descripcion = (''+pro.Descripcion).trim()
             });
 
 /*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
@@ -1043,5 +1045,14 @@ export default {
 }
 .big-text {
     font-size: 30px;
+}
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
+    }
 }
 </style>
