@@ -4,7 +4,7 @@
 
         <Menu v-if="false"></Menu>
 
-        <br />
+        <br class="ocularMovil"/>
         <b-container class="bv-example-row">
             <div class="ocularMovil">
                 <div class="float-right">
