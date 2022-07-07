@@ -330,6 +330,11 @@
       <br>
       <b-row>
         <b-col md="12">
+            <h6>
+              POR FAVOR COLOCAR LOS VALORES EN SECUENCIA: CANTIDAD, VALOR DE VENTA Y AL FINAL COSTO PROVEEDOR(COSTO PROV.)
+            </h6>
+        </b-col>
+        <b-col>
           <table class="tablaGuia">
           <thead>
             <tr>

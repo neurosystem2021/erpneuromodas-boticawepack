@@ -491,8 +491,10 @@ export default {
 
     cambiarPrecio (index, prod) {
      // if( this.productos[index].PorcentajeUtilidadMin <= this.productos[index].PorcentajeUtilidad && this.productos[index].PorcentajeUtilidad <= this.productos[index].PorcentajeUtilidadMax){
-        var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-        this.productos[index].precio = (Math.round((this.productos[index].PrecioCosto + utilidad) * 100) / 100).toFixed(2);
+        //var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
+        //(this.productos[index].PorcentajeUtilidad * this.productos[index].PrecioCosto) - this.productos[index].PrecioCosto
+       // this.productos[index].precio = (Math.round((this.productos[index].PrecioCosto + utilidad) * 100) / 100).toFixed(2);
+      this.productos[index].precio = (Math.round(((this.productos[index].PorcentajeUtilidad/100 * this.productos[index].PrecioCosto) + this.productos[index].PrecioCosto) * 100) / 100).toFixed(1);
     },
     
     addManoDeObra (index, e) {
