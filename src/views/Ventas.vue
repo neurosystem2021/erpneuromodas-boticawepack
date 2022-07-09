@@ -150,6 +150,7 @@
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
+                                :customParams="{idPuntoVenta:idPuntoVentaSiste}"
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
@@ -355,7 +356,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            idPuntoVentaSiste: 1
         }
     },
     watch: {

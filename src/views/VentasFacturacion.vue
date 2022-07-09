@@ -229,7 +229,7 @@ import ProductoKardex from '@/components/ProductoKardex'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count', {
+    this.axios.get(this.API + 'ventas/count?idPuntoVenta='+this.idPuntoVentaSiste, {
       params: { idAlmacen: this.almacen.IdAlmacen }
     }).then((response) => {
       this.totalRows = response.data.total
@@ -314,7 +314,8 @@ export default {
         { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
       ],
       notaIdMotivo: null,
-      notaCredito: {}
+      notaCredito: {},
+      idPuntoVentaSiste: 1
     }
   },
   watch: {
@@ -584,7 +585,7 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       
-      let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?idPuntoVenta='+this.idPuntoVentaSiste+'&estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
