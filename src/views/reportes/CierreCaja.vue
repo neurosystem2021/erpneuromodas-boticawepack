@@ -114,7 +114,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Ventas Tarjeta o Transf.</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -184,7 +184,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Niubiz</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
