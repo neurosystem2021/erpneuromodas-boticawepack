@@ -61,7 +61,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
@@ -323,7 +323,7 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.01"
+                step="0.0001"
                 />
             </b-form-group>
             
@@ -334,7 +334,7 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.001"
+                step="0.0001"
                 />
             </b-form-group>
           </b-card>
