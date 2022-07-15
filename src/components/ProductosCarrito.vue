@@ -685,9 +685,11 @@ export default {
           this.PresentacionesProd = JSON.parse(obj.Presentaciones)
           if(this.PresentacionesProd.length==0){
              this.setProductoUni(obj)
+             return
           }
         }else{
           this.setProductoUni(obj)
+          return
         }
       } catch (error) {
         
