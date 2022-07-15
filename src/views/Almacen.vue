@@ -380,16 +380,17 @@ export default {
   methods: {
     getSumaValorizado () {
     
-      /*this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
-        })*/
-      
+          console.log(this.sumaValorizado);
+        })
+      /*
       this.axios.get(this.API + 'empresa/config/1')
         .then( response => {
           this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
         })
-
+      */
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1')
         .then( response => {
           this.sumaValorizadoContado = (response.data[0].sumaValorizado);
@@ -475,10 +476,10 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputGenero.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      // this.$refs.inputColor.setValue('')
+      // this.$refs.inputTalla.setValue('')
+      // this.$refs.inputGenero.setValue('')
+      // this.$refs.inputBotapie.setValue('')
 
       this.productoSelect = {}
       this.limpiarClassRows()
