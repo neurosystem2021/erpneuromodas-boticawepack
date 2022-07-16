@@ -583,41 +583,33 @@ export default {
       let idProducto = this.loadCode
       this.codeBar = this.loadCode
 
-      if(this.isVentas && idProducto){
-
-        let params = {codigoBarra: idProducto}
-        this.loadCode = ''
-        axios.get(this.API + 'productos/codigobarra', {params: params})
-        .then((response) => {
-          let productos = response.data
-          if (productos) {
-            if(productos.length==1){
-              this.setProducto(productos[0])
-            }else if(productos.length > 1){
-              this.ProductosCodigoBarra = productos
-              this.$refs['modalCant'].show()
+      if(idProducto){
+        if(this.isVentas){
+          let params = {codigoBarra: idProducto, idAlmacen: this.idAlmacen || 1}
+          this.loadCode = ''
+          axios.get(this.API + '/productos/codigobarra', {params: params})
+          .then((response) => {
+            if (response.data) {
+              this.setProducto(response.data[0])
             }else{
               this.$toasted.show('No se encontró ningun producto')
               this.loadCode = ''
             }
-          }else{
-            this.$toasted.show('No se encontró ningun producto')
-            this.loadCode = ''
-          }
-        })
-      }else{
-        if (idProducto) {
-          this.add([idProducto, (obj) => {
-          if (obj) {
-              this.$emit('onAddProducto')
-              this.loadMovimientoLotes(obj.IdProducto)
-              this.$toasted.show('Producto añadido correctamente')
-            } else {
+          })
+        }else{
+          let params = {codigoBarra: idProducto}
+          this.loadCode = ''
+          axios.get(this.API + '/productos/id/'+idProducto, {params: params})
+          .then((response) => {
+            if (response.data) {
+              this.setProducto(response.data)
+            }else{
               this.$toasted.show('No se encontró ningun producto')
+              this.loadCode = ''
             }
-            this.loadCode = ''
-          }, { setPrecioCosto: (this.isVentas ? false : true),  setSuma: true }, true])
+          })
         }
+
       }
     },
     /*alterarBuscadorProductos() {

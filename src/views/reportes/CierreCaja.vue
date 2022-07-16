@@ -39,7 +39,7 @@
       <h4 class="si-print">Cierre de Caja </h4>
       <hr>
       <div v-if="cierre.FechaCierre">Fecha Fin:  <b>{{ cierre.FechaCierre }}</b></div>
-      <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</b></div>
+      <div v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</div>
       <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <br>
       <b-row>
@@ -75,11 +75,11 @@
               <td>{{ totalVentasEfectivo | moneda }} </td>
             </tr>
             <tr>
-              <td>Visa S/.</td>
+              <td>Tarjeta Débito o Crédito S/.</td>
               <td>{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
-              <td>Mastercard S/.</td>
+              <td>Yape, Plin o Transf. S/.</td>
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
@@ -95,7 +95,7 @@
         </b-col>
       </b-row>
 
-      <b-row  class="no-print">
+       <!--<b-row  class="no-print">
         <b-col>
           <table class="table b-table table-sm table-striped table-bordered">
             <thead>
@@ -116,20 +116,20 @@
                 <td>{{ venta.Numero }}</td>
                 <td>{{ venta.Total | moneda }}</td>
                 <td>{{ estadoVenta(venta) }}</td>
-              </tr>
+              </tr>-->
               <!--<tr v-for="(item, index) in ingresos" :key="index">
                 <td>{{ item.FechaDoc }}</td>
                 <td>RECIBO</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>-->
-            </tbody>
+             <!--</tbody>
           </table>
         </b-col>
-      </b-row>
+      </b-row>-->
       
 
-      <!--<b-row>
+     <b-row class="no-print">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -158,8 +158,8 @@
       </b-row>
 
 
-      <b-row>
-        <h5>Ventas Visa</h5><br>
+      <b-row class="no-print">
+        <h5>Ventas Tarjeta Débito o Crédito</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -179,7 +179,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Visa</b></td>
+              <td class="total"><b>Total Tarjeta Débito o Crédito</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
@@ -188,8 +188,8 @@
 
       
 
-      <b-row>
-        <h5>Ventas Mastercard</h5><br>
+      <b-row class="no-print">
+        <h5>Ventas Yape, Plin o Transf.</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -209,14 +209,14 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
+              <td class="total"><b>Total Yape, Plin o Transf.</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
       </b-row>
 
-      <b-row class="credito">
+      <b-row class="credito no-print" >
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -241,10 +241,10 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>-->
+      </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <b-col v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
@@ -327,7 +327,8 @@ export default {
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
         { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' }
+        { value: 2, text: 'Tarde' },
+        { value: 3, text: 'Noche' }
       ],
       cierre: {},
       vendedor: {}
