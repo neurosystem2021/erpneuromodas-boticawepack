@@ -180,7 +180,7 @@
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
-              {{productos[data.index].hashMovimiento}}
+              {{productos[data.index].Lote}}
             </div>
             <small>Doc: <span style="font-weight:bold;"> {{productos[data.index].Serie}}-{{productos[data.index].Numero}}</span></small><br />
 
