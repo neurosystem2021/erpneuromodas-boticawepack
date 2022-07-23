@@ -327,6 +327,7 @@ export default {
     saveEntrega (event) {
 
       var exceso = false
+      let existeCant = 0
       this.porEntregarDet.forEach(d => {
         if (d.cantEntregar) {
           if (d.cantEntregar > d.entregar) {
@@ -334,9 +335,16 @@ export default {
             this.$toasted.show('Entrega excesiva ' + d.Producto + ': ' + d.cantEntregar)
             event.preventDefault()
           }
+          existeCant = existeCant + d.cantEntregar
         }
       });
 
+      if(existeCant==0){
+        this.$toasted.show('Ingrese la cantidad para entregar')
+        event.preventDefault()
+        return
+      }
+      
       if (exceso) return;
 
       this.axios.post(this.API + 'entregar', {
