@@ -975,8 +975,8 @@ export default {
             }
 
             this.productos.forEach(p => {
-                if((!(p.PorcentajeUtilidadMin <= p.PorcentajeUtilidad && p.PorcentajeUtilidad <= p.PorcentajeUtilidadMax)) && this.venta.tipoVenta.CodSunat != '07'){
-                   this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado '+ p.PorcentajeUtilidad );
+                if((!(parseFloat(p.PorcentajeUtilidadMin)  <= parseFloat(p.PorcentajeUtilidad) && parseFloat(p.PorcentajeUtilidad) <= parseFloat(p.PorcentajeUtilidadMax))) && this.venta.tipoVenta.CodSunat != '07'){
+                  this.$toasted.error('El porcentaje de utilidad asignado en el producto: '+p.Producto+' no está en su rango asignado '+ p.PorcentajeUtilidad );
                     porcentError +=1
                 }
             });
