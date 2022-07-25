@@ -18,6 +18,7 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
+import StockMinimo from '@/views/reportes/StockMinimo.vue'
 
 Vue.use(Router)
 
@@ -103,6 +104,11 @@ export default new Router({
       path: '/configuraciones',
       name: 'Configuraciones',
       component: Configuraciones
-    }
+    },
+    {
+      path: '/reportes/stockminimo',
+      name: 'StockMinimo',
+      component: StockMinimo
+    },
   ]
 })

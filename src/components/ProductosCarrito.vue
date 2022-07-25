@@ -140,7 +140,6 @@
           <input
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
-            :readonly="isVentas?true:false"
             type="number"
             style="width: 110px"
             min="0"
