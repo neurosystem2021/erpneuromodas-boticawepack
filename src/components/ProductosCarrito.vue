@@ -27,11 +27,12 @@
         </b-input-group>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal id="modalCant" ref="modalCant" size="md" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration:underline">{{objProd.Producto}}</h3>
           <h6>PRESENTACIONES</h6>
         </div>
+        <hr>
 
         <b-row>
           <b-col cols="6">
@@ -40,7 +41,14 @@
               class="mb-3 contentCard"
               @click="setProductoUni(objProd)"
             >
-              <b>1 - UNIDAD</b>
+                <b-row>
+                <b-col md="6" class="nomCart">
+                  <h5 class="text-uppercase">{{objProd.ProductoMedicion}}</h5>
+                </b-col>
+                <b-col md="6" class="text-left">
+                  <b>Precio: </b>S/ {{ objProd.PrecioContado | redondear }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
 
@@ -48,6 +56,7 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
+              v-if="d.cantidad>0"
               :class="{'disabledMouse': !parseFloat(d.cantidad)}"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
@@ -55,7 +64,14 @@
                 }
               }"
             >
-              {{d.cantidad}} - UNIDADES
+              <b-row>
+                <b-col md="6" class="nomCart" >
+                  <h5>x{{ d.cantidad }}</h5>
+                </b-col>
+                <b-col md="6" class="text-left">
+                  <b>Precio: </b>S/ {{ d.precio | redondear }}
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
         </b-row>
@@ -701,5 +717,14 @@ export default {
   .disabledMouse {
     background: #CECECE;
     cursor: inherit;
+  }
+  .nomCart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px solid black;
+  }
+  #modalCant .modal-dialog{
+    max-width: 40% !important;
   }
 </style>
