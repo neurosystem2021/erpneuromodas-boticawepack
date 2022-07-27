@@ -130,7 +130,7 @@
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>1ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
@@ -253,8 +253,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr />
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -436,7 +436,7 @@ export default {
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
-        this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
+        //this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
         //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
         //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
@@ -611,7 +611,8 @@ export default {
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: '',
-        ControlaStockMinimo:0,
+        ControlaStockMinimo:1,
+        ControlaStock:1,
         StockMinimo: 0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
