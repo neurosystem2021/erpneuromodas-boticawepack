@@ -849,6 +849,7 @@ export default {
 
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
@@ -859,6 +860,21 @@ export default {
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
             this.venta.cliente = {}
+        },
+        emitirauto(idDocVenta){
+            this.axios.post(this.API + 'emitirauto', {IdDocVenta:idDocVenta})
+            .then((response) => {
+                if(response.data.success){
+                    if(response.data.Estado == 1) {
+                    this.$toasted.error("SUNAT: "+response.data.msj_sunat)                  
+                    } else {
+                    this.$toasted.info("SUNAT: "+response.data.msj_sunat)
+                    }
+                }
+            })
+            .catch((error) => {
+                this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
+            })
         }
     },
     components: {
