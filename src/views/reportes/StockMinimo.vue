@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container fluid style="width: calc(100% - 300px)" class="bv-example-row">
+      <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">  
             <b-row>
@@ -116,7 +116,8 @@ export default {
             { key: 'ProductoMarca', label: 'Lab.', sortable: true },
             { key: 'ProductoMedicion', label: 'Medicion' },
             { key: 'StockMinimo', label: 'Stock Min.', sortable: true },
-            { key: 'stock', label: 'Stock', sortable: true },
+            { key: 'stock', label: 'Stock Actual', sortable: true },
+            //{ key: 'CantidadUltima', label: 'Stock Ult.', sortable: true },
             { key: 'ProveedorUltimo', label: 'Proveedor Ult.' , sortable: true},
       ],
       totalRows: 50,
