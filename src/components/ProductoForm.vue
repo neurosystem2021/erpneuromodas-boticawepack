@@ -227,7 +227,7 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
                      v-model="producto.EsHabitacion"
@@ -260,8 +260,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -641,8 +641,10 @@ export default {
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: 0,
+        ControlaStock:1,
         ControlaStockMinimo:0,
         StockMinimo: 0,
+        PrecioCosto:0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
@@ -692,7 +694,7 @@ export default {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
           return
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.success('Producto guardado correctamente')
         }
 
         // this.initForm()

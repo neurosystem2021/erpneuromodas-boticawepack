@@ -2,7 +2,6 @@
   <b-row>
     <b-col md="12">
       <b-form-group>
-        <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -81,10 +80,9 @@
         </b-row>
       </b-modal>
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
-          <br>
           <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
@@ -222,6 +220,7 @@
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
+            style="width:90px"
             type="number"
             min="0"
             step="0.01"
@@ -253,7 +252,7 @@
             :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
-            cols="9" rows="3"
+            cols="9" rows="1"
             style="width: 150px"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input

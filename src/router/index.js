@@ -10,6 +10,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
+import Proveedores from '@/views/Proveedores.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -27,6 +28,7 @@ import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 
 Vue.use(Router)
 
@@ -157,6 +159,16 @@ export default new Router({
       path: '/impresoras',
       name: 'Impresoras',
       component: Impresoras
+    },
+    {
+      path: '/proveedores',
+      name: 'Proveedores',
+      component: Proveedores
+    },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
     },
   ]
 })

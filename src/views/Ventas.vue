@@ -4,26 +4,25 @@
 
         <Menu v-if="false"></Menu>
 
-        <br />
         <b-container class="bv-example-row"  id="conten">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
-                        <!--<delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>-->
+                    <b-button-group size="sm" class="ocularMovil">
+                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -38,12 +37,12 @@
                 </b-col>
             </b-row>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
-                <b-row>
-                    <b-col md="7">
+                <b-row style="margin-bottom:-15px">
+                    <b-col md="8">
                         <b-row>
-                            <b-col md="4">
+                            <b-col md="5">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <b-input-group prepend="Doc. Venta" class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -56,6 +55,7 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                    </b-input-group>
                                 </b-form-group>
                                  <b-form-group v-if="isNota">
                                     <label>Doc. Referencia:</label>
@@ -73,9 +73,9 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="3">
                                 <b-form-group>
-                                    <label>Almacen:</label>
+                                    <b-input-group prepend="Alm." class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -88,6 +88,7 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                    </b-input-group>
                                 </b-form-group>
                                     <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
@@ -96,7 +97,7 @@
                             </b-col>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Punto de Venta:</label>
+                                    <b-input-group prepend="P. Venta" class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -109,15 +110,15 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
+                            <b-col md="12" style="margin-top:-10px">
                                 <b-form-group>
-                                    <label>Cliente:</label>
-                                    
-                                    <b-input-group>
+                                    <b-input-group prepend="Cliente ">
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
+                                            style="width:40%"
                                             required="required"
                                             ref="inputCliente"
                                             :url="API + 'clientes'"
@@ -164,7 +165,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="2">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -480,7 +481,7 @@ export default {
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
+                    { key: 'descuento', label: 'Desc.'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
@@ -919,7 +920,7 @@ export default {
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                this.$toasted.show('Proforma Guardada con exito')
+                this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
@@ -1182,5 +1183,10 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+}
 </style>

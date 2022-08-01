@@ -13,7 +13,8 @@
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
                         v-if="show"
-                        id="table-proformas" 
+                        id="table-proformas"
+                        ref="tableProformas"
                         striped hover 
                         :busy.sync="isBusy" 
                         :filter="filter"
@@ -32,6 +33,10 @@
 
                       <template slot="verTicket" slot-scope="data">
                         <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                      </template>
+                      
+                      <template slot="Eliminar" slot-scope="data">
+                        <b-button @click="eliminarProf(data.item)" variant="danger" target="_blank">Eliminar</b-button>
                       </template>
 
                     </b-table>
@@ -79,7 +84,7 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket','Eliminar' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -130,6 +135,31 @@ import { mapActions } from 'vuex'
                 // this.isBusy = false
                 // Returning an empty array, allows table to correctly handle busy state in case of error
                 return []
+                })
+            },
+            eliminarProf(data){
+                this.$swal({
+                target: document.getElementById('conten'),
+                title: 'Se eliminará la proforma: <strong>'+data.Anio+' - '+data.Numero+'</strong> del  cliente <strong>'+data.Cliente+'</strong>',
+                text:'¿Está seguro?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No, atrás'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.axios.delete(this.API + 'proforma/eliminar/'+data.IdProforma).then(res => {
+                            if(res.data){
+                               this.$toasted.info('¡PROFORMA ELIMINADA!')
+                                this.$refs.tableProformas.refresh()
+                            }
+                        }).catch(err => {
+                            console.log(err)
+                        this.$toasted.error('Ha ocurrido un error')
+                        })        
+                    }
                 })
             }
         }
