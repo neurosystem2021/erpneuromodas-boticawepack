@@ -98,7 +98,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="0.001"
+            step="1"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index])"
@@ -114,7 +114,7 @@
             type="number"
             style="width: 80px"
             class="form-control"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
@@ -145,7 +145,7 @@
             type="number"
             style="width: 90px"
             min="0"
-            step="0.00001"
+            step="0.1"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -196,7 +196,7 @@
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
-            step="0.01"
+            step="0.1"
             class="form-control"
             placeholder="Precio Venta"/>
             <b-form-text>
@@ -224,7 +224,8 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
-            step="0.01"
+            step="0.1"
+            style="width:95px"
             class="form-control"
             value="0"
             @input="actualizarDescu(data.index)"/>

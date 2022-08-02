@@ -184,7 +184,7 @@
               v-model="producto.PrecioPorMayor"
               type="number"
               min="0"
-              step="0.0001"
+              step="0.1"
               class="form-control"
               />
           </b-form-group>
@@ -261,7 +261,7 @@
             <input
               v-model="producto.PrecioCosto"
               :disabled="(idPerfil == 1) ? false : true"
-              step="0.0001"
+              step="0.1"
               type="number"
               class="form-control"
               />
@@ -273,7 +273,7 @@
             <input v-model="producto.PrecioContado"
               :disabled="(idPerfil == 1) ? false : true"
               type="number"
-              step="0.0001"
+              step="0.1"
               @input="actualizarPorcentajeUtilidad"
               class="form-control"
               />
@@ -288,7 +288,7 @@
             <input v-model="producto.precioConvenio"
               :disabled="(idPerfil == 1) ? false : true"
               type="number"
-              step="0.0001"
+              step="0.1"
               class="form-control"
               />
           </b-form-group>
@@ -315,7 +315,7 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.01"
+                step="1"
                 />
             </b-form-group>
             
@@ -326,7 +326,7 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.001"
+                step="0.1"
                 />
             </b-form-group>
           </b-card>

@@ -98,6 +98,7 @@ const actions = {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
         producto.nuevoPrecioContado = producto.PrecioContado || 0
+        producto.cantidad = ''
       }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
@@ -112,7 +113,7 @@ const actions = {
         if (arr[i].desc == null) {
           arr[i].desc = ''
         }
-        producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
+        producto.Descripcion = (''+arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc).trim()
       }
 
       // console.log(producto);
@@ -167,7 +168,7 @@ const actions = {
             obj.cantxPrecio = 1
             if(!isVentas){
               obj.estadoPxP = true
-              obj.cantidad = 0
+              obj.cantidad = ''
               obj.precio = obj.PrecioCosto
               obj.nuevoPrecioContado = obj.PrecioContado || 0
             }else{
@@ -189,7 +190,7 @@ const actions = {
             if (arr2[i].desc == null) {
               arr2[i].desc = ''
             }
-            obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
+            obj.Descripcion = (''+arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc).trim()
           }
 
           commit('AGREGAR_PRODUCTO', obj)
