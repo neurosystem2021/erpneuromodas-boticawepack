@@ -249,7 +249,7 @@ export default {
           this.$toasted.show('Ingrese fecha de fin')
           return
         }
-        window.open('/api/index.php/reporte/fechaven/nuevo?idAlmacen='+this.almacen.IdAlmacen+'&fechaIni='+this.fechaDesde+'&fechaFin='+this.fechaHasta,'_blank');
+        window.open('/api/index.php/reporte/fechaven/nuevo?idAlmacen='+this.almacen.IdAlmacen+'&fechaIni='+this.fechaDesde+'&fechaFin='+this.fechaHasta+(this.condicionStock==1?'&condiStock=1':''),'_blank');
       },
       EditarFechaVen(item){
         this.productoSelect = item
