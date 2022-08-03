@@ -6,7 +6,7 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
-                    <b-button-group>
+                    <b-button-group v-show="false">
                        <b-button variant="outline-danger" @click="testImpresora()">Probar Impresora</b-button>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -150,7 +150,7 @@
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
-                                :customParams="{idPuntoVenta:idPuntoVentaSiste}"
+                                :customParams="{idPuntoVenta:venta.puntoVenta.IdDocVentaPuntoVenta}"
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
@@ -791,11 +791,11 @@ export default {
                         Fecha: response.data.fecha,
                     }
                     this.venta.dataInfoDocVenta = dataInfoDocVenta
-                    let ventaJson= JSON.stringify(this.venta)
+                    /*let ventaJson= JSON.stringify(this.venta)
                     var left = (screen.width/2)-(800/2)
                     var top = (screen.height/2)-(800/2)
                     let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)*/
                    
                 } catch (error) {
                     console.log(error)
@@ -817,7 +817,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
                 this.$refs.carrito.pagocon = 0
-                //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -826,6 +826,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank');
+            return
             try {
                let ventaJson= JSON.stringify(this.ultimaVentaData)
                var left = (screen.width/2)-(800/2)
