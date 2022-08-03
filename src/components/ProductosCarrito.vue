@@ -698,10 +698,12 @@ export default {
         obj.Presentacion = presentacion.nombre
         obj.cantidadPress = Number(presentacion.cantidad || 1)
         obj.EsPresentacion = 1
+        obj.PrecioCostoF = presentacion.preciocosto || 0
       }else{
         obj.Presentacion = obj.ProductoMedicion
         obj.cantidadPress = 1
         obj.EsPresentacion = 0
+        obj.PrecioCostoF = obj.PrecioCosto || 0
       }
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
