@@ -23,7 +23,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock <br>General</b>
-                  <div> {{ sumaStock }} </div>
+                  <div> {{ sumaStock | redondear }} </div>
                 </div>
               </b-col>
               <b-col md="2">
