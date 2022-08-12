@@ -29,9 +29,10 @@
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
-      <b-modal ref="modalCant" hide-footer hide-header>
+      <b-modal ref="modalCant" id="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3>PRESENTACIONES</h3>
+          <h2 style="text-decoration:underline">{{objProd.Producto}}</h2>
+          <h5>PRESENTACIONES</h5>
         </div>
         <hr>
         <b-row>
@@ -87,26 +88,27 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val, productos[data.index])"
-            placeholder="Cantidad">
-          </b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].cantidad"
             :disabled="isVentas? true : false"
             type="number"
-            style="width: 75px"
+            style="width: 85px"
             min="0"
+            step="0.001"
             @input="(val) => {
               $emit('onInputCantidad', val)
              /* if(!productos[data.index].PreciosPorProducto) {
@@ -121,18 +123,20 @@
               }
               productos[data.index].precio = productos[data.index].PrecioContado */
             }"
-            placeholder="Cantidad"></b-form-input>
+            placeholder="Cantidad"
+            class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -171,13 +175,14 @@
         </template>
 
         <template slot="precioVenta" slot-scope="data">
-          <b-form-input
+          <input
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Precio Venta"></b-form-input>
+            placeholder="Precio Venta"
+            class="form-control"/>
             <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
             </b-form-text>
@@ -198,13 +203,16 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <b-form-input
+          <input
             :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
+            style="width: 90px"
             min="0"
             step="0.01"
-            :value="0"></b-form-input>
+            value="0"
+            class="form-control"
+             @input="actualizarDescu(data.index)"/>
             <b-form-text>
             </b-form-text>
         </template>
@@ -225,17 +233,19 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <!--<template slot="Descripcion" slot-scope="data">
+        <template slot="Descripcion" slot-scope="data">
           <textarea 
+            :disabled="bloquearInput?true:false"
             class="form-control"
-            placeholder="Descripción"
-            cols="9" rows="3"
+            placeholder="Descripción - Obs."
+            cols="9" rows="1"
+            style="width: 170px;"
             v-model="productos[data.index].Descripcion"></textarea>
-          <b-form-input
+          <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>
-        </template>--> 
+            placeholder="Descripción"></b-form-input>-->
+        </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -700,13 +710,25 @@ export default {
       //}
     },
     renderChild(data) {
-      let style = '';
-      if(parseFloat(data.stock) <= 0) {
-          style = "background-color:#ff7675; color: #ffffff;";
+     if (this.idAlmacen) {
+        let style = 'ss'
+        if(data.stock <= 0) {
+          style = 'danger'
+        }
+        // cambiar color los que faltan 4 meses por vencer
+        if (data.stock > 0) {
+          style = 'success'
+        }
+        return `
+        <div>
+          <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / 
+          <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
+        </div>
+        `
       }
       return `
-      <div style="${style}">
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / Stock: ${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}
+      <div>
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion}
       </div>  
       `
     },
@@ -786,7 +808,10 @@ export default {
       this.$emit('onRemoveProducto', index)
       this.$toasted.show('Producto quitado del listado')
     },
-
+    actualizarDescu(index){
+        let obj = this.productos[index];
+       this.actualizarProd(obj)
+    },
     formatFecha(fecha) {
       if (fecha) {
 			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
@@ -812,9 +837,15 @@ export default {
   .nomCart {
     display: flex;
     align-items: center;
+    justify-content: center;
     border-right: 2px solid black;
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+</style>
+<style>
+  #modalCant .modal-dialog {
+    max-width: 40% !important;
   }
 </style>

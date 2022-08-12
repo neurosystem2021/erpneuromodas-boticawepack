@@ -225,14 +225,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -295,14 +297,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -355,7 +358,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center" v-show="false">
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -433,10 +436,10 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -444,7 +447,7 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -956,6 +959,8 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                pro.Descripcion = (''+pro.Descripcion).trim().toUpperCase()
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
@@ -985,7 +990,7 @@ export default {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
