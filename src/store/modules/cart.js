@@ -103,6 +103,14 @@ const actions = {
         producto.precio = producto.precioConvenio || producto.precio;
       }
 
+      if (cantidad) {
+        producto.cantidad = cantidad
+      }
+
+      if(setPreOr){
+        producto.precio = setPreOr
+      }
+      
       /*let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},
@@ -116,7 +124,7 @@ const actions = {
       }*/
 
       // console.log(producto);
-      producto.Descripcion = producto.Descripcion || ""
+      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
       producto.disabledProf = 0
       
       commit('AGREGAR_PRODUCTO', producto)

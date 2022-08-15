@@ -36,7 +36,7 @@
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger" target="_blank">Eliminar</b-button>
+                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-trash"></i></b-button>
                       </template>
 
                     </b-table>
@@ -95,28 +95,29 @@ import { mapActions } from 'vuex'
             ...mapActions({
                 add         : 'agregarProducto',
                 obtenerStok : 'obtenerStock',
-                limpiarCarrito: 'limpiarCarrito'
+                limpiarCarrito: 'limpiarCarrito',
             }),
             selectProformas (proforma) {
-                this.axios.get(this.API + 'proformas/detalle', {
+                this.axios.get(this.API + 'proformas/detalle/nuevo', {
                     params: {
                         idProforma: proforma.IdProforma
                     }
                 }).then((response) => {
+                    this.limpiarCarrito()
                     response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                        }, { setPrecio: true, setPreOr: item.Precio, cantidad: item.Cantidad } ])
-
+                        this.add([item, () => {
+                        }, {setPreOr: item.Precio, cantidad: item.Cantidad } ])
                         this.filter = ''
                         this.show = false
                     })
+                    setTimeout(() => {
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })        
+                    }, 300);
                     proforma.productos = response.data
                     // console.log(proforma);
 
                     // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.$emit('onSelectProforma', proforma)
-                    this.limpiarCarrito()
                 })
             },
             myProvider (ctx) {

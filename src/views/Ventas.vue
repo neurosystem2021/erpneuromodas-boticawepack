@@ -4,7 +4,7 @@
 
         <Menu v-if="false"></Menu>
 
-        <b-container class="bv-example-row"  id="conten">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row"  id="conten">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil">
@@ -16,7 +16,7 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" class="ocularMovil" v-if="false">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
@@ -37,12 +37,12 @@
                 </b-col>
             </b-row>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
-                <b-row style="margin-bottom:-15px">
-                    <b-col md="8">
+                <b-row style="margin-bottom:-10px">
+                    <b-col md="7">
                         <b-row>
-                            <b-col md="5">
+                            <b-col md="4">
                                 <b-form-group>
-                                    <b-input-group prepend="Doc. Venta" class="mt-2">
+                                    <b-input-group prepend="Doc." class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -73,7 +73,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="3">
+                            <b-col md="4">
                                 <b-form-group>
                                     <b-input-group prepend="Alm." class="mt-2">
                                     <autocomplete
@@ -97,7 +97,7 @@
                             </b-col>
                             <b-col md="4">
                                 <b-form-group>
-                                    <b-input-group prepend="P. Venta" class="mt-2">
+                                    <b-input-group prepend="P.V." class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -134,7 +134,7 @@
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
                                             class="form-control"
-                                            placeholder="Codigo de Barra" />
+                                            placeholder="Cod. Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
                                             <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
@@ -165,7 +165,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="2">
+                    <b-col md="3">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -809,7 +809,7 @@ export default {
                 })
             }
             
-            this.actualizarPrecioConvenio(obj)
+            //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
         onSetProducto (obj, cant, precio) {
@@ -994,7 +994,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
+                if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
                     sinStock += 1
                 }
 
@@ -1051,11 +1051,27 @@ export default {
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
+            })
+        },
+        emitirauto(idDocVenta){
+            this.axios.post(this.API + 'emitirauto', {IdDocVenta:idDocVenta})
+            .then((response) => {
+                if(response.data.success){
+                    if(response.data.Estado == 1) {
+                    this.$toasted.error("SUNAT: "+response.data.msj_sunat)                  
+                    } else {
+                    this.$toasted.info("SUNAT: "+response.data.msj_sunat)
+                    }
+                }
+            })
+            .catch((error) => {
+                this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
             })
         },
         eliminarCliente () {
