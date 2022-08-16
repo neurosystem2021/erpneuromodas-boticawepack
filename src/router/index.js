@@ -25,6 +25,7 @@ import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 
@@ -157,6 +158,11 @@ export default new Router({
       path: '/impresoras',
       name: 'Impresoras',
       component: Impresoras
+    },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
     },
   ]
 })
