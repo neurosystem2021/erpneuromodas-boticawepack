@@ -419,6 +419,7 @@ export default {
             { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
