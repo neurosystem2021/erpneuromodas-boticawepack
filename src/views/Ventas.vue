@@ -854,6 +854,11 @@ export default {
                 return 
             }
 
+            if(this.venta.tipoVenta.CodSunat == '03' && this.totalCart>700){
+                this.$toasted.show('No puede emitir una BOLETA con monto superior a S/ 700, emita una FACTURA')
+                this.inProgress = false
+                return
+            }
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
             let totalCero = 0 
