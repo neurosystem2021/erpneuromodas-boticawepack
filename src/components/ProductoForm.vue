@@ -178,7 +178,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="false">
             <label>Precio X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
@@ -326,8 +326,11 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.001"
+                step="0.00001"
                 />
+            </b-form-group>
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</label>
             </b-form-group>
           </b-card>
         </b-col>
@@ -461,7 +464,10 @@ export default {
 
         this.producto.EsPadre = newVal.EsPadre
         Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+           if (this.$refs.productoDet){  this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+           setTimeout(() => {
+            this.$refs.productoDet.getProductosDet()
+           }, 100);}
         })
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
@@ -487,12 +493,13 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+        //this.$refs.productoDet.getProductosDet()
         }).catch((error) => {
             console.log(error)
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
           })
-
+       
       } else {
 
         this.title = 'Nuevo Producto'

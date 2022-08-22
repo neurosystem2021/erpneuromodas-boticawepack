@@ -110,8 +110,6 @@ export default {
             { key: 'stock', label: 'Stock', sortable: true },
             { key: 'ProveedorUltimo', label: 'Proveedor Ult.' , sortable: true},
             { key: 'TelefonoUltimo', label: 'Telf. Proveedor Ult.' },
-            { key: 'ProveedorSec', label: 'Proveedor Sec.' , sortable: true},
-            { key: 'ProveedorSecTelf', label: 'Telf. Proveedor Sec.' },
       ],
       totalRows: 50,
       perPage: 10,
