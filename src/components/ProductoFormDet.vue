@@ -42,6 +42,7 @@ import config from '@/store/config.js'
 export default {
   mounted () {
     this.getProductosDet()
+    console.log("hola entra");
   },
   data () {
     return {

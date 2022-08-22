@@ -385,7 +385,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center" v-if="false">
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -467,7 +467,7 @@ export default {
             ],
             carrito: {
                 fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
                     { key: 'Descripcion', label: 'Descripción'},
