@@ -404,7 +404,9 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-            //this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2)
+            if(this.venta.tipoVenta.CodSunat == '07'){
+                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2)
+            }  
         }
     },
     computed: {
@@ -554,6 +556,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
