@@ -155,12 +155,12 @@ export default {
       let total = 0;
       
       for (var i = 0; i < this.cierres.length; i++) {
-        if (!this.cierres[i].Ingresos && !this.cierres[i].Salidas) {
-          continue;
-        } else {
-          total = this.cierres[i].Total
-          break;
-        }
+        //if (!this.cierres[i].Ingresos && !this.cierres[i].Salidas) {
+         // continue;
+       // } else {
+          total += this.cierres[i].Total
+        //  break;
+        //}
       }
 
       return total
