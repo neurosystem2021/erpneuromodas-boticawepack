@@ -629,6 +629,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }

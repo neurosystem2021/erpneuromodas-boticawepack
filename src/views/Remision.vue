@@ -266,6 +266,7 @@ export default {
         codUndPesoBruto: 'KGM',
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
+        descripcionMotivoTraslado:'VENTA',
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
@@ -293,7 +294,7 @@ export default {
       return false
     },
     motivoTrasladoChange (e) {
-      descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
+      let descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
       this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado
     },
     onReset (evt) {
@@ -351,7 +352,7 @@ export default {
           this.remision.totalBultos = '';
           this.$refs.inputDocRef.setValue('');
           this.$refs.inputMovRef.setValue('');
-          this.$toasted.success('Movimiento guardado correctamente ')          
+          this.$toasted.success('Guia de remisión guardada correctamente ')       
         }
         this.inProgress = false
       })
@@ -380,19 +381,19 @@ export default {
         }).then((response) => {
           
           if (response.data[0]) {
-            this.axios.get(this.API + 'cliente', {
+            this.axios.get(this.API + 'proveedor', {
               params: {
-                  idCliente: response.data[0].IdProveedor
+                  idProveedor: response.data[0].IdProveedor
               }})
               .then((response) => {
                 if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
+                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
                   this.$set(this.remision, 'direccionCliente', response.data.Direccion);
 
                   this.cliente = response.data;
                 } else {
-                  this.$toasted.show('No se encontro al cliente');
+                  this.$toasted.show('No se encontro al proveedor');
                 }
               })
               .catch((error) => {
