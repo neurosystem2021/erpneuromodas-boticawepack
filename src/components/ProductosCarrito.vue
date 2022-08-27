@@ -35,7 +35,7 @@
         </div>
         <hr>
         <b-row>
-          <b-col cols="6">
+          <b-col cols="6"  v-if="false">
             <b-card
               align="center"
               class="mb-3 contentCard"
@@ -59,10 +59,9 @@
               v-if="d.cantidad != 0"
               align="center"
               class="mb-3 contentCard"
-              v-bind:class="[d.nombre=='OFERTA' ? 'oferta' : '']"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
-                  setProductoCant(d)
+                  setProductoUni(objProd, d.precio)
                 }
               }"
             >
@@ -109,13 +108,14 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
+            :disabled="bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 80px"
+            style="width: 95px"
             class="form-control"
             step="0.001"
             min="0"
             @input="(val) => {
+              changeCant(val.target.value, productos[data.index])
               $emit('onInputCantidad', val.target.value)
               if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
@@ -142,7 +142,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 90px"
+            style="width: 95px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -221,7 +221,7 @@
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
-            style="width:90px"
+            style="width:95px"
             type="number"
             min="0"
             step="0.01"
@@ -254,7 +254,7 @@
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="1"
-            style="width: 150px"
+            style="width: 170px"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -506,10 +506,6 @@ export default {
         event.target.src = "static/no-photo.png" 
     },
     changeCant (val, prod) {
-      if (val>0) {
-        prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
-      }
       this.$nextTick(() => {
         this.actualizarProd(prod)
       })
@@ -668,23 +664,28 @@ export default {
       this.objProd = {}
 
       if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
-      }
-
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-      let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
-      
-      if (!obj.PreciosPorProducto || fPP.length === 4) {
         obj.estadoPxP = true
+        obj.PreciosPorProducto = ''
         this.setProductoUni(obj)
         return
       }
-
+      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+      if(obj.precioConvenio){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+      }
+      if(obj.PrecioEspecial){
+       this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
+      }
+      this.objProd = {}
+    
+     // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+     // let fPP = this.preciosProd.filter(p => p.cantidad === 0)
+      
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
     },  
-    setProductoUni (obj) {
+    setProductoUni (obj, precio) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -694,7 +695,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj, false, precio)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -728,10 +729,15 @@ export default {
       this.actualizarProd(obj)
     },
     showPresentacion (obj) {
-      if (!obj.PreciosPorProducto !== '') {
-        this.precioCont = obj.PrecioContado
-        obj.estadoPxP = false
-        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+      if(this.isVentas){
+        this.preciosProd = []
+        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+        if(obj.precioConvenio){
+          this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+        }
+        if(obj.PrecioEspecial){
+        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+        }
         this.objProd = obj
         this.$refs['modalCant'].show()
         return

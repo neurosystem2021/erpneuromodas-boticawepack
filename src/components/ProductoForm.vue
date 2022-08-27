@@ -174,7 +174,6 @@
             <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              :disabled="(idPerfil == 1) ? false : true"
               @input="actualizarPrecioContado"
               type="number"
               step="0.0001"
@@ -267,9 +266,19 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              :disabled="(idPerfil == 1) ? false : true"
               step="0.0001"
               type="number"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Especial:</label>
+            <input
+              v-model="producto.PrecioEspecial"
+              type="number"
+              step="0.00001"
               class="form-control"
               />
           </b-form-group>
@@ -278,9 +287,8 @@
           <b-form-group>
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
-              :disabled="(idPerfil == 1) ? false : true"
               type="number"
-              step="0.0001"
+              step="0.00001"
               @input="actualizarPorcentajeUtilidad"
               class="form-control"
               />
@@ -289,13 +297,22 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Convenio:</label>
             <input v-model="producto.precioConvenio"
-              :disabled="(idPerfil == 1) ? false : true"
               type="number"
               step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Distribuidor:</label>
+            <input v-model="producto.precioConvenio"
+              type="number"
+              step="0.00001"
               class="form-control"
               />
           </b-form-group>
@@ -303,7 +320,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="false">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
@@ -495,6 +512,7 @@ export default {
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
         this.producto.precioConvenio        = newVal.precioConvenio
+        this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
@@ -651,6 +669,7 @@ export default {
         PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
+        PrecioEspecial: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},
