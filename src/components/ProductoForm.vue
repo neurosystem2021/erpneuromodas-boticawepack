@@ -334,8 +334,11 @@
                 :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
-                step="0.001"
+                step="0.00001"
                 />
+            </b-form-group>
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear }}</label>
             </b-form-group>
           </b-card>
         </b-col>

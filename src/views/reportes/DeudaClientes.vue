@@ -83,7 +83,8 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage"
+            @row-clicked="myRowClickHandler"></b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -97,11 +98,15 @@
         </b-row>
         <br /><br />
       </b-container>
+      <b-modal id="modalDetalleDeuda" size="lg" modal-class="modal-xl" v-model="showLetras" ok-only ok-title="Cerrar" title="Detalle de Deuda">
+           <detalle-deuda-cliente ref="detDeuCli"></detalle-deuda-cliente>
+      </b-modal>
   </div>
 </template>
 
 <script>
 import config from '@/store/config.js'
+import DetalleDeudaCliente from '@/components/DetalleDeudaCliente.vue'
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
@@ -130,6 +135,7 @@ export default {
             { key: 'Saldo', label: 'Saldo', sortable: true },
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
+            { key: 'Letras', label: 'Letras', sortable: true },
       ],
       totalRows: 50,
       perPage: 50,
@@ -141,6 +147,7 @@ export default {
         fechaDesde: this.$moment().format("YYYY-01-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
+      showLetras: false,
     }
   },
   methods: {
@@ -173,10 +180,17 @@ export default {
         // Returning an empty array, allows table to correctly handle busy state in case of error
         return []
       })
+    },
+    myRowClickHandler(record, index) {
+      if(record.Letras!='Ninguna'){
+        this.showLetras = true
+        this.$refs.detDeuCli.cargarDeudasCliente(record.IdDocVenta,record.Total,record.DniRuc,record.Cliente,record.Correlativo);
+      }
     }
   },
   components: {
       // ProductoForm
+    DetalleDeudaCliente
   }
 }
 </script>
