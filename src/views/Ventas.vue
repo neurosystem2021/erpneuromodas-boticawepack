@@ -490,7 +490,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
         }
     },
     computed: {
@@ -622,6 +622,8 @@ export default {
             this.adelantosPreOrden=[]
             this.adelanto = 0
             this.infoDelivery = {}
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -825,12 +827,14 @@ export default {
             return obj
         },
         onAddProducto (obj) {
+            this.venta.pago.visa.monto = 0
             this.actualizarDescuento()
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }

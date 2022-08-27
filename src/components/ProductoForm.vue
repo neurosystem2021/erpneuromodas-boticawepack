@@ -174,7 +174,6 @@
             <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              :disabled="(idPerfil == 1) ? false : true"
               @input="actualizarPrecioContado"
               type="number"
               step="0.0001"
@@ -267,7 +266,6 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              :disabled="(idPerfil == 1) ? false : true"
               step="0.0001"
               type="number"
               class="form-control"
@@ -278,9 +276,8 @@
           <b-form-group>
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
-              :disabled="(idPerfil == 1) ? false : true"
               type="number"
-              step="0.0001"
+              step="0.00001"
               @input="actualizarPorcentajeUtilidad"
               class="form-control"
               />
@@ -293,7 +290,6 @@
           <b-form-group>
             <label>Precio Convenio:</label>
             <input v-model="producto.precioConvenio"
-              :disabled="(idPerfil == 1) ? false : true"
               type="number"
               step="0.0001"
               class="form-control"
