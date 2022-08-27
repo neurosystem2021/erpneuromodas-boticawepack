@@ -267,7 +267,7 @@ import config from '@/store/config.js'
                 }
 
                 for (let index = 0; index < this.documentos.length; index++) {
-                    if (this.documentos[index].aplicar>this.documentos[index].Saldo){
+                    if (Math.round(this.documentos[index].aplicar* 100) / 100 > Math.round(this.documentos[index].Saldo * 100) / 100){
                         this.isLoading = false;
                         this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo');
                         return;

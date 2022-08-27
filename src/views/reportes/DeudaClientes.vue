@@ -3,7 +3,7 @@
     <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="4" class="my-1">
+          <b-col md="4">
             <b-form-group>
                   <label>Buscar:</label>
               
@@ -33,7 +33,7 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="4">
             <b-row>
             <b-col md="8">
 
@@ -47,7 +47,30 @@
             </b-col>
             </b-row>
           </b-col>
-
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Emisión Inicio:</label>
+              <b-form-input
+                v-model="rango.fechaDesde"
+                type="date"
+                step="1"
+                @input="val => $refs.tablaProductos.refresh()"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Emisión Fin:</label>
+              <b-form-input
+                v-model="rango.fechaHasta"
+                type="date"
+                step="1"
+                @input="val =>$refs.tablaProductos.refresh() "
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
           <b-table small
             ref="tablaProductos"
             :filter="filter"
@@ -69,7 +92,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage+'&fechaDesde='+rango.fechaDesde+'&fechaHasta='+rango.fechaHasta" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -91,7 +114,7 @@ export default {
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [ 50, 100, 150, 200, 300 ],
       filter: '',
       sortBy: 'IdDocVenta',
       sortDesc: false,
@@ -109,11 +132,15 @@ export default {
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
       ],
       totalRows: 50,
-      perPage: 10,
+      perPage: 50,
       currentPage: 1,
       almacen: {
         IdAlmacen: 1
-      }
+      },
+      rango: {
+        fechaDesde: this.$moment().format("YYYY-01-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
     }
   },
   methods: {
@@ -131,7 +158,7 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage+'&fechaDesde='+this.rango.fechaDesde+'&fechaHasta='+this.rango.fechaHasta)
 
       return promise.then((response) => {
         console.log(response)

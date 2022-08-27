@@ -23,7 +23,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock <br>General</b>
-                  <div> {{ sumaStock }} </div>
+                  <div> {{ sumaStock | redondear }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -389,6 +389,7 @@ export default {
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
+    this.getPrimerAlmacen()
   },
   data() {
     return {
@@ -401,7 +402,7 @@ export default {
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'PRINCIPAL'
+        Almacen: ''
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
@@ -510,6 +511,14 @@ export default {
           }
         })
       }
+    },
+    getPrimerAlmacen(){
+        this.axios.get(this.API + '/almacenes/id/1').then(r => {
+          if (r.data) {
+            this.setAlmacen(r.data)
+            this.$refs.inputAlmacen.setValue(r.data.Almacen)
+          }
+        })
     },
     getSumaValorizado () {
       this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')

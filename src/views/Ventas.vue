@@ -4,7 +4,7 @@
 
         <Menu v-if="false"></Menu>
 
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row"  id="conten">
+        <b-container fluid class="ancho"  id="conten">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil">
@@ -679,6 +679,7 @@ export default {
                         if (response.data) {
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
                         } else {
                             this.$toasted.show('No se encontro al cliente')
                         }
@@ -937,12 +938,27 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago tarjeta/transferencia no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Yape o Plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
+                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
                     this.inProgress = false            
                     return                
@@ -1203,6 +1219,13 @@ export default {
   /* For desktop: */
     .ocularMovil{
         display: none;
+    }
+}
+
+@media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
     }
 }
 </style>

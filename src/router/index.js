@@ -29,6 +29,7 @@ import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
+import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 
 Vue.use(Router)
 
@@ -169,6 +170,11 @@ export default new Router({
       path: '/reportes/estadisticas',
       name: 'Estadisticas',
       component: Estadisticas
+    },
+    {
+      path: '/reportes/articulosresumen',
+      name: 'ArticulosResumen',
+      component: ArticulosResumen
     },
   ]
 })
