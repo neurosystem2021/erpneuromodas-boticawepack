@@ -227,6 +227,7 @@ export default {
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
+    isVentas:Boolean,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -272,7 +273,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       }
       return this.API + 'productos'
     },
