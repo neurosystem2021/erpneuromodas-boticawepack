@@ -393,7 +393,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          //{ key: 'Descripcion', label: 'Descripción'},
+          { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Present.' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
