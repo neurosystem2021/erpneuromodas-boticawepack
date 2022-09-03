@@ -494,7 +494,11 @@ export default {
 
         this.producto.EsPadre = newVal.EsPadre
         Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+          if(this.$refs.productoDet){  this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+            setTimeout(() => {
+              this.$refs.productoDet.getProductosDet()
+            }, 100);
+          }
         })
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
