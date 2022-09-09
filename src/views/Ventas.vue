@@ -1005,7 +1005,7 @@ export default {
                     //this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
                     window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
-
+                    this.emitirauto(response.data.insertId)
                 }
                  
                    
@@ -1015,6 +1015,21 @@ export default {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
+            })
+        },
+        emitirauto(idDocVenta){
+            this.axios.post(this.API + 'emitirauto', {IdDocVenta:idDocVenta})
+            .then((response) => {
+                if(response.data.success){
+                    if(response.data.Estado == 1) {
+                    this.$toasted.error("SUNAT: "+response.data.msj_sunat)                  
+                    } else {
+                    this.$toasted.info("SUNAT: "+response.data.msj_sunat)
+                    }
+                }
+            })
+            .catch((error) => {
+                this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
             })
         },
         eliminarCliente () {
