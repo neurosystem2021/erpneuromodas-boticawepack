@@ -124,7 +124,7 @@ const actions = {
       }*/
 
       // console.log(producto);
-      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
+      producto.Descripcion = (''+((producto.ProductoDesc?producto.ProductoDesc:producto.Descripcion) || "")).trim()
       producto.disabledProf = 0
       
       commit('AGREGAR_PRODUCTO', producto)
@@ -200,7 +200,7 @@ const actions = {
             }
             obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
           }*/
-          obj.Descripcion = ''
+          obj.Descripcion = obj.ProductoDesc || ''
 
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
