@@ -6,9 +6,9 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
-                    <b-button-group>
+                    <!--<b-button-group>
                        <b-button variant="outline-danger" @click="testImpresora()">Probar Impresora</b-button>
-                    </b-button-group>
+                    </b-button-group>-->
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
@@ -596,14 +596,14 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
+            this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true 
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
@@ -791,11 +791,11 @@ export default {
                         Fecha: response.data.fecha,
                     }
                     this.venta.dataInfoDocVenta = dataInfoDocVenta
-                    let ventaJson= JSON.stringify(this.venta)
+                    /*let ventaJson= JSON.stringify(this.venta)
                     var left = (screen.width/2)-(800/2)
                     var top = (screen.height/2)-(800/2)
                     let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    window.open('http://localhost:5000/imprimir/getdata.php?rep=2&venta='+encodeURIComponent(ventaJson), "Impresión", params)*/
                    
                 } catch (error) {
                     console.log(error)
@@ -817,7 +817,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
                 this.$refs.carrito.pagocon = 0
-                //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -826,6 +826,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank');
+            return
             try {
                let ventaJson= JSON.stringify(this.ultimaVentaData)
                var left = (screen.width/2)-(800/2)
