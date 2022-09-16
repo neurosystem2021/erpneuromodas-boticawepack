@@ -1,11 +1,19 @@
 <template>
-    <div>
+    <div :class="{'fondo-empresa': (this.empresa === 'dismart')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
 
         <b-container fluid class="ancho"  id="conten">
             <div>
+                <div class="float-left">
+                    <b-button-group size="sm">
+                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                            <option value="rosmart">EMPRESA ROSMART</option>
+                            <option value="dismart">EMPRESA DISMART</option>
+                        </select>
+                    </b-button-group>
+                </div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil">
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
@@ -14,7 +22,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" :empresa="empresa" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm" class="ocularMovil" v-if="false">
                         <pre-orden-lista 
@@ -203,7 +211,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedorManual" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -404,7 +412,7 @@
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta + '&empresa=' + empresa">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -426,11 +434,27 @@ import DeliveryModal from '@/components/DeliveryModal.vue'
 import Swal from 'sweetalert2'
 export default {
     beforeMount () {
+        // Interceptos XMLHttpRequest
+        let oldXHROpen = window.XMLHttpRequest.prototype.open;
+        window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+            // do something with the method, url and etc.
+            
+            var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
+            newUrl = new URL(newUrl);
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'rosmart');
+            url = newUrl.toString();
+            arguments[1] = url
+            
+            return oldXHROpen.apply(this, arguments);
+        }
         this.initForm()
     },
-    mounted () {
+    async mounted () {
         // this.getNumeroVenta()
-        this.getVendedor()
+        await this.getVendedor()
+        if (sessionStorage.getItem('empresa')) {
+            this.empresa = sessionStorage.getItem('empresa');
+        }
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
@@ -485,7 +509,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            empresa: 'rosmart'
         }
     },
     watch: {
@@ -519,6 +544,11 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        cambiarEmpresa () {
+            sessionStorage.setItem('empresa', this.empresa)
+            window.location.reload();
+            return false;
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -558,10 +588,17 @@ export default {
             })
         },
         loadFirstAlmacen () {
-            this.axios.get(this.API + 'almacenes/primero')
+            return this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
                     this.$refs.inputAlmacen.setValue(res.data.Almacen)
                     this.venta.almacen = res.data
+                })
+        },
+        loadFirstPuntoVenta () {
+            return this.axios.get(this.API + 'puntoventa/primero')
+                .then(res => {
+                    this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta)
+                    this.setPuntoVenta(res.data)
                 })
         },
         loadClienteBarcode (e) {
@@ -590,12 +627,12 @@ export default {
                     CodSunat: '03'
                 },
                 almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'PRINCIPAL'
+                    //IdAlmacen: 1,
+                    //Almacen: 'PRINCIPAL'
                 },
                 puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'PRINCIPAL'
+                    //IdDocVentaPuntoVenta: 1,
+                    //PuntoVenta: 'PRINCIPAL'
                 },
                 vendedor: {},
                 adelantosPreOrden:[],
@@ -744,13 +781,16 @@ export default {
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
-        getVendedor () {
+        getVendedor (user) {
             let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                //this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -769,6 +809,10 @@ export default {
             if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
             this.venta.vendedor = obj
+        },
+        setVendedorManual (obj) {
+            this.venta.vendedor = obj
+            this.getVendedor(obj.Usuario)
         },
         setComisionista (obj) {
             if (typeof obj === 'object') {
@@ -881,19 +925,19 @@ export default {
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
-        limpiarDespuesVenta () {
-            this.inProgress = false
-            this.tieneIgv = false
-            this.initForm()
-            this.limpiarCart()
-            this.getVendedor()
-            this.$refs.inputCliente.setValue('')
+        //limpiarDespuesVenta () {
+        //    this.inProgress = false
+        //    this.tieneIgv = false
+        //    this.initForm()
+        //    this.limpiarCart()
+        //    this.getVendedor()
+        //    this.$refs.inputCliente.setValue('')
             // this.getNumeroVenta()
             // this.$refs.inputTipoVenta.setValue('TICKET')
             // this.$refs.inputAlmacen.setValue('VENTA')
             // this.$refs.inputPuntoVenta.setValue('CAJA1')
             // this.$refs.inputVendedor.setValue('')
-        },
+        //},
         guardarProforma () {
             this.inProgress = true
 
@@ -924,12 +968,19 @@ export default {
             this.venta.productos = this.productos
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
-            .then((response) => {
+            .then(async(response) => {
                 this.$toasted.info('Proforma Guardada con exito')
-                this.limpiarDespuesVenta()
+                //this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                this.inProgress = false
+                this.tieneIgv = false
+                this.ultimaVenta = response.data.insertId
+                this.initForm()
+                this.limpiarCart()
+                this.$refs.inputCliente.setValue('')
+                this.$refs.inputVendedor.setValue('')
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '&empresa=' + this.empresa,'_blank');
             })
             .catch((error) => {
                 console.log(error)
@@ -1050,7 +1101,7 @@ export default {
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
-            .then((response) => {
+            .then(async(response) => {
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
@@ -1060,17 +1111,19 @@ export default {
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                await this.loadFirstAlmacen()
+                await this.loadFirstPuntoVenta()
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
+                //this.$refs.inputAlmacen.setValue('VENTA')
+                //this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank');
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
@@ -1231,5 +1284,9 @@ export default {
     .ancho{
         width: calc(100% - 300px)
     }
+}
+
+.fondo-empresa {
+    background: #eff9ff;
 }
 </style>

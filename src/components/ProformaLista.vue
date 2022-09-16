@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
+        <b-button @click="show=true" variant="outline-primary">Ver Proformas</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
@@ -28,11 +28,11 @@
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresa" variant="primary" target="_blank">Ver Ticket</b-button>
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
@@ -90,7 +90,7 @@ import { mapActions } from 'vuex'
                 currentPage: 1
             }
         },
-        props: ['idAlmacen'],
+        props: ['idAlmacen','empresa'],
         methods: {
             ...mapActions({
                 add         : 'agregarProducto',

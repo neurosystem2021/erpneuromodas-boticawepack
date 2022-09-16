@@ -1,11 +1,19 @@
 <template>
-  <div>
+  <div :class="{'fondo-empresa': (this.empresa === 'dismart')}">
     <br>
     <b-container class="bv-example-row">
       <div>
           <div class="no-print">
+              <div class="float-left"  v-if="!this.$route.params.id">
+                  <b-button-group size="sm">
+                      <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                          <option value="rosmart">EMPRESA ROSMART</option>
+                          <option value="dismart">EMPRESA DISMART</option>
+                      </select>
+                  </b-button-group>
+              </div>
               <b-row align-h="end" class=" no-print">
-                    <label v-if="!this.$route.params.id" >Vendedor:</label>
+                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
                     <b-form-group size="sm" >
                         <autocomplete
@@ -19,7 +27,7 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>
+                </b-col>-->
                 <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
@@ -28,7 +36,7 @@
                         <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <cierres-caja></cierres-caja>
+                        <cierres-caja :empresa="empresa"></cierres-caja>
                     </b-button-group>
                     <b-button-group size="sm">
                         <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
@@ -417,12 +425,35 @@ import config from '@/store/config.js'
 import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
+  beforeMount () {
+    let empresa = sessionStorage.getItem('empresa') || 'rosmart';
+    if (this.$route.query.empresa === 'dismart') {
+      empresa = 'dismart';
+    }
+    
+    // Interceptos XMLHttpRequest
+    let oldXHROpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+        // do something with the method, url and etc.
+        var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
+        newUrl = new URL(newUrl);
+        newUrl.searchParams.append('empresa', empresa);
+        url = newUrl.toString();
+        arguments[1] = url
+        return oldXHROpen.apply(this, arguments);
+    }
+  },
   mounted () {
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
       this.loadData()
     } else {
-        this.getVendedor()
+        //this.getVendedor()
+      this.loadData()
+    }
+
+    if (sessionStorage.getItem('empresa')) {
+      this.empresa = sessionStorage.getItem('empresa');
     }
   },
   data () {
@@ -441,7 +472,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      empresa: 'rosmart'
     }
   },
   computed: {
@@ -542,6 +574,11 @@ export default {
     }
   },
   methods: {
+    cambiarEmpresa () {
+        sessionStorage.setItem('empresa', this.empresa)
+        window.location.reload();
+        return false;
+    },
     getDetalles (idDocVenta) {
       let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
@@ -553,11 +590,11 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
             // this.$refs.inputVendedor.$refs.input.disabled = true
 
             if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              //this.$refs.inputVendedor.$refs.input.disabled = true
             }
         })
         .catch((error) => {
@@ -586,8 +623,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          //user: sessionStorage.getItem("User")
-          user:         this.vendedor.Usuario,
+          user: sessionStorage.getItem("User"),
+          //user:         this.vendedor.Usuario,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -627,7 +664,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -646,7 +683,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -663,7 +700,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
@@ -757,6 +794,9 @@ th {
 }
 .adelantos {
   background-color: #ffe8c5;
+}
+.fondo-empresa {
+    background: #eff9ff;
 }
 @media print {
   .no-print {
