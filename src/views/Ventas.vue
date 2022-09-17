@@ -235,6 +235,14 @@
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
+                <b-row v-if="venta.idProforma > 0">
+                    <b-col md="6" class="ml-3">
+                        <b-row>
+                            <h5 class="mt-1">Proforma Seleccionada: <b-badge variant="info" style="font-size:1.2rem">{{venta.anioNumeroProforma}}</b-badge></h5>
+                            <b-button class="ml-1 mb-1" size="sm" variant="warning" @click="limpiarProforma"><b>Quitar</b></b-button>
+                        </b-row>
+                    </b-col>
+                </b-row>
                 <b-row>
                     <b-col> 
                         <productos-carrito 
@@ -652,7 +660,9 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                idProforma: 0,
+                anioNumeroProforma:'',
             }
             this.isNota = false
             this.bloquearInput=false
@@ -838,6 +848,11 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                console.log(obj);
+                if(obj.IdProforma>0){
+                    this.venta.idProforma = obj.IdProforma
+                    this.venta.anioNumeroProforma = obj.Anio+'-'+obj.Numero
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -858,6 +873,12 @@ export default {
             
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
+        },
+        limpiarProforma(){
+            this.venta.idProforma = 0
+            this.venta.anioNumeroProforma = ''
+            //this.limpiarCart()
+            //this.loadClienteVarios()
         },
         onSetProducto (obj, cant, precio) {
             if (cant && precio) {
