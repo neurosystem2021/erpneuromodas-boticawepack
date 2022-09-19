@@ -348,7 +348,11 @@ export default {
         this.producto.EsPadre = newVal.EsPadre
         this.producto.ControlaStock = newVal.ControlaStock
         Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+          if(this.$refs.productoDet){  this.$refs.productoDet.show = parseInt(newVal.EsPadre)
+            setTimeout(() => {
+              this.$refs.productoDet.getProductosDet()
+            }, 100);
+          }
         })
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
@@ -519,7 +523,7 @@ export default {
           pre.precio=0
         }
       })
-
+      this.producto.Producto = (''+this.producto.Producto).trim();
       this.axios.post(this.API + 'productos',{ ...this.producto,
       PreciosPorProducto: this.producto.precios} )
       .then((response) => {
