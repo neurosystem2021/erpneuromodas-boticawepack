@@ -24,7 +24,7 @@
                         :current-page="currentPage">
 
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
