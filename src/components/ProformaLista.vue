@@ -10,6 +10,12 @@
                 headerTextVariant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">           
+                    <b-button-group size="sm">
+                        <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
+                            <option value="rosmart">EMPRESA ROSMART</option>
+                            <option value="dismart">EMPRESA DISMART</option>
+                        </select>
+                    </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
                         v-if="show"
@@ -28,11 +34,11 @@
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresaselec" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresa" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresaselec" variant="primary" target="_blank">Ver Ticket</b-button>
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
@@ -68,7 +74,7 @@ import { mapActions } from 'vuex'
         },
         watch: {
           items () {
-            this.axios.get(this.API + 'proformas/count').then((response) => {
+            this.axios.get(this.API + 'proformas/count?prof=1&emp='+this.empresaselec).then((response) => {
                 this.totalRows = response.data.total
             })
           }
@@ -87,7 +93,8 @@ import { mapActions } from 'vuex'
                     { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket','Eliminar' ],
                 totalRows: 50,
                 perPage: 5,
-                currentPage: 1
+                currentPage: 1,
+                empresaselec: sessionStorage.getItem('empresa') || 'rosmart'
             }
         },
         props: ['idAlmacen','empresa'],
@@ -97,10 +104,15 @@ import { mapActions } from 'vuex'
                 obtenerStok : 'obtenerStock',
                 limpiarCarrito: 'limpiarCarrito',
             }),
+            cambiarEmpresa(){
+                this.$refs.tableProformas.refresh()
+            },
             selectProformas (proforma) {
                 this.axios.get(this.API + 'proformas/detalle/nuevo', {
                     params: {
-                        idProforma: proforma.IdProforma
+                        idProforma: proforma.IdProforma,
+                        prof: 1,
+                        emp: this.empresaselec
                     }
                 }).then((response) => {
                     this.limpiarCarrito()
@@ -123,7 +135,7 @@ import { mapActions } from 'vuex'
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'proformas?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'proformas?prof=1&emp='+this.empresaselec+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
 
                 return promise.then((result) => {
                 this.items = result.data
