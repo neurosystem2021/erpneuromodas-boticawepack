@@ -845,13 +845,24 @@ export default {
             }
 
             if (typeof obj === 'object') {
-                this.$refs.inputCliente.setValue(obj.Cliente)
-                this.venta.cliente = obj
-                this.venta.CampoDireccion = this.venta.cliente.Direccion
-                console.log(obj);
                 if(obj.IdProforma>0){
                     this.venta.idProforma = obj.IdProforma
                     this.venta.anioNumeroProforma = obj.Anio+'-'+obj.Numero
+                    delete obj.productos
+                    this.axios.post(this.API + 'verificar/crear/cliente', {data:obj})
+                    .then((response) => {
+                            console.log(response.data);
+                            this.$refs.inputCliente.setValue(response.data.Cliente)
+                            this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
+                    })
+                    .catch((error) => {
+                        this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
+                    })
+                }else{
+                    this.$refs.inputCliente.setValue(obj.Cliente)
+                    this.venta.cliente = obj
+                    this.venta.CampoDireccion = this.venta.cliente.Direccion
                 }
             } else {
                 this.axios.get(this.API + 'cliente', {
@@ -1001,7 +1012,7 @@ export default {
                 this.limpiarCart()
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '&empresa=' + this.empresa,'_blank');
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '?empresa=' + this.empresa,'_blank');
             })
             .catch((error) => {
                 console.log(error)
