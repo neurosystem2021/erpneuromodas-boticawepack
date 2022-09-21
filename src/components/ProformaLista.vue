@@ -163,7 +163,7 @@ import { mapActions } from 'vuex'
                 cancelButtonText: 'No, atrás'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.axios.delete(this.API + 'proforma/eliminar/'+data.IdProforma).then(res => {
+                        this.axios.delete(this.API + 'proforma/eliminar/'+data.IdProforma+'?prof=1&emp='+this.empresaselec).then(res => {
                             if(res.data){
                                this.$toasted.info('¡PROFORMA ELIMINADA!')
                                 this.$refs.tableProformas.refresh()
