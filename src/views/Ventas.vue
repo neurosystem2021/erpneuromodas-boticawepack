@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa': (this.empresa === 'rosmart')}">
+    <div :class="{'fondo-empresa': (this.empresa === 'mayvel')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -9,8 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="dismart">EMPRESA DISMART</option>
-                            <option value="rosmart">EMPRESA ROSMART</option>
+                            <option value="mofertas">EMPRESA MOFERTAS</option>
+                            <option value="mayvel">EMPRESA MAYVEL</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -449,7 +449,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'dismart');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'mofertas');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -518,7 +518,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'dismart'
+            empresa: 'mofertas'
         }
     },
     watch: {
