@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
+    <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -1336,6 +1336,9 @@ export default {
     }
 }
 
+.fondo-empresa0 {
+    background: #f8fafb;
+}
 .fondo-empresa1 {
     background: #eff9ff;
 }

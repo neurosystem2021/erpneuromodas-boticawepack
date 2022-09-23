@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'fondo-empresa': (this.empresa === 'dismart')}">
+  <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
     <br>
     <b-container class="bv-example-row">
       <div>
@@ -820,8 +820,20 @@ th {
 .adelantos {
   background-color: #ffe8c5;
 }
-.fondo-empresa {
+.fondo-empresa0 {
+    background: #f8fafb;
+}
+.fondo-empresa1 {
     background: #eff9ff;
+}
+.fondo-empresa2 {
+    background: #d7f3f4;
+}
+.fondo-empresa3 {
+    background: #f3f3dc;
+}
+.fondo-empresa4 {
+    background: #d2f9d5;
 }
 @media print {
   .no-print {
