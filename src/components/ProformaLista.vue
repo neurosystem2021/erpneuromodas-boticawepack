@@ -97,7 +97,7 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
-                empresaselec: sessionStorage.getItem('empresa') || 'modasjun'
+                empresaselec: sessionStorage.getItem('empresa') || 'modaspau'
             }
         },
         props: ['idAlmacen','empresa'],

@@ -429,7 +429,7 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'modasjun';
+    let empresa = sessionStorage.getItem('empresa') || 'modaspau';
 
     switch (this.$route.query.empresa) {
       case 'modasm':{
@@ -447,8 +447,8 @@ export default {
         break;
       }
 
-      case 'modaspau':{
-        empresa = 'modaspau';
+      case 'modasjun':{
+        empresa = 'modasjun';
         break;
       }
     
@@ -498,7 +498,7 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'modasjun'
+      empresa: 'modaspau'
     }
   },
   computed: {
