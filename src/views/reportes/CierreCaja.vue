@@ -7,8 +7,11 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                          <option value="rosmart">EMPRESA ROSMART</option>
-                          <option value="dismart">EMPRESA DISMART</option>
+                        <option value="modasm">EMPRESA MODASM</option>
+                        <option value="modasgio">EMPRESA MODASGIO</option>
+                        <option value="modasjes">EMPRESA MODASJES</option>
+                        <option value="modasjun">EMPRESA MODASJUN</option>
+                        <option value="modaspau">EMPRESA MODASPAU</option>
                       </select>
                   </b-button-group>
               </div>
@@ -426,9 +429,31 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'rosmart';
-    if (this.$route.query.empresa === 'dismart') {
-      empresa = 'dismart';
+    let empresa = sessionStorage.getItem('empresa') || 'modasm';
+
+    switch (this.$route.query.empresa) {
+      case 'modasgio':{
+        empresa = 'modasgio';
+        break;
+      }
+        
+      case 'modasjes':{
+        empresa = 'modasjes';
+        break;
+      } 
+      
+      case 'modasjun':{
+        empresa = 'modasjun';
+        break;
+      }
+
+      case 'modaspau':{
+        empresa = 'modaspau';
+        break;
+      }
+    
+      default:
+        break;
     }
     
     // Interceptos XMLHttpRequest
@@ -473,7 +498,7 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'rosmart'
+      empresa: 'modasm'
     }
   },
   computed: {

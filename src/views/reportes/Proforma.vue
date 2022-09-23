@@ -149,18 +149,46 @@
 import {API} from '@/store/config.js'
 export default {
   beforeMount () {
-    if (this.$route.query.empresa === 'dismart') {
-      // Interceptos XMLHttpRequest
-      let oldXHROpen = window.XMLHttpRequest.prototype.open;
-      window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        // do something with the method, url and etc.
-        var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
-        newUrl = new URL(newUrl);
-        newUrl.searchParams.append('empresa', 'dismart');
-        url = newUrl.toString();
-        arguments[1] = url
-        return oldXHROpen.apply(this, arguments);
+    let empresa = null;
+    switch (this.$route.query.empresa) {
+      case 'modasgio':{
+        empresa = 'modasgio';
+        break;
       }
+        
+      case 'modasjes':{
+        empresa = 'modasjes';
+        break;
+      } 
+      
+      case 'modasjun':{
+        empresa = 'modasjun';
+        break;
+      }
+
+      case 'modaspau':{
+        empresa = 'modaspau';
+        break;
+      }
+    
+      default:
+        empresa = null
+      break;
+    }
+
+    if(empresa == null){
+      return
+    }
+
+    let oldXHROpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+      // do something with the method, url and etc.
+      var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
+      newUrl = new URL(newUrl);
+      newUrl.searchParams.append('empresa', empresa);
+      url = newUrl.toString();
+      arguments[1] = url
+      return oldXHROpen.apply(this, arguments);
     }
   },
 	mounted () {

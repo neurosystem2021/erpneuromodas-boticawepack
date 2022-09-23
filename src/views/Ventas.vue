@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa': (this.empresa === 'dismart')}">
+    <div :class="{'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -9,8 +9,11 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="rosmart">EMPRESA ROSMART</option>
-                            <option value="dismart">EMPRESA DISMART</option>
+                            <option value="modasm">EMPRESA MODASM</option>
+                            <option value="modasgio">EMPRESA MODASGIO</option>
+                            <option value="modasjes">EMPRESA MODASJES</option>
+                            <option value="modasjun">EMPRESA MODASJUN</option>
+                            <option value="modaspau">EMPRESA MODASPAU</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -449,7 +452,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'rosmart');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'modasm');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -518,7 +521,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'rosmart'
+            empresa: 'modasm'
         }
     },
     watch: {
@@ -1318,7 +1321,16 @@ export default {
     }
 }
 
-.fondo-empresa {
+.fondo-empresa1 {
     background: #eff9ff;
+}
+.fondo-empresa2 {
+    background: #d7f3f4;
+}
+.fondo-empresa3 {
+    background: #f3f3dc;
+}
+.fondo-empresa4 {
+    background: #d2f9d5;
 }
 </style>
