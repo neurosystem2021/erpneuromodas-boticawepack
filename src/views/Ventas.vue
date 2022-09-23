@@ -456,7 +456,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'modasjes');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'modasjun');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -526,7 +526,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'modasjes',
+            empresa: 'modasjun',
             rubroTexto: '---'
         }
     },
