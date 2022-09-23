@@ -156,8 +156,8 @@ export default {
         break;
       }
         
-      case 'modasjes':{
-        empresa = 'modasjes';
+      case 'modasgio':{
+        empresa = 'modasgio';
         break;
       } 
       
