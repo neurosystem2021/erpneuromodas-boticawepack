@@ -151,8 +151,8 @@ export default {
   beforeMount () {
     let empresa = null;
     switch (this.$route.query.empresa) {
-      case 'modasgio':{
-        empresa = 'modasgio';
+      case 'modasm':{
+        empresa = 'modasm';
         break;
       }
         
