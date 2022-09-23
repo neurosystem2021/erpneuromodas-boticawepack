@@ -15,6 +15,7 @@
                             <option value="modasjun">EMPRESA MODASJUN</option>
                             <option value="modaspau">EMPRESA MODASPAU</option>
                         </select>
+
                     </b-button-group>
                 </div>
                 <div class="float-right">
@@ -41,6 +42,9 @@
             </div>
             <br /><br />
             <b-row>
+                <b-col v-if="rubroTexto != '---'">
+                   <h4><b-badge variant="primary">{{rubroTexto}}</b-badge></h4>
+                </b-col>
                 <b-col md="12" v-if="this.$route.query.idPedido">
                     <div class="form-inline">
                         <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
@@ -469,6 +473,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
+        this.getRubro()
     },
     data () {
         return {
@@ -521,7 +526,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'modasm'
+            empresa: 'modasm',
+            rubroTexto: '---'
         }
     },
     watch: {
@@ -566,6 +572,15 @@ export default {
                     if (res.data.IdCliente) {
                         this.setCliente(res.data)
                     }
+                })
+        },
+        getRubro () {
+            this.axios.get(this.API + 'ventas/rubro')
+                .then(res => {
+                       this.rubroTexto = res.data.RUBRO
+                       console.log(this.rubroTexto);
+                }).catch((err)=>{
+                    this.rubroTexto = '---'
                 })
         },
         prevent (evt) {
