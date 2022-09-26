@@ -246,7 +246,7 @@
               <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
             </div>
             <b-row style="display:flex; justify-content:center; align-items:center">
-              <b-img :src="productoUrl" width="100%"></b-img>
+              <b-img :src="productoUrl" class="imagenGrande"></b-img>
             </b-row>
           </b-modal>
 
@@ -735,6 +735,9 @@ export default {
     justify-content: start;
     align-content: center;
     align-items: center;
+  }
+  .imagenGrande{
+    width: 100%;
   }
 </style>
 </style>
