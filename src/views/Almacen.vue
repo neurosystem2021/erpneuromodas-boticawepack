@@ -241,7 +241,16 @@
               </tbody>
             </table>
           </b-col>
-          
+
+          <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+            <div class="d-block text-center">
+              <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+            </div>
+            <b-row style="display:flex; justify-content:center; align-items:center">
+              <b-img :src="productoUrl" class="imagenGrande"></b-img>
+            </b-row>
+          </b-modal>
+
           <b-col md="12">
             <b-table small
               ref="tablaProductos"
@@ -274,7 +283,7 @@
                 </template>
 
                 <template slot="ImagenProducto" slot-scope="data">
-                  <b-button style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                  <b-button @click="abrirImagen(data.item.Producto, data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
                   <b-popover placement="top" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
                     <div style="text-align:center">
                       <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
@@ -443,6 +452,8 @@ export default {
         fechaDesde: this.$moment().format("YYYY-MM-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
+      productoNombre:'',
+      productoUrl:''
     }
   },
   watch: {
@@ -501,6 +512,11 @@ export default {
     },
   },
   methods: {
+    abrirImagen(producto,url){
+      this.productoNombre = producto
+      this.productoUrl = url
+      this.$refs['modalImagen'].show()
+    },
     opcionesExportar(){
       this.$refs['modalExportar'].show()
     },
@@ -721,5 +737,10 @@ export default {
     align-content: center;
     align-items: center;
   }
-</style>
+  #modalImagen .modal-dialog {
+    max-width: 75% !important;
+  }
+  .imagenGrande{
+    width: 100%;
+  }
 </style>
