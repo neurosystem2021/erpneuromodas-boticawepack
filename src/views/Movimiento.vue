@@ -195,7 +195,7 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov"></productos-carrito>
+                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -394,15 +394,26 @@ return false
 
       let faltaLlenar = false
       let sinStock = 0
+      let faltaCantidad = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
         }
 
-        if (prod.total <= 0) {
+        if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true
         }
+
+        if(!(prod.cantidad > 0)){
+          faltaCantidad = true
+        }
       })
+
+      if (faltaCantidad) {
+        this.$toasted.show('Complete la cantidad de los productos ingresados')
+        this.inProgress = false
+        return;
+      }
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
