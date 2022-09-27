@@ -736,6 +736,9 @@ export default {
     align-content: center;
     align-items: center;
   }
+  #modalImagen .modal-dialog {
+    max-width: 75% !important;
+  }
   .imagenGrande{
     width: 100%;
   }

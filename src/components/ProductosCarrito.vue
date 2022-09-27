@@ -101,6 +101,18 @@
           </b-popover>
         </template>
 
+        <template slot="obsequio" slot-scope="data">
+          <div class="obsequio" v-if="tipoMov==0">
+            <b-form-checkbox
+              button-variant="primary"
+              v-model="productos[data.index].EsObsequio"
+              :value="1"
+              @input="setObsequio(data.index)"
+              :unchecked-value="0">
+            </b-form-checkbox>
+          </div>
+        </template>
+
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <input
             v-model="productos[data.index].cantxPrecio"
@@ -140,7 +152,12 @@
                 
                 productos[data.index].precio = productos[data.index].PrecioContado 
               }else{
-            
+                if(productos[data.index].EsObsequio==1){
+                    productos[data.index].precio = 0
+                    productos[data.index].nuevoPrecioContado = 0
+                }else{
+                    productos[data.index].precio = productos[data.index].PrecioCosto; 
+                }
               }
 
             }"
@@ -149,7 +166,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
             style="width: 95px"
             min="0"
@@ -166,7 +183,7 @@
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
             :value="1"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
             <div>{{ getIgv(data.index) }}</div>
@@ -409,6 +426,7 @@ export default {
     setPrecio: Boolean,
     tipoCambio: Number,
     igvTotal: Boolean,
+    tipoMov: Number,
     idAlmacen: Number,
     bloquearInput:Boolean,
     esDelivery:Boolean,
@@ -433,6 +451,7 @@ export default {
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Anaquel' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -646,6 +665,10 @@ export default {
         this.pasteCode = false
       }
     },*/
+    setObsequio(index){
+      this.productos[index].precio = 0
+      this.productos[index].nuevoPrecioContado = 0
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -682,6 +705,8 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
+      obj.EsObsequio = 0
+      obj.EsVenta = this.isVentas
 
       if (!this.isVentas) {
         obj.PreciosPorProducto = '';
@@ -942,5 +967,10 @@ export default {
   }
   .imagenGrande{
     width: 100%;
+  }
+  .obsequio{
+    display: flex;
+    justify-content: center;
+    justify-items: center;
   }
 </style>
