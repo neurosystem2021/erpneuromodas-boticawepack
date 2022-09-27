@@ -18,7 +18,7 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
@@ -201,7 +201,7 @@ const actions = {
             obj.Descripcion = arr2[0].desc + '\n' + arr2[1].desc + '\n' + arr2[2].desc
           }*/
           obj.Descripcion = ''
-
+          obj.EsObsequio = 0
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {
