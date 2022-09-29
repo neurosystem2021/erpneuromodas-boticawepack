@@ -717,6 +717,12 @@ export default {
       if(obj.PrecioEspecial){
        this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
       }
+
+      if(this.preciosProd.length==1){
+        this.setProductoUni(obj,obj.PrecioContado)
+        return
+      }
+
       this.objProd = {}
     
      // this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
