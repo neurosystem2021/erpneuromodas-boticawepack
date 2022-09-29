@@ -80,15 +80,36 @@
         </b-row>
       </b-modal>
 
+      <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+        </div>
+        <b-row style="display:flex; justify-content:center; align-items:center">
+          <b-img :src="productoUrl" class="imagenGrande"></b-img>
+        </b-row>
+      </b-modal>
+
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
-          <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
               <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
             </div>
           </b-popover>
+        </template>
+
+        <template slot="obsequio" slot-scope="data">
+          <div class="obsequio" v-if="tipoMov==0">
+            <b-form-checkbox
+              button-variant="primary"
+              v-model="productos[data.index].EsObsequio"
+              :value="1"
+              @input="setObsequio(data.index)"
+              :unchecked-value="0">
+            </b-form-checkbox>
+          </div>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
@@ -131,7 +152,12 @@
                 
                 productos[data.index].precio = productos[data.index].PrecioContado 
               }else{
-            
+                if(productos[data.index].EsObsequio==1){
+                    productos[data.index].precio = 0
+                    productos[data.index].nuevoPrecioContado = 0
+                }else{
+                    productos[data.index].precio = productos[data.index].PrecioCosto; 
+                }
               }
 
             }"
@@ -140,7 +166,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
             style="width: 95px"
             min="0"
@@ -157,7 +183,7 @@
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
             :value="1"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
             <div>{{ getIgv(data.index) }}</div>
@@ -377,7 +403,9 @@ export default {
       precioCont: 0,
       medicionPro:'UNIDAD',
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      productoNombre:'',
+      productoUrl:''
     }
   },
   watch: {
@@ -398,6 +426,7 @@ export default {
     setPrecio: Boolean,
     tipoCambio: Number,
     igvTotal: Boolean,
+    tipoMov: Number,
     idAlmacen: Number,
     bloquearInput:Boolean,
     esDelivery:Boolean,
@@ -422,6 +451,7 @@ export default {
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Anaquel' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -502,6 +532,11 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    abrirImagen(producto,url){
+      this.productoNombre = producto
+      this.productoUrl = url
+      this.$refs['modalImagen'].show()
+    },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
@@ -626,6 +661,10 @@ export default {
         this.pasteCode = false
       }
     },*/
+    setObsequio(index){
+      this.productos[index].precio = 0
+      this.productos[index].nuevoPrecioContado = 0
+    },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -662,6 +701,8 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
+      obj.EsObsequio = 0
+      obj.EsVenta = this.isVentas
 
       if (!this.isVentas) {
         obj.estadoPxP = true
@@ -926,5 +967,16 @@ export default {
     align-content: center;
     align-items: center;
     border-right: 2px solid black;
+  }
+  #modalImagen .modal-dialog {
+    max-width: 75% !important;
+  }
+  .imagenGrande{
+    width: 100%;
+  }
+  .obsequio{
+    display: flex;
+    justify-content: center;
+    justify-items: center;
   }
 </style>
