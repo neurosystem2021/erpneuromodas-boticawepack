@@ -50,12 +50,13 @@
            <b-col md="2" class="my-1">
               Total Comisión
               <div class="total-comision">{{ totalComision }}</div>
-       
+              <hr>
+              <b-button variant="success" size="md" block :href="hrefXls" target="_blank"><i class='fas fa-file-excel'></i> Exportar</b-button>
           </b-col>
           <b-col md="2" class="my-1">
               Total Saldo Comisión
               <div class="total-comision">{{ totalSaldoComision }}</div>
-       
+              <hr>
           </b-col>
 
           <b-table small
@@ -124,6 +125,11 @@ export default {
       this.totalComision = Math.round(total)
       this.totalSaldoComision = Math.round(saldo)
     }
+  },
+  computed: {
+      hrefXls () {
+        return '/api/index.php/reporte/comisionistas?idAlmacen=' + this.almacen.IdAlmacen+(this.fechaFin?'&fechaFin=' + this.fechaFin + ' ' +  this.horaFinal:'')+(this.fechaInicio?'&fechaInicio=' + this.fechaInicio  + ' ' +  this.horaIni:'');
+      }
   },
   data() {
     return {
