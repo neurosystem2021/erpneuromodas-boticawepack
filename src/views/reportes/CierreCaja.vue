@@ -423,6 +423,7 @@ export default {
       this.loadData()
     } else {
         //this.getVendedor()
+      this.loadData()
     }
   },
   data () {
