@@ -79,6 +79,12 @@
             <b-row>
               <b-col md="3">
                 <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
@@ -118,7 +124,11 @@
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
-              </b-col>  
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="6">
+            <b-row>
               <b-col md="3">
                 <b-form-group>
                   <label>Presentación:</label>
@@ -133,10 +143,6 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-            </b-row>
-          </b-col>
-          <b-col md="6">
-            <b-row>
               <b-col md="3">
                 <b-form-group>
                   <label>Medición:</label>
@@ -412,6 +418,7 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputPresentacion.setValue('')
+      this.$refs.inputCodigoBarra.value='';
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
