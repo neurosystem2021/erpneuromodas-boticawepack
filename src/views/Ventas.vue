@@ -9,7 +9,7 @@
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
+                        <pago-deuda v-show="idPerfil!=3"></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
@@ -441,7 +441,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            usuario: sessionStorage.getItem('User')
+            usuario: sessionStorage.getItem('User'),
+            idPerfil: sessionStorage.getItem('IdPerfil')
         }
     },
     watch: {
