@@ -667,6 +667,7 @@ export default {
           {nombre: 'PRECIO 1', cantidad: 0, precio: 0},
           {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
           {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
+          {nombre: 'PRECIO 4', cantidad: 0, precio: 0},
           {nombre: 'OFERTA', cantidad: 0, precio: 0}
         ]
       }
