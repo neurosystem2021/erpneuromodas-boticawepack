@@ -466,6 +466,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
+        this.configStock()
     },
     data () {
         return {
@@ -518,7 +519,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'rosmart'
+            empresa: 'rosmart',
+            ventaSinStock: 0
         }
     },
     watch: {
@@ -552,6 +554,15 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+                .then(res => {
+                    this.ventaSinStock = res.data
+                })
+                .catch((err)=>{
+                    this.ventaSinStock = 0
+                })
+        },
         cambiarEmpresa () {
             sessionStorage.setItem('empresa', this.empresa)
             window.location.reload();
@@ -1106,7 +1117,7 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
