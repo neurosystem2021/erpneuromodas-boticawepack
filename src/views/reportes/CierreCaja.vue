@@ -422,7 +422,7 @@ export default {
       this.getCierre(this.$route.params.id)
       this.loadData()
     } else {
-        //this.getVendedor()
+      this.loadData()
     }
   },
   data () {
