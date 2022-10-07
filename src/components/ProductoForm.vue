@@ -262,7 +262,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              step="0.001"
+              step="0.00001"
               type="number"
               class="form-control"
               />
@@ -308,7 +308,15 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
+          <b-card border-variant="light" :header="'Precio '+i" class="text-center" >
+            <b-form-group>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                style="text-transform:uppercase"
+                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
+                ></b-form-input>
+            </b-form-group>
             <b-form-group>
               <label>Cantidad:</label>
               <input
@@ -325,9 +333,14 @@
                 v-model="producto.precios[i-1].precio"
                 type="number"
                 class="form-control"
-                step="0.001"
+                step="0.00001"
                 />
             </b-form-group>
+
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</label>
+            </b-form-group>
+
           </b-card>
         </b-col>
       </b-row>

@@ -199,7 +199,7 @@
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
                 :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
-                tipo="mov" padre="compra"></productos-carrito>
+                tipo="mov" padre="compra" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -379,8 +379,9 @@ return false
       let faltaFechaVen = false
       let igualProducto = false
       let faltaStock = false
+      let faltaCantidad = false
       this.productos.forEach((prod, index) => {
-        if (prod.total <= 0) {
+        if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true
         }
 
@@ -402,8 +403,17 @@ return false
           }
         }
 
+        if(!(prod.cantidad > 0)){
+          faltaCantidad = true
+        }
         
       })
+
+      if (faltaCantidad) {
+        this.$toasted.show('Complete la cantidad de los productos ingresados')
+        this.inProgress = false
+        return;
+      }
 
       if (faltaStock) {
           this.$toasted.error('No hay stock del producto para el movimiento seleccionado');

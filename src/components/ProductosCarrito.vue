@@ -49,7 +49,7 @@
                   <h5 class="text-uppercase">{{medicionPro}}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
-                  <b>Precio: </b><br>S/ {{ precioCont }}
+                  <b>Precio: </b>S/ {{ precioCont }}
                 </b-col>
               </b-row>
             </b-card>
@@ -69,9 +69,10 @@
             >
               <b-row>
                 <b-col md="7" class="nomCart" >
-                  <h5>x{{ d.cantidad }}</h5>
+                  <h5 style="text-transform:uppercase">{{ d.nombre }}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
+                  <h5>x{{ d.cantidad }}</h5>
                   <b>Precio: </b>S/ {{ d.precio }}
                 </b-col>
               </b-row>
@@ -83,6 +84,18 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+        </template>
+
+        <template slot="obsequio" slot-scope="data">
+          <div class="obsequio" v-if="tipoMov==0">
+            <b-form-checkbox
+              button-variant="primary"
+              v-model="productos[data.index].EsObsequio"
+              :value="1"
+              @input="setObsequio(data.index)"
+              :unchecked-value="0">
+            </b-form-checkbox>
+          </div>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
@@ -108,6 +121,10 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
+                if(productos[data.index].EsObsequio==1){
+                    productos[data.index].precio = 0
+                    productos[data.index].nuevoPrecioContado = 0
+                }
              /* if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -126,9 +143,9 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 100px"
+            style="width: 105px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -136,11 +153,26 @@
             class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div v-if="isVentas">
+            {{ getSubtotal(data.index) }}
+          </div>
+          <div v-else>
+            <input
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            class="form-control"
+            v-model="productos[data.index].subt"
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
+            :disabled="(productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
@@ -412,6 +444,7 @@ export default {
     igvTotal: Boolean,
     idAlmacen: Number,
     movTipo: Number,
+    tipoMov: Number,
     almacenDestino:Number,
     almacenOrigen:Number,
     bloquearInput:Boolean,
@@ -430,7 +463,7 @@ export default {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
-          { key: 'CodigoBarra', label: 'Código'},
+          //{ key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
@@ -440,6 +473,7 @@ export default {
           { key: 'eventPres', label: '' },
           { key: 'cantxPrecio', variant: 'warning' },
           { key: 'cantidad' },
+          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
           { key: 'igv', label: 'IGV' },
@@ -521,12 +555,21 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
-
+    setObsequio(index){
+      this.productos[index].precio = 0
+      this.productos[index].nuevoPrecioContado = 0
+    },
+    setSubtotal(index, val,prod) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)
+      Vue.set(this.productos[index], 'precio', precio)
+      this.actualizarProd({Producto:prod,Pos:index})
+    },
     changeCant (val, prod, index) {
       if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
+      prod.subt = ''
       this.$nextTick(() => {
         this.actualizarProd({Producto:prod,Pos:index})
       })
@@ -747,6 +790,7 @@ export default {
       this.preciosProd = []
       this.objProd = {}
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+      obj.EsObsequio = 0
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       if(!this.isVentas && this.padre=="compra"){
         if(this.movTipo==undefined){
@@ -768,6 +812,7 @@ export default {
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
+      obj.subt = ''
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
       obj.cantidad = 0
@@ -775,6 +820,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.Descripcion = obj.ProductoMedicion
       obj = this.onSetProducto(obj)
       obj.cantidadPres = obj.cantidad
       if(this.indexProdSelect == null){
@@ -798,10 +844,12 @@ export default {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
+      obj.subt = ''
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
+      obj.Descripcion = prod.nombre
       obj.precio = 0
       obj.cantidad = 0
       //obj.IdLote = 0
@@ -871,6 +919,7 @@ export default {
         precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
       }else{
         precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+        Vue.set(this.productos[index], 'subt', '')
       }
 
       let normalPrecio = this.$options.filters.redondear(precio)
@@ -969,6 +1018,14 @@ export default {
   .form-check-input {
     margin-left: -0.2rem !important;
   }
-
-
+</style>
+<style>
+  #modalCantidad .modal-dialog{
+    max-width: 55% !important;
+  }
+  .obsequio{
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+  }
 </style>
