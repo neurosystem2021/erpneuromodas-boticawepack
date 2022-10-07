@@ -138,7 +138,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              if(this.ventas){
+              if(isVentas){
                 if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
