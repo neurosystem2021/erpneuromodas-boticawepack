@@ -252,7 +252,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-      return this.API + 'productos/stock/' + this.idAlmacen
+      return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       }
       return this.API + 'productos'
     },
@@ -421,7 +421,7 @@ export default {
 
         return `
         <div class="${style}">
-          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
+          <b class="bg-${styleBag}" style="color: #fff; padding: 0 6px">${data.stock>0? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> /
           <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} / V. Estratégica: ${data.VentaEstrategica}
           / F. Vencimiento: ${data.FechaVen} / <b style=""> Precio: S/. ${data.PrecioContado}</b>
