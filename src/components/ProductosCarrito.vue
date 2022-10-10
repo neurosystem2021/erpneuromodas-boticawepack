@@ -131,7 +131,7 @@
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2">
+    <b-col md="3" offset-md="2" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -237,7 +237,8 @@ export default {
         ]
       },
       type: Array
-    }
+    },
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
