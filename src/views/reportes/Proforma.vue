@@ -71,6 +71,9 @@
         <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
       </div>
     </main>
+    <div style="text-align:center">
+        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+    </div>
     <!--<footer>
       Invoice was created on a computer and is valid without the signature and seal.
     </footer>-->
@@ -114,6 +117,9 @@ export default {
 			.then(res => {
 				this.empresa = res.data
 			})
+    },
+    imprimir(){
+    window.print();
     }
   }
 }
@@ -121,4 +127,9 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
+@media print {
+  #printBtn {
+    display: none;
+  }
+}
 </style>

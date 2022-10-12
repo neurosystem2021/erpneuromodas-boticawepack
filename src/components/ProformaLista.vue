@@ -24,7 +24,11 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                      </template>
+
+                      <template slot="verTicket" slot-scope="data">
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
                       </template>
 
                     </b-table>
@@ -71,7 +75,7 @@ import config from '@/store/config.js'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver', 'verTicket' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
