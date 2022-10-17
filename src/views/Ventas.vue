@@ -433,7 +433,7 @@ export default {
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
-        this.escucharPedidos()
+        //this.escucharPedidos()
     },
     data () {
         return {

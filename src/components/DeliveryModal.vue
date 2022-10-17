@@ -185,12 +185,12 @@ L.Icon.Default.mergeOptions({
 });
 export default {
   mounted() {
-    this.escucharCanceladoPedidos();
+    /*this.escucharCanceladoPedidos();
     this.escucharMotorizadoOnline();
     this.escucharCoordsMotorizado();
     this.escucharEstadoPedido();
     this.getEmpresaDatos();
-    console.log("hola");
+    console.log("hola");*/
   },
   beforeDestroy(){
       this.sockets.unsubscribe('lista-on-motorizado');
