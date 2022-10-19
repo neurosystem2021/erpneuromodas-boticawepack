@@ -369,9 +369,14 @@ return false
       }
 
       let faltaLlenar = false
+      let faltaStock = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
           faltaLlenar = true
+        }
+
+        if( (prod.stock <= 0) || parseFloat(prod.cantidad) > prod.stock){
+           faltaStock = true
         }
       })
 
@@ -386,7 +391,13 @@ return false
         this.inProgress = false
         return;
       }
-
+      
+      if (faltaStock && this.isTraslado) {
+        this.$toasted.show('No tiene stock para realizar el movimiento')
+        this.inProgress = false
+        return;
+      }
+      
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos
