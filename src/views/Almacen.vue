@@ -327,7 +327,7 @@ export default {
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
+       this.axios.get(this.API + 'productos/puntoventa/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
             idAlmacen: this.almacen.IdAlmacen
