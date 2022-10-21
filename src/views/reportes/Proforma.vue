@@ -54,14 +54,14 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>
                 <td class="celda" style="text-transform: uppercase">: {{fechaHasta}}</td>
               </tr>
-              <tr>
+              <!--<tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
                 <td class="celda" style="text-transform: uppercase">: CONTADO</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
-              </tr>
+              </tr>-->
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
@@ -112,8 +112,8 @@
           </tr>-->
           <tr>
             <td colspan="2"></td>
-            <td colspan="2" style="background:#3c84d6">TOTAL</td>
-            <td style="background:#3c84d6">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#90b9e9">TOTAL</td>
+            <td style="background:#90b9e9">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -125,9 +125,13 @@
       </div>
       <br>
       <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div class="notice"><b>VALIDEZ DE OFERTA :</b> {{proforma.DiasValidos}} DIAS</div>
+        <div class="notice"><b>PLAZO DE ENTREGA  :</b> 5 DIAS</div>
+        <div class="notice"><b>CONDICION DE PAGO :</b> CONTADO COMERCIAL</div>
+      </div>
+      <br>
+      <div id="notices">
+        <img src="/resources/images/firma.jpg">
       </div>
       <div>
         <br>
@@ -135,9 +139,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #3c84d6; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid #90b9e9; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #3c84d6; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #90b9e9; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>
