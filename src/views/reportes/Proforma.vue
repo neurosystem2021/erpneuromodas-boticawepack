@@ -112,8 +112,8 @@
           </tr>-->
           <tr>
             <td colspan="2"></td>
-            <td colspan="2" style="background:#E7BC2F">TOTAL</td>
-            <td style="background:#E7BC2F">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#3c84d6">TOTAL</td>
+            <td style="background:#3c84d6">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -135,9 +135,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #E7BC2F; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid #3c84d6; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #E7BC2F; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #3c84d6; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>
