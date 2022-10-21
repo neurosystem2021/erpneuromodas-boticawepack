@@ -26,9 +26,9 @@
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
-                      <!--<template slot="ver" slot-scope="data">
+                      <template slot="ver" slot-scope="data">
                         <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
-                      </template>-->
+                      </template>
 
                        <template slot="verTicket" slot-scope="data">
                         <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
@@ -79,7 +79,7 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'update' ,'verTicket'],
+                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket'],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -137,6 +137,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 65% !important;
+    max-width: 75% !important;
    }
 </style>
