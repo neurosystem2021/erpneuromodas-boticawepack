@@ -317,7 +317,7 @@ export default {
       let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
+        this.add([this.loadCode, (obj) => {
           if (obj) {
             this.$emit('onAddProducto')
             this.$toasted.show('Producto añadido correctamente')
