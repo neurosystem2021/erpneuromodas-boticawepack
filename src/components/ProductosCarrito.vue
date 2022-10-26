@@ -138,7 +138,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              if(this.ventas){
+              /*if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -158,6 +158,10 @@
                   }else{
                     productos[data.index].precio = productos[data.index].PrecioCosto; 
                   }
+              }*/
+              if(productos[data.index].EsObsequio==1){
+                productos[data.index].precio = 0
+                productos[data.index].nuevoPrecioContado = 0
               }
 
             }"
