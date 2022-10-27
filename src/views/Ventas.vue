@@ -401,7 +401,7 @@ export default {
                     { key: 'Producto', class:'text-center stocksize' }, 
                     { key: 'ProductoFormaFarmaceutica', label: 'For. F.', class:'text-center stocksize' }, 
                     { key: 'ProductoMarca', label: 'Lab.', class:'text-center stocksize' },
-                    { key: 'ProductoDescCorto', label: 'Anaquel', class:'text-center stocksize' },
+                    //{ key: 'ProductoDescCorto', label: 'Anaquel', class:'text-center stocksize' },
                     { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
                     { key: 'eventPres', label: '', class:'text-center stocksize' },
                     { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
