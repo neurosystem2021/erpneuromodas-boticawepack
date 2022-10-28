@@ -266,7 +266,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              step="0.0001"
+              step="0.000001"
               type="number"
               class="form-control"
               />
