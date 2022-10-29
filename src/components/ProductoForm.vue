@@ -61,7 +61,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
@@ -112,7 +112,7 @@
 
          
           <b-form-group>
-            <label>Anaquel:</label>
+            <label>Rack:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
@@ -180,7 +180,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false" >
             <label>Precio X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
@@ -216,7 +216,7 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -260,6 +260,45 @@
       </b-row>
 
       <hr/>
+      <b-row class="rendimiento">
+        <b-col md="4">
+          <b-form-group>
+            <label>Rendimiento (M²):</label>
+            <input
+              v-model="producto.Rendimiento"
+              type="number"
+              :readonly="!!producto.EsPadre"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+            <label>Ancho (cm):</label>
+            <input
+              v-model="producto.Ancho"
+              type="number"
+              :readonly="!!producto.EsPadre"
+              class="form-control"
+              step="0.0001"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+            <label>Largo (cm):</label>
+            <input
+              v-model="producto.Largo"
+              type="number"
+              :readonly="!!producto.EsPadre"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <hr/>
       <b-row>
         <b-col md="6">
           <b-form-group>
@@ -272,7 +311,7 @@
               />
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Especial:</label>
             <input
@@ -307,7 +346,7 @@
               />
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
             <input v-model="producto.precioConvenio"
@@ -466,7 +505,7 @@ export default {
         this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
         
         // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        //this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
@@ -522,6 +561,9 @@ export default {
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
+        this.producto.Rendimiento           = newVal.Rendimiento
+        this.producto.Ancho                 = newVal.Ancho
+        this.producto.Largo                 = newVal.Largo
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -636,7 +678,7 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
       // this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
+      //this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
@@ -668,6 +710,9 @@ export default {
         PorcentajeUtilidad: 0,
         ControlaStock:1,
         ControlaStockMinimo:0,
+        Rendimiento: '',
+        Ancho: '',
+        Largo: '',
         StockMinimo: 0,
         PrecioCosto:0,
         PrecioContado: 0,
@@ -841,5 +886,11 @@ export default {
 .oferta .card-header{
   background: #dc3545;
   font-weight: bold;
+}
+</style>
+<style scoped>
+.rendimiento {
+  background-color: #e1f7d5;
+  padding: 5px;
 }
 </style>

@@ -7,9 +7,9 @@
         <b-container fluid class="ancho"  id="conten">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
+                    <!--<b-button-group size="sm" class="ocularMovil">
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                    </b-button-group>
+                    </b-button-group>-->
                     <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
@@ -481,7 +481,7 @@ export default {
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Desc.'},
+                    { key: 'descuento', label: '% Desc.'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]

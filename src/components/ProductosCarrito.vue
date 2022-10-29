@@ -11,7 +11,7 @@
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
-            :on-select="setProducto"
+            :on-select="abrirCalcularM2"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
@@ -88,6 +88,23 @@
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
         </b-row>
       </b-modal>
+
+      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular M2">
+      <div class="d-block text-center">
+        <b>{{ productoSelect.Producto }}</b>
+        <hr />
+        <label>Metros Cuadrados (M²):</label>
+        <input
+            type="number"
+            ref="inputM2"
+            placeholder="M²"
+            class="form-control"
+            @input="val => calcularm2(val.target.value, productoSelect.Rendimiento, productoSelect.Ancho, productoSelect.Largo, productoSelect.ProductoDetCantidad )"/><br>
+        <hr />
+        <p v-html="mensajeM2"></p>
+      </div>
+      <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
+    </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="eventPres" slot-scope="data">
@@ -166,7 +183,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false) || (isVentas && idPerfil!=1)"
             type="number"
             style="width: 95px"
             min="0"
@@ -246,15 +263,19 @@
         <template slot="descuento" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
-            v-model="productos[data.index].descuento"
+           
             style="width:95px"
             type="number"
             min="0"
             step="0.01"
             class="form-control"
             value="0"
-            @input="actualizarDescu(data.index)"/>
-            <b-form-text>
+            :max="productos[data.index].PorcentajeDescMax"
+            @input="val =>{productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value/100*10)/10; actualizarDescu(data.index); } "/>
+            <b-form-text class="text-center">
+                <b style="color:#dc3545">% Max: {{productos[data.index].PorcentajeDescMax}}</b>
+                <br>
+                <b>Desc: S/{{productos[data.index].descuento}}</b>      
             </b-form-text>
         </template>
 
@@ -291,8 +312,9 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
+          <h6 v-if="false"><i>Prof.</i></h6>
           <input 
+             v-if="false"
             class="form-check-input" 
             type="checkbox" 
             :disabled="bloquearInput?true:false"
@@ -405,7 +427,9 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      mensajeM2: '',
+      M2: ''
     }
   },
   watch: {
@@ -532,6 +556,68 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    abrirCalcularM2 (obj) {
+      this.setProducto(obj)
+      if (obj.Rendimiento || obj.Ancho || obj.Largo) {
+        this.$refs.modalCalcularM2.show()
+      }
+      this.productoSelect = obj
+      this.productoSelect.cantidad = 1
+      this.mensajeM2 = ''
+      this.$refs.inputM2.value = ''
+    },
+    calcularm2 (m2, rendimiento = 0, ancho = 0, largo = 0, productoDetCantidad = 0) {
+      rendimiento = (rendimiento == '0' ) ? false : rendimiento;
+      ancho = (ancho == '0' ) ? false : ancho;
+      largo = (largo == '0' ) ? false : largo;
+      if ((!rendimiento && !ancho) || (!rendimiento && !largo)) {
+        alert('El producto no cuenta con un rendimiento en M2, un ancho o largo establecido');
+        return;
+      }
+      var cantidad = 0
+      var mensaje = 0
+      // console.log(rendimiento)
+      if(rendimiento && rendimiento != '0') {
+        cantidad = (m2 / rendimiento).toFixed(1);
+        cantidad = Math.ceil(cantidad)
+        mensaje = "Total de cajas requeridas: " + cantidad
+      } else {
+        // console.log(ancho)
+        // console.log(largo)
+        cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
+        cantidad = Math.ceil(cantidad)
+        mensaje = "Total de unidades requeridas: " + cantidad
+      }
+      if (cantidad > 0) {
+        var mensajeAdicional = ''
+        if (productoDetCantidad) {
+          if (cantidad > productoDetCantidad) {
+            var cajas = Math.floor(cantidad / productoDetCantidad);
+            var unidades = cantidad%productoDetCantidad;
+            mensajeAdicional += '(Cajas: ' + cajas;
+            if (unidades > 0) {
+              mensajeAdicional += ', Unidades: ' + unidades + ')';
+            }else {
+              mensajeAdicional += ')';
+            }
+          }
+        } 
+        this.mensajeM2 = mensaje;
+        this.mensajeM2 += " <br /> " + mensajeAdicional
+        this.productoSelect.cantidad = cantidad
+      }
+      
+      if(!m2) {
+        this.mensajeM2 = ''
+        this.productoSelect.cantidad = 1
+      }
+    },
+    seleccionarCalcularM2 () {
+      this.$refs.modalCalcularM2.hide()
+      
+      this.productoSelect.cantidad = this.productoSelect.cantidad || 1
+      // this.setProducto(this.productoSelect)
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url

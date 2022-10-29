@@ -111,7 +111,7 @@
             </b-row>
           </b-col>
         </b-row>
-        <categoria-impresora-form ref="categoriaForm" :categoria-update="categoriaSelect" :cbGuardar="actualizarTablaCategorias"></categoria-impresora-form>
+        <categoria-form-nuevo ref="categoriaForm" :categoria-update="categoriaSelect" :cbGuardar="actualizarTablaCategorias"></categoria-form-nuevo>
         <impresora-form ref="impresoraForm" :impresora-update="impresoraSelect" :cbGuardar="actualizarTablaImpresoras"></impresora-form>
       </b-container>
   </div>
@@ -119,7 +119,7 @@
 
 <script>
 import config from '@/store/config.js'
-import CategoriaImpresoraForm from '@/components/CategoriaImpresoraForm'
+import CategoriaFormNuevo from '@/components/CategoriaFormNuevo'
 import ImpresoraForm from '@/components/ImpresoraForm'
 export default {
   mounted() {
@@ -135,7 +135,7 @@ export default {
       API: config.API,
       pageOptions: [ 10, 15, 20, 50, 100 ],
       filter: null,
-      sortBy: 'MostrarPuntoVenta',
+      sortBy: 'PorcentajeDescMax',
       sortDesc: true,
       categoriaSelect: {},
       items: [],
@@ -143,11 +143,12 @@ export default {
       fields: [
             { key: 'IdProductoCategoria', label: 'Id', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'NombreImpresora', label: 'Impresora Asignada', sortable: true },
-            { key: 'Delivery', label: 'Mostrar en Delivery', sortable: true , class:'text-center'},
-            { key: 'PuntoVenta', label: 'Mostrar en P. de Venta', sortable: true , class:'text-center'},
-            { key: 'OrdenPuntoVenta', label: 'Orden P. de Venta', sortable: true , class:'text-center'},
-            { key: 'EsOferta', label: 'Oferta APP', class:'text-center'},
+            { key: 'PorcentajeDescMax', label: '% Desc. Max', sortable: true},
+            // { key: 'NombreImpresora', label: 'Impresora Asignada', sortable: true },
+            // { key: 'Delivery', label: 'Mostrar en Delivery', sortable: true , class:'text-center'},
+            //{ key: 'PuntoVenta', label: 'Mostrar en P. de Venta', sortable: true , class:'text-center'},
+            //{ key: 'OrdenPuntoVenta', label: 'Orden P. de Venta', sortable: true , class:'text-center'},
+            //{ key: 'EsOferta', label: 'Oferta APP', class:'text-center'},
       ],
       totalRows: 50,
       perPage: 10,
@@ -251,7 +252,7 @@ export default {
       }
   },
   components: {
-      CategoriaImpresoraForm,
+      CategoriaFormNuevo,
       ImpresoraForm
   }
 }
