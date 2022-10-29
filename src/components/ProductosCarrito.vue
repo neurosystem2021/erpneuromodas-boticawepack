@@ -108,7 +108,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
@@ -153,9 +153,9 @@
             step="0.001"
             min="0"
             @input="(val) => {
-              changeCant(val.target.value, productos[data.index])
+              changeCant(val.target.value, productos[data.index], data.index)
               $emit('onInputCantidad', val.target.value)
-              if(this.ventas){
+              /*if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
@@ -175,7 +175,7 @@
                 }else{
                     productos[data.index].precio = productos[data.index].PrecioCosto; 
                 }
-              }
+              }*/
 
             }"
             placeholder="Cantidad"/>
@@ -263,17 +263,16 @@
         <template slot="descuento" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
-           
-            style="width:95px"
+            v-model="productos[data.index].PorcentajeDesc"
             type="number"
             min="0"
             step="0.01"
             class="form-control"
             value="0"
-            :max="productos[data.index].PorcentajeDescMax"
+            :max="tipoVenta==2?productos[data.index].PorcentajeDescMax:8"
             @input="val =>{productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value/100*10)/10; actualizarDescu(data.index); } "/>
             <b-form-text class="text-center">
-                <b style="color:#dc3545">% Max: {{productos[data.index].PorcentajeDescMax}}</b>
+                <b style="color:#dc3545">% Max: {{tipoVenta==2?productos[data.index].PorcentajeDescMax:8}}</b>
                 <br>
                 <b>Desc: S/{{productos[data.index].descuento}}</b>      
             </b-form-text>
@@ -446,6 +445,7 @@ export default {
   },
   props: {
     isVentas: Boolean,
+    tipoVenta:Number,
     tipo: String,
     setPrecio: Boolean,
     tipoCambio: Number,
@@ -473,9 +473,9 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Anaquel' }, 
+          { key: 'ProductoPresentacion', label: 'Rack' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+          //{ key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -626,8 +626,11 @@ export default {
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
-    changeCant (val, prod) {
+    changeCant (val, prod, index) {
       this.$nextTick(() => {
+        if(prod.PorcentajeDesc>0){
+          this.productos[index].descuento = Math.round(this.getSubtotal(index) * prod.PorcentajeDesc/100*10)/10;
+        }
         this.actualizarProd(prod)
       })
     },

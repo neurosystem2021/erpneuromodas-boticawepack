@@ -40,7 +40,19 @@
                 <b-row style="margin-bottom:-10px">
                     <b-col md="7">
                         <b-row>
-                            <b-col md="4">
+                            <b-col md="12">
+                                <b-form-group>
+                                <b-input-group prepend="Tipo" class="mt-2">
+                                    <b-form-radio-group style="margin-left: 12px; margin-top: 7px;"
+                                        id="radio-group-1"
+                                        v-model="selectedtv"
+                                        :options="optionstv"
+                                        name="radio-options"
+                                    ></b-form-radio-group>
+                                </b-input-group>
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <b-input-group prepend="Doc." class="mt-2">
                                     <autocomplete
@@ -73,7 +85,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <b-input-group prepend="Alm." class="mt-2">
                                     <autocomplete
@@ -95,7 +107,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
                                     <b-input-group prepend="P.V." class="mt-2">
                                     <autocomplete
@@ -242,6 +254,7 @@
                             :isVentas="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto"
+                            :tipoVenta="selectedtv"
                             :esDelivery="venta.EsDelivery">
 
                             <template slot="operaciones">
@@ -315,7 +328,8 @@
                                             <td colspan="3" class="text-center">Metodo de Pago</td>
                                         </tr>
                                         <tr>
-                                            <td>Efectivo</td>
+                                            <td style="vertical-align: middle !important;">Efectivo</td>
+                                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
@@ -337,7 +351,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td style="vertical-align: middle !important;">Visa</td>
+                                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -360,7 +375,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td style="vertical-align: middle !important;">Mastercard</td>
+                                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -471,7 +487,7 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    { key: 'ProductoPresentacion', label: 'Anaquel' },
+                    { key: 'ProductoPresentacion', label: 'Rack' },
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     //{ key: 'cantxPrecio', variant: 'warning' },
@@ -485,7 +501,13 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            selectedtv: 1, // Must be an array reference!
+            optionstv: [
+            { text: 'TV 1 (Corporativos)', value: 1 },
+            { text: 'TV 2 (Sala)', value: 2 },
+            { text: 'TV 3 (Institucional)', value: 3 },
+            ]
         }
     },
     watch: {
@@ -624,6 +646,29 @@ export default {
             this.infoDelivery = {}
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
+            this.selectedtv = 1
+        },
+        metodoPagoCambio(opc){
+            switch (opc) {
+                case 1:
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = this.totalCart;
+                    break;
+                case 2:
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto =this.totalCart;
+                    break;
+                case 3:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = this.totalCart;
+                    break;
+            
+                default:
+                    break;
+            }
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -749,8 +794,8 @@ export default {
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                //this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -1013,6 +1058,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let descuentoTotal = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
                     sinStock += 1
@@ -1021,6 +1067,8 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                descuentoTotal += (pro.descuento || 0)
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
@@ -1041,6 +1089,20 @@ export default {
                 return 
             }
 
+            if((parseFloat(this.venta.pago.visa.monto)>0 || parseFloat(this.venta.pago.mastercard.monto)>0) && this.selectedtv==2 && descuentoTotal > 0 ){
+                this.$swal({
+                icon: 'error',
+                title: 'Descuento no permitido',
+                text: 'El descuento en el TIPO DE VENTA 2 solo esta permitido en el metodo de pago EFECTIVO',
+                target: document.getElementById('conten'),
+                showConfirmButton: true,
+                confirmButtonText: 'Entiendo',
+                confirmButtonColor:'#3880ff',
+                })
+                this.inProgress = false            
+                return 
+            }
+
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
@@ -1049,6 +1111,7 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.TipoVenta = this.selectedtv
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 

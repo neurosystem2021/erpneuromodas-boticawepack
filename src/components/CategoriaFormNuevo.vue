@@ -59,6 +59,7 @@ export default {
         this.title='Editar Categoria << '+newVal.IdProductoCategoria+' >>'
         this.categoria.ProductoCategoria=newVal.ProductoCategoria
         this.categoria.IdProductoCategoria = newVal.IdProductoCategoria
+        this.categoria.PorcentajeDescMax = newVal.PorcentajeDescMax
       } else {
         this.title='Nueva Categoria'
         this.initForm();
