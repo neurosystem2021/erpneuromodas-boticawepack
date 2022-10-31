@@ -221,7 +221,7 @@
                                             <td>
                                                 <b-form-checkbox 
                                                     v-model="venta.EsCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || idPerfil!=1"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
@@ -229,7 +229,7 @@
                                                 <b-form-input 
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || idPerfil!=1"
                                                     type="date">
                                                 </b-form-input>
                                             </td>
@@ -399,7 +399,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            idPerfil: sessionStorage.getItem('idPerfil')
+            idPerfil: sessionStorage.getItem('IdPerfil')
         }
     },
     watch: {
