@@ -628,6 +628,7 @@ export default {
         this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
         .then((response) => {
           if (response.data.IdProducto) {
+            response.data.setSuma = true
             this.setProducto(response.data)
           } else {
             this.loadCode = ''
@@ -754,7 +755,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1

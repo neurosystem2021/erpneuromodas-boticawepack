@@ -15,10 +15,10 @@ const mutations = {
       if (index < 0) {
         productos.unshift(item)
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad = Number(productos[index].cantidad) + 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
