@@ -473,8 +473,8 @@ export default {
       this.getCierre(this.$route.params.id)
       this.loadData()
     } else {
-        //this.getVendedor()
-      this.loadData()
+      this.getVendedor()
+      //this.loadData()
     }
 
     if (sessionStorage.getItem('empresa')) {
@@ -689,7 +689,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -708,7 +708,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -725,7 +725,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
