@@ -78,10 +78,10 @@
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                        {{ prod.Subtotal - (prod.Subtotal * (item.IgvNuevo==1?0.10:0.18)) | redondear }}
                       </td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
+                        {{ prod.Subtotal * (item.IgvNuevo==1?0.10:0.18) | redondear}}
                       </td>
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
@@ -141,10 +141,10 @@
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                        {{ prod.Subtotal - (prod.Subtotal * (item.IgvNuevo==1?0.10:0.18)) | redondear }}
                       </td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
+                        {{ prod.Subtotal * (item.IgvNuevo==1?0.10:0.18) | redondear}}
                       </td>
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
@@ -205,10 +205,10 @@
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                        {{ prod.Subtotal - (prod.Subtotal * (item.IgvNuevo==1?0.10:0.18)) | redondear }}
                       </td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
+                        {{ prod.Subtotal * (item.IgvNuevo==1?0.10:0.18) | redondear}}
                       </td>
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
@@ -267,10 +267,10 @@
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                        {{ prod.Subtotal - (prod.Subtotal * (item.IgvNuevo==1?0.10:0.18)) | redondear }}
                       </td>
                       <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
+                        {{ prod.Subtotal * (item.IgvNuevo==1?0.10:0.18) | redondear}}
                       </td>
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>

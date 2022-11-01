@@ -166,7 +166,7 @@
                 <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
-                <td><b>IGV</b></td>
+                <td><b>IGV (10%)</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
               <tr>
@@ -264,7 +264,7 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.10
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.subtotal)
@@ -288,8 +288,8 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
-        //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        //sumatoria = sumatoria * 0.10
+        sumatoria = sumatoria - (sumatoria/1.10)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)
@@ -389,7 +389,7 @@ export default {
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio)
       if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+        precio += (precio * 0.10)
       }
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
@@ -416,7 +416,7 @@ export default {
     getIgv (index) {
       let igv = 0
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.10)
       }
 
       Vue.set(this.productos[index], 'igv', igv)
