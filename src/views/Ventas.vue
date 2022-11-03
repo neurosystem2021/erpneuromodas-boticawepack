@@ -127,7 +127,6 @@
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>                                
                                 </b-form-group>
-                                </b-form-group>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -804,8 +803,9 @@ export default {
             })
         },
         guardarVenta (evt) {
+            evt.preventDefault();
+            this.inProgress = true
 
-          
             if (this.venta.comisionista.IdCliente) {
                 let checkComision = false;
                 this.productos.map(pro => {
@@ -822,10 +822,6 @@ export default {
                 }
             }
 
-
-            evt.preventDefault();
-
-            this.inProgress = true
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
