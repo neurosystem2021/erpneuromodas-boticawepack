@@ -105,6 +105,7 @@
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 85px"
+            step="0.01"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
