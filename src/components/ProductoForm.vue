@@ -208,12 +208,23 @@
               step="0.0001"
               />
           </b-form-group>
+          <hr>
           <b-form-group>
             <b-form-checkbox
                    v-model="producto.ControlaStock"
                    :value="1"
                    :unchecked-value="0">
               Controla Stock
+            </b-form-checkbox>
+          </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.EsCaja"
+                   :value="1"
+                   :unchecked-value="0"
+                   @input="(val)=>cambiarPieza(val)">
+              Es Caja
             </b-form-checkbox>
           </b-form-group>
           <b-form-group v-if="false">
@@ -267,7 +278,7 @@
             <input
               v-model="producto.Rendimiento"
               type="number"
-              :readonly="!!producto.EsPadre"
+              :readonly="!!producto.EsPadre || producto.EsCaja==0"
               step="0.0001"
               class="form-control"
               />
@@ -564,6 +575,7 @@ export default {
         this.producto.Rendimiento           = newVal.Rendimiento
         this.producto.Ancho                 = newVal.Ancho
         this.producto.Largo                 = newVal.Largo
+        this.producto.EsCaja                = newVal.EsCaja
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -599,6 +611,11 @@ export default {
         
       })
     },*/
+    cambiarPieza(val){
+      if(val==0){
+        this.producto.Rendimiento = 0
+      }
+    },
     handleFileUpload() {
       this.file = this.$refs.file.files[0]
     },
@@ -713,6 +730,7 @@ export default {
         Rendimiento: '',
         Ancho: '',
         Largo: '',
+        EsCaja: 0,
         StockMinimo: 0,
         PrecioCosto:0,
         PrecioContado: 0,
@@ -752,6 +770,9 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      if(this.producto.EsCaja==0){
+        this.producto.Rendimiento = 0
+      }
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 

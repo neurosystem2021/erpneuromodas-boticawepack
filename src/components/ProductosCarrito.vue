@@ -558,6 +558,9 @@ export default {
     }),
     abrirCalcularM2 (obj) {
       this.setProducto(obj)
+      if(!this.isVentas){
+        return;
+      }
       if (obj.Rendimiento || obj.Ancho || obj.Largo) {
         this.$refs.modalCalcularM2.show()
       }
