@@ -81,7 +81,13 @@
         <b-row>
           <b-col md="12">
             <b-row>
-              <b-col md="3">
+              <b-col md="2">
+                <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+              <b-col md="2">
                 <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
@@ -137,9 +143,9 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>-->
-              <b-col md="3">
-                <!--<b-form-group>
-                  <label>Modelo:</label>
+              <b-col md="2">
+                <b-form-group>
+                  <label>Cod. P.:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
                     ref="inputModelo"
@@ -149,7 +155,7 @@
                     :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>-->
+                </b-form-group>
               </b-col>
             </b-row>
           </b-col>
@@ -345,6 +351,7 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo'},
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -507,6 +514,8 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
+      this.$refs.inputModelo.setValue('')
+      this.$refs.inputCodigoBarra.value='';
       // this.$refs.inputCodigoBarra.setValue('')
       // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
