@@ -12,11 +12,11 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODASM (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. MODASGIO (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                            <option value="modasjes">EMP. MODASJES (PLASTIQUERIA)</option>
-                            <option value="modasjun">EMP. MODASJUN (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MODASPAU (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
+                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
+                            <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
+                            <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
+                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  

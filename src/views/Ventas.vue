@@ -9,11 +9,11 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODASM (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. MODASGIO (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                            <option value="modasjes">EMP. MODASJES (PLASTIQUERIA)</option>
-                            <option value="modasjun">EMP. MODASJUN (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MODASPAU (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
+                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
+                            <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
+                            <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
+                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
                         </select>
 
                     </b-button-group>
@@ -818,7 +818,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                //this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -1173,7 +1173,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
