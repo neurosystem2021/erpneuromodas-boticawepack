@@ -16,7 +16,7 @@
                   </b-button-group>
               </div>
               <b-row align-h="end" class=" no-print">
-                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
+                <label v-if="!this.$route.params.id" >Vendedor:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
                     <b-form-group size="sm" >
                         <autocomplete
@@ -30,7 +30,7 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>-->
+                </b-col>
                 <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
@@ -615,12 +615,12 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            this.$refs.inputVendedor.$refs.input.disabled = true
 
-            if(response.data.IdUsuarioPerfil !== 1) {
-              //this.$refs.inputVendedor.$refs.input.disabled = true
-            }
+            //if(response.data.IdUsuarioPerfil !== 1) {
+              this.$refs.inputVendedor.$refs.input.disabled = true
+            //}
         })
         .catch((error) => {
             console.log(error)
