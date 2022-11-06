@@ -7,16 +7,16 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                          <option value="modasm">EMP. MODASM (PRENDAS DE VESTIR)</option>
-                          <option value="modasgio">EMP. MODASGIO (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                          <option value="modasjes">EMP. MODASJES (PLASTIQUERIA)</option>
-                          <option value="modasjun">EMP. MODASJUN (PASAMANERIA Y BAZAR)</option>
-                          <option value="modaspau">EMP MODASPAU (ALUMNIO Y ELECTRICIDAD)</option>
+                          <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
+                          <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
+                          <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
+                          <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
+                          <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
                       </select>
                   </b-button-group>
               </div>
               <b-row align-h="end" class=" no-print">
-                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
+                <label v-if="!this.$route.params.id" >Vendedor:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
                     <b-form-group size="sm" >
                         <autocomplete
@@ -30,7 +30,7 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>-->
+                </b-col>
                 <b-col cols="7">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
@@ -473,8 +473,8 @@ export default {
       this.getCierre(this.$route.params.id)
       this.loadData()
     } else {
-        //this.getVendedor()
-      this.loadData()
+      this.getVendedor()
+      //this.loadData()
     }
 
     if (sessionStorage.getItem('empresa')) {
@@ -615,12 +615,12 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            this.$refs.inputVendedor.$refs.input.disabled = true
 
-            if(response.data.IdUsuarioPerfil !== 1) {
-              //this.$refs.inputVendedor.$refs.input.disabled = true
-            }
+            //if(response.data.IdUsuarioPerfil !== 1) {
+              this.$refs.inputVendedor.$refs.input.disabled = true
+            //}
         })
         .catch((error) => {
             console.log(error)
@@ -689,7 +689,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -708,7 +708,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -725,7 +725,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
