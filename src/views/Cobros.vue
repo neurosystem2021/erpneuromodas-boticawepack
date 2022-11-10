@@ -67,12 +67,48 @@
         
       <b-modal size="lg" ref="modalCobrar" hide-footer :title="'COBRAR VENTA: '+titulo">
         <div class="d-block text-left">
-          <h5>DNI/RUC: {{ productoSelect.DniRuc}}</h5>
-          <h5>Cliente: {{ productoSelect.Cliente}}</h5>
-          <h5>Monto Total: {{ productoSelect.Total}}</h5>
-          <h5>Metodo de Pago {{ productoSelect.metodopago}}</h5>
-          <h5>Por Entregar: {{ productoSelect.PorEntregar==1?'SI':'NO'}}</h5>
+          <h5><span style="font-weight:normal">DNI/RUC:</span> {{ productoSelect.DniRuc }}</h5>
+          <h5><span style="font-weight:normal">Cliente:</span> {{ productoSelect.Cliente }}</h5>
+          <h5><span style="font-weight:normal">Forma de Pago:</span> {{ productoSelect.EsCredito==1?'CREDITO':'CONTADO' }}</h5>
+          <h5 v-if="productoSelect.EsCredito==0"><span style="font-weight:normal">Metodo de Pago:</span> {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'VISA':''}} {{ productoSelect.Mastercard>0?'MASTERCARD':''}}</h5>
+          <h5><span style="font-weight:normal">Por Entregar:</span> 
+            <span v-if="productoSelect.PorEntregar==1"><b-badge variant="success"><b>SI</b></b-badge></span>
+            <span v-else><b-badge variant="warning"><b>NO</b></b-badge></span>
+          </h5>
         </div>
+        <hr>
+        <table class="table" style="width:100%">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>PRODUCTO</th>
+              <th>CANTIDAD</th>
+              <th>PRECIO UNI.</th>
+              <th>TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(detalle, index) in productoSelect.Detalle" :key="index">
+              <td>{{index+1}}</td>
+              <td>{{detalle.Producto}}</td>
+              <td>{{detalle.Cantidad}}</td>
+              <td>{{detalle.Precio}}</td>
+              <td>{{detalle.Precio * detalle.Cantidad}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"></td>
+              <td>TOTAL: </td>
+              <td> {{productoSelect.Total}} </td>
+            </tr>
+            <tr>
+              <td colspan="3"></td>
+              <td>DESCUENTO: </td>
+              <td> {{productoSelect.DescuentoTotal}} </td>
+            </tr>
+          </tfoot>
+        </table>
         <b-btn class="mt-3" variant="success" block>COBRAR</b-btn>
       </b-modal>
       </b-container>
@@ -123,9 +159,16 @@ export default {
             this.productoSelect = response.data
             this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
             this.$refs.modalCobrar.show()
+            let descuentoTotal = 0
+            this.productoSelect.Detalle.map((det)=>{
+              descuentoTotal += det.Descuento
+            })
+
+            this.productoSelect.DescuentoTotal = descuentoTotal
           }
           
         }).catch((err)=>{
+          console.log(err);
           this.$toasted.error('No se encontró ningun producto') 
         })
         
