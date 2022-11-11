@@ -800,9 +800,9 @@ export default {
                 <th style="width: 250px; padding-left:10px !important">Producto</th>
                 <th style="width: 150px; padding-left:10px !important">Forma</th>
                 <th style="width: 100px; padding-left:10px !important">Medición</th>
-                <th style="width: 200px; padding-left:10px !important">Compuestos</th>
+                <th style="width: 150px; padding-left:10px !important">Lab</th>                
                 <th style="width: 100px; padding-left:10px !important">Bloque</th>
-                <th style="width: 150px; padding-left:10px !important">Lab</th>
+                <th style="width: 200px; padding-left:10px !important">Compuestos</th>
                 <th class="table-success text-center" style="width: 65px">Precio.</th>
                 <th class="text-center" style="width: 35px">V.E.</th>
               </tr>
@@ -813,9 +813,9 @@ export default {
                 <td style="padding-left:10px !important"><b>${data.Producto}</b></td>
                 <td style="padding-left:10px !important">${data.ProductoFormaFarmaceutica}</td>
                 <td style="padding-left:10px !important">${data.ProductoMedicion}</td>
-                <td style="font-size:10px; padding-left:10px !important">${data.CompuestosProducto}</td>
-                <td style="font-size:10px; padding-left:10px !important"><b>${data.Bloque}</b></td>
                 <td style="padding-left:10px !important">${data.ProductoMarca}</td>
+                <td style="font-size:10px; padding-left:10px !important"><b>${data.Bloque}</b></td>
+                <td style="font-size:10px; padding-left:10px !important">${data.CompuestosProducto}</td>
                 <td class="table-success text-center"><b>${data.PrecioContado}</b></td>
                 <td class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
