@@ -1,6 +1,10 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row" id="conten">
+        <b-row class="text-center">
+          <b-col style="margin-bottom: -15px"><h1>COBROS</h1></b-col>
+        </b-row>
+        <hr>
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group class="mb-0">
@@ -15,14 +19,17 @@
           </b-col>
           <b-col md="6" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="5">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1" style="margin-left: 5px"/>
               </b-form-group>
             </b-col>
+            <b-col md="3">
+              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Docs</p>
+            </b-col>
             <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Documentos</p>
+              <b-button variant="primary" @click="actualizar()"><i class="fas fa-sync-alt"></i> ACTUALIZAR</b-button>
             </b-col>
             </b-row>
           </b-col>
@@ -48,10 +55,10 @@
                   </div>
                   <div v-else class="text-center">
                       <span v-if="data.item.Pagado==0">
-                         <b-button variant="primary" size="sm" block @click="onCobrar(data.item.idDocVenta)"><b>COBRAR</b></b-button>
+                         <b-button variant="warning" size="sm" block @click="onCobrar(data.item.idDocVenta)"><b>COBRAR</b></b-button>
                       </span>
                       <span v-else>
-                        <b-badge variant="success"><b>PAGADO</b></b-badge>
+                        <b-badge variant="success"><b>COBRADO</b></b-badge>
                       </span>
                   </div>
               </template>
@@ -66,50 +73,98 @@
         <br />
         
       <b-modal size="lg" ref="modalCobrar" hide-footer :title="'COBRAR VENTA: '+titulo">
-        <div class="d-block text-left">
-          <h5><span style="font-weight:normal">DNI/RUC:</span> {{ productoSelect.DniRuc }}</h5>
-          <h5><span style="font-weight:normal">Cliente:</span> {{ productoSelect.Cliente }}</h5>
-          <h5><span style="font-weight:normal">Forma de Pago:</span> {{ productoSelect.EsCredito==1?'CREDITO':'CONTADO' }}</h5>
-          <h5 v-if="productoSelect.EsCredito==0"><span style="font-weight:normal">Metodo de Pago:</span> {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'VISA':''}} {{ productoSelect.Mastercard>0?'MASTERCARD':''}}</h5>
-          <h5><span style="font-weight:normal">Por Entregar:</span> 
-            <span v-if="productoSelect.PorEntregar==1"><b-badge variant="success"><b>SI</b></b-badge></span>
-            <span v-else><b-badge variant="warning"><b>NO</b></b-badge></span>
-          </h5>
-        </div>
+        <b-row>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Documento</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.DniRuc }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Cliente</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Cliente }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Forma de Pago</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.EsCredito==1?'CREDITO':'CONTADO' }}</td>
+                </tr>
+                <tr v-if="productoSelect.EsCredito==0">
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'VISA':''}} {{ productoSelect.Mastercard>0?'MASTERCARD':''}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Fecha y Hora</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaDoc }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Por Entregar</td>
+                  <td class="celda" style="text-transform: uppercase">: 
+                    <span v-if="productoSelect.PorEntregar==1"><b-badge variant="success"><b>SI</b></b-badge></span>
+                    <span v-else><b-badge variant="warning"><b>NO</b></b-badge></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Atendido Por</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.UsuarioReg }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+        </b-row>
         <hr>
-        <table class="table" style="width:100%">
+        <b-row v-if="productoSelect.PorEntregar==1">
+          <b-col>
+            <h5>OBS:</h5>
+            <h6 v-if="productoSelect.PorEntregar==1"><i class="fas fa-plus text-danger"></i> La venta está marcada por entregar</h6>
+          </b-col>
+        </b-row>
+        <hr>
+        <table class="table table-striped" style="width:100%">
           <thead>
             <tr>
-              <th>#</th>
+              <th class="text-center">#</th>
               <th>PRODUCTO</th>
-              <th>CANTIDAD</th>
-              <th>PRECIO UNI.</th>
-              <th>TOTAL</th>
+              <th class="text-center">CANTIDAD</th>
+              <th class="text-center">PRECIO UNI.</th>
+              <th class="text-center">TOTAL</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(detalle, index) in productoSelect.Detalle" :key="index">
-              <td>{{index+1}}</td>
-              <td>{{detalle.Producto}}</td>
-              <td>{{detalle.Cantidad}}</td>
-              <td>{{detalle.Precio}}</td>
-              <td>{{detalle.Precio * detalle.Cantidad}}</td>
+              <td class="text-center">{{ index+1 }}</td>
+              <td>{{ detalle.Producto }}</td>
+              <td class="text-center">{{ detalle.Cantidad }}</td>
+              <td class="text-center">{{ detalle.Precio | moneda }}</td>
+              <td class="text-center">{{ (detalle.Precio * detalle.Cantidad) | moneda }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3"></td>
-              <td>TOTAL: </td>
-              <td> {{productoSelect.Total}} </td>
+              <td><b>SUBTOTAL</b></td>
+              <td class="table-primary" style="vertical-align: middle !important;">S/ {{productoSelect.SubTotal | moneda}} </td>
+            </tr>
+            <tr v-if="productoSelect.DescuentoTotal>0">
+              <td colspan="3"></td>
+              <td><b>DESCUENTO</b></td>
+              <td class="table-danger" style="vertical-align: middle !important;">- S/ {{productoSelect.DescuentoTotal | moneda}} </td>
             </tr>
             <tr>
               <td colspan="3"></td>
-              <td>DESCUENTO: </td>
-              <td> {{productoSelect.DescuentoTotal}} </td>
+              <td><b>TOTAL</b></td>
+              <td class="table-success" style="vertical-align: middle !important;">S/ {{productoSelect.Total | moneda}} </td>
             </tr>
           </tfoot>
         </table>
-        <b-btn class="mt-3" variant="success" block>COBRAR</b-btn>
+        <b-btn :disabled="inProgress" class="mt-3" variant="success" block @click="cobrarVenta(productoSelect.idDocVenta)">COBRAR</b-btn>
       </b-modal>
       </b-container>
   </div>
@@ -141,13 +196,14 @@ export default {
             { key: 'DniRuc', sortable: true },
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
-            { key: 'Total', sortable: true },
-            { key: 'Estado' }
+            { key: 'Total', sortable: true, class:'centrar' },
+            { key: 'Estado', class:'centrar'}
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      titulo: ''
+      titulo: '',
+      inProgress: false
     }
   },
   methods: {
@@ -156,22 +212,30 @@ export default {
         this.axios.get(this.API + 'venta/info', {params: params})
         .then((response) => {
           if(response.data){
-            this.productoSelect = response.data
-            this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
-            this.$refs.modalCobrar.show()
-            let descuentoTotal = 0
-            this.productoSelect.Detalle.map((det)=>{
-              descuentoTotal += det.Descuento
-            })
-
-            this.productoSelect.DescuentoTotal = descuentoTotal
+            if(response.data.Pagado==0){
+              this.productoSelect = response.data
+              this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
+              this.$refs.modalCobrar.show()
+              let descuentoTotal = 0
+              this.productoSelect.Detalle.map((det)=>{
+                descuentoTotal += det.Descuento
+              })
+              this.productoSelect.DescuentoTotal = descuentoTotal
+            }else{
+              this.$toasted.show('La venta fue cobrada anteriormente')
+              this.$refs.tablaVentas.refresh()
+            }
           }
           
         }).catch((err)=>{
           console.log(err);
-          this.$toasted.error('No se encontró ningun producto') 
+          this.$toasted.error('Error: Intente nuevamente') 
         })
         
+      },
+      actualizar(){
+        this.$refs.tablaVentas.refresh()
+        this.$toasted.info('¡Se actualizó las ventas!') 
       },
       rowClick (item, index) {
         this.productoSelect = item
@@ -216,7 +280,51 @@ export default {
           // Returning an empty array, allows table to correctly handle busy state in case of error
           return []
         })
+      },
+      cobrarVenta(idDocVenta){
+        this.$swal({
+        target: document.getElementById('conten'),
+        title: 'La venta: <strong>'+this.productoSelect.Serie+'-'+this.productoSelect.Numero+'</strong> pasará a estado <strong>COBRADO</strong>',
+        text:'¿Está seguro?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, cobrar',
+        cancelButtonText: 'No, atrás'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              this.inProgress = true
+              this.axios.post(this.API + 'venta/cobrar', {IdDocVenta: idDocVenta})
+              .then((response) => {
+                if(response.data){
+                  this.$swal({
+                    position: 'center',
+                    icon: 'success',
+                    title: '¡La venta <strong>'+this.productoSelect.Serie+'-'+this.productoSelect.Numero+'</strong> fue cobrada correctamente!',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Ok',
+                    target: document.getElementById('conten'),
+                    confirmButtonColor:'#1D9828',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                  })
+                  window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta,'_blank');
+                }else{
+                  this.$toasted.show('La venta fue cobrada anteriormente')
+                }
+                this.$refs.modalCobrar.hide()
+                this.$refs.tablaVentas.refresh()
+                this.inProgress = false
+              })
+              .catch((error) => {
+                  this.$toasted.error('Ha ocurrido un error, vuelva a intentarlo')
+                  this.inProgress = false
+              })
+            }
+        })
       }
+
   },
   components: {
   }
@@ -224,5 +332,12 @@ export default {
 </script>
 
 <style>
-
+.celda{
+  text-align:left;
+  border: none !important;
+  background: white !important
+}
+.centrar{
+vertical-align: middle !important;
+}
 </style>

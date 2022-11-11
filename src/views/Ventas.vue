@@ -1116,8 +1116,9 @@ export default {
             .then((response) => {
 
                 // limpiar preorden seleccionado
+                let idPerfil = this.venta.vendedor.IdUsuarioPerfil
                 this.$router.replace('/ventas')
-                this.$toasted.success('Venta realizada con exito')
+                //this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -1133,7 +1134,20 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                this.$swal({
+                    position: 'center',
+                    icon: 'success',
+                    title: '¡La venta realizada correctamente!',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Ok',
+                    target: document.getElementById('conten'),
+                    confirmButtonColor:'#1D9828',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                })
+                if(idPerfil!=3){
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                }
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
