@@ -23,7 +23,7 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form v-if="tipo!='mov'" :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -355,7 +355,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-show="tipo != 'mov'">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">

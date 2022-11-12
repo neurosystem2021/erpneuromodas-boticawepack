@@ -33,6 +33,12 @@
               v-model="proveedor.Telefono"
               type="text"></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Número de Cuenta:</label>
+            <b-form-input 
+              v-model="proveedor.NumCuenta"
+              type="text"></b-form-input>
+          </b-form-group>
         </b-col>
       </b-row>
       <div slot="modal-footer" >
@@ -70,6 +76,7 @@ export default {
       this.proveedor.Direccion = ''
       this.proveedor.Proveedor = ''
       this.proveedor.Telefono = ''
+      this.proveedor.NumCuenta = ''
     },
     consultarRUC() {
       this.axios.get(this.API + 'consultarRUC', {
@@ -78,17 +85,39 @@ export default {
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
           var data = response.data
-          this.proveedor.Proveedor = data.razonSocial
-          this.proveedor.Direccion = data.direccion
+          if(data.success==false){
+            this.$toasted.error('ERROR: No se encontró el RUC')   
+          }else if(data.razonSocial){
+            this.$toasted.info('Proveedor encontrado, se llenarán sus datos') 
+            this.proveedor.Proveedor = data.razonSocial
+            this.proveedor.Direccion = data.direccion
+          }else{
+            this.$toasted.error('ERROR: Complete el RUC correctamente')
+          }
       })
       .catch((error) => {
-          this.$toasted.show('No se encontró el RUC')        
+          this.$toasted.show('ERROR: No se encontró el RUC')        
           console.log(error)
       })
     },
     guardarProveedor() {
+      this.$nextTick(() => {
+        this.proveedor.Ruc = (''+this.proveedor.Ruc).toUpperCase().trim();
+        this.proveedor.Proveedor = (''+this.proveedor.Proveedor).toUpperCase().trim();
+        this.proveedor.Direccion = (''+this.proveedor.Direccion).toUpperCase().trim();
+        this.proveedor.Telefono = (''+this.proveedor.Telefono).toUpperCase().trim();
+      })
+
+      if(this.proveedor.Ruc==''){
+         this.$toasted.show('Ingrese el RUC del proveedor')
+        return
+      }
+      if(this.proveedor.Proveedor==''){
+         this.$toasted.show('Ingrese el nombre del proveedor')
+        return
+      }
+
       this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
         this.$toasted.success('Proveedor guardado correctamente')

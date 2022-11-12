@@ -1,8 +1,23 @@
 <template>
   <div>
       <b-container class="bv-example-row" id="conten">
-        <b-row class="text-center">
-          <b-col style="margin-bottom: -15px"><h1>COBROS</h1></b-col>
+        <b-row class="text-left" style="margin-bottom: -15px">
+          <b-col md="9"><h1>COBROS</h1></b-col>
+          <b-col md="3">
+            <b-input-group prepend="Usuario:" class="mt-2">
+                    <autocomplete
+                        required="required"
+                        ref="inputVendedor"
+                        :url="API + 'usuarios'"
+                        anchor="NombreUsuario"
+                        class="font-weight-bold"
+                        label="writer"
+                        :on-select="setVendedor" 
+                        :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                        :classes="{input: 'form-control'}">
+                    </autocomplete>
+            </b-input-group>
+          </b-col>
         </b-row>
         <hr>
         <b-row>
@@ -178,6 +193,7 @@ export default {
     this.axios.get(this.API + 'ventas/count').then((response) => {
       this.totalRows = response.data.total
     })
+    this.getVendedor()
   },
   data() {
     return {
@@ -203,10 +219,31 @@ export default {
       perPage: 10,
       currentPage: 1,
       titulo: '',
-      inProgress: false
+      inProgress: false,
+      vendedor: {}
     }
   },
   methods: {
+      getVendedor () {
+          let usuario = sessionStorage.getItem('User')
+          this.axios.get(this.API + 'usuarios/' + usuario)
+          .then((response) => {
+              this.setVendedor(response.data)
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
+          })
+          .catch((error) => {
+              console.log(error)
+              this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
+      },
+      setVendedor (obj) {
+          this.vendedor = obj
+      },
+      focusAutocomplete (ref) {
+          // this.$refs[ref].type = ""
+          this.$refs[ref].handleDoubleClick()
+      },
       onCobrar(idDocVenta){
         let params = {IdDocVenta: idDocVenta}
         this.axios.get(this.API + 'venta/info', {params: params})
@@ -295,7 +332,7 @@ export default {
         }).then((result) => {
             if (result.isConfirmed) {
               this.inProgress = true
-              this.axios.post(this.API + 'venta/cobrar', {IdDocVenta: idDocVenta})
+              this.axios.post(this.API + 'venta/cobrar', {IdDocVenta: idDocVenta, Usuario: sessionStorage.getItem('User') || 'xx'})
               .then((response) => {
                 if(response.data){
                   this.$swal({

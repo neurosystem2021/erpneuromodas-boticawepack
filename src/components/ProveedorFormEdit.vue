@@ -31,6 +31,12 @@
               v-model="proveedor.Telefono"
               type="text"></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Número de Cuenta:</label>
+            <b-form-input 
+              v-model="proveedor.NumCuenta"
+              type="text"></b-form-input>
+          </b-form-group>
         </b-col>
       </b-row>
       <div slot="modal-footer" >
@@ -57,6 +63,7 @@ export default {
         Direccion: '',
         Telefono: '',
         Observacion: '',
+        NumCuenta: '',
         FechaReg: null
       },
       titulo:'',
@@ -78,6 +85,7 @@ export default {
         Direccion: '',
         Telefono: '',
         Observacion: '',
+        NumCuenta: '',
         FechaReg: null
         }
       }
@@ -93,12 +101,14 @@ export default {
           }
       }).then((response) => {            
           var data = response.data
-          if(data.razonSocial){
+          if(data.success==false){
+            this.$toasted.error('ERROR: No se encontró el RUC')   
+          }else if(data.razonSocial){
             this.$toasted.info('Proveedor encontrado, se llenarán sus datos') 
             this.proveedor.Proveedor = data.razonSocial
-            this.proveedor.Direccion = data.direccion || ''
+            this.proveedor.Direccion = data.direccion
           }else{
-            this.$toasted.show('Proveedor no encontrado') 
+            this.$toasted.error('ERROR: Complete el RUC correctamente')
           }
       })
       .catch((error) => {
@@ -113,7 +123,6 @@ export default {
         this.proveedor.Direccion = (''+this.proveedor.Direccion).toUpperCase().trim();
         this.proveedor.Telefono = (''+this.proveedor.Telefono).toUpperCase().trim();
       })
-      console.log(this.proveedor)
 
       if(this.proveedor.Ruc==''){
          this.$toasted.show('Ingrese el RUC del proveedor')

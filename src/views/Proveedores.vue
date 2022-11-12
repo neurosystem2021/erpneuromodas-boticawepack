@@ -91,6 +91,7 @@ export default {
             { key: 'Ruc', sortable: true },
             { key: 'Direccion', sortable: true },
             { key: 'Telefono', sortable: true },
+            { key: 'NumCuenta', label:'N° Cuenta', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
