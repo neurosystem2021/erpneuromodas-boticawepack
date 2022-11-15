@@ -86,6 +86,16 @@
                       </autocomplete>
                   </b-form-group>
 
+                  <b-form-group v-if="estadoVenta==2">
+                    <b-form-checkbox
+                        :disabled="false"
+                        v-model="anuladoSistema"
+                        :value="1"
+                        @change="(val)=>cambiarOpcion(val)"
+                        :unchecked-value="0">
+                        Anulados del sistema
+                    </b-form-checkbox>
+                  </b-form-group>                                                     
                 
                 
               </b-col>
@@ -227,6 +237,10 @@
               <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
+            <b-col cols="12" v-if="estadoVenta == 2 && anuladoSistema==1">
+              <b-button :disabled="this.loading" variant="success" size="lg" @click="emitirResumen(1)">Emitir Resumen Boletas</b-button>
+              <b-button :disabled="this.loading" variant="danger" size="lg" @click="emitirResumen(3)">Emitir Resumen Anulado Boletas</b-button>
+            </b-col>
         </b-row>
         <br /><br />
       </b-container>
@@ -329,7 +343,8 @@ export default {
         { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
       ],
       notaIdMotivo: null,
-      notaCredito: {}
+      notaCredito: {},
+      anuladoSistema: 0
     }
   },
   watch: {
@@ -359,6 +374,69 @@ export default {
   computed: {
   },
   methods: {
+    cambiarOpcion(val){
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+    },
+    emitirResumen(opc){
+      console.log(this.items);
+      if(this.items.length==0){
+        this.$toasted.show('No hay documentos para crear resumen')
+        return
+      }
+      let existeFactura = false
+      let sinIdResumen = false
+      let conIdResumen = false
+      this.items.map((r)=>{
+        if(r.CodSunat !="03"){
+          existeFactura = true
+        }
+
+        if(r.IdResumen == null && opc==3){
+          sinIdResumen = true
+           this.$toasted.error('Error boleta: '+r.Serie+'-'+r.Numero)
+        }
+
+        if(r.IdResumen != null && opc==1){
+          conIdResumen = true
+          this.$toasted.error('Error boleta: '+r.Serie+'-'+r.Numero)
+        }
+      })
+
+      if(existeFactura){
+        this.$toasted.show('No se puede crear resumen, existen facturas')
+        return
+      }
+
+      if(sinIdResumen){
+        this.$toasted.show('No se puede crear resumen anulado, existe una venta sin un resumen asociado')
+        return
+      }
+
+      if(conIdResumen){
+        this.$toasted.show('No se puede crear resumen, existe una venta con un resumen asociado')
+        return
+      }
+
+      this.loading = true
+      this.axios.post(this.API + 'emitirelectronicoresumenboleta', {
+        boletas: this.items,
+        statu: opc, // Statu 3 = dar de baja / 1 = emitir
+        codSunat: '03',
+        fechaReferencia: this.fechaReferencia
+      }).then(res => {
+        this.loading = false
+        if(res.data.Estado==null){
+          this.$toasted.error('ERROR AL CREAR RESUMEN')
+        }else{
+        this.$toasted.show(opc==1?'RESUMEN CREADO':'RESUMEN ANULADOS CREADO')
+        this.$refs.tablaVentas.refresh()
+        }
+      }).catch((err)=>{
+        this.loading = false
+        this.$toasted.show("Ha ocurrido un error")
+      })
+  
+    },
     loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
@@ -620,6 +698,7 @@ export default {
       
       let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      url += '&anuladoSistema='+(this.estadoVenta==2 ? (this.anuladoSistema==1? 1 : 0) : 0 )
 console.log(url)
       let promise = this.axios.get( url )
 

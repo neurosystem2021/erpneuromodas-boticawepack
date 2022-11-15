@@ -1173,6 +1173,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
+                this.$refs.carrito.loadCode = ''
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
             })
