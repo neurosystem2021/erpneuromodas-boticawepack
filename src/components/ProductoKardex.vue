@@ -4,6 +4,7 @@
         <thead>
             <tr>
                 <th rowspan="2">FECHA</th>
+                <th rowspan="2">USUARIO</th>
                 <th rowspan="2">COMPROBANTE</th>
                 <th rowspan="2">PROVEEDOR/CLIENTE</th>
                 <th colspan="2">INGRESOS</th>
@@ -20,6 +21,7 @@
         <tbody>
             <tr v-for="(prod, i) in kardexSaldo" :key="i">
                 <td>{{ prod.Fecha }}</td>
+                <td style="text-transform:uppercase">{{ prod.UsuarioReg }}</td>
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
                 <td>{{ prod.Nombres }}</td>
                 <td :class="{'table-warning': prod.IngresoCantidad > 0}">{{ prod.IngresoCantidad }}</td>
