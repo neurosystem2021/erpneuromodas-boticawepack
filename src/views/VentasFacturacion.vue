@@ -86,7 +86,7 @@
                       </autocomplete>
                   </b-form-group>
 
-                  <b-form-group v-if="estadoVenta==2">
+                  <b-form-group v-if="tipoDoc.CodSunat == '03'">
                     <b-form-checkbox
                         :disabled="false"
                         v-model="anuladoSistema"
@@ -233,13 +233,13 @@
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
-            <b-col cols="12">
+            <b-col cols="12" v-if="anuladoSistema!=1">
               <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
               <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
             </b-col>
-            <b-col cols="12" v-if="estadoVenta == 2 && anuladoSistema==1">
-              <b-button :disabled="this.loading" variant="success" size="lg" @click="emitirResumen(1)">Emitir Resumen Boletas</b-button>
-              <b-button :disabled="this.loading" variant="danger" size="lg" @click="emitirResumen(3)">Emitir Resumen Anulado Boletas</b-button>
+            <b-col cols="12" v-if="anuladoSistema==1 && tipoDoc.CodSunat == '03'">
+              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="primary" size="lg" @click="emitirResumen(1)">Emitir Resumen Boletas</b-button>
+              <b-button v-if="estadoVenta == 2" :disabled="this.loading" variant="danger" size="lg" @click="emitirResumen(3)">Emitir Resumen Anulado Boletas</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -426,9 +426,13 @@ export default {
       }).then(res => {
         this.loading = false
         if(res.data.Estado==null){
-          this.$toasted.error('ERROR AL CREAR RESUMEN')
+          this.$toasted.error('ERROR AL CREAR RESUMEN: '+res.data.cod_sunat+' '+res.data.msj_sunat)
         }else{
-        this.$toasted.show(opc==1?'RESUMEN CREADO':'RESUMEN ANULADOS CREADO')
+        this.$toasted.success(opc==1?'RESUMEN CREADO LOS DOCUMENTOS PASARON A EMITIDOS':'RESUMEN ANULADOS CREADO LOS DOCUMENTOS PASARON A ANULADOS')
+        if(opc==1){
+          this.estadoVenta = 2
+          this.$toasted.info('LA LISTA CAMBIO A EMITIDOS', { duration: 7000 })
+        }
         this.$refs.tablaVentas.refresh()
         }
       }).catch((err)=>{
@@ -469,6 +473,7 @@ export default {
     },
     setTipoDoc (obj) {
       console.log(obj)
+      this.anuladoSistema = 0
       this.tipoDoc = obj
       if (this.tipoDoc.CodSunat == 3) {
         this.isBoleta = true
@@ -545,6 +550,19 @@ export default {
 
           }))
         } else {
+
+        let existenAnulado = false
+        this.items.map((r)=>{
+          if(r.Anulado == 1 ){
+            existenAnulado = true
+          }
+        })
+
+        if(existenAnulado && this.tipoDoc.CodSunat=='03'){
+          this.$toasted.show('EXISTEN ANULADOS EN LA LISTA DE BOLETAS PRIMERO EMITIR RESUMEN');
+          return;
+        }
+
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
           console.log(JSON.stringify(item))
@@ -698,7 +716,7 @@ export default {
       
       let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      url += '&anuladoSistema='+(this.estadoVenta==2 ? (this.anuladoSistema==1? 1 : 0) : 0 )
+      url += '&anuladoSistema='+(this.anuladoSistema==1? 1 : 0)
 console.log(url)
       let promise = this.axios.get( url )
 
