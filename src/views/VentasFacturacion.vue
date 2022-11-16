@@ -379,6 +379,11 @@ export default {
     },
     emitirResumen(opc){
       console.log(this.items);
+      if((''+this.fechaInicio).substring(0,10) != (''+this.fechaFin).substring(0,10)){
+        this.$toasted.show('SOLO ES POSIBLE ENVIAR RESUMEN DEL DIA, SELECCIONE FECHA INICIO Y FIN DEL MISMO DIA',{duration: 7000})
+        return
+      }
+
       if(this.items.length==0){
         this.$toasted.show('No hay documentos para crear resumen')
         return
@@ -422,7 +427,7 @@ export default {
         boletas: this.items,
         statu: opc, // Statu 3 = dar de baja / 1 = emitir
         codSunat: '03',
-        fechaReferencia: this.fechaReferencia
+        fechaReferencia: (''+this.fechaInicio).substring(0,10)
       }).then(res => {
         this.loading = false
         if(res.data.Estado==null){
