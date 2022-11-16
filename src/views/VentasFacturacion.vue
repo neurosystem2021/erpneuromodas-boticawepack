@@ -559,6 +559,7 @@ export default {
         })
 
         if(existenAnulado && this.tipoDoc.CodSunat=='03'){
+          this.loading = false
           this.$toasted.show('EXISTEN ANULADOS EN LA LISTA DE BOLETAS PRIMERO EMITIR RESUMEN');
           return;
         }
