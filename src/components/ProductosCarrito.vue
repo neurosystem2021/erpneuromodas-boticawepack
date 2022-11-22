@@ -13,12 +13,14 @@
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+            :classes="{input: 'form-control'}"
+            style="margin-top:2px">
           </autocomplete>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
+                  style="font-weight:bold; font-size:1.2rem"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -118,7 +120,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="0.001"
+            step="1"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index])"
@@ -134,7 +136,7 @@
             type="number"
             style="width: 95px"
             class="form-control"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
@@ -294,11 +296,12 @@
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
-          <br>
-          <h6><i>Prof.</i></h6>
+          <!--<br>
+          <h6><i>Prof.</i></h6>-->
           <input 
             class="form-check-input" 
             type="checkbox" 
+            v-if="false"
             :disabled="bloquearInput?true:false"
             @change="(e) => {
               $emit('onCheckProf', e)
