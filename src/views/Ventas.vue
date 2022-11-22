@@ -1332,7 +1332,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 180px)
     }
 }
 
