@@ -427,7 +427,7 @@
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="false" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta + '&empresa=' + empresa">Imprimir última Venta</b-button>
+                        <b-button @click="habilitarPrecio" v-if="ultimaVenta" target="_blank" variant="info" size="lg">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -561,6 +561,48 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        //Nuevos metodos de venta
+        habilitarPrecio(){
+            this.$swal({
+            title: 'Autorización de Administrador',
+            html: `<form onsubmit="event.preventDefault();"><label>Reimpresion de la ultima venta realizada</label>
+            <input type="password" id="password" class="swal2-input" placeholder="Ingrese su contraseña"><form>`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Autorizar',
+            cancelButtonText: 'Cancelar',
+            target: document.getElementById('conten'),
+            focusConfirm: false,
+                preConfirm: () => {
+                const password = this.$swal.getPopup().querySelector('#password').value
+                if (!password) {
+                this.$swal.showValidationMessage('Ingrese la contraseña de administrador')
+                }
+                return {password: password }
+            }
+            }).then((result) => {
+                if (result.value.password) {
+                    this.axios.post(this.API + 'login', {
+                    user: 'admin',
+                    password: result.value.password
+                    }).then(r => {
+                        if (r.data) {
+                            this.$toasted.info("¡Autorizado!")
+                            setTimeout(() => {
+                                window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta + '&empresa=' + this.empresa,'_blank','noopener');
+                            }, 300);
+                        }else{
+                            this.$toasted.error("¡Error de contraseña, no autorizado la reimpresion!",{duration:3000})
+                        }
+                    })
+                }else{
+                    this.$toasted.error("¡No autorizado para la reimpresion!")
+                }
+            }).catch((err)=>{
+                console.log("error");
+            })
+        },
         cambiarEmpresa () {
             sessionStorage.setItem('empresa', this.empresa)
             window.location.reload();
