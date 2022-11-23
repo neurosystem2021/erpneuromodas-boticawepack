@@ -1159,12 +1159,13 @@ export default {
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
                 this.initForm()
                 this.limpiarCart()
-                await this.loadFirstAlmacen()
-                await this.loadFirstPuntoVenta()
+                //await this.loadFirstAlmacen()
+                //await this.loadFirstPuntoVenta()
                 this.getVendedor()
-                this.getNumeroVenta()
+                //this.getNumeroVenta()
                 this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 //this.$refs.inputAlmacen.setValue('VENTA')
@@ -1174,8 +1175,7 @@ export default {
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 this.$refs.carrito.loadCode = ''
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
-                this.emitirauto(response.data.insertId)
+                //this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
