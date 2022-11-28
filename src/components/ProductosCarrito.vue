@@ -122,16 +122,16 @@
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
-          <b-form-input
+          <input
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false"
             type="number"
-            style="width: 85px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)">
-          </b-form-input>
+            @input="setNuevoPrecioContado(data.index)"
+            class="form-control"/>
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -226,17 +226,18 @@
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
-        <!--<template slot="Descripcion" slot-scope="data">
+        <template slot="Descripcion" slot-scope="data">
           <textarea 
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
+            style="width:180px"
             v-model="productos[data.index].Descripcion"></textarea>
-          <b-form-input
+          <!--b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
-            placeholder="Descripción"></b-form-input>
-        </template>--> 
+            placeholder="Descripción"></b-form-input>-->
+        </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -660,6 +661,7 @@ export default {
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
       obj.cantidad = 0
+      obj.Descripcion = ''
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
@@ -679,6 +681,7 @@ export default {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
+      obj.Descripcion = ''
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       // this.objProd.precio = 0

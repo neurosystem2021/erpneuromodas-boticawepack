@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -226,14 +226,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        step="0.01"
+                                                        class="form-control"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -424,7 +426,7 @@ export default {
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
+                    { key: 'Descripcion', label: 'Descripción'},
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -433,7 +435,7 @@ export default {
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porc. Utilidad %' },
+                    //{ key: 'utilidad', label: 'Porc. Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
@@ -940,6 +942,8 @@ export default {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
                 }
+
+                pro.Descripcion = (''+(pro.Descripcion || '')).toUpperCase()
 
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1

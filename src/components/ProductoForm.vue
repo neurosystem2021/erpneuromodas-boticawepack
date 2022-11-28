@@ -272,11 +272,12 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio Público:</label>
-            <b-form-input v-model="producto.PrecioContado"
+            <input v-model="producto.PrecioContado"
               type="number"
               step="0.01"
-              @input.native="actualizarPorcentajeUtilidad"
-              ></b-form-input>
+              @input="actualizarPorcentajeUtilidad"
+              class="form-control"
+              />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
