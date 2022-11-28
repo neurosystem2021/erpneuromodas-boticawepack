@@ -160,7 +160,21 @@
             />
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div v-if="isVentas">
+            {{ getSubtotal(data.index) }}
+          </div>
+          <div v-else>
+            <input
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            class="form-control"
+            v-model="productos[data.index].subt"
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -274,10 +288,11 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
+          <h6 v-if="false"><i>Prof.</i></h6>
           <input 
             class="form-check-input" 
-            type="checkbox" 
+            type="checkbox"
+            v-if="false" 
             :disabled="bloquearInput?true:false"
             @change="(e) => {
               $emit('onCheckProf', e)
@@ -433,6 +448,8 @@ export default {
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoPresentacion', label: 'Anaquel' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'eventPres', label: '' },
+          { key: 'cantxPrecio', variant: 'warning' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -521,11 +538,17 @@ export default {
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
+    setSubtotal(index, val,prod) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)
+      Vue.set(this.productos[index], 'precio', precio)
+      this.actualizarProd(prod)
+    },
     changeCant (val, prod) {
       if (val>0) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
+      prod.subt = ''
       this.$nextTick(() => {
         this.actualizarProd(prod)
       })
@@ -661,7 +684,7 @@ export default {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
       
-      if(this.isVentas){
+      //if(this.isVentas){
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
         if(fPP.length!=4){
           obj.ProductoMedicion = obj.medicion.ProductoMedicion
@@ -674,7 +697,7 @@ export default {
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
           this.showPresentacion(this.productoSelect)
         } 
-      }
+      //}
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
@@ -683,9 +706,9 @@ export default {
       this.preciosProd = []
       this.objProd = {}
 
-      if (!this.isVentas) {
+      /*if (!this.isVentas) {
         obj.PreciosPorProducto = '';
-      }
+      }*/
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -704,6 +727,7 @@ export default {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
+      obj.subt = ''
       obj.precio = 0
       obj.cantidad = 0
       //obj.IdLote = 0
@@ -728,6 +752,7 @@ export default {
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
+      obj.subt = ''
       obj.precio = 0
       obj.cantidad = 0
       //obj.IdLote = 0
@@ -840,6 +865,7 @@ export default {
       Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
       Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
+      Vue.set(this.productos[index], 'subt', '')
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
