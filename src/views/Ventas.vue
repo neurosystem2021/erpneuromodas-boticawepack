@@ -3,7 +3,11 @@
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
-
+        <b-row v-if="pagosPendientes>0">
+            <b-col class="holder">
+                <h4 class="news" height="100" width="200" bgcolor="white">Tiene <b>{{pagosPendientes}} pago(s) pendientes</b> del servicio de facturación, porfavor regularizar para mantener la validez de los comprobantes emitidos.  <b>{{fechaUltPago!=''?' Fecha de Vencimiento: '+fechaUltPago:''}}</b></h4>
+            </b-col>
+        </b-row>
         <br />
         <b-container class="bv-example-row"  id="conten">
             <div>
@@ -434,6 +438,7 @@ export default {
         this.loadClienteVarios()
         this.loadComisionista()
         this.escucharPedidos()
+        this.getEstadoSistema()
     },
     data () {
         return {
@@ -445,6 +450,7 @@ export default {
             ultimaVenta: '',
             inProgress: false,
             API: config.API,
+            APIADMIN: "http://204.48.21.196:5000",
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
@@ -485,7 +491,9 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            pagosPendientes:0,
+            fechaUltPago:''
         }
     },
     watch: {
@@ -519,6 +527,28 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        getEstadoSistema(){
+            let hostUrl = sessionStorage.getItem('HostUrl')
+            if(hostUrl != null){
+                this.axios.get(this.APIADMIN + '/api/sistema', {params: { Url:hostUrl}
+                }).then(res => {
+                    if(res.data.success==true){
+                        let info = res.data.data
+                        this.pagosPendientes = info.length
+                        this.fechaUltPago = info.slice(-1)[0].FechaVencimientoFormat || ''
+                    }else{
+                        this.pagosPendientes = 0
+                        console.log(res.data.msg);
+                    }
+                }).catch(err => {
+                    this.pagosPendientes = 0
+                    console.log("Error de conexión al admin");
+                })   
+       
+            }else{
+                this.pagosPendientes = 0
+            }
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -1195,4 +1225,29 @@ export default {
     font-size: 30px;
 }
 
+</style>
+<style>
+.holder {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    clear: both;
+    display: inline-block;
+    overflow: hidden;
+}
+.news {
+    animation : slide 20s linear infinite;
+    white-space: pre;
+}
+
+@keyframes slide {
+    0% {
+        transform: translatex(100vw)
+       
+    }
+
+    100% {
+         transform: translatex(-120vw)
+    }
+}
 </style>
