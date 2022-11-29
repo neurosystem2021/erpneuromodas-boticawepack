@@ -635,6 +635,7 @@ export default {
           this.productos[index].descuento = Math.round(this.getSubtotal(index) * prod.PorcentajeDesc/100*10)/10;
         }
         this.actualizarProd(prod)
+        this.getSubtotal(index)
       })
     },
 

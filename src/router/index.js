@@ -13,6 +13,7 @@ import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
 import Cobros from '@/views/Cobros.vue'
 import MovimientoCantidad from '@/views/MovimientoCantidad.vue'
+import OrdenCompra from '@/views/OrdenCompra.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -187,6 +188,11 @@ export default new Router({
       path: '/movimiento/cantidad',
       name: 'MovimientoCantidad',
       component: MovimientoCantidad
+    },
+    {
+      path: '/orden',
+      name: 'OrdenCompra',
+      component: OrdenCompra
     },
   ]
 })
