@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'stock': 1}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1, 'stock': 1 }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -216,7 +216,7 @@ export default {
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
-
+    isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -260,7 +260,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       } else {
         return this.API + 'productos'
       }
