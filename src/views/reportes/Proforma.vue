@@ -68,9 +68,12 @@
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
     </main>
+    <div style="text-align:center">
+        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+    </div>
     <!--<footer>
       Invoice was created on a computer and is valid without the signature and seal.
     </footer>-->
@@ -107,13 +110,22 @@ export default {
       this.axios.get(API + 'proformas/id/' + this.idProforma)
 			.then(res => {
 				this.proforma = res.data
+        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
 			})
+    },
+    calcularFechaHasta(actual,dias){
+    var date = new Date(actual);
+    date.setDate(date.getDate() + (dias-1));
+    return date;
     },
     getEmpresa () {
       this.axios.get(API + 'empresa/id/' + 1)
 			.then(res => {
 				this.empresa = res.data
 			})
+    },
+    imprimir(){
+    window.print();
     }
   }
 }
@@ -121,4 +133,9 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
+@media print {
+  #printBtn {
+    display: none;
+  }
+}
 </style>

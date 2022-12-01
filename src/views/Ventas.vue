@@ -235,6 +235,19 @@
                                                 </b-form-input>
                                             </td>
                                         </tr>
+                                        <tr>
+                                                <td>
+                                                    <b-input-group prepend="Proforma válido por:" append="días">
+                                                    <b-form-input
+                                                        :disabled="bloquearInput?true:false"
+                                                        v-model="diasValidosProf"
+                                                        min="0"
+                                                        value="0"
+                                                        type="number"
+                                                    ></b-form-input>
+                                                </b-input-group>
+                                                </td>
+                                            </tr>
                                     </tbody>
                                 </table>
                             </template>
@@ -365,6 +378,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
+            diasValidosProf:0,
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -473,7 +487,8 @@ export default {
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
-                NotaDescMotivo: ''      
+                NotaDescMotivo: '',
+                diasValidosProf: 0      
             }
 
             this.isNota = false
@@ -694,6 +709,12 @@ export default {
                 return
             }
 
+            if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
+                this.$toasted.show('Debe ingresar los días de validez de la proforma')
+                this.inProgress = false
+                return
+            }
+
             if(!this.venta.cliente.IdCliente) {
                 this.$toasted.show('Debe seleccionar un cliente')
                 this.inProgress = false
@@ -707,14 +728,14 @@ export default {
             }
 
             this.venta.productos = this.productos
-
+            this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
 
                 this.limpiarDespuesVenta()
-
+                this.diasValidosProf=0;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
