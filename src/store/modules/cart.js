@@ -126,6 +126,7 @@ const actions = {
       // console.log(producto);
       producto.Descripcion = (''+(producto.Descripcion || "")).trim()
       producto.disabledProf = 0
+      producto.RendimientoFin = producto.Rendimiento==0?1:producto.Rendimiento
       
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)

@@ -346,6 +346,11 @@ export default {
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                   })
+                  let ventaJson= JSON.stringify(null)
+                  var left = (screen.width/2)-(800/2)
+                  var top = (screen.height/2)-(800/2)
+                  let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                  window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
                   window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta,'_blank');
                 }else{
                   this.$toasted.show('La venta fue cobrada anteriormente')

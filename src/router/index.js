@@ -14,6 +14,8 @@ import Proveedores from '@/views/Proveedores.vue'
 import Cobros from '@/views/Cobros.vue'
 import MovimientoCantidad from '@/views/MovimientoCantidad.vue'
 import OrdenCompra from '@/views/OrdenCompra.vue'
+import CalculoPvp from '@/views/CalculoPvp.vue'
+import OrdenesCompra from '@/views/OrdenesCompra.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -193,6 +195,16 @@ export default new Router({
       path: '/orden',
       name: 'OrdenCompra',
       component: OrdenCompra
+    },
+    {
+      path: '/calculopvp',
+      name: 'CalculoPvp',
+      component: CalculoPvp
+    },
+    {
+      path: '/ordenescompra',
+      name: 'OrdenesCompra',
+      component: OrdenesCompra
     },
   ]
 })
