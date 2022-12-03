@@ -47,10 +47,16 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage">
-          
+
+              <template slot="Ver" slot-scope="data">
+                <div class="text-center">
+                  <b-button variant="primary" @click="mostrarDetalles(data.item)"><i class="fas fa-eye"></i> Ver</b-button>
+                </div> 
+              </template>
+
               <template slot="Reimprimir" slot-scope="data">
                 <div class="text-center">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'"><i class="fas fa-file-excel"></i> Excel</a>
+                  <a class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra?IdOrdenCompra=' + data.item.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a>
                 </div> 
               </template>
           </b-table>
@@ -62,6 +68,83 @@
         </b-row>
         <br />
         <br />
+        <b-modal size="lg" id="modalDetalle" ref="modalDetalle" :title="'Orden de Compra: '+infoOrden.Correlativo" ok-only ok-title="Cerrar">
+          <b-row>
+            <b-col md="6">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">RUC</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Ruc }}</td>
+                  </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Proveedor</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Proveedor }}</td>
+                  </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Dirección</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Direccion }}</td>
+                  </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Forma de Pago</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.EsCredito==1?'CRÉDITO':'CONTADO'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </b-col>
+
+            <b-col md="6">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
+                  </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Fecha a Recoger</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaRecojo }}</td>
+                  </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Registrado Por</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.UsuarioRegOrden }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </b-col>
+          </b-row>
+          <br>
+          <b-row>
+            <b-col md="12">
+              <table class="table b-table table-sm table-striped">
+                  <thead>
+                      <tr>
+                          <th class="text-center">Codigo</th>
+                          <th class="text-center">Producto</th>
+                          <th class="text-center">Cantidad</th>
+                          <th class="text-center">Precio</th>
+                          <th class="text-center">Total</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-for="(prod, i) in detalle" :key="i">
+                          <td class="text-center">{{ prod.CodigoBarra }}</td>
+                          <td class="text-center">{{ prod.Producto }}</td>
+                          <td class="text-center">{{ prod.Cantidad }}</td>
+                          <td class="text-center">{{ prod.Precio | moneda }}</td>
+                          <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
+                      </tr>
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                    <td colspan="3"></td>
+                    <td class="text-center"><b>TOTAL</b></td>
+                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{infoOrden.Total | moneda}} </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </b-col>
+          </b-row>
+        </b-modal>
       </b-container>
   </div>
 </template>
@@ -82,7 +165,6 @@ export default {
       filter: null,
       sortBy: 'IdOrdenCompra',
       sortDesc: true,
-      productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
@@ -93,16 +175,35 @@ export default {
             { key: 'Proveedor', sortable: true },
             { key: 'Proveedor', sortable: true },
             { key: 'Total', sortable: true },
+            { key: 'Ver', label: 'Ver', class:'text-center' },
             { key: 'Reimprimir', label: 'Reporte', class:'text-center' }
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      detalle: {},
+      infoOrden:{
+        Anio: null,
+        Correlativo: null,
+        Direccion: null,
+        EsCredito: null,
+        FechaCredito: null,
+        FechaOrdenCompra: null,
+        FechaRecojo: null,
+        IdOrdenCompra: null,
+        IdProveedor: null,
+        NumCuenta: null,
+        Numero: null,
+        Proveedor: null,
+        Ruc: null,
+        Telefono: null,
+        UsuarioReg: null,
+      }
     }
   },
   methods: {
       rowClick (item, index) {
-        this.productoSelect = item
+        this.infoOrden = item
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
       },
@@ -110,9 +211,22 @@ export default {
         this.$refs.tablaVentas.refresh()
       },
       nuevoProducto () {
-          this.productoSelect = {}
+          this.infoOrden = {}
           this.$refs.productoForm.show = true
-
+      },
+      mostrarDetalles(data){
+        this.axios.get(this.API + 'ordencompra/detalle', {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra
+          }
+        }).then((response) => {
+             this.detalle = response.data
+             this.infoOrden = data
+             this.$refs['modalDetalle'].show()
+        })
+        .catch((error) => {
+          console.log(error)
+        })
       },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
@@ -141,5 +255,7 @@ export default {
 </script>
 
 <style>
-
+#modalDetalle .modal-dialog{
+    max-width: 65% !important;
+}
 </style>
