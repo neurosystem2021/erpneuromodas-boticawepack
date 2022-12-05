@@ -6,7 +6,7 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-left">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-show="false">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                             <option value="vg">VIRGEN DE GUADALUPE</option>
                             <option value="vg2">VIRGEN DE GUADALUPE SF</option>
@@ -271,7 +271,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Trasferencia</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -294,7 +294,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Yape/Plin</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
