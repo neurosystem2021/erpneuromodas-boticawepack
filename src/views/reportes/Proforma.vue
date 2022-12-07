@@ -2,14 +2,14 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/logo.png">
+				<img src="/resources/images/banner-proforma.png">
 			</div>
-			<div id="company">
+			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
 				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
 				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>
+			</div>-->
 		</header>
 		<main>
       <div id="details" class="clearfix">
@@ -65,6 +65,9 @@
           </tr>
         </tfoot>
       </table>
+      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+          <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+        </div><br>
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
         <div>NOTA:</div>
