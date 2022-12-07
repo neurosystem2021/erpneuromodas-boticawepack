@@ -35,6 +35,21 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Doc. Referencia:</label>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRef"
+                                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
+                                        anchor="NroComprobante"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRef" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
                             </b-col>
                             <b-col md="4">
                                 <b-form-group>
@@ -50,6 +65,10 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                </b-form-group>
+                                <b-form-group v-if="isNota">
+                                    <label>Motivo :</label>
+                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
                             <b-col md="4">
@@ -159,6 +178,7 @@
                             :setPrecio="true"
                             ref="carrito" 
                             :showButton="false" 
+                            :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
@@ -174,6 +194,7 @@
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <input
                                                         v-model="descuentoGeneral"
+                                                        :disabled="bloquearInput?true:false"
                                                         min="0"
                                                         value="0"
                                                         @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
@@ -191,6 +212,7 @@
                                             <td>
                                                 <b-form-checkbox 
                                                     v-model="venta.EsCredito"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
@@ -198,6 +220,7 @@
                                                 <b-form-input 
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
+                                                    :disabled="bloquearInput?true:false || isNota"
                                                     type="date">
                                                 </b-form-input>
                                             </td>
@@ -216,6 +239,7 @@
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
+                                                    :disabled="bloquearInput?true:false"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -223,6 +247,7 @@
                                             <td>
                                                 <input
                                                     v-model="venta.pago.efectivo.monto"
+                                                    :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
@@ -236,6 +261,7 @@
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
+                                                    :disabled="bloquearInput?true:false"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -244,6 +270,7 @@
                                                 <input
                                                     class="form-control"
                                                     v-model="venta.pago.visa.monto"
+                                                    :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
@@ -257,6 +284,7 @@
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
+                                                    :disabled="bloquearInput?true:false"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -265,6 +293,7 @@
                                                 <input
                                                     class="form-control"
                                                     v-model="venta.pago.mastercard.monto"
+                                                    :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
@@ -313,6 +342,7 @@ export default {
     },
     data () {
         return {
+            isNota: false,
             dni: '',
             newDniRuc: '',
             ultimaVenta: '',
@@ -323,7 +353,20 @@ export default {
             descuentoGeneral: 0,
             tieneIgv: false,
             venta: {},
-
+            bloquearInput:false,
+            itemsMotivoNota: [
+                { value: null, text: '-- SELECCIONE EL MOTIVO --' },
+                { value: '01', text: 'ANULACION DE LA OPERACION' },
+                { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+                { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
+                { value: '04', text: 'DESCUENTO GLOBAL' },
+                { value: '05', text: 'DESCUENTO POR ITEM' },
+                { value: '06', text: 'DEVOLUCION TOTAL' },
+                { value: '07', text: 'DEVOLUCION POR ITEM' },
+                { value: '08', text: 'BONIFICACION' },
+                { value: '09', text: 'DISMINUCION EN EL VALOR' },
+                { value: '10', text: 'OTROS CONCEPTOS' }
+            ],    
             carrito: {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
@@ -358,7 +401,8 @@ export default {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock'
+            obtenerStok: 'obtenerStock',
+            add:'agregarProducto'
         }),
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
@@ -422,12 +466,30 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                CampoDireccion: 'Direccion'
+                CampoDireccion: 'Direccion',
+                NroComprobanteModifica: '',
+                CodSunatModifica: '',
+                NotaIdMotivo: '',
+                NotaDescMotivo: ''
             }
 
+            this.isNota = false
+            this.bloquearInput = false 
             this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
+            this.isNota = false
+            this.bloquearInput=false
+            this.venta.NroComprobanteModifica = ''
+            this.venta.CodSunatModifica = ''
+            this.venta.NotaIdMotivo = ''
+            this.venta.NotaDescMotivo = ''
+            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
+            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                this.isNota = true
+            }
+
             if (obj.TieneIgv) {
                 this.tieneIgv = true
             } else {
@@ -435,6 +497,66 @@ export default {
             }
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
+        },
+        setDocRef (obj) {
+            this.venta.CodSunatModifica = obj.CodSunat
+            this.venta.NroComprobanteModifica = obj.NroComprobante
+            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
+            }
+            this.axios.get(this.API + 'ventas/solonumero', {
+                params: {
+                    serie: this.venta.Serie,
+                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+                }
+            })
+            .then((response) => {
+                this.venta.Numero = response.data.numero
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+            //Cargar producto del documento afectado nota credito
+             this.axios.get(this.API + 'venta/detalle/comprobante', {
+                    params: {
+                        NroComprobante: obj.NroComprobante,
+                        idDocVenta: obj.IdDocVenta,
+                        IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+                    }
+                }).then((response) => {
+                this.axios.get(this.API + 'cliente', {
+                    params: {
+                        idCliente: response.data[0].IdCliente
+                    }})
+                    .then((response) => {
+                        if (response.data) {
+                            this.$refs.inputCliente.setValue(response.data.Cliente)
+                            this.venta.cliente = response.data
+                            this.venta.CampoDireccion = this.venta.cliente.Direccion
+                        } else {
+                            this.$toasted.show('No se encontro al cliente')
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                     this.limpiarCart()
+                     response.data.map((item) => {
+                        this.add([item, () => {
+                        }, false ])
+                    })     
+                    this.venta.NotaIdMotivo=null
+                    this.bloquearInput=true
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+                })
+        },
+        setMotivo(ev){
+            if(ev == '01' || ev == '02' || ev == '06' || ev == null){
+                this.bloquearInput=true;
+            }else{
+                this.bloquearInput=false;
+            }
         },
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
@@ -445,7 +567,9 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -640,6 +764,20 @@ export default {
                 this.inProgress = false
                 return;
             }
+
+            if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+                    this.inProgress = false
+                    return 
+                }
+                if(!this.venta.NotaIdMotivo) {
+                    this.$toasted.show('Debe seleccionar un Motivo')
+                    this.inProgress = false
+                    return 
+                }
+                this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
+            }
             
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
@@ -654,7 +792,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
-                // this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
