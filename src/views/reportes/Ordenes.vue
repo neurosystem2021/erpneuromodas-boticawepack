@@ -9,7 +9,7 @@
           </b-row>
           <hr>
           <b-row>
-            <b-col md="2" class="my-1">
+            <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Fecha Inicio:</label>
                 <b-form-input
@@ -19,7 +19,7 @@
                   placeholder="Fecha Inicio"></b-form-input>
               </b-form-group>
             </b-col>
-            <b-col md="2" class="my-1">
+            <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Fecha Fin:</label>
                 <b-form-input
@@ -29,10 +29,10 @@
                   placeholder="Fecha Inicio"></b-form-input>
               </b-form-group>
             </b-col>
-            <b-col md="3" class="my-1">
-              <b-button variant="success" size="sm" @click="verArticulos">Generar</b-button>
+            <b-col md="4" class="my-1">
+              <b-button variant="success" size="md" @click="verArticulos">Generar</b-button>
               <hr>
-              <b-button variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="md" :href="hrefXls" target="_blank"><i class="fas fa-file-excel"></i>  Exportar Ordenes</b-button>
             </b-col>
           </b-row>
 
@@ -181,7 +181,7 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/articulosmovimientos?fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta;
+      return '/api/index.php/reporte/ordenescompra?fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta;
     }
   },
   methods: {

@@ -361,7 +361,7 @@
             <h5>Exportar stock hasta la fecha actual:</h5>
           </b-col>
           <b-col md="4" class="centrarClase">
-            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen +'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + filter" target="_blank">Exportar Actual</b-button>
+            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/mercaderia?controlaStock=1&idAlmacen=' + almacen.IdAlmacen +'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + filter" target="_blank">Exportar Actual</b-button>
           </b-col>
         </b-row>
         <hr>
@@ -505,7 +505,7 @@ export default {
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
     },
     hrefXlsFechas () {
-      return ('/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + this.filter).replace('#','');
+      return ('/api/index.php/reporte/mercaderia?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + this.filter).replace('#','');
     },
     hrefXlsProducto () {
       return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');

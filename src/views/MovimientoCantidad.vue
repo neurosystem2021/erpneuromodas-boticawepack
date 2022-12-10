@@ -177,6 +177,21 @@
                         placeholder="Fecha Stock"
                         ></b-form-input>
                     </b-form-group>
+                    <b-form-group v-if="movimiento.movimientoTipo.CodSunat=='12'">
+                      <label>Orden de compra:</label>
+                      <autocomplete
+                        ref="inputOrdenCompra"
+                        required="required"
+                        initValue=""
+                        :url="API + 'ordencompra/solo'"
+                        anchor="Correlativo"
+                        label="writer"
+                        placeholder=""
+                        :on-select="setOrdenCompra"
+                        :onFocus="focusAutocomplete.bind(null, 'inputOrdenCompra')"
+                        :classes="{input: 'form-control'}">
+                      </autocomplete>
+                    </b-form-group>
                     <b-form-group v-if="false">
                       <label>Tipo de cambio:</label>
                       <input v-model.number="movimiento.TipoCambio"
@@ -314,7 +329,8 @@ return false
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
-        user: sessionStorage.getItem("User")
+        user: sessionStorage.getItem("User"),
+        OrdenCompra: 0
       }
     },
     onReset (evt) {
@@ -327,6 +343,9 @@ return false
       /* Trick to reset/clear native browser form validation state */
       /*this.show = false;
       this.$nextTick(() => { this.show = true });*/
+    },
+    setOrdenCompra(obj){
+      this.movimiento.OrdenCompra = obj.IdOrdenCompra
     },
     setTipoMovimiento (obj) {
       if (obj.Tipo == 0) {
@@ -358,7 +377,12 @@ return false
         }
       }
       this.movimiento.movimientoTipo = obj
-
+      if(obj.CodSunat!=12){
+        this.movimiento.OrdenCompra = 0
+        if(this.$refs.inputOrdenCompra){
+          this.$refs.inputOrdenCompra.setValue('')
+        }  
+      }
       this.cargarNumero()
     },
     setProveedor (obj) {

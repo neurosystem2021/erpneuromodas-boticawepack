@@ -65,18 +65,20 @@
             :current-page="currentPage">
           
               <template slot="Estado" slot-scope="data">
-                  <div v-if="data.item.Anulado==1" class="text-center">
-                    <b-badge variant="danger"><b>ANULADO</b></b-badge>
-                  </div>
-                  <div v-else class="text-center">
-                      <span v-if="data.item.Pagado==0 && data.item.EsCredito==0">
-                         <b-button variant="warning" size="sm" block @click="onCobrar(data.item.idDocVenta)"><b>COBRAR</b></b-button>
-                      </span>
-                      <span v-else>
-                        <div>
-                        <b-badge variant="success"><b v-if="data.item.EsCredito==0">COBRADO</b><b v-else>CREDITO</b></b-badge>
-                        </div>
-                      </span>
+                  <div v-if="data.item.CodSunat !='07'">
+                    <div v-if="data.item.Anulado==1" class="text-center">
+                      <b-badge variant="danger"><b>ANULADO</b></b-badge>
+                    </div>
+                    <div v-else class="text-center">
+                        <span v-if="data.item.Pagado==0 && data.item.EsCredito==0">
+                          <b-button variant="warning" size="sm" block @click="onCobrar(data.item.idDocVenta)"><b>COBRAR</b></b-button>
+                        </span>
+                        <span v-else>
+                          <div>
+                          <b-badge variant="success"><b v-if="data.item.EsCredito==0">COBRADO</b><b v-else>CREDITO</b></b-badge>
+                          </div>
+                        </span>
+                    </div>
                   </div>
               </template>
           </b-table>
