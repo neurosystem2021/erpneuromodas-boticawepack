@@ -160,6 +160,21 @@
                         placeholder="Fecha Stock"
                         ></b-form-input>
                     </b-form-group>
+                    <b-form-group>
+                      <label>Metodo de Pago:</label>
+                      <autocomplete
+                        ref="inputMetodo"
+                        required="required"
+                        initValue=""
+                        :url="API + 'metodopago/movimientos'"
+                        anchor="MovimientoMetodoPago"
+                        label="writer"
+                        placeholder=""
+                        :on-select="setMetodoPago"
+                        :onFocus="focusAutocomplete.bind(null, 'inputMetodo')"
+                        :classes="{input: 'form-control'}">
+                      </autocomplete>
+                    </b-form-group>
                     <b-form-group v-if="false">
                       <label>Tipo de cambio:</label>
                       <input v-model.number="movimiento.TipoCambio"
@@ -299,7 +314,8 @@ return false
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
         user: sessionStorage.getItem("User"),
-        FechaRecojo: this.$moment().format("YYYY-MM-DD")
+        FechaRecojo: this.$moment().format("YYYY-MM-DD"),
+        IdMetodoPago:null
       }
     },
     onReset (evt) {
@@ -345,6 +361,9 @@ return false
       this.movimiento.movimientoTipo = obj
 
       this.cargarNumero()
+    },
+    setMetodoPago(obj){
+      this.movimiento.IdMetodoPago = obj.IdMovimientoMetodoPago
     },
     setProveedor (obj) {
       this.movimiento.proveedor = obj
@@ -416,6 +435,12 @@ return false
         return;
       }
 
+      if (this.movimiento.IdMetodoPago == null) {
+        this.$toasted.show('Seleccione un metodo de pago')
+        this.inProgress = false
+        return;
+      }
+
       if (faltaLlenar) {
         this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
@@ -436,6 +461,7 @@ return false
           this.limpiar()
           //this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
+          this.$refs.inputMetodo.setValue('')
           this.$toasted.success('Orden de compra guardada correctamente')          
         }
         this.inProgress = false

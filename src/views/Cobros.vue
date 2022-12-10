@@ -69,11 +69,13 @@
                     <b-badge variant="danger"><b>ANULADO</b></b-badge>
                   </div>
                   <div v-else class="text-center">
-                      <span v-if="data.item.Pagado==0">
+                      <span v-if="data.item.Pagado==0 && data.item.EsCredito==0">
                          <b-button variant="warning" size="sm" block @click="onCobrar(data.item.idDocVenta)"><b>COBRAR</b></b-button>
                       </span>
                       <span v-else>
-                        <b-badge variant="success"><b>COBRADO</b></b-badge>
+                        <div>
+                        <b-badge variant="success"><b v-if="data.item.EsCredito==0">COBRADO</b><b v-else>CREDITO</b></b-badge>
+                        </div>
                       </span>
                   </div>
               </template>
@@ -346,11 +348,13 @@ export default {
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                   })
-                  let ventaJson= JSON.stringify(null)
-                  var left = (screen.width/2)-(800/2)
-                  var top = (screen.height/2)-(800/2)
-                  let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                  window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                  if(this.productoSelect.PorEntregar!=1){
+                    let ventaJson= JSON.stringify(null)
+                    var left = (screen.width/2)-(800/2)
+                    var top = (screen.height/2)-(800/2)
+                    let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                    window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                  }
                   window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta,'_blank');
                 }else{
                   this.$toasted.show('La venta fue cobrada anteriormente')

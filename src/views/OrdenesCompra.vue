@@ -89,6 +89,10 @@
                     <td class="celda" style="font-weight:bold; width:35% !important;">Forma de Pago</td>
                     <td class="celda" style="text-transform: uppercase">: {{ infoOrden.EsCredito==1?'CRÉDITO':'CONTADO'}}</td>
                   </tr>
+                  <tr>
+                    <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
+                    <td class="celda" style="text-transform: uppercase">: {{ infoOrden.MovimientoMetodoPago}}</td>
+                  </tr>
                 </tbody>
               </table>
             </b-col>
@@ -172,7 +176,6 @@ export default {
             { key: 'Correlativo', sortable: true },
             { key: 'FechaOrdenCompra', label:'Fecha', sortable: true },
             { key: 'Ruc', sortable: true },
-            { key: 'Proveedor', sortable: true },
             { key: 'Proveedor', sortable: true },
             { key: 'Total', sortable: true },
             { key: 'Ver', label: 'Ver', class:'text-center' },

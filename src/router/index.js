@@ -35,6 +35,7 @@ import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
+import Ordenes from '@/views/reportes/Ordenes.vue'
 
 Vue.use(Router)
 
@@ -205,6 +206,11 @@ export default new Router({
       path: '/ordenescompra',
       name: 'OrdenesCompra',
       component: OrdenesCompra
+    },
+    {
+      path: '/reporte/ordenes',
+      name: 'Ordenes',
+      component: Ordenes
     },
   ]
 })
