@@ -409,6 +409,7 @@ export default {
     renderChild(data) {
       if (this.idAlmacen) {
         let style = 'ss'
+        let styleBag = 'ss'
 
         // cambiar color los vencidos
         var dt = new Date()
@@ -436,6 +437,16 @@ export default {
         // if (!data.ControlaStock) {
         //   data.stock = '---'
         // }
+
+        if (!data.ControlaStock) {
+          data.stock = '---'
+        }
+        if (data.stock > 0) {
+          styleBag  = 'success'
+        }
+        if (data.stock <= 0) {
+          styleBag  = 'secondary'
+        }
 
 //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
         return `
@@ -467,7 +478,7 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="table-info"><b>${data.stock}</b></td>
+                <td class="bg-${styleBag}"><b>${data.stock}</b></td>
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td>${data.ProductoMedicion}</td>
