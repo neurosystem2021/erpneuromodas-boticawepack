@@ -1134,6 +1134,9 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
+                if(idPerfil!=3){
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
+                }
                 this.$swal({
                     position: 'center',
                     icon: 'success',
@@ -1145,9 +1148,6 @@ export default {
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                 })
-                if(idPerfil!=3){
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
-                }
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
