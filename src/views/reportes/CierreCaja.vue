@@ -1,14 +1,14 @@
 <template>
-  <div :class="{'fondo-empresa': (this.empresa === 'rosmart')}">
+  <div :class="{'fondo-empresa': (this.empresa === 'imperiop1')}">
     <br>
     <b-container class="bv-example-row">
       <div>
           <div class="no-print">
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
-                      <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                          <option value="dismart">EMPRESA DISMART</option>
-                          <option value="rosmart">EMPRESA ROSMART</option>
+                      <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
+                          <option value="imperiop1">EMP. EL IMPERIO DE LOS COLCHONES S.A.C</option>
+                          <option value="imperiop2">EMP. HUILCA AGUILAR LEYDI SUSAN</option>
                       </select>
                   </b-button-group>
               </div>
@@ -426,9 +426,9 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'dismart';
-    if (this.$route.query.empresa === 'rosmart') {
-      empresa = 'rosmart';
+    let empresa = sessionStorage.getItem('empresa') || 'imperiop2';
+    if (this.$route.query.empresa === 'imperiop1') {
+      empresa = 'imperiop1';
     }
     
     // Interceptos XMLHttpRequest
@@ -473,7 +473,7 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'dismart'
+      empresa: 'imperiop2'
     }
   },
   computed: {

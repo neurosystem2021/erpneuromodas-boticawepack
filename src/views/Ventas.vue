@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa': (this.empresa === 'rosmart')}">
+    <div :class="{'fondo-empresa': (this.empresa === 'imperiop1')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -8,9 +8,9 @@
             <div>
                 <div class="float-left">
                     <b-button-group size="sm">
-                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
-                            <option value="dismart">EMPRESA DISMART</option>
-                            <option value="rosmart">EMPRESA ROSMART</option>
+                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
+                            <option value="imperiop1">EMP. EL IMPERIO DE LOS COLCHONES S.A.C</option>
+                            <option value="imperiop2">EMP. HUILCA AGUILAR LEYDI SUSAN</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -449,7 +449,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'dismart');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'imperiop2');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -519,7 +519,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'dismart',
+            empresa: 'imperiop2',
             ventaSinStock: 0
         }
     },
