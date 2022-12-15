@@ -36,6 +36,7 @@ import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 import Ordenes from '@/views/reportes/Ordenes.vue'
+import Confrontacion from '@/views/reportes/Confrontacion.vue'
 
 Vue.use(Router)
 
@@ -211,6 +212,11 @@ export default new Router({
       path: '/reporte/ordenes',
       name: 'Ordenes',
       component: Ordenes
+    },
+    {
+      path: '/reporte/confrontacion',
+      name: 'Confrontacion',
+      component: Confrontacion
     },
   ]
 })
