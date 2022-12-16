@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated Target="_blank">
         <b-container fluid class="bv-example-row">
           <b-row>
               <b-col md="4">
@@ -125,8 +125,10 @@ return false
         return;
       }
 
-      this.axios.post(this.API + 'movimientos', {
-        productos: this.productos
+      this.axios.post(this.API + 'reporte/confrontacion', {
+        Productos: this.productos.map((p)=>({IdProducto:p.IdProducto,cantidad:p.cantidad})),
+        IdProductos: this.productos.map(prod => prod.IdProducto),
+        IdAlmacen: this.almacen.IdAlmacen,
       })
       .then((response) => {
         if (response.data.error) {
@@ -136,7 +138,8 @@ return false
           if(this.$refs.inputAlmacenOrigen){
             this.$refs.inputAlmacenOrigen.setValue('')
           }
-          this.$toasted.success('Movimiento guardado correctamente ')          
+          this.almacen = {}
+          this.$toasted.success('Reporte de confrontacion generado')          
         }
         this.inProgress = false
       })

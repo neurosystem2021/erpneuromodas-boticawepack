@@ -257,7 +257,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <!--<b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>-->
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -664,7 +664,7 @@ export default {
         this.$toasted.success('Producto añadido correctamente')
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
+      //this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
     },
@@ -687,7 +687,7 @@ export default {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
       }, false, false, this.cliente.EsVIP])
-      this.$refs['modalCant'].hide()
+      //this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
     },
@@ -754,7 +754,7 @@ export default {
         `
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> | ${data.CodigoBarra} | ${data.ProductoCategoria} | ${data.ProductoMarca}
       `
     },
     // setCantidad (index, val) {
