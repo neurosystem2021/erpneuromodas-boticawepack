@@ -23,7 +23,7 @@
                     </b-form-group>
               </b-col>
               <b-col md="4" v-if="almacen.IdAlmacen">
-                <b-button variant="success">Confrontar Todo ({{almacen.Almacen}})</b-button>
+                <b-button variant="success" :href="'/api/index.php/reporte/confrontacion/total?idAlmacen=' + almacen.IdAlmacen" target="_blank">Confrontar Todo ({{almacen.Almacen}})</b-button>
                 <hr>
                 
               </b-col>
@@ -139,7 +139,13 @@ return false
             this.$refs.inputAlmacenOrigen.setValue('')
           }
           this.almacen = {}
-          this.$toasted.success('Reporte de confrontacion generado')          
+          this.$toasted.success('Reporte de confrontacion generado')   
+          document.open();
+          document.write(response.data);
+          document.close(); 
+          setTimeout(() => {
+              document.location.reload();
+          }, 1500);
         }
         this.inProgress = false
       })

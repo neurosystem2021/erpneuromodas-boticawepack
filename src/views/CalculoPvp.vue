@@ -444,11 +444,11 @@ return false
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
-      if (!this.movimiento.proveedor.IdProveedor) {
+      /*if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
         this.inProgress = false            
         return
-      }
+      }*/
 
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
@@ -473,7 +473,7 @@ return false
         }
       })
 
-      if (faltaCantidad) {
+      /*if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
         this.inProgress = false
         return;
@@ -485,7 +485,7 @@ return false
         return;
       }*/
 
-      if (sinStock>=1 && (this.isTraslado==true || this.isSalida==true)) {
+      /*if (sinStock>=1 && (this.isTraslado==true || this.isSalida==true)) {
         this.$toasted.show('No tiene stock para realizar el movimiento')
         this.inProgress = false
         return;
@@ -493,9 +493,9 @@ return false
 
       if(this.isTraslado==true || this.isSalida==true){
         this.movimiento.alterarProductos = 0
-      }
+      }*/
 
-      this.axios.post(this.API + 'movimientos', {
+      this.axios.post(this.API + 'pvp', {
         movimiento: this.movimiento,
         productos: this.productos
       })
@@ -503,12 +503,12 @@ return false
         if (response.data.error) {
           this.$toasted.show(response.data.error)
         } else {
-          this.ultimoMovimiento = response.data.hash
+          //this.ultimoMovimiento = response.data.hash
           this.movimiento = this.initMovimiento()
           this.limpiar()
-          this.$refs.inputMovimiento.setValue('')
+          //this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.success('Movimiento guardado correctamente ')          
+          this.$toasted.success('PVP guardado correctamente ')          
         }
         this.inProgress = false
       })

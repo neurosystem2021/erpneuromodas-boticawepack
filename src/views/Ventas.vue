@@ -1071,7 +1071,7 @@ export default {
                 descuentoTotal += (pro.descuento || 0)
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.venta.tipoVenta.CodSunat != '99' ) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;

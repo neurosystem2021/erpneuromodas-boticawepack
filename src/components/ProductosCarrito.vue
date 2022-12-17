@@ -561,7 +561,7 @@ export default {
       if(!this.isVentas){
         return;
       }
-      if (obj.Rendimiento || obj.Ancho || obj.Largo) {
+      if (obj.Rendimiento && obj.Ancho && obj.Largo) {
         this.$refs.modalCalcularM2.show()
       }
       this.productoSelect = obj
