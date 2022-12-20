@@ -188,8 +188,13 @@
               <h5>Datos de la empresa de transportes</h5>
               <div class="container">
                 <div class="row">
-                  <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                    <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
+                    <div class="input-group input-group-sm col-sm-8">
+                      <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                      <div class="input-group-append">
+                          <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUC()">Buscar</b-button>
+                      </div>
+                    </div>
                 </div>
               </div>
               <div class="container">
@@ -303,6 +308,13 @@ export default {
     guardarRemision (evt) {
       evt.preventDefault();
       this.inProgress = true
+
+      if((''+this.remision.codUbigeoOrigen).trim().length!=6 || (''+this.remision.codUbigeoDestino).trim().length!=6){
+          this.$toasted.show('Verificar los codigos de ubigeo origen y destino; debe tener 6 digitos',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
           this.inProgress = false            
@@ -327,7 +339,7 @@ export default {
         console.log(response);
         
         if (response.data.error) {
-          this.$toasted.show(response.data.error)
+          this.$toasted.show(response.data.error,{duration:3000})
         } else {
           this.limpiarCart()
           this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
@@ -364,6 +376,37 @@ export default {
     focusAutocomplete (ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
+    },
+    consultarDNIRUC () {
+      if ((''+this.remision.nroDocumentoTransportista).trim()=='' || this.remision.nroDocumentoTransportista == undefined) {
+          this.$toasted.show('Debe ingresar Número Documento Transportista')
+          return
+      }
+      let esNumerico = Number.isInteger(parseInt(this.remision.nroDocumentoTransportista))
+      if (!esNumerico) {
+          this.$toasted.show('El RUC debe ser numérico, editar Número Documento Transportista')
+          return
+      }
+      
+      this.axios.get(this.API + 'consultarRUC', {
+          params: {
+              type: 'RUC',
+              numero: this.remision.nroDocumentoTransportista
+          }
+      }).then((response) => {
+          if (response.data) {
+              this.$toasted.info('Transportista encontrado, se llenarán sus datos')                  
+              let data = response.data
+              this.remision.razonSocialTransportista = data.razonSocial
+              document.getElementById("razonSocialTransportista").value = data.razonSocial
+          } else {
+              this.$toasted.show('No se encontró el Transportista')                
+          }
+      })
+      .catch((error) => {
+          this.$toasted.show('No se encontró el Transportista')        
+          console.log(error)
+      })
     },
     setMovRef (obj) {
       this.$set(this.remision, 'nroDocumentoCliente', '');
