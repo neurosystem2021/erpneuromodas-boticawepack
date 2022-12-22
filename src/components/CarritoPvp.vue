@@ -228,6 +228,19 @@
             @input="setPvp(data.index)"
             />
         </template>
+        <template slot="costototal" slot-scope="data">
+          <input
+            v-model="productos[data.index].costototal"
+            type="number"
+            style="width: 95px"
+            min="0"
+            required
+            step="0.00001"
+            class="form-control"
+            placeholder="Costo Total"
+            @input="setPvp(data.index)"
+            />
+        </template>
         <template slot="uti" slot-scope="data">
           <input
             v-model="productos[data.index].preciouti"
@@ -1058,14 +1071,12 @@ export default {
     },
     setPvp(index){
       //REDONDEAR A DECIMAL
-      this.productos[index].preciopvp = (Number(this.productos[index].PrecioCosto || 0) + Number(this.productos[index].preciof || 0) +
-      Number(this.productos[index].preciofusd || 0) + Number(this.productos[index].precios || 0) + Number(this.productos[index].precioo || 0))  / (1-(Number(this.productos[index].preciouti || 100)/100))
+      this.productos[index].costototal = (Number(this.productos[index].PrecioCosto || 0) + Number(this.productos[index].preciof || 0) +
+      Number(this.productos[index].preciofusd || 0) + Number(this.productos[index].precios || 0) + Number(this.productos[index].precioo || 0))
 
-      console.log((Number(this.productos[index].PrecioCosto || 0) + Number(this.productos[index].preciof || 0) +
-      Number(this.productos[index].preciofusd || 0) + Number(this.productos[index].precios || 0) + Number(this.productos[index].precioo || 0)));
-      console.log(1-(Number(this.productos[index].preciouti || 100)/100));
+      this.productos[index].preciopvp =  Math.ceil((this.productos[index].costototal  / (1-(Number(this.productos[index].preciouti || 100)/100)))) 
 
-      this.productos[index].preciopvp3 = (this.productos[index].preciopvp || 0) * this.productos[index].Rendimiento || 1
+      this.productos[index].preciopvp3 = Math.ceil((this.productos[index].preciopvp || 0) * this.productos[index].Rendimiento || 1)
        },
     actualizarDescu(index){
       let obj = this.productos[index];
