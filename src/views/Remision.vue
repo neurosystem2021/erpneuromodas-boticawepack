@@ -45,6 +45,12 @@
                     <option value="02">Transporte privado</option>
                   </select>
                 </div>
+                <div class="row">
+                  <div class="col-12">
+                    <b-form-text style="color:red !important; font-size:0.8rem;">*La opción público requiere que se complete toda información de un transportista, hace referencia a una tercer empresa de transportes encargada en trasladar.*</b-form-text>
+                    <b-form-text style="color:red !important; font-size:0.8rem;">*La opción privado no requiere información del transportista, ya que es su empresa o el cliente encargado en transladar.*</b-form-text>
+                  </div>
+                </div>
               </div>
               <div class="container">
                 <div class="row">
@@ -101,6 +107,7 @@
                         ref="inputDocRef"
                         :url="API + 'ventas/busqueda'"
                         anchor="NroComprobante"
+                        :customParams="{'idPuntoVenta': idPuntoVentaSiste}"
                         initValue=""
                         label="writer"
                         placeholder=""
@@ -189,7 +196,12 @@
               <div class="container">
                 <div class="row">
                   <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                  <div class="input-group input-group-sm col-sm-8">
+                    <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                    <div class="input-group-append">
+                        <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUC()">Buscar</b-button>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="container">
@@ -211,7 +223,7 @@
               <div class="container">
                 <div class="row">
                   <label for="placaCarreta" class="col-sm-4">N° de Placa Carreta</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="placaCarreta" placeholder="N° de Placa" v-model="remision.placaCarreta">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="placaCarreta" placeholder="N° de Placa Carreta" v-model="remision.placaCarreta">
                 </div>
               </div>
 
@@ -237,7 +249,7 @@
 
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true" :isVentas="true"></productos-carrito>
+              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -267,7 +279,10 @@ export default {
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
         descripcionMotivoTraslado:'VENTA',
-        fechaTraslado: this.$moment().format("YYYY-MM-DD")
+        fechaTraslado: this.$moment().format("YYYY-MM-DD"),
+        placaCarreta: '',
+        nroDocumentoTransportista: '',
+        razonSocialTransportista: ''
       },
       cliente: {},
       carrito: {
@@ -304,6 +319,37 @@ export default {
     guardarRemision (evt) {
       evt.preventDefault();
       this.inProgress = true
+
+      if((''+this.remision.codUbigeoOrigen).trim().length!=6 || (''+this.remision.codUbigeoDestino).trim().length!=6){
+          this.$toasted.show('Verificar los codigos de ubigeo origen y destino; debe tener 6 digitos',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
+      if((this.remision.codMotivoTraslado!='08' || this.remision.codMotivoTraslado!='09') && (''+this.remision.placaCarreta)!=''){
+          this.$toasted.show('La placa de carreta o contenedor, solo se debe completar en IMPORTACION O EXPORTACION, PORFAVOR BORRAR CAMPO',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
+      if((this.remision.codMotivoTraslado=='08' || this.remision.codMotivoTraslado=='09') && (''+this.remision.placaCarreta).trim()==''){
+          this.$toasted.show('La placa de carreta o contenedor, debe completarse en IMPORTACION O EXPORTACION, COMPLETAR CAMPO',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
+      if(this.remision.codModalidadTraslado=='01' && (''+this.remision.nroDocumentoTransportista).trim()==''){
+          this.$toasted.show('EN TRANSPORTE MODALIDAD PUBLICO DEBE COMPLETAR LOS DATOS DEL TRANSPORTISTA',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
+      if(this.remision.codModalidadTraslado=='02' && ((''+this.remision.nroDocumentoTransportista)!='' || (''+this.remision.razonSocialTransportista)!='')){
+          this.$toasted.show('EN TRANSPORTE MODALIDAD PRIVADO NO DEBE COMPLETAR LOS DATOS DEL TRANSPORTISTA, PORFAVOR BORRAR CAMPOS',{duration:3000})
+          this.inProgress = false            
+          return
+      }
+
       if(!this.productos.length) {
           this.$toasted.show('No ha seleccionado ningun producto')
           this.inProgress = false            
@@ -329,7 +375,7 @@ export default {
         console.log(response);
         
         if (response.data.error) {
-          this.$toasted.show(response.data.error)
+          this.$toasted.show(response.data.error,{duration:3000})
         } else {
           this.limpiarCart()
           this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
@@ -354,7 +400,7 @@ export default {
           this.remision.totalBultos = '';
           this.$refs.inputDocRef.setValue('');
           this.$refs.inputMovRef.setValue('');
-          this.$toasted.success('Movimiento guardado correctamente ')          
+          this.$toasted.success('Guia guardada correctamente ')          
         }
         this.inProgress = false
       })
@@ -366,6 +412,41 @@ export default {
     focusAutocomplete (ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
+    },
+    consultarDNIRUC () {
+      if ((''+this.remision.nroDocumentoTransportista).trim()=='' || this.remision.nroDocumentoTransportista == undefined) {
+          this.$toasted.show('Debe ingresar Número Documento Transportista')
+          return
+      }
+      let esNumerico = Number.isInteger(parseInt(this.remision.nroDocumentoTransportista))
+      if (!esNumerico) {
+          this.$toasted.show('El RUC debe ser numérico, editar Número Documento Transportista')
+          return
+      }
+      
+      this.axios.get(this.API + 'consultarRUC', {
+          params: {
+              type: 'RUC',
+              numero: this.remision.nroDocumentoTransportista
+          }
+      }).then((response) => {
+          if (response.data) {
+              if(response.data.success==false){
+                this.$toasted.show('No se encontro al Transportista');
+                return
+              }
+              this.$toasted.info('Transportista encontrado, se llenarán sus datos')                  
+              let data = response.data
+              this.remision.razonSocialTransportista = data.razonSocial
+              document.getElementById("razonSocialTransportista").value = data.razonSocial
+          } else {
+              this.$toasted.show('No se encontró el Transportista')                
+          }
+      })
+      .catch((error) => {
+          this.$toasted.show('No se encontró el Transportista')        
+          console.log(error)
+      })
     },
     setMovRef (obj) {
       this.$set(this.remision, 'nroDocumentoCliente', '');
@@ -383,18 +464,18 @@ export default {
         }).then((response) => {
           
           if (response.data[0]) {
-            this.axios.get(this.API + 'cliente', {
+            this.axios.get(this.API + 'proveedor', {
               params: {
-                  idCliente: response.data[0].IdProveedor
+                  idProveedor: response.data[0].IdProveedor
               }})
               .then((response) => {
                 if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
+                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
                   this.$set(this.remision, 'direccionCliente', response.data.Direccion);
                   this.cliente = response.data;
                 } else {
-                  this.$toasted.show('No se encontro al cliente');
+                  this.$toasted.show('No se encontro al proveedor');
                 }
               })
               .catch((error) => {
