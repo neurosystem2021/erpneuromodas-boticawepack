@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary">Configurar</b-button>
+        <b-button @click="MostrarConfiguracion" variant="outline-primary">Configurar</b-button>
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 
@@ -28,12 +28,13 @@
                     <b-col><label for="input-porcada">El cliente gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
-                        <b-form-input v-model="puntos"
+                        <input v-model="puntos"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="1"
-                            placeholder=""></b-form-input>
+                            placeholder=""
+                            class="form-control"/>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -41,12 +42,13 @@
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="valorPunto"
+                        <input v-model="valorPunto"
                             id="input-porcada"
                             type="number"
                             min="0"
                             step="0.1"
-                            placeholder=""></b-form-input>
+                            placeholder=""
+                            class="form-control"/>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -62,6 +64,33 @@
                             class="form-control"
                             placeholder=""/>
                             <b-button size="sm" text="Button" variant="success" @click="guardarConfigComision">Ok</b-button>
+                        </b-input-group>
+                    </b-col>
+                </b-row>
+                <hr>
+                <b-row class="mb-1">
+                    <b-col><label for="input-porcada">Descuento Coorporativo: </label></b-col>
+                    <b-col>
+                        <b-input-group size="sm" prepend="%. ">
+                        <b-form-input v-model="descCorporativo"
+                            id="input-porcada"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder=""></b-form-input>
+                        </b-input-group>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-1">
+                    <b-col><label for="input-porcada">Descuento Institucional: </label></b-col>
+                    <b-col>
+                        <b-input-group size="sm" prepend="% ">
+                        <b-form-input v-model="descInstitucional"
+                            id="input-porcada"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder=""></b-form-input>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -94,6 +123,8 @@ import config from '@/store/config.js'
                 puntos: 1,
                 valorPunto: 1,
                 valorComision: 1,
+                descCorporativo: 0,
+                descInstitucional: 0
             }
         },
         methods: {
@@ -103,6 +134,8 @@ import config from '@/store/config.js'
                     this.porCada = response.data.PorCada,
                     this.puntos = response.data.Puntos,
                     this.valorPunto = response.data.ValorPunto
+                    this.descCorporativo = response.data.DescCorporativo
+                    this.descInstitucional = response.data.DescInstitucional
                 })
                 .catch((error) => {
                     console.log(error)
@@ -120,6 +153,24 @@ import config from '@/store/config.js'
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
+            MostrarConfiguracion(){
+                let pass = window.prompt('Escriba su contraseña de administrador')
+                if (pass) {
+                    this.axios.post(this.API + 'login', {
+                    user: 'admin',
+                    password: pass
+                    }).then(r => {
+                        if (r.data) {
+                            this.show = true;
+                        }else{
+                            this.$toasted.show('Contraseña incorrecta, no autorizado.')
+                        }
+                    }).catch((error) => {
+                        console.log(error)
+                        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    })
+                }
+            },
             guardarConfigVenta (evt) {
                 evt.preventDefault()
 
@@ -131,7 +182,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.$emit('onUpdateConfig', response.data)
                     this.obtenerDescuento()
-                    this.$toasted.show('Se actualizó la configuración')
+                    this.$toasted.info('Se actualizó la configuración')
                     this.show = false
                 })
                 .catch((error) => {
