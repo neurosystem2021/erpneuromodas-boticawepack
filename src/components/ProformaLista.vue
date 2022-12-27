@@ -12,8 +12,8 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                            <option value="imperiop1">EMP. EL IMPERIO DE LOS COLCHONES S.A.C</option>
-                            <option value="imperiop2">EMP. HUILCA AGUILAR LEYDI SUSAN</option>
+                            <option value="toyorep">TOYOREP CORPORATION ALBORNOZ S.A.C.</option>
+                            <option value="toyorep2">ALBORNOZ ISIDRO CARLOS URIARTE</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
@@ -94,7 +94,7 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
-                empresaselec: sessionStorage.getItem('empresa') || 'imperiop2'
+                empresaselec: sessionStorage.getItem('empresa') || 'toyorep2'
             }
         },
         props: ['idAlmacen','empresa'],

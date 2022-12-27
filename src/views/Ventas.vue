@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa': (this.empresa === 'imperiop1')}">
+    <div :class="{'fondo-empresa': (this.empresa === 'toyorep')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -9,8 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                            <option value="imperiop1">EMP. EL IMPERIO DE LOS COLCHONES S.A.C</option>
-                            <option value="imperiop2">EMP. HUILCA AGUILAR LEYDI SUSAN</option>
+                            <option value="toyorep">TOYOREP CORPORATION ALBORNOZ S.A.C.</option>
+                            <option value="toyorep2">ALBORNOZ ISIDRO CARLOS URIARTE</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -449,7 +449,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'imperiop2');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'toyorep2');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -519,7 +519,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'imperiop2',
+            empresa: 'toyorep2',
             ventaSinStock: 0
         }
     },
