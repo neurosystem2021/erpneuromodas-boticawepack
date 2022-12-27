@@ -155,7 +155,7 @@ export default {
     myRowClickHandler(record, index) {
       if(record.Letras!='Ninguna'){
         this.showLetras = true
-        this.$refs.detDeuPro.cargarDeudasProveedor(record.Id,record.Total,record.Ruc,record.Proveedor,record.Correlativo);
+        this.$refs.detDeuPro.cargarDeudasProveedor(record.Id,record.Total,record.Ruc,record.Proveedor,record.Correlativo,record.Moneda);
       }
     }
   },
