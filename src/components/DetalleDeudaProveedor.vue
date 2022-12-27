@@ -8,7 +8,7 @@
             <b-col>
                 <h6 style="font-weight:normal"> Serie: <span style="font-weight:bold">{{Serie}}</span></h6>   
                 <h6 style="font-weight:normal"> ID Documento: <span style="font-weight:bold">{{IdDoc}}</span></h6>
-                <h6 style="font-weight:normal"> Monto total: <span style="font-weight:bold">S/. {{Total.toFixed(2)}}</span></h6>
+                <h6 style="font-weight:normal"> Monto total: <span style="font-weight:bold">{{Moneda}} {{Total.toFixed(2)}}</span></h6>
             </b-col>
         </b-row>
 
@@ -76,18 +76,20 @@ import config from '@/store/config.js'
                 Total:0,
                 Empresa:"",
                 Serie:"",
-                Ruc:""
+                Ruc:"",
+                Moneda: ""
             }
         },
         computed:{
         },
         methods: {
-            cargarDeudasProveedor(idDocDet, total, ruc, empresa, serie){
+            cargarDeudasProveedor(idDocDet, total, ruc, empresa, serie, moneda){
             this.IdDoc = idDocDet;
             this.Total = total;  
             this.Ruc = ruc;
             this.Empresa = empresa; 
             this.Serie = serie; 
+            this.Moneda = moneda;
             this.axios.get(this.API + 'letras?idDocDet=' +idDocDet) 
                 .then((response) => {
                    this.Letras = response.data;
