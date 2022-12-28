@@ -813,6 +813,7 @@ export default {
                 <th style="width: 200px">Producto</th>
                 <th style="width: 100px">Categoría</th>
                 <th style="width: 100px">Marca</th>
+                <th style="width: 120px">Modelo</th>
                 <th class="table-primary" style="width: 65px">Precio</th>
               </tr>
             </thead>
@@ -822,6 +823,7 @@ export default {
                 <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
                 <td>${data.ProductoCategoria}</td>
                 <td>${data.ProductoMarca}</td>
+                <td>${data.ProductoModelo}</td>
                 <td class="table-primary"><b>${data.PrecioContado}</b></td>
               </tr>
             </tbody>

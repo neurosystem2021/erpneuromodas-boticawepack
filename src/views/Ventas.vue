@@ -171,6 +171,18 @@
                                     </b-row>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="4" style="margin-top:-20px; margin-bottom:10px">
+                                <b-form-group>
+                                    <b-input-group prepend="Placa" class="mt-2">
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            required
+                                            class="form-control"
+                                            onkeyup="this.value = this.value.toUpperCase();"
+                                            placeholder="Placa" />
+                                    </b-input-group>
+                                </b-form-group>
+                            </b-col>
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -674,6 +686,7 @@ export default {
                 diasValidosProf: 0,
                 idProforma: 0,
                 anioNumeroProforma:'',
+                Placa:'',
             }
             this.isNota = false
             this.bloquearInput=false
