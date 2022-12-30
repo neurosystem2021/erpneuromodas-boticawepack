@@ -85,6 +85,10 @@
                       <td class="celda" style="font-weight:bold; width:35% !important;">Forma de Pago</td>
                       <td class="celda" style="text-transform: uppercase">: {{ infoOrden.EsCredito==1?'CRÉDITO':'CONTADO'}}</td>
                     </tr>
+                    <tr v-if="infoOrden.EsCredito==1">
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Fecha de Crédito</td>
+                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaCredito }}</td>
+                    </tr>
                     <tr>
                       <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
                       <td class="celda" style="text-transform: uppercase">: {{ infoOrden.MovimientoMetodoPago}}</td>

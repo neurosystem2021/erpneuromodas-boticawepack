@@ -388,12 +388,20 @@ export default {
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                   })
+                  let venta = {
+                    Cliente: this.productoSelect.Cliente,
+                    DniRuc: this.productoSelect.DniRuc,
+                    FechaDoc: this.productoSelect.FechaDoc,
+                    UsuarioReg: this.productoSelect.UsuarioReg
+                  }
+                  let productos = this.productoSelect.Detalle.map(p=>({CodigoBarra:p.CodigoBarra,Producto:p.Producto,Cantidad:p.Cantidad,ProductoMedicion:p.ProductoMedicion}))
                   if(this.productoSelect.PorEntregar!=1){
-                    let ventaJson= JSON.stringify(null)
+                    let ventaJson= JSON.stringify(venta)
+                    let productosJson= JSON.stringify(productos)
                     var left = (screen.width/2)-(800/2)
                     var top = (screen.height/2)-(800/2)
                     let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                    window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    window.open('http://localhost:5000/imprimir/entregar.php?venta='+encodeURIComponent(ventaJson)+'&productos='+encodeURIComponent(productosJson), "Impresión", params)
                   }
                   window.open('/imprimir/index.php?IdDocVenta=' + idDocVenta,'_blank');
                 }else{
