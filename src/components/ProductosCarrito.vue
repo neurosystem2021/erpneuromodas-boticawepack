@@ -269,10 +269,10 @@
             step="0.01"
             class="form-control"
             value="0"
-            :max="tipoVenta==2?productos[data.index].PorcentajeDescMax:8"
+            :max="tipoVenta==2?productos[data.index].PorcentajeDescMax:(tipoVenta==1?descCorporativoProp:(tipoVenta==3?descInstitucionalProp:0))"
             @input="val =>{productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value/100*10)/10; actualizarDescu(data.index); } "/>
             <b-form-text class="text-center">
-                <b style="color:#dc3545">% Max: {{tipoVenta==2?productos[data.index].PorcentajeDescMax:8}}</b>
+                <b style="color:#dc3545">% Max: {{tipoVenta==2?productos[data.index].PorcentajeDescMax:(tipoVenta==1?descCorporativoProp:(tipoVenta==3?descInstitucionalProp:0))}}</b>
                 <br>
                 <b>Desc: S/{{productos[data.index].descuento}}</b>      
             </b-form-text>
@@ -454,6 +454,8 @@ export default {
     idAlmacen: Number,
     bloquearInput:Boolean,
     esDelivery:Boolean,
+    descCorporativoProp: Number,
+    descInstitucionalProp: Number,
     onSetProducto: {
       type: Function,
       default (obj) {

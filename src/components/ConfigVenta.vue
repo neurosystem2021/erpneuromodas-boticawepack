@@ -11,7 +11,7 @@
                 body-bg-variant="light"
                 body-text-variant="dark">
 
-                <b-row class="mb-1">
+                <b-row class="mb-1" v-show="false">
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
@@ -24,7 +24,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-1">
+                <b-row class="mb-1"  v-show="false">
                     <b-col><label for="input-porcada">El cliente gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
@@ -38,7 +38,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-1">
+                <b-row class="mb-1"  v-show="false">
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
@@ -52,7 +52,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-1">
+                <b-row class="mb-1"  v-show="false">
                     <b-col><label for="input-porcada">% Pago de comision:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="% ">
@@ -67,7 +67,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row>
-                <hr>
+                <hr  v-show="false">
                 <b-row class="mb-1">
                     <b-col><label for="input-porcada">Descuento Coorporativo: </label></b-col>
                     <b-col>
@@ -177,7 +177,9 @@ import config from '@/store/config.js'
                 this.axios.post(this.API + 'ventas/descuento', {
                     porCada: this.porCada,
                     puntos: this.puntos,
-                    valorPunto: this.valorPunto
+                    valorPunto: this.valorPunto,
+                    descCorporativo: this.descCorporativo,
+                    descInstitucional: this.descInstitucional
                 })
                 .then((response) => {
                     this.$emit('onUpdateConfig', response.data)

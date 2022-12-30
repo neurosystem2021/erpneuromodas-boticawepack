@@ -47,6 +47,7 @@
                                         id="radio-group-1"
                                         v-model="selectedtv"
                                         :options="optionstv"
+                                        v-on:change="cambioTipoVenta($event)"
                                         name="radio-options"
                                     ></b-form-radio-group>
                                 </b-input-group>
@@ -215,7 +216,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedorManual"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -255,7 +256,9 @@
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto"
                             :tipoVenta="selectedtv"
-                            :esDelivery="venta.EsDelivery">
+                            :esDelivery="venta.EsDelivery"
+                            :descCorporativoProp="descCorporativoProp"
+                            :descInstitucionalProp="descInstitucionalProp">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -450,6 +453,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
+        this.obtenerDescuentoVenta();
     },
     data () {
         return {
@@ -507,7 +511,9 @@ export default {
             { text: 'TV 1 (Corporativos)', value: 1 },
             { text: 'TV 2 (Sala)', value: 2 },
             { text: 'TV 3 (Institucional)', value: 3 },
-            ]
+            ],
+            descCorporativoProp:0,
+            descInstitucionalProp:0
         }
     },
     watch: {
@@ -541,6 +547,19 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        obtenerDescuentoVenta () {
+            this.axios.get(this.API + 'ventas/descuento')
+            .then((response) => {
+                this.descCorporativoProp = response.data.DescCorporativo
+                this.descInstitucionalProp = response.data.DescInstitucional
+            })
+            .catch((error) => {
+                console.log(error)
+                this.descCorporativoProp = 0
+                this.descInstitucionalProp = 0
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -789,8 +808,14 @@ export default {
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
-        getVendedor () {
+        cambioTipoVenta(val){
+            this.obtenerDescuentoVenta()
+        },
+        getVendedor (user) {
             let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
@@ -808,6 +833,10 @@ export default {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
+        },
+        setVendedorManual (obj) {
+            this.venta.vendedor = obj
+            this.getVendedor(obj.Usuario)
         },
         setVendedor (obj) {
             // console.log(obj)
@@ -1172,8 +1201,9 @@ export default {
             })
         },
         eliminarCliente () {
-            this.$refs.inputCliente.setValue('')
-            this.venta.cliente = {}
+            //this.$refs.inputCliente.setValue('')
+            //this.venta.cliente = {}
+            this.obtenerDescuentoVenta()
         },
         eliminarComisionista () {
             this.$refs.inputComisionista.setValue('')

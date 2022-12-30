@@ -2,7 +2,24 @@
   <div>
       <b-container class="bv-example-row" id="conten">
         <b-row class="text-left" style="margin-bottom: -15px">
-          <b-col md="9"><h1>COBROS</h1></b-col>
+          <b-col md="6"><h1>COBROS</h1></b-col>
+          <b-col md="3">
+            <b-form-group>
+                <b-input-group prepend="Alm." class="mt-2">
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    initValue="PRINCIPAL"
+                    label="writer"
+                    placeholder=""
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+                </b-input-group>
+            </b-form-group>
+          </b-col>
           <b-col md="3">
             <b-input-group prepend="Usuario:" class="mt-2">
                     <autocomplete
@@ -224,7 +241,8 @@ export default {
       currentPage: 1,
       titulo: '',
       inProgress: false,
-      vendedor: {}
+      vendedor: {},
+      almacen:{}
     }
   },
   methods: {
@@ -233,6 +251,7 @@ export default {
           this.axios.get(this.API + 'usuarios/' + usuario)
           .then((response) => {
               this.setVendedor(response.data)
+              this.loadAlmacen(response.data.IdAlmacen)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
           })
@@ -240,6 +259,18 @@ export default {
               console.log(error)
               this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
           })
+      },
+      loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+      },
+      setAlmacen (obj) {
+          this.almacen = obj
+          this.$refs.inputAlmacen.setValue(obj.Almacen)
+          this.$refs.inputAlmacen.$refs.input.disabled = true
+          this.$refs.tablaVentas.refresh()
       },
       setVendedor (obj) {
           this.vendedor = obj
@@ -292,35 +323,42 @@ export default {
 
       },
       myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+        if(this.almacen.IdAlmacen>0){
+          // Here we don't set isBusy prop, so busy state will be handled by table itself
+          // this.isBusy = true
+          let url = this.API + 'ventas?noFecha=1&idAlmacen'+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+          url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+          let promise = this.axios.get( url )
 
-        return promise.then((result) => {
-          this.items = result.data
-          this.items.map(r=>{
-            if(r.Pagado==1){
-                  r._rowVariant='success'
-            }else{
-              r._rowVariant='warning'
-            }
+          return promise.then((result) => {
+            this.items = result.data
+            this.items.map(r=>{
+              if(r.Pagado==1){
+                    r._rowVariant='success'
+              }else{
+                r._rowVariant='warning'
+              }
 
-            if(r.Anulado==1){
-              r._rowVariant='danger'
-            }
+              if(r.Anulado==1){
+                r._rowVariant='danger'
+              }
+            })
+            //this.totalRows = this.items.length
+            // Here we could override the busy state, setting isBusy to false
+            // this.isBusy = false
+            return(this.items)
+          }).catch(error => {
+            // Here we could override the busy state, setting isBusy to false
+            // this.isBusy = false
+            // Returning an empty array, allows table to correctly handle busy state in case of error
+            
           })
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
+
+        }else{
+
           return []
-        })
+        }
+
       },
       cobrarVenta(idDocVenta){
         this.$swal({
