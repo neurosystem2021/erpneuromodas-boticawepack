@@ -16,6 +16,7 @@ import MovimientoCantidad from '@/views/MovimientoCantidad.vue'
 import OrdenCompra from '@/views/OrdenCompra.vue'
 import CalculoPvp from '@/views/CalculoPvp.vue'
 import OrdenesCompra from '@/views/OrdenesCompra.vue'
+import Compras from '@/views/Compras.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -217,6 +218,11 @@ export default new Router({
       path: '/reporte/confrontacion',
       name: 'Confrontacion',
       component: Confrontacion
+    },
+    {
+      path: '/compras',
+      name: 'Compras',
+      component: Compras
     },
   ]
 })

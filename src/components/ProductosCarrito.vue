@@ -484,7 +484,7 @@ export default {
           { key: 'igv', label: 'IGV' },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
+          //{ key: 'precioVenta', label: 'Precio venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
           { key: 'acciones', label: ''}
         ]
