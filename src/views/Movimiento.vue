@@ -113,7 +113,7 @@
                   </b-col>
                 </b-row>
 
-                <b-row>
+                <b-row v-if="!isTraslado">
                   <b-col md="6">
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
@@ -231,7 +231,9 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      isTraslado:true,
+      isSalida:false,
     }
   },
   computed: {
@@ -250,9 +252,16 @@ export default {
       limpiarCart: 'limpiarCarrito',
     }),
     onAddProducto (obj) {
+      if(this.isSalida){
         this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+          IdAlmacen: (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
         })
+        console.log(this.movimiento.almacenOrigen.IdAlmacen)
+      }else{
+        this.obtenerStok({
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }
     },
     afe (e) {
 return false
@@ -288,7 +297,8 @@ return false
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
-        almacenDestino: { IdAlmacen: -1 }
+        almacenDestino: { IdAlmacen: -1 },
+        user: sessionStorage.getItem("User")
       }
     },
     onReset (evt) {
@@ -318,14 +328,30 @@ return false
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
+        this.isTraslado = false
+        this.isSalida = false
+        if(this.$refs.inputAlmacenDestino){
+          this.$refs.inputAlmacenDestino.setValue('')
+        }
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-         this.limpiarCart()
+        this.isTraslado = false
+        this.isSalida = true
+        if(this.$refs.inputAlmacenOrigen){
+          this.$refs.inputAlmacenOrigen.setValue('')
+        }
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-         this.limpiarCart()
+        this.isTraslado = true
+        this.isSalida = false
+        if(this.$refs.inputAlmacenDestino){
+          this.$refs.inputAlmacenDestino.setValue('')
+        }
+        if(this.$refs.inputAlmacenOrigen){
+          this.$refs.inputAlmacenOrigen.setValue('')
+        }
       }
       this.movimiento.movimientoTipo = obj
       this.cargarNumero()
@@ -336,11 +362,22 @@ return false
     setAlmacenOrigen (obj) {
       this.limpiarCart()
       this.movimiento.almacenOrigen = obj
+      if(this.isSalida){
+        this.obtenerStok({
+          IdAlmacen: (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }else{
+        this.obtenerStok({
+          IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+        })
+      }
     },
     setAlmacenDestino (obj) {
       console.log(obj);
       this.movimiento.almacenDestino = obj
-      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
+      })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda
@@ -402,7 +439,7 @@ return false
         }
         
       })
-      if (faltaStock) {
+      if (faltaStock && (this.isTraslado==true || this.isSalida==true)) {
           this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
           this.inProgress = false            
           return;
@@ -411,6 +448,10 @@ return false
       if (faltaLote) {
           this.inProgress = false            
           return;
+      }
+
+      if(this.isTraslado==true || this.isSalida==true){
+        this.movimiento.alterarProductos = 0
       }
 
       if (igualProducto) {
@@ -425,7 +466,7 @@ return false
         return;
       }
       if (faltaLlenar && this.movimiento.alterarProductos) {
-        //this.$toasted.show('Falta llenar cantidad / precio')
+        this.$toasted.show('Falta llenar cantidad / precio')
         this.inProgress = false
         return;
       }
