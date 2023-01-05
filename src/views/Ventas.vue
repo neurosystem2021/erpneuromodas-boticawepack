@@ -11,6 +11,9 @@
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>-->
                     <b-button-group size="sm" class="ocularMovil">
+                        <ventas-pedido></ventas-pedido>
+                    </b-button-group>
+                    <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -442,6 +445,7 @@ import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import DeliveryModal from '@/components/DeliveryModal.vue'
+import VentasPedido from '@/components/VentasPedido.vue'
 import Swal from 'sweetalert2'
 export default {
     beforeMount () {
@@ -1313,6 +1317,7 @@ export default {
         PreOrdenLista,
         Proformas,
         DeliveryModal,
+        VentasPedido
     }
 }
 </script>
