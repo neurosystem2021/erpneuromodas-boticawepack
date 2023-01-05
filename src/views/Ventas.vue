@@ -386,7 +386,7 @@
                         </b-col>
                     </b-row>
                     <br>
-                    <b-row  style="height:90%; overflow-y: scroll; background: #E6E6E6; place-content: flex-start;">     
+                    <b-row  style="height:90vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start;">     
                         <b-col md="12" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)">
                             <b-row >
                                 <b-col md="5">
