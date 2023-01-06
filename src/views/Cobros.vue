@@ -82,7 +82,7 @@
             :current-page="currentPage">
               <template slot="Total" slot-scope="data">
                   <div>
-                    <b>{{data.item.Total}}</b>
+                    <b>{{(data.item.Total || 0).toFixed(2)}}</b>
                   </div>
               </template>
               <template slot="Estado" slot-scope="data">

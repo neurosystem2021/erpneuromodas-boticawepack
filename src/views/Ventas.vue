@@ -268,6 +268,7 @@
                             :onSetProducto="onSetProducto"
                             :tipoVenta="selectedtv"
                             :esDelivery="venta.EsDelivery"
+                            :tipoDocSunat="venta.tipoVenta.CodSunat"
                             :descCorporativoProp="descCorporativoProp"
                             :descInstitucionalProp="descInstitucionalProp">
 
@@ -471,6 +472,7 @@ export default {
     data () {
         return {
             isNota: false,
+            isVentaPedido: false,
             dni: '',
             adelanto: 0,
             gasto: 0,
@@ -697,6 +699,7 @@ export default {
                 correlativoVentaPedido: null
             }
             this.isNota = false
+            this.isVentaPedido = false
             this.bloquearInput=false
             this.adelantosPreOrden=[]
             this.adelantosVentaPedido=[]
@@ -738,6 +741,16 @@ export default {
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
+            }
+
+            if(this.isVentaPedido==true && obj.CodSunat!="99"){
+                this.limpiarCart()
+            }
+
+            if(obj.CodSunat == "99"){
+                this.isVentaPedido = true
+            }else{
+                this.isVentaPedido = false
             }
 
             if (obj.TieneIgv) {

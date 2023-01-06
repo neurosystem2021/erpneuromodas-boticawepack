@@ -183,7 +183,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false) || (isVentas && idPerfil!=1)"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false) || (isVentas && idPerfil!=1 && tipoDocSunat!='99')"
             type="number"
             style="width: 95px"
             min="0"
@@ -444,6 +444,7 @@ export default {
     }
   },
   props: {
+    tipoDocSunat: String,
     isVentas: Boolean,
     tipoVenta:Number,
     tipo: String,
