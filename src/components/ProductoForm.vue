@@ -61,8 +61,19 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group v-if="false">
-            <label>Modelo:</label>
+          <b-form-group>
+            <label>Artículo:</label>
+            <b-form-input v-model="producto.Producto"
+              ref="inputProducto"
+              required="required"
+              type="text"
+              @input="(val) => producto.Producto = val && val.toUpperCase()"
+              :value="producto.Producto"
+              ></b-form-input>
+          </b-form-group>
+
+          <b-form-group>
+            <label>Presentacion:</label>
             <b-input-group>
               <autocomplete
                 :url="API + 'productos/modelos'"
@@ -98,18 +109,6 @@
               </b-input-group-append>
             </b-input-group> -->
           </b-form-group>
-          
-          <b-form-group>
-            <label>Artículo:</label>
-            <b-form-input v-model="producto.Producto"
-              ref="inputProducto"
-              required="required"
-              type="text"
-              @input="(val) => producto.Producto = val && val.toUpperCase()"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
-
          
           <b-form-group>
             <label>Rack:</label>

@@ -127,7 +127,7 @@
                 </tr>
                 <tr v-if="productoSelect.EsCredito==0">
                   <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
-                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'VISA':''}} {{ productoSelect.Mastercard>0?'MASTERCARD':''}}</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'TARJETA / TRANSF.':''}} {{ productoSelect.Mastercard>0?'YAPE / PLIN':''}}</td>
                 </tr>
               </tbody>
             </table>
@@ -392,7 +392,8 @@ export default {
                     Cliente: this.productoSelect.Cliente,
                     DniRuc: this.productoSelect.DniRuc,
                     FechaDoc: this.productoSelect.FechaDoc,
-                    UsuarioReg: this.productoSelect.UsuarioReg
+                    UsuarioReg: this.productoSelect.UsuarioReg,
+                    Correlativo: this.productoSelect.Serie +'-'+ this.productoSelect.Numero
                   }
                   let productos = this.productoSelect.Detalle.map(p=>({CodigoBarra:p.CodigoBarra,Producto:p.Producto,Cantidad:p.Cantidad,ProductoMedicion:p.ProductoMedicion}))
                   if(this.productoSelect.PorEntregar!=1){

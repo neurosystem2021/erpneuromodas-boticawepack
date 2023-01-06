@@ -11,7 +11,7 @@
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>-->
                     <b-button-group size="sm" class="ocularMovil">
-                        <ventas-pedido></ventas-pedido>
+                        <ventas-pedido :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @onFacturar="facturarVentaPedido"></ventas-pedido>
                     </b-button-group>
                     <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
@@ -182,7 +182,7 @@
                         </b-row>
                     </b-col>
                     <b-col md="3">
-                        <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                        <!--<b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
                             </div>
@@ -202,7 +202,14 @@
                         </b-form-text>
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
-                        </b-form-text>
+                        </b-form-text>-->
+                        <br>
+                        <div v-if="venta.idVentaPedido != null" style="border: 0.5px dashed #dc3545; padding:10px">
+                            <h5 style="text-align:center">Facturacion de la Venta a Pedido</h5>
+                            <h5 style="text-align:center; color:#dc3545">{{venta.correlativoVentaPedido}}</h5>
+                            <b-badge variant="info" style="font-size:0.8rem" v-if="adelanto">Adelanto de: S/ {{ $options.filters.redondear(adelanto) }} </b-badge>
+                            <b-badge variant="success" style="font-size:0.8rem" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
+                        </div>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group class="text-center">
@@ -217,6 +224,7 @@
                                 required="required"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
+                                :customParams="{ 'soloVendedor':1, 'idAlmacen': almacenRaiz }"
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedorManual"
@@ -239,8 +247,8 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
-                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
+                        <!--<b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
+                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>-->
                     </b-col>
                 </b-row>
                 <b-row>
@@ -357,7 +365,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="vertical-align: middle !important;">Visa</td>
+                                            <td style="vertical-align: middle !important;">Tarjeta / Transf.</td>
                                             <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -381,7 +389,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="vertical-align: middle !important;">Mastercard</td>
+                                            <td style="vertical-align: middle !important;">Yape / Plin</td>
                                             <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -424,7 +432,8 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" @click="anularPagoVentaPedido" variant="danger" v-if="venta.idVentaPedido!=null">Cancelar Facturacion VP</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Cotizacion</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -477,6 +486,7 @@ export default {
             bloquearInput:false,
             diasValidosProf:0,
             adelantosPreOrden:[],
+            adelantosVentaPedido:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -510,14 +520,15 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            selectedtv: 1, // Must be an array reference!
+            selectedtv: 2, // Must be an array reference!
             optionstv: [
             { text: 'TV 1 (Corporativos)', value: 1 },
             { text: 'TV 2 (Sala)', value: 2 },
             { text: 'TV 3 (Institucional)', value: 3 },
             ],
             descCorporativoProp:0,
-            descInstitucionalProp:0
+            descInstitucionalProp:0,
+            almacenRaiz: sessionStorage.getItem('IdAlmacen') || 0
         }
     },
     watch: {
@@ -551,6 +562,25 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        facturarVentaPedido(data){
+            //this.venta.IdPreOrden.push(orden)
+            // obtener total adelantos
+            this.venta.idVentaPedido = data.idDocVenta
+            this.venta.correlativoVentaPedido = data.Correlativo
+            this.axios.get(this.API + 'ventas/pedido/adelantos', { 
+                params: { 
+                    IdDocVenta      : data.idDocVenta,
+                } 
+            })
+            .then(res => {
+                this.adelantosVentaPedido = res.data
+                let suma = 0
+                res.data.map(ad => {
+                    suma += ad.Importe
+                })
+                this.adelanto = suma
+            })
+        },
         obtenerDescuentoVenta () {
             this.axios.get(this.API + 'ventas/descuento')
             .then((response) => {
@@ -644,6 +674,7 @@ export default {
                 },
                 vendedor: {},
                 adelantosPreOrden:[],
+                adelantosVentaPedido:[],
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
@@ -660,16 +691,19 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                idVentaPedido: null,
+                correlativoVentaPedido: null
             }
             this.isNota = false
             this.bloquearInput=false
             this.adelantosPreOrden=[]
+            this.adelantosVentaPedido=[]
             this.adelanto = 0
             this.infoDelivery = {}
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
-            this.selectedtv = 1
+            this.selectedtv = 2 
         },
         metodoPagoCambio(opc){
             switch (opc) {
@@ -1007,6 +1041,7 @@ export default {
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
+                this.inProgress = false
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -1049,6 +1084,12 @@ export default {
 
             if (!this.venta.cliente.DniRuc) {
                 this.$toasted.show('Debe seleccionar un cliente.')
+                this.inProgress = false
+                return
+            }
+
+            if (this.venta.idVentaPedido!=null && (this.venta.tipoVenta.CodSunat == '99' || this.venta.tipoVenta.CodSunat == '07')) {
+                this.$toasted.show('No se puede facturar una venta a pedido con otra venta a pedido o nota de credito',{duration:3000})
                 this.inProgress = false
                 return
             }
@@ -1141,12 +1182,29 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.adelantosPreOrden = this.adelantosPreOrden
+            this.venta.adelantosVentaPedido = this.adelantosVentaPedido.map(adpv => adpv.IdCajaBanco)
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.venta.TipoVenta = this.selectedtv
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
+
+                if(response.data.errorUser){
+                    this.$swal({
+                        position: 'center',
+                        icon: 'error',
+                        title: '¡No se especifico el usuario, por favor salir del sistema e ingresar nuevamente!',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                        target: document.getElementById('conten'),
+                        confirmButtonColor:'#007bff',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                    })
+                    this.inProgress = false
+                    return;
+                }
 
                 // limpiar preorden seleccionado
                 let idPerfil = this.venta.vendedor.IdUsuarioPerfil
@@ -1279,6 +1337,22 @@ export default {
             this.venta.nombreLlevar = ''
             this.venta.DireccionEntrega = ''
             this.$router.replace('/ventas')
+        },
+        anularPagoVentaPedido(){
+            this.$router.replace('/ventas')
+            this.inProgress = false
+            this.tieneIgv = false
+            this.venta.idVentaPedido = null
+            this.venta.correlativoVentaPedido = null
+            this.initForm()
+            this.limpiarCart()
+            this.getVendedor()
+            this.getNumeroVenta()
+            this.loadClienteVarios()
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputCliente.setValue('')
+            this.$refs.inputVendedor.setValue('')
+            this.$refs.carrito.pagocon = 0
         },
         //Sockets
         escucharPedidos(){

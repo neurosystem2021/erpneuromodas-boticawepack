@@ -14,9 +14,11 @@
                     <b-table 
                         v-if="show"
                         id="table-proformas"
-                        ref="tableProformas"
+                        ref="tableVentaPedido"
                         striped hover 
                         :busy.sync="isBusy" 
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
                         :filter="filter"
                         :items="myProvider" 
                         :fields="fields"
@@ -24,7 +26,14 @@
                         :current-page="currentPage">
 
                       <template slot="facturar" slot-scope="data">
-                        <b-button @click="selectVentaPedido(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
+                        <div v-if="data.item.PedidoFacturado!=null">
+                            <label>----</label>
+                        </div>
+                        <div v-else>
+                            <b-button v-if="data.item.Anulado==0" @click="selectVentaPedido(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
+                            <label v-else>----</label>
+                        </div>
+
                       </template>
 
                       <template slot="total" slot-scope="data">
@@ -36,15 +45,26 @@
                       </template>
 
                       <template slot="pendiente" slot-scope="data">
-                        <b>{{((data.item.Total || 0) - (data.item.Aplicado || 0)).toFixed(2)}}</b>
+                        <div v-if="data.item.PedidoFacturado!=null">
+                            <label>----</label>
+                        </div>
+                        <div v-else>
+                            <b>{{((data.item.Total || 0) - (data.item.Aplicado || 0)).toFixed(2)}}</b>
+                        </div>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta" variant="primary" target="_blank">Ver Doc</b-button>
+                        <b-button size="sm" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta" variant="primary" target="_blank">Ver Doc</b-button>
                       </template>
                       
                       <template slot="Anular" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-ban"></i></b-button>
+                        <div v-if="data.item.PedidoFacturado!=null">
+                            <b-badge variant="success" style="font-size:1rem">{{data.item.PedidoFacturado}}</b-badge>
+                        </div>
+                        <div v-else>
+                            <b-button v-if="data.item.Anulado==0" @click="anularVentaPedido(data.item)" variant="danger"><i class="fas fa-ban"></i></b-button>
+                            <h5 v-else><b-badge  variant="danger">Anulado</b-badge></h5>
+                        </div>
                       </template>
 
                     </b-table>
@@ -86,13 +106,15 @@ import { mapActions } from 'vuex'
                 API: config.API,
                 show: false,
                 filter: '',
+                sortBy: 'idDocVenta',
+                sortDesc: true,
                 items: [],
                 isBusy: false,
                 fields: [ 
-                    { key: 'idDocVenta', label: 'Id' }, 
+                    { key: 'idDocVenta', label: 'Id' }, 'Almacen',
                     'Serie', 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaDoc', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'total', label: 'Total' }, { key: 'aplicado', label: 'Adelantos' },{ key: 'pendiente', label: 'Pendiente' }, 'facturar', 'verTicket', 'Anular' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'total', label: 'Total' }, { key: 'aplicado', label: 'Adelantos' },{ key: 'pendiente', label: 'Pendiente' }, 'facturar', 'verTicket', { key: 'Anular', label: 'Estado' } ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
@@ -126,12 +148,13 @@ import { mapActions } from 'vuex'
 
                     // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.$emit('onSelectProforma', proforma)
+                    this.$emit('onFacturar', proforma)
                 })
             },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'ventas/pedido?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'ventas/pedido?idAlmacen='+this.idAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter+'&sortBy='+ctx.sortBy+'&sortDesc='+(ctx.sortDesc ? 1 : 0 ))
 
                 return promise.then((result) => {
                 this.items = result.data
@@ -146,23 +169,23 @@ import { mapActions } from 'vuex'
                 return []
                 })
             },
-            eliminarProf(data){
+            anularVentaPedido(data){
                 this.$swal({
                 target: document.getElementById('conten'),
-                title: 'Se eliminará la proforma: <strong>'+data.Anio+' - '+data.Numero+'</strong> del  cliente <strong>'+data.Cliente+'</strong>',
+                title: 'Se anulara la venta a pedido: <strong>'+data.Serie+' - '+data.Numero+'</strong> del  cliente <strong>'+data.Cliente+'</strong>',
                 text:'¿Está seguro?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, anular',
                 cancelButtonText: 'No, atrás'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.axios.delete(this.API + 'proforma/eliminar/'+data.IdProforma).then(res => {
+                        this.axios.put(this.API + 'venta/pedido/anular/'+data.idDocVenta).then(res => {
                             if(res.data){
-                               this.$toasted.info('¡PROFORMA ELIMINADA!')
-                                this.$refs.tableProformas.refresh()
+                               this.$toasted.info('¡VENTA A PEDIDO ANULADA!')
+                                this.$refs.tableVentaPedido.refresh()
                             }
                         }).catch(err => {
                             console.log(err)
@@ -176,6 +199,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalVentaPedido .modal-dialog {
-    max-width: 85% !important;
+    max-width: 95% !important;
 }
 </style>

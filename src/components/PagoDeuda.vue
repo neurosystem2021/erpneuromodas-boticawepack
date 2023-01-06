@@ -302,8 +302,11 @@ import config from '@/store/config.js'
                     cuentas: cuentasId
                 })
                 .then((response) => {
-                    console.log(response.data)
-                    this.$toasted.show('Se pagó la deuda del cliente.')
+                    if(response.data.errorUser){
+                        this.$toasted.error('Error no se identifico el usuario, debe seleccionar su usuario',{duration:3000})
+                        return;
+                    }
+                    this.$toasted.info('Se pagó la deuda del cliente.',{duration:3000})
                     this.show = false
                     this.initForm()
                     // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
