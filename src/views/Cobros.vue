@@ -80,7 +80,11 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage">
-          
+              <template slot="Total" slot-scope="data">
+                  <div>
+                    <b>{{data.item.Total}}</b>
+                  </div>
+              </template>
               <template slot="Estado" slot-scope="data">
                   <div v-if="data.item.CodSunat !='07'">
                     <div v-if="data.item.Anulado==1" class="text-center">
