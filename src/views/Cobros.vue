@@ -399,7 +399,8 @@ export default {
                     UsuarioReg: this.productoSelect.UsuarioReg,
                     Correlativo: this.productoSelect.Serie +'-'+ this.productoSelect.Numero
                   }
-                  let productos = this.productoSelect.Detalle.map(p=>({CodigoBarra:p.CodigoBarra,Producto:p.Producto,Cantidad:p.Cantidad,ProductoMedicion:p.ProductoMedicion}))
+                  //let productos = this.productoSelect.Detalle.map(p=>({CodigoBarra:p.CodigoBarra,Producto:p.Producto,Cantidad:p.Cantidad,ProductoMedicion:p.ProductoMedicion}))
+                  let productos = this.productoSelect.Detalle.map(p=>({Producto:p.Producto,Cantidad:p.Cantidad}))
                   if(this.productoSelect.PorEntregar!=1){
                     let ventaJson= JSON.stringify(venta)
                     let productosJson= JSON.stringify(productos)
