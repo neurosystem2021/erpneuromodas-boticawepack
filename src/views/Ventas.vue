@@ -224,7 +224,7 @@
                                 required="required"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
-                                :customParams="{ 'soloVendedor':1, 'idAlmacen': almacenRaiz }"
+                                :customParams="{ 'soloVendedor':soloVendedor, 'idAlmacen': almacenRaiz }"
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedorManual"
@@ -528,7 +528,8 @@ export default {
             ],
             descCorporativoProp:0,
             descInstitucionalProp:0,
-            almacenRaiz: sessionStorage.getItem('IdAlmacen') || 0
+            almacenRaiz: sessionStorage.getItem('IdPerfil') == 1 ? 0 : (sessionStorage.getItem('IdAlmacen') || 0),
+            soloVendedor: sessionStorage.getItem('IdPerfil') == 1 ? 0 : 1,
         }
     },
     watch: {

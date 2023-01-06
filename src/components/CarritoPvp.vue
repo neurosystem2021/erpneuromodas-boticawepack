@@ -262,6 +262,7 @@
             step="0.00001"
             class="form-control"
             placeholder="Pvp"
+            @input="setPvp(data.index)"
             />
         </template>
         <template slot="pvp2" slot-scope="data">
@@ -273,6 +274,7 @@
             step="0.00001"
             class="form-control"
             placeholder="Pvp"
+            @input="setPvp(data.index)"
             />
         </template>
         <template slot="pvp3" slot-scope="data">
@@ -1076,7 +1078,7 @@ export default {
 
       this.productos[index].preciopvp =  Math.ceil((this.productos[index].costototal  / (1-(Number(this.productos[index].preciouti || 100)/100)))) 
 
-      this.productos[index].preciopvp3 = Math.ceil((this.productos[index].preciopvp || 0) * this.productos[index].Rendimiento || 1)
+      this.productos[index].preciopvp3 = Math.ceil((this.productos[index].preciopvp || 0) * this.productos[index].RendimientoFin || 1)
        },
     actualizarDescu(index){
       let obj = this.productos[index];
