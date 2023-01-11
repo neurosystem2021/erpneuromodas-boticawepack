@@ -80,9 +80,25 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage">
-              <template slot="Total" slot-scope="data">
-                  <div>
-                    <b>{{(data.item.Total || 0).toFixed(2)}}</b>
+              <template slot="Reimprimir" slot-scope="data">
+                 <div v-if="data.item.CodSunat !='07'">
+                    <div v-if="data.item.Anulado==1" class="text-center">
+                      <b>---</b>
+                    </div>
+                    <div v-else class="text-center">
+                        <span v-if="data.item.Pagado==0 && data.item.EsCredito==0">
+                          <b>---</b>
+                        </span>
+                        <span v-else>
+                          <div>
+                            <b v-if="data.item.EsCredito==0">
+                              <span v-if="data.item.PorEntregar==0"><b-button variant="info" size="sm" block @click="reImprimirEntrega(data.item.idDocVenta)"><i class='fas fa-print'></i></b-button></span>
+                              <span v-else><b-badge variant="info"><b>POR ENTREGAR</b></b-badge></span>
+                            </b> 
+                            <b v-else>---</b>
+                          </div>
+                        </span>
+                    </div>
                   </div>
               </template>
               <template slot="Estado" slot-scope="data">
@@ -238,7 +254,8 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true, class:'centrar' },
-            { key: 'Estado', class:'centrar'}
+            { key: 'Estado', class:'centrar'},
+            { key: 'Reimprimir', label: 'Reimprimir Entrega', class:'centrar'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -317,6 +334,40 @@ export default {
         this.productoSelect = item
         //this.$refs.productoForm.producto.IdProducto = 'a'
         //console.log(this.$refs.productoForm.$refs.productoForm)
+      },
+      reImprimirEntrega(idDocVenta){
+        let params = {IdDocVenta: idDocVenta}
+        this.axios.get(this.API + 'venta/info', {params: params})
+        .then((response) => {
+          if(response.data){
+            if(response.data.Pagado==1 && response.data.Anulado==0 && response.data.PorEntregar==0){
+              this.productoSelect = response.data
+                let venta = {
+                  Cliente: this.productoSelect.Cliente,
+                  DniRuc: this.productoSelect.DniRuc,
+                  FechaDoc: this.productoSelect.FechaDoc,
+                  UsuarioReg: this.productoSelect.UsuarioReg,
+                  Correlativo: this.productoSelect.Serie +'-'+ this.productoSelect.Numero
+                }
+                let productos = this.productoSelect.Detalle.map(p=>({Producto:p.Producto,Cantidad:p.Cantidad}))
+                if(this.productoSelect.PorEntregar!=1){
+                  let ventaJson= JSON.stringify(venta)
+                  let productosJson= JSON.stringify(productos)
+                  var left = (screen.width/2)-(800/2)
+                  var top = (screen.height/2)-(800/2)
+                  let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                  window.open('http://localhost:5000/imprimir/entregar.php?venta='+encodeURIComponent(ventaJson)+'&productos='+encodeURIComponent(productosJson), "Impresión", params)
+                }
+            }else{
+              this.$toasted.show('La Venta se ha modificado, no puede reimprimirse',{duration:3000})
+              this.$refs.tablaVentas.refresh()
+            }
+          }
+          
+        }).catch((err)=>{
+          console.log(err);
+          this.$toasted.error('Error: Intente nuevamente') 
+        })
       },
       actualizarTabla() {
         this.$refs.tablaVentas.refresh()

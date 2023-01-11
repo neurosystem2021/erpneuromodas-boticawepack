@@ -19,7 +19,11 @@ const mutations = {
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.unshift(item)
+        if(item.ordenNormal){
+          productos.push(item)
+        }else{
+          productos.unshift(item)
+        }   
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
@@ -84,6 +88,7 @@ const actions = {
     let setPrecioCosto = false
     let setPreOr = false
     let isDelivery = false
+    let setOrden = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
@@ -92,6 +97,7 @@ const actions = {
       setPrecioCosto = obje.setPrecioCosto
       setPreOr =obje.setPreOr
       isDelivery = obje.isDelivery
+      setOrden = obje.setOrden
     }
 
     if(typeof producto === 'object') {
@@ -111,6 +117,7 @@ const actions = {
         producto.precio = setPreOr
       }
       
+      producto.ordenNormal = setOrden?true:false 
       /*let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},

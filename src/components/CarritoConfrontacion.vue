@@ -339,6 +339,7 @@ export default {
     idAlmacen: Number,
     bloquearInput:Boolean,
     esDelivery:Boolean,
+    ordenNormal: Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -662,7 +663,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false), setOrden:this.ordenNormal }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       //this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
@@ -754,7 +755,7 @@ export default {
         `
       }
       return `
-        <b>${data.Producto}</b> | ${data.CodigoBarra} | ${data.ProductoCategoria} | ${data.ProductoMarca}
+        <b>${data.CodigoBarra}</b> | ${data.Producto} |  | ${data.ProductoCategoria} | ${data.ProductoMarca}
       `
     },
     // setCantidad (index, val) {

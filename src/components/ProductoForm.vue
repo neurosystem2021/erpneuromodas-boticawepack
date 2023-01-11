@@ -773,6 +773,7 @@ export default {
         this.producto.Rendimiento = 0
       }
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
+      this.producto.Producto=(''+this.producto.Producto).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
         PreciosPorProducto: this.producto.precios 

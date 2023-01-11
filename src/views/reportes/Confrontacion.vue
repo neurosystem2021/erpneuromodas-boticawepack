@@ -33,12 +33,13 @@
             <b-col  md="12">
               <carrito-confrontacion 
                 ref="carritoc"
-                tipo="mov" :fields="carrito.fields"></carrito-confrontacion>
+                tipo="mov" :fields="carrito.fields" :ordenNormal="true"></carrito-confrontacion>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
             <b-col cols="4">
               <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Confrontar Inventario</b-button>
+              <b-button variant="primary" size="md" :disabled="inProgress" @click="preConfrontar">Pre Confrontar (Listado)</b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -119,14 +120,14 @@ return false
         }
       })
 
-      if (faltaCantidad) {
+      /*if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
         this.inProgress = false
         return;
-      }
+      }*/
 
       this.axios.post(this.API + 'reporte/confrontacion', {
-        Productos: this.productos.map((p)=>({IdProducto:p.IdProducto,cantidad:p.cantidad})),
+        Productos: this.productos.map((p)=>({IdProducto:p.IdProducto,cantidad:(p.cantidad>0?p.cantidad:0)})),
         IdProductos: this.productos.map(prod => prod.IdProducto),
         IdAlmacen: this.almacen.IdAlmacen,
       })
@@ -139,7 +140,49 @@ return false
             this.$refs.inputAlmacenOrigen.setValue('')
           }
           this.almacen = {}
-          this.$toasted.success('Reporte de confrontacion generado')   
+          this.$toasted.success('Reporte de confrontacion generado',{duration:3000})   
+          document.open();
+          document.write(response.data);
+          document.close(); 
+          setTimeout(() => {
+              document.location.reload();
+          }, 1500);
+        }
+        this.inProgress = false
+      })
+      .catch((error) => {
+        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        this.inProgress = false
+      })
+    },
+    preConfrontar(){
+      this.inProgress = true
+
+      if(!this.productos.length) {
+          this.$toasted.show('No ha seleccionado ningun producto',{duration:3000})
+          this.inProgress = false            
+          return          
+      }
+      if(!(this.almacen.IdAlmacen>0)){
+          this.$toasted.show('No ha seleccionado ningun almacen',{duration:3000})
+          this.inProgress = false            
+          return  
+      }
+
+      this.axios.post(this.API + 'reporte/preconfrontacion', {
+        Productos: this.productos.map((p)=>({Producto:p.Producto,CodigoBarra:p.CodigoBarra,cantidad:(p.cantidad>0?p.cantidad:0)})),
+        IdAlmacen: this.almacen.IdAlmacen,
+      })
+      .then((response) => {
+        if (response.data.error) {
+          this.$toasted.show(response.data.error)
+        } else {
+          this.limpiar()
+          if(this.$refs.inputAlmacenOrigen){
+            this.$refs.inputAlmacenOrigen.setValue('')
+          }
+          this.almacen = {}
+          this.$toasted.success('Reporte de preconfrontacion generado',{duration:3000})   
           document.open();
           document.write(response.data);
           document.close(); 
