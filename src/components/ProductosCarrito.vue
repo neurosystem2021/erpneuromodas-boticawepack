@@ -117,7 +117,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ data.item.stock | redondear }}</div>
         </template>
 
       </b-table>
@@ -221,6 +221,7 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
