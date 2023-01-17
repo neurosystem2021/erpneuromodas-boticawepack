@@ -165,7 +165,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Yape / Plin / Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -219,7 +219,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
+              <td class="total"><b>Total Yape / Plin / Transferencia</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
             </tr>
           </tfoot>
