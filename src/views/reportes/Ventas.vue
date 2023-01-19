@@ -123,9 +123,9 @@
               :per-page="perPage"
               :current-page="currentPage">
 
-                <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
+                <template slot="Total" slot-scope="data">
+                  <div :class="(data.item.Total) > 0 ? 'table-success' : 'table-danger'">
+                    {{ data.item.Total.toFixed(2) }}
                   </div>
                 </template>
 
@@ -251,7 +251,6 @@ export default {
     },
     setAlmacen (obj) {
       this.almacen = obj
-      this.limpiarFiltros()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     rowClick (item) {

@@ -51,7 +51,7 @@
                                     <td>{{ item.CodigoBarra }}</td>
                                     <td>{{ item.Producto }}</td>
                                     <td>{{ item.Prestados }}</td>
-                                    <td><input type="number" class="form-control" v-model="item.devueltos" /></td>
+                                    <td><input type="number" class="form-control" @keyup="validaPresto($event.key)" v-model="item.devueltos" /></td>
                                     <td><input type="text" class="form-control" v-model="item.persona" /></td>
                                 </tr>
                             </tbody>
@@ -59,7 +59,7 @@
                     </b-col>
                 </b-row>
                 <div slot="modal-footer" >
-                    <b-btn size="sm" variant="success" type="submit">
+                    <b-btn size="sm" variant="success" type="submit" :disabled="(this.itemdevolver <= this.itemcaptura && this.itemdevolver > 0) ? false : true">
                         Guardar
                     </b-btn>
                     <b-btn size="sm" variant="secondary" @click="show=false">
@@ -83,7 +83,9 @@ import config from '@/store/config.js'
                 show: false,
                 prestados: [],
                 serie: '',
-                numero: ''
+                numero: '',
+                itemdevolver: 0,
+                itemcaptura: 0
             }
         },
         methods: {
@@ -102,6 +104,12 @@ import config from '@/store/config.js'
                 this.prestados = []
                 this.serie = ''
                 this.numero = ''
+            },
+            validaPresto(x){
+                this.itemdevolver = x;
+                this.prestados.map(res => {
+                    this.itemcaptura = res.Prestados;
+                })
             },
             guardarDevueltos (evt) {
                 evt.preventDefault()

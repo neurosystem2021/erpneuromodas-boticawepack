@@ -5,8 +5,12 @@
           <b-col md="3" class="my-1">
             <b-row>
               <b-col style="text-align: center;color: #fff;background: #ff9900;">
-                <b>Balones vacíos<br>
-                {{cantidadVacios}}</b>
+                <b>Total Balones<br>
+                {{cantidadBalones}}</b>
+              </b-col>
+              <b-col style="text-align: center;color: #fff;background: #ff9900;">
+                <b>Total de Envaces Vacios<br>
+                {{stock}}</b>
               </b-col>
               <b-col style="text-align: center;color: #fff;background: #ff9900;">
                 <b>Cantidad prestados<br>
@@ -14,7 +18,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="3" class="my-1">
+          <b-col md="2" class="my-1">
             <b-form-group>
               <autocomplete
                   required="required"
@@ -129,8 +133,9 @@ export default {
       almacen: {
         IdAlmacen: 1
       },
-      cantidadVacios: 0,
-      cantidadPrestado: 0
+      cantidadBalones: 0,
+      cantidadPrestado: 0,
+      stock: 0
     }
   },
   methods: {
@@ -145,7 +150,8 @@ export default {
       getBalonesVacios() {
         this.axios.get(this.API + 'balonesvacios' + '?idAlmacen=' + this.almacen.IdAlmacen)
           .then(res => {
-            this.cantidadVacios = res.data.cantidad
+            this.cantidadBalones = res.data.cantidadEnvases;
+            this.stock = res.data.envasesVacios;
           })
       },
       setAlmacen (obj) {
