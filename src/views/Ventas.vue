@@ -530,7 +530,7 @@ export default {
             ],
             descCorporativoProp:0,
             descInstitucionalProp:0,
-            almacenRaiz: sessionStorage.getItem('IdPerfil') == 1 ? 0 : (sessionStorage.getItem('IdAlmacen') || 0),
+            almacenRaiz: (sessionStorage.getItem('IdAlmacen') || 0),
             soloVendedor: sessionStorage.getItem('IdPerfil') == 1 ? 0 : 1,
         }
     },
