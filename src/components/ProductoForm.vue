@@ -7,6 +7,16 @@
       <b-row>
         <b-col md="6">
           <b-form-group>
+            <label>Código barra:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.CodigoBarra"
+              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -156,7 +166,7 @@
             <label>Genero:</label>            
             <b-form-select required="required" v-model="producto.Genero" :options="generos" />
           </b-form-group>
-          <b-form-group>
+          <!--<b-form-group>
             <label>Botapie/Manga:</label>
             <autocomplete
                 required="required"
@@ -169,12 +179,12 @@
                 :onInput="val => producto.Botapie = val && val.toUpperCase()"
                 :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
                 :classes="{input: 'form-control upper'}">
-              </autocomplete>
+              </autocomplete>-->
             <!--<b-form-input v-model="producto.Botapie"
               type="text"
               @input="(val) => producto.Botapie = val && val.toUpperCase()"              
               ></b-form-input>-->
-          </b-form-group>
+          <!--</b-form-group>-->
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <input 
@@ -199,8 +209,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto" />
-      <b-row v-if="producto.IdProducto">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -220,11 +230,40 @@
               type="number"
               class="form-control"
               step="0.001"
+              @input="actualizarLiquidacion"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
           </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6">
+
+        </b-col>
+        <b-col md="6">
+            
+            <b-row>
+              <b-col>
+                <label>% de Liquidación:</label>
+                <input v-model="producto.PorcentajeLiquidacion"
+                type="number"
+                class="form-control"
+                step="1"
+                min="0"
+                max="100"
+                @input="(val)=>actualizarLiquidacion(val.target.value)"
+                />
+              </b-col>
+              <b-col>
+                <label>Precio Final:</label>
+                <br>
+                <div style="display:flex; justify-content: start; align-items: center; margin-top: 6px;">
+                  <b>{{ precioLiquidacion }}</b>
+                </div>
+              </b-col>
+            </b-row>
         </b-col>
       </b-row>
 
@@ -282,7 +321,8 @@ export default {
       show: false, 
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
-      productosDet: []
+      productosDet: [],
+      precioLiquidacion: 0
     }
   },
   beforeMount () {
@@ -326,7 +366,7 @@ export default {
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         
         this.$refs.inputColor.setValue(newVal.Color)
-        this.$refs.inputBotapie.setValue(newVal.Botapie)
+        //this.$refs.inputBotapie.setValue(newVal.Botapie)
         
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
@@ -339,7 +379,7 @@ export default {
         this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.IdProducto = newVal.IdProducto
         this.producto.Genero = newVal.Genero
-        this.producto.Botapie = newVal.Botapie
+        //this.producto.Botapie = newVal.Botapie
         this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
         this.producto.StockMinimo = newVal.StockMinimo
@@ -347,9 +387,11 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
+        this.actualizarLiquidacion()
 
       } else {
-
+        this.precioLiquidacion = 0
         this.title = 'Nuevo Producto'
         this.clearForm()
       }
@@ -372,6 +414,9 @@ export default {
           }
         })
       }
+    },
+    actualizarLiquidacion(){
+      this.precioLiquidacion = this.producto.PrecioContado -  Math.round(((this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0)*(this.producto.PrecioContado>0?this.producto.PrecioContado:0)/100)* 10) / 10;
     },
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
@@ -408,7 +453,7 @@ export default {
       this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputColor.setValue('')
-      this.$refs.inputBotapie.setValue('')
+      //this.$refs.inputBotapie.setValue('')
 
       this.initForm()
     },
@@ -429,6 +474,9 @@ export default {
         PrecioContado: '',
         Botapie: '',
         Genero: '',
+        PrecioContado: 0,
+        PorcentajeLiquidacion: 0,
+        PrecioCosto: 0,
         categoria: {},
         marca: {},
         // modelo: {},
@@ -458,6 +506,9 @@ export default {
         return;
       }
 
+      this.producto.PorcentajeLiquidacion = (this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0);
+      this.producto.CodigoBarra = (''+this.producto.CodigoBarra).trim();
+
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
@@ -469,16 +520,16 @@ export default {
           this.cbGuardar(response.data.insertId)
         }
         if (response.data.error) {
-          this.$toasted.show('Producto insertado correctamente - ' + response.data.codigoBarra)
+          this.$toasted.show(response.data.error)
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.success('Producto guardado correctamente')
+          // this.initForm()
+          this.producto.talla = {}
+          this.$refs.inputTalla.setValue('')
+          this.$refs.productoForm.hide()
         }
 
-        // this.initForm()
-        this.producto.talla = {}
-        this.$refs.inputTalla.setValue('')
 
-        this.$refs.productoForm.hide()
       })
       .catch((error) => {
         console.log(error)
