@@ -249,7 +249,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput?true:false  || esDelivery"
+            :disabled="bloquearInput?true:false  || esDelivery || true"
             v-model="productos[data.index].descuento"
             style="width:90px"
             type="number"
