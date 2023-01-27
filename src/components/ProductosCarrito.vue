@@ -113,6 +113,12 @@
           </div>
         </template>
 
+        <template slot="VentaEstrategica" slot-scope="data">
+          <div v-if="data.item.VentaEstrategica==1">
+            <i class="fas fa-star" style="color:yellow !important"></i>
+          </div>
+        </template>
+
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
           <input
             v-model="productos[data.index].cantxPrecio"
