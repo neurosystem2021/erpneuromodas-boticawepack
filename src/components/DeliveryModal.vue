@@ -319,13 +319,13 @@ export default {
             }).catch(err => {
                 this.idEmpresa = null
                 this.empresa = {}
-                this.$swal({
+                /*this.$swal({
                     icon: 'error',
                     title: 'Sin servicio de delivery',
                     text: 'No hay conexión con el servidor de delivery',
                     //target: document.getElementById('conten'),
                     footer: 'Por favor cierre sesion e ingrese nuevamente'
-                })
+                })*/
             })   
         }else{
             this.idEmpresa = null
