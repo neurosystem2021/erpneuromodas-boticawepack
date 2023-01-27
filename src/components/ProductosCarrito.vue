@@ -6,7 +6,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -117,7 +117,7 @@
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 80px"
+            style="width: 100px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
@@ -172,7 +172,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 95px"
+            style="width: 120px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -181,7 +181,21 @@
             />
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div v-if="isVentas">
+            {{ getSubtotal(data.index) }}
+          </div>
+          <div v-else>
+            <input
+            type="number"
+            style="width: 105px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            class="form-control"
+            v-model="productos[data.index].subt"
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -221,7 +235,7 @@
         <template slot="precioVenta" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false"
-            style="width:95px"
+            style="width:105px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -453,9 +467,11 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Anaquel' }, 
-          // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: 'ProductoPresentacion', label: 'Anaquel' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+          { key: 'eventPres', label: '' },
+          { key: 'cantxPrecio', variant: 'warning' },
+          // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -536,6 +552,11 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    setSubtotal(index, val, prod) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
+      Vue.set(this.productos[index], 'precio', precio)
+      this.actualizarProd(prod)
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url
@@ -549,6 +570,7 @@ export default {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
+      prod.subt = ''
       this.$nextTick(() => {
         this.actualizarProd(prod)
       })
@@ -688,7 +710,7 @@ export default {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
       
-      if(this.isVentas){
+
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
         if(fPP.length!=4){
           obj.ProductoMedicion = obj.medicion.ProductoMedicion
@@ -700,8 +722,7 @@ export default {
           this.productoSelect = obj
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
           this.showPresentacion(this.productoSelect)
-        } 
-      }
+        }
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
@@ -711,10 +732,6 @@ export default {
       this.objProd = {}
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
-
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
-      }
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -732,6 +749,7 @@ export default {
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
+      obj.subt = ''
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
@@ -754,6 +772,7 @@ export default {
       this.cant = prod.cantidad
       let obj = this.objProd
       this.$refs.autocompleteProducto.setValue('')
+      obj.subt = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
@@ -806,23 +825,15 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center  ">
-            <thead>
-              <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
-                <th style="width: 200px">Producto</th>
-                <th style="width: 100px">Categoría</th>
-                <th style="width: 100px">Marca</th>
-                <th class="table-primary" style="width: 65px">Precio</th>
-              </tr>
-            </thead>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
-              <tr>
-                <td class="${styleStock}"><b>${data.EsPadre==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b></td>
-                <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
-                <td>${data.ProductoCategoria}</td>
-                <td>${data.ProductoMarca}</td>
-                <td class="table-primary"><b>${data.PrecioContado}</b></td>
+              <tr style="padding:0; margin:0">
+                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>
               </tr>
             </tbody>
           </table>   
@@ -849,6 +860,9 @@ export default {
        // let precioFinal = 
       // }else{
       precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
+      if(this.isVentas){
+        Vue.set(this.productos[index], 'subt', '')
+      }
        // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
 

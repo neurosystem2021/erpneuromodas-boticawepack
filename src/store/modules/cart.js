@@ -18,7 +18,7 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
@@ -174,9 +174,15 @@ const actions = {
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
-            if(!isVentas){
+
+            let preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+            let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            
+            if (!obj.PreciosPorProducto || fPP.length === 4) {
               obj.estadoPxP = true
-              obj.cantidad = 0
+            }
+
+            if(!isVentas){
               obj.precio = obj.PrecioCosto
               obj.nuevoPrecioContado = obj.PrecioContado || 0
             }else{

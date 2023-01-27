@@ -330,13 +330,13 @@ export default {
         }else{
             this.idEmpresa = null
             this.empresa = {}
-            this.$swal({
+            /*this.$swal({
                 icon: 'error',
                 title: 'Error en la autentificación de delivery',
                 text: 'No hay conexión con el servidor de delivery',
                 target: document.getElementById('conten'),
                 footer: 'Por favor cierre sesion e ingrese nuevamente'
-            })
+            })*/
         }
     },
     getPedidos(){
