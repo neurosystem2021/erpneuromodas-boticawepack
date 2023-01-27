@@ -5,9 +5,14 @@
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
+        <b-col md="12" style="margin-top: -10px; margin-bottom: -10px;">
+            <b-btn v-if="showNew" variant="success" size="md" @click="eliminaId"><b>Nuevo</b></b-btn>    
+            <hr style="margin-top: 5px;"/> 
+        </b-col>
+
         <b-col md="6">
-          <b-form-group>
-            <label>Código barra:</label>
+        <b-form-group>
+          <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
               v-model="producto.CodigoBarra"
@@ -123,9 +128,8 @@
               @input="(val) => producto.Color = val && val.toUpperCase()"              
               ></b-form-input>-->
           </b-form-group>
-          
-          
         </b-col>
+
         <b-col md="6">
           <b-form-group>
             <label>Medición:</label>
@@ -206,6 +210,13 @@
               class="form-control"
               />
           </b-form-group>
+
+          <b-form-group v-if="true">
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+          </b-form-group>
+          
         </b-col>
       </b-row>
 
@@ -216,7 +227,6 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               class="form-control"
               step="0.0001"
@@ -294,7 +304,7 @@
           Limpiar
         </b-btn>
         <b-btn  variant="primary" type="submit">
-           Guardar
+           {{this.mensajeBtn}}
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
            Close
@@ -314,6 +324,8 @@ import ProductoFormDet from '@/components/ProductoFormDet'
 export default {
   data () {
     return {
+      mensajeBtn: 'Crear',
+      showNew:false,
       showProductoDet: false,
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
@@ -322,7 +334,8 @@ export default {
       generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
-      precioLiquidacion: 0
+      precioLiquidacion: 0,
+      file: ''
     }
   },
   beforeMount () {
@@ -331,13 +344,18 @@ export default {
   props: ['showButton', 'productoUpdate', 'cbGuardar'],
   watch: {
     show (val) {
-      if (!val) {
-        console.log('close')
+      if (val) {
+        
+      }
+      else {
+        this.producto.IdProducto;
       }
     },
     productoUpdate (newVal) {
       if (newVal.IdProducto) {
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+        this.mensajeBtn='Guardar'
+        this.showNew = true;
+        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >> '
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
           ProductoCategoria: newVal.ProductoCategoria
@@ -387,12 +405,15 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.Imagen = newVal.Imagen
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
         this.actualizarLiquidacion()
 
       } else {
         this.precioLiquidacion = 0
         this.title = 'Nuevo Producto'
+        this.showNew = false;
+        this.mensajeBtn = 'Crear';
         this.clearForm()
       }
     }
@@ -414,6 +435,15 @@ export default {
           }
         })
       }
+    },
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0]
+    },
+    eliminaId(){
+      delete this.producto.IdProducto;
+      this.mensajeBtn = 'Crear';
+      this.showNew = false;
+      //console.log(this.producto,"asdasd");
     },
     actualizarLiquidacion(){
       this.precioLiquidacion = this.producto.PrecioContado -  Math.round(((this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0)*(this.producto.PrecioContado>0?this.producto.PrecioContado:0)/100)* 10) / 10;
@@ -479,6 +509,7 @@ export default {
         PrecioCosto: 0,
         categoria: {},
         marca: {},
+        Imagen: null,
         // modelo: {},
         talla: {},
         medicion: {
@@ -524,12 +555,25 @@ export default {
         } else {
           this.$toasted.success('Producto guardado correctamente')
           // this.initForm()
-          this.producto.talla = {}
-          this.$refs.inputTalla.setValue('')
+          //this.producto.talla = {}
+          //this.$refs.inputTalla.setValue('')
           this.$refs.productoForm.hide()
         }
 
+        //INSERTANDO IMAGEN
+        let formData = new FormData();
+        formData.append('imagen', this.file);
+        this.axios({
+            method    : 'post',
+            url       : this.API + 'producto/imagen/' + response.data.insertId,
+            data      : formData,
+            headers   : { 'Content-Type': 'multipart/form-data' }
+          })
+          .then((res) => {
+            // console.log(res);
+          })
 
+        this.$refs.productoForm.hide()
       })
       .catch((error) => {
         console.log(error)

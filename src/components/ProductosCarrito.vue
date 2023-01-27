@@ -23,7 +23,8 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -35,7 +36,7 @@
             type="number"
             style="width: 80px"
             min="0"
-            @input="(val) => $emit('onInputCantidad', val.target.value)"
+            @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index);} "
             placeholder="Cantidad"
             class="form-control"/>
         </template>
@@ -103,7 +104,8 @@
             step="0.01"
             value="0"
             class="form-control"/>
-            <b-form-text>
+            <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0;">
+              <p style="color: red; text-align: center;">Liquidación</p>
             </b-form-text>
         </template>
 
@@ -112,6 +114,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <b-button style="margin-top:5px" :disabled="bloquearInput?true:false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -194,7 +197,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      productoSelect: {}
     }
   },
   watch: {
@@ -299,8 +303,19 @@ export default {
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart'
     }),
+    actualizaDesc (index) {
+      let descGeneral = this.$options.filters.redondear((Math.round(((this.productos[index].PorcentajeLiquidacion>0?this.productos[index].PorcentajeLiquidacion:0)*(this.productos[index].PrecioContado>0?this.productos[index].PrecioContado:0)/100)* 10) / 10)*parseFloat(this.productos[index].cantidad))
+      Vue.set(this.productos[index], 'descuento', descGeneral)
+    },
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
+    },
+    agregarObj(id){
+      if (id) {
+        this.add([id, (obj) => {
+          this.$emit('onAddProducto')
+        }, { setPrecio: this.setPrecio }])
+      }
     },
     loadBarcode (e) {
       e.preventDefault()
@@ -350,6 +365,10 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
+    editarProducto(datos){
+      this.productoSelect = datos;
+      this.$refs.productoFormEdit.show = true;
+    },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
@@ -357,7 +376,12 @@ export default {
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
+      if (this.tipo=='mov') {
+        obj.descuento = 0;
+      }
+      else{
+        obj.descuento = (Math.round(((obj.PorcentajeLiquidacion>0?obj.PorcentajeLiquidacion:0)*(obj.PrecioContado>0?obj.PrecioContado:0)/100)* 10) / 10)
+      }
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
       this.add([obj, () => {
@@ -392,7 +416,9 @@ export default {
       // return nuevoPrecio 
     },
     getSubtotal(index) {
-      
+      if (this.tipo=='mov') {
+        this.productos[index].descuento = 0; 
+      }
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal

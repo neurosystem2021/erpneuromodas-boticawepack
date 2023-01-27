@@ -191,7 +191,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" tipo="mov"></productos-carrito>
+              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" @onAddProducto="onAddProducto"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -220,6 +220,24 @@ export default {
   },
   data () {
     return {
+      carrito: {
+        fields: [
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: 'ProductoCategoria', label: 'Categoria'}, 
+          { key: 'Producto', label: 'Articulo'}, 
+          { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoModelo', label: 'Modelo' }, 
+          { key: 'Color', label: 'Color' },
+          { key: 'ProductoTalla', label: 'Talla' },
+          { key: 'Genero' },
+          { key: 'cantidad' },
+          { key: 'precio', label: 'P/U' },
+          { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+          { key: 'igv', label: 'IGV' }, 
+          { key: 'precioVenta', label: 'Precio Venta'},
+          { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+          { key: 'acciones', label: ''}
+      ]},
       inProgress: false,
       newRuc: '',
       API: config.API,
@@ -238,10 +256,16 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
+    onAddProducto (obj) {
+      this.obtenerStok({
+        IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : ( this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1 )
+      })
+    },
     afe (e) {
-return false
+    return false
     },
     cargarNumero () {
       this.axios.get(this.API + 'movimientos/numero', {
@@ -308,9 +332,11 @@ return false
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1 })
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
     },
     setMoneda (obj) {
       this.movimiento.Moneda = obj.Moneda

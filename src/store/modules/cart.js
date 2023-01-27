@@ -15,11 +15,17 @@ const mutations = {
       if (index < 0) {
         productos.push(item)
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad = Number(productos[index].cantidad)+1
+        productos[index].descuento = (Math.round(((productos[index].PorcentajeLiquidacion>0?productos[index].PorcentajeLiquidacion:0)*(productos[index].PrecioContado>0?productos[index].PrecioContado:0)/100)* 10) / 10)*productos[index].cantidad
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
+      }
+      else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2, 0, item)
       }
     }
   },
@@ -85,10 +91,12 @@ const actions = {
           let obj = response.data
 
           if(setPrecio) {
+            obj.descuento = Math.round(((obj.PorcentajeLiquidacion>0?obj.PorcentajeLiquidacion:0)*(obj.PrecioContado>0?obj.PrecioContado:0)/100)* 10) / 10
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             obj.nuevoPrecioContado = 0
           } else {
+            obj.descuento = 0
             obj.cantidad = 0
             obj.precio = obj.PrecioCosto
             obj.nuevoPrecioContado = obj.PrecioContado || 0
@@ -101,9 +109,6 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-
-          obj.descuento = 0
-          
         
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
