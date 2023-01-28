@@ -434,6 +434,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
+        this.configStock()
     },
     data () {
         return {
@@ -487,7 +488,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            ventaSinStock:0
         }
     },
     watch: {
@@ -521,6 +523,15 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+                .then(res => {
+                    this.ventaSinStock = res.data
+                })
+                .catch((err)=>{
+                    this.ventaSinStock = 0
+                })
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -1036,7 +1047,7 @@ export default {
                 return;
             }
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
