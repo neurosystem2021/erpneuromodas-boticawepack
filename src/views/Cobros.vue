@@ -147,7 +147,7 @@
                 </tr>
                 <tr v-if="productoSelect.EsCredito==0">
                   <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
-                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'TARJETA / TRANSF.':''}} {{ productoSelect.Mastercard>0?'YAPE / PLIN':''}}</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'TARJETA':''}} {{ productoSelect.Mastercard>0?'YAPE / PLIN':''}} {{ productoSelect.Transferencia>0?'TRANSFERENCIA':''}}</td>
                 </tr>
               </tbody>
             </table>
