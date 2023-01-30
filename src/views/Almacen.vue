@@ -73,6 +73,15 @@
             <b-row>
               <b-col md="3">
                 <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <br>
+              <b-col md="3">
+                <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
@@ -195,8 +204,44 @@
 
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
-        <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
-      </b-modal>
+      <b-row>
+        <b-col md="5">
+          <b-form-group>
+            <label>Fecha Inicio:</label>
+            <b-form-input
+              v-model="kardex.fechaDesde"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="5">
+          <b-form-group>
+            <label>Fecha Fin:</label>
+            <b-form-input
+              v-model="kardex.fechaHasta"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="2" class="text-center">
+          <b-form-group>
+            <br>
+            <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+      <b-row>
+        <b-col class="text-center">
+            <b-button variant="success" size="sm" :href="hrefXlsProducto" target="_blank">Exportar Excel Producto</b-button>
+        </b-col>
+      </b-row>
+      <br>
+    </b-modal>
   </div>
 </template>
 
@@ -243,7 +288,11 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      kardex: {
+        fechaDesde: this.$moment().format("YYYY-MM-DD"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      }
     }
   },
   watch: {
@@ -292,6 +341,11 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoModelo 
+    },
+    hrefXlsProducto () {
+      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+
+      '&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+
+      '&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
     }
   },
   methods: {
@@ -342,17 +396,35 @@ export default {
       this.productoSelect = item
     },
     rowDblClick (item) {
+      this.kardexFechaRango();
       this.productoSelect = item
       this.showKardex = true
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-DD")
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD")
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
           }
       }).then((response) => {
           this.kardexSelect = response.data
       })
+    },
+    kardexFechaRango(){
+      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
+          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
+          }
+          }).then((response) => {
+              this.kardexSelect = response.data
+          })
+      }
+     
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
@@ -383,6 +455,7 @@ export default {
       this.tipoStock = ''
       this.filters = {}
       this.filter = ''
+      this.$refs.inputCodigoBarra.value=''
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')

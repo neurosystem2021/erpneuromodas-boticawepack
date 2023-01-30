@@ -317,7 +317,7 @@ import config from '@/store/config.js'
                 })
                 .then((response) => {
                     if (response.data.success) {
-                        this.$toasted.success('Retiro registrado correctamente.')
+                        this.$toasted.success(response.data.msg)
                         this.getRetiros()
                         this.conceptoRetiro = '';
                         this.importeRetiro = '';

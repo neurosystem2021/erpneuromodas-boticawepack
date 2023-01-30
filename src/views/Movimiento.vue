@@ -223,7 +223,8 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      idPerfil:sessionStorage.getItem('IdPerfil')
     }
   },
   computed: {
@@ -276,7 +277,8 @@ export default {
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
-        almacenDestino: { IdAlmacen: -1 }
+        almacenDestino: { IdAlmacen: -1 },
+        user: sessionStorage.getItem('User')
       }
     },
     onReset (evt) {
