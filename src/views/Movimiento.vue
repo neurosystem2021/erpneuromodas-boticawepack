@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -468,5 +468,11 @@ return false
 <style>
   .input-group {
     /*margin: 0.25rem 0 !important;*/
+  }
+  @media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
   }
 </style>
