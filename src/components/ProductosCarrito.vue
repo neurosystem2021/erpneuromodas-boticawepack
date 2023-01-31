@@ -284,7 +284,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -373,6 +373,7 @@ export default {
     igvTotal: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
+    noSubtotal: Boolean, 
     onSetProducto: {
       type: Function,
       default (obj) {
