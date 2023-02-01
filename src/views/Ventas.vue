@@ -84,7 +84,7 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
-                                    <b-input-group>
+                                    <b-input-group prepend="Cliente">
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -92,7 +92,6 @@
                                             anchor="ClienteDniRuc"
                                             label="writer"
                                             placeholder=""
-                                            initValue=""
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
@@ -356,6 +355,7 @@ export default {
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
+        this.loadClienteVarios()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -428,6 +428,14 @@ export default {
                 this.$refs.inputRepartidor.$refs.input.required = true                          
             }
         },
+        loadClienteVarios() {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+            })
+        },
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -453,9 +461,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
-                cliente: {
-                    IdCliente: 0
-                },
+                cliente: {},
                 tipoVenta: {
                     IdTipoDoc: 3,
                     TipoDoc: 'TICKET',
@@ -550,13 +556,14 @@ export default {
                 }
             }else {
                 params = {
-                    idCliente: obj
+                    idCliente: obj.IdCliente  || obj
                 }
             }
 
             if (typeof obj === 'object') {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
+                this.venta.CampoDireccion = this.venta.cliente.Direccion
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -663,6 +670,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
+                this.loadClienteVarios()
                 this.$refs.inputCliente.setValue('')
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -718,6 +726,7 @@ export default {
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')

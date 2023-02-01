@@ -11,16 +11,23 @@ const state = {
 
 const mutations = {
   AGREGAR_PRODUCTO ({ productos }, item) {
+    //console.log(productos,"prod");
+    //console.log(item,"item");
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
         productos.push(item)
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad = Number(productos[index].cantidad)+1
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
+      }
+      else{
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2, 0, item)
       }
     }
   },
@@ -70,7 +77,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje]) {
+  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
@@ -84,7 +91,12 @@ const actions = {
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      let params = {}
+      if (isBarCode) {
+        params = {codigoBarra: producto}
+      } 
+
+      axios.get(API + 'productos/id/' + producto,{params: params}).then((response) => {
         if (response.data) {
           let obj = response.data
 

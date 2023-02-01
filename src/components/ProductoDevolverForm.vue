@@ -51,7 +51,7 @@
                                     <td>{{ item.CodigoBarra }}</td>
                                     <td>{{ item.Producto }}</td>
                                     <td>{{ item.Prestados }}</td>
-                                    <td><input type="number" class="form-control" @keyup="validaPresto($event.key)" v-model="item.devueltos" /></td>
+                                    <td><input type="number" class="form-control" v-model="item.devueltos" /></td>
                                     <td><input type="text" class="form-control" v-model="item.persona" /></td>
                                 </tr>
                             </tbody>
@@ -59,7 +59,7 @@
                     </b-col>
                 </b-row>
                 <div slot="modal-footer" >
-                    <b-btn size="sm" variant="success" type="submit" :disabled="(this.itemdevolver <= this.itemcaptura && this.itemdevolver > 0) ? false : true">
+                    <b-btn size="sm" variant="success" type="submit">
                         Guardar
                     </b-btn>
                     <b-btn size="sm" variant="secondary" @click="show=false">
@@ -84,8 +84,8 @@ import config from '@/store/config.js'
                 prestados: [],
                 serie: '',
                 numero: '',
-                itemdevolver: 0,
-                itemcaptura: 0
+                itemcaptura: 0,
+                itemCapturado: 0
             }
         },
         methods: {
@@ -105,21 +105,28 @@ import config from '@/store/config.js'
                 this.serie = ''
                 this.numero = ''
             },
-            validaPresto(x){
-                this.itemdevolver = x;
-                this.prestados.map(res => {
-                    this.itemcaptura = res.Prestados;
-                })
-            },
             guardarDevueltos (evt) {
                 evt.preventDefault()
-                this.axios.post(this.API + 'productos/devueltos', { devueltos: this.prestados})
-                .then((response) => {
-                    this.show = false
-                    this.$toasted.show('Productos actualizados correctamente')
-                    this.limpiar();
-                    this.$emit('update')
+                this.prestados.map(res => {
+                    this.itemcaptura = res.Cantidad;
+                    this.itemCapturado = res.devueltos;
                 })
+
+                if (this.itemCapturado>this.itemcaptura) {
+                    this.$toasted.show('No puede devolver mas de lo prestado')
+                }
+                else if (this.itemCapturado==0 || this.itemCapturado==undefined ) {
+                    this.$toasted.show('No puede devolver cero')
+                }
+                else{
+                    this.axios.post(this.API + 'productos/devueltos', { devueltos: this.prestados})
+                    .then((response) => {
+                        this.show = false
+                        this.$toasted.success('Productos actualizados correctamente')
+                        this.limpiar();
+                        this.$emit('update')
+                    })
+                }
             }
         }
     }

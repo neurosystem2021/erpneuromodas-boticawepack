@@ -319,8 +319,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
-
+      /*let idProducto = this.loadCode;
       if (idProducto) {
         this.add([idProducto, (obj) => {
           if (obj) {
@@ -331,6 +330,20 @@ export default {
           }
           this.loadCode = ''
         }, { setPrecio: this.setPrecio,  setSuma: true }])
+      }.*/
+
+      let idProducto = this.loadCode;
+      if (idProducto) {
+        let params = {codigoBarra: idProducto}
+        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
+        .then((response) => {
+          if (response.data.IdProducto) {
+            this.setProducto(response.data)
+          } else {
+            this.loadCode = ''
+            this.$toasted.show('No se encontró ningun producto')    
+          }
+        })
       }
     },
     /*alterarBuscadorProductos() {
@@ -368,6 +381,7 @@ export default {
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
+      this.loadCode = ''
       obj.precio = 0
       obj.cantidad = 0
       //obj.IdLote = 0
@@ -375,9 +389,9 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
-      this.add([obj, () => {
+      this.add([obj.IdProducto, (obj) => {
         this.$emit('onAddProducto', obj)
-      }])
+      },{ setPrecio: this.setPrecio, setSuma: true }])
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },

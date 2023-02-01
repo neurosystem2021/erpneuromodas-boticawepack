@@ -2,22 +2,29 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="3" class="my-1">
+          <b-col md="12" class="my-3">
             <b-row>
-              <b-col style="text-align: center;color: #fff;background: #ff9900;">
-                <b>Total Balones<br>
+              <b-col style="text-align: center; padding:10px; text-align: center; border-radius: 10px 0px 0px 10px; border: 1px black solid; color: #fff;background: #ff9900;">
+                <b>Total de Balones<br>
                 {{cantidadBalones}}</b>
               </b-col>
-              <b-col style="text-align: center;color: #fff;background: #ff9900;">
+              <b-col style="text-align: center; padding:10px; text-align: center; border: 1px black solid; color: #fff;background: #ff9900;">
                 <b>Total de Envaces Vacios<br>
                 {{stock}}</b>
               </b-col>
-              <b-col style="text-align: center;color: #fff;background: #ff9900;">
-                <b>Cantidad prestados<br>
+              <b-col style="text-align: center; padding:10px; text-align: center; border: 1px black solid; color: #fff;background: #ff9900;">
+                <b>Cantidad de Balones Prestados<br>
                 {{cantidadPrestado}}</b>
+              </b-col>
+              <b-col style="text-align: center; padding:10px; text-align: center; border-radius: 0px 10px 10px 0px; border: 1px black solid; color: #fff;background: #ff9900;">
+                <b>Cantidad de Gases (contenido)<br>
+                {{cantidadGases}}</b>
               </b-col>
             </b-row>
           </b-col>
+        </b-row>
+
+        <b-row>
           <b-col md="2" class="my-1">
             <b-form-group>
               <autocomplete
@@ -34,7 +41,7 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="3" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -45,14 +52,14 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="2" class="my-1">
+          <b-col md="6" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="6">
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
             </b-col>
-            <b-col md="4">
+            <b-col md="6">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
             </b-row>
@@ -135,6 +142,7 @@ export default {
       },
       cantidadBalones: 0,
       cantidadPrestado: 0,
+      cantidadGases: 0,
       stock: 0
     }
   },
@@ -152,6 +160,7 @@ export default {
           .then(res => {
             this.cantidadBalones = res.data.cantidadEnvases;
             this.stock = res.data.envasesVacios;
+            this.cantidadGases = res.data.cantidadGases;
           })
       },
       setAlmacen (obj) {
