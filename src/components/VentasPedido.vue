@@ -96,7 +96,7 @@ import { mapActions } from 'vuex'
         },
         watch: {
           items () {
-            this.axios.get(this.API + 'proformas/count').then((response) => {
+            this.axios.get(this.API + 'ventapedido/count').then((response) => {
                 this.totalRows = response.data.total
             })
           }

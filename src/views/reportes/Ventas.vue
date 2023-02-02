@@ -129,6 +129,10 @@
                   </div>
                 </template>
 
+                <template slot="Total" slot-scope="data">
+                    {{ ((data.item.CodSunat=='07'? -1:1) * data.item.Total) | redondear }}
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -140,7 +144,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/ventasxvendedor?fechaInicio=' +fechaInicio+'&fechaFin=' +fechaFin+'&idTipoDoc='+(tipoDoc.IdTipoDoc || '')+'&usuario='+(vendedor.Usuario||'')+'&idAlmacen='+(almacen.IdAlmacen||'')+'&almacen='+(almacen.Almacen||'')" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -248,7 +252,8 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen
           }
         }).then((response) => {
           this.ventasAcumuladas = response.data.total
@@ -262,6 +267,7 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
       this.limpiarFiltros()
+      this.getVentasAcumuladas()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     rowClick (item) {
@@ -287,7 +293,7 @@ export default {
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
-      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&nopedido=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
