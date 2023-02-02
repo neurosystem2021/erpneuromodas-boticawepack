@@ -533,7 +533,7 @@ export default {
       this.$set(this.remision, 'razonSocialCliente', '');
       this.$set(this.remision, 'direccionCliente', '');
       this.$refs.inputDocRef.setValue('');
-      this.remision.documentoReferencia = '';
+      this.remision.documentoReferencia = obj.NroComprobante;
       this.limpiarCart();
       
       // Cargar producto del movimiento
