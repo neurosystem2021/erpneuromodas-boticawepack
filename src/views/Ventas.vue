@@ -273,7 +273,7 @@
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        :disabled="bloquearInput?true:false"
+                                                        :disabled="bloquearInput?true:false || true"
                                                         @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
                                                         class="form-control"
