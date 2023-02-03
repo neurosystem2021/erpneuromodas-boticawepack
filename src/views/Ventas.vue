@@ -63,7 +63,7 @@
                                         required="required"
                                         ref="inputDocRef"
                                         :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
-                                        anchor="NroComprobante"
+                                        anchor="NroComprobanteAnt"
                                         initValue=""
                                         label="writer"
                                         placeholder=""
@@ -112,6 +112,14 @@
                                     </autocomplete>
                                     </b-input-group>
                                 </b-form-group>
+                            </b-col>
+                            <b-col md="12" style="margin-top:-5px; margin-bottom:20px; margin-left:5px" v-if="venta.tipoVenta.CodSunat == '01' || venta.tipoVenta.CodSunat == '03'">
+                                <b-form-checkbox
+                                    v-model="venta.EsAnticipo"
+                                    :value="1"
+                                    :unchecked-value="0">
+                                    <b>¿Es pago anticipado?</b>
+                                </b-form-checkbox>    
                             </b-col>
                             <b-col md="12" style="margin-top:-10px">
                                 <b-form-group>
@@ -615,7 +623,8 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                EsAnticipo: 0
             }
             this.isNota = false
             this.bloquearInput=false
@@ -627,11 +636,12 @@ export default {
         },
         setTipoVenta (obj) {
             this.isNota = false
-            this.bloquearInput=false,
+            this.bloquearInput=false
             this.venta.NroComprobanteModifica = ''
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
+            this.venta.EsAnticipo = 0
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true

@@ -92,7 +92,7 @@
               </td>
               <!--<td>{{ item.EfectivoDesc }}</td>-->
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td><span v-if="item.CodSunat=='07'">-</span> S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -495,7 +495,11 @@ export default {
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado && venta.CodSunat!='07') total += venta.Efectivo
+        if (!venta.Anulado && venta.CodSunat!='07'){
+          total += venta.Efectivo
+        }else if(!venta.Anulado && venta.CodSunat=='07'){
+          total -= venta.Efectivo
+        } 
       });
       return total
     },
