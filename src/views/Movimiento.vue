@@ -225,6 +225,7 @@ export default {
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'ProductoCategoria', label: 'Categoria'}, 
           { key: 'Producto', label: 'Articulo'}, 
+          { key: 'eventPres', label: 'Img' },
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo' }, 
           { key: 'Color', label: 'Color' },

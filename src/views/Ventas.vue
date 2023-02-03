@@ -380,6 +380,7 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
+                    { key: 'eventPres', label: 'Img' },
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
