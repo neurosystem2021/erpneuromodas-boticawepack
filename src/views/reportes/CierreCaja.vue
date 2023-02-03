@@ -35,6 +35,33 @@
       </b-row>
       <br class="no-print" /><br class="no-print" />
 
+      <h2 class="text-center">Resumen de Productos</h2>
+      <br>
+      <b-row>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>ID</th><th>Producto</th><th>Cantidad Vendida</th><th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in productosVendidos" :key="index">
+              <td>{{ item.IdProducto }}</td>
+              <td>{{ item.Producto }}</td>
+              <td>{{ item.CantidadVendida }}</td>
+              <td>S/. {{ item.MontoVendido | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Monto</b></td>
+              <td class="total"><b>S/. {{ productosVendidosTotal | redondear}}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
@@ -53,14 +80,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo }}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear}}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -82,14 +109,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa }}</td>
+              <td>S/. {{ item.Visa | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -112,14 +139,14 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard }}</td>
+              <td>S/. {{ item.Mastercard | redondear}}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -139,14 +166,14 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total }}</td>
+              <td>S/. {{ item.Total | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -244,7 +271,9 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      productosVendidos: [],
+      productosVendidosTotal: 0
     }
   },
   computed: {
@@ -367,6 +396,23 @@ export default {
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
+    getProductos (ventas) {
+      this.productosVendidos = []
+      this.productosVendidosTotal = 0
+      this.axios.post(this.API + 'cierrecaja/productos', {
+         idDocVentas: ventas.map(prod => prod.idDocVenta)
+      })
+      .then(res => {
+        this.productosVendidos = res.data
+        let total = 0
+        this.productosVendidos.map(pv=>{
+          total += pv.MontoVendido;
+        })
+        this.productosVendidosTotal = total
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     getVentas () {
       let params = {
         idCierre: this.$route.params.id
@@ -381,6 +427,9 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        if(this.ventas.length > 0){
+          this.getProductos(this.ventas)
+        }
       }).catch(err => {
         console.log(err)
       })
