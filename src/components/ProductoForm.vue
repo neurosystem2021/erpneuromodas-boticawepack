@@ -288,8 +288,9 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio Convenio:</label>
-            <input v-model="producto.precioConvenio"
+            <label>Costo Precio Dolares (Actualizar):</label>
+            <input v-model="producto.PrecioCostoDolares"
+              @input="(val)=>{calcularPrecioSoles(val.target.value)}"
               type="number"
               step="0.0001"
               class="form-control"
@@ -408,7 +409,7 @@ export default {
   beforeMount () {
     this.initForm()
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ['showButton', 'productoUpdate', 'cbGuardar','tipoCambio'],
   watch: {
     show (val) {
       if(val){
@@ -500,6 +501,7 @@ export default {
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
+        this.PrecioCostoDolares = 0
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -510,7 +512,7 @@ export default {
           })
 
       } else {
-
+        this.PrecioCostoDolares = 0
         this.title = 'Nuevo Producto'
         this.clearForm()
 
@@ -519,6 +521,12 @@ export default {
     }
   },
   methods: {
+    calcularPrecioSoles(val){
+      if(val > 0){
+        this.producto.PrecioCosto = Math.round((val * this.tipoCambio) * 1000) / 1000
+        this.producto.PrecioContado = Math.round((this.producto.PrecioCosto * (this.producto.PorcentajeUtilidad / 100) + this.producto.PrecioCosto)* 100) / 100 
+      }
+    },
     /*cargarCatOferta(){
       this.categoriaItems = []
       this.axios.get(this.API + 'categorias/oferta')
@@ -651,6 +659,7 @@ export default {
         PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
+        PrecioCostoDolares: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},

@@ -18,7 +18,7 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
@@ -96,7 +96,7 @@ const actions = {
 
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
-        producto.precio = 0
+        producto.precio = producto.PrecioCosto
         producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
       if (isClienteVip) {
