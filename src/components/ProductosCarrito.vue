@@ -102,7 +102,7 @@
         <template slot="descuento" slot-scope="data">
           <input
             v-model="productos[data.index].descuento"
-             :disabled="true"
+            :disabled="bloquearInput?true:false"
             type="number"
             min="0"
             style="width: 100px"
