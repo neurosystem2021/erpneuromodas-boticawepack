@@ -14,6 +14,7 @@
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                             <option value="mayvel">EMPRESA MAYVEL</option>
                             <option value="mofertas">EMPRESA MOFERTAS</option>
+                            <option value="gusbet">EMPRESA GUSBET</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
@@ -94,7 +95,7 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
-                empresaselec: sessionStorage.getItem('empresa') || 'mofertas'
+                empresaselec: sessionStorage.getItem('empresa') || 'gusbet'
             }
         },
         props: ['idAlmacen','empresa'],
