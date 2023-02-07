@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa': (this.empresa === 'mofertas')}">
+    <div :class="{'fondo-empresa': (this.empresa === 'mofertas'), 'fondo-empresa1': (this.empresa === 'gusbet')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -11,6 +11,7 @@
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                             <option value="mayvel">EMPRESA MAYVEL</option>
                             <option value="mofertas">EMPRESA MOFERTAS</option>
+                            <option value="gusbet">EMPRESA GUSBET</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -1320,5 +1321,8 @@ export default {
 
 .fondo-empresa {
     background: #eff9ff;
+}
+.fondo-empresa1 {
+    background: #d2f9d5;
 }
 </style>
