@@ -190,7 +190,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito"></productos-carrito>
+              <productos-carrito @onAddProducto="onAddProducto" ref="carrito" :fields="carrito.fields"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -224,7 +224,23 @@ export default {
       API: config.API,
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
-      idPerfil:sessionStorage.getItem('IdPerfil')
+      idPerfil:sessionStorage.getItem('IdPerfil'),
+      carrito: {
+                fields: [
+                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'ProductoCategoria', label: 'Categoría' },
+                    { key: 'Producto', label: 'Artículo' },
+                    { key: 'ProductoMarca', label: 'Marca' },
+                    { key: 'ProductoMedicion', label: 'Medicion' },
+                    { key: 'cantidad' },
+                    { key: 'precio', label: 'P/U' },
+                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
+                    { key: 'igv', label: 'IGV' },
+                    { key: 'precioVenta', label: 'Precio venta' },
+                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+                    { key: 'acciones', label: ''}
+                ]
+            }
     }
   },
   computed: {
@@ -238,7 +254,8 @@ export default {
     ...mapActions({
       buscarProveedores: 'buscarProveedores',
       buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito'
+      limpiar: 'limpiarCarrito',
+      obtenerStok: 'obtenerStock'
     }),
     loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
@@ -260,6 +277,18 @@ export default {
         console.log(error)
         // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
+    },
+    onAddProducto () {
+      if (this.movimiento.almacenOrigen.IdAlmacen==-1&&this.movimiento.almacenDestino.IdAlmacen==-1) {
+        this.obtenerStok({
+          IdAlmacen: 1
+        })
+      }
+      else {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacenOrigen.IdAlmacen==-1?this.movimiento.almacenDestino.IdAlmacen:this.movimiento.almacenOrigen.IdAlmacen
+        })
+      }
     },
     initMovimiento () {
       let currentMonth = this.$moment().month() + 1
@@ -302,6 +331,7 @@ export default {
         this.loadFirstAlmacen(data => {
           this.$refs.inputAlmacenDestino.setValue(data.Almacen)
           this.movimiento.almacenDestino = data
+          this.onAddProducto();
         })
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
@@ -309,6 +339,7 @@ export default {
         this.loadFirstAlmacen(data => {
           this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
           this.movimiento.almacenOrigen = data
+          this.onAddProducto();
         })
       }else {
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
@@ -319,6 +350,7 @@ export default {
 
           this.$refs.inputAlmacenDestino.setValue(data.Almacen)
           this.movimiento.almacenDestino = data
+          this.onAddProducto();
         })
       }
       this.movimiento.movimientoTipo = obj
@@ -330,12 +362,13 @@ export default {
     },
     setAlmacenOrigen (obj) {
       this.movimiento.almacenOrigen = obj
+      this.onAddProducto();
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj
+      this.onAddProducto();
     },
     setMoneda (obj) {
-      console.log(obj)
       this.movimiento.Moneda = obj.Moneda
       this.movimiento.TipoCambio = obj.TipoCambio
     },
@@ -376,21 +409,32 @@ export default {
 
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
-        productos: this.productos
+        productos: this.productos,
+        idProductos: this.productos.map(prod => {prod.IdProducto})
       })
       .then((response) => {
         if (response.data.error) {
           this.$toasted.show(response.data.error)
-        } else {
-          this.ultimoMovimiento = response.data.hash
-          this.movimiento = this.initMovimiento()
-          this.limpiar()
-          this.$refs.inputMovimiento.setValue('')
-          this.$refs.inputProveedor.setValue('')
-          this.$refs.inputMoneda.setValue('PEN')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+        } 
+        else if(response.data){
+          if (response.data.success==false) {
+            response.data.msg.map(x => {
+              this.$toasted.show(x)
+            }) 
+            this.inProgress = false
+            return
+          }
+          else{
+            this.ultimoMovimiento = response.data.hash
+            this.movimiento = this.initMovimiento()
+            this.limpiar()
+            this.$refs.inputMovimiento.setValue('')
+            this.$refs.inputProveedor.setValue('')
+            this.$refs.inputMoneda.setValue('PEN')
+            this.$toasted.show('Movimiento guardado correctamente ')
+            this.inProgress = false
+          }
         }
-        this.inProgress = false
       })
       .catch((error) => {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')

@@ -140,6 +140,44 @@
               type="number"
               ></b-form-input>
           </b-form-group>
+          
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.EsBalon"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Balon Contenido
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.EsBalonEnvase"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Balon Envase
+            </b-form-checkbox>
+          </b-form-group>
+
+          <hr v-if="producto.EsBalonEnvase"/>
+            <b-col md="8" v-if="producto.EsBalonEnvase">
+              <b-form-group>
+                <label>Enlazar Producto:</label>
+                <autocomplete
+                  required="required"
+                  ref="inputBalon"
+                  :url="API + 'productos/balones'"
+                  anchor="Producto"
+                  label="writer"
+                  :onSelect="setBalones"
+                  :onFocus="focusAutocomplete.bind(null, 'inputBalon')"
+                  :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+            </b-col>
+          <hr v-if="producto.EsBalonEnvase"/>
+
           <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
@@ -154,8 +192,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -249,6 +287,19 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto) {
+
+        if (newVal.IdProductoContenido) {
+          this.producto.IdProductoContenido=newVal.IdProductoContenido;
+
+          this.axios.get(this.API + 'productos', {
+          params: {
+            idProducto: this.producto.IdProductoContenido,
+          }
+          }).then((response) => {
+            this.$refs.inputBalon.setValue(response.data[0].Producto);
+          })
+        }
+
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -311,6 +362,8 @@ export default {
         this.producto.ProductoPresentacion = newVal.ProductoPresentacion
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.EsBalon = newVal.EsBalon
+        this.producto.EsBalonEnvase = newVal.EsBalonEnvase
 
       } else {
 
@@ -372,6 +425,10 @@ export default {
 
       this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
     },
+    setBalones (obj) {
+      this.producto.IdProductoContenido = obj.IdProducto
+      this.$refs.inputBalon.setValue(obj.Producto)
+    },
     setCategoria (obj) {
       this.producto.categoria = obj
       this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
@@ -406,11 +463,14 @@ export default {
     initForm () {
       this.producto = {
         EsPadre: 0,
+        EsBalon:0,
+        EsBalonEnvase:0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
         IdProductoModelo: null,
+        IdProductoContenido: null,
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
         Producto: '',

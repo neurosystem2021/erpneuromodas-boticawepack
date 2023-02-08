@@ -301,7 +301,7 @@ export default {
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
+       this.axios.get(this.API + 'productos/puntoventa/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
             idAlmacen: this.almacen.IdAlmacen
@@ -314,7 +314,6 @@ export default {
         })
 
         // Cargar la sumatoria
-        console.log('asdasd')
         this.getSumaStock()
         this.getSumaValorizado()
 
@@ -358,13 +357,13 @@ export default {
         })
     },
     getSumaValorizado () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
+      this.axios.get(this.API + 'productos/puntoventa/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
           this.sumaValorizado = (response.data[0].sumaValorizado);
         })
     },
     getSumaStock () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
+      this.axios.get(this.API + 'productos/puntoventa/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
         .then( response => {
           this.sumaStock = response.data[0].sumaStock
         })
@@ -386,7 +385,6 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
       this.limpiarFiltros()
-      console.log(this.filter)
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
     rowClick (item, index, e) {
@@ -433,7 +431,6 @@ export default {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      console.log(url)
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get( url )
 
@@ -461,7 +458,6 @@ export default {
       this.$refs.inputMarca.setValue('')
       this.productoSelect = {}
       this.limpiarClassRows()
-      console.log(this.filter)
     },
     generateFilter (key, value) {
       this.filters[key] = value
@@ -472,7 +468,7 @@ export default {
         
         if(key == 'stock' || key == 'minimo') {
           // si la consulta se hace al stock jalar de otro endpoint
-          this.APISTOCK = 'productos/stock'
+          this.APISTOCK = 'productos/puntoventa/stock'
         }
       }
 

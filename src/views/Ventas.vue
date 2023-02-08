@@ -24,6 +24,9 @@
                     <b-button-group size="sm">
                         <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                     </b-button-group>
+                    <b-button-group size="sm">
+                        <total-balones :idAlmacen="venta.almacen.IdAlmacen"></total-balones>
+                    </b-button-group>
                 </div>
             </div>
             <br /><br />
@@ -347,6 +350,7 @@ import Proformas from '@/components/ProformaLista.vue'
 import PendienteLista from '@/components/PendienteLista.vue'
 import RetirosFise from '@/components/RetirosFise.vue'
 import PagoDeuda from '@/components/PagoDeuda'
+import TotalBalones from '@/components/TotalBalones'
 
 export default {
     beforeMount () {
@@ -753,7 +757,8 @@ export default {
         Proformas,
         PendienteLista,
         RetirosFise,
-        PagoDeuda
+        PagoDeuda,
+        TotalBalones
     }
 }
 </script>

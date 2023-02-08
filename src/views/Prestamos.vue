@@ -2,21 +2,21 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="12" class="my-3">
+          <b-col md="8" class="my-3" style="margin: 0px auto;">
             <b-row>
-              <b-col style="text-align: center; padding:10px; text-align: center; border-radius: 10px 0px 0px 10px; border: 1px black solid; color: #fff;background: #ff9900;">
+              <b-col style="text-align: center; padding-top:10px; text-align: center; border-radius: 10px 0px 0px 10px; border: 0.5px white solid; color: #fff;background: #0a2164;">
                 <b>Total de Balones<br>
                 {{cantidadBalones}}</b>
               </b-col>
-              <b-col style="text-align: center; padding:10px; text-align: center; border: 1px black solid; color: #fff;background: #ff9900;">
+              <b-col style="text-align: center; text-align: center; border: 0.5px white solid; color: #fff;background: #0a2164;">
                 <b>Total de Envaces Vacios<br>
                 {{stock}}</b>
               </b-col>
-              <b-col style="text-align: center; padding:10px; text-align: center; border: 1px black solid; color: #fff;background: #ff9900;">
+              <b-col style="text-align: center; text-align: center; border: 0.5px white solid; color: #fff;background: #0a2164;">
                 <b>Cantidad de Balones Prestados<br>
                 {{cantidadPrestado}}</b>
               </b-col>
-              <b-col style="text-align: center; padding:10px; text-align: center; border-radius: 0px 10px 10px 0px; border: 1px black solid; color: #fff;background: #ff9900;">
+              <b-col style="text-align: center; text-align: center; border-radius: 0px 10px 10px 0px; border: 0.5px white solid; color: #fff;background: #0a2164;">
                 <b>Cantidad de Gases (contenido)<br>
                 {{cantidadGases}}</b>
               </b-col>
@@ -25,6 +25,20 @@
         </b-row>
 
         <b-row>
+          <b-col md="3" class="my-1">
+            <b-form-group>
+              <autocomplete
+                  required="required"
+                  ref="inputBalonEnvase"
+                  :url="API + 'productos/balonesEnvase'"
+                  anchor="Producto"
+                  label="writer"
+                  :on-select="setBalonesEnvase"
+                  :onFocus="focusAutocomplete.bind(null, 'inputBalonEnvase')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+          </b-col>
           <b-col md="2" class="my-1">
             <b-form-group>
               <autocomplete
@@ -41,7 +55,7 @@
               </autocomplete>
             </b-form-group>
           </b-col>
-          <b-col md="3" class="my-1">
+          <b-col md="5" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -50,21 +64,14 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <br />
           </b-col>
-          <b-col md="6" class="my-1">
-            <b-row>
-            <b-col md="6">
-              <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="6">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
-            </b-col>
-            </b-row>
+          <b-col md="2" class="my-1">
+            <b-form-group class="mb-0">
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+            </b-form-group>
           </b-col>
-
+        </b-row>
+        <b-row>
           <b-table small
             ref="tablaProductos"
             :filter="filter"
@@ -86,6 +93,11 @@
             </b-row>
         </b-row>
        <producto-devolver ref="productoDevolver" @update="$refs.tablaProductos.refresh()"></producto-devolver>
+       <b-row align-h="center" class="text-center">
+            <b-col cols="0">
+              <b-button variant="primary" size="lg" @click="getBalonesTotales">REPORTE TOTAL DE TODOS LOS BALONES</b-button>
+            </b-col>
+        </b-row>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
@@ -108,12 +120,9 @@ import ProductosPrestados from '@/components/ProductosPrestados'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/prestados/count').then((response) => {
-      this.totalRows = response.data.total
-    })
     
     this.loadFirstAlmacen()
-    this.getBalonesVacios()
+    this.loadFirstEnvase()
   },
   data() {
     return {
@@ -140,10 +149,15 @@ export default {
       almacen: {
         IdAlmacen: 1
       },
+      productos: {
+        IdProducto : null,
+        IdProductoContenido : null
+      },
       cantidadBalones: 0,
       cantidadPrestado: 0,
       cantidadGases: 0,
-      stock: 0
+      stock: 0,
+      url:''
     }
   },
   methods: {
@@ -155,13 +169,45 @@ export default {
             //this.almacen = res.data
           })
       },
+      loadFirstEnvase () {
+      this.axios.get(this.API + 'balonesEnvase/primero')
+        .then(res => {
+          this.$refs.inputBalonEnvase.setValue(res.data.Producto)
+          this.setBalonesEnvase(res.data)
+        })
+      },
+      getBalonesTotales() {
+        this.axios.get(this.API + 'balonesvacios' + '?idAlmacen='+this.almacen.IdAlmacen)
+        .then(res => {
+            this.$refs.inputBalonEnvase.setValue('TODOS')
+            this.cantidadBalones = res.data.cantidadEnvases;
+            this.stock = res.data.envasesVacios;
+            this.cantidadGases = res.data.cantidadGases;
+            this.productos.IdProducto = null;
+            this.$refs.tablaProductos.refresh()
+        })
+      },
       getBalonesVacios() {
-        this.axios.get(this.API + 'balonesvacios' + '?idAlmacen=' + this.almacen.IdAlmacen)
-          .then(res => {
+        this.axios.get(this.API + 'balonesvacios', {
+          params: {
+            idProducto: this.productos.IdProducto,
+            idAlmacen: this.almacen.IdAlmacen,
+            idProductoContenido: this.productos.IdProductoContenido
+          }
+        }).then(res => {
             this.cantidadBalones = res.data.cantidadEnvases;
             this.stock = res.data.envasesVacios;
             this.cantidadGases = res.data.cantidadGases;
           })
+      },
+      setBalonesEnvase(obj) {
+        this.productos = obj;
+        this.productos.IdProducto = obj.IdProducto
+        this.productos.IdProductoContenido = obj.IdProductoContenido
+        setTimeout(() => {
+          Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+        }, 100);
+        this.getBalonesVacios()
       },
       setAlmacen (obj) {
         this.almacen = obj
@@ -191,9 +237,15 @@ export default {
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos/prestados?idAlmacen='+this.almacen.IdAlmacen+ '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+        if (this.productos.IdProducto) {
+          this.url = this.API + 'productos/prestados?idAlmacen='+this.almacen.IdAlmacen+ '&idProducto='+this.productos.IdProducto+ '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+          this.url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+        }
+        else {
+          this.url = this.API + 'productos/prestados?idAlmacen='+this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+          this.url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+        }
+        let promise = this.axios.get( this.url )
 
         return promise.then((result) => {
           this.items = result.data
