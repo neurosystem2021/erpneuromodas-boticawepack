@@ -127,7 +127,7 @@
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
             placeholder="Cantidad"
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -561,7 +561,7 @@ export default {
     setSubtotal(index, val, prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
       Vue.set(this.productos[index], 'precio', precio)
-      this.actualizarProd(prod)
+      this.actualizarProd({Producto:prod,Pos:index})
     },
     abrirImagen(producto,url){
       this.productoNombre = producto
@@ -571,14 +571,14 @@ export default {
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
-    changeCant (val, prod) {
+    changeCant (val, prod, index) {
       if (val>0) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
       prod.subt = ''
       this.$nextTick(() => {
-        this.actualizarProd(prod)
+        this.actualizarProd({Producto:prod,Pos:index})
       })
     },
 
@@ -771,7 +771,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -795,7 +795,7 @@ export default {
       }, false, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
@@ -896,7 +896,7 @@ export default {
     },
     actualizarDescu(index){
       let obj = this.productos[index];
-       this.actualizarProd(obj)
+       this.actualizarProd({Producto:obj,Pos:index})
     },
     getSubtotal(index) {
       
