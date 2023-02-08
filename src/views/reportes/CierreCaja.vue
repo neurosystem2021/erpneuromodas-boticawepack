@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'fondo-empresa': (this.empresa === 'mayvel')}">
+  <div :class="{'fondo-empresa': (this.empresa === 'mayvel'), 'fondo-empresa1': (this.empresa === 'gusbet')}">
     <br>
     <b-container class="bv-example-row">
       <div>
@@ -9,6 +9,7 @@
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 300px">
                           <option value="mofertas">EMPRESA MOFERTAS</option>
                           <option value="mayvel">EMPRESA MAYVEL</option>
+                          <option value="gusbet">EMPRESA GUSBET</option>
                       </select>
                   </b-button-group>
               </div>
@@ -430,6 +431,10 @@ export default {
     if (this.$route.query.empresa === 'mayvel') {
       empresa = 'mayvel';
     }
+
+    if (this.$route.query.empresa === 'gusbet') {
+      empresa = 'gusbet';
+    }
     
     // Interceptos XMLHttpRequest
     let oldXHROpen = window.XMLHttpRequest.prototype.open;
@@ -797,6 +802,9 @@ th {
 }
 .fondo-empresa {
     background: #eff9ff;
+}
+.fondo-empresa1 {
+    background: #d2f9d5;
 }
 @media print {
   .no-print {
