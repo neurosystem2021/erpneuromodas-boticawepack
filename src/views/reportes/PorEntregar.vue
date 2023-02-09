@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row anchoEntrega">
         <b-row>
           <b-col md="12" class="my-1">
             <b-row>
@@ -26,7 +26,6 @@
                   <b-form-input v-model="fechaInicio"
                     type="date"
                     placeholder=""
-                    :value="fechaInc"
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
                 </b-form-group>
                 <b-form-group>
@@ -54,6 +53,12 @@
                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                             :classes="{input: 'form-control'}">
                         </autocomplete>
+                    </b-form-group>
+                  </b-col>
+                  <b-col md="12">                              
+                    <b-form-group>
+                        <label>Estado: </label>
+                        <b-form-select v-model="estadoEntrega" :options="itemsEstadoEntrega" v-on:change="setEstado($event)" class="mb-3" size="md" required/>
                     </b-form-group>
                   </b-col>
                 </b-row>
@@ -104,12 +109,19 @@
                 </template>
 
                 <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+                  <a class="btn btn-success btn-sm" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
                 </template>
 
                 <template slot="Entregar" slot-scope="data">
                   <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
-                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
+                  <button class="btn btn-success btn-sm" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
+                </template>
+
+                <template slot="Estado" slot-scope="data">
+                  <div class="text-center">
+                    <span v-if="((data.item.CantidadDetalle || 0) - (data.item.CantidadEntrega || 0)) == 0"><b-badge variant="success"><b>COMPLETADO</b></b-badge></span>
+                    <span v-else><b-badge variant="warning"><b>PENDIENTE</b></b-badge></span>
+                  </div>
                 </template>
 
               </b-table>
@@ -239,7 +251,8 @@ export default {
             { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
             { key: 'Reimprimir', label: 'Ver' },
-            { key: 'Entregar' }
+            { key: 'Entregar' },
+            { key: 'Estado' },
       ],
       totalRows: 50,
       perPage: 10,
@@ -248,7 +261,13 @@ export default {
       porEntregarDet: {},
       porEntregar: {},
       idDocVen: '',
-      dVentDet: {}
+      dVentDet: {},
+      estadoEntrega: 0,
+      itemsEstadoEntrega: [
+          { value: 0, text: 'TODOS' },
+          { value: 1, text: 'COMPLETADO' },
+          { value: 2, text: 'PENDIENTE' },
+      ],
     }
   },
   computed: {
@@ -271,6 +290,10 @@ export default {
     }  
   },
   methods: {
+    setEstado(val){
+      this.estadoEntrega = val
+      this.$refs.tablaVentas.refresh()
+    },
     entregarVenta (venta) {
         let r = confirm('¿Esta seguro de entregar esta venta?')
 
@@ -404,14 +427,14 @@ export default {
       this.ventaSelect = item
       this.showKardex = true
 
-      this.axios.get(this.API + 'productos/kardex/' + 10 + '?limit=0', {
+      /*this.axios.get(this.API + 'productos/kardex/' + 10 + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
               fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
           }
       }).then((response) => {
           this.ventaDetalleSelect = response.data
-      })
+      })*/
     },
     actualizarTabla() {
       this.$refs.tablaVentas.refresh()
@@ -426,7 +449,7 @@ export default {
       if (!ctx.filter) {
         ctx.filter = '&filter[fechaInicio]=' + this.fechaInicio
       }
-      let url = this.API + 'ventas?' + tipoDocFilter + 'porEntregar=1&nopedido=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas/entregar?' + tipoDocFilter + 'porEntregar=1&estadoEntrega='+this.estadoEntrega+'&nopedido=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 // console.log(url)
       let promise = this.axios.get( url )
@@ -505,5 +528,13 @@ export default {
 }
 .rowImprimir {
   background: #E3E3E3;
+}
+</style>
+<style>
+@media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .anchoEntrega{
+        width: calc(100% - 100px)
+    }
 }
 </style>
