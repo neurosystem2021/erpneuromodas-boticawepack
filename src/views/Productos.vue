@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid class="ancho bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -40,7 +40,14 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+              <template slot="PrecioCosto" slot-scope="data" >
+                {{(items[data.index].PrecioCosto).toFixed(2)}}
+              </template>
+              <template slot="PrecioContado" slot-scope="data" >
+                {{(items[data.index].PrecioContado).toFixed(2)}}
+              </template>
+            </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -85,7 +92,10 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'PorcentajeUtilidad', label: 'Porcentaje Utilidad', sortable: true },
+            { key: 'PrecioCosto', label: 'Precio Compra', sortable: true },
+            { key: 'PrecioContado', label: 'Precio Venta', sortable: true },
+            { key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
@@ -135,5 +145,10 @@ export default {
 </script>
 
 <style>
-
+  @media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
+  }
 </style>

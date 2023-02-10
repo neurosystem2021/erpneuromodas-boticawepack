@@ -434,6 +434,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
+        this.configStock()
     },
     data () {
         return {
@@ -470,6 +471,8 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+                    { key: 'CodigoBarra', label:'Codigo' },
+                    { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
                     { key: 'ProductoPresentacion', label: 'Anaquel' },
                     { key: 'Descripcion', label: 'Descripción'},
@@ -485,7 +488,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            ventaSinStock:0
         }
     },
     watch: {
@@ -519,6 +523,15 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+                .then(res => {
+                    this.ventaSinStock = res.data
+                })
+                .catch((err)=>{
+                    this.ventaSinStock = 0
+                })
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -1013,6 +1026,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let proTieneVe = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
                     sinStock += 1
@@ -1021,9 +1035,19 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                if(pro.VentaEstrategica == 1 && this.venta.tipoVenta.CodSunat != '12') {
+                    this.$toasted.error('El producto '+pro.Producto+' tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta',{duration: 4000});
+                    proTieneVe += 1
+                }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if(proTieneVe >= 1){
+                this.inProgress = false            
+                return;
+            }
+
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;

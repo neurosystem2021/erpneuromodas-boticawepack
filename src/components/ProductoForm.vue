@@ -208,6 +208,16 @@
               step="0.0001"
               />
           </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.VentaEstrategica"
+                   :value="1"
+                   :unchecked-value="0">
+              Producto con Venta Estrategica
+            </b-form-checkbox>
+          </b-form-group>
+          <hr>
           <b-form-group>
             <b-form-checkbox
                    v-model="producto.ControlaStock"
@@ -522,6 +532,7 @@ export default {
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
+        this.producto.VentaEstrategica      = newVal.VentaEstrategica
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -679,6 +690,7 @@ export default {
         categoria: {},
         marca: {},
         IdOfertaCategoria: null,
+        VentaEstrategica: 0,
         // modelo: {},
         //talla: {},
         medicion: {
