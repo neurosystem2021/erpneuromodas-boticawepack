@@ -2,8 +2,8 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
+          <b-col md="5" class="my-1">
+            <b-form-group class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
                 <b-input-group-append>
@@ -13,7 +13,7 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="4" class="my-1">
             <b-row>
             <b-col md="8">
 
@@ -25,6 +25,17 @@
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
             </b-row>
+          </b-col>
+
+          <b-col md="3" class="my-1">
+            <b-form-group>
+                <b-input-group prepend="En S/">
+                  <input class="form-control" type="number" step="0.00001" v-model="tipoCambio" placeholder="Tipo de cambio" />
+                  <b-input-group-append>
+                    <b-button size="sm" text="Button" variant="success" @click="guardarTipoCambio">Guardar</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
           </b-col>
 
           <b-table small
@@ -40,14 +51,21 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+              <template slot="PrecioCostoDol" slot-scope="data">
+                  $ {{ (data.item.PrecioCosto / tipoCambio) | redondear }}
+              </template>
+              <template slot="PrecioContadoDol" slot-scope="data">
+                  $ {{ (data.item.PrecioContado / tipoCambio) | redondear }}
+              </template>
+            </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
                 </b-col>
             </b-row>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla" :tipoCambio="tipoCambio"></producto-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
@@ -68,6 +86,7 @@ export default {
     this.axios.get(this.API + 'productos/count').then((response) => {
       this.totalRows = response.data.total
     })
+    this.loadTipoCambio()
   },
   data() {
     return {
@@ -85,14 +104,37 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },
+            { key: 'PrecioCosto', label: 'P. Costo (S/)', sortable: true },
+            { key: 'PrecioContado', label: 'P. Venta (S/)', sortable: true },
+            { key: 'PrecioCostoDol', label: 'P. Costo ($)', sortable: true },
+            { key: 'PrecioContadoDol', label: 'P. Venta ($)', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      tipoCambio: 0
     }
   },
   methods: {
+      guardarTipoCambio () {
+        this.axios.post(this.API + 'tipocambio/usd', { tipoCambio: this.tipoCambio })
+          .then(res => {
+            if(res.data){
+              this.$toasted.info('Tipo de cambio actualizado')
+            }else{
+              this.$toasted.error('No actualizado')
+            } 
+        }).catch((error)=>{
+          this.$toasted.error('Ha ocurrido, un error')
+        })
+      },
+      loadTipoCambio () {
+        this.axios.get(this.API + 'tipocambio/usd')
+          .then(res => {
+            this.tipoCambio = res.data
+        })
+      },
       rowClick (item, index) {
         this.productoSelect = item
         this.$refs.productoForm.show = true;

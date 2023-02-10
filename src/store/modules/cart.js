@@ -37,9 +37,9 @@ const mutations = {
       return p;
     })
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
-    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
-    productos.splice(index, 1, prod)
+  ACTUALIZAR_PRODUCTO ({ productos }, obj) {
+    //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(obj.Pos, 1, obj.Producto)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
@@ -174,9 +174,15 @@ const actions = {
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
-            if(!isVentas){
+
+            let preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+            let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            
+            if (!obj.PreciosPorProducto || fPP.length === 4) {
               obj.estadoPxP = true
-              obj.cantidad = 0
+            }
+
+            if(!isVentas){
               obj.precio = obj.PrecioCosto
               obj.nuevoPrecioContado = obj.PrecioContado || 0
             }else{

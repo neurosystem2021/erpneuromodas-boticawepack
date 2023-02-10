@@ -408,7 +408,7 @@ export default {
   beforeMount () {
     this.initForm()
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ['showButton', 'productoUpdate', 'cbGuardar','tipoCambio'],
   watch: {
     show (val) {
       if(val){

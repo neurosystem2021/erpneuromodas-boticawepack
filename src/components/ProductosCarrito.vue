@@ -117,11 +117,11 @@
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
-            style="width: 80px"
+            style="width: 100px"
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
             placeholder="Cantidad"
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -172,7 +172,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 95px"
+            style="width: 120px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -181,7 +181,21 @@
             />
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div v-if="isVentas">
+            {{ getSubtotal(data.index) }}
+          </div>
+          <div v-else>
+            <input
+            type="number"
+            style="width: 105px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            class="form-control"
+            v-model="productos[data.index].subt"
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -221,7 +235,7 @@
         <template slot="precioVenta" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false"
-            style="width:95px"
+            style="width:105px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -456,6 +470,8 @@ export default {
           { key: 'ProductoPresentacion', label: 'Anaquel' }, 
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+          { key: 'eventPres', label: '' },
+          { key: 'cantxPrecio', variant: 'warning' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },
@@ -536,6 +552,12 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    setSubtotal(index, val, prod) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
+      Vue.set(this.productos[index], 'precio', precio)
+      this.setNuevoPrecioContado(index)
+      this.actualizarProd({Producto:prod,Pos:index})
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url
@@ -544,13 +566,14 @@ export default {
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
-    changeCant (val, prod) {
+    changeCant (val, prod, index) {
       if (val>0) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
+      prod.subt = ''
       this.$nextTick(() => {
-        this.actualizarProd(prod)
+        this.actualizarProd({Producto:prod,Pos:index})
       })
     },
 
@@ -688,7 +711,7 @@ export default {
               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, 200); 
       
-      if(this.isVentas){
+
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
         if(fPP.length!=4){
           obj.ProductoMedicion = obj.medicion.ProductoMedicion
@@ -701,7 +724,6 @@ export default {
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
           this.showPresentacion(this.productoSelect)
         } 
-      }
     },
     setProducto (obj) {
       this.precioCont = obj.PrecioContado
@@ -711,10 +733,6 @@ export default {
       this.objProd = {}
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
-
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
-      }
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -732,6 +750,7 @@ export default {
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
+      obj.subt = ''
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
@@ -747,13 +766,14 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
       this.$refs.autocompleteProducto.setValue('')
+      obj.subt = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
@@ -770,7 +790,7 @@ export default {
       }, false, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
     },
     showPresentacion (obj) {
       if (!obj.PreciosPorProducto !== '') {
@@ -849,6 +869,9 @@ export default {
        // let precioFinal = 
       // }else{
       precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
+      if(this.isVentas){
+        Vue.set(this.productos[index], 'subt', '')
+      }
        // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
 
@@ -876,7 +899,7 @@ export default {
     },
     actualizarDescu(index){
       let obj = this.productos[index];
-       this.actualizarProd(obj)
+      this.actualizarProd({Producto:obj,Pos:index})
     },
     getSubtotal(index) {
       

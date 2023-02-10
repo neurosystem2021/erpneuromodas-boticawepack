@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="8">
 
@@ -195,7 +195,7 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
+                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -247,6 +247,18 @@ export default {
       limpiar: 'limpiarCarrito',
       obtenerStok: 'obtenerStock'
     }),
+    onSetProducto (obj, cant, precio) {
+      if (cant) {
+          obj.cantidad = cant
+          obj.precio = obj.PrecioCosto || 0
+          obj.nuevoPrecioContado = obj.PrecioContado || 0
+          return obj
+      }
+      obj.cantidad = 1
+      obj.precio = obj.PrecioCosto || 0
+      obj.nuevoPrecioContado = obj.PrecioContado || 0
+      return obj
+    },
     onAddProducto (obj) {
       if(this.isSalida){
         this.obtenerStok({
@@ -468,5 +480,11 @@ return false
 <style>
   .input-group {
     /*margin: 0.25rem 0 !important;*/
+  }
+  @media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 200px)
+    }
   }
 </style>
