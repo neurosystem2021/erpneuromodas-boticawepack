@@ -688,7 +688,7 @@ export default {
         guardarVenta (evt) {
             evt.preventDefault();
 
-            this.inProgress = true
+            this.inProgress = false
             let totalPagos = 0
             totalPagos += parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += parseFloat(this.venta.pago.visa.monto)

@@ -72,7 +72,8 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-table small
+          <b-col md="12">
+            <b-table small
             ref="tablaProductos"
             :filter="filter"
             :sort-by.sync="sortBy"
@@ -86,6 +87,8 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage"></b-table>
+          </b-col>
+          
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -95,7 +98,7 @@
        <producto-devolver ref="productoDevolver" @update="$refs.tablaProductos.refresh()"></producto-devolver>
        <b-row align-h="center" class="text-center">
             <b-col cols="0">
-              <b-button variant="primary" size="lg" @click="getBalonesTotales">REPORTE TOTAL DE TODOS LOS BALONES</b-button>
+              <b-button variant="primary" size="lg" @click="getBalonesTotales">REPORTE TOTAL DE LOS BALONES</b-button>
             </b-col>
         </b-row>
         <br />
@@ -211,8 +214,15 @@ export default {
       },
       setAlmacen (obj) {
         this.almacen = obj
-        Vue.nextTick(() => this.$refs.tablaProductos.refresh())
-        this.getBalonesVacios()
+        setTimeout(() => {
+          Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+          if (this.productos.IdProducto==null) {
+          this.getBalonesTotales()    
+          }
+          else {
+            this.getBalonesVacios()
+          }
+        }, 100);
       },
       focusAutocomplete (ref) {
         // this.$refs[ref].type = ""

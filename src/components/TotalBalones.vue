@@ -55,13 +55,7 @@
           </b-col>
         </b-row>
           <div slot="modal-footer" >
-            <b-button variant="success" size="sm" 
-            :href="'/api/index.php/reporte/balonesContenido?balonesTotal='+this.cantidadBalones+'&envasesVacios='+this.stock+
-            '&balonesPrestados='+this.cantidadPrestado+'&contenidoTotal='+this.cantidadGases+
-            '&productoBalon='+(this.productos.IdProducto==undefined||this.productos.IdProducto==null?'NINGUNO':this.productos.Producto)" 
-            target="_blank">
-              Exportar
-            </b-button>
+            <b-button variant="success" size="sm" @click="hrefXlsProductoBalones" :disabled="btnExportar" target="_blank">Exportar Reporte Total</b-button>
             <b-btn size="sm" variant="secondary" @click="show=false">
                 Cerrar
             </b-btn>
@@ -88,18 +82,21 @@ import config from '@/store/config.js'
                 selected: null,
                 API: config.API,
                 show: false,
+                btnExportar: false,
                 balonesTot: 0,
                 cantidadBalones: 0,
                 cantidadPrestado: 0,
                 cantidadGases: 0,
                 stock: 0,
                 productos: {},
+                prodPrestados:{},
                 msgFirst: 'TODOS',
                 url:''
             }
         },
         methods: {
             getBalonesTotales() {
+              this.btnExportar=false;
                 this.axios.get(this.API + 'balonesvacios' + '?idAlmacen='+this.idAlmacen)
                 .then(res => {
                     this.$refs.inputBalonEnvase.setValue('TODOS')
@@ -109,6 +106,19 @@ import config from '@/store/config.js'
                     this.productos.IdProducto = null;
                     this.getPrestados();
                 })
+            },
+            hrefXlsProductoBalones() {
+              this.btnExportar=true;
+              this.axios.get(this.API + 'reporte/balonesContenido',{
+                  params: {
+                    idProductos: this.prodPrestados.map(x => x.IdProducto),
+                    idAlmacen: this.idAlmacen,
+                    idProductoContenido: this.prodPrestados.map(x => x.IdProductoContenido)
+                  }
+                })
+                .then(res => {
+                  window.open(res.request.responseURL,'_blank');
+              })
             },
             getBalonesEnvase() {
                 this.axios.get(this.API + 'balonesvacios',{
@@ -143,6 +153,7 @@ import config from '@/store/config.js'
               let promise = this.axios.get( this.url )
 
               return promise.then((result) => {
+                this.prodPrestados=result.data;
                 var cont = 0;
                 result.data.map(d => {
                   cont += parseInt(d['Prestados']);

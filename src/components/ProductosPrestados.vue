@@ -16,7 +16,7 @@
         <tbody>
             <tr class="text-center" v-for="(item, i) in productosPrestados" :key="i">
                 <td>{{ item.FechaReg }}</td>
-                <td>{{ item.Repartidor }}</td>
+                <td>{{ item.Repartidor==undefined?item.NombreUsuario:item.Repartidor }}</td>
                 <td>{{ item.TipoDoc }}</td>
                 <td>{{ item.Serie }}</td>
                 <td>{{ item.Numero }}</td>

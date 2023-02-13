@@ -8,7 +8,6 @@
                 <b-form-group>
                   <label>Vendedor:</label>
                   <autocomplete
-                      required="required"
                       ref="inputVendedor"
                       :url="API + 'usuarios'"
                       anchor="NombreUsuario"
@@ -105,6 +104,7 @@ export default {
   mounted() {
     this.axios.get(this.API + 'reportes/ventavendedor/count').then((response) => {
       this.totalRows = response.data.total
+      this.$refs.inputVendedor.setValue('TODOS');
     })
   },
   data() {
@@ -122,10 +122,10 @@ export default {
       showVenta: false,
       isBusy: false,
       fields: [
-            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
-            { key: 'Cant. Balones', label: 'V. Balones.', sortable: true},
-            { key: 'Efectivo', label: 'V. Efectivo', sortable: true },
-            { key: 'Fise', label: 'V. Fise', sortable: true },
+            { key: 'Vendedor', label: 'Vendedor', sortable: true },
+            { key: 'VBalones', label: 'V. Balones.', sortable: true},
+            { key: 'VEfectivo', label: 'V. Efectivo', sortable: true },
+            { key: 'VVisa', label: 'V. Fise', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
@@ -173,10 +173,8 @@ export default {
       this.$refs.tablaVentas.refresh()
     },
     myProvider (ctx) {
-      console.log(ctx)
       let url = this.API + 'reportes/ventavendedor?' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0)
-      console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -191,6 +189,9 @@ export default {
       this.filters = {}
       this.filter = ''
       this.vendedor = ''
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
+      this.fechaFin = this.$moment().format("YYYY-MM-DD")
+      this.$refs.inputVendedor.setValue('TODOS')
 
     },
     generateFilter (key, value) {
