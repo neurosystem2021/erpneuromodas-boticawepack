@@ -248,7 +248,7 @@ import config from '@/store/config.js'
                 })
                 .catch((error) => {
                     console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    //this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
             generateFilter (key, value) {
