@@ -105,20 +105,21 @@ import config from '@/store/config.js'
                 })
             },
             hrefXlsProductoBalones() {
-              this.axios.get(this.API + 'productos/prestados?idAlmacen='+this.idAlmacen+ '&reporte=1').then(res1 => {
-                this.prodPrestados=res1.data;
-                this.axios.get(this.API + 'reporte/balonesContenido',{
-                  params: {
-                    idProductos: this.prodPrestados.map(x => x.IdProducto),
-                    idAlmacen: this.idAlmacen,
-                    idProductoContenido: this.prodPrestados.map(x => x.IdProductoContenido)
-                  }
+              this.axios.get(this.API + 'productos/balonesEnvase' + '?idAlmacen='+this.idAlmacen)
+                .then(res1 => {
+                  this.prodPrestados = res1.data;
+                  this.axios.get(this.API + 'reporte/balonesContenido',{
+                    params: {
+                      idProductos: this.prodPrestados.map(x => x.IdProducto),
+                      idAlmacen: this.idAlmacen,
+                      idProductoContenido: this.prodPrestados.map(x => x.IdProductoContenido)
+                    }
+                  })
+                  .then(res => {
+                    window.open(res.request.responseURL,'_blank');
+                    this.getBalonesTotales();
+                  })
                 })
-                .then(res => {
-                  window.open(res.request.responseURL,'_blank');
-                  this.getBalonesTotales();
-                })
-              })
             },
             getBalonesEnvase() {
                 this.axios.get(this.API + 'balonesvacios',{
