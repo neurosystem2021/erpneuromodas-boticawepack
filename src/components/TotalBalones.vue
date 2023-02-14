@@ -145,10 +145,10 @@ import config from '@/store/config.js'
             },
             getPrestados() {
               if (this.productos.IdProducto) {
-                this.url = this.API + 'productos/prestados?idAlmacen='+this.idAlmacen+ '&idProducto='+this.productos.IdProducto
+                this.url = this.API + 'productos/prestados?idAlmacen='+this.idAlmacen+ '&idProducto='+this.productos.IdProducto + '&reporte=1'
               }
               else {
-                this.url = this.API + 'productos/prestados?idAlmacen='+this.idAlmacen
+                this.url = this.API + 'productos/prestados?idAlmacen='+this.idAlmacen + '&reporte=1'
               }
               let promise = this.axios.get( this.url )
 
