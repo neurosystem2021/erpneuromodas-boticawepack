@@ -502,6 +502,10 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
+      if (this.producto.EsBalon) {
+        this.producto.IdProductoContenido=null;
+      }
+
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
