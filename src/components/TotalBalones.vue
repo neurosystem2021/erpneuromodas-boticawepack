@@ -27,7 +27,7 @@
                 {{cantidadPrestado}}</b>
               </b-col>
               <b-col style="text-align: center; text-align: center; border-radius: 0px 10px 10px 0px; border: 0.5px black solid; color: black;background: white;">
-                <b>Cantidad de Gases (contenido)<br>
+                <b>Cantidad de GLP (Contenido)<br>
                 {{cantidadGases}}</b>
               </b-col>
             </b-row>

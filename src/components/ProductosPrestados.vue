@@ -9,7 +9,7 @@
                 <th>SERIE</th>
                 <th>NUMERO</th>
                 <th>CLIENTE</th>
-                <th>DNI/RUC</th>
+                <th>DIRECCIÓN</th>
                 <th class="table-danger">CANTIDAD</th>
             </tr>
         </thead>
@@ -21,7 +21,7 @@
                 <td>{{ item.Serie }}</td>
                 <td>{{ item.Numero }}</td>
                 <td>{{ item.Cliente }}</td>
-                <td>{{ item.DniRuc }}</td>
+                <td>{{ item.DireccionTemp==""?'---':item.DireccionTemp }}</td>
                 <td >{{ item.Prestados }}</td>
             </tr>
         </tbody>
