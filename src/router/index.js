@@ -17,6 +17,8 @@ import OrdenCompra from '@/views/OrdenCompra.vue'
 import CalculoPvp from '@/views/CalculoPvp.vue'
 import OrdenesCompra from '@/views/OrdenesCompra.vue'
 import Compras from '@/views/Compras.vue'
+import Cuentas from '@/views/Cuentas.vue'
+import Registros from '@/views/Registros.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -223,6 +225,16 @@ export default new Router({
       path: '/compras',
       name: 'Compras',
       component: Compras
+    },
+    {
+      path: '/cuentas',
+      name: 'Cuentas',
+      component: Cuentas
+    },
+    {
+      path: '/registros',
+      name: 'Registros',
+      component: Registros
     },
   ]
 })
