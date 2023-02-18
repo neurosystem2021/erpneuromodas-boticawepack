@@ -99,7 +99,8 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <input
+          <div style="display: flex; justify-content: space-evenly; align-items: center;">
+            <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 100px"
@@ -110,6 +111,7 @@
             placeholder="Cantidad"
             class="form-control"/>
           <span>x{{productos[data.index].cantidadPres}}</span>
+          </div>
         </template>
 
         <template slot="cantidad" slot-scope="data">
@@ -285,7 +287,7 @@
               {{productos[data.index].FechaVen}}
             </div>
           </div>
-          <b-form-select v-if="!isNota"
+          <!--<b-form-select v-if="!isNota"
             style="width: 135px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
@@ -296,7 +298,23 @@
           <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
           </div>
 
-          <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+          <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
+
+          <div style="display: flex; justify-content: space-evenly; align-items: center;">
+          <b-form-select v-if="!isNota"
+            style="width: 135px;"
+            :disabled="bloquearInput?true:false"
+            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+            v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+            <div style="width: 135px;">
+              <div v-if="!isNota">
+              <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small>
+              <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small>
+              </div>
+
+              <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+            </div>
+          </div>
         </template>
 
         <template slot="fechavencimiento" slot-scope="data" >
@@ -308,18 +326,21 @@
         </template>
 
         <template slot="total" slot-scope="data">
-          {{ getTotal(data.index) }}
-          <br>
-          <h6 v-if="isVentas"><i>Prof.</i></h6>
-          <input v-if="isVentas"
-            class="form-check-input" 
-            type="checkbox" 
-            :disabled="bloquearInput?true:false"
-            @change="(e) => {
-              $emit('onCheckProf', e)
-              asignarDisabledProf(data.index, e)
-            }"
-          />
+          <div style="display: flex; justify-content: space-evenly;">
+            {{ getTotal(data.index) }}
+            <h6 v-if="isVentas" style="padding-top: 2px;"><i>Prof.</i></h6>
+          </div>
+          <div style="margin-top: -5px;">
+            <input v-if="isVentas"
+              class="form-check-input" 
+              type="checkbox" 
+              :disabled="bloquearInput?true:false"
+              @change="(e) => {
+                $emit('onCheckProf', e)
+                asignarDisabledProf(data.index, e)
+              }"
+            />
+          </div>
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
