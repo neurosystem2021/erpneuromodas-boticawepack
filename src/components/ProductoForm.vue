@@ -124,7 +124,7 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group v-if="false">
+          <b-form-group v-if="true">
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>

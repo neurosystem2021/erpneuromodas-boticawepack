@@ -31,6 +31,15 @@
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
+      <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+        </div>
+        <b-row style="display:flex; justify-content:center; align-items:center">
+          <b-img :src="productoUrl" class="imagenGrande"></b-img>
+        </b-row>
+      </b-modal>
+
 <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
@@ -82,8 +91,18 @@
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="eventPresImagen" slot-scope="data">
+          <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
+          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <div style="text-align:center">
+              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+            </div>
+          </b-popover>
+        </template>
+
         <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)" style="margin-top:2px;"><i class="fas fa-list"></i></b-button>
         </template>
 
         <template slot="obsequio" slot-scope="data">
@@ -440,7 +459,10 @@ export default {
       movimientoLotes: {},
       productoSelect: {},
       indexProdSelect: null,
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      productoSelect: {},
+      productoNombre:'',
+      productoUrl:''
     }
   },
   watch: {
@@ -576,6 +598,14 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    abrirImagen(producto,url){
+      this.productoNombre = producto
+      this.productoUrl = url
+      this.$refs['modalImagen'].show()
+    },
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     setObsequio(index){
       this.productos[index].precio = 0
       this.productos[index].nuevoPrecioContado = 0
@@ -1041,6 +1071,12 @@ export default {
   }
 </style>
 <style>
+  #modalImagen .modal-dialog {
+    max-width: 75% !important;
+  }
+  .imagenGrande{
+    width: 100%;
+  }
   #modalCantidad .modal-dialog{
     max-width: 55% !important;
   }

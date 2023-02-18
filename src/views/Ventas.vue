@@ -449,6 +449,7 @@ export default {
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
+                    { key: 'eventPresImagen', label: '' },
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     { key: 'cantidad' },

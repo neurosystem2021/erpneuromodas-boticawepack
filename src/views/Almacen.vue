@@ -235,6 +235,15 @@
               </tbody>
             </table>
           </b-col>
+
+          <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+            <div class="d-block text-center">
+              <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+            </div>
+            <b-row style="display:flex; justify-content:center; align-items:center">
+              <b-img :src="productoUrl" class="imagenGrande"></b-img>
+            </b-row>
+          </b-modal>
           
           <b-col md="12">
             <b-table small
@@ -257,6 +266,15 @@
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
                     {{ getStock(data.item.IdProducto) }}
                   </div>
+                </template>
+
+                <template slot="ImagenProducto" slot-scope="data">
+                  <b-button @click="abrirImagen(data.item.Producto, data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                  <b-popover placement="top" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
+                    <div style="text-align:center">
+                      <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+                    </div>
+                  </b-popover>
                 </template>
 
               </b-table>
@@ -343,6 +361,7 @@ export default {
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
+            { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
@@ -351,7 +370,9 @@ export default {
       perPage: 10,
       currentPage: 1,
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      verValorizado: false
+      verValorizado: false,
+      productoNombre:'',
+      productoUrl:''
     }
   },
   watch: {
@@ -404,6 +425,14 @@ export default {
     }
   },
   methods: {
+    abrirImagen(producto,url){
+      this.productoNombre = producto
+      this.productoUrl = url
+      this.$refs['modalImagen'].show()
+    },
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
     clickVerValorizado() {
       let pass = window.prompt('Escriba su contraseña')
       if (pass) {
