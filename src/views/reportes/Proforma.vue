@@ -15,7 +15,7 @@
       <div id="details" class="clearfix">
         <div id="client">
           <br>
-          <h5 class="to" style="color:black">PROFORMA A:</h5>
+          <h5 class="to" style="color:black">COTIZACIÓN A:</h5>
           <table>
             <tbody>
               <tr>
@@ -30,19 +30,19 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
               </tr>
-              <tr>
+              <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
                 <td class="celda" style="text-transform: uppercase">: Soles</td>
-              </tr>
-              <tr>
+              </tr>-->
+              <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>
+              </tr>-->
             </tbody>
           </table>
         </div>
         <div id="invoice">
-          <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
+          <h1>COTIZACIÓN {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
           <div style="height:15px"></div>
           <table>
             <tbody>
@@ -120,10 +120,11 @@
       <br>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
+        <div class="notice">NO SE ACEPTAN DEVOLUCIONES DE DINERO, TODO CAMBIO SERA EN PRODUCTOS.</div>
         <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
       <div>
+        <br>
         <br>
         <br>
         <br>
