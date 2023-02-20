@@ -297,14 +297,14 @@
                             <b-col>
                                 <h6>Tipo Cambio: </h6>
                                 <b-row>
-                                    <b-col md="4">
+                                    <b-col md="5">
                                         <b-input-group prepend="Moneda" class="mb-1">
                                             <autocomplete
                                                 required="required"
                                                 ref="inputTipoMoneda"
                                                 :url="API + 'contabilidad/moneda'"
                                                 anchor="Moneda"
-                                                initValue="PEN"
+                                                initValue="NUEVOS SOLES"
                                                 label="writer"
                                                 placeholder=""
                                                 :on-select="setTipoMoneda"
@@ -314,12 +314,12 @@
                                         </b-input-group>
                                     </b-col>
                                     <b-col md="4">
-                                        <b-input-group prepend="C." class="mb-1">
+                                        <b-input-group prepend="Tipo C." class="mb-1">
                                             <input class="form-control" type="number" step="0.0001" v-model="Moneda.TipoCambio" autocomplete="off"/>
                                         </b-input-group>
                                     </b-col>
-                                    <b-col md="4">
-                                        <b-input-group prepend="I.G.V." class="mb-1">
+                                    <b-col md="3">
+                                        <b-input-group prepend="IGV" class="mb-1">
                                             <input class="form-control" type="number" step="0.1" v-model="IgvPorcentaje" @input="calcularMontos" autocomplete="off"/>
                                         </b-input-group>
                                     </b-col>
@@ -482,7 +482,7 @@ export default {
                 Direccion:''
             },
             Moneda: {
-                Moneda: 'PEN',
+                Moneda: 'NUEVOS SOLES',
                 TipoCambio: 1
             },
             Comprobante: {
@@ -569,7 +569,7 @@ export default {
                 Direccion:''
             }
             this.Moneda= {
-                Moneda: 'PEN',
+                Moneda: 'NUEVOS SOLES',
                 TipoCambio: 1
             }
             this.Comprobante = {
@@ -608,7 +608,7 @@ export default {
             this.$refs.inputTipoOperacionDet.setValue('')
             this.$refs.inputTipoOperacion.setValue('')
             this.$refs.inputTipoComprob.setValue('')
-            this.$refs.inputTipoMoneda.setValue('PEN')
+            this.$refs.inputTipoMoneda.setValue('NUEVOS SOLES')
             this.$refs.inputFormaPago.setValue('CONTADO')
             this.$refs.inputModoPago.setValue('EFECTIVO - MOV. EFECTIVO')
         },

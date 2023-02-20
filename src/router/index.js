@@ -19,6 +19,7 @@ import OrdenesCompra from '@/views/OrdenesCompra.vue'
 import Compras from '@/views/Compras.vue'
 import Cuentas from '@/views/contabilidad/Cuentas.vue'
 import Registros from '@/views/contabilidad/Registros.vue'
+import ConfigOperacion from '@/views/contabilidad/ConfiguracionOperacion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -236,5 +237,10 @@ export default new Router({
       name: 'Registros',
       component: Registros
     },
+    {
+      path: '/config/operacion',
+      name: 'ConfigOperacion',
+      component: ConfigOperacion
+    }
   ]
 })
