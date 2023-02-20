@@ -17,8 +17,8 @@ import OrdenCompra from '@/views/OrdenCompra.vue'
 import CalculoPvp from '@/views/CalculoPvp.vue'
 import OrdenesCompra from '@/views/OrdenesCompra.vue'
 import Compras from '@/views/Compras.vue'
-import Cuentas from '@/views/Cuentas.vue'
-import Registros from '@/views/Registros.vue'
+import Cuentas from '@/views/contabilidad/Cuentas.vue'
+import Registros from '@/views/contabilidad/Registros.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
