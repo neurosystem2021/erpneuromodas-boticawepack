@@ -347,9 +347,9 @@
         <template slot="total" slot-scope="data">
           <div style="display: flex; justify-content: space-evenly;">
             {{ getTotal(data.index) }}
-            <h6 v-if="isVentas" style="padding-top: 2px;"><i>Prof.</i></h6>
+            <!--<h6 v-if="isVentas" style="padding-top: 2px;"><i>Prof.</i></h6>-->
           </div>
-          <div style="margin-top: -5px;">
+          <!--<div style="margin-top: -5px;">
             <input v-if="isVentas"
               class="form-check-input" 
               type="checkbox" 
@@ -359,7 +359,7 @@
                 asignarDisabledProf(data.index, e)
               }"
             />
-          </div>
+          </div>-->
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>

@@ -199,6 +199,15 @@
               step="0.001"
               />
           </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.ControlaStockMinimo"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Activar stock minimo
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group v-if="!producto.EsPadre">
             <label>Stock Minimo:</label>
             <input   
@@ -530,6 +539,7 @@ export default {
           // this.producto.Color = newVal.Color
           this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
           this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
+          this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
           this.producto.StockMinimo           = newVal.StockMinimo
           this.producto.StockPorMayor         = newVal.StockPorMayor
           this.producto.CodigoBarra           = newVal.CodigoBarra
@@ -729,6 +739,7 @@ export default {
         CodigoBarra: '',
         // Color: '',
         PorcentajeUtilidad: 0,
+        ControlaStockMinimo:0,
         StockMinimo: 0,
         StockPorMayor: 0,
         PrecioContado: 0,

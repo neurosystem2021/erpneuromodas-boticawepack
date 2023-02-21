@@ -67,6 +67,11 @@
             </b-row>
         </b-row>
         <br /><br />
+        <b-row align-h="center" class="text-center">
+            <b-col cols="4">
+              <b-button variant="success" :href="urlExportar" target="_blank" size="lg" >Exportar</b-button>
+            </b-col>
+        </b-row>
       </b-container>
   </div>
 </template>
@@ -86,7 +91,7 @@ export default {
       API: config.API,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
-      sortBy: 'Gen_Producto.IdProducto',
+      sortBy: 'ProveedorUltimo',
       sortDesc: false,
       items: [],
       isBusy: false,
@@ -97,14 +102,17 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
+            { key: 'StockMinimo', label: 'Stock Minimo', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
+            { key: 'ProveedorUltimo', label: 'Proveedor Ult.' , sortable: true}
       ],
       totalRows: 50,
       perPage: 10,
 			currentPage: 1,
 			almacen: {
 				IdAlmacen: 1
-			}
+			},
+      urlExportar:''
     }
   },
   methods: {
@@ -119,8 +127,9 @@ export default {
 		myProvider (ctx) {
 			// Here we don't set isBusy prop, so busy state will be handled by table itself
 			// this.isBusy = true
-			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
+			let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&stockminimo=1&sortBy='+ctx.sortBy
 			url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      this.urlExportar  = this.API + 'reporte/stock/minimo?idAlmacen='+this.almacen.IdAlmacen+'&sortBy='+ctx.sortBy+'&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 			let promise = this.axios.get( url )
 
 			return promise.then((result) => {
@@ -128,6 +137,11 @@ export default {
 				//this.totalRows = this.items.length
 				// Here we could override the busy state, setting isBusy to false
 				// this.isBusy = false
+        this.items.map(r=>{
+          if(r.stock < r.StockMinimo){
+            r._rowVariant='danger'
+          }
+        })
 				return(this.items)
 			}).catch(error => {
 				// Here we could override the busy state, setting isBusy to false
