@@ -129,6 +129,20 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
+              <b-col md="3">
+                <b-form-group>
+                  <label>Talla:</label>
+                  <autocomplete
+                    :url="API + 'tallas'"
+                    ref="inputTalla"
+                    anchor="ProductoTalla"
+                    label="writer"
+                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
+                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
               <!--<b-col md="3">
                 <b-form-group>
                   <label>Codigo de Barra:</label>
@@ -436,6 +450,8 @@ export default {
             { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoPresentacion', label: 'Color', sortable: true },
+            { key: 'ProductoTalla', label: 'Color', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -653,7 +669,7 @@ export default {
       this.$refs.inputCodigoBarra.value='';
       // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
-      // this.$refs.inputTalla.setValue('')
+      this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
       // this.$refs.inputBotapie.setValue('')
 

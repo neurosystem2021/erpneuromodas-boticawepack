@@ -112,7 +112,7 @@
 
          
           <b-form-group>
-            <label>Anaquel:</label>
+            <label>Color:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
@@ -168,6 +168,30 @@
               :onFocus="focusAutocomplete.bind(null, 'inputMedicion')" 
               :classes="{input: 'form-control'}">
             </autocomplete>
+          </b-form-group>
+          <b-form-group>
+            <label>Talla:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'tallas'"
+                ref="inputTalla"
+                anchor="ProductoTalla"
+                label="writer"
+                :placeholder.sync="producto.talla.ProductoTalla"
+                :on-select="setTalla"
+                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group>
+            <label>Genero:</label>            
+            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
@@ -407,7 +431,7 @@ export default {
       title: 'Nuevo Producto',
       API: config.API,
       show: false, 
-      // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
+      generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
       file: '',
@@ -462,7 +486,7 @@ export default {
         //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
         //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
-        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
+        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
         //this.$refs.inputCodigoBarra.$el.disabled = true
 
@@ -473,10 +497,10 @@ export default {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
         } */
-        /*this.producto.talla = {
+        this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
-        }*/
+        }
         //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.Producto = newVal.Producto
         this.producto.IdProducto = newVal.IdProducto
@@ -511,6 +535,7 @@ export default {
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.VentaEstrategica      = newVal.VentaEstrategica
+        this.producto.Genero                = newVal.Genero
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -616,15 +641,15 @@ export default {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
     }, */
-    /*setTalla (obj) {
+    setTalla (obj) {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
-    },*/
+    },
     clearForm () {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
-      // this.$refs.inputTalla.setValue('')
+      this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
@@ -644,7 +669,7 @@ export default {
         ProductoModelo:'',
         // IdProductoModelo: null,
         // IdProductoBotapie: null,
-        // IdProductoTalla: '',
+        IdProductoTalla: '',
         Producto: '',
         ProductoDesc: '',
         ProductoDesc2: '',
@@ -663,13 +688,13 @@ export default {
         PrecioPorMayor: 0,
         precioConvenio: 0,
         // Botapie: '',
-        // Genero: '',
+        Genero: '',
         categoria: {},
         marca: {},
         IdOfertaCategoria: null,
         VentaEstrategica: 0,
         // modelo: {},
-        //talla: {},
+        talla: {},
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
@@ -690,6 +715,11 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
+        this.$toasted.show('Falta seleccionar o guardar la Talla.')
+        return;
+      }
 
       // Agregar producto DET
       if (this.showProductoDet) {
@@ -713,8 +743,8 @@ export default {
         }
 
         // this.initForm()
-        // this.producto.talla = {}
-        // this.$refs.inputTalla.setValue('')
+        this.producto.talla = {}
+        this.$refs.inputTalla.setValue('')
 
 
         //INSERTANDO IMAGEN

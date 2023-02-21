@@ -474,7 +474,7 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
-                    { key: 'ProductoPresentacion', label: 'Anaquel' },
+                    { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
@@ -825,7 +825,7 @@ export default {
                 })
             }
             
-            //this.actualizarPrecioConvenio(obj)
+            this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
         onSetProducto (obj, cant, precio) {
