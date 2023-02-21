@@ -27,6 +27,7 @@ import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 
 Vue.use(Router)
 
@@ -158,5 +159,10 @@ export default new Router({
       name: 'Impresoras',
       component: Impresoras
     },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
+    }
   ]
 })
