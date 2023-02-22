@@ -26,6 +26,7 @@ import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 
 Vue.use(Router)
 
@@ -152,5 +153,10 @@ export default new Router({
       name: 'RemisionLista',
       component: RemisionLista
     },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
+    }
   ]
 })
