@@ -649,7 +649,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputMedicion.setValue('UNIDAD')
-      this.$refs.inputTalla.setValue('')
+      this.$refs.inputTalla.setValue('S')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
@@ -688,13 +688,16 @@ export default {
         PrecioPorMayor: 0,
         precioConvenio: 0,
         // Botapie: '',
-        Genero: '',
+        Genero: 'UNISEX',
         categoria: {},
         marca: {},
         IdOfertaCategoria: null,
         VentaEstrategica: 0,
         // modelo: {},
-        talla: {},
+        talla: {
+          IdProductoTalla: 100,
+          ProductoTalla: 'S'
+        },
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"

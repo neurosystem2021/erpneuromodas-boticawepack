@@ -402,7 +402,7 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="tipoProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -410,6 +410,15 @@
                     </b-col>
                 </b-row>
             </b-form>
+            <b-modal id="modalProforma" size="md" ref="modalProforma" title="Tipo de Proforma" hide-footer>
+                <b-row>
+                    <b-col md="2"></b-col>
+                    <b-col md="4" class="text-center"><b-button variant="success" size="lg" @click="guardarProforma(0)" block>SIN IGV</b-button></b-col>
+                    <b-col md="4" class="text-center"><b-button variant="success" size="lg" @click="guardarProforma(1)" block>CON IGV</b-button></b-col>
+                    <b-col md="2"></b-col>
+                </b-row>
+                <br>
+            </b-modal>
         </b-container>
     </div>
 </template>
@@ -907,7 +916,11 @@ export default {
             // this.$refs.inputPuntoVenta.setValue('CAJA1')
             // this.$refs.inputVendedor.setValue('')
         },
-        guardarProforma () {
+        tipoProforma(){
+            this.$refs['modalProforma'].show()
+        },
+        guardarProforma (igv) {
+            this.$refs['modalProforma'].hide()
             this.inProgress = true
 
             if(!this.productos.length) {
@@ -936,6 +949,7 @@ export default {
 
             this.venta.productos = this.productos
             this.venta.diasValidosProf = this.diasValidosProf
+            this.venta.TieneIgv = igv
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.info('Proforma Guardada con exito')

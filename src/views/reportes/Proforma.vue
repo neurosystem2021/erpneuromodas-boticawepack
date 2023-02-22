@@ -100,13 +100,13 @@
           <tr>
             <td colspan="3"></td>
             <td colspan="2">SUBTOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
+            <td>S/. {{ (subTotal / (tieneIgv==1?1.18:1)) | redondear }}</td>
           </tr>
-          <!--<tr>
-            <td colspan="2"></td>
-            <td colspan="2">TAX 25%</td>
-            <td>$1,300.00</td>
-          </tr>-->
+          <tr v-if="tieneIgv==1">
+            <td colspan="3"></td>
+            <td colspan="2">IGV</td>
+            <td>S/. {{ subTotal - (subTotal / (tieneIgv==1?1.18:1)) | redondear }}</td>
+          </tr>
           <tr>
             <td colspan="3"></td>
             <td colspan="2" style="background:#57B223">TOTAL</td>
@@ -159,6 +159,7 @@ export default {
 			proforma: { productos: [] },
       empresa: {},
       fechaHasta:'',
+      tieneIgv: 0
 		}
 	},
 	computed: {
@@ -175,6 +176,7 @@ export default {
       this.axios.get(API + 'proformas/id/' + this.idProforma)
 			.then(res => {
 				this.proforma = res.data
+        this.tieneIgv = res.data.TieneIgv==1?1:0;
         this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
 			})
     },
