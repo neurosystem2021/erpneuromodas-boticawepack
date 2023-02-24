@@ -330,7 +330,7 @@
                     </b-col>
                     <b-col md="7">
                         <b-row>
-                            <b-col>
+                            <b-col md="5">
                                 <table class="tablaMontos">
                                     <tbody>
                                         <tr>
@@ -372,8 +372,63 @@
                                     </tbody>
                                 </table>
                             </b-col>
-                            <b-col>
-
+                            <b-col md="7">
+                                <table class="tablaCosteo">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" align="center"><h6>Asiento - Destino Almacén</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%" class="noArrow"><input class="form-control" v-on:keyup="validarTecla" type="number" autocomplete="off"/></td>
+                                            <td width="30%"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td width="20%" class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td width="30%"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <br>
+                                <table class="tablaCosteo">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" align="center"><h6>Asiento - Destino Costo Flexible</h6></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="15%"><b-form-select size="md"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td align="right"><b-button size="sm" variant="primary">Modif.</b-button></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b-form-select size="md"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b-form-select size="md"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b-form-select size="md"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </b-col>
                         </b-row>
                         <hr>
@@ -539,6 +594,14 @@ export default {
 
     },
     methods: {
+        validarTecla(e){
+            if(e.key=='ArrowDown' || e.key=='ArrowUp'){
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+            }
+            console.log(e);
+        },
         cambiarLibro(){
             this.$emit('cambioLibro')
         },
@@ -944,6 +1007,13 @@ export default {
     border-radius: 0% !important;
 }
 
+.tablaCosteo * {
+    font-size: 0.8rem;
+}
+.tablaCosteo input {
+    border-radius: 0% !important;
+}
+
 .filaFormaPago .input-group-text{
     font-weight: bold;
     font-size: 0.75rem;
@@ -956,4 +1026,17 @@ export default {
     font-size: 0.75rem
 }
 
+.noArrow input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.noArrow input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.noArrow input[type=number] {
+  -moz-appearance: textfield;
+}
 </style>
