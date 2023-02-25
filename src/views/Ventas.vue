@@ -827,14 +827,16 @@ export default {
             }
 
             var sinStock = 0;
-            let igualLote = 0
+            let igualLote = 0;
+            let totalCero = 0;
             this.productos.map(pro => {
                 if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) ) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
 
-                if(parseFloat(pro.total) <= 0) {
+                if(parseFloat(pro.cantidad * pro.precio) <= 0) {
+                    this.$toasted.error('No se puede vender el producto '+pro.Producto+' con total cero, si es obsequio ingrese 0.01 en el precio',{duration: 4000});
                     totalCero += 1
                 }
 
@@ -853,6 +855,11 @@ export default {
                 this.inProgress = false            
                 return;
             }*/
+
+            if(totalCero >= 1){
+                this.inProgress = false            
+                return;
+            }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

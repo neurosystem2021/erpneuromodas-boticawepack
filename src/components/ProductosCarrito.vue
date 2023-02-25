@@ -80,7 +80,7 @@
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
               if(isVentas){
-                productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+                //productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
               }   
             }"
             placeholder="Cantidad"
