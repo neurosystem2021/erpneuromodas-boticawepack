@@ -373,6 +373,7 @@
                                 </table>
                             </b-col>
                             <b-col md="7">
+                                <h6>Tipo de Costo: {{ TipoCosto[0].NombreSub  }} </h6>
                                 <table class="tablaCosteo">
                                     <tbody>
                                         <tr>
@@ -393,37 +394,37 @@
                                             <td colspan="5" align="center"><h6>Asiento - Destino Costo Flexible</h6></td>
                                         </tr>
                                         <tr>
-                                            <td width="15%"><b-form-select size="md"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td width="15%"><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td align="right"><b-button size="sm" variant="primary">Modif.</b-button></td>
                                         </tr>
                                         <tr>
-                                            <td><b-form-select size="md"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b-form-select size="md"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td><b-form-select size="md"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td></td>
                                         </tr>
                                         <tr>
+                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto" v-on:change="setMotivo($event)"/></td>
+                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr style="border-top: 1px solid black">
                                             <td></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
                                         </tr>
@@ -494,6 +495,7 @@ import config from '@/store/config.js'
 export default {
     mounted() {
         //this.cargarDatos();
+        this.obtenerTipoCosteo()
     },
     data () {
         return {
@@ -580,7 +582,13 @@ export default {
             Otros:0,
             BImp:0,
             NoGrav:0,
-            Isc:0
+            Isc:0,
+            TipoCosto:[
+                {
+                    NombreSub: ''
+                }
+            ],
+            CentroCosto:[]
         }
     },
     watch: {
@@ -614,6 +622,18 @@ export default {
         },
         cerrarModal(){
             this.$refs['modalCompras'].hide()
+        },
+        obtenerTipoCosteo(){
+            this.axios.get(this.API + 'contabilidad/config/costo')
+            .then((r) => {
+                if(r.data.success){
+                    this.TipoCosto = r.data.tipo
+                    this.CentroCosto = r.data.centro
+                }
+            })
+            .catch((error)=>{
+
+            })    
         },
         initModal(){
             this.operacion = {
@@ -807,7 +827,7 @@ export default {
             }).then((response) => {
                 if(response.data.success){
                     this.CuentasCalculo = response.data.data
-                    console.log(response);
+                    this.calcularMontos()
                 }
             })
             .catch((error) => {
@@ -1038,5 +1058,13 @@ export default {
 /* Firefox */
 .noArrow input[type=number] {
   -moz-appearance: textfield;
+}
+
+.selectCosteo{
+    height: auto !important;
+    font-weight: bold !important;
+}
+.selectCosteo option{
+    font-weight: bold;
 }
 </style>
