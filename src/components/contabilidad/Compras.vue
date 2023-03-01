@@ -123,12 +123,12 @@
                     </tr>
                 </thead>
                 <tbody class="infoFilas">
-                    <!--<tr>
-                        <td>06-03-2019</td>
+                    <tr v-for="(reg, index) in RegistrosData" :key="index">
+                        <td>{{ reg.FechaEmision }}</td>
                         <td>01</td>
                         <td>F001</td>
                         <td>58</td>
-                        <td>NAVARRO NARDINI S.A.C. </td>
+                        <td>{{ reg.Proveedor }}</td>
                         <td>100.00</td>
                         <td>18.00</td>
                         <td></td>
@@ -156,7 +156,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                    </tr>-->
+                    </tr>
                 </tbody>
                 <tfoot class="infoFilas">
                     <tr>
@@ -496,6 +496,7 @@ export default {
     mounted() {
         //this.cargarDatos();
         this.obtenerTipoCosteo()
+        this.cargarRegistros()
     },
     data () {
         return {
@@ -610,7 +611,8 @@ export default {
             totalCostoCuenta:null,
             costoCalculadoFinal:null,
             costoCalcularFinal:null,
-            opcRegistro:0
+            opcRegistro:0,
+            RegistrosData:[]
         }   
     },
     watch: {
@@ -636,11 +638,27 @@ export default {
             this.$emit('cambioLibro')
         },
         setMes(mes){
-
+            console.log(mes);
+            this.cargarRegistros(mes)
         },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
+        },
+        cargarRegistros(mes){
+            this.RegistrosData = []
+            this.axios.get(this.API + 'contabilidad/registro',{
+                params: {
+                    IdLibro: this.libroIdSelec,
+                    Mes: mes>0?mes:this.mesSelect
+                }
+            })
+            .then((r) => {
+                this.RegistrosData = r.data
+            })
+            .catch((error)=>{
+                this.RegistrosData = []
+            })  
         },
         cerrarModal(){
             this.$refs['modalCompras'].hide()
@@ -1136,12 +1154,12 @@ export default {
 
             }
 
-            this.axios.post(this.API + 'contabilidad/registro', {
-                data,
-            }).then(r => {
+            this.axios.post(this.API + 'contabilidad/registro',
+                data
+            ).then(r => {
                 if (r.data) {
-                    this.$toasted.show('Registro Exitoso')
-                   // this.$refs['modalCompras'].hide()    
+                    this.$toasted.success('Registro Exitoso')
+                    this.$refs['modalCompras'].hide()    
                 }
             }).catch((error) => {
                
