@@ -260,7 +260,7 @@
                                     <label> - </label>
                                     <b-col md="5">
                                         <b-input-group prepend="Número" class="mb-1">
-                                            <b-form-input type="number" v-model="Comprobante.Numero" size="md" min="0" step="1" autocomplete="off" required/>
+                                            <b-form-input type="text" v-model="Comprobante.Numero" size="md" min="0" pattern="[0-9]+" maxlength="11" autocomplete="off" required/>
                                         </b-input-group>
                                     </b-col>
                                 </b-row>
@@ -335,37 +335,37 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 5%;">Total</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Total" @input="calcularMontos" step="0.00001"   autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Total" @input="calcularMontos" step="0.01"   autocomplete="off"/></td>
                                             <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Total"  pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.TotalOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">I.G.V.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Igv" step="0.00001" autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Igv" step="0.01" autocomplete="off"/></td>
                                             <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Igv" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.IgvOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">Otros</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Otros" step="0.00001" autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Otros" step="0.01" autocomplete="off"/></td>
                                             <td style="width: 30%;"><input class="form-control" type="text" value="40189" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" value="D" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">B. Imp</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="BImp" step="0.00001" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImp" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="BImp" step="0.01" autocomplete="off"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImp" v-on:keyup="setBImp" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImpOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">No Grav.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="NoGrav" step="0.00001" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Exo" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="NoGrav" step="0.01" autocomplete="off"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Exo" v-on:keyup="setExo" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.ExoOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr style="border-top: 1px solid black">
                                             <td style="width: 5%;">I.S.C.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Isc" step="0.00001" autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Isc" step="0.01" autocomplete="off"/></td>
                                             <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Isc" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.IscOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
@@ -380,10 +380,10 @@
                                             <td colspan="5" align="center"><h6>Asiento - Destino Almacén</h6></td>
                                         </tr>
                                         <tr>
-                                            <td width="20%" class="noArrow"><input class="form-control" v-on:keyup="validarTecla" type="number" autocomplete="off"/></td>
-                                            <td width="30%"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td width="20%" class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td width="30%"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td width="20%" class="noArrow"><input class="form-control" v-model="asientoCuenta" v-on:keyup="validarTecla" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td width="30%"><input class="form-control" type="number" v-model="asientoCuentaMonto" step="0.01" autocomplete="off"/></td>
+                                            <td width="20%" class="noArrow"><input class="form-control" v-model="destinoCuenta" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td width="30%"><input class="form-control" type="number" v-model="destinoCuentaMonto" step="0.01" autocomplete="off"/></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -394,39 +394,39 @@
                                             <td colspan="5" align="center"><h6>Asiento - Destino Costo Flexible</h6></td>
                                         </tr>
                                         <tr>
-                                            <td width="15%"><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
-                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td align="right"><b-button size="sm" variant="primary">Modif.</b-button></td>
+                                            <td width="15%"><b-form-select size="md" class="selectCosteo" v-model="costoSelec1" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" readonly v-model="costoSelec1" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.01" v-model="costoSelecPorc1" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" readonly v-model="costoSelecMonto1" step="0.01" autocomplete="off"/></td>
+                                            <td align="right"><b-button @click="calcularCostos" size="sm" variant="primary">Cal.</b-button></td>
                                         </tr>
                                         <tr>
-                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
-                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><b-form-select size="md" class="selectCosteo" v-model="costoSelec2" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" readonly v-model="costoSelec2" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.01" v-model="costoSelecPorc2" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" readonly v-model="costoSelecMonto2" step="0.01" autocomplete="off"/></td>
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto"/></td>
-                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><b-form-select size="md" class="selectCosteo" v-model="costoSelec3" :options="CentroCosto"/></td>
+                                            <td class="noArrow"><input class="form-control" readonly v-model="costoSelec3" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.01" v-model="costoSelecPorc3" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" readonly v-model="costoSelecMonto3" step="0.01" autocomplete="off"/></td>
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td><b-form-select size="md" class="selectCosteo" :options="CentroCosto" v-on:change="setMotivo($event)"/></td>
-                                            <td class="noArrow"><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td></td>
+                                            <td><b-form-select size="md" class="selectCosteo" v-model="costoSelec4" :options="CentroCosto" v-on:change="setMotivo($event)"/></td>
+                                            <td class="noArrow"><input class="form-control" readonly v-model="costoSelec4" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" step="0.01" v-model="costoSelecPorc4" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" readonly v-model="costoSelecMonto4" step="0.01" autocomplete="off"/></td>
+                                            <td><input class="form-control" type="number" readonly v-model="costoCalculadoFinal" step="0.01" autocomplete="off"/></td>
                                         </tr>
                                         <tr style="border-top: 1px solid black">
                                             <td></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" readonly v-model="totalCostoCuenta" type="text" pattern="[0-9]+"  autocomplete="off"/></td>
                                             <td></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
-                                            <td><input class="form-control" type="number" step="0.00001" autocomplete="off"/></td>
+                                            <td><input class="form-control" readonly v-model="costoCalcularFinal" type="number" step="0.01" autocomplete="off"/></td>
+                                            <td><input class="form-control" readonly v-model="costoCalculadoFinal"  type="number" step="0.01" autocomplete="off"/></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -588,8 +588,30 @@ export default {
                     NombreSub: ''
                 }
             ],
-            CentroCosto:[]
-        }
+            CentroCosto:[],
+            asientoCuenta:'',
+            asientoCuentaMonto:'',
+            destinoCuenta:'',
+            destinoCuentaMonto:'',
+            costoSelec1:null,
+            costoSelec2:null,
+            costoSelec3:null,
+            costoSelec4:null,
+            costoSelecMonto1:null,
+            costoSelecMonto2:null,
+            costoSelecMonto3:null,
+            costoSelecMonto4:null,
+
+            costoSelecPorc1:null,
+            costoSelecPorc2:null,
+            costoSelecPorc3:null,
+            costoSelecPorc4:null,
+
+            totalCostoCuenta:null,
+            costoCalculadoFinal:null,
+            costoCalcularFinal:null,
+            opcRegistro:0
+        }   
     },
     watch: {
 
@@ -634,6 +656,150 @@ export default {
             .catch((error)=>{
 
             })    
+        },
+        obtenerCuenta(cuenta, igv){
+            this.axios.get(this.API + 'contabilidad/cuenta', {
+                params: {
+                    Cuenta: (''+cuenta).trim()
+                }
+            })
+            .then((r) => {
+                if(r.data){
+                    this.$toasted.info(r.data.Nombre, { 
+                        position: "top-right", 
+                    })
+                    
+                    let contador = 0
+                    if(r.data.Cargo1 == '-' || r.data.Cargo2 == '-' || r.data.Abono == '-'){
+                        contador++;
+                    }
+
+                    switch (contador) {
+                        case 3:{
+                            this.opcRegistro = 3
+                            this.asientoCuenta = null
+                            this.destinoCuenta = null
+                            this.asientoCuentaMonto = null
+                            this.destinoCuentaMonto = null
+                            this.costoSelec1 = null
+                            this.costoSelec2 = null
+                            this.costoSelec3 = null
+                            this.costoSelec4 = null
+                            this.costoSelecMonto1 = null
+                            this.costoSelecMonto2 = null
+                            this.costoSelecMonto3 = null
+                            this.costoSelecMonto4 = null
+                            this.costoSelecPorc1 = null
+                            this.costoSelecPorc2 = null
+                            this.costoSelecPorc3 = null
+                            this.costoSelecPorc4 = null
+
+                            this.totalCostoCuenta = null
+                            this.costoCalculadoFinal = null
+                            this.costoCalcularFinal = null
+                            break;
+                            }
+                        case 1:{
+                            this.opcRegistro = 1
+                            this.costoSelec1 = null
+                            this.costoSelec2 = null
+                            this.costoSelec3 = null
+                            this.costoSelec4 = null
+                            this.costoSelecMonto1 = null
+                            this.costoSelecMonto2 = null
+                            this.costoSelecMonto3 = null
+                            this.costoSelecMonto4 = null
+                            this.costoSelecPorc1 = null
+                            this.costoSelecPorc2 = null
+                            this.costoSelecPorc3 = null
+                            this.costoSelecPorc4 = null
+
+                            this.totalCostoCuenta = null
+                            this.costoCalculadoFinal = null
+                            this.costoCalcularFinal = null
+
+                            this.asientoCuenta = r.data.Cargo1
+                            this.destinoCuenta = r.data.Abono
+                            if(igv){
+                                this.asientoCuentaMonto = this.BImp
+                                this.destinoCuentaMonto = this.BImp
+                            }else{
+                                this.asientoCuentaMonto = this.NoGrav
+                                this.destinoCuentaMonto = this.NoGrav
+                            }
+                            break;
+                        }
+                        case 0:{
+                            this.opcRegistro = 0
+                            this.asientoCuenta = null
+                            this.destinoCuenta = null
+                            this.asientoCuentaMonto = null
+                            this.destinoCuentaMonto = null
+                            this.costoSelec1 = r.data.Cargo1
+                            this.costoSelec2 = r.data.Cargo2
+                            this.totalCostoCuenta = r.data.Abono
+
+                            let index1 = this.CentroCosto.findIndex((element) => element.Cuenta === this.costoSelec1)
+                            let index2 = this.CentroCosto.findIndex((element) => element.Cuenta === this.costoSelec2) 
+                            this.costoSelecPorc1 = (index1>=0?this.CentroCosto[index1].ValorPorcentaje:0)
+                            this.costoSelecPorc2 = (index2>=0?this.CentroCosto[index2].ValorPorcentaje:0)
+                            if(igv){
+                                this.costoSelecMonto1 = Math.round((this.BImp * this.costoSelecPorc1 / 100) * 100) / 100 
+                                this.costoSelecMonto2 = this.$options.filters.redondear(this.BImp * this.costoSelecPorc2 / 100, 2)
+                                this.costoCalcularFinal = this.BImp
+                            }else{
+                                this.costoSelecMonto1 = Math.round((this.NoGrav * this.costoSelecPorc1 / 100) * 100) / 100
+                                this.costoSelecMonto2 = this.$options.filters.redondear(this.NoGrav * this.costoSelecPorc2 / 100, 2)
+                                this.costoCalcularFinal = this.NoGrav
+                            }
+                            this.costoCalculadoFinal = (Number(this.costoSelecMonto1>0?this.costoSelecMonto1:0) + Number(this.costoSelecMonto2>0?this.costoSelecMonto2:0) + Number(this.costoSelecMonto3>0?this.costoSelecMonto3:0) + Number(this.costoSelecMonto4>0?this.costoSelecMonto4:0)).toFixed(2)
+                            break;
+                        }
+                            
+                        default:
+                            break;
+                    }
+
+                }else{
+                    this.$toasted.error('CUENTA NO ENCONTRADA', { 
+                        position: "top-right", 
+                    })
+                }
+            })
+            .catch((error)=>{
+            })      
+        },
+        validarMontoTecla(){
+            //this.setBImp()
+            //this.setExo()
+        },
+        calcularCostos(){
+            if(this.operacionDet.IdTipoOperacionDet>0 && this.CuentasCalculo.IdOperacionDetCuenta!=null){
+                if(this.CuentasCalculo.CalculaIgv==1){
+                    this.costoSelecMonto1 = Math.round((this.BImp * this.costoSelecPorc1 / 100) * 100) / 100 
+                    this.costoSelecMonto2 = this.$options.filters.redondear(this.BImp * this.costoSelecPorc2 / 100, 2)
+                }else{
+                    this.costoSelecMonto1 = Math.round((this.NoGrav * this.costoSelecPorc1 / 100) * 100) / 100
+                    this.costoSelecMonto2 = this.$options.filters.redondear(this.NoGrav * this.costoSelecPorc2 / 100, 2)
+                }
+                this.costoCalculadoFinal = (Number(this.costoSelecMonto1>0?this.costoSelecMonto1:0) + Number(this.costoSelecMonto2>0?this.costoSelecMonto2:0) + Number(this.costoSelecMonto3>0?this.costoSelecMonto3:0) + Number(this.costoSelecMonto4>0?this.costoSelecMonto4:0)).toFixed(2)
+            }
+        },
+        setBImp(){
+            if(this.operacionDet.IdTipoOperacionDet>0 && this.CuentasCalculo.IdOperacionDetCuenta!=null && this.CuentasCalculo.CalculaIgv==1){
+                let cuentabimp = ("")+this.CuentasCalculo.BImp
+                if(cuentabimp.length==5){
+                    this.obtenerCuenta(cuentabimp, true)
+                }
+            }
+        },
+        setExo(){
+            if(this.operacionDet.IdTipoOperacionDet>0 && this.CuentasCalculo.IdOperacionDetCuenta!=null && this.CuentasCalculo.CalculaIgv==0){
+                let cuentaexo = ("")+this.CuentasCalculo.Exo
+                if(cuentaexo.length==5){
+                    this.obtenerCuenta(cuentaexo, false)
+                }
+            }
         },
         initModal(){
             this.operacion = {
@@ -687,6 +853,13 @@ export default {
                 IdModoPago: 1,
                 ModoPago: 'EFECTIVO - MOV. EFECTIVO'
             }
+
+            this.Total = 0
+            this.Igv = 0
+            this.Otros = 0
+            this.BImp = 0
+            this.NoGrav = 0
+            this.Isc = 0
 
             this.$refs.inputTipoOperacionDet.setValue('')
             this.$refs.inputTipoOperacion.setValue('')
@@ -945,7 +1118,21 @@ export default {
                 Numero: this.Comprobante.Numero,
                 Moneda: this.Moneda.Moneda,
                 TipoCambio: this.Moneda.TipoCambio,
-                IgvPorcentaje: this.IgvPorcentaje
+                IgvPorcentaje: this.IgvPorcentaje,
+                TotalCuenta: this.CuentasCalculo.Total,
+                TotalCuentaOpc: this.CuentasCalculo.TotalOpc,
+                IgvCuenta: this.CuentasCalculo.Igv,
+                IgvCuentaOpc: this.CuentasCalculo.IgvOpc,
+                BImpCuenta: this.CuentasCalculo.BImp,
+                BImpCuentaOpc: this.CuentasCalculo.BImpOpc,
+                NoGravCuenta: this.CuentasCalculo.Exo,
+                NoGravCuentaOpc: this.CuentasCalculo.ExoOpc,
+                CosteoD1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuentaMonto:this.costoSelecMonto1)),
+                CosteoD1Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuenta:this.costoSelec1)),
+                CosteoD2: (this.opcRegistro==3?0:(this.opcRegistro==1?0:this.costoSelec2)),
+                CosteoD2Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?'':this.costoSelec2)),
+                CosteoH1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.destinoCuentaMonto:this.costoSelecMonto1)),
+                CosteoH1Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?this.destinoCuenta:this.totalCostoCuenta)),
 
             }
 
@@ -954,7 +1141,7 @@ export default {
             }).then(r => {
                 if (r.data) {
                     this.$toasted.show('Registro Exitoso')
-                    this.$refs['modalCompras'].hide()    
+                   // this.$refs['modalCompras'].hide()    
                 }
             }).catch((error) => {
                
