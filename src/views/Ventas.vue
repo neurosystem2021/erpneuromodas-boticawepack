@@ -476,7 +476,8 @@ export default {
                 tipoVenta: {
                     IdTipoDoc: 3,
                     TipoDoc: 'NOTA DE VENTA',
-                    LimitItems: 0
+                    LimitItems: 0,
+                    CodSunat: '12',
                 },
                 almacen: {
                     // IdAlmacen: 1,
