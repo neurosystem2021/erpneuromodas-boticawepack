@@ -13,17 +13,21 @@ import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
 
+import VueSocketIO from 'vue-socket.io';
+import VueSweetalert2 from 'vue-sweetalert2';
+
 const browser = detect();
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
+import 'leaflet/dist/leaflet.css';
 
 Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
-
+Vue.use(VueSweetalert2)
 Vue.use(VueAxios, axios)
 Vue.use(Toasted, {
   theme: "bubble",
@@ -48,6 +52,12 @@ Vue.component('editable',{
     }
   }
 })
+
+Vue.use(new VueSocketIO({
+  debug: false,
+  connection: 'http://198.211.103.92:5000',
+  options: { autoConnect: false } //Optional options
+}))
 
 
 Vue.filter('redondear', (value, length) => {

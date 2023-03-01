@@ -11,6 +11,8 @@ import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Venta from '@/views/Venta.vue'
+import CategoriasNuevo from '@/views/CategoriasNuevo.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -157,6 +159,16 @@ export default new Router({
       path: '/reportes/estadisticas',
       name: 'Estadisticas',
       component: Estadisticas
-    }
+    },
+    {
+      path: '/venta',
+      name: 'Venta',
+      component: Venta
+    },
+    {
+      path: '/categoriasnuevo',
+      name: 'CategoriasNuevo',
+      component: CategoriasNuevo
+    },
   ]
 })

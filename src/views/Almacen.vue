@@ -83,6 +83,12 @@
             <b-row>
               <b-col md="3">
                 <b-form-group>
+                  <label>Código de barra:</label>
+                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
@@ -290,8 +296,9 @@
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen + filter" target="_blank">Exportar</b-button>
+          <b-col cols="4">
+              <!--<b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen + filter" target="_blank">Exportar</b-button>-->
+              <b-button variant="success" size="lg" @click="opcionesExportar()">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -323,8 +330,44 @@
         <p>{{kardexSelect}}</p>-->
 
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
+        <b-row>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="kardex.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="kardex.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
-      </b-modal>
+        <b-row>
+          <b-col class="text-center">
+              <b-button variant="success" size="sm" :href="hrefXlsProducto" target="_blank">Exportar Excel Producto</b-button>
+          </b-col>
+        </b-row>
+      <br>
+    </b-modal>
 
       <b-modal size="md" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
@@ -372,6 +415,50 @@
                 </b-col>
               </b-row>
             </b-card>
+          </b-col>
+        </b-row>
+      </b-modal>
+
+      <b-modal size="lg" ref="modalExportar" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">Opciones de Exportación</h3>
+        </div>
+        <hr>
+        <b-row>
+          <b-col md="8" class="centrarClaseIzq">
+            <h5>Exportar stock hasta la fecha actual:</h5>
+          </b-col>
+          <b-col md="4" class="centrarClase">
+            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen +'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + filter" target="_blank">Exportar Actual</b-button>
+          </b-col>
+        </b-row>
+        <hr>
+        <h5>Exportar stock según rango de fechas:</h5>
+        <b-row>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="exportar.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="exportar.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4" class="centrarClase">
+              <b-button  block variant="success" :href="hrefXlsFechas" size="md" target="_blank">Exportar por Fechas</b-button>
           </b-col>
         </b-row>
       </b-modal>
@@ -424,6 +511,14 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
+      exportar: {
+        fechaDesde: this.$moment().format("YYYY-01-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
+      kardex: {
+        fechaDesde: this.$moment().format("YYYY-MM-DD"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
       idPerfil: sessionStorage.getItem('IdPerfil'),
       verValorizado: false,
       productoNombre:'',
@@ -479,13 +574,22 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
-    }
+    },
+    hrefXlsFechas () {
+      return ('/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + this.filter).replace('#','');
+    },
+    hrefXlsProducto () {
+      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
+    },
   },
   methods: {
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url
       this.$refs['modalImagen'].show()
+    },
+    opcionesExportar(){
+      this.$refs['modalExportar'].show()
     },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
@@ -558,17 +662,35 @@ export default {
       this.productoSelect = item
     },
     rowDblClick (item) {
+      this.kardexFechaRango();
       this.productoSelect = item
       this.showKardex = true
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-DD")
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD")
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
           }
       }).then((response) => {
           this.kardexSelect = response.data
       })
+    },
+    kardexFechaRango(){
+      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
+          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
+          }
+          }).then((response) => {
+              this.kardexSelect = response.data
+          })
+      }
+     
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
@@ -598,6 +720,7 @@ export default {
       this.tipoStock = ''
       this.filters = {}
       this.filter = ''
+      this.$refs.inputCodigoBarra.value=''
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
