@@ -264,10 +264,10 @@
                             </template>
                             <template slot="botones">
                                 <b-row class="m-1">
-                                    <b-col md="12" class="mt-1">
+                                    <!--<b-col md="12" class="mt-1">
                                         <b-button v-if="precioHabilitado" variant="danger" block @click="habilitarPrecio()"><i class="fas fa-lock fa-sm"></i> Bloquear Precio</b-button>
                                         <b-button v-else variant="warning" block @click="habilitarPrecio()"><i class="fas fa-unlock fa-sm"></i> Habilitar Precio</b-button>
-                                    </b-col>
+                                    </b-col>-->
                                     <!--<b-col md="12" class="mt-1">
                                         <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
                                     </b-col>-->

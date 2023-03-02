@@ -113,9 +113,22 @@
                     placeholder="Cantidad"/>
                 </template>
                 <template slot="precio" slot-scope="data">
-                <input
+                <!--<input
                     v-model="productos[data.index].precio"
                     :disabled="(bloquearInput?true:false) || esDelivery || (precioHabilitado?false:true)"
+                    type="number"
+                    style="width: 90px"
+                    min="0"
+                    step="0.001"
+                    placeholder="Precio"
+                    autocomplete="off"
+                    @input="setNuevoPrecioContado(data.index)"
+                    :v-on="setNuevoPrecioContado(data.index)"
+                    class="form-control"
+                    />
+                -->
+                <input
+                    v-model="productos[data.index].precio"
                     type="number"
                     style="width: 90px"
                     min="0"
