@@ -274,9 +274,9 @@
                                     <b-col md="12" class="mt-1">
                                         <b-button type="button" block variant="primary" @click="LimpiarPuntoVenta"><i class="fas fa-redo"></i> Actualizar</b-button>
                                     </b-col>
-                                    <!--<b-col md="12" class="mt-1">
+                                    <b-col md="12" class="mt-1">
                                         <pago-deuda></pago-deuda>
-                                    </b-col>-->
+                                    </b-col>
                                     <!--<b-col md="12" class="mt-1">
                                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                                     </b-col>-->
@@ -1988,19 +1988,11 @@ export default {
                           Fecha: response.data.fecha,
                         }
                         this.venta.dataInfoDocVenta = dataInfoDocVenta
-                        let tablet = this.venta.vendedor.EsTablet
-                        if(tablet==1){
-                            window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId+'&preview=1','_blank');
-                        } else if(tablet==2){
-                            window.open('neuroprinterred://factura.vip?iddocventa='+response.data.insertId+'&token=' + this.APPTOKEN)
-                        }else{
-                            //window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank');
-                            let ventaJson= JSON.stringify(this.venta)
-                            var left = (screen.width/2)-(800/2)
-                            var top = (screen.height/2)-(800/2)
-                            let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                            window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
-                        }
+                        let ventaJson= JSON.stringify(this.venta)
+                        var left = (screen.width/2)-(800/2)
+                        var top = (screen.height/2)-(800/2)
+                        let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                        window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
                         
                     } catch (error) {
   
@@ -2014,58 +2006,6 @@ export default {
                         target: document.getElementById('conten'),
                         confirmButtonColor:'#1D9828',
                     })
-                    /*
-                    if(this.$route.query.idPreOrden==null){
-                        let comandaEstruc = {
-                            dataInfoDocVenta:this.venta.dataInfoDocVenta,
-                            productos:this.venta.productos,
-                            impresoraCocina:this.impresoraCocina,
-                            direccionEntrega:this.venta.DireccionEntrega,
-                            cliente:this.venta.cliente.Cliente,
-                            esDelivery:this.venta.EsDelivery?1: 0,
-                            nombreLlevar:this.venta.nombreLlevar,
-                            selectOpcionVenta:this.venta.selectOpcionVenta,
-                            vendedor:this.venta.vendedor.Usuario || sessionStorage.getItem('User')
-                        }
-                        this.$swal({
-                            position: 'center',
-                            icon: 'success',
-                            title: 'Venta Realizada!',
-                            text: 'Si son productos a preparar envie la comanda.',
-                            showConfirmButton: true,
-                            showCancelButton: true,
-                            confirmButtonText: 'Enviar a Comanda',
-                            cancelButtonColor: '#dc3545',
-                            cancelButtonColor: '#d33',
-                            cancelButtonText: 'Cerrar',
-                            target: document.getElementById('conten'),
-                            confirmButtonColor:'#1D9828',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                        }).then((result) => {
-                            if (result.isConfirmed) {    
-                               this.ultimaComanda = comandaEstruc;
-                               let comandaJson= JSON.stringify(comandaEstruc)
-                               var left = (screen.width/2)-(800/2)
-                               var top = (screen.height/2)-(800/2)
-                               let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                               window.open('http://localhost:5000/imprimir/getcomanda.php?comandaJson='+encodeURIComponent(comandaJson), "Impresión Comanda", params)
-                            }
-                        }) 
-                    }*/
-                    if(this.$route.query.idPreOrden !=null){
-                        this.$swal({
-                            position: 'center',
-                            icon: 'success',
-                            title: 'Venta Realizada , orden pagada!',
-                            showConfirmButton: true,
-                            confirmButtonText: 'Ok',
-                            target: document.getElementById('conten'),
-                            confirmButtonColor:'#1D9828',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                        })
-                    }
                     this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
