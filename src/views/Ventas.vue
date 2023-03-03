@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA."
+                                        initValue="NOTA DE VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -80,7 +80,7 @@
                                     <label>Cliente:</label>
                                     
                                     <b-input-group>
-                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -315,6 +315,7 @@ export default {
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
+        this.loadClienteVarios()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -373,6 +374,14 @@ export default {
                     this.venta.almacen = res.data
                 })
         },
+        loadClienteVarios () {
+            this.axios.get(this.API + 'clientes/00000000')
+                .then(res => {
+                    if (res.data.IdCliente) {
+                        this.setCliente(res.data)
+                    }
+                })
+        },
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
@@ -393,9 +402,9 @@ export default {
                 cliente: {},
                 tipoVenta: {
                     IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA.',
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 8,
-                    CodSunat: '03',
+                    CodSunat: '12',
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -607,7 +616,7 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
 
                 this.limpiarDespuesVenta()
-
+                this.loadClienteVarios()
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -680,7 +689,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -688,7 +697,8 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA.')
+                this.loadClienteVarios()
+                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
