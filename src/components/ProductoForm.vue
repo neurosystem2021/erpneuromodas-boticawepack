@@ -220,6 +220,14 @@
           </b-form-group>
           <b-form-group>
             <b-form-checkbox
+                   v-model="producto.MasMovido"
+                   :value="1"
+                   :unchecked-value="0">
+              Producto con más movimiento
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
                    v-model="producto.ControlaStock"
                    :value="1"
                    :unchecked-value="0">
@@ -555,6 +563,7 @@ export default {
           this.producto.EsHabitacion          = newVal.EsHabitacion
           this.producto.Piso                  = newVal.Piso
           this.producto.ControlaStock         = newVal.ControlaStock
+          this.producto.MasMovido             = newVal.MasMovido
           this.producto.Imagen                = newVal.Imagen
           if (newVal.PreciosPorProducto) {
             this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
@@ -740,6 +749,7 @@ export default {
         // Color: '',
         PorcentajeUtilidad: 0,
         ControlaStockMinimo:0,
+        MasMovido:0,
         StockMinimo: 0,
         StockPorMayor: 0,
         PrecioContado: 0,

@@ -751,6 +751,8 @@ export default {
             this.axios.get(this.API + 'categorias/puntoventa').then((response) => {
                 this.categorias = response.data
                 if(this.categorias.length>0){
+                    let masMov = {ProductoCategoria:'MAS MOVIDOS',IdProductoCategoria:0}
+                    this.categorias.unshift(masMov)
                     setTimeout(() => {
                         this.tabActive = 0
                         let primerCategoria = this.categorias[0].IdProductoCategoria
@@ -769,7 +771,8 @@ export default {
                 this.axios.get(this.API + 'productos/categoria', {
                     params: {
                         IdProductoCategoria: idProductoCategoria,
-                        idAlmacen:this.venta.almacen.IdAlmacen
+                        idAlmacen:this.venta.almacen.IdAlmacen,
+                        MasMovido: idProductoCategoria==0?1:0
                     }
                 }).then((response) => {
                     this.cargandoProductos = false;
