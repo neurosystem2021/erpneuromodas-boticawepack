@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="NOTA DE VENTA"
                                         class="font-weight-bold"
                                         label="writer"
                                         placeholder=""
@@ -416,7 +416,7 @@
                         </b-col>
                     </b-row>
                     <b-row style="background: #F4F4F4;">
-                            <b-tabs v-model="tabActive" style="font-size:0.8rem !important; font-weight:500">
+                            <b-tabs v-model="tabActive" style="font-size:1.1rem !important; font-weight:500">
                                 <b-tab no-body v-for="(item, index) in categorias" :key="index"  :title="item.ProductoCategoria" :ref="'tab'+index" @click="getProductosCategoria(item.IdProductoCategoria)">
                                 </b-tab>
                                 <b-tab v-if="busqueda!=''" :active="busqueda!=''" no-body title="BUSQUEDA">
@@ -436,11 +436,11 @@
                                             <b-badge :variant="parseFloat(producto.stock)<=0?'danger':'success'" style="font-size: 0.8rem;">{{producto.stock? Number.isInteger(producto.stock)?producto.stock:producto.stock.toFixed(2):producto.stock}}</b-badge>
                                         </b-col>
                                         <b-col md="12" class="text-center">
-                                            <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                                            <b-badge variant="dark" style="font-size: 1rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
                                         </b-col>
                                     </b-row>
                                     <b-img style="border-radius: 10px;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
-                                    <label class="font-weight-bold" style="font-size:0.75rem; cursor:pointer">
+                                    <label class="font-weight-bold" style="font-size:rem; cursor:pointer">
                                         {{producto.Producto}}
                                     </label>
                                 </b-col>
@@ -962,7 +962,7 @@ export default {
             }
         },
         LimpiarPuntoVenta(){
-            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
             this.$refs.inputAlmacen.setValue('PRINCIPAL')
             this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
             this.$refs.inputCliente.setValue('')
@@ -1225,10 +1225,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -2009,7 +2009,7 @@ export default {
                         target: document.getElementById('conten'),
                         confirmButtonColor:'#1D9828',
                     })
-                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
