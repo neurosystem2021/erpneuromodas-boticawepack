@@ -380,9 +380,9 @@
                                             <td colspan="5" align="center"><h6>Asiento - Destino Almacén</h6></td>
                                         </tr>
                                         <tr>
-                                            <td width="20%" class="noArrow"><input class="form-control" v-model="asientoCuenta" v-on:keyup="validarTecla" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td width="20%" class="noArrow"><input class="form-control" v-model="asientoCuenta" v-on:keyup="validarTecla" type="text" pattern="[0-9]+" maxlength="5" autocomplete="off"/></td>
                                             <td width="30%"><input class="form-control" type="number" v-model="asientoCuentaMonto" step="0.01" autocomplete="off"/></td>
-                                            <td width="20%" class="noArrow"><input class="form-control" v-model="destinoCuenta" type="text" pattern="[0-9]+" autocomplete="off"/></td>
+                                            <td width="20%" class="noArrow"><input class="form-control" v-model="destinoCuenta" type="text" pattern="[0-9]+" maxlength="5" autocomplete="off"/></td>
                                             <td width="30%"><input class="form-control" type="number" v-model="destinoCuentaMonto" step="0.01" autocomplete="off"/></td>
                                         </tr>
                                     </tbody>
@@ -398,7 +398,7 @@
                                             <td class="noArrow"><input class="form-control" readonly v-model="costoSelec1" type="text" pattern="[0-9]+" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" step="0.01" v-model="costoSelecPorc1" autocomplete="off"/></td>
                                             <td><input class="form-control" type="number" readonly v-model="costoSelecMonto1" step="0.01" autocomplete="off"/></td>
-                                            <td align="right"><b-button @click="calcularCostos" size="sm" variant="primary">Cal.</b-button></td>
+                                            <td align="center"><b-button @click="calcularCostos" size="sm" variant="primary">Cal.</b-button></td>
                                         </tr>
                                         <tr>
                                             <td><b-form-select size="md" class="selectCosteo" v-model="costoSelec2" :options="CentroCosto"/></td>
@@ -434,8 +434,8 @@
                         </b-row>
                         <hr>
                         <b-row class="filaFormaPago">
-                            <b-col md="4">
-                                <b-input-group prepend="Forma de Pago" class="mb-1">
+                            <b-col md="3">
+                                <b-input-group prepend="F. Pago" class="mb-1">
                                     <autocomplete
                                         required="required"
                                         ref="inputFormaPago"
@@ -455,9 +455,7 @@
                                     <b-form-input ref="inputFechaVenc" v-model="FechaVen" type="date" size="md" required/>
                                 </b-input-group>
                            </b-col>
-                        </b-row>
-                        <b-row class="filaFormaPago" v-if="FormaPago.IdFormaPago!=2 && FormaPago.IdFormaPago!=3">
-                            <b-col md="8">
+                           <b-col md="5" v-if="FormaPago.IdFormaPago!=2 && FormaPago.IdFormaPago!=3">
                                 <b-input-group prepend="Modo de Pago" class="mb-1">
                                     <autocomplete
                                         required="required"
@@ -472,6 +470,69 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-input-group>
+                            </b-col>
+                        </b-row>
+                        <b-row class="mt-2">
+                            <b-col md="8">
+                                <h6>Caja y Bancos - DETALLE DE LOS MOVIMIENTOS DEL EFECTIVO</h6>
+                                <b-col md="12">
+                                    <b-row>
+                                        <table class="tablaBanco">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Seleccione Efectivo</td>
+                                                    <td>Debe</td>
+                                                    <td>Haber</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="50%"><b-form-select class="selectCosteo" size="md" required/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Nombre de la Cta Contable</td>
+                                                    <td>Deudor</td>
+                                                    <td>Acreedor</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b-form-input type="text" size="md" readonly autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tipo Medio de Pago</td>
+                                                    <td colspan="2">N° del Tipo de Medio de Pago</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b-form-select class="selectCosteo" size="md" required/></td>
+                                                    <td colspan="2"><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="tablaBanco">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="30%">Tipo Medio de Pago</td>
+                                                    <td>Descripcion de la operacion o Glosa</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b-form-input type="date" size="md" class="selectCosteo" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="tablaBanco">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Apellidos y Nombres, Denom. o Razón Social</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b-form-input type="text" size="md" autocomplete="off" required/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </b-row>
+                                </b-col>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -497,6 +558,7 @@ export default {
         //this.cargarDatos();
         this.obtenerTipoCosteo()
         this.cargarRegistros()
+        this.obtenerMetodoPago()
     },
     data () {
         return {
@@ -514,7 +576,7 @@ export default {
                 { value: 10, text: 'OCTUBRE' },
                 { value: 11, text: 'NOVIEMBRE' },
                 { value: 12, text: 'DICIEMBRE' }
-                    ],
+            ],
             mesSelect: 1,
             selected: null,
             options: [
@@ -612,7 +674,11 @@ export default {
             costoCalculadoFinal:null,
             costoCalcularFinal:null,
             opcRegistro:0,
-            RegistrosData:[]
+            RegistrosData:[],
+            itemsEfectivo: [
+                { value: 1, text: 'EFECTIVO' },
+            ],
+            itemsMetodoPago:[]
         }   
     },
     watch: {
@@ -673,6 +739,17 @@ export default {
             })
             .catch((error)=>{
 
+            })    
+        },
+        obtenerMetodoPago(){
+            this.axios.get(this.API + 'contabilidad/mediopago')
+            .then((r) => {
+                if(r.data){
+                    this.itemsMetodoPago = r.data
+                }
+            })
+            .catch((error)=>{
+                this.itemsMetodoPago = []
             })    
         },
         obtenerCuenta(cuenta, igv){
@@ -1232,10 +1309,31 @@ export default {
     border-radius: 0% !important;
 }
 
+.tablaMontos {
+    box-shadow: 5px 3px rgb(147, 146, 146);
+    background-color: #DFF9F9;
+}
+
 .tablaCosteo * {
     font-size: 0.8rem;
 }
 .tablaCosteo input {
+    border-radius: 0% !important;
+}
+.tablaCosteo {
+    box-shadow: 5px 3px rgb(147, 146, 146);
+    background-color: #F3F3F3;
+}
+
+.tablaBanco {
+    width: 100%;
+    box-shadow: 5px 3px rgb(147, 146, 146);
+    background-color: #F3F3F3;
+}
+.tablaBanco * {
+    font-size: 0.8rem;
+}
+.tablaBanco input {
     border-radius: 0% !important;
 }
 
