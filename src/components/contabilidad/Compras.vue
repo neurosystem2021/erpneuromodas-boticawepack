@@ -485,9 +485,9 @@
                                                     <td>Haber</td>
                                                 </tr>
                                                 <tr>
-                                                    <td width="50%"><b-form-select class="selectCosteo" size="md" required/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td width="50%"><b-form-select class="selectCosteo" size="md"/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Nombre de la Cta Contable</td>
@@ -495,17 +495,17 @@
                                                     <td>Acreedor</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="text" size="md" readonly autocomplete="off" required/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" readonly autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Tipo Medio de Pago</td>
                                                     <td colspan="2">N° del Tipo de Medio de Pago</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-select class="selectCosteo" size="md" required/></td>
-                                                    <td colspan="2"><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td><b-form-select class="selectCosteo" size="md" /></td>
+                                                    <td colspan="2"><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -516,8 +516,8 @@
                                                     <td>Descripcion de la operacion o Glosa</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="date" size="md" class="selectCosteo" autocomplete="off" required/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="date" size="md" class="selectCosteo" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -527,7 +527,7 @@
                                                     <td>Apellidos y Nombres, Denom. o Razón Social</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="text" size="md" autocomplete="off" required/></td>
+                                                    <td><b-form-input type="text" size="md" autocomplete="off" /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
