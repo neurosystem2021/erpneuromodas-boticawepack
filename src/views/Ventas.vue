@@ -657,6 +657,7 @@ export default {
             this.getNumeroVenta()
         },
         setDocRef (obj) {
+            this.venta.EsAnticipo = obj.EsAnticipo
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
