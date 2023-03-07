@@ -9,12 +9,26 @@
               
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
               </b-input-group>
             </b-form-group>
             <br />
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+                  <label>Vendedor:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputVendedor"
+                      :url="API + 'usuarios'"
+                      anchor="Usuario"
+                      initValue="TODOS"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setVendedor" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
           </b-col>
           <b-col md="4">
             <b-form-group>
@@ -32,20 +46,6 @@
                       :classes="{input: 'form-control'}">
                   </autocomplete>
                 </b-form-group>
-          </b-col>
-          <b-col md="4">
-            <b-row>
-            <b-col md="8">
-
-              <b-form-group>
-                  <label>Mostrar:</label>
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
-            </b-row>
           </b-col>
           <b-col md="4">
             <b-form-group>
@@ -71,6 +71,26 @@
               </b-form-input>
             </b-form-group>
           </b-col>
+          <b-col md="1">
+            <b-form-group label="Limpiar ">
+              <b-button @click="limpiarFiltros">Limpiar</b-button>
+            </b-form-group>
+            <br />
+          </b-col>
+          <b-col md="3" style="padding-left: 60px;">
+            <b-row>
+            <b-col md="8">
+
+              <b-form-group>
+                  <label>Mostrar:</label>
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
+            </b-col>
+            </b-row>
+          </b-col>
           <b-table small
             ref="tablaProductos"
             :filter="filter"
@@ -78,7 +98,7 @@
             :sort-desc.sync="sortDesc"
             striped
             hover
-            id="my-table" 
+            id="my-tableDeuda"
             :busy.sync="isBusy" 
             :items="myProvider" 
             :fields="fields"
@@ -93,7 +113,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage+'&fechaDesde='+rango.fechaDesde+'&fechaHasta='+rango.fechaHasta" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage+'&usuarioReg='+vendedor.Usuario+'&fechaDesde='+rango.fechaDesde+'&fechaHasta='+rango.fechaHasta" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -112,7 +132,6 @@ import DetalleDeudaCliente from '@/components/DetalleDeudaCliente.vue'
 export default {
   mounted() {
     this.axios.get(this.API + 'clientes/deuda/count?idalmacen=' + this.almacen.IdAlmacen ).then((response) => {
-      console.log(response)
       this.totalRows = response.data.total
     })
   },
@@ -128,6 +147,7 @@ export default {
       fields: [
             { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
             { key: 'Cliente', label: 'Cliente', sortable: true },
+            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
             { key: 'Correlativo', label: 'Serie', sortable: true },
             { key: 'Total', label: 'Total', sortable: true},
             { key: 'Aplicado', label: 'Aplicado', sortable: true},
@@ -142,6 +162,9 @@ export default {
       currentPage: 1,
       almacen: {
         IdAlmacen: 1
+      },
+      vendedor: {
+        Usuario: undefined
       },
       rango: {
         fechaDesde: this.$moment().format("YYYY-01-01"),
@@ -159,13 +182,27 @@ export default {
       this.almacen = obj
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
+    setVendedor (obj) {
+      this.vendedor = obj
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
+    limpiarFiltros () {
+      this.filter = ''
+      this.vendedor.Usuario = undefined;
+      this.almacen.IdAlmacen = 1;
+      this.rango.fechaDesde = this.$moment().format("YYYY-01-01")
+      this.rango.fechaHasta = this.$moment().format("YYYY-MM-DD")
+      this.$refs.inputVendedor.setValue('TODOS')
+      this.$refs.inputAlmacen.setValue('')
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage+'&fechaDesde='+this.rango.fechaDesde+'&fechaHasta='+this.rango.fechaHasta)
+      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&usuarioReg=' + this.vendedor.Usuario + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage+'&fechaDesde='+this.rango.fechaDesde+'&fechaHasta='+this.rango.fechaHasta)
 
       return promise.then((response) => {
         console.log(response)
@@ -182,7 +219,7 @@ export default {
       })
     },
     myRowClickHandler(record, index) {
-      if(record.Letras!='Ninguna'){
+      if(record.Letras!='Ninguna' && record.Letras!=''){
         this.showLetras = true
         this.$refs.detDeuCli.cargarDeudasCliente(record.IdDocVenta,record.Total,record.DniRuc,record.Cliente,record.Correlativo);
       }
@@ -196,5 +233,9 @@ export default {
 </script>
 
 <style>
-
+#my-tableDeuda tbody tr:last-child{
+    color: black;
+    background: transparent;
+    font-weight: bold;
+}
 </style>
