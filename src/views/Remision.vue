@@ -403,7 +403,7 @@ export default {
           this.remision.apellidosChofer = '';
           this.remision.nombresChofer = '';
           this.remision.licenciaChofer = '';
-          this.remision.descripcionMotivoTraslado = '';
+          this.remision.descripcionMotivoTraslado = 'VENTA';
           this.remision.totalBultos = '';
           this.$refs.inputDocRef.setValue('');
           this.$refs.inputMovRef.setValue('');
@@ -537,7 +537,7 @@ export default {
       this.$set(this.remision, 'razonSocialCliente', '');
       this.$set(this.remision, 'direccionCliente', '');
       this.$refs.inputDocRef.setValue('');
-      this.remision.documentoReferencia = '';
+      this.remision.documentoReferencia = obj.NroComprobante;
       this.limpiarCart();
       
       // Cargar producto del movimiento
