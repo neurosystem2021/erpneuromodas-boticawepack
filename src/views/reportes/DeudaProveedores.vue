@@ -16,8 +16,8 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4">
-<!--             <b-form-group>
+          <!--<b-col md="4">
+             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
                       required="required"
@@ -31,9 +31,32 @@
                       :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
-                </b-form-group> -->
-          </b-col>
+                </b-form-group> 
+          </b-col>-->
           <b-col md="4" class="my-1">
+            <b-form-group>
+                  <label>Proveedor:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputProveedor"
+                      :url="API + 'proveedores'"
+                      anchor="Proveedor"
+                      initValue="TODOS"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setProveedor" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+          </b-col>
+          <b-col md="1" class="my-1" >
+            <b-form-group label="Limpiar ">
+              <b-button @click="limpiarFiltros">Limpiar</b-button>
+            </b-form-group>
+            <br />
+          </b-col>
+          <b-col md="3" class="my-1" style="padding-left: 60px;">
             <b-row>
             <b-col md="8">
 
@@ -49,12 +72,13 @@
           </b-col>
 
           <b-table small
+            ref="tablaProductos"
             :filter="filter"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             striped
             hover
-            id="my-table" 
+            id="my-tableDeuda"
             :busy.sync="isBusy" 
             :items="myProvider" 
             :fields="fields"
@@ -69,7 +93,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaproveedores'" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaproveedores?proveedor=' + proveedor.Proveedor" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -88,7 +112,7 @@ import DetalleDeudaProveedor from '@/components/DetalleDeudaProveedor.vue'
 export default {
   mounted() {
     this.axios.get(this.API + 'proveedores/deuda/count').then((response) => {
-      console.log(response)
+      //console.log(response)
       this.totalRows = response.data.total
     })
   },
@@ -118,6 +142,9 @@ export default {
       almacen: {
         IdAlmacen: 1
       },
+      proveedor: {
+        Proveedor: undefined
+      },
       showLetras: false,
     }
   },
@@ -130,16 +157,26 @@ export default {
       // this.almacen = obj
       // Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
+    setProveedor (obj) {
+      this.proveedor = obj
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
+    limpiarFiltros () {
+      this.filter = ''
+      this.proveedor.Proveedor = undefined;
+      this.$refs.inputProveedor.setValue('TODOS')
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    },
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&proveedor=' + this.proveedor.Proveedor + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
-        console.log(response)
+        //console.log(response)
         this.items = response.data
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false
@@ -153,7 +190,7 @@ export default {
       })
     },
     myRowClickHandler(record, index) {
-      if(record.Letras!='Ninguna'){
+      if(record.Letras!='Ninguna' && record.Letras!=''){
         this.showLetras = true
         this.$refs.detDeuPro.cargarDeudasProveedor(record.Id,record.Total,record.Ruc,record.Proveedor,record.Correlativo);
       }
@@ -167,5 +204,9 @@ export default {
 </script>
 
 <style>
-
+#my-tableDeuda tbody tr:last-child{
+    color: black;
+    background: transparent;
+    font-weight: bold;
+}
 </style>
