@@ -485,9 +485,9 @@
                                                     <td>Haber</td>
                                                 </tr>
                                                 <tr>
-                                                    <td width="50%"><b-form-select class="selectCosteo" size="md"/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td width="50%"><b-form-select class="selectCosteo" v-model="efectivoId" :options="itemsEfectivo" size="md"/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Nombre de la Cta Contable</td>
@@ -504,7 +504,7 @@
                                                     <td colspan="2">N° del Tipo de Medio de Pago</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-select class="selectCosteo" size="md" /></td>
+                                                    <td><b-form-select class="selectCosteo" v-model="medioPagoId" :options="itemsMedioPago" v-on:change="setMedioPago($event)" size="md"  /></td>
                                                     <td colspan="2"><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
                                                 </tr>
                                             </tbody>
@@ -558,7 +558,7 @@ export default {
         //this.cargarDatos();
         this.obtenerTipoCosteo()
         this.cargarRegistros()
-        this.obtenerMetodoPago()
+        this.obtenerMedioPago()
     },
     data () {
         return {
@@ -678,7 +678,9 @@ export default {
             itemsEfectivo: [
                 { value: 1, text: 'EFECTIVO' },
             ],
-            itemsMetodoPago:[]
+            efectivoId: 1,
+            itemsMedioPago:[],
+            medioPagoId: 8
         }   
     },
     watch: {
@@ -706,6 +708,9 @@ export default {
         setMes(mes){
             console.log(mes);
             this.cargarRegistros(mes)
+        },
+        setMedioPago(medio){
+            console.log(medios);
         },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
@@ -741,15 +746,15 @@ export default {
 
             })    
         },
-        obtenerMetodoPago(){
+        obtenerMedioPago(){
             this.axios.get(this.API + 'contabilidad/mediopago')
             .then((r) => {
                 if(r.data){
-                    this.itemsMetodoPago = r.data
+                    this.itemsMedioPago = r.data
                 }
             })
             .catch((error)=>{
-                this.itemsMetodoPago = []
+                this.itemsMedioPago = []
             })    
         },
         obtenerCuenta(cuenta, igv){
