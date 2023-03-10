@@ -23,6 +23,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -761,23 +762,14 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center  ">
-            <thead>
-              <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
-                <th style="width: 200px">Producto</th>
-                <th style="width: 100px">Categoría</th>
-                <th style="width: 100px">Marca</th>
-                <th class="table-primary" style="width: 65px">Precio</th>
-              </tr>
-            </thead>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
-                <td class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
-                <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
-                <td>${data.ProductoCategoria}</td>
-                <td>${data.ProductoMarca}</td>
-                <td class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
               </tr>
             </tbody>
           </table>   
