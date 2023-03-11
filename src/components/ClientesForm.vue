@@ -141,9 +141,8 @@ export default {
           this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
           return
       }
-
+      
       let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
-
       this.axios.get(this.API + 'consultarRUC', {
           params: {
               type: tipo,
@@ -152,12 +151,14 @@ export default {
       }).then((response) => {
           if (response.data) {
               this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-              var data = response.data.result
+              var data = response.data
+              
               if (tipo == 'DNI') {
-                  this.cliente.Cliente = data.Nombre + ' ' + data.Paterno + ' ' + data.Materno
+                  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+                  this.cliente.Direccion = ''
               } else {
-                  this.cliente.Cliente = data.RazonSocial
-                  this.cliente.Direccion = data.Direccion
+                  this.cliente.Cliente = data.razonSocial
+                  this.cliente.Direccion = data.direccion
                   // this.cliente.Telefono = data.Telefono
               }
           } else {
