@@ -18,13 +18,25 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-     // if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if (!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.unshift(item)
     //  }else{
       //  let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
      //   productos.splice(index2, 1)
       //  productos.splice(index2,0,item)
      // }
+      }
+      else{
+        let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+
+        productos[index].cantxPrecio = Number(productos[index].cantxPrecio) + 1
+        productos[index].cantidad = productos[index].cantxPrecio*item.cantidadPres
+        productos[index].precio = item.precio
+        productos[index].cantidadPres = item.cantidadPres
+
+        let prod = Object.assign({}, productos[index]);
+        productos.splice(index, 1,prod)
+      }
     }
   },
   ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
