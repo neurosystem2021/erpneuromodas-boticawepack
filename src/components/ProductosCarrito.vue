@@ -295,7 +295,7 @@
             placeholder="Descripción"></b-form-input>
         </template>--> 
 
-        <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+        <!--<template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
           <div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].hashMovimiento}}
@@ -306,7 +306,7 @@
               {{productos[data.index].FechaVen}}
             </div>
           </div>
-          <!--<b-form-select v-if="!isNota"
+          <b-form-select v-if="!isNota"
             style="width: 135px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
@@ -317,7 +317,7 @@
           <small>Stock: <span style="font-weight:bold;">{{ productos[data.index].stockMovimiento }}</span></small><br />
           </div>
 
-          <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
+          <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
 
           <div style="display: flex; justify-content: space-evenly; align-items: center;">
           <b-form-select v-if="!isNota"
@@ -334,15 +334,15 @@
               <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
             </div>
           </div>
-        </template>
+        </template>-->
 
-        <template slot="fechavencimiento" slot-scope="data" >
+        <!--<template slot="fechavencimiento" slot-scope="data" >
           <b-form-input
             required="required"
             v-model="productos[data.index].FechaVen"
             type="date"
             ></b-form-input>
-        </template>
+        </template>-->
 
         <template slot="total" slot-scope="data">
           <div style="display: flex; justify-content: space-evenly;">
@@ -505,7 +505,7 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
+          //{ key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
           //{ key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
@@ -524,7 +524,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta' },
           { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'fechavencimiento', label: 'Vencimiento' },
+          //{ key: 'fechavencimiento', label: 'Vencimiento' },
           { key: 'acciones', label: ''}
         ]
       },
@@ -712,7 +712,7 @@ export default {
           })
         }
         // Fecha de vencimiento
-        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+        /*var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
         let hoy      = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
         let en5dias  = this.$moment().add(5, 'days').unix();
@@ -741,11 +741,11 @@ export default {
           this.$nextTick(() => {
             Vue.set(this.productos[index], 'fechaVenMovimiento', '')
           })
-        }
+        }*/
           // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
       }
     },
-    loadMovimientoLotes ($idProducto) {
+    /*loadMovimientoLotes ($idProducto) {
       this.movimientoLotes[$idProducto]=[]
       this.axios.get(this.API + '/movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
         .then((response) => {
@@ -771,7 +771,7 @@ export default {
         .catch((error) => {
           console.log(error)
         })
-    },
+    },*/
     loadBarcode (e) {
       e.preventDefault()
       let idProducto = this.loadCode;
@@ -878,7 +878,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-        this.loadMovimientoLotes(obj.IdProducto)
+        //this.loadMovimientoLotes(obj.IdProducto)
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       }else{
         this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
@@ -913,7 +913,7 @@ export default {
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-        this.loadMovimientoLotes(obj.IdProducto)
+        //this.loadMovimientoLotes(obj.IdProducto)
       }, false, false, this.cliente.EsVIP])
 
       }else{

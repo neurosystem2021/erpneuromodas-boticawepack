@@ -12,7 +12,7 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @onLoadMovimiento="cargarLotes"></proformas>
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" ></proformas>
                     </b-button-group>
                     <b-button-group size="sm">
                         <pre-orden-lista 
@@ -458,7 +458,7 @@ export default {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
+                    //{ key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
                     { key: 'Producto' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -524,9 +524,9 @@ export default {
                 evt.preventDefault();
             }
         },
-        cargarLotes(lote){
+        /*cargarLotes(lote){
             this.$refs.carrito.loadMovimientoLotes(lote)
-        },
+        },*/
         selectPreOrden (orden) {
             // console.log(orden)
            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
@@ -1024,7 +1024,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0  Y QUE NO SEAN MISMO LOTE
             let sinStock = 0
             let totalCero = 0 
-            let igualLote = 0
+            //let igualLote = 0
             this.productos.forEach(pro => {
                 console.log(pro);
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
@@ -1035,10 +1035,10 @@ export default {
                     totalCero += 1
                 }
 
-                let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
+                /*let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
                 if(lote > 1){
                     igualLote += 1 
-                }
+                }*/
                 
             });
 
@@ -1048,11 +1048,11 @@ export default {
                 return;
             }
 
-            if (igualLote >= 1) {
+            /*if (igualLote >= 1) {
                 this.$toasted.error('Debe seleccionar diferente lote por producto');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');

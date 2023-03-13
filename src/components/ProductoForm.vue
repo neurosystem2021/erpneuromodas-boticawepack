@@ -387,7 +387,7 @@
               </autocomplete>
           </b-form-group>
         </b-col>
-        <b-col md="2">
+        <!--<b-col md="2">
             <b-form-group>
               <label>Lote: <span style="font-weight:bold">{{serieNumero}}</span></label>
               <br>
@@ -404,7 +404,7 @@
               <br>
               <div style=" margin-top:7px" v-html="fechaVenMovimiento"></div>
             </b-form-group>
-        </b-col>
+        </b-col>-->
         <b-col md="4">
           <label>Cantidad:</label>
         <b-input-group>
@@ -620,9 +620,9 @@ export default {
     setAlmacen (obj) {
         this.almacen = obj
         this.$refs.inputAlmacen.setValue(obj.Almacen)
-        this.loadMovimientoLotes(this.producto.IdProducto)
+        //this.loadMovimientoLotes(this.producto.IdProducto)
     },
-    changeMovimiento(hash) {
+    /*changeMovimiento(hash) {
       if  (hash) {
         // Fecha de vencimiento
         var fechaVen = this.movimientoLotes.find(m => m.value === hash).FechaVen
@@ -645,8 +645,8 @@ export default {
         }
           // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
       }
-    },
-    loadMovimientoLotes ($idProducto) {
+    },*/
+    /*loadMovimientoLotes ($idProducto) {
       this.axios.get(this.API + '/movimientolotesbarra/' + $idProducto+'/'+(this.almacen.IdAlmacen))
         .then((response) => {
        
@@ -671,7 +671,7 @@ export default {
         .catch((error) => {
           console.log(error)
         })
-    },
+    },*/
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
       var utilidad = this.producto.PorcentajeUtilidad
