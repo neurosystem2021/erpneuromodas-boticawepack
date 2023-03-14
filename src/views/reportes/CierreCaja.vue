@@ -321,8 +321,8 @@
 
 
       <b-row>
-        <b-col v-if="totalIngresos">
-          <h5>Ingresos</h5><br>
+        <b-col v-if="totalIngresosSinPagoCliente">
+          <h5>Ingresos Sin Pago Cliente</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr>
@@ -330,7 +330,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresosSinPagoCliente" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -340,8 +340,8 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+                <td class="total"><b>Total Ingresos Sin Pago Cliente</b></td>
+                <td class="total"><b>S/. {{ totalIngresosSinPagoCliente | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -372,8 +372,36 @@
           </table>
         </b-col>
       </b-row>
-      
 
+      <br>
+
+      <b-row>
+        <b-col v-if="totalIngresosPagoCliente">
+          <h5>Ingresos Pago Cliente (NO SUMA)</h5>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosPagoCliente" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos Pago Cliente</b></td>
+                <td class="total"><b>S/. {{ totalIngresosPagoCliente | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
 
       <b-row>
           <b-col v-if="totalAdelantos">
@@ -428,7 +456,7 @@ export default {
       ventas: [],
       ingresos: [],
       salidas: [],
-	  adelantos: [],
+	    adelantos: [],
       turno: null,
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
@@ -445,7 +473,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosSinPagoCliente - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -460,9 +488,23 @@ export default {
       });
       return total 
     },
-    totalIngresos () {
+    /*totalIngresos () {
       let total = 0
       this.ingresos.forEach(ingreso => {
+        if (!ingreso.Anulado) total += ingreso.Importe
+      });
+      return total 
+    },*/
+    totalIngresosSinPagoCliente () {
+      let total = 0
+      this.ingresosSinPagoCliente.forEach(ingreso => {
+        if (!ingreso.Anulado) total += ingreso.Importe
+      });
+      return total 
+    },
+    totalIngresosPagoCliente () {
+      let total = 0
+      this.ingresosPagoCliente.forEach(ingreso => {
         if (!ingreso.Anulado) total += ingreso.Importe
       });
       return total 
@@ -487,6 +529,16 @@ export default {
         if (!venta.Anulado && venta.CodSunat!='07') total += venta.Efectivo
       });
       return total
+    },
+    ingresosPagoCliente () {
+      return this.ingresos.filter(ingreso => {
+        return ingreso.IdTipoCajaBanco == 2
+      })
+    },
+    ingresosSinPagoCliente () {
+      return this.ingresos.filter(ingreso => {
+        return ingreso.IdTipoCajaBanco != 2
+      })
     },
     ventasEfectivo () {
       return this.ventas.filter(venta => {
@@ -641,6 +693,7 @@ export default {
         params: params
       })
       .then(res => {
+        console.log(res.data);
         this.ingresos = res.data
       }).catch(err => {
         console.log(err)
