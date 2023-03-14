@@ -35,27 +35,29 @@
                   <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>-->
                 
-                <b-form-group v-show="isBoleta">
+                <!--<b-form-group v-show="isBoleta">
                   <label>Fecha Referencia:</label>
                   <b-form-input
                     v-model="fechaReferencia"
                     type="date"
                     placeholder=""
                     @input="setFechaReferencia"></b-form-input>
-                </b-form-group>
+                </b-form-group>-->
                 
-                <b-form-group v-show="!isBoleta">
+                <b-form-group>
                   <label>Fecha Inicio:</label>
                   <b-form-input v-model="fechaInicio"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     placeholder=""
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
                 </b-form-group>
 
-                <b-form-group v-show="!isBoleta">
+                <b-form-group>
                   <label>Fecha Fin:</label>
                   <b-form-input v-model="fechaFin"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     placeholder=""
                     @input="val => generateFilter('fechaFin', val) "></b-form-input>
                 </b-form-group>
@@ -276,8 +278,8 @@ export default {
       // optionsTipoDoc: [],
       vendedor: '',
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
-      fechaInicio: this.$moment().format("YYYY-MM-DD"),
-      fechaFin: this.$moment().format("YYYY-MM-DD"),
+      fechaInicio: this.$moment().format("YYYY-MM-DD HH:MM:SS"),
+      fechaFin: this.$moment().format("YYYY-MM-DD HH:MM:SS"),
       fechaReferencia: this.$moment().format("YYYY-MM-DD"),
       filters: { },
       filter: '',
