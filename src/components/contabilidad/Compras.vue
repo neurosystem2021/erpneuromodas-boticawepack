@@ -327,6 +327,60 @@
 
                             </b-col>
                         </b-row>
+                        <hr>
+                        <b-row>
+                            <b-col md="9">
+                                <b-row v-if="EsNotaCred==1" class="filaMoneda CampoNC">
+                                    <b-col>
+                                        <b-row>
+                                            <b-col md="6">
+                                                <b-input-group prepend="Tipo Doc." class="mb-1">
+                                                    <autocomplete
+                                                        required="required"
+                                                        ref="inputTipoComprob"
+                                                        :url="API + 'contabilidad/comprobantes'"
+                                                        :onShouldRenderChild="renderChildTipoComprob"
+                                                        anchor="Comprobante"
+                                                        initValue=""
+                                                        label="writer"
+                                                        placeholder=""
+                                                        :onFocus="focusAutocomplete.bind(null, 'inputTipoComprob')"
+                                                        :classes="{input: 'form-control'}">
+                                                    </autocomplete>
+                                                </b-input-group>
+                                            </b-col>
+                                            <b-col md="6">
+                                                <b-input-group prepend="F. Emisión" class="mb-1">
+                                                    <b-form-input ref="inputFechaEmision" v-model="FechaDoc" type="date" size="md" required/>
+                                                </b-input-group>
+                                            </b-col>
+                                        </b-row>
+                                        <b-row>
+                                            <b-col md="4">
+                                                <b-input-group prepend="Serie" class="mb-1">
+                                                    <b-form-input ref="inputSerie" type="text" style="text-transform: uppercase" maxlength="4" size="md" autocomplete="off" required/>
+                                                </b-input-group>
+                                            </b-col>
+                                            <label> - </label>
+                                            <b-col md="4">
+                                                <b-input-group prepend="Número" class="mb-1">
+                                                    <b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="11" autocomplete="off" required/>
+                                                </b-input-group>
+                                            </b-col>
+                                        </b-row>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col md="3">
+                                <b-form-checkbox
+                                button-variant="primary"
+                                v-model="EsNotaCred"
+                                :value="1"
+                                :unchecked-value="0">
+                                Nota de Crédito/Débito
+                                </b-form-checkbox>
+                            </b-col>
+                        </b-row>
                     </b-col>
                     <b-col md="7">
                         <b-row>
@@ -472,7 +526,7 @@
                                 </b-input-group>
                             </b-col>
                         </b-row>
-                        <b-row class="mt-2">
+                        <b-row v-if="FormaPago.IdFormaPago!=2 && FormaPago.IdFormaPago!=3" class="mt-2">
                             <b-col md="8">
                                 <h6>Caja y Bancos - DETALLE DE LOS MOVIMIENTOS DEL EFECTIVO</h6>
                                 <b-col md="12">
@@ -680,7 +734,8 @@ export default {
             ],
             efectivoId: 1,
             itemsMedioPago:[],
-            medioPagoId: 8
+            medioPagoId: 8,
+            EsNotaCred: 0
         }   
     },
     watch: {
@@ -1374,5 +1429,13 @@ export default {
 }
 .selectCosteo option{
     font-weight: bold;
+}
+
+.CampoNC{
+    padding: 6px;
+    border: 1px solid #F3F3F3;
+    box-shadow: 5px 3px rgb(147, 146, 146);
+    background-color: #F3F3F3;
+
 }
 </style>

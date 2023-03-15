@@ -3,6 +3,7 @@
       <b-container fluid class="bv-example-row" id="conten">
         <div class="contenido" v-if="libroIdSelec!=null">
            <compras v-if="libroIdSelec==8" :libroIdSelec="libroIdSelec" @cambioLibro="cargarLibros" ></compras>
+           <caja-banco v-if="libroIdSelec==1" :libroIdSelec="libroIdSelec" @cambioLibro="cargarLibros" ></caja-banco>
         </div>
 
         <b-modal id="modalRegistros" size="md" ref="modalRegistros" hide-footer hide-header :no-close-on-esc="true" no-close-on-backdrop>
@@ -30,6 +31,7 @@
 <script>
 import config from '@/store/config.js'
 import Compras from '@/components/contabilidad/Compras'
+import CajaBanco from '@/components/contabilidad/CajaBanco'
 
 export default {
   mounted() {
@@ -101,7 +103,8 @@ export default {
       },
   },
   components: {
-    Compras
+    Compras,
+    CajaBanco
   }
 }
 </script>
