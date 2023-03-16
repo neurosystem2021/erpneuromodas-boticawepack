@@ -51,7 +51,7 @@
             <b-row>
                 <b-col class="text-center">
                     <label>Generar Asientos</label>
-                    <b-button block size="sm">Asientos para balance</b-button>
+                    <b-button block size="sm" @click="abrirAsientos()">Asientos para balance</b-button>
                     <b-button block size="sm">Asientos para PLE</b-button>
                 </b-col>
                 <b-col>
@@ -351,7 +351,7 @@
                                             </b-col>
                                             <b-col md="6">
                                                 <b-input-group prepend="F. Emisión" class="mb-1">
-                                                    <b-form-input ref="inputFechaEmision" v-model="FechaDoc" type="date" size="md" required/>
+                                                    <b-form-input ref="inputFechaEmision" type="date" size="md" required/>
                                                 </b-input-group>
                                             </b-col>
                                         </b-row>
@@ -601,6 +601,62 @@
             </div>
             </b-form>
         </b-modal>
+        <b-modal id="modalAsientos" size="lg" ref="modalAsientos" hide-footer hide-header :no-close-on-esc="true" no-close-on-backdrop>
+            <b-row>
+                <b-col md="2">
+                    <b-form-select v-model="asientoSelect" :options="asientosNum" class="mb-3" size="md" required/>
+                </b-col>
+                <b-col md="4">
+                    <b-form-input ref="inputFechaEmision" type="date" size="md" required/>
+                </b-col>
+                <b-col md="4">
+                    {{ (mesSelect==1?'Enero':((mesSelect==2?'Febrero':((mesSelect==3?'Marzo':''))))) }}
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ord</th>
+                                <th>D/H</th>
+                                <th>Cuentas</th>
+                                <th>Descripcion</th>
+                                <th>Parcial</th>
+                                <th>Debe</th>
+                                <th>Haber</th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col md="5">
+
+                </b-col>
+                <b-col md="7">
+                    <b-row>
+                        <b-button class="ml-2">General 5 Dias</b-button>
+                        <b-button class="ml-2">General</b-button>
+                        <b-button class="ml-2">D. Clásico</b-button>
+                        <b-button class="ml-3" variant="danger" @click="()=>{$refs['modalAsientos'].hide()}">Salir</b-button>
+                    </b-row>
+                </b-col>
+            </b-row>
+        </b-modal>
   </div>
 </template>
 
@@ -631,6 +687,12 @@ export default {
                 { value: 11, text: 'NOVIEMBRE' },
                 { value: 12, text: 'DICIEMBRE' }
             ],
+            asientosNum: [
+                { value: 1, text: '1' },
+                { value: 2, text: '2' },
+                { value: 3, text: '3' },
+            ],
+            asientoSelect: 1,
             mesSelect: 1,
             selected: null,
             options: [
@@ -770,6 +832,9 @@ export default {
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
+        },
+        abrirAsientos(){
+            this.$refs['modalAsientos'].show()
         },
         cargarRegistros(mes){
             this.RegistrosData = []
