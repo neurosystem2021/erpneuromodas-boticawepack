@@ -257,7 +257,8 @@
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <b-input-group prepend="S/" append="Descuento">
+                                                <label class="ocularMovil2">Descuento:</label>
+                                                <b-input-group prepend="S/">
                                                     <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
@@ -1250,19 +1251,19 @@ export default {
 .big-text {
     font-size: 30px;
 }
-@media only screen and (max-width: 700px) {
+
+@media only screen and (max-width: 750px) {
   /* For desktop: */
     .ocularMovil{
         display: none;
     }
 }
 
-@media only screen and (min-width: 777px) and (max-width: 1800px) {
-  /* For desktop: */
+/*@media only screen and (min-width: 777px) and (max-width: 1800px) {
     .ancho{
         width: calc(100% - 300px)
     }
-}
+}*/
 
 @media only screen and (max-width: 750px) {
   /* For desktop: */

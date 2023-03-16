@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-form-group class="ocultarMovil">
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -28,6 +28,46 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+
+      <div class="mostrarMovil">
+      <b-form-group>
+      <b-row>
+        <b-col md="6">
+          <b-input-group>
+          <autocomplete
+            ref="autocompleteProducto2"
+            :url="APIProductos"
+            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40' }"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto2')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+        </b-input-group>
+        </b-col><br/>
+        </b-row>
+        <b-row>
+        <b-col md="6">
+          <b-input-group>
+          <input v-model="loadCode"
+                  @keydown.enter.prevent="loadBarcode"
+                  type="text"
+                  class="form-control"
+                  placeholder="Codigo de Barra" />
+          <b-input-group-append>
+            <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+          </b-input-group-append>
+        </b-input-group>
+        </b-col>
+      </b-row>
+      </b-form-group>
+      </div>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
@@ -333,7 +373,7 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
+          <!--<h6><i>Prof.</i></h6>
           <input 
             class="form-check-input" 
             type="checkbox" 
@@ -342,7 +382,7 @@
               $emit('onCheckProf', e)
               asignarDisabledProf(data.index, e)
             }"
-          />
+          />-->
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
@@ -830,6 +870,7 @@ export default {
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto2.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
       obj.precio = 0
@@ -853,6 +894,7 @@ export default {
       this.cant = prod.cantidad
       let obj = this.objProd
       this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto2.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
@@ -1085,6 +1127,9 @@ export default {
     justify-content: center;
     justify-items: center;
   }
+  .mostrarMovil{
+    display: none;
+  }
   @media only screen and (max-width: 1440px) {
     #modalCodigoBarra .modal-dialog {
       max-width: 50% !important;
@@ -1096,7 +1141,7 @@ export default {
       margin: 0 auto;
     }
   }
-  @media only screen and (max-width: 720px) {
+  @media only screen and (max-width: 750px) {
     #modalCodigoBarra .modal-dialog {
       max-width: 100% !important;
       margin: 5%;
@@ -1105,6 +1150,12 @@ export default {
       height: 15em;
       width: auto;
       margin: 0 auto;
+    }
+    .ocultarMovil {
+      display: none;
+    }
+    .mostrarMovil{
+      display: block;
     }
   }
   @media only screen and (max-width: 375px) {
