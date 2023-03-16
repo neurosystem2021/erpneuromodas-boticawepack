@@ -22,7 +22,8 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -88,6 +89,23 @@
         <b-row style="display:flex; justify-content:center; align-items:center">
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
         </b-row>
+      </b-modal>
+
+      <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer hide-header>
+        <div class="d-block text-center">
+          ESCANEE EL CODIGO DE BARRA
+          <br />
+          <br />
+          <div id="codigoBarraStyle">
+            <v-quagga
+              :onDetected="onBarcodeScanned"
+              :readerSize="readerSize"
+              :readerTypes="detecteds"
+              :patchSize="'medium'"
+              class="cameraBarra"
+            ></v-quagga>
+          </div>
+        </div>
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
@@ -405,6 +423,11 @@
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
+import sound from '../../static/beep.mp3'
+import Vue from "vue"
+import VueQuagga from "vue-quaggajs"
+
+Vue.use(VueQuagga)
 
 export default {
   mounted() {
@@ -412,6 +435,25 @@ export default {
   },
   data () {
     return {
+      readerSize: {
+        width: 640,
+        height: 480,
+      },
+      detecteds: [
+        "code_128_reader"
+        /*"ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader",*/
+      ],
+      result: "",
+      format: "",
       API: config.API,
       loadCode: '',
       pasteCode: false,
@@ -421,6 +463,7 @@ export default {
       vuelto: 0,
       pagocon: 0,
       cliente: {},
+      modalAbiertCode: false,
       preciosProd: [],
       objProd: {},
       cant: 0,
@@ -431,6 +474,14 @@ export default {
       productoNombre:'',
       productoUrl:''
     }
+  },
+  created() {
+    // Add barcode scan listener and pass the callback function
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
+  destroyed() {
+    // Remove listener when component is destroyed
+    this.$barcodeScanner.destroy();
   },
   watch: {
     sumatoriaTotal (sum) {
@@ -568,6 +619,28 @@ export default {
       this.productoUrl = url
       this.$refs['modalImagen'].show()
     },
+    abrirCodigoBarra(){
+      this.$refs['modalCodigoBarra'].show()
+      this.modalAbiertCode=true;
+      this.result="";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound)
+        audio.play()
+
+        if (this.result.length>0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs['modalCodigoBarra'].hide()
+          this.modalAbiertCode=false;
+        }
+      }
+      
+      // do something...
+    },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
@@ -652,7 +725,9 @@ export default {
     // },
 
     loadBarcode (e) {
-      e.preventDefault()
+      if (e) {
+        e.preventDefault()
+      }
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -989,6 +1064,19 @@ export default {
   #modalImagen .modal-dialog {
     max-width: 75% !important;
   }
+  #modalCodigoBarra .modal-dialog {
+    max-width: 25% !important;
+    margin: 5% auto;
+  }
+  #codigoBarraStyle video, canvas{
+    width: 100%;
+    height: 100%;
+  }
+  .cameraBarra {
+    height: 20em;
+    width: auto;
+    margin: 0 auto;
+  }
   .imagenGrande{
     width: 100%;
   }
@@ -996,5 +1084,38 @@ export default {
     display: flex;
     justify-content: center;
     justify-items: center;
+  }
+  @media only screen and (max-width: 1440px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 50% !important;
+      margin: 5% auto;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
+  }
+  @media only screen and (max-width: 720px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 100% !important;
+      margin: 5%;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
+  }
+  @media only screen and (max-width: 375px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 100% !important;
+      margin: 5%;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
   }
 </style>

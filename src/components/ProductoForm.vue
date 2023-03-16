@@ -6,7 +6,7 @@
     <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
-          <b-form-group>
+          <b-form-group class="ocularMovil">
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
@@ -831,4 +831,10 @@ export default {
   background: #dc3545;
   font-weight: bold;
 }
+  @media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+  }
 </style>

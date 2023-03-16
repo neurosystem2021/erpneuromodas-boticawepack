@@ -36,13 +36,15 @@
                     </div>
                 </b-col>
             </b-row>
+            <br class="ocularMovil2" /><br class="ocularMovil2"/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row style="margin-bottom:-10px">
                     <b-col md="7">
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <b-input-group prepend="Doc." class="mt-2">
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <b-input-group class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -73,9 +75,10 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="Alm." class="mt-2">
+                                    <label>Almacen:</label>
+                                    <b-input-group class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -95,9 +98,10 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="P.V." class="mt-2">
+                                    <label>Punto de Venta:</label>
+                                    <b-input-group class="mt-2">
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -115,7 +119,8 @@
                             </b-col>
                             <b-col md="12" style="margin-top:-10px">
                                 <b-form-group>
-                                    <b-input-group prepend="Cliente ">
+                                    <label>Cliente:</label>
+                                    <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             style="width:40%"
@@ -165,7 +170,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil2">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -188,7 +193,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil2">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -247,7 +252,7 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr>
+                                        <tr class="ocularMovil2">
                                             <td  class="text-center">Opciones</td>
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
@@ -294,7 +299,8 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                <label class="ocularMovil2">Proforma válido por:</label>
+                                                <b-input-group append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -403,6 +409,7 @@
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <br/><br/>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -1254,6 +1261,16 @@ export default {
   /* For desktop: */
     .ancho{
         width: calc(100% - 300px)
+    }
+}
+
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil2{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
     }
 }
 </style>

@@ -14,6 +14,8 @@ import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
 import VueSocketIO from 'vue-socket.io';
 import VueSweetalert2 from 'vue-sweetalert2';
+import VueQuagga from "vue-quaggajs";
+import VueBarcodeScanner from "vue-barcode-scanner";
 
 const browser = detect();
 
@@ -27,6 +29,8 @@ Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
 Vue.use(VueSweetalert2)
+Vue.use(VueQuagga)
+Vue.use(VueBarcodeScanner);
 Vue.use(VueAxios, axios)
 Vue.use(Toasted, {
   theme: "bubble",
