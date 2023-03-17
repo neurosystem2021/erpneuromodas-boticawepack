@@ -1928,7 +1928,7 @@ export default {
                     this.$toasted.show(response.data.error)    
                 }else {
                     try {
-                        this.venta.productos.map((pro)=>{
+                        /*this.venta.productos.map((pro)=>{
                             delete pro.nuevoPrecioContado
                             delete pro.Descripcion
                             delete pro.disabledProf
@@ -1996,10 +1996,11 @@ export default {
                         var top = (screen.height/2)-(800/2)
                         let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
                         window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
-                        
+                        */
                     } catch (error) {
   
                     }
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
                     this.$swal({
                         position: 'center',
                         icon: 'success',
@@ -2036,6 +2037,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' +this.ultimaVenta,'_blank');
+            return;
             let tablet = this.venta.vendedor.EsTablet
             if(tablet==1){
                 window.open('/imprimir/index.php?IdDocVenta=' +this.ultimaVenta+'&preview=1','_blank');
