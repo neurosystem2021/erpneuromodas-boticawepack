@@ -480,8 +480,8 @@ export default {
         height: 480,
       },
       detecteds: [
-        "code_128_reader"
-        /*"ean_reader",
+        "code_128_reader",
+        "ean_reader",
         "ean_8_reader",
         "code_39_reader",
         "code_39_vin_reader",
@@ -490,7 +490,7 @@ export default {
         "upc_e_reader",
         "i2of5_reader",
         "2of5_reader",
-        "code_93_reader",*/
+        "code_93_reader",
       ],
       result: "",
       format: "",
@@ -1115,7 +1115,7 @@ export default {
     height: 100%;
   }
   .cameraBarra {
-    height: 20em;
+    height: 25em;
     width: auto;
     margin: 0 auto;
   }
@@ -1136,7 +1136,7 @@ export default {
       margin: 5% auto;
     }
     .cameraBarra {
-      height: 15em;
+      height: 25em;
       width: auto;
       margin: 0 auto;
     }
@@ -1147,7 +1147,7 @@ export default {
       margin: 5%;
     }
     .cameraBarra {
-      height: 15em;
+      height: 25em;
       width: auto;
       margin: 0 auto;
     }
