@@ -482,8 +482,8 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
-                    { key: 'ProductoPresentacion', label: 'Anaquel' },
-                    { key: 'Descripcion', label: 'Descripción'},
+                    { key: 'ProductoPresentacion', label: 'Anaquel', class:'ocularMovil2' },
+                    { key: 'Descripcion', label: 'Descripción', class:'ocularMovil2' },
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -1251,7 +1251,8 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+</style>
+<style>
 @media only screen and (max-width: 750px) {
   /* For desktop: */
     .ocularMovil{

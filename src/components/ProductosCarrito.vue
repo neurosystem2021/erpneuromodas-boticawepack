@@ -196,8 +196,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
             type="number"
-            style="width: 95px"
-            class="form-control"
+            class="form-control tamaño"
             step="0.001"
             min="0"
             @input="(val) => {
@@ -236,10 +235,9 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 120px"
             min="0"
             step="0.00001"
-            class="form-control"
+            class="form-control tamaño"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             />
@@ -329,11 +327,10 @@
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
-            style="width:90px"
             type="number"
             min="0"
             step="0.01"
-            class="form-control"
+            class="form-control tamaño"
             value="0"
             @input="actualizarDescu(data.index)"/>
             <b-form-text>
@@ -1130,6 +1127,9 @@ export default {
   .mostrarMovil{
     display: none;
   }
+  .tamaño{
+    width: 100px;
+  }
   @media only screen and (max-width: 1440px) {
     #modalCodigoBarra .modal-dialog {
       max-width: 50% !important;
@@ -1156,6 +1156,9 @@ export default {
     }
     .mostrarMovil{
       display: block;
+    }
+    .tamaño {
+      width: 80px;
     }
   }
   @media only screen and (max-width: 375px) {
