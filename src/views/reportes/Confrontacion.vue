@@ -29,6 +29,16 @@
               </b-col>
           </b-row>
           <hr>
+          <b-row>
+            <b-col></b-col>
+            <b-col></b-col>
+            <b-col>
+              <b-form-group>
+                <label>Agregar por categoria:</label>
+                <b-form-select v-model="idCategoria" :options="categoriasSelect" v-on:change="setCategoria($event)" class="mb-3" size="md"/>
+              </b-form-group>
+            </b-col>
+          </b-row>
           <b-row>  
             <b-col  md="12">
               <carrito-confrontacion 
@@ -57,6 +67,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+    this.getCategorias();
   },
   data () {
     return {
@@ -72,7 +83,9 @@ export default {
               { key: 'acciones', label: ''}
           ]
       },
-      almacen:{}
+      almacen:{},
+      idCategoria:0,
+      categoriasSelect:[ { value: 0, text: 'SELECCIONE' }]
     }
   },
   computed: {
@@ -92,6 +105,30 @@ export default {
     }),
     afe (e) {
 return false
+    },
+    getCategorias(){
+      this.categoriasSelect = []
+      this.categoriasSelect.push({ value: 0, text: 'SELECCIONE' })
+      this.axios.get(this.API + 'categorias?limit=300&q=').then(r => {
+        if (r.data) {
+          r.data.map(cat=>{
+            this.categoriasSelect.push({ value: cat.IdProductoCategoria, text: cat.ProductoCategoria })
+          })
+        }
+      })
+    },
+    setCategoria(val){
+      this.axios.get(this.API + 'productos/categoria/carga', {
+            params: {
+                IdCategoria: val,
+            }
+        }).then((response) => {
+            this.idCategoria = 0
+            response.data.map((item) => {
+                this.add([item, () => {
+              }, { setPrecioCosto: true }, false, false])
+            })              
+        })
     },
     onReset (evt) {
       evt.preventDefault();

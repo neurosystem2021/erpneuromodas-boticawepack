@@ -180,6 +180,18 @@
             }"
             placeholder="Cantidad"/>
         </template>
+        <template slot="preciocosto" slot-scope="data">
+          <input
+            v-model="productos[data.index].PrecioCosto"
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            class="form-control"
+            placeholder="Precio"
+            @input="setPvp(data.index)"
+            />
+        </template>
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].preciof"

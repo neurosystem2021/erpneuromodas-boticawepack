@@ -237,7 +237,7 @@ export default {
               //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
               { key: 'CodigoBarra', label:'CODIGO' },
               { key: 'Producto', label: 'PRODUCTO' },
-              { key: 'PrecioCosto' , label:'P. PROVEEDOR' },
+              { key: 'preciocosto' , label:'P. PROVEEDOR' },
               { key: 'precio' , label:'FLETES S/' },
               { key: 'fleteusd' , label:'FLETES USD' },
               { key: 'seg' , label:'SEGUROS' },
