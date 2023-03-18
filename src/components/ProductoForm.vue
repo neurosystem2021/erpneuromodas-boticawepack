@@ -303,7 +303,7 @@
       </b-row>
 
       <hr>
-      <b-row v-if="false">
+      <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
             <b-form-group>
@@ -324,6 +324,9 @@
                 step="0.001"
                 class="form-control"
                 />
+            </b-form-group>
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</label>
             </b-form-group>
           </b-card>
         </b-col>

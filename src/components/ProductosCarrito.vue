@@ -103,6 +103,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
+            :disabled="isVentas? true : false"
             type="number"
             style="width: 85px"
             min="0"
@@ -646,19 +647,19 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
 
-     // if(!this.isVentas){
+      if(!this.isVentas){
         this.setProductoUni(obj)
-     //   return
-     // }
+        return
+      }
 
-      /*if(fPP.length==4){
+      if(fPP.length==4){
         obj.cantxPrecio=1
         this.setProductoUni(obj)
         return
       }
 
       this.$refs['modalCant'].show()
-      this.objProd = obj*/
+      this.objProd = obj
     },  
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
@@ -671,21 +672,21 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
-      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      //let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       this.add([obj, () => {
-        if(existe){
+        /*if(existe){
             this.$toasted.info('El producto ya está en la lista')
         }else{
           this.$toasted.success('Producto añadido correctamente')
-        }
+        }*/
         this.$emit('onAddProducto', obj)
-  
+        this.$toasted.success('Producto añadido correctamente')
       },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
       this.actualizarProd(obj)
-      //this.$refs.barcodeInput.focus()
+      this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
