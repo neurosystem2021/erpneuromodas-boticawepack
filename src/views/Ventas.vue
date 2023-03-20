@@ -128,13 +128,13 @@
                             Puntos del cliente
                         </b-form-group>
                         <b-input-group prepend="Puntos" :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0">
-                            <b-form-input
+                            <input
                                 v-model="puntosAplicados"
                                 min="0"
                                 :max="venta.cliente.Puntos"
                                 @input="aplicarPuntos"
                                 type="number"
-                            ></b-form-input>
+                                class="form-control"/>
                         </b-input-group>
                         <b-form-text v-if="descuentoPuntos.ValorPunto">
                            1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
@@ -218,13 +218,14 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        step="0.01"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        class="form-control"/>
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -266,13 +267,13 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"/>
                                             </td>
                                         </tr>
                                         <tr>
@@ -731,7 +732,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('TICKET')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')

@@ -79,13 +79,15 @@
                             autocomplete="off"></b-form-input>
                     </b-col>
                     <b-col md="3">
-                        <b-form-input
+                        <input
                             required
                             v-model="importeRetiro"
                             type="number"
                             placeholder="Importe"
                             @input="validaRetiro"
-                            autocomplete="off"></b-form-input>
+                            step="0.01"
+                            autocomplete="off"
+                            class="form-control"/>
                     </b-col>
                     <b-col md="2" >
                         <b-form-group>
