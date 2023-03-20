@@ -108,10 +108,16 @@
                         <th>EB</th>
                         <th>TipoCam</th>
                         <th>Reg</th>
-                        <th>Total</th>
-                        <th>IGV</th>
-                        <th>Base Imp</th>
-                        <th>No Grav</th>
+                        <th style="min-width: 80px">Total</th>
+                        <th style="min-width: 80px">IGV</th>
+                        <th style="min-width: 80px">Base Imp</th>
+                        <th style="min-width: 80px">No Grav</th>
+                        <th>CosteoD</th>
+                        <th>Cost1</th>
+                        <th>CosteoD</th>
+                        <th>Cost2</th>
+                        <th>CosteoH</th>
+                        <th>Cost3</th>
                         <th style="min-width: 100px">F. Ven.</th>
                         <th>Periodo</th>
                         <th>Caja</th>
@@ -126,30 +132,36 @@
                     <tr v-for="(reg, index) in RegistrosData" :key="index">
                         <td>{{ reg.FechaEmision }}</td>
                         <td>01</td>
-                        <td>F001</td>
-                        <td>58</td>
+                        <td style="text-transform: uppercase;">{{  reg.Serie }}</td>
+                        <td>{{ reg.Numero }}</td>
                         <td>{{ reg.Proveedor }}</td>
-                        <td>100.00</td>
-                        <td>18.00</td>
+                        <td>{{ reg.OpcionCuadro==1?reg.BImp:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==1?reg.Igv:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==2?reg.BImp:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==2?reg.Igv:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==3?reg.BImp:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==3?reg.Igv:'' }}</td>
+                        <td>{{ reg.OpcionCuadro==5?reg.NoGrav:'' }}</td>
+                        <td></td>
+                        <td>{{ reg.Total.toFixed(2) }}</td>
+                        <td></td>
+                        <td>{{ reg.IdMoneda }}</td>
                         <td></td>
                         <td></td>
+                        <td>{{ reg.TipoCambio.toFixed(4) }}</td>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>{{ reg.TotalCuenta }} - {{ reg.TotalCuentaOpc }}</td>
+                        <td>{{ reg.IgvCuenta }} - {{ reg.IgvCuentaOpc }}</td>
+                        <td>{{ reg.BImpCuenta }} - {{ reg.BImpCuentaOpc }}</td>
+                        <td>{{ reg.NoGravCuenta }} - {{ reg.NoGravCuentaOpc }}</td>
+                        <td>{{ reg.CosteoD1 }}</td>
+                        <td>{{ reg.CosteoD1Cuenta }}</td>
+                        <td>{{ reg.CosteoD2 }}</td>
+                        <td>{{ reg.CosteoD2Cuenta }}</td>
+                        <td>{{ reg.CosteoH1 }}</td>
+                        <td>{{ reg.CosteoH1Cuenta }}</td>
+                        <td>{{ reg.FechaVen }}</td>
+                        <td>{{ reg.Periodo }}</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -165,15 +177,15 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
+                        <td><b>{{ totalCuadroBImp1.toFixed(2) }}</b></td>
+                        <td><b>{{ totalCuadroIgv1.toFixed(2) }}</b></td>
+                        <td><b>{{ totalCuadroBImp2.toFixed(2)  }}</b></td>
+                        <td><b>{{ totalCuadroIgv2.toFixed(2) }}</b></td>
+                        <td><b>{{ totalCuadroBImp3.toFixed(2)  }}</b></td>
+                        <td><b>{{ totalCuadroIgv3.toFixed(2) }}</b></td>
+                        <td><b>{{ totalCuadroNoGrav.toFixed(2) }}</b></td>
+                        <td></td>
+                        <td><b>{{ totalCuadroTotal.toFixed(2) }}</b></td>
                     </tr>
                 </tfoot>
             </table>
@@ -718,6 +730,7 @@ export default {
                 Direccion:''
             },
             Moneda: {
+                IdMoneda: 1,
                 Moneda: 'NUEVOS SOLES',
                 TipoCambio: 1
             },
@@ -808,7 +821,62 @@ export default {
         libroIdSelec: Number
     },
     computed: {
-
+        totalCuadroBImp1 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==1 ) total += rd.BImp
+            });
+            return total
+        },
+        totalCuadroBImp2 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==2) total += rd.BImp
+            });
+            return total
+        },
+        totalCuadroBImp3 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==3) total += rd.BImp
+            });
+            return total
+        },
+        totalCuadroIgv1 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==1 ) total += rd.Igv
+            });
+            return total
+        },
+        totalCuadroIgv2 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==2) total += rd.Igv
+            });
+            return total
+        },
+        totalCuadroIgv3 () {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==3) total += rd.Igv
+            });
+            return total
+        },
+        totalCuadroNoGrav() {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+                if (rd.OpcionCuadro==5) total += rd.NoGrav
+            });
+            return total
+        },
+        totalCuadroTotal() {
+            let total = 0
+            this.RegistrosData.forEach(rd => {
+               total += rd.Total
+            });
+            return total
+        },
     },
     methods: {
         validarTecla(e){
@@ -1038,6 +1106,7 @@ export default {
                 Direccion:''
             }
             this.Moneda= {
+                IdMoneda: 1,
                 Moneda: 'NUEVOS SOLES',
                 TipoCambio: 1
             }
@@ -1337,6 +1406,7 @@ export default {
                 Serie: this.Comprobante.Serie,
                 Numero: this.Comprobante.Numero,
                 Moneda: this.Moneda.Moneda,
+                IdMoneda: this.Moneda.IdMoneda,
                 TipoCambio: this.Moneda.TipoCambio,
                 IgvPorcentaje: this.IgvPorcentaje,
                 TotalCuenta: this.CuentasCalculo.Total,
@@ -1349,9 +1419,9 @@ export default {
                 NoGravCuentaOpc: this.CuentasCalculo.ExoOpc,
                 CosteoD1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuentaMonto:this.costoSelecMonto1)),
                 CosteoD1Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuenta:this.costoSelec1)),
-                CosteoD2: (this.opcRegistro==3?0:(this.opcRegistro==1?0:this.costoSelec2)),
+                CosteoD2: (this.opcRegistro==3?0:(this.opcRegistro==1?0:this.costoSelecMonto2)),
                 CosteoD2Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?'':this.costoSelec2)),
-                CosteoH1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.destinoCuentaMonto:this.costoSelecMonto1)),
+                CosteoH1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.destinoCuentaMonto:this.costoCalcularFinal)),
                 CosteoH1Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?this.destinoCuenta:this.totalCostoCuenta)),
 
             }
