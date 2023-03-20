@@ -76,6 +76,7 @@
             <th class="no">#</th>
             <th></th>
             <th class="desc">DESCRIPCIÓN</th>
+            <th class="qty">MAR.</th>
             <th class="qty">CANT.</th>
             <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
@@ -86,6 +87,7 @@
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
+            <td class="qty" style="font-size:0.9rem">{{ prod.ProductoMarca }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:1.1rem">
