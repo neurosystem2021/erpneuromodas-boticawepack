@@ -355,7 +355,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3" v-show="tipo != 'mov'">
+    <b-col md="3" v-show="tipo != 'mov' || opcionCarrito">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -446,6 +446,7 @@ export default {
   props: {
     tipoDocSunat: String,
     isVentas: Boolean,
+    opcionCarrito: Boolean,
     tipoVenta:Number,
     tipo: String,
     setPrecio: Boolean,

@@ -614,12 +614,12 @@
             </b-form>
         </b-modal>
         <b-modal id="modalAsientos" size="lg" ref="modalAsientos" hide-footer hide-header :no-close-on-esc="true" no-close-on-backdrop>
-            <b-row>
+            <b-row style="font-size: 0.8rem;">
                 <b-col md="2">
-                    <b-form-select v-model="asientoSelect" :options="asientosNum" class="mb-3" size="md" required/>
+                    <b-form-select v-model="asientoSelect" :options="asientosNum" v-on:change="setAsientoTabla($event)" class="mb-3" size="md" required/>
                 </b-col>
                 <b-col md="4">
-                    <b-form-input ref="inputFechaEmision" type="date" size="md" required/>
+                    <b-form-input ref="inputFechaEmision" type="date" v-model="FechaAsiento" size="md" required/>
                 </b-col>
                 <b-col md="4">
                     {{ (mesSelect==1?'Enero':((mesSelect==2?'Febrero':((mesSelect==3?'Marzo':''))))) }}
@@ -627,7 +627,7 @@
             </b-row>
             <b-row>
                 <b-col>
-                    <table class="table table-striped">
+                    <table class="table table-striped tablaAsientosContables">
                         <thead>
                             <tr>
                                 <th>Ord</th>
@@ -641,11 +641,11 @@
 
                         </thead>
                         <tbody>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                            <tr v-for="(asiento, index) in AsientosData" :key="index">
+                                <td>{{ asiento.Orden }}</td>
+                                <td>{{ asiento.AsientoOpcDH }}</td>
+                                <td>{{ asiento.Cuenta }}</td>
+                                <td>{{ asiento.Nombre }}</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -810,7 +810,9 @@ export default {
             efectivoId: 1,
             itemsMedioPago:[],
             medioPagoId: 8,
-            EsNotaCred: 0
+            EsNotaCred: 0,
+            AsientosData: [],
+            FechaAsiento: this.$moment().format("YYYY-MM-DD"),
         }   
     },
     watch: {
@@ -901,7 +903,27 @@ export default {
             // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
         },
-        abrirAsientos(){
+        setAsientoTabla(val){
+            this.obtenerAsientoTabla(val)
+        },
+        obtenerAsientoTabla(val){
+            this.AsientosData = []
+            this.axios.get(this.API + 'contabilidad/asiento',{
+                params: {
+                    NumAsiento: val,
+                }
+            })
+            .then((r) => {
+                this.AsientosData = r.data
+                
+            })
+            .catch((error)=>{
+                this.AsientosData = []
+                this.$toasted.error('Ha ocurrido un error')
+            })
+        },
+        abrirAsientos(val){
+            this.obtenerAsientoTabla(1)
             this.$refs['modalAsientos'].show()
         },
         cargarRegistros(mes){
@@ -1572,5 +1594,12 @@ export default {
     box-shadow: 5px 3px rgb(147, 146, 146);
     background-color: #F3F3F3;
 
+}
+
+.tablaAsientosContables th {
+    font-size: 0.8rem;
+}
+.tablaAsientosContables td {
+    font-size: 0.8rem;
 }
 </style>

@@ -193,7 +193,7 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :fields="carrito.fields"></productos-carrito>
+                tipo="mov" :opcionCarrito="true" :tipoMov="this.movimiento.movimientoTipo.Tipo" :fields="carrito.fields"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">

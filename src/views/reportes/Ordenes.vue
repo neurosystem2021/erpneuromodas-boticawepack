@@ -48,18 +48,20 @@
                   <th>Total</th>
                   <th>Ver</th>
                   <th>Reporte</th>
+                  <th>Accion</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(prod, i) in productos" :key="i">
-                  <td style="width: 5% !important">{{ prod.IdOrdenCompra }}</td>
-                  <td>{{ prod.Correlativo }}</td>
-                  <td>{{ prod.FechaOrdenCompra }}</td>
-                  <td>{{ prod.Ruc }}</td>
-                  <td>{{ prod.Proveedor }}</td>
-                  <td>S/ {{ prod.Total | moneda }}</td>
-                  <td><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
-                  <td><a class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra?IdOrdenCompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}" style="width: 5% !important">{{ prod.IdOrdenCompra }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}">{{ prod.Correlativo }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}">{{ prod.FechaOrdenCompra }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}">{{ prod.Ruc }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}">{{ prod.Proveedor }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}">S/ {{ prod.Total | moneda }}</td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}"><a class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra?IdOrdenCompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
+                  <td :class="{'table-danger': prod.AnuladoOrden == 1}" align="center"><b-button variant="danger" v-if="prod.AnuladoOrden==0" @click="anularOrden(prod)"><i class="fas fa-times"></i> Anular</b-button><span v-else>----</span></td>
                 </tr>
               </tbody>
             </table>
@@ -217,6 +219,45 @@ export default {
       }).then((response) => {
           this.productos = response.data
       })
+    },
+    anularOrden(orden){
+      this.$swal({
+        target: document.getElementById('conten'),
+        title: 'Se anulará la orden de compra <strong>'+orden.Correlativo+'</strong> del proveedor <strong>'+orden.Proveedor+'</strong>',
+        text:'¿Está seguro?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, anular',
+        cancelButtonText: 'No, atrás'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              this.inProgress = true
+              this.axios.post(this.API + 'ordencompra/anular', {IdOrdenCompra: orden.IdOrdenCompra})
+              .then((response) => {
+                if(response.data){
+                  this.$swal({
+                    position: 'center',
+                    icon: 'success',
+                    title: '¡La orden de compra fue anulada correctamente!',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Ok',
+                    target: document.getElementById('conten'),
+                    confirmButtonColor:'#1D9828',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                  })
+
+                  this.verArticulos()
+                }
+              })
+              .catch((error) => {
+                  this.$toasted.error('Ha ocurrido un error, vuelva a intentarlo')
+                  this.inProgress = false
+              })
+            }
+        })
     }
   }
 }
