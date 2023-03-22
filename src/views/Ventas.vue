@@ -5,35 +5,36 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
+        <b-container fluid class="bv-example-row">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" ></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
                 </div>
             </div>
             <br /><br />
+            <br class="ocularMovil2" /><br class="ocularMovil2"/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
                         <b-row>
                             <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <label>Tipo de Venta: <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -63,7 +64,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil2">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -84,7 +85,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil2">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -156,7 +157,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil2">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -179,7 +180,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil2">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -238,12 +239,13 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr>
+                                        <tr class="ocularMovil2">
                                             <td  class="text-center">Opciones</td>
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <b-input-group prepend="S/" append="Descuento">
+                                                <label class="ocularMovil2">Descuento:</label>
+                                                <b-input-group prepend="S/">
                                                     <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
@@ -286,7 +288,8 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válidez: " append="días">
+                                                <label class="ocularMovil2">Proforma válido por:</label>
+                                                <b-input-group append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -394,6 +397,7 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <br/><br/>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -1142,4 +1146,26 @@ export default {
     font-size: 30px;
 }
 
+</style>
+<style>
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+}
+/*@media only screen and (min-width: 777px) and (max-width: 1800px) {
+    .ancho{
+        width: calc(100% - 300px)
+    }
+}*/
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil2{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
+    }
+}
 </style>

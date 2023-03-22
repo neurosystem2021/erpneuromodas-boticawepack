@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-form-group class="ocultarMovil">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -25,11 +25,55 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
+
+      <div class="mostrarMovil">
+        <b-form-group>
+        <b-row>
+        <b-col md="6">
+        <label>Agregar Productos:</label>
+        <b-input-group>
+          <autocomplete
+            ref="autocompleteProducto2"
+            :url="APIProductos"
+            :customParams="{ limit: '25' }"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto2')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+        </b-input-group>
+        </b-col><br/><br/>
+        </b-row>
+        <b-row>
+        <b-col md="6">
+          <b-input-group>
+          <input v-model="loadCode"
+                  :disabled="isNota"
+                  @keydown.enter.prevent="loadBarcode"
+                   ref="barcodeInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="Codigo de Barra" />
+          <b-input-group-append>
+            <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+          </b-input-group-append>
+        </b-input-group>
+        </b-col>
+        </b-row>
+        <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
+      </b-form-group>
+      </div>
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
@@ -863,6 +907,7 @@ export default {
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
       this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto2.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
@@ -897,6 +942,7 @@ export default {
       let obj = this.objProd
       obj.subt = ''
       this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto2.setValue('')
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
@@ -1084,5 +1130,23 @@ export default {
     display: flex;
     justify-content: center;
     justify-items: center;
+  }
+  .mostrarMovil{
+    display: none;
+  }
+  
+  @media only screen and (max-width: 750px) {
+    .ocultarMovil {
+      display: none;
+    }
+    .mostrarMovil{
+      display: block;
+    }
+    #modalCantidad .modal-dialog{
+      max-width: 100% !important;
+    }
+    #modalImagen .modal-dialog {
+      max-width: 100% !important;
+    }
   }
 </style>
