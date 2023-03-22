@@ -27,6 +27,7 @@
                 </div>
             </div>
             <br /><br />
+            <br class="S_linea" /><br class="S_linea"/>
             <br class="ocularMovil2" /><br class="ocularMovil2"/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
@@ -1148,6 +1149,9 @@ export default {
 
 </style>
 <style>
+.S_linea {
+    display: none;
+}
 @media only screen and (max-width: 750px) {
   /* For desktop: */
     .ocularMovil{
@@ -1166,6 +1170,9 @@ export default {
     }
     .mostrarSerie{
       display: inline !important;
+    }
+    .S_linea {
+        display: block;
     }
 }
 </style>
