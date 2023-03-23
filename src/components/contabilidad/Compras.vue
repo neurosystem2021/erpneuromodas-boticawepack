@@ -150,10 +150,10 @@
                         <td></td>
                         <td>{{ reg.TipoCambio.toFixed(4) }}</td>
                         <td></td>
-                        <td>{{ reg.TotalCuenta }} - {{ reg.TotalCuentaOpc }}</td>
-                        <td>{{ reg.IgvCuenta }} - {{ reg.IgvCuentaOpc }}</td>
-                        <td>{{ reg.BImpCuenta }} - {{ reg.BImpCuentaOpc }}</td>
-                        <td>{{ reg.NoGravCuenta }} - {{ reg.NoGravCuentaOpc }}</td>
+                        <td>{{ reg.TotalCuenta }} - {{ reg.TotalCuentaOpcDH }}</td>
+                        <td>{{ reg.IgvCuenta }} - {{ reg.IgvCuentaOpcDH }}</td>
+                        <td>{{ reg.BImpCuenta }} - {{ reg.BImpCuentaOpcDH }}</td>
+                        <td>{{ reg.NoGravCuenta }} - {{ reg.NoGravCuentaOpcDH }}</td>
                         <td>{{ reg.CosteoD1 }}</td>
                         <td>{{ reg.CosteoD1Cuenta }}</td>
                         <td>{{ reg.CosteoD2 }}</td>
@@ -192,7 +192,7 @@
         </b-col>
     </b-row>
         <b-modal id="modalCompras" size="lg" ref="modalCompras" hide-footer hide-header :no-close-on-esc="true" no-close-on-backdrop>
-            <b-form @submit="guardarCompra">  
+            <b-form @submit="guardarCompra" @keydown.enter="prevent">  
             <div class="d-block">
                 <b-row>
                     <b-col md="5">
@@ -401,38 +401,38 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 5%;">Total</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Total" @input="calcularMontos" step="0.01"   autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Total"  pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Total" @input="calcularMontos" step="0.01"   autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Total"  pattern="[0-9]+" style="font-weight: bold;" autocomplete="off"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.TotalOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">I.G.V.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Igv" step="0.01" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Igv" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Igv" step="0.01" autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Igv" pattern="[0-9]+"  autocomplete="off" style="font-weight: bold;"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.IgvOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">Otros</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Otros" step="0.01" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" value="40189" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Otros" step="0.01" autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" value="40189" pattern="[0-9]+"  autocomplete="off" style="font-weight: bold;"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" value="D" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">B. Imp</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="BImp" step="0.01" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImp" v-on:keyup="setBImp" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="BImp" step="0.01" autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImp" v-on:keyup="setBImp" pattern="[0-9]+"  autocomplete="off" style="font-weight: bold;"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.BImpOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr>
                                             <td style="width: 5%;">No Grav.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="NoGrav" step="0.01" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Exo" v-on:keyup="setExo" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="NoGrav" step="0.01" autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Exo" v-on:keyup="setExo" pattern="[0-9]+"  autocomplete="off" style="font-weight: bold;"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.ExoOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                         <tr style="border-top: 1px solid black">
                                             <td style="width: 5%;">I.S.C.</td>
-                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Isc" step="0.01" autocomplete="off"/></td>
-                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Isc" pattern="[0-9]+"  autocomplete="off"/></td>
+                                            <td style="width: 50%;"><input class="form-control" type="number" v-model="Isc" step="0.01" autocomplete="off" style="font-weight: bold;"/></td>
+                                            <td style="width: 30%;"><input class="form-control" type="text" v-model="CuentasCalculo.Isc" pattern="[0-9]+"  autocomplete="off" style="font-weight: bold;"/></td>
                                             <td style="width: 15%;"><input class="form-control" type="text" v-model="CuentasCalculo.IscOpc" style="font-weight:bold; text-transform:uppercase" maxlength="1"  autocomplete="off"/></td>
                                         </tr>
                                     </tbody>
@@ -538,7 +538,7 @@
                                 </b-input-group>
                             </b-col>
                         </b-row>
-                        <b-row v-if="FormaPago.IdFormaPago!=2 && FormaPago.IdFormaPago!=3" class="mt-2">
+                        <b-row v-if="FormaPago.IdFormaPago!=2 && FormaPago.IdFormaPago!=3 && ModoPago.IdModoPago!=3" class="mt-2">
                             <b-col md="8">
                                 <h6>Caja y Bancos - DETALLE DE LOS MOVIMIENTOS DEL EFECTIVO</h6>
                                 <b-col md="12">
@@ -552,8 +552,8 @@
                                                 </tr>
                                                 <tr>
                                                     <td width="50%"><b-form-select class="selectCosteo" v-model="efectivoId" :options="itemsEfectivo" size="md"/></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" /></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" v-model="debeCuentaCB" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
+                                                    <td><b-form-input type="text" size="md" v-model="haberCuentaCB" @change="obtenerCuentaCB" min="0" pattern="^[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Nombre de la Cta Contable</td>
@@ -561,9 +561,9 @@
                                                     <td>Acreedor</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="text" size="md" readonly autocomplete="off" /></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" v-model="nombreCuentaCB" size="md" readonly autocomplete="off" style="font-weight: bold;"/></td>
+                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
+                                                    <td><b-form-input type="text" v-model="montoAcreedor" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Tipo Medio de Pago</td>
@@ -571,7 +571,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td><b-form-select class="selectCosteo" v-model="medioPagoId" :options="itemsMedioPago" v-on:change="setMedioPago($event)" size="md"  /></td>
-                                                    <td colspan="2"><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td colspan="2"><b-form-input type="text" v-model="tipoMedioPago" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -805,7 +805,7 @@ export default {
             opcRegistro:0,
             RegistrosData:[],
             itemsEfectivo: [
-                { value: 1, text: 'EFECTIVO' },
+                { value: 1, text: 'EFECTIVO', cuenta:'10111' },
             ],
             efectivoId: 1,
             itemsMedioPago:[],
@@ -813,6 +813,11 @@ export default {
             EsNotaCred: 0,
             AsientosData: [],
             FechaAsiento: this.$moment().format("YYYY-MM-DD"),
+            haberCuentaCB:'42121',
+            debeCuentaCB:'10111',
+            nombreCuentaCB:'EMITIDAS',
+            montoAcreedor: null,
+            tipoMedioPago:'EFECTIVO'
         }   
     },
     watch: {
@@ -897,7 +902,11 @@ export default {
             this.cargarRegistros(mes)
         },
         setMedioPago(medio){
-            console.log(medios);
+            if(medio==8){
+                this.tipoMedioPago = "EFECTIVO"
+            }else{
+                this.tipoMedioPago = ''
+            }
         },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
@@ -1224,7 +1233,10 @@ export default {
                 <table id="table-render" style="width: 500px; text-align: left;  padding:0; margin:0"">
                     <tbody>
                     <tr style="padding:0; margin:0">
-                        <td><b style="font-size: 0.75rem">${data.TipoOperacionDet}</b></td>
+                        <td style="width: 425px"><b style="font-size: 0.75rem">${data.TipoOperacionDet}</b></td>
+                        <td style="width: 25px" align:"center"><b style="font-size: 0.75rem">${data.IdTipoOperacionDet}</b></td>
+                        <td style="width: 25px" align:"center"><b style="font-size: 0.75rem">${data.CalculaIgv}</b></td>
+                        <td style="width: 25px" align:"center"><b style="font-size: 0.75rem">${data.OpcionCuadro}</b></td>
                     </tr>
                     </tbody>
                 </table>   
@@ -1382,11 +1394,37 @@ export default {
         setModoPago(obj){
             this.ModoPago = obj
         },
+        prevent (evt) {
+            if (evt.target.tagName !== 'TEXTAREA') {
+                evt.preventDefault();
+            }
+        },
+        obtenerCuentaCB(){
+            if((''+this.haberCuentaCB).trim().length==5){
+                this.axios.get(this.API + 'contabilidad/cuenta', {
+                    params: {
+                        Cuenta: (''+this.haberCuentaCB).trim()
+                    }
+                })
+                .then((r) => {
+                    if(r.data){
+                        this.nombreCuentaCB = r.data.Nombre
+                        this.$toasted.info(r.data.Nombre, { 
+                        position: "top-right", 
+                    })
+                    }
+                })
+                .catch((error)=>{
+                })  
+            }
+    
+        },
         nuevaCompra(){
             this.initModal()
             this.$refs['modalCompras'].show()
         },
         calcularMontos(){
+            this.montoAcreedor = this.Total
             if(this.operacionDet.IdTipoOperacionDet>0 && this.CuentasCalculo.IdOperacionDetCuenta!=null){
 
                 if(this.CuentasCalculo.CalculaIgv==1){
@@ -1403,7 +1441,8 @@ export default {
         editarCompra(){
 
         },
-        guardarCompra(){
+        guardarCompra(evt){
+            evt.preventDefault();
             let data = {
                 FechaDoc:this.FechaDoc,
                 Anio: 2023,
@@ -1432,13 +1471,13 @@ export default {
                 TipoCambio: this.Moneda.TipoCambio,
                 IgvPorcentaje: this.IgvPorcentaje,
                 TotalCuenta: this.CuentasCalculo.Total,
-                TotalCuentaOpc: this.CuentasCalculo.TotalOpc,
+                TotalCuentaOpc: ((''+this.CuentasCalculo.TotalOpc).trim()=='D'?0:1),
                 IgvCuenta: this.CuentasCalculo.Igv,
-                IgvCuentaOpc: this.CuentasCalculo.IgvOpc,
+                IgvCuentaOpc: ((''+this.CuentasCalculo.IgvOpc).trim()=='D'?0:1),
                 BImpCuenta: this.CuentasCalculo.BImp,
-                BImpCuentaOpc: this.CuentasCalculo.BImpOpc,
+                BImpCuentaOpc: ((''+this.CuentasCalculo.BImpOpc).trim()=='D'?0:1),
                 NoGravCuenta: this.CuentasCalculo.Exo,
-                NoGravCuentaOpc: this.CuentasCalculo.ExoOpc,
+                NoGravCuentaOpc: ((''+this.CuentasCalculo.ExoOpc).trim()=='D'?0:1),
                 CosteoD1: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuentaMonto:this.costoSelecMonto1)),
                 CosteoD1Cuenta: (this.opcRegistro==3?0:(this.opcRegistro==1?this.asientoCuenta:this.costoSelec1)),
                 CosteoD2: (this.opcRegistro==3?0:(this.opcRegistro==1?0:this.costoSelecMonto2)),
