@@ -243,7 +243,7 @@
                                 <b-row>
                                     <b-col md="6">
                                         <b-input-group prepend="F. Emisión" class="mb-1">
-                                            <b-form-input ref="inputFechaEmision" v-model="FechaDoc" type="date" size="md" required/>
+                                            <b-form-input ref="inputFechaEmision" v-model="FechaDoc" type="date" size="md" required @keyup.enter.native="$refs.inputTipoComprob.$refs.input.focus()"/>
                                         </b-input-group>
                                     </b-col>
                                 </b-row>
@@ -266,13 +266,13 @@
                                 <b-row>
                                     <b-col md="4">
                                         <b-input-group prepend="Serie" class="mb-1">
-                                            <b-form-input ref="inputSerie" type="text" v-model="Comprobante.Serie" style="text-transform: uppercase" maxlength="4" size="md" autocomplete="off" required/>
+                                            <b-form-input ref="inputSerie" type="text" v-model="Comprobante.Serie" style="text-transform: uppercase" @change="obtenerGlosa" maxlength="4" size="md" autocomplete="off" required @keyup.enter.native="$refs.inputNumero.$refs.input.focus()"/>
                                         </b-input-group>
                                     </b-col>
                                     <label> - </label>
                                     <b-col md="5">
                                         <b-input-group prepend="Número" class="mb-1">
-                                            <b-form-input type="text" v-model="Comprobante.Numero" size="md" min="0" pattern="[0-9]+" maxlength="11" autocomplete="off" required/>
+                                            <b-form-input ref="inputNumero" type="text" v-model="Comprobante.Numero" @change="obtenerGlosa" size="md" min="0" pattern="[0-9]+" maxlength="11" autocomplete="off" required @keyup.enter.native="$refs.inputProveedorRuc.$refs.input.focus()"/>
                                         </b-input-group>
                                     </b-col>
                                 </b-row>
@@ -285,8 +285,8 @@
                                 <b-row>
                                     <b-col md="8">
                                         <b-input-group prepend="RUC" class="mb-1">
-                                            <b-form-input type="text" maxlength="11" size="md"  v-model="proveedor.Ruc" @change="validarTipoDocRuc" required autocomplete="off"/>
-                                            <b-button size="sm" @click="validarTipoDocRuc" class="ml-1" variant="primary"><i class="fas fa-search fa-sm"></i></b-button>
+                                            <b-form-input type="text" maxlength="11" size="md"  v-model="proveedor.Ruc" @change="validarTipoDocRuc" required autocomplete="off" ref="inputProveedorRuc" @keyup.enter.native="$refs.buttonBuscarProveedor.focus()"/>
+                                            <b-button size="sm" @click="validarTipoDocRuc" ref="buttonBuscarProveedor" class="ml-1" variant="primary" @keyup.enter="$refs.inputDireccion.$refs.input.focus()"><i class="fas fa-search fa-sm"></i></b-button>
                                         </b-input-group>
                                     </b-col>
                                     <b-col md="4">
@@ -300,7 +300,7 @@
                                     <b-form-input type="text" size="md" readonly v-model="proveedor.Proveedor" autocomplete="off"/>
                                 </b-input-group>
                                 <b-input-group prepend="Dirección" class="mb-1">
-                                    <b-form-input type="text" size="md" style="text-transform: uppercase" v-model="proveedor.Direccion" autocomplete="off"/>
+                                    <b-form-input type="text" ref="inputDireccion" size="md" style="text-transform: uppercase" v-model="proveedor.Direccion" autocomplete="off"/>
                                 </b-input-group>
                             </b-col>
                         </b-row>
@@ -370,7 +370,7 @@
                                         <b-row>
                                             <b-col md="4">
                                                 <b-input-group prepend="Serie" class="mb-1">
-                                                    <b-form-input ref="inputSerie" type="text" style="text-transform: uppercase" maxlength="4" size="md" autocomplete="off" required/>
+                                                    <b-form-input ref="inputSerieNC" type="text" style="text-transform: uppercase" maxlength="4" size="md" autocomplete="off" required/>
                                                 </b-input-group>
                                             </b-col>
                                             <label> - </label>
@@ -571,19 +571,19 @@
                                                 </tr>
                                                 <tr>
                                                     <td><b-form-select class="selectCosteo" v-model="medioPagoId" :options="itemsMedioPago" v-on:change="setMedioPago($event)" size="md"  /></td>
-                                                    <td colspan="2"><b-form-input type="text" v-model="tipoMedioPago" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" style="font-weight: bold;"/></td>
+                                                    <td colspan="2"><b-form-input type="text" v-model="tipoMedioPago" size="md" autocomplete="off" style="font-weight: bold;"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                         <table class="tablaBanco">
                                             <tbody>
                                                 <tr>
-                                                    <td width="30%">Tipo Medio de Pago</td>
+                                                    <td width="30%">Fecha de Cancelación</td>
                                                     <td>Descripcion de la operacion o Glosa</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="date" size="md" class="selectCosteo" autocomplete="off" /></td>
-                                                    <td><b-form-input type="text" size="md" min="0" pattern="[0-9]+" maxlength="5" autocomplete="off" /></td>
+                                                    <td><b-form-input type="date" size="md" class="selectCosteo" v-model="fechaCancelacion" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" size="md" v-model="descripcionGlosaCompra" autocomplete="off" style="font-weight: bold;" /></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -593,7 +593,7 @@
                                                     <td>Apellidos y Nombres, Denom. o Razón Social</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><b-form-input type="text" size="md" autocomplete="off" /></td>
+                                                    <td><b-form-input type="text" v-model="proveedor.Proveedor" readonly size="md" autocomplete="off" style="font-weight: bold;"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -619,7 +619,7 @@
                     <b-form-select v-model="asientoSelect" :options="asientosNum" v-on:change="setAsientoTabla($event)" class="mb-3" size="md" required/>
                 </b-col>
                 <b-col md="4">
-                    <b-form-input ref="inputFechaEmision" type="date" v-model="FechaAsiento" size="md" required/>
+                    <b-form-input ref="inputFechaEmisionAsiento" type="date" v-model="FechaAsiento" size="md" required/>
                 </b-col>
                 <b-col md="4">
                     {{ (mesSelect==1?'Enero':((mesSelect==2?'Febrero':((mesSelect==3?'Marzo':''))))) }}
@@ -817,7 +817,9 @@ export default {
             debeCuentaCB:'10111',
             nombreCuentaCB:'EMITIDAS',
             montoAcreedor: null,
-            tipoMedioPago:'EFECTIVO'
+            tipoMedioPago:'EFECTIVO',
+            fechaCancelacion: this.$moment().format("YYYY-MM-DD"),
+            descripcionGlosaCompra: ''
         }   
     },
     watch: {
@@ -1291,10 +1293,16 @@ export default {
             }
             this.$refs.inputTipoOperacionDet.setValue('')
             this.$refs.buttonConfig.focus()
+            setTimeout(() => {
+                this.$refs.inputTipoOperacionDet.$refs.input.focus()
+            }, 200);
+            
         },
         setOperacionDet(obj){
             this.operacionDet = obj
-            this.$refs.inputFechaEmision.$refs.input.focus()
+            setTimeout(() => {
+                this.$refs.inputFechaEmision.$refs.input.focus()
+            }, 200);
             this.consultaCuentasDet(obj.IdTipoOperacionDet)
         },
         consultaCuentasDet(id){
@@ -1358,11 +1366,13 @@ export default {
                         this.proveedor.IdProveedor = data.data.IdProveedor
                         this.proveedor.Proveedor = data.data.Proveedor
                         this.proveedor.Direccion = data.data.Direccion
+                        this.obtenerGlosa()
                     }else if(data.razonSocial){
                         this.$toasted.info('Proveedor encontrado en SUNAT, se llenarán sus datos', {duration:3000})
                         this.proveedor.IdProveedor = null
                         this.proveedor.Proveedor = data.razonSocial
                         this.proveedor.Direccion = data.direccion
+                        this.obtenerGlosa()
                     }else{
                         this.$toasted.error('ERROR: Complete el RUC correctamente')
                         this.proveedor.IdProveedor = null
@@ -1378,6 +1388,11 @@ export default {
 
             return;
         },
+        obtenerGlosa(){
+            if(this.Comprobante.IdComprobante>0 && (''+this.Comprobante.Serie).trim()!='' && (''+this.Comprobante.Numero).trim()!='' ){
+                this.descripcionGlosaCompra = (this.nombreCuentaCB +' '+ this.Comprobante.CodSunat + "*" + this.Comprobante.Serie + '-' + this.Comprobante.Numero).toUpperCase();
+            }
+        },
         setTipoMoneda(obj){
             this.Moneda = obj
         },
@@ -1385,7 +1400,11 @@ export default {
             this.Comprobante.IdComprobante = obj.IdComprobante
             this.Comprobante.Comprobante = obj.Comprobante
             this.Comprobante.CodSunat = obj.CodSunat
-            this.$refs.inputSerie.$refs.input.focus()
+            this.obtenerGlosa()
+            setTimeout(() => {
+                this.$refs.inputSerie.$refs.input.focus()      
+            }, 300);
+            
         },
         setFormaPago(obj){
             this.FormaPago = obj
@@ -1398,6 +1417,9 @@ export default {
             if (evt.target.tagName !== 'TEXTAREA') {
                 evt.preventDefault();
             }
+        },
+        cambioTecla(){
+            console.log("data");
         },
         obtenerCuentaCB(){
             if((''+this.haberCuentaCB).trim().length==5){
@@ -1492,6 +1514,7 @@ export default {
             ).then(r => {
                 if (r.data) {
                     this.$toasted.success('Registro Exitoso')
+                    this.cargarRegistros(0)
                     this.$refs['modalCompras'].hide()    
                 }
             }).catch((error) => {
