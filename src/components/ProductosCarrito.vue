@@ -222,6 +222,9 @@ export default {
   props: {
     setPrecio: Boolean,
     esVenta: Boolean,
+    movTipo: Number,
+    padre: String,
+    tipoMov: Number,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
@@ -395,6 +398,14 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      if(!this.esVentas && this.padre=="compra"){
+        if(this.movTipo==undefined){
+          this.$toasted.show('Primero seleccione un tipo de movimiento')
+          return
+        }
+        //this.setProductoUni(obj)
+        //return
+      }
       obj = this.onSetProducto(obj)
       this.add([obj.IdProducto, (obj) => {
         this.$emit('onAddProducto', obj)

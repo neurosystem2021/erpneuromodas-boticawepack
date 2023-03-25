@@ -192,7 +192,14 @@
           </b-row>
           <b-row>
             <b-col>
-              <productos-carrito @onAddProducto="onAddProducto" ref="carrito" :fields="carrito.fields"></productos-carrito>
+              <productos-carrito 
+              @onAddProducto="onAddProducto" 
+              :movTipo = "movimiento.movimientoTipo.Tipo" 
+              padre="compra" 
+              :tipoMov="this.movimiento.movimientoTipo.Tipo" 
+              ref="carrito" 
+              :fields="carrito.fields">
+              </productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -259,12 +266,12 @@ export default {
       limpiar: 'limpiarCarrito',
       obtenerStok: 'obtenerStock'
     }),
-    loadFirstAlmacen (cb) {
+    /*loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
           cb(res.data)
         })
-    },
+    },*/
     cargarNumero () {
       this.axios.get(this.API + 'movimientos/numero', {
         params: {
@@ -330,30 +337,30 @@ export default {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
+        /*this.loadFirstAlmacen(data => {
           this.$refs.inputAlmacenDestino.setValue(data.Almacen)
           this.movimiento.almacenDestino = data
           this.onAddProducto();
-        })
+        })*/
       }else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
+        /*this.loadFirstAlmacen(data => {
           this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
           this.movimiento.almacenOrigen = data
           this.onAddProducto();
-        })
+        })*/
       }else {
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
         // this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-        this.loadFirstAlmacen(data => {
+        /*this.loadFirstAlmacen(data => {
           this.$refs.inputAlmacenOrigen.setValue(data.Almacen)
           this.movimiento.almacenOrigen = data
 
           this.$refs.inputAlmacenDestino.setValue(data.Almacen)
           this.movimiento.almacenDestino = data
           this.onAddProducto();
-        })
+        })*/
       }
       this.movimiento.movimientoTipo = obj
 
