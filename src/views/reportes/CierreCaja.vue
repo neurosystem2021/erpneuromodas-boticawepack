@@ -51,6 +51,34 @@
       </b-row>
       <br class="no-print" /><br class="no-print" />
 
+      <h2 class="text-center">Resumen de Productos</h2>
+      <br>
+      <b-row>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>ID</th><th>Producto</th><th>Cantidad Vendida</th><th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in productosVendidos" :key="index">
+              <td>{{ item.IdProducto }}</td>
+              <td>{{ item.Producto }}</td>
+              <td>{{ item.CantidadVendida }}</td>
+              <td>S/. {{ item.MontoVendido | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Monto</b></td>
+              <td class="total"><b>S/. {{ productosVendidosTotal | redondear}}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
@@ -398,6 +426,8 @@ export default {
       ],
       cierre: {},
       vendedor: {},
+      productosVendidos: [],
+      productosVendidosTotal: 0,
       almacen: {},
     }
   },
@@ -553,7 +583,25 @@ export default {
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
+    getProductos (ventas) {
+      this.productosVendidos = []
+      this.productosVendidosTotal = 0
+      this.axios.post(this.API + 'cierrecaja/productos', {
+         idDocVentas: ventas.map(prod => prod.idDocVenta)
+      })
+      .then(res => {
+        this.productosVendidos = res.data
+        let total = 0
+        this.productosVendidos.map(pv=>{
+          total += pv.MontoVendido;
+        })
+        this.productosVendidosTotal = total
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     loadDetalles () {
+      console.log("asdasd");
       this.axios.get(this.API + 'ventas/detalle', {
           params: {
             idDocVentas: this.ventas.map((item) => item.idDocVenta),
@@ -586,6 +634,9 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        if(this.ventas.length > 0){
+          this.getProductos(this.ventas)
+        }
         this.loadDetalles()
       }).catch(err => {
         console.log(err)

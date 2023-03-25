@@ -2,7 +2,7 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="9" class="my-1">
+          <b-col md="12" class="my-1">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -38,7 +38,24 @@
 										</autocomplete>
 								</b-form-group>
 							</b-col>
-              <b-col md="3">
+              <b-col md="2">
+								<b-form-group>
+										<label>Repartidor:</label>
+										<autocomplete
+												required="required"
+												ref="inputRepartidor"
+												:url="API + 'repartidores'"
+												anchor="Repartidor"
+												label="writer"
+												placeholder=""
+												:on-select="setRepartidor" 
+												:onInput="(val) => !val ? setRepartidor() : false"
+												:onFocus="focusAutocomplete.bind(null, 'inputRepartidor')"
+												:classes="{input: 'form-control'}">
+										</autocomplete>
+								</b-form-group>
+							</b-col>
+              <b-col md="2">
                 <b-form-group>
                   <label>Fecha Inicio:</label>
                   <b-form-input v-model="fechaInicio"
@@ -47,7 +64,7 @@
                     @input="val => generateFilter('fechaInicio', val) "></b-form-input>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-row>
                   <!--<b-col md="6">
                     <b-form-group label="Declarado">
@@ -93,14 +110,14 @@
               </b-col>-->
             </b-row>
           </b-col>
-          <b-col md="3" class="my-1">
+          <b-col md="6" class="my-1">
             <b-row>
-              <b-col md="5">
+              <b-col md="6">
                 <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                  <b-button @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
               </b-col>
-							<b-col md="7">
+							<b-col md="5">
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
@@ -148,6 +165,8 @@
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
              <!-- <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button> -->
+             <b-button variant="success" size="lg" :href="'/api/index.php/reporte/repartoconcluido?idAlmacen=' 
+             + almacen.IdAlmacen + '&tipoDoc=' + tipoDoc.IdTipoDoc + '&repartidor=' + repartidor.Repartidor + '&soloPago=1' + '&filter[fechaInicio]='+fechaInicio+ '&filter[fechaFin]='+fechaFin" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -192,6 +211,8 @@ export default {
         IdAlmacen: 1
       },
       tipoDoc: {
+      },
+      repartidor: {
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -238,6 +259,11 @@ export default {
         this.getVentasAcumuladas()
         this.$refs.tablaVentas.refresh()
     },
+    setRepartidor (obj) {
+        this.repartidor = obj || {}
+        this.getVentasAcumuladas()
+        this.$refs.tablaVentas.refresh()
+    },
     setVendedor (obj) {
       this.currentPage = 1
       this.vendedor = obj
@@ -274,7 +300,7 @@ export default {
     },
     setAlmacen (obj) {
       this.almacen = obj
-      this.limpiarFiltros()
+      //this.limpiarFiltros()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     rowClick (item) {
@@ -296,11 +322,15 @@ export default {
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+      let repartidorFiltro = ''
+      if (this.repartidor.Repartidor) {
+        repartidorFiltro = '&repartidor=' + this.repartidor.Repartidor
+      }
       let tipoDocFilter = ''
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
-      let url = this.API + 'ventas?soloPago=1&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?soloPago=1&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + repartidorFiltro + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 console.log(url)
       let promise = this.axios.get( url )
@@ -321,6 +351,14 @@ console.log(url)
     limpiarFiltros () {
       this.filters = {}
       this.filter = ''
+      this.tipoDoc = {}
+      this.repartidor = {}
+      this.almacen.IdAlmacen = 1
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD");
+      this.fechaFin = this.$moment().format("YYYY-MM-DD");
+      this.$refs.inputAlmacen.setValue('PRINCIPAL');
+      this.$refs.inputTipoVenta.setValue('');
+      this.$refs.inputRepartidor.setValue('');
       //this.$refs.inputVendedor.setValue('')
       // document.location.reload()
      //  this.getVentasAcumuladas()

@@ -504,7 +504,7 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
-      if (this.producto.EsBalon) {
+      if (this.producto.EsBalon || (this.producto.EsBalon==0 && this.producto.EsBalonEnvase==0)) {
         this.producto.IdProductoContenido=null;
       }
 
