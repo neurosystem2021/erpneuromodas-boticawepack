@@ -43,258 +43,33 @@
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+
       <b-row>
-        <h5>Ventas Efectivo</h5><br>
+        <h5>Resumen de Productos</h5>
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
+              <th>ID</th><th>Producto</th><th>Cantidad Vendida</th><th>Monto</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-              
-                  <table class="tabla-detalle">
-                  <thead>
-                    <tr>
-                      <th>Codigo</th>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
-
-              </td>
-              <!--<td>{{ item.EfectivoDesc }}</td>-->
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
+            <tr v-for="(item, index) in productosVendidos" :key="index">
+              <td>{{ item.IdProducto }}</td>
+              <td>{{ item.Producto }}</td>
+              <td>{{ item.CantidadVendida }}</td>
+              <td>S/. {{ item.MontoVendido | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Monto</b></td>
+              <td class="total"><b>S/. {{ productosVendidosTotal | redondear}}</b></td>
             </tr>
           </tfoot>
         </table>
       </b-row>
-
-
-      <b-row>
-        <h5>Ventas Visa</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-              
-                  <table class="tabla-detalle">
-                  <thead>
-                    <tr>
-                      <th>Codigo</th>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
-
-              </td>
-              <td>{{ item.VisaDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Visa</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
       
-
-      <b-row>
-        <h5>Ventas Mastercard</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-
-                  <table class="tabla-detalle">
-                  <thead>
-                    <tr>
-                      <th>Codigo</th>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
-                    
-              </td>
-              <td>{{ item.MastercardDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      <b-row class="credito">
-        <h5>Ventas a Credito</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-                
-                  <table class="tabla-detalle">
-                  <thead>
-                    <tr>
-                      <th>Codigo</th>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
-
-
-              </td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3"></td>
-              <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-
       <b-row>
         <b-col v-if="totalIngresos">
           <h5>Ingresos Caja Principal</h5><br>
@@ -370,7 +145,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos tarjeta</b></td>
+                <td class="total"><b>Total Ingresos Tarjetas</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -404,6 +179,319 @@
               </tfoot>
             </table>
           </b-col>
+      </b-row>
+
+      <b-row>
+        <h5>Ventas Efectivo</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+              
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+
+              </td>
+              <!--<td>{{ item.EfectivoDesc }}</td>-->
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+
+      <b-row>
+        <h5>Ventas Tarjetas</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+              
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+
+              </td>
+              <td>{{ item.VisaDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Visa | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Tarjetas</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      
+
+      <b-row>
+        <h5>Ventas Yape / Plin</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <td>{{ item.MastercardDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Mastercard | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Yape / Plin</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row>
+        <h5>Ventas Transferencias</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+
+              </td>
+              <td>{{ item.TransferenciaDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Transferencias </b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row class="credito">
+        <h5>Ventas a Credito</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+                
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+
+
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Total | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"></td>
+              <td><b>Total Credito</b></td>
+              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
       </b-row>
 
       <br>
@@ -441,7 +529,9 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      productosVendidos: [],
+      productosVendidosTotal: 0
     }
   },
   computed: {
@@ -449,13 +539,13 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia  - this.totalSalidas
     },
     totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia
     },
     totalSalidas () {
       let total = 0
@@ -523,9 +613,21 @@ export default {
       });
       return total
     },
+    totalVentasTransferencia () {
+      let total = 0
+      this.ventasTransferencia.forEach(venta => {
+        if (!venta.Anulado) total += venta.Transferencia
+      });
+      return total
+    },
     ventasMastercard () {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0  && !venta.EsCredito
+      })
+    },
+    ventasTransferencia () {
+      return this.ventas.filter(venta => {
+        return venta.Transferencia > 0  && !venta.EsCredito
       })
     },
     totalVentasCredito () {
@@ -606,6 +708,23 @@ export default {
     estadoVenta (venta) {
         return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
     },
+    getProductos (ventas) {
+      this.productosVendidos = []
+      this.productosVendidosTotal = 0
+      this.axios.post(this.API + 'cierrecaja/productos', {
+         idDocVentas: ventas.map(prod => prod.idDocVenta)
+      })
+      .then(res => {
+        this.productosVendidos = res.data
+        let total = 0
+        this.productosVendidos.map(pv=>{
+          total += pv.MontoVendido;
+        })
+        this.productosVendidosTotal = total
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     loadDetalles () {
       this.axios.get(this.API + 'ventas/detalle', {
           params: {
@@ -635,6 +754,9 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        if(this.ventas.length > 0){
+          this.getProductos(this.ventas)
+        }
         this.loadDetalles()
 		this.getAdelantos()
       }).catch(err => {

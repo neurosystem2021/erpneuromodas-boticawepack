@@ -113,7 +113,7 @@
                   </b-col>
                 </b-row>
 
-                <b-row v-if="!isTraslado">
+                <b-row>
                   <b-col md="6">
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
