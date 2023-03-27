@@ -127,8 +127,7 @@
                   </tbody>
                 </table>
                 <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
-                <div v-if="item.DireccionTemp || item.Direccion"><i><b>Dirección:</b> {{ item.DireccionTemp || item.Direccion }}</i></div>
-
+                <div><i><b>Dirección:</b> {{ item.DireccionTemp==''||item.DireccionTemp==null?'---':item.DireccionTemp}}</i></div>
               </td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
