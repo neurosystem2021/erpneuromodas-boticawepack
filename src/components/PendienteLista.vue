@@ -9,8 +9,39 @@
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">           
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                body-text-variant="dark">
+                
+                <b-row>
+                    <b-col md="6" class="my-1">
+                        <b-form-group>
+                            <label>Buscar:</label>
+                            <b-form-input placeholder="Busqueda..." v-model="filter" @input="currentPage = 1" />
+                        </b-form-group>
+                    </b-col>
+                    <b-col md="6" class="my-1">
+                        <b-form-group>
+						    <label>Almacen:</label>
+						    <autocomplete
+                                required="required"
+                                ref="inputAlmacen"
+                                :url="API + 'almacenes'"
+                                anchor="Almacen"
+                                initValue="TODOS"
+                                label="writer"
+                                placeholder=""
+                                :on-select="setAlmacen" 
+                                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                                :classes="{input: 'form-control'}">
+						    </autocomplete>
+					    </b-form-group>
+                    </b-col>
+                    <b-col md="12">
+                        <b-form-group>
+                            <b-btn @click="limpiarFiltros">Limpiar</b-btn>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                    
                     <b-table 
                         v-if="show"
                         id="table-pendientes" 
@@ -64,7 +95,7 @@ import config from '@/store/config.js'
 
     export default {
         mounted () {
-            
+            this.limpiarFiltros();
         },
         watch: {
           items () {
@@ -79,6 +110,9 @@ import config from '@/store/config.js'
                 show: false,
                 filter: '',
                 items: [],
+                almacen: {
+                    IdAlmacen: 1
+                },
                 isBusy: false,
                 fields: [ 
                     { key: 'idDocVenta', label: 'Id' }, 
@@ -86,6 +120,7 @@ import config from '@/store/config.js'
                     { key: 'Serie', label: 'Serie' }, 
                     { key: 'Numero', label: 'Numero' },
                     { key: 'Cliente', label: 'Cliente' },
+                    { key: 'Almacen', label: 'Almacen' },
                     { key: 'Repartidor', label: 'Repartidor' },
                     { key: 'total', label: 'Total' },
                     { key: 'PagoCon', label: 'Paga con', variant: 'danger' },
@@ -111,10 +146,24 @@ import config from '@/store/config.js'
                     })
                 }
             },
+            setAlmacen (obj) {
+                this.almacen = obj || {}
+                this.$refs.tablaPendientes.refresh()
+            },
+            focusAutocomplete (ref) {
+            // this.$refs[ref].type = ""
+            this.$refs[ref].handleDoubleClick()
+            },
+            limpiarFiltros() {
+                this.filter = ''
+                this.almacen.IdAlmacen = ''
+                this.$refs.inputAlmacen.setValue('TODOS')
+                this.$refs.tablaPendientes.refresh()
+            },
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'ventas/pendientes?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
+                let promise = this.axios.get(this.API + 'ventas/pendientes?limit='+ctx.perPage+'&idAlmacen='+this.almacen.IdAlmacen+'&page='+ctx.currentPage+'&filter='+ctx.filter)
 
                 return promise.then((result) => {
                 this.items = result.data

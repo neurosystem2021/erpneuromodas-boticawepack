@@ -29,7 +29,7 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
 
         <template slot="prestamo" slot-scope="data" v-if="esVenta">
-          <b-button variant="warning" size="sm" @click="agregarProductoPrestado(data.item, data.index)"><img src="static/gas.png" width="20"/></b-button>
+          <b-button variant="primary" size="sm" @click="agregarProductoPrestado(data.item, data.index)"><img src="static/gas.png" width="20"/></b-button>
         </template>
 
         <template slot="cantidad" slot-scope="data">
