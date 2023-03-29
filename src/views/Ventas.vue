@@ -6,9 +6,9 @@
 
         <br class="ocularMovil"/>
         <b-container class="bv-example-row">
-            <div class="ocularMovil">
+            <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -26,7 +26,7 @@
                     </b-button-group>
                 </div>
             </div>
-            <br class="ocularMovil" /><br class="ocularMovil"/>
+            <br/><br/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
