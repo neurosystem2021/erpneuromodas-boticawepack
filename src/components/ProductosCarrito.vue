@@ -102,7 +102,7 @@
         <template slot="descuento" slot-scope="data">
           <input
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false"
+            :disabled="(bloquearInput?true:false) || (idPerfil == 1) ? false : (idPerfil == 24 ? false : true)"
             type="number"
             min="0"
             style="width: 100px"
@@ -196,7 +196,8 @@ export default {
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: 0
+      pagocon: 0,
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {
