@@ -18,6 +18,7 @@
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
+                  ref="barcodeInput"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
@@ -28,10 +29,10 @@
         </b-input-group>
       </b-form-group>
 
-      <b-modal size="lg" ref="modalCant" hide-footer hide-header>
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
-          <h5>Presentaciones</h5>
+          <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
+          <h5>{{objProd.Producto}}</h5>
         </div>
         <hr>
         <b-row>
@@ -42,12 +43,10 @@
               @click="setProductoUni(objProd)"
             >
               <b-row>
-                <b-col md="6" class="nomCart">
-                  <h5 class="text-uppercase">UNIDAD</h5>
+                <b-col md="7" class="nomCart">
+                  <h5 class="text-uppercase">{{medicionPro}}</h5>
                 </b-col>
-                <b-col md="6" class="text-left">
-                  <b>Cant: </b>1
-                  <br>
+                <b-col md="5" class="text-left">
                   <b>Precio: </b>S/ {{ precioCont }}
                 </b-col>
               </b-row>
@@ -56,10 +55,10 @@
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card
-              v-if="d.cantidad != 0"
+              v-if="parseFloat(d.cantidad) > 0"
               align="center"
               class="mb-3 contentCard"
-              v-bind:class="[d.nombre=='OFERTA' ? 'oferta' : '']"
+              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
               @click="() => {
                 if ( parseFloat(d.cantidad) ) {
                   setProductoCant(d)
@@ -67,12 +66,11 @@
               }"
             >
               <b-row>
-                <b-col md="6" class="nomCart" v-bind:class="[d.nombre=='OFERTA' ? 'ofertanom' : '']">
-                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                <b-col md="7" class="nomCart" >
+                  <h5 style="text-transform:uppercase">{{ d.nombre }}</h5>
                 </b-col>
-                <b-col md="6" class="text-left">
-                  <b>Cant: </b>{{ d.cantidad }}
-                  <br>
+                <b-col md="5" class="text-left">
+                  <h5>x{{ d.cantidad }}</h5>
                   <b>Precio: </b>S/ {{ d.precio }}
                 </b-col>
               </b-row>
@@ -119,7 +117,7 @@
           </div>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -136,49 +134,45 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
+            :disabled="bloquearInput?true:false || esDelivery || true"
             type="number"
-            style="width: 95px"
+            autocomplete="off"
+            style="width: 90px; font-weight:bold"
             class="form-control"
-            step="0.001"
+            step="1"
             min="0"
             @input="(val) => {
+              changeCant(val.target.value,productos[data.index])
               $emit('onInputCantidad', val.target.value)
-              /*if(this.ventas){
                 if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
                 }
-
-                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-                if(reg && reg.cantidad){
-                  productos[data.index].precio = reg.precio
-                  return
-                }
-                
-                productos[data.index].precio = productos[data.index].PrecioContado 
-              }else{
-                if(productos[data.index].EsObsequio==1){
-                    productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
-                }else{
-                    productos[data.index].precio = productos[data.index].PrecioCosto; 
-                }
-              }*/
-              if(productos[data.index].EsObsequio==1){
-                productos[data.index].precio = 0
-                productos[data.index].nuevoPrecioContado = 0
+              if(!precioHabilitado){
+              let arr = JSON.parse(productos[data.index].PreciosPorProducto || '[]');
+              arr.map((r)=>{
+                r.cantidad = Number(r.cantidad || 0)
+                r.precio = Number(r.precio || 0)
+              })
+              let arreglado = arr.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
+              let cambio = false
+              arreglado.map(r=>{
+              if(r.cantidad>0 && r.precio>0 && val.target.value >=r.cantidad){
+                productos[data.index].precio = r.precio
+                cambio = true
               }
-
+              })
+                if(!cambio){
+                  productos[data.index].precio = productos[data.index].PrecioContado
+                }
+              } 
             }"
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 120px"
+            style="width: 90px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -315,7 +309,7 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
+          <!--<h6><i>Prof.</i></h6>
           <input 
             class="form-check-input" 
             type="checkbox" 
@@ -324,7 +318,7 @@
               $emit('onCheckProf', e)
               asignarDisabledProf(data.index, e)
             }"
-          />
+          />-->
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
@@ -738,63 +732,80 @@ export default {
       this.objProd = {}
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
+      obj.EsVentaNew = true;
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       
-      if (!obj.PreciosPorProducto || fPP.length === 4) {
+      if (fPP.length==4) {
         obj.estadoPxP = true
+        obj.cantxPrecio=1
         this.setProductoUni(obj)
         return
       }
 
+      this.indexProdSelect = null
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
     },  
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
-      this.$refs.autocompleteProducto.setValue('')
+      //this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioContado
       obj.cantidad = 0
+      obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)
+      obj.cantidadPres = obj.cantidad
       this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
+        //this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
+      this.loadCode=''
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
-      obj.cantidadPres = obj.cantidad
+      this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
-      this.$refs.autocompleteProducto.setValue('')
+      //this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
       obj.precio = 0
-      obj.cantidad = 0
+      obj.cantidad = 1
+      obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-      }, false, false, this.cliente.EsVIP])
-      this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
+      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
+
+      if(this.indexProdSelect == null){
+        this.add([obj, () => {
+          this.$emit('onAddProducto', obj)
+          this.$toasted.success('Producto añadido correctamente')
+          this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+        }, false, false])
+      }else{
+        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+        this.indexProdSelect = null
+      }
+      
+      this.$refs['modalCant'].hide()
+      this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
     showPresentacion (obj) {

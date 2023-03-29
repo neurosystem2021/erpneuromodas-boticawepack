@@ -18,12 +18,19 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+      if (!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVentaNew) {
         productos.unshift(item)
-      }else{
-        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
-        productos.splice(index2, 1)
-        productos.splice(index2,0,item)
+      }
+      else{
+        let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+
+        productos[index].cantxPrecio = Number(productos[index].cantxPrecio) + 1
+        productos[index].cantidad = productos[index].cantxPrecio*item.cantidadPres
+        productos[index].precio = item.precio
+        productos[index].cantidadPres = item.cantidadPres
+
+        let prod = Object.assign({}, productos[index]);
+        productos.splice(index, 1,prod)
       }
     }
   },
@@ -95,6 +102,27 @@ const actions = {
     }
 
     if(typeof producto === 'object') {
+      
+      /*let preciosProd = JSON.parse(producto.PreciosPorProducto || '[]')
+      let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+
+      if (fPP.length !== 4) {
+
+      preciosProd.map((r)=>{
+        r.cantidad = Number(r.cantidad || 0)
+        r.precio = Number(r.precio || 0)
+      })
+
+      let arreglado = preciosProd.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
+
+      arreglado.map(r=>{
+        if(r.cantidad>0 && r.precio>0){
+          producto.precio = producto.PrecioCosto
+          producto.nuevoPrecioContado = r.precio || 0
+        }
+      })
+      }*/
+
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
         producto.nuevoPrecioContado = producto.PrecioContado || 0
