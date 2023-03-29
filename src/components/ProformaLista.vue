@@ -137,6 +137,12 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 65% !important;
-   }
+    max-width: 100% !important;
+    }
+#modalProformas {
+    padding-right: 0px !important;
+    } 
+#modalProformas .modal-body {
+    overflow-x: scroll;
+    }  
 </style>
