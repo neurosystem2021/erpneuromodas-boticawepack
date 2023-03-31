@@ -764,9 +764,9 @@ export default {
       obj = this.onSetProducto(obj)
       obj.cantidadPres = obj.cantidad
       this.add([obj, () => {
-        //this.$emit('onAddProducto', obj)
+        this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+        //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
       this.loadCode=''
       // Vue.set(this.productos, obj.IdProducto, obj)
@@ -797,7 +797,7 @@ export default {
         this.add([obj, () => {
           this.$emit('onAddProducto', obj)
           this.$toasted.success('Producto añadido correctamente')
-          this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+          //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
         }, false, false])
       }else{
         this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
