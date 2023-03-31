@@ -95,7 +95,7 @@ import config from '@/store/config.js'
 
     export default {
         mounted () {
-            this.limpiarFiltros();
+            //this.limpiarFiltros();
         },
         watch: {
           items () {
@@ -111,7 +111,7 @@ import config from '@/store/config.js'
                 filter: '',
                 items: [],
                 almacen: {
-                    IdAlmacen: 1
+                    IdAlmacen: ''
                 },
                 isBusy: false,
                 fields: [ 
