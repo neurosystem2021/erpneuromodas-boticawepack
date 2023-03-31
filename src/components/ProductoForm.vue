@@ -236,6 +236,15 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TienePresentacion"
+                   :value="1"
+                   :unchecked-value="0">
+              Tiene Presentacion
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group v-show="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
@@ -308,6 +317,7 @@
         </b-col>
       </b-row>
 
+      <b-form-group v-if="producto.TienePresentacion">
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
@@ -349,6 +359,7 @@
           </b-card>
         </b-col>
       </b-row>
+    </b-form-group>
 
       <hr />
       <b-row>
@@ -511,6 +522,7 @@ export default {
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.VentaEstrategica      = newVal.VentaEstrategica
+        this.producto.TienePresentacion     = newVal.TienePresentacion
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -658,6 +670,7 @@ export default {
         ControlaStock:1,
         ControlaStockMinimo:0,
         StockMinimo: 0,
+        TienePresentacion: 0,
         PrecioCosto:0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
