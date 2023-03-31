@@ -402,6 +402,7 @@ export default {
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' }, 
                     { key: 'Producto' }, 
+                    { key: 'Descripcion', label: 'Descripción'},
                     // { key: 'ProductoMarca', label: 'Marca' },
                     // { key: 'ProductoFormaFarmaceutica', label: 'Lab.' }, 
                     // { key: 'ProductoMedicion', label: 'Med.' },
@@ -863,6 +864,7 @@ export default {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }
+                pro.Descripcion = (''+(pro.Descripcion || '')).toUpperCase()
             })
             if (sinStock && this.venta.tipoVenta.CodSunat != '07') {
                 this.inProgress = false

@@ -116,11 +116,26 @@
             :disabled="bloquearInput?true:false"
             type="number"
             min="0"
+            style="width: 110px"
             step="0.01"
             value="0"
             class="form-control"/>
             <b-form-text>
             </b-form-text>
+        </template>
+
+        <template slot="Descripcion" slot-scope="data">
+          <textarea 
+            :disabled="bloquearInput?true:false"
+            class="form-control"
+            placeholder="Descripción"
+            cols="9" rows="1"
+            style="width: 210px"
+            v-model="productos[data.index].Descripcion"></textarea>
+          <!--<b-form-input
+            v-model="productos[data.index].Descripcion"
+            type="text"
+            placeholder="Descripción"></b-form-input>-->
         </template>
 
         <template slot="total" slot-scope="data">
