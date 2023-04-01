@@ -1,6 +1,6 @@
 <template>
     <b-col md="12">
-      <b-row style="height:40vh; overflow-y: scroll; background: #FFFFFF;">
+      <b-row style="height:35vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="selec" slot-scope="data">
