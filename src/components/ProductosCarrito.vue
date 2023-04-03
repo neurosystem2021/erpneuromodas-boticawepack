@@ -44,6 +44,7 @@
         </template>
         <template slot="precio" slot-scope="data">
           <input
+            :disabled="tipo == 'mov' ? false : true"
             v-model="productos[data.index].precio"
             type="number"
             style="width: 80px"
@@ -202,7 +203,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    tipo: String,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
