@@ -95,7 +95,7 @@
             <b-row>
               <b-col md="12">
                 <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                  <b-button @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -140,7 +140,10 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" 
+              :href="'/api/index.php/reporte/ventasporvendedor?idAlmacen='+almacen.IdAlmacen+'&vendedor='+vendedor.Usuario+'&fechaInicio='+fechaInicio+
+              '&fechaFin='+fechaFin+'&declarado='+declarado+'&idTipoDoc='+tipoDoc.IdTipoDoc" 
+              target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -170,7 +173,10 @@ export default {
   data() {
     return {
       API: config.API,
-      vendedor: '',
+      vendedor: {
+        Usuario: '',
+        NombreUsuario: ''
+      },
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
@@ -185,6 +191,7 @@ export default {
         Almacen: ''
       },
       tipoDoc: {
+        IdTipoDoc: ''
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -261,7 +268,7 @@ export default {
     },
     setAlmacen (obj) {
       this.almacen = obj
-      this.limpiarFiltros()
+      //this.limpiarFiltros()
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     rowClick (item) {
@@ -289,7 +296,7 @@ export default {
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
+      //console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -308,7 +315,22 @@ console.log(url)
     limpiarFiltros () {
       this.filters = {}
       this.filter = ''
+      this.almacen = {
+        IdAlmacen: 1,
+      };
       this.$refs.inputVendedor.setValue('')
+      this.$refs.inputTipoVenta.setValue('')
+      this.vendedor = {
+        Usuario: '',
+        NombreUsuario: ''
+      };
+      this.tipoDoc = {
+        IdTipoDoc: ''
+      }
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD");
+      this.fechaFin = this.$moment().format("YYYY-MM-DD");
+      this.getPrimerAlmacen();
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
       //document.location.reload()
      //  this.getVentasAcumuladas()
     },

@@ -27,6 +27,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</b-form-text>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -88,7 +89,7 @@
         </b-row>
       </b-modal>
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
+      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
@@ -840,6 +841,14 @@ export default {
           #table-render td, #table-render th {
             color: #000000 !important;
           }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 200px;
+            heigth: 200px;
+          }
         </style>
         <div>
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
@@ -850,7 +859,10 @@ export default {
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
-                <td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>
+                <td style="width: 5%">
+                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                </td>
+                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>-->
               </tr>
             </tbody>
           </table>   
