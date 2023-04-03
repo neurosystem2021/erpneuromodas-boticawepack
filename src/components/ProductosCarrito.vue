@@ -100,7 +100,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="isVentas? true : false"
+            :disabled="isVentas? true : false || bloquearInput?true:false"
             type="number"
             style="width: 85px"
             min="0"
@@ -116,6 +116,7 @@
         </template>
         <template slot="precio" slot-scope="data">
           <input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].precio"
             type="number"
             style="width: 110px"
@@ -130,6 +131,7 @@
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].TieneIgv"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
@@ -155,6 +157,7 @@
         <template slot="precioVenta" slot-scope="data">
           <input
             style="width:85px"
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
@@ -185,11 +188,11 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button variant="danger" :disabled="bloquearInput?true:false" size="sm" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+           <b-button size="sm" :disabled="bloquearInput?true:false" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -236,6 +239,7 @@
                   <b-form-input
                     type="text"
                     placeholder="Pagó con"
+                    :disabled="bloquearInput?true:false"
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
                   <label>Vuelto:</label>
