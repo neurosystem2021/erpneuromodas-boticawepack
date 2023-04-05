@@ -1,5 +1,35 @@
 <template>
     <b-col md="12">
+      <b-row>
+        <b-col md="12">
+          <b-form-group>
+            <b-input-group>
+              <autocomplete
+                ref="autocompleteProducto"
+                style="width:55%"
+                :url="APIProductos"
+                :onShouldRenderChild="renderChild"
+                :customParams="{'sinMovidos': 1}"
+                anchor="Producto"
+                label="writer"
+                placeholder="Agregar Producto"
+                :on-select="setProducto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+              <input v-model="loadCode"
+                      @keydown.enter.prevent="loadBarcode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Codigo de Barra" />
+              <b-input-group-append>
+                <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+                <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-row style="height:35vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
@@ -307,7 +337,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       }
       return this.API + 'productos'
     },
@@ -507,32 +537,10 @@ export default {
       if (this.idAlmacen) {
         let style = 'ss'
 
-        // cambiar color los vencidos
-        var dt = new Date()
-        var anio = dt.getFullYear()
-        var mes =  dt.getMonth() + 1
-        var dia = dt.getDate()
-        var fechaVen = new Date(data.FechaVen).getTime()
-        
-        var hoy = anio + "-" + mes + "-" + dia
-        hoy = new Date(hoy).getTime()
-        var en4meses = anio + '-' + (mes + 4) + '-' + dia
-        en4meses = new Date(en4meses).getTime()
-
-        if(fechaVen < hoy && data.stock > 0) {
-          style = 'danger'
-        }
-
-        // cambiar color los que faltan 4 meses por vencer
-        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
-          style = 'ambar'
-        }
-
-
         return `
-        <div class="${style}">
-          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | <b>${data.CodigoBarra}</b> / 
-          <b>${data.Producto}</b> / ${data.ProductoMarca} 
+        <div>
+          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock>0?data.stock.toFixed(2):0}</b> | <b>${data.CodigoBarra}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoCategoria} 
         </div>
         `
       }

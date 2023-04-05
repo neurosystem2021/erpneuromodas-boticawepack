@@ -77,6 +77,18 @@
                                 </b-input-group>
                             </b-col>
                             <b-col md="4" class="docInfo mt-2">
+                                    <b-form-checkbox
+                                        v-model="venta.EsConsumoVale"
+                                        :value="1"
+                                        :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='01'" class="mt-1">
+                                        <b>VENTA PARA CONSUMO CON VALES</b>
+                                    </b-form-checkbox> 
+                                    <b-form-checkbox
+                                        v-model="venta.EsVale"
+                                        :value="1"
+                                        :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1">
+                                        <b>ES UN VALE</b>
+                                    </b-form-checkbox> 
                                  <b-input-group prepend="Doc. Referenc" v-if="isNota">
                                     <autocomplete
                                         required="required"
@@ -96,13 +108,27 @@
                                 <b-input-group v-if="isNota" style="margin-bottom:-20px">
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-input-group>
+                                <b-input-group prepend="Venta Consumo" v-if="venta.EsVale==1">
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRef"
+                                        :url="API + 'ventas/consumo/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
+                                        anchor="NroComprobante"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRefConsumo" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-input-group>
                             </b-col>
                         </b-row>
                         <b-row>
                             <b-col md="9">
                                 <b-row>
                                     <b-col md="4" class="docInfo mt-2">
-                                        <b-input-group prepend="Placa">
+                                        <b-input-group prepend="Placa" class="mb-1">
                                             <input v-model="venta.Placa"
                                                     type="text"
                                                     ref="inputPlaca"
@@ -110,6 +136,14 @@
                                                     class="form-control"
                                                     placeholder="Placa" />
                                          </b-input-group>
+                                        <b-input-group prepend="Km">
+                                            <input v-model="venta.Km"
+                                                    type="text"
+                                                    ref="inputKm"
+                                                    style="text-transform:uppercase;"
+                                                    class="form-control"
+                                                    placeholder="Kilometraje" />
+                                        </b-input-group>
                                         <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center mt-1">
                                             <b-row>
                                                 <b-col md="3">
@@ -174,6 +208,11 @@
                                 </b-row>
                             </b-col>
                             <b-col md="3" >
+                                <b-form-group class="text-left mt-1" v-if="venta.ConsumoId>0">
+                                    <b-badge style="font-size:13.5px" variant="primary">Monto Total: S/ {{ MontoTotal }} </b-badge>
+                                    <b-badge style="font-size:13.5px" variant="danger">Monto Consumido: S/ {{ MontoConsumido }} </b-badge>
+                                    <b-badge style="font-size:13.5px" variant="success">Monto Disponible: S/ {{ MontoTotal - MontoConsumido }} </b-badge>
+                                </b-form-group>
                                 <b-form-group class="text-center">
                                     <div class="big-text">
                                         {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -503,7 +542,9 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger',class:'fontsize thsize' },
                     { key: 'acciones', label: '', class:'thsize'}
                 ]
-            }
+            },
+            MontoTotal: 0,
+            MontoConsumido: 0
         }
     },
     watch: {
@@ -633,6 +674,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Placa: '',
+                Km: '',
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
@@ -663,11 +705,16 @@ export default {
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
-                NotaDescMotivo: ''
+                NotaDescMotivo: '',
+                EsConsumoVale: 0,
+                EsVale: 0,
+                ConsumoId: 0
             }
 
             this.isNota = false
             this.bloquearInput = false 
+            this.MontoConsumido = 0
+            this.MontoTotal = 0
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
@@ -677,6 +724,11 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
+            this.venta.EsConsumoVale = 0
+            this.venta.EsVale = 0
+            this.venta.ConsumoId = 0
+            this.MontoConsumido = 0
+            this.MontoTotal = 0
 
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
 
@@ -693,6 +745,7 @@ export default {
             this.getNumeroVenta()
         },
         setDocRef (obj) {
+            this.venta.EsConsumoVale = obj.EsConsumoVale
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
 
@@ -722,6 +775,7 @@ export default {
                     }
                 }).then((response) => {
                     this.venta.Placa = response.data[0].Placa
+                    this.venta.Km = response.data[0].Km
                     this.venta.DescripcionEmbarcacion = response.data[0].DescripcionEmbarcacion
                 this.axios.get(this.API + 'cliente', {
                     params: {
@@ -749,6 +803,44 @@ export default {
                     this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
                 })
         },
+        setDocRefConsumo (obj) {
+            this.venta.ConsumoId = obj.IdDocVenta
+            this.MontoConsumido = obj.SubTotalConsumo
+            this.MontoTotal = obj.SubtotalIni
+            this.axios.get(this.API + 'venta/detalle/comprobante', {
+                params: {
+                    NroComprobante: obj.NroComprobante,
+                    idDocVenta: obj.IdDocVenta,
+                    IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+                }
+            }).then((response) => {
+                this.venta.Placa = ''
+                this.venta.Km = ''
+                this.venta.DescripcionEmbarcacion = ''
+                this.axios.get(this.API + 'cliente', {
+                    params: {
+                        idCliente: response.data[0].IdCliente
+                }})
+                .then((response) => {
+                    if (response.data) {
+                        this.$refs.inputCliente.setValue(response.data.Cliente)
+                        this.venta.cliente = response.data
+                        this.venta.CampoDireccion = this.venta.cliente.Direccion
+                    } else {
+                        this.$toasted.show('No se encontro al cliente')
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+                this.limpiarCart()
+                response.data.map((item) => {
+                    this.add([item, () => {
+                    }, false ])
+                })
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+            })
+        },
         setMotivo(ev){
             if(ev == '01' || ev == '02' || ev == '06' || ev == null){
                 this.bloquearInput=true;
@@ -759,7 +851,9 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
@@ -977,6 +1071,30 @@ export default {
             evt.preventDefault();
 
             this.inProgress = true
+            
+            if(this.venta.EsVale == 1 && this.venta.ConsumoId == 0){
+                this.$toasted.show('Debe seleccionar una venta consumo...')
+                this.inProgress = false
+                return 
+            }
+
+            if(this.venta.EsVale == 0){
+                this.venta.ConsumoId = 0
+            }
+
+            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
+                this.$toasted.show('El monto de la venta debe ser menor o igual al disponible: '+(this.MontoTotal - this.MontoConsumido),{duration:3000})
+                this.inProgress = false            
+                return  
+            }
+
+            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && (''+this.venta.Placa).trim() == ''){
+                this.$toasted.show('Debe ingresar una placa para identificar al vehículo que consumió el vale',{duration:3000})
+                this.$refs.inputPlaca.focus()
+                this.inProgress = false
+                return 
+            }
+
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
@@ -1097,6 +1215,7 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
+            this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)

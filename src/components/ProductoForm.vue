@@ -10,7 +10,6 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
@@ -140,6 +139,14 @@
               />
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.MasMovido"
+                   :value="1"
+                   :unchecked-value="0">
+              Producto con más movimiento
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -153,8 +160,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto" />
-      <b-row v-if="producto.IdProducto">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
@@ -306,6 +313,7 @@ export default {
         // this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.MasMovido = newVal.MasMovido
         this.$refs.file.value=null
       } else {
 
@@ -389,9 +397,11 @@ export default {
         Producto: '',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         StockMinimo: 0,
         PrecioContado: '',
+        MasMovido: 0,
+        PrecioContado: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},
