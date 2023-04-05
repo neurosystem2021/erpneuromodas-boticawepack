@@ -145,7 +145,7 @@
               :current-page="currentPage">
 
 								<template slot="tiempo" slot-scope="data">
-									{{ diferenciaFecha(data.item.FechaDoc, data.item.FechaPago) }}
+									{{ data.item.FechaDoc==''?null:diferenciaFecha(data.item.FechaDoc, data.item.FechaPago) }}
 								</template>
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
@@ -166,7 +166,7 @@
             <b-col cols="4">
              <!-- <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button> -->
              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/repartoconcluido?idAlmacen=' 
-             + almacen.IdAlmacen + '&tipoDoc=' + tipoDoc.IdTipoDoc + '&repartidor=' + repartidor.Repartidor + '&soloPago=1' + '&filter[fechaInicio]='+fechaInicio+ '&filter[fechaFin]='+fechaFin" target="_blank">Exportar</b-button>
+             + almacen.IdAlmacen + '&tipoDoc=' + tipoDoc.IdTipoDoc + '&repartidor=' + repartidor.Repartidor + '&filter[fechaInicio]='+fechaInicio+ '&filter[fechaFin]='+fechaFin" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -231,6 +231,8 @@ export default {
             { key: 'Repartidor', label: 'Repartidor', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Anulado', label: 'Anulado', sortable: true },
+            { key: 'CantidadBalones', label: 'Cantidad Balones', sortable: true },
+            { key: 'CantidadTot', label: 'Cantidad General', sortable: true },
             { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
       ],
       totalRows: 50,
@@ -330,9 +332,9 @@ export default {
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
-      let url = this.API + 'ventas?soloPago=1&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + repartidorFiltro + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?soloPago=1&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + repartidorFiltro + '&reparto=1' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
+      //console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -384,6 +386,11 @@ console.log(url)
 </script>
 
 <style scope>
+#tabla-ventas tbody tr:last-child{
+    color: black;
+    background: transparent;
+    font-weight: bold;
+}
 .total-ventas {
   font-weight: bold;
   text-align: center;

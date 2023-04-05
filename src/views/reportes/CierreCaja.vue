@@ -627,7 +627,8 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasTarjeta + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalVentasVisa + this.totalIngresos - this.totalSalidas - this.totalComprasFise
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalIngresos - this.totalSalidas - this.totalComprasFise
+      //return this.totalVentasEfectivo + this.totalVentasTarjeta + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalVentasVisa + this.totalIngresos - this.totalSalidas - this.totalComprasFise
     },
     totalSalidas () {
       let total = 0
@@ -747,8 +748,8 @@ export default {
             .then(res => {
               this.setAlmacen(response.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              if(response.data.IdUsuarioPerfil !== 1) {
-                this.$refs.inputAlmacen.$refs.input.disabled = true
+              if(response.data.IdUsuarioPerfil == 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = false
               }
             })
       })
@@ -850,6 +851,10 @@ export default {
         this.ventas = res.data
         if(this.ventas.length > 0){
           this.getProductos(this.ventas)
+        }
+        else {
+          this.productosVendidos = []
+          this.productosVendidosTotal = 0
         }
         this.loadDetalles()
       }).catch(err => {
