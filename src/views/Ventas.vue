@@ -817,6 +817,13 @@ export default {
                 CodSunat: '03',
             }
             this.tieneIgv = false
+            this.TieneIgvComprobante = false
+            this.venta.IdComprobanteModifica = 0
+            this.venta.EsConsumoVale = 0
+            this.venta.EsVale = 0
+            this.venta.ConsumoId = 0
+            this.MontoConsumido = 0
+            this.MontoTotal = 0
             this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.getVendedor()
             this.$toasted.error('No autorizado')
