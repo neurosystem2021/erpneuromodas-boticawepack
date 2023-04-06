@@ -181,7 +181,7 @@
       </b-row>
 
       <b-row>
-        <h5>Ventas Vale</h5><br>
+        <h5>Ventas Vale (No Suma)</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -193,7 +193,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.EfectivoDesc }} - {{ item.VisaDesc }} - {{ item.MastercardDesc }} - {{ item.TransferenciaDesc }}</td>
+              <td>{{ item.Placa }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
             </tr>
@@ -362,7 +362,7 @@ export default {
     },
     ventasEfectivo () {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito
+        return venta.Efectivo > 0 && !venta.EsCredito && venta.EsVale == 0
       })
     },
     totalVentasVisa () {
@@ -374,7 +374,7 @@ export default {
     },
     ventasVisa () {
       return this.ventas.filter(venta => {
-        return venta.Visa > 0  && !venta.EsCredito
+        return venta.Visa > 0  && !venta.EsCredito && venta.EsVale == 0
       })
     },
     totalVentasTransferencia() {
@@ -386,7 +386,7 @@ export default {
     },
     ventasTransferencia () {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0  && !venta.EsCredito
+        return venta.Transferencia > 0  && !venta.EsCredito && venta.EsVale == 0
       })
     },
     totalVentasVale() {
@@ -410,7 +410,7 @@ export default {
     },
     ventasMastercard () {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0  && !venta.EsCredito
+        return venta.Mastercard > 0  && !venta.EsCredito && venta.EsVale == 0
       })
     },
     totalVentasCredito () {
@@ -433,7 +433,9 @@ export default {
       .then((response) => {
           this.setVendedor(response.data)
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          this.$refs.inputVendedor.$refs.input.disabled = true
+          if(response.data.IdUsuarioPerfil !== 1) {
+              this.$refs.inputVendedor.$refs.input.disabled = true
+          }
       })
       .catch((error) => {
           console.log(error)
@@ -448,6 +450,8 @@ export default {
       window.print();
     },
     loadData () {
+      this.productosVendidos = []
+      this.productosVendidosTotal = 0
       this.getVentas()
       this.getIngresos()
       this.getSalidas()
@@ -461,7 +465,7 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          user: sessionStorage.getItem("User")
+          user: this.vendedor.Usuario
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')

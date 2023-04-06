@@ -77,6 +77,7 @@
             <input
               v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
               v-model="productos[data.index].sutotal"
+              :disabled="bloquearInput?true:false"
               type="number"
               min="0"
               step="0.00001"
@@ -201,7 +202,7 @@
               <tbody>
                 <tr>
                   <td>
-                    <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                    <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success" :disabled="EsVale==1"><i class="fas fa-credit-card" ></i></b-button>
                     <b-popover target="popover-metodopago" title="Metodo de pago" triggers="focus">
                     <slot name="metodopago"></slot>
                     </b-popover>
@@ -299,6 +300,7 @@ export default {
     idAlmacen: Number,
     bloquearInput:Boolean,
     igvTotal: Boolean,
+    EsVale: Number,
     onSetProducto: {
       type: Function,
       default (obj) {

@@ -17,6 +17,8 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import Vales from '@/views/reportes/Vales.vue'
+
 
 Vue.use(Router)
 
@@ -97,6 +99,11 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
+    },
+    {
+      path: '/vales',
+      name: 'Vales',
+      component: Vales
     }
   ]
 })
