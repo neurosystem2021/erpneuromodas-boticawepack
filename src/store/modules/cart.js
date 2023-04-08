@@ -72,11 +72,13 @@ const actions = {
     let cantidad = false
     let setSuma = false
     let setPrecioCosto = false
+    let setPreOr = false
     
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      setPreOr = obje.setPreOr
       setPrecioCosto = obje.setPrecioCosto
     }
     
@@ -84,6 +86,14 @@ const actions = {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
         producto.nuevoPrecioContado = producto.PrecioContado
+      }
+
+      if (cantidad) {
+        producto.cantidad = cantidad
+      }
+
+      if(setPreOr){
+        producto.precio = setPreOr
       }
 
       commit('AGREGAR_PRODUCTO', producto)

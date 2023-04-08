@@ -87,22 +87,24 @@ import { mapActions } from 'vuex'
             }),
             selectProformas (item) {
                 // console.log('adsasdasdasd');
-                this.axios.get(this.API + 'proformas/detalle', {
+                this.axios.get(this.API + 'proformas/detalle/nuevo', {
                     params: {
                         idProforma: item.IdProforma
                     }
                 }).then((response) => {
+                    this.limpiarCarrito()
                     response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+                        this.add([item, () => {
+                        }, {setPreOr: item.Precio, cantidad: item.Cantidad } ])
 
                         this.filter = ''
                         this.show = false
                     })
+                    setTimeout(() => {
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })        
+                    }, 300);
 
                     this.$emit('onSelectProforma', item.IdCliente)
-                    this.limpiarCarrito()
                 })
             },
             myProvider (ctx) {
