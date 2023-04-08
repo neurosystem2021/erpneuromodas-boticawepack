@@ -122,11 +122,13 @@ export default {
 
         return promise.then((result) => {
           this.items = result.data
+          this.actualizarTabla();
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           return(this.items)
         }).catch(error => {
+          this.actualizarTabla();
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error

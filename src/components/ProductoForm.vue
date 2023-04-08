@@ -443,6 +443,7 @@ export default {
       delete this.producto.IdProducto;
       this.mensajeBtn = 'Crear';
       this.showNew = false;
+      this.$refs.inputCodigoBarra.setValue('');
       //console.log(this.producto,"asdasd");
     },
     actualizarLiquidacion(){

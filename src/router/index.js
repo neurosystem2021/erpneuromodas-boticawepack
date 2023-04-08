@@ -10,6 +10,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -128,5 +129,10 @@ export default new Router({
       name: 'RemisionLista',
       component: RemisionLista
     },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
+    }
   ]
 })

@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-form-group class="ocultarMovil">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -22,12 +22,56 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
             <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+
+      <div class="mostrarMovil">
+      <b-form-group>
+      <b-row>
+        <b-col md="6">
+          <b-input-group>
+          <autocomplete
+            ref="autocompleteProducto2"
+            :url="API + 'productos'"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto2')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+        </b-input-group>
+        </b-col><br/>
+        </b-row>
+        <b-row>
+        <b-col md="6">
+          <b-input-group>
+          <input v-model="loadCode"
+          :disabled="bloquearInput?true:false"
+                  @keydown.enter.prevent="loadBarcode"
+                  type="text"
+                  class="form-control"
+                  placeholder="Codigo de Barra" />
+          <b-input-group-append>
+            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            <!--<proveedores-tabla></proveedores-tabla>-->
+            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
+          </b-input-group-append>
+        </b-input-group>
+        </b-col>
+      </b-row>
+      </b-form-group>
+      </div>
+
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
@@ -36,6 +80,23 @@
         <b-row style="display:flex; justify-content:center; align-items:center">
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
         </b-row>
+      </b-modal>
+
+      <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer hide-header>
+        <div class="d-block text-center">
+          ESCANEE EL CODIGO DE BARRA
+          <br />
+          <br />
+          <div id="codigoBarraStyle">
+            <v-quagga
+              :onDetected="onBarcodeScanned"
+              :readerSize="readerSize"
+              :readerTypes="detecteds"
+              :patchSize="'medium'"
+              class="cameraBarra"
+            ></v-quagga>
+          </div>
+        </div>
       </b-modal>
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
@@ -180,7 +241,7 @@
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
               <tr>
-                <td  colspan="2">
+                <td  colspan="2" class="ocularMovil">
                   <label>pagó con:</label>
                   <b-form-input
                     type="text"
@@ -203,6 +264,11 @@
 import { mapState, mapActions } from 'vuex'
 import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
+import sound from '../../static/beep.mp3'
+import Vue from "vue"
+import VueQuagga from "vue-quaggajs"
+
+Vue.use(VueQuagga)
 
 export default {
   mounted() {
@@ -210,6 +276,25 @@ export default {
   },
   data () {
     return {
+      readerSize: {
+        width: 640,
+        height: 480,
+      },
+      detecteds: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader"
+      ],
+      result: "",
+      format: "",
       API: config.API,
       loadCode: '',
       pasteCode: false,
@@ -220,8 +305,17 @@ export default {
       pagocon: 0,
       productoSelect: {},
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      modalAbiertCode: false
     }
+  },
+  created() {
+    // Add barcode scan listener and pass the callback function
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
+  destroyed() {
+    // Remove listener when component is destroyed
+    this.$barcodeScanner.destroy();
   },
   watch: {
     sumatoriaTotal (sum) {
@@ -330,6 +424,27 @@ export default {
       this.productoUrl = url
       this.$refs['modalImagen'].show()
     },
+    abrirCodigoBarra(){
+      this.$refs['modalCodigoBarra'].show()
+      this.modalAbiertCode=true;
+      this.result="";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound)
+        audio.play()
+        if (this.result.length>0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs['modalCodigoBarra'].hide()
+          this.modalAbiertCode=false;
+        }
+      }
+      
+      // do something...
+    },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
@@ -348,7 +463,9 @@ export default {
       }
     },
     loadBarcode (e) {
-      e.preventDefault()
+      if (e) {
+        e.preventDefault()
+      }
       let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
 
       if (idProducto) {
@@ -401,6 +518,7 @@ export default {
     },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto2.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
@@ -503,5 +621,66 @@ export default {
   }
   .imagenGrande{
     width: 100%;
+  }
+  #modalCodigoBarra .modal-dialog {
+    max-width: 25% !important;
+    margin: 5% auto;
+  }
+  #codigoBarraStyle video, canvas{
+    width: 100%;
+    height: 100%;
+  }
+  .cameraBarra {
+    height: 20em;
+    width: auto;
+    margin: 0 auto;
+  }
+  .mostrarMovil{
+    display: none;
+  }
+  @media only screen and (max-width: 1440px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 50% !important;
+      margin: 5% auto;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
+  }
+  @media only screen and (max-width: 750px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 100% !important;
+      margin: 5%;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
+    .ocultarMovil {
+      display: none;
+    }
+    .mostrarMovil{
+      display: block;
+    }
+  }
+  @media only screen and (max-width: 375px) {
+    #modalCodigoBarra .modal-dialog {
+      max-width: 100% !important;
+      margin: 5%;
+    }
+    .cameraBarra {
+      height: 15em;
+      width: auto;
+      margin: 0 auto;
+    }
+  }
+  @media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
   }
 </style>

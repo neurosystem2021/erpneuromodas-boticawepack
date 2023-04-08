@@ -12,6 +12,8 @@ import VueAxios from 'vue-axios'
 import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
+import VueQuagga from "vue-quaggajs";
+import VueBarcodeScanner from "vue-barcode-scanner";
 
 const browser = detect();
 
@@ -33,6 +35,8 @@ Vue.use(Toasted, {
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
+Vue.use(VueQuagga);
+Vue.use(VueBarcodeScanner);
 
 // Componentes 
 Vue.component('autocomplete', Autocomplete)
