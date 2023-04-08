@@ -28,7 +28,7 @@
                 <b-row>
                   <b-col>
                     <h3>Valor de venta por día</h3>
-                    <bar-chart ref="chartGrafica" :height="400"></bar-chart>
+                    <bar-chart ref="chartGrafica" id="grafico"></bar-chart>
                   </b-col>
                 </b-row>
               </b-container>
@@ -52,7 +52,7 @@
                 <b-row>
                   <b-col>
                     <h3>Valor de venta por mes</h3>
-                    <bar-chart ref="chartGraficaMes"></bar-chart>
+                    <bar-chart ref="chartGraficaMes" id="grafico"></bar-chart>
                   </b-col>
                 </b-row>
               </b-container>
@@ -98,7 +98,7 @@
                   <b-row>
                   <b-col>
                     <h3>Valor de venta por rango</h3>
-                    <line-chart ref="chartGraficaRango"></line-chart>
+                    <line-chart ref="chartGraficaRango" id="grafico"></line-chart>
                   </b-col>
                   </b-row>
                 </b-container>
@@ -286,3 +286,10 @@
     }
   }
   </script>
+  <style>
+
+  #grafico canvas{
+    height: 400px !important;
+  }
+
+  </style>
