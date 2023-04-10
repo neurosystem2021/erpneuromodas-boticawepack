@@ -82,11 +82,8 @@
         </b-row>
       </b-modal>
 
-      <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer hide-header>
+      <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
         <div class="d-block text-center">
-          ESCANEE EL CODIGO DE BARRA
-          <br />
-          <br />
           <div id="codigoBarraStyle">
             <v-quagga
               :onDetected="onBarcodeScanned"
@@ -277,8 +274,8 @@ export default {
   data () {
     return {
       readerSize: {
-        width: 640,
-        height: 480,
+        width: 1600,
+        height: 1080,
       },
       detecteds: [
         "code_128_reader",
@@ -622,16 +619,23 @@ export default {
   .imagenGrande{
     width: 100%;
   }
+  #modalCodigoBarra {
+    padding: 0!important;
+  }
   #modalCodigoBarra .modal-dialog {
-    max-width: 25% !important;
-    margin: 5% auto;
+    max-width: 50vw !important;
+    max-height: 50vh !important;
+  }
+  #modalCodigoBarra .modal-body {
+    padding-bottom: 1px !important;
+    margin-bottom: 1px !important;
   }
   #codigoBarraStyle video, canvas{
     width: 100%;
     height: 100%;
   }
   .cameraBarra {
-    height: 20em;
+    height: 50vh;
     width: auto;
     margin: 0 auto;
   }
@@ -640,24 +644,22 @@ export default {
   }
   @media only screen and (max-width: 1440px) {
     #modalCodigoBarra .modal-dialog {
-      max-width: 50% !important;
-      margin: 5% auto;
+      max-width: 50vw !important;
+      max-height: 50vh !important;
     }
     .cameraBarra {
-      height: 15em;
+      height: 50vh;
       width: auto;
-      margin: 0 auto;
     }
   }
   @media only screen and (max-width: 750px) {
     #modalCodigoBarra .modal-dialog {
-      max-width: 100% !important;
-      margin: 5%;
+      max-width: 100vw !important;
+      max-height: 80vh !important;
     }
     .cameraBarra {
-      height: 15em;
+      height: 80vh;
       width: auto;
-      margin: 0 auto;
     }
     .ocultarMovil {
       display: none;
@@ -668,13 +670,12 @@ export default {
   }
   @media only screen and (max-width: 375px) {
     #modalCodigoBarra .modal-dialog {
-      max-width: 100% !important;
-      margin: 5%;
+      max-width: 100vw !important;
+      max-height: 80vh !important;
     }
     .cameraBarra {
-      height: 15em;
+      height: 80vh;
       width: auto;
-      margin: 0 auto;
     }
   }
   @media only screen and (max-width: 700px) {
