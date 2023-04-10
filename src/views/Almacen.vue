@@ -201,7 +201,7 @@
 
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ $options.filters.redondear(getStock(data.item.IdProducto), 4) }}
+                    {{ $options.filters.redondear(getStock(data.item.IdProducto), 2) }}
                   </div>
                   <img v-if="getStock(data.item.IdProducto) === undefined" src="static/box.png" style="width: 24px" />
                 </template>
