@@ -14,6 +14,7 @@ import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
 import VueQuagga from "vue-quaggajs";
 import VueBarcodeScanner from "vue-barcode-scanner";
+import VueSweetalert2 from 'vue-sweetalert2';
 
 const browser = detect();
 
@@ -37,6 +38,7 @@ Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 Vue.use(VueQuagga);
 Vue.use(VueBarcodeScanner);
+Vue.use(VueSweetalert2);
 
 // Componentes 
 Vue.component('autocomplete', Autocomplete)

@@ -6,7 +6,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -38,7 +38,7 @@
           <b-input-group>
           <autocomplete
             ref="autocompleteProducto2"
-            :url="API + 'productos'"
+            :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -325,6 +325,7 @@ export default {
   props: {
     tipo: String,
     setPrecio: Boolean,
+    idAlmacen: Number,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -368,6 +369,13 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    APIProductos () {
+      if (this.idAlmacen) {
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+      } else {
+        return this.API + 'productos'
+      }
+    },
     sumatoriaSubTotal () {
       let sumatoria = 0
       if (this.igvTotal) {
@@ -539,8 +547,44 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      if (this.idAlmacen) {
+        let styleStock = ''
+        if(data.stock <= 0){
+          styleStock = 'table-danger'
+        }else{
+          styleStock = 'table-success'
+        }
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr>
+                <td style="width: 60px" class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `
+      }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
       `
     },
     setNuevoPrecioContado (index) {

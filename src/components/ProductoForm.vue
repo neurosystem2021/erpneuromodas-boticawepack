@@ -201,6 +201,15 @@
               />
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.ControlaStockMinimo"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Activar stock minimo
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Stock Minimo:</label>
             <input   
               required="required"
@@ -405,6 +414,7 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
         this.producto.Imagen = newVal.Imagen
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
         this.actualizarLiquidacion()
@@ -508,6 +518,7 @@ export default {
         PrecioContado: 0,
         PorcentajeLiquidacion: 0,
         PrecioCosto: 0,
+        ControlaStockMinimo:0,
         categoria: {},
         marca: {},
         Imagen: null,

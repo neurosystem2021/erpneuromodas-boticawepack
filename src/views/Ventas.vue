@@ -28,7 +28,7 @@
                             <b-col md="4">
                                 <b-form-group>
                                     <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
-                                    <b-input-group class="mt-2">
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -185,6 +185,7 @@
                             @onRemoveProducto="actualizarDescuento"
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
+                            :idAlmacen="venta.almacen.IdAlmacen"
                             ref="carrito" 
                             :showButton="false" 
                             :bloquearInput="bloquearInput"  
