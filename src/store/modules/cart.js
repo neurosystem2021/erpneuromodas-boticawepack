@@ -83,6 +83,7 @@ const actions = {
         producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
 
+      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
@@ -109,7 +110,8 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-        
+
+          obj.Descripcion = ''
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {

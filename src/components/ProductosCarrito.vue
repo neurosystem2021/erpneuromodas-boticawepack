@@ -123,7 +123,7 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 80px"
+            style="width: 90px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -185,6 +185,20 @@
             <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0;">
               <p style="color: red; text-align: center;">Liquidación</p>
             </b-form-text>
+        </template>
+
+        <template slot="Descripcion" slot-scope="data">
+          <textarea 
+            :disabled="bloquearInput?true:false"
+            class="form-control"
+            placeholder="Descripción"
+            cols="9" rows="1"
+            style="width: 210px"
+            v-model="productos[data.index].Descripcion"></textarea>
+          <!--<b-form-input
+            v-model="productos[data.index].Descripcion"
+            type="text"
+            placeholder="Descripción"></b-form-input>-->
         </template>
 
         <template slot="total" slot-scope="data">

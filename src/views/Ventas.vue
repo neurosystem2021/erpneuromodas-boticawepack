@@ -384,6 +384,7 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
+                    { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: 'Img' },
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
@@ -828,6 +829,7 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+                pro.Descripcion = (''+(pro.Descripcion || '')).toUpperCase()
             });
 
             if(totalCero >= 1) {
@@ -863,7 +865,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -872,6 +874,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
+                this.loadClienteVarios()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
@@ -879,7 +882,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 console.log(error)
