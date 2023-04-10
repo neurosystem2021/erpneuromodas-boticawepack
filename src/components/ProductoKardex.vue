@@ -60,7 +60,7 @@ export default {
             let saldo = 0
             return this.kardex.map(item => {
                 saldo += (item.IngresoCantidad - item.SalidaCantidad)
-                item.saldo = saldo
+                item.saldo = Math.round(saldo* 100) / 100
                 return item
             })
         }
