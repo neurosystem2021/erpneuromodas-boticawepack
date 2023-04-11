@@ -107,7 +107,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="0.001"
+            step="0.01"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index])"
@@ -123,7 +123,7 @@
             type="number"
             style="width: 80px"
             class="form-control"
-            step="0.001"
+            step="0.1"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
@@ -154,7 +154,7 @@
             type="number"
             style="width: 90px"
             min="0"
-            step="0.00001"
+            step="0.0001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -303,7 +303,7 @@
           </div>
           <div v-else>
             <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-            <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+            <div v-if="!data.item.EsPadre">{{ data.item.stock | redondear(2) }}</div>
           </div>
         </template>
       </b-table>

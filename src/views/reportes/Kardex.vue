@@ -143,7 +143,7 @@ export default {
       let saldoCostoUnitario = 0
       return this.kardexSelect.map(item => {
           saldo += (item.IngresoCantidad - item.SalidaCantidad)
-          item.saldo = saldo
+          item.saldo = Math.round(saldo* 100) / 100
           if (item.IngresoCantidad > 0) {
             saldoCostoTotal = saldoCostoTotal + (item.IngresoCantidad * item.IngresoPrecio)
             saldoCostoUnitario = saldoCostoTotal / saldo

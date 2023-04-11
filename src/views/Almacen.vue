@@ -23,7 +23,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock <br>General</b>
-                  <div> {{ sumaStock }} </div>
+                  <div> {{ sumaStock | redondear(2) }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -236,7 +236,7 @@
                   <td>{{ productoSelect.Producto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioContado }}</td>
-                  <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>
+                  <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) | redondear(2) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -270,7 +270,7 @@
 
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
+                    {{ getStock(data.item.IdProducto) | redondear(2)  }}
                   </div>
                 </template>
 
