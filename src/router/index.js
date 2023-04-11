@@ -8,6 +8,7 @@ import Ventas from '@/views/Ventas.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
+import Remision from '@/views/Remision.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -18,6 +19,7 @@ import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Vales from '@/views/reportes/Vales.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 
 Vue.use(Router)
@@ -104,6 +106,16 @@ export default new Router({
       path: '/vales',
       name: 'Vales',
       component: Vales
-    }
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
+    },
   ]
 })
