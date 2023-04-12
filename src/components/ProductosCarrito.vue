@@ -105,7 +105,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -693,7 +693,7 @@ export default {
     },*/
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""

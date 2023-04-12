@@ -490,7 +490,7 @@ return false
   @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 250px)
+        width: calc(100% - 150px)
     }
   }
 </style>
