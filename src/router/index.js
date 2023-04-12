@@ -25,6 +25,7 @@ import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import Formato from '@/views/reportes/Formato.vue'
+import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 
 Vue.use(Router)
 
@@ -145,6 +146,11 @@ export default new Router({
       path: '/proveedores',
       name: 'Proveedores',
       component: Proveedores
+    },
+    {
+      path: '/reportes/articulosresumen',
+      name: 'ArticulosResumen',
+      component: ArticulosResumen
     }
   ]
 })

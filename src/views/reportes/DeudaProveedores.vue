@@ -130,7 +130,8 @@ export default {
             { key: 'Saldo', label: 'Saldo', sortable: true },
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
-            { key: 'Letras', label: 'Letras', sortable: true },
+            { key: 'Letras', label: 'Letras', sortable: true, class:"table-primary text-center" },
+            { key: 'LetrasCancelado', label: 'Letras Cancel.', sortable: true, class:"table-success text-center" }
       ],
       totalRows: 50,
       perPage: 10,
@@ -176,6 +177,11 @@ export default {
         //this.totalRows = this.items.length
         // Here we could override the busy state, setting isBusy to false
         // this.isBusy = false
+        this.items.map(r=>{
+          if(r.Letras == 'Ninguna'){
+            r.LetrasCancelado='---'
+          }
+        })
         return(this.items)
       }).catch(error => {
         // Here we could override the busy state, setting isBusy to false

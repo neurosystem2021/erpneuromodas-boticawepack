@@ -68,7 +68,6 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="VENTA"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +85,6 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
