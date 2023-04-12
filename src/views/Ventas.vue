@@ -1040,6 +1040,12 @@ export default {
                 return
             }
 
+            if(parseFloat(totalPagos) >= 700 && this.venta.tipoVenta.CodSunat == '03' && this.venta.cliente.DniRuc == '00000000' ){
+                this.$toasted.error('Venta con boleta mayor a 700 soles, no puede ser emitida con CLIENTE VARIOS');
+                this.inProgress = false
+                return;
+            }
+
             //Nota de Creadito
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
