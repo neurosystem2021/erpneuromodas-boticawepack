@@ -236,7 +236,7 @@
                   <td>{{ productoSelect.Producto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioContado }}</td>
-                  <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) | redondear(2) }}</td>
+                  <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -270,7 +270,7 @@
 
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) | redondear(2)  }}
+                    {{ getStock(data.item.IdProducto)  }}
                   </div>
                 </template>
 
@@ -547,7 +547,7 @@ export default {
     },
     getStock (idProducto) {
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
+      return this.itemsStock[index] &&  (this.itemsStock[index].stock? Number.isInteger(this.itemsStock[index].stock)?this.itemsStock[index].stock:this.itemsStock[index].stock.toFixed(2):this.itemsStock[index].stock )
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""

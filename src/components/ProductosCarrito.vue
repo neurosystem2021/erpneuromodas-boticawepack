@@ -303,7 +303,7 @@
           </div>
           <div v-else>
             <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-            <div v-if="!data.item.EsPadre">{{ data.item.stock | redondear(2) }}</div>
+            <div v-if="!data.item.EsPadre">{{ data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
           </div>
         </template>
       </b-table>
