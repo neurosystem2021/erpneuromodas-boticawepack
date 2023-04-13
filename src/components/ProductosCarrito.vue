@@ -107,7 +107,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="0.01"
+            step="0.0001"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index])"
@@ -123,7 +123,7 @@
             type="number"
             style="width: 80px"
             class="form-control"
-            step="0.1"
+            step="0.0001"
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
