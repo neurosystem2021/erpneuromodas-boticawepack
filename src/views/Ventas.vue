@@ -385,7 +385,19 @@
                                     </tbody>
                                 </table>
                             </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                            <template slot="adicional">
+                                <b-row >
+                                    <b-col md="12">
+                                        <h6 style="text-align:left">Observación: </h6>
+                                        <textarea 
+                                        class="form-control"
+                                        style="font-weight:bold;"
+                                        cols="9" rows="6"
+                                        placeholder="Ingrese alguna observacion del comprobante..."
+                                        v-model="venta.Observacion">
+                                        </textarea>
+                                    </b-col>
+                                </b-row>
                                 <table class="table b-table border table-footer table-sm text-center" v-if="false">
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -637,7 +649,8 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                Observacion:''
             }
             this.isNota = false
             this.bloquearInput=false

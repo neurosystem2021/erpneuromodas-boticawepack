@@ -9,6 +9,15 @@
           <b-col md="6">
             <fieldset class="scheduler-border">
               <legend class="scheduler-border">
+                <h5>GRE</h5>
+              </legend>
+              <div class="container text-center">
+                  <h2>{{ SerieGRE }} - {{ NumeroGRE }}</h2>
+                  <h6>{{ FechaDocGRE }}</h6>
+              </div>
+            </fieldset>
+            <fieldset class="scheduler-border">
+              <legend class="scheduler-border">
                 <h5>Resumen</h5>
               </legend>
               <h5>Guía de remisión</h5>
@@ -21,7 +30,7 @@
               <div class="container">
                 <div class="row">
                   <label for="observacion" class="col-sm-4">Observación</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Observación" v-model="remision.observacion">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Observación" v-model="remision.observacion" autocomplete="off">
                 </div>
               </div>
               <div class="container">
@@ -30,8 +39,8 @@
                   <select class="form-control form-control-sm col-sm-2" id="codUndPesoBruto" v-model="remision.codUndPesoBruto" required>
                     <option value="KGM">KILOGRAMO</option>
                   </select>
-                  <input type="text" class="form-control form-control-sm col-sm-3" id="pesoBruto" placeholder="Peso Total" v-model="remision.pesoBruto" required>
-                  <input type="text" class="form-control form-control-sm col-sm-3" id="totalBultos" placeholder="Total Bultos" v-model="remision.totalBultos">
+                  <input type="text" class="form-control form-control-sm col-sm-3" id="pesoBruto" placeholder="Peso Total" v-model="remision.pesoBruto" required autocomplete="off">
+                  <input type="text" class="form-control form-control-sm col-sm-3" id="totalBultos" placeholder="Total Bultos" v-model="remision.totalBultos" autocomplete="off">
                 </div>
               </div>
 
@@ -79,7 +88,7 @@
                 <div class="row">
                   <label for="codUbigeoOrigen" class="col-sm-4">Ubigeo de Partida</label>
                   <div class="input-group input-group-sm col-sm-8">
-                    <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required>
+                    <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required autocomplete="off">
                     <div class="input-group-append">
                       <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
                     </div>
@@ -89,7 +98,7 @@
               <div class="container">
                 <div class="row">
                   <label for="direccionOrigen" class="col-sm-4">Dirección de Partida</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required>
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required autocomplete="off">
                 </div>
               </div>
             </fieldset>
@@ -114,6 +123,7 @@
                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                         :classes="{input: 'form-control form-control-sm '}">
                     </autocomplete>
+                    <b-form-text style="color:red !important; font-size:0.8rem;">Al seleccionar su comprobante, se actualizará el campo NRO.GUIA del mismo.</b-form-text>
                   </div>
                   <div class="col-sm-6">
                     <label>Importar Movimiento:</label>
@@ -144,19 +154,19 @@
               <div class="container">
                 <div class="row">
                   <label for="nroDocumentoCliente" class="col-sm-4">RUC</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required>
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required autocomplete="off">
                 </div>
               </div>
               <div class="container">
                 <div class="row">
                   <label for="razonSocialCliente" class="col-sm-4">Razón Social</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialCliente" placeholder="Razón Social" v-model="remision.razonSocialCliente" required>
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialCliente" placeholder="Razón Social" v-model="remision.razonSocialCliente" required autocomplete="off">
                 </div>
               </div>
               <div class="container">
                 <div class="row">
                   <label for="direccionCliente" class="col-sm-4">Dirección</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionCliente" placeholder="Dirección" v-model="remision.direccionCliente">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionCliente" placeholder="Dirección" v-model="remision.direccionCliente" autocomplete="off">
                 </div>
               </div>
               <!-- <div class="container">
@@ -172,7 +182,7 @@
                 <div class="row">
                   <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
                   <div class="input-group input-group-sm col-sm-8">
-                    <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required>
+                    <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required autocomplete="off">
                     <div class="input-group-append">
                       <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
                     </div>
@@ -182,7 +192,7 @@
               <div class="container">
                 <div class="row">
                   <label for="direccionDestino" class="col-sm-4">Dirección de Llegada</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required>
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required autocomplete="off">
                 </div>
               </div>
             </fieldset> 
@@ -196,7 +206,7 @@
                 <div class="row">
                     <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
                     <div class="input-group input-group-sm col-sm-8">
-                      <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" ref="inputnroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista">
+                      <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" ref="inputnroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista" autocomplete="off">
                       <div class="input-group-append">
                           <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUC()">Buscar</b-button>
                       </div>
@@ -206,7 +216,7 @@
               <div class="container">
                 <div class="row">
                   <label for="razonSocialTransportista" class="col-sm-4">Razón Social</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" ref="inputrazonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" ref="inputrazonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista" autocomplete="off">
                 </div>
               </div>
 
@@ -223,7 +233,7 @@
                 <div class="row">
                     <label for="nroDocChofer" class="col-sm-4">Doc. del Chofer (DNI)</label>
                     <div class="input-group input-group-sm col-sm-8">
-                       <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer">
+                       <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer" autocomplete="off">
                       <div class="input-group-append">
                           <b-button size="sm" variant="outline-secondary" @click="consultaDocConductor()">Buscar</b-button>
                       </div>
@@ -234,28 +244,28 @@
               <div class="container mt-2">
                 <div class="row">
                   <label for="apellidosChofer" class="col-sm-4">Apellidos del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container mt-2">
                 <div class="row">
                   <label for="nombresChofer" class="col-sm-4">Nombres del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container mt-2">
                 <div class="row">
                   <label for="licenciaChofer" class="col-sm-4">Licencia del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container">
                 <div class="row">
                   <label for="placaVehiculo" class="col-sm-4">N° de Placa Vehículo</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo">
+                  <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo" autocomplete="off">
                 </div>
               </div>
 
@@ -289,6 +299,7 @@ import config from '@/store/config.js'
 export default {
   mounted () {
     this.limpiarCamposRefs();
+    this.obtenerNumero()
   },
   data () {
     return {
@@ -308,7 +319,9 @@ export default {
         razonSocialTransportista: '',
         placaVehiculo: '',
         nroDocChofer: '',
-        direccionCliente: ''
+        direccionCliente: '',
+        idDocVenta: 0,
+        documentoReferencia: '',
       },
       cliente: {},
       carrito: {
@@ -318,7 +331,10 @@ export default {
           { key: 'cantidad' },
           { key: 'acciones', label: ''}
         ]
-      }
+      },
+      SerieGRE:'',
+      NumeroGRE:'',
+      FechaDocGRE:'',
     }
   },
   computed: {
@@ -333,6 +349,19 @@ export default {
     }),
     afe (e) {
       return false
+    },
+    obtenerNumero(){
+      this.axios.get(this.API + 'remision/ultima')
+      .then((response) => {
+          if(response.data){
+            this.SerieGRE = response.data.serie
+            this.NumeroGRE = response.data.numero
+            this.FechaDocGRE = this.$moment().format("YYYY-MM-DDTH:mm:ss")
+          }
+      })
+      .catch((error) => {
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
     },
     motivoTrasladoChange (e) {
       let descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
@@ -401,10 +430,13 @@ export default {
           this.remision.licenciaChofer = '';
           this.remision.descripcionMotivoTraslado = 'VENTA';
           this.remision.totalBultos = '';
+          this.remision.documentoReferencia = '';
+          this.remision.idDocVenta = 0;
           this.$refs.inputDocRef.setValue('');
           this.$refs.inputMovRef.setValue('');
           this.limpiarCamposRefs();
-          this.$toasted.success('Guia de remisión guardada correctamente ')          
+          this.$toasted.success('Guia de remisión guardada correctamente ') 
+          this.obtenerNumero();       
         }
         this.inProgress = false
       })
@@ -540,7 +572,8 @@ export default {
       this.$set(this.remision, 'razonSocialCliente', '');
       this.$set(this.remision, 'direccionCliente', '');
       this.$refs.inputDocRef.setValue('');
-      this.remision.documentoReferencia = obj.NroComprobante;
+      this.remision.idDocVenta = 0;
+      this.remision.documentoReferencia = '';
       this.limpiarCart();
       
       // Cargar producto del movimiento
@@ -591,6 +624,7 @@ export default {
       this.$set(this.remision, 'direccionCliente', '');
       this.$refs.inputMovRef.setValue('');
       this.limpiarCart();
+      this.remision.idDocVenta = obj.IdDocVenta
       this.remision.documentoReferencia = obj.NroComprobante;
       //Cargar producto del documento afectado
       this.axios.get(this.API + 'venta/detalle/comprobante/guia', {
