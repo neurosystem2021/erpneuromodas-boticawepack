@@ -740,7 +740,7 @@ export default {
                 let pass = window.prompt('Escriba su contraseña')
                 if ((''+pass).trim()!='') {
                     this.axios.post(this.API + 'login', {
-                    user: 'admin',
+                    user: this.venta.almacen.IdAlmacen==2?'admin2':'admin',
                     password: pass
                     }).then(r => {
                         if (r.data) {
@@ -770,6 +770,7 @@ export default {
                             }
                             this.venta.tipoVenta = obj
                             this.getNumeroVenta()
+                            this.$toasted.info('Autorizado')
                         }else{
                             this.noAutorizado()
                         }
