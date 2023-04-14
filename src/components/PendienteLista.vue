@@ -14,32 +14,34 @@
                 <b-row>
                     <b-col md="6" class="my-1">
                         <b-form-group>
-                            <label>Buscar:</label>
-                            <b-form-input placeholder="Busqueda..." v-model="filter" @input="currentPage = 1" />
+                            <b-input-group>
+                                <b-form-input placeholder="Busqueda..." v-model="filter" @input="currentPage = 1" />
+                                <b-input-group-append>
+                                    <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+                                </b-input-group-append>
+                            </b-input-group>
                         </b-form-group>
                     </b-col>
                     <b-col md="6" class="my-1">
                         <b-form-group>
-						    <label>Almacen:</label>
 						    <autocomplete
                                 required="required"
                                 ref="inputAlmacen"
+                                :disabled="true"
                                 :url="API + 'almacenes'"
                                 anchor="Almacen"
-                                initValue="TODOS"
                                 label="writer"
-                                placeholder=""
                                 :on-select="setAlmacen" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                 :classes="{input: 'form-control'}">
 						    </autocomplete>
 					    </b-form-group>
                     </b-col>
-                    <b-col md="12">
+                    <!--<b-col md="12">
                         <b-form-group>
                             <b-btn @click="limpiarFiltros">Limpiar</b-btn>
                         </b-form-group>
-                    </b-col>
+                    </b-col>-->
                 </b-row>
                     
                     <b-table 
@@ -96,6 +98,7 @@ import config from '@/store/config.js'
     export default {
         mounted () {
             //this.limpiarFiltros();
+            this.getAlmacenById();
         },
         watch: {
           items () {
@@ -146,20 +149,36 @@ import config from '@/store/config.js'
                     })
                 }
             },
+            getAlmacenById() {
+                let usuario = sessionStorage.getItem('User')
+                this.axios.get(this.API + 'usuarios/' + usuario)
+                .then((response) => {
+                    this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+                        .then(res => {
+                        this.setAlmacen(response.data)
+                        this.$refs.inputAlmacen.setValue(res.data.Almacen)
+                        this.$refs.inputAlmacen.$refs.input.disabled = true
+                        })
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            },
             setAlmacen (obj) {
                 this.almacen = obj || {}
-                this.$refs.tablaPendientes.refresh()
+                //this.$refs.tablaPendientes.refresh()
             },
             focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
             },
-            limpiarFiltros() {
+            /*limpiarFiltros() {
                 this.filter = ''
                 this.almacen.IdAlmacen = ''
                 this.$refs.inputAlmacen.setValue('TODOS')
                 this.$refs.tablaPendientes.refresh()
-            },
+            },*/
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true

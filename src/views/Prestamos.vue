@@ -124,7 +124,8 @@ import ProductosPrestados from '@/components/ProductosPrestados'
 export default {
   mounted() {
     
-    this.loadFirstAlmacen()
+    //this.loadFirstAlmacen()
+    this.getAlmacenById()
     this.loadFirstEnvase()
   },
   data() {
@@ -164,13 +165,29 @@ export default {
     }
   },
   methods: {
-      loadFirstAlmacen () {
+      /*loadFirstAlmacen () {
         this.axios.get(this.API + 'almacenes/primero')
           .then(res => {
             this.$refs.inputAlmacen.setValue(res.data.Almacen)
             this.setAlmacen(res.data)
             //this.almacen = res.data
           })
+      },*/
+      getAlmacenById(){
+        let usuario = sessionStorage.getItem('User')
+        this.axios.get(this.API + 'usuarios/' + usuario)
+        .then((response) => {
+          this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(response.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              this.$refs.inputAlmacen.$refs.input.disabled = true
+            })
+        })
+        .catch((error) => {
+            console.log(error)
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
       },
       loadFirstEnvase () {
       this.axios.get(this.API + 'balonesEnvase/primero')

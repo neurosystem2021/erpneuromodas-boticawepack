@@ -145,7 +145,7 @@
               :current-page="currentPage">
 
 								<template slot="tiempo" slot-scope="data">
-									{{ data.item.FechaDoc==''?null:diferenciaFecha(data.item.FechaDoc, data.item.FechaPago) }}
+									{{ data.item.FechaPago=='' || data.item.FechaPago==null?'':diferenciaFecha(data.item.FechaDoc, data.item.FechaPago) }}
 								</template>
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
@@ -191,8 +191,9 @@ export default {
       this.totalRows = response.data.total
     })
 
+    this.getAlmacenById()
 		this.getVentasAcumuladas()
-		this.loadFirstAlmacen()
+		//this.loadFirstAlmacen()
   },
   data() {
     return {
@@ -249,13 +250,29 @@ export default {
 
 			return d.years() + '/' + d.months() + '/' + d.days() + ' ' + d.hours() + ':' + d.minutes() + ':' + d.seconds()
 		},
-		loadFirstAlmacen () {
+		/*loadFirstAlmacen () {
 				this.axios.get(this.API + 'almacenes/primero')
 						.then(res => {
 								this.$refs.inputAlmacen.setValue(res.data.Almacen)
 								this.almacen = res.data
 						})
-		},
+		},*/
+    getAlmacenById(){
+        let usuario = sessionStorage.getItem('User')
+        this.axios.get(this.API + 'usuarios/' + usuario)
+        .then((response) => {
+          this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(response.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              this.$refs.inputAlmacen.$refs.input.disabled = true
+            })
+        })
+        .catch((error) => {
+            console.log(error)
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+      },
     setTipoVenta (obj) {
         this.tipoDoc = obj || {}
         this.getVentasAcumuladas()
@@ -332,7 +349,7 @@ export default {
       if (this.tipoDoc.IdTipoDoc) {
         tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
       }
-      let url = this.API + 'ventas?soloPago=1&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + repartidorFiltro + '&reparto=1' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      let url = this.API + 'ventas?soloPago=0&' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + repartidorFiltro + '&reparto=1' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       //console.log(url)
       let promise = this.axios.get( url )
@@ -355,10 +372,10 @@ export default {
       this.filter = ''
       this.tipoDoc = {}
       this.repartidor = {}
-      this.almacen.IdAlmacen = 1
+      //this.almacen.IdAlmacen = 1
       this.fechaInicio = this.$moment().format("YYYY-MM-DD");
       this.fechaFin = this.$moment().format("YYYY-MM-DD");
-      this.$refs.inputAlmacen.setValue('PRINCIPAL');
+      //this.$refs.inputAlmacen.setValue('PRINCIPAL');
       this.$refs.inputTipoVenta.setValue('');
       this.$refs.inputRepartidor.setValue('');
       //this.$refs.inputVendedor.setValue('')

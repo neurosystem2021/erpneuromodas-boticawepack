@@ -748,9 +748,9 @@ export default {
             .then(res => {
               this.setAlmacen(response.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              if(response.data.IdUsuarioPerfil == 1) {
+              /*if(response.data.IdUsuarioPerfil == 1) {
                 this.$refs.inputAlmacen.$refs.input.disabled = false
-              }
+              }*/
             })
       })
       .catch((error) => {

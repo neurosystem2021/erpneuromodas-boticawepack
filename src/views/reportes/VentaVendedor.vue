@@ -104,8 +104,9 @@ export default {
   mounted() {
     this.axios.get(this.API + 'reportes/ventavendedor/count').then((response) => {
       this.totalRows = response.data.total
-      this.$refs.inputVendedor.setValue('TODOS');
+      //this.$refs.inputVendedor.setValue('TODOS');
     })
+    this.getVendedor();
   },
   data() {
     return {
@@ -114,6 +115,7 @@ export default {
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       filters: {},
+      url: '',
       filter: '',
       sortBy: '',
       sortDesc: true,
@@ -141,7 +143,7 @@ export default {
 
 		// 	return d.years() + '/' + d.months() + '/' + d.days() + ' ' + d.hours() + ':' + d.minutes() + ':' + d.seconds()
 		// },
-		loadFirstAlmacen () {
+		/*loadFirstAlmacen () {
         let usuario = sessionStorage.getItem('User')
           if (user) {
             usuario = user
@@ -152,7 +154,7 @@ export default {
 								this.$refs.inputAlmacen.setValue(res.data.Almacen)
 								this.almacen = res.data
 						})
-		},
+		},*/
     setTipoVenta (obj) {
         this.tipoDoc = obj || {}
         this.getVentasAcumuladas()
@@ -173,9 +175,14 @@ export default {
       this.$refs.tablaVentas.refresh()
     },
     myProvider (ctx) {
-      let url = this.API + 'reportes/ventavendedor?' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0)
-      let promise = this.axios.get( url )
+      if (ctx.filter) {
+        this.url = this.API + 'reportes/ventavendedor?' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      }
+      else {
+        this.url = this.API + 'reportes/ventavendedor?' + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[vendedor]='+sessionStorage.getItem('User')+'&sortBy='+ctx.sortBy
+      }
+      this.url += '&sortDesc='+(ctx.sortDesc ? 1 : 0)
+      let promise = this.axios.get( this.url )
 
       return promise.then((result) => {
         this.items = result.data
@@ -186,12 +193,12 @@ export default {
       })
     },
     limpiarFiltros () {
-      this.filters = {}
-      this.filter = ''
-      this.vendedor = ''
+      //this.filters = {}
+      //this.filter = ''
+      //this.vendedor = ''
       this.fechaInicio = this.$moment().format("YYYY-MM-DD")
       this.fechaFin = this.$moment().format("YYYY-MM-DD")
-      this.$refs.inputVendedor.setValue('TODOS')
+      //this.$refs.inputVendedor.setValue('TODOS')
 
     },
     generateFilter (key, value) {
@@ -213,6 +220,7 @@ export default {
         .then((response) => {
             this.setVendedor(response.data)
             this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            this.$refs.inputVendedor.$refs.input.disabled = true
         })
         .catch((error) => {
             console.log(error)

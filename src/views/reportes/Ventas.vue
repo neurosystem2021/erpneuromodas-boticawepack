@@ -95,7 +95,7 @@
             <b-row>
               <b-col md="12">
                 <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                  <b-button @click="limpiarFiltros">Limpiar</b-button>
                 </b-form-group>
                 <b-form-group label="Mostrar">
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -140,7 +140,9 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" 
+              :href="'/api/index.php/reporte/ventasporvendedor?idAlmacen='+almacen.IdAlmacen+'&vendedor='+vendedor.Usuario+'&fechaInicio='+fechaInicio+
+              '&fechaFin='+fechaFin+'&declarado='+declarado+'&idTipoDoc='+tipoDoc.IdTipoDoc"  target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -166,6 +168,7 @@ export default {
     })
 
     this.getVentasAcumuladas()
+    this.getAlmacenVendedorById()
   },
   data() {
     return {
@@ -184,6 +187,7 @@ export default {
         IdAlmacen: 1
       },
       tipoDoc: {
+        IdTipoDoc: ''
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       ventaSelect: {},
@@ -249,6 +253,29 @@ export default {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    getAlmacenVendedorById(){
+      let usuario = sessionStorage.getItem('User')
+      this.axios.get(this.API + 'usuarios/' + usuario)
+      .then((response) => {
+        //console.log(response.data);
+        //OBTENER VENDEDOR POR USUARIO
+        this.setVendedor(response.data)
+        this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+        this.$refs.inputVendedor.$refs.input.disabled = true
+        
+        //OBTENER ALMACEN POR USUARIO
+        this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+          .then(res => {
+            this.setAlmacen(response.data)
+            this.$refs.inputAlmacen.setValue(res.data.Almacen)
+            this.$refs.inputAlmacen.$refs.input.disabled = true
+          })
+      })
+      .catch((error) => {
+          console.log(error)
+          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+      })
+    },
     setAlmacen (obj) {
       this.almacen = obj
       Vue.nextTick(() => this.$refs.tablaVentas.refresh())
@@ -278,7 +305,7 @@ export default {
       }
       let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
+//console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -297,8 +324,14 @@ console.log(url)
     limpiarFiltros () {
       this.filters = {}
       this.filter = ''
-      this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      this.tipoDoc = {
+        IdTipoDoc: ''
+      }
+      this.$refs.inputTipoVenta.setValue('')
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD");
+      this.fechaFin = this.$moment().format("YYYY-MM-DD");
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+      //this.$refs.inputVendedor.setValue('')
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
