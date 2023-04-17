@@ -43,6 +43,59 @@
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      <br>
+      <b-row>
+        <b-col cols="4">
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Total General S/.</td>
+              <td>{{ totalGeneral | moneda }}</td>
+            </tr>
+          </tbody>
+        </table>          
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Total Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Total Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Total Yape / Plin S/.</td>
+              <td>{{ totalVentasMastercard | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Total Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | moneda }} </td>
+            </tr>
+            <tr>
+              <td>Total a Crédito S/.</td>
+              <td>{{ totalVentasCredito | moneda }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr v-if="totalPagoSinCliente>0">
+              <td>Ingreso Caja Principal</td>
+              <td>{{  totalPagoSinCliente | moneda }}</td>
+            </tr>
+            <tr v-for="(cuenta, index) in CuentasBancariasIngreso" :key="index">
+              <td>Ingreso {{ cuenta.Nombre }}</td>
+              <td>{{ cuenta.Monto | moneda }} </td>
+            </tr>
+            <tr v-if="totalPagoCliente>0">
+              <td>Ingreso Cobro de Vta. a Crédito</td>
+              <td>{{  totalPagoCliente | moneda }}</td>
+            </tr>
+          </tbody>
+        </table>
+        </b-col>
+      </b-row>
 
       <b-row>
         <h5>Resumen de Productos</h5>
@@ -144,8 +197,8 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td colspan="3"></td>
+                <td class="total"><b>Total Ingreso de C. Bancarias</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -531,12 +584,18 @@ export default {
       cierre: {},
       vendedor: {},
       productosVendidos: [],
-      productosVendidosTotal: 0
+      productosVendidosTotal: 0,
+      CuentasBancariasIngreso: [],
+      totalPagoCliente: 0,
+      totalPagoSinCliente: 0
     }
   },
   computed: {
     getFechaCierre () {
       //return this.$route.params.id ? 
+    },
+    totalGeneral (){
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos + this.totalIngresosTarjeta + this.totalVentasCredito
     },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
@@ -776,6 +835,26 @@ export default {
       .then(res => {
         this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
         this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
+        let idCuentas = this.ingresosTarjeta.map((res) => res.IdCuenta)
+        let idCuentasFinales = [...new Set(idCuentas)];
+        this.CuentasBancariasIngreso = []
+        idCuentasFinales.map((id)=>{
+          let obj = {
+              IdCuenta : id,
+              Nombre: '',
+              Monto: 0,
+           }
+          this.ingresosTarjeta.map((ing)=>{
+            if(ing.IdCuenta === id){
+              obj.Nombre = ing.Cuenta
+              obj.Monto = obj.Monto + ing.Importe
+            }
+          })
+          this.CuentasBancariasIngreso.push(obj)
+        })
+        this.totalPagoCliente = res.data.filter((ing)=> ing.IdTipoCajaBanco==2).reduce((total, item) => total + item.Importe,0); 
+        this.totalPagoSinCliente = res.data.filter((ing)=> ing.IdTipoCajaBanco!=2 && ing.EsTarjeta==0).reduce((total, item) => total + item.Importe,0); 
+      
       }).catch(err => {
         console.log(err)
       }) 
@@ -863,7 +942,7 @@ th {
 }
 .credito {
   background: #f9f9f9;
-  padding: 10px;
+  /*padding: 10px;*/
 }
 .tabla-detalle {
 }
