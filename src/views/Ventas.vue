@@ -150,7 +150,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedorManual"
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -314,7 +314,8 @@ export default {
         this.loadClienteVarios()
     },
     mounted () {
-        this.getNumeroVenta()
+        //this.getNumeroVenta()
+        this.getVendedor()
         //setInterval(this.updateTime, 1000)
     },
     data () {
@@ -434,14 +435,56 @@ export default {
         },
         setAlmacen (obj) {
             this.venta.almacen = obj
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            this.$refs.inputAlmacen.setValue(obj.Almacen)
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
         },
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
+            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
+        },
+        loadAlmacen(id) {
+            this.axios.get(this.API + 'almacenes/id/' + id)
+            .then(res => {
+                this.setAlmacen(res.data)
+            })
+        },
+        loadPuntoVenta (id) {
+            this.axios.get(this.API + 'puntoventa/id/' + id)
+            .then(res => {
+                this.setPuntoVenta(res.data)
+            })
+        },
+        getVendedor (user) {
+            let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
+            this.axios.get(this.API + 'usuarios/' + usuario)
+            .then((response) => {
+                this.setVendedor(response.data)
+                //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.loadAlmacen(response.data.IdAlmacen)
+                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+                // bloquear ambos inputs
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+                this.$refs.inputPuntoVenta.$refs.input.disabled = true
+                //this.getNumeroVenta()
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+            })
         },
         setVendedor (obj) {
             this.venta.vendedor = obj
+        },
+        setVendedorManual (obj) {
+            this.venta.vendedor = obj
+            this.getVendedor(obj.Usuario)
         },
         setCliente (obj, dni = false) {
             let params = {}
@@ -659,12 +702,13 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.getNumeroVenta()
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
@@ -672,7 +716,7 @@ export default {
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
-
+                this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
             .catch((error) => {
