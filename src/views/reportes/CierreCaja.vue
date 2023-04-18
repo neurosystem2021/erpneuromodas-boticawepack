@@ -33,6 +33,9 @@
                     <b-button-group size="sm">
                         <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
                     </b-button-group>
+                    <b-button-group size="sm" v-if="this.$route.params.id">
+                        <b-button variant="outline-primary" @click="imprimirResumen">IMPRIMIR RESUMEN</b-button>
+                    </b-button-group>
                 </b-col>
               </b-row>
                      </div>
@@ -42,18 +45,13 @@
       <h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <br>
-      <b-row>
+      <b-row id="CierrResumen">
         <b-col cols="4">
-        <table class="table b-table table-sm table-striped table-bordered">
-          <tbody>
-            <tr>
-              <td>Total General S/.</td>
-              <td>{{ totalGeneral | moneda }}</td>
-            </tr>
-          </tbody>
-        </table>          
+        <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+        <div v-if="cierre.FechaCierre">Fecha:  <b>{{ cierre.FechaCierre }}</b></div>
+        <div v-if="cierre.IdTurno">Turno: <b>{{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</b></div>
+        <br>    
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
@@ -73,8 +71,16 @@
               <td>{{ totalVentasTransferencia | moneda }} </td>
             </tr>
             <tr>
-              <td>Total a Crédito S/.</td>
+              <td>Total a Crédito S/. (Ref.)</td>
               <td>{{ totalVentasCredito | moneda }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td>Cobros de Vtas. a Crédito (Ref.)</td>
+              <td>{{  totalPagoCliente | moneda }}</td>
             </tr>
           </tbody>
         </table>
@@ -82,15 +88,27 @@
           <tbody>
             <tr v-if="totalPagoSinCliente>0">
               <td>Ingreso Caja Principal</td>
-              <td>{{  totalPagoSinCliente | moneda }}</td>
+              <td>{{  totalIngresos | moneda }}</td>
             </tr>
             <tr v-for="(cuenta, index) in CuentasBancariasIngreso" :key="index">
               <td>Ingreso {{ cuenta.Nombre }}</td>
               <td>{{ cuenta.Monto | moneda }} </td>
             </tr>
-            <tr v-if="totalPagoCliente>0">
-              <td>Ingreso Cobro de Vta. a Crédito</td>
-              <td>{{  totalPagoCliente | moneda }}</td>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered">
+          <tbody>
+            <tr>
+              <td><b>Total Ingresos</b></td>
+              <td>{{  (totalIngresos + totalIngresosTarjeta + totalVentasEfectivo + totalVentasVisa + totalVentasMastercard + totalVentasTransferencia) | moneda }}</td>
+            </tr>
+            <tr>
+              <td><b>Total Salidas / Gastos</b></td>
+              <td>{{  totalSalidas | moneda }}</td>
+            </tr>
+            <tr>
+              <td><b>Ingresos Neto</b></td>
+              <td>{{  ((totalIngresos + totalIngresosTarjeta + totalVentasEfectivo + totalVentasVisa + totalVentasMastercard + totalVentasTransferencia) - totalSalidas) | moneda }}</td>
             </tr>
           </tbody>
         </table>
@@ -595,7 +613,7 @@ export default {
       //return this.$route.params.id ? 
     },
     totalGeneral (){
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos + this.totalIngresosTarjeta + this.totalVentasCredito
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos + this.totalIngresosTarjeta
     },
     granTotal () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
@@ -896,7 +914,25 @@ export default {
       }).then(res =>{
         this.cierre = res.data[0]
       })
-    }
+    },
+    imprimirResumen() {
+			var elem = "CierrResumen";
+			var cssHead = '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>';
+			var mywindow = window.open('', 'PRINT', 'height=600,width=1000');
+			mywindow.document.write(cssHead);
+			mywindow.document.write('<h5 style="text-align:left; margin: 10px">RESUMEN DE CIERRE</h5> <hr>');
+			mywindow.document.write(document.getElementById(elem).innerHTML);
+			
+			mywindow.document.close(); // necessary for IE >= 10
+			mywindow.focus(); // necessary for IE >= 10*/
+			mywindow.onload = function() {
+				setTimeout(function(){
+					mywindow.print();
+					mywindow.close();
+				}, 500);
+			}
+			return true;
+		},
   },
   components: {
     CierresCaja
