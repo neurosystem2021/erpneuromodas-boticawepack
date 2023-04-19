@@ -74,7 +74,7 @@
                       </tr>
                     </tbody>
                   </table>
-                      <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                        <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
                       </b-row>
                   </b-card>
                 </template>
@@ -86,6 +86,8 @@
                       <img v-b-tooltip.hover v-if="data.item.Msj_sunat && data.item.Estado != 2" :title="data.item.Msj_sunat"  src="static/error.png" height="32"/>
                       &nbsp;&nbsp;
                       <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
+                      &nbsp;&nbsp;
+                      <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
                       &nbsp;&nbsp;
                       <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
@@ -202,6 +204,24 @@ export default {
           this.$toasted.success(response.data.msj_sunat)
           this.loading = false
         }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
+      });
+    },
+    async validarElectronico (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'validarguiaelectronica/' + doc.IdDocVentaRemision ).then((response) => {
+        if(response.data.Estado == 1) {
+          this.$toasted.error(response.data.msj_sunat)                  
+          this.loading = false
+        } else {
+          this.$toasted.success(response.data.msj_sunat)
+          this.loading = false
+        }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
       });
     },
     getDetalles (idDocVentaRemision) {
