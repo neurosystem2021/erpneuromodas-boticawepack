@@ -163,6 +163,17 @@
                                     </b-row>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="5" style="margin-top: -10px;">
+                                <b-input-group prepend="Placa">
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            ref="inputPlaca"
+                                            style="text-transform:uppercase;"
+                                            class="form-control"
+                                            placeholder="Placa" />
+                                    </b-input-group>
+                                    <br>
+                            </b-col>
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -594,6 +605,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
+                Placa: '',
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
@@ -686,6 +698,7 @@ export default {
                         IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
                     }
                 }).then((response) => {
+                    this.venta.Placa = response.data[0].Placa
                 this.axios.get(this.API + 'cliente', {
                     params: {
                         idCliente: response.data[0].IdCliente
@@ -1073,6 +1086,7 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
