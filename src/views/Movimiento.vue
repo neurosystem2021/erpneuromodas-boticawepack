@@ -230,7 +230,8 @@ export default {
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
       isTraslado:true,
-      isSalida:false
+      isSalida:false,
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   computed: {
@@ -394,6 +395,12 @@ return false
       
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
+        this.inProgress = false            
+        return
+      }
+
+      if (this.isSalida == true && this.IdPerfil != 1){
+        this.$toasted.show('Solo el administrador puede realizar salidas')        
         this.inProgress = false            
         return
       }
