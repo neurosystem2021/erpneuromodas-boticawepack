@@ -399,7 +399,7 @@ return false
         return
       }
 
-      if (this.isSalida == true && this.IdPerfil != 1){
+      if (this.isSalida == true && this.idPerfil != 1){
         this.$toasted.show('Solo el administrador puede realizar salidas')        
         this.inProgress = false            
         return
