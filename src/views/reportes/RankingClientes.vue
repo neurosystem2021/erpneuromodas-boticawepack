@@ -6,17 +6,37 @@
           <b-col md="4" class="my-1">
             <b-form-group>
                   <label>Buscar:</label>
-              
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
               </b-input-group>
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4">
+          <b-col md="4" class="my-1">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="fechaInicio"
+                type="date"
+                step="1"
+                @input="val => $refs.tablaProductos.refresh()"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4" class="my-1">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="fechaFin"
+                type="date"
+                step="1"
+                @input="val =>$refs.tablaProductos.refresh() "
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="3">
             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -33,19 +53,18 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
-            <b-row>
-            <b-col md="8">
-
-              <b-form-group>
-                  <label>Mostrar:</label>
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
-            </b-row>
+          <b-col md="2">
+            <label>Mostrar:</label>
+            <b-form-group>
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <label>Limpiar Filtros:</label>
+            <b-form-group>
+              <b-button @click="limpiarFiltros">Limpiar</b-button>
+            </b-form-group>   
+            <br>
           </b-col>
 
           <b-table small
@@ -69,7 +88,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes?idalmacen=' + almacen.IdAlmacen +'&fechaDesde='+fechaInicio+'&fechaHasta='+fechaFin" target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -108,8 +127,10 @@ export default {
       perPage: 10,
       currentPage: 1,
       almacen: {
-        IdAlmacen: 1
-      }
+        IdAlmacen: ''
+      },
+      fechaInicio: this.$moment().format("YYYY-MM-DD"),
+      fechaFin: this.$moment().format("YYYY-MM-DD")
     }
   },
   methods: {
@@ -121,13 +142,22 @@ export default {
       this.almacen = obj
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
+    limpiarFiltros () {
+      this.filter = ''
+      this.$refs.inputAlmacen.setValue('')
+      this.almacen.IdAlmacen = ''
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
+      this.fechaFin = this.$moment().format("YYYY-MM-DD")
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+     //  this.getVentasAcumuladas()
+    },
     myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get( this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen + '&fechaDesde='+this.fechaInicio+'&fechaHasta='+this.fechaFin + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
 
       return promise.then((response) => {
         console.log(response)

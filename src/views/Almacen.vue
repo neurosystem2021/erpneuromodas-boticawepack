@@ -408,8 +408,8 @@
                       <h6 class="text-uppercase">{{ objPro.nombre }}</h6>
                     </b-row>
                     <b-row class="nomCart2">
-                       <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge>
-                       <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad).toFixed(2)}}</b-badge></h5>
+                       <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad) | redondear(2) }}</b-badge>
+                       <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad) | redondear(2) }}</b-badge></h5>
                     </b-row>
                   </div>
                 </b-col>

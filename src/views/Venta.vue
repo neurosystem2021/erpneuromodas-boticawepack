@@ -111,7 +111,7 @@
                         </b-col>
                     </b-row>
                     <b-row>
-                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true">
+                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab">
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -271,6 +271,10 @@
                                     <!--<b-col md="12" class="mt-1">
                                         <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
                                     </b-col>-->
+                                    <b-col md="12" class="mt-1">
+                                        <b-button v-if="touchHab" variant="danger" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                                        <b-button v-else variant="success" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                                    </b-col>
                                     <b-col md="12" class="mt-1">
                                         <b-button type="button" block variant="primary" @click="LimpiarPuntoVenta"><i class="fas fa-redo"></i> Actualizar</b-button>
                                     </b-col>
@@ -560,6 +564,7 @@ export default {
             precioCont: 0,
             preciosProd: [],
             objProd: {},
+            touchHab: false,
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,

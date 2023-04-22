@@ -193,6 +193,7 @@
             <b-col>
               <productos-carrito 
                 ref="carrito"
+                :fields="carrito.fields"
                 @onAddProducto="onAddProducto" 
                 :onSetProducto="onSetProducto"
                 :tipoCambio="movimiento.TipoCambio"
@@ -232,7 +233,27 @@ export default {
       newRuc: '',
       API: config.API,
       ultimoMovimiento: '',
-      movimiento: this.initMovimiento()
+      movimiento: this.initMovimiento(),
+      carrito: {
+        fields: [
+            //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+            { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+            { key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
+            { key: 'Producto',label: 'Artículo' },
+            { key: 'ProductoMarca', label: 'Marca' },
+            { key: 'eventPres', label: '' },
+            { key: 'cantxPrecio', variant: 'warning' },
+            { key: 'cantidad' },
+            { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+            { key: 'precio', label: 'P/U' },
+            //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+            { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
+            { key: 'igv', label: 'IGV' },
+            { key: 'precioVenta', label: 'Precio venta' },
+            { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+            { key: 'acciones', label: ''}
+        ]
+      }
     }
   },
   computed: {
@@ -376,7 +397,7 @@ return false
       }
 
       let faltaLlenar = false
-      let faltaFechaVen = false
+      //let faltaFechaVen = false
       let igualProducto = false
       let faltaStock = false
       let faltaCantidad = false
@@ -385,12 +406,12 @@ return false
           faltaLlenar = true
         }
 
-        if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
+        /*if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
           if(prod.FechaVen.length>10){
              this.$toasted.show('La fecha de vencimiento del producto '+prod.Producto+' no tiene el formato correcto')
           }
           faltaFechaVen = true
-        }
+        }*/
 
         let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
         if(pro > 1){
@@ -427,11 +448,11 @@ return false
           return;
       }
 
-      if (faltaFechaVen) {
+      /*if (faltaFechaVen) {
         this.$toasted.show('Ingrese la fecha de vencimiento del producto')
         this.inProgress = false
         return;
-      }
+      }*/
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
