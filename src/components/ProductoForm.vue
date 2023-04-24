@@ -458,15 +458,23 @@ export default {
     },
     actualizarLiquidacion(){
       this.precioLiquidacion = this.producto.PrecioContado -  Math.round(((this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0)*(this.producto.PrecioContado>0?this.producto.PrecioContado:0)/100)* 10) / 10;
+      this.actualizarPorcentajeUtilidad()
     },
     actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
-      var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-
+      var precioCosto = Number(this.producto.PrecioCosto)
+      var utilidad = Number(this.producto.PorcentajeUtilidad)
+      // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+      //var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      var nuevoPrecioContado = precioCosto *(utilidad / 100) + precioCosto
       this.producto.precioContadoNormal = nuevoPrecioContado
-      this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
+      this.producto.PrecioContado = this.$options.filters.redondear(nuevoPrecioContado, 1)
 
+    },
+    actualizarPorcentajeUtilidad () {
+      var precioContado = Number(this.producto.PrecioContado)
+      var precioCosto = Number(this.producto.PrecioCosto)
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(((precioContado - precioCosto)/precioCosto) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
