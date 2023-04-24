@@ -117,7 +117,11 @@
             type="number"
             style="width: 80px"
             min="0"
-            @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index);} "
+            @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index);
+              if(setPrecio){
+                productos[data.index].precio = (productos[data.index].StockPorMayor > 0 && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              }
+            } "
             placeholder="Cantidad"
             class="form-control"/>
         </template>
@@ -326,6 +330,7 @@ export default {
     tipo: String,
     setPrecio: Boolean,
     idAlmacen: Number,
+    isVentas: Boolean,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {

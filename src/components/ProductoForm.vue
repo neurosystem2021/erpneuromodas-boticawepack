@@ -201,6 +201,26 @@
               />
           </b-form-group>
           <b-form-group>
+            <label>Precio X Mayor:</label>
+            <input 
+              v-model="producto.PrecioPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+          <b-form-group>
+            <label>Stock X Mayor:</label>
+            <input 
+              v-model="producto.StockPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+          <b-form-group>
             <b-form-checkbox
                      v-model="producto.ControlaStockMinimo"
                      :value="1"
@@ -409,6 +429,8 @@ export default {
         //this.producto.Botapie = newVal.Botapie
         this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
+        this.producto.PrecioPorMayor = newVal.PrecioPorMayor
+        this.producto.StockPorMayor = newVal.StockPorMayor
         this.producto.StockMinimo = newVal.StockMinimo
         this.producto.CodigoBarra = newVal.CodigoBarra
         this.producto.ProductoModelo = newVal.ProductoModelo
@@ -521,6 +543,8 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        PrecioPorMayor: 0,
+        StockPorMayor: 0,
         Botapie: '',
         Genero: '',
         PrecioContado: 0,
