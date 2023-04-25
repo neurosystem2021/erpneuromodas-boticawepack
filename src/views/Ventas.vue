@@ -912,7 +912,7 @@ export default {
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
