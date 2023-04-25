@@ -399,7 +399,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            ventaSinStock: 0
+            ventaSinStock: 0,
+            TieneIgvComprobante:false
         }
     },
     watch: {
@@ -418,6 +419,7 @@ export default {
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock',
+            actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
         configStock () {
@@ -493,6 +495,7 @@ export default {
 
             this.isNota = false
             this.bloquearInput = false 
+            this.tieneIgv = false
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -501,10 +504,12 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
+            this.TieneIgvComprobante = false
             
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
+                this.limpiarCart()
             }
 
             if (obj.TieneIgv) {
@@ -518,6 +523,15 @@ export default {
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
+            this.TieneIgvComprobante = (obj.TieneIgv==1?true:false)
+            if(this.TieneIgvComprobante != this.tieneIgv){
+                if(this.TieneIgvComprobante){
+                    this.$toasted.show('El comprobante de referencia tiene IGV, seleccione NOTA DE CREDITO/IGV ELEC.',{duration:3000})
+                }else{
+                    this.$toasted.show('El comprobante de referencia no tiene IGV, seleccione NOTA DE CREDITO ELEC.',{duration:3000})
+                }
+            }
+
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
             }
@@ -663,6 +677,7 @@ export default {
                     console.log(error)
                 })
             }
+            this.actualizarPrecioConvenio(obj)
         },
         onSetProducto (obj) {
             obj.cantidad = 1
@@ -737,7 +752,7 @@ export default {
             this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
-
+            this.inProgress = true
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
                 this.inProgress = false            
@@ -762,7 +777,7 @@ export default {
             .then((response) => {
                 console.log(response)
                 this.$toasted.show('Proforma Guardada con exito')
-
+                this.inProgress = false
                 this.limpiarDespuesVenta()
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
@@ -855,6 +870,18 @@ export default {
             }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+
+                if(this.TieneIgvComprobante != this.tieneIgv){
+                    if(this.TieneIgvComprobante){
+                        this.$toasted.show('El comprobante de referencia tiene IGV, seleccione NOTA DE CREDITO/IGV ELEC.',{duration:3000})
+                    }else{
+                        this.$toasted.show('El comprobante de referencia no tiene IGV, seleccione NOTA DE CREDITO ELEC.',{duration:3000})
+                    }
+                    
+                    this.inProgress = false
+                    return 
+                }
+
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
                     this.inProgress = false
@@ -875,7 +902,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -884,7 +911,8 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.loadClienteVarios()
+                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')

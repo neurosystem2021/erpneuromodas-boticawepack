@@ -276,6 +276,16 @@
               </b-form-text>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Convenio:</label>
+            <input v-model="producto.PrecioConvenio"
+              type="number"
+              step="0.001"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
       </b-row>
       <b-row>
         <b-col md="6">
@@ -436,6 +446,7 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.PrecioConvenio = newVal.PrecioConvenio
         this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
         this.producto.Imagen = newVal.Imagen
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
@@ -543,6 +554,7 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        PrecioConvenio: 0,
         PrecioPorMayor: 0,
         StockPorMayor: 0,
         Botapie: '',

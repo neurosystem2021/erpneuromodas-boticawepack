@@ -479,7 +479,7 @@ export default {
       if (e) {
         e.preventDefault()
       }
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+      let idProducto = this.loadCode;
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
