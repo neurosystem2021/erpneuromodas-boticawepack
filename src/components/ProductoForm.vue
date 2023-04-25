@@ -315,6 +315,43 @@
             </b-row>
         </b-col>
       </b-row>
+      <b-form-group>
+      <hr>
+      <b-row>
+        <b-col md="3" v-for="i in 4" :key="i.id">
+          <b-card :header="'Presentacion '+i" class="text-center">
+            <b-form-group>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                style="text-transform:uppercase; font-weight: bold;"
+                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
+                ></b-form-input>
+            </b-form-group>
+
+            <b-form-group class="text-left">
+              <label>Cantidad Total:</label>
+              <input
+                v-model="producto.precios[i-1].cantidad"
+                type="number"
+                class="form-control"
+                step="0.01"
+                />
+            </b-form-group>
+            
+            <b-form-group class="text-left">
+              <label>Precio Total:</label>
+              <input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-form-group>
 
       <hr />
       <b-row>
@@ -450,6 +487,16 @@ export default {
         this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
         this.producto.Imagen = newVal.Imagen
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }else{
+          this.producto.precios = [
+            {nombre: 'NOMBRE 1', cantidad: 0, precio: 0},
+            {nombre: 'NOMBRE 2', cantidad: 0, precio: 0},
+            {nombre: 'NOMBRE 3', cantidad: 0, precio: 0},
+            {nombre: 'NOMBRE 4', cantidad: 0, precio: 0}
+          ]
+        }
         this.actualizarLiquidacion()
 
       } else {
@@ -571,7 +618,13 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
-        }
+        },
+        precios: [
+          {nombre: 'NOMBRE 1', cantidad: 0, precio: 0},
+          {nombre: 'NOMBRE 2', cantidad: 0, precio: 0},
+          {nombre: 'NOMBRE 3', cantidad: 0, precio: 0},
+          {nombre: 'NOMBRE 4', cantidad: 0, precio: 0}
+        ]
       }
     },
     guardarProducto(e) {
@@ -601,7 +654,10 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
 
-      this.axios.post(this.API + 'productos', this.producto)
+      this.axios.post(this.API + 'productos', {
+        ...this.producto, 
+        PreciosPorProducto: this.producto.precios 
+      })
       .then((response) => {
         if (this.cbGuardar) {
           this.cbGuardar(response.data.insertId)

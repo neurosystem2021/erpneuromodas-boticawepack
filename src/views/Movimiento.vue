@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="ancho" id="conten">
           <b-row>
               <b-col md="8">
 
@@ -390,7 +390,7 @@ export default {
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })
@@ -414,5 +414,11 @@ export default {
 <style>
   .input-group {
     /*margin: 0.25rem 0 !important;*/
+  }
+  @media only screen and (min-width: 560px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 250)
+    }
   }
 </style>

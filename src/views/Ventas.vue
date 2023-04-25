@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid class="ancho" id="conten">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil2">
@@ -391,6 +391,8 @@ export default {
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
                     { key: 'Genero' },
+                    { key: 'eventPresent', label: '' },
+                    { key: 'Presentacion', label: 'Presentación', class:'text-center stocksize' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
@@ -679,9 +681,13 @@ export default {
             }
             this.actualizarPrecioConvenio(obj)
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, precio = false) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            if(precio){
+                obj.precio = precio || 0
+            }
+           
             return obj
         },
         onAddProducto (obj) {
@@ -958,10 +964,10 @@ export default {
         display: none;
     }
 }
-@media only screen and (min-width: 777px) and (max-width: 1800px) {
+@media only screen and (min-width: 560px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 250px)
     }
 }
 @media only screen and (max-width: 750px) {
