@@ -624,7 +624,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -780,9 +780,13 @@ export default {
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 console.log(response)
-                this.$toasted.show('Proforma Guardada con exito')
+                this.$toasted.info('Proforma Guardada con exito')
                 this.inProgress = false
                 this.limpiarDespuesVenta()
+                this.getVendedor()
+                this.getNumeroVenta()
+                this.loadClienteVarios()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })

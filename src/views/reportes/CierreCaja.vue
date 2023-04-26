@@ -352,9 +352,9 @@ export default {
             .then(res => {
               this.setAlmacen(res.data)
               this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              if(response.data.IdUsuarioPerfil !== 1) {
+              //if(response.data.IdUsuarioPerfil !== 1) {
                 this.$refs.inputAlmacen.$refs.input.disabled = true
-              }
+              //}
             }).catch((err)=>{
               this.$toasted.show('Ha ocurrido un error, actualice la pagina y vuelva a intentarlo')
             })

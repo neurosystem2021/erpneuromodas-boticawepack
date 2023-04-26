@@ -61,6 +61,7 @@
                       <tr>
                         <th>Codigo</th>
                         <th>Producto</th>
+                        <th>Presentacion</th>
                         <th>Cantidad</th>
                         <th>Unidad</th>
                       </tr>
@@ -69,6 +70,7 @@
                       <tr v-for="(item, index) in getDetalles(row.item.IdDocVentaRemision)" :key="index">
                         <td>{{ item.CodigoBarra }}</td>
                         <td>{{ item.Producto }}</td>
+                        <td>{{ item.Descripcion }}</td>
                         <td>{{ item.Cantidad }}</td>
                         <td>{{ item.CodigoMedicion }}</td>
                       </tr>
@@ -86,6 +88,8 @@
                       <img v-b-tooltip.hover v-if="data.item.Msj_sunat && data.item.Estado != 2" :title="data.item.Msj_sunat"  src="static/error.png" height="32"/>
                       &nbsp;&nbsp;
                       <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
+                      &nbsp;&nbsp;
+                      <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
                       &nbsp;&nbsp;
                       <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
@@ -202,6 +206,24 @@ export default {
           this.$toasted.success(response.data.msj_sunat)
           this.loading = false
         }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
+      });
+    },
+    async validarElectronico (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'validarguiaelectronica/' + doc.IdDocVentaRemision ).then((response) => {
+        if(response.data.Estado == 1) {
+          this.$toasted.error(response.data.msj_sunat)                  
+          this.loading = false
+        } else {
+          this.$toasted.success(response.data.msj_sunat)
+          this.loading = false
+        }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
       });
     },
     getDetalles (idDocVentaRemision) {
