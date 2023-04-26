@@ -478,7 +478,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosEfectivo - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosEfectivo + this.totalIngresosDeposito - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
