@@ -17,6 +17,7 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
+import Proforma from '@/views/reportes/Proforma.vue'
 
 Vue.use(Router)
 
@@ -62,6 +63,11 @@ export default new Router({
       path: '/reportes/cierrecaja',
       name: 'CierreCaja',
       component: CierreCaja
+    },
+    {
+      path: '/reportes/proforma/:id',
+      name: 'Proforma',
+      component: Proforma
     },
     {
       path: '/reportes/cierrecaja/:id',
