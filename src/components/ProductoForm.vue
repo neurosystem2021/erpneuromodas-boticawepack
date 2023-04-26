@@ -330,7 +330,7 @@
             </b-form-group>
 
             <b-form-group class="text-left">
-              <label>Cantidad Total:</label>
+              <label>Cantidad:</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
                 type="number"
@@ -340,7 +340,17 @@
             </b-form-group>
             
             <b-form-group class="text-left">
-              <label>Precio Total:</label>
+              <label>Precio Costo:</label>
+              <input 
+                v-model="producto.precios[i-1].precioc"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+
+            <b-form-group class="text-left">
+              <label>Precio Venta:</label>
               <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
@@ -491,10 +501,10 @@ export default {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }else{
           this.producto.precios = [
-            {nombre: 'NOMBRE 1', cantidad: 0, precio: 0},
-            {nombre: 'NOMBRE 2', cantidad: 0, precio: 0},
-            {nombre: 'NOMBRE 3', cantidad: 0, precio: 0},
-            {nombre: 'NOMBRE 4', cantidad: 0, precio: 0}
+            {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
           ]
         }
         this.actualizarLiquidacion()
@@ -620,10 +630,10 @@ export default {
           ProductoMedicion:"UNIDAD"
         },
         precios: [
-          {nombre: 'NOMBRE 1', cantidad: 0, precio: 0},
-          {nombre: 'NOMBRE 2', cantidad: 0, precio: 0},
-          {nombre: 'NOMBRE 3', cantidad: 0, precio: 0},
-          {nombre: 'NOMBRE 4', cantidad: 0, precio: 0}
+        {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+        {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+        {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+        {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
         ]
       }
     },
@@ -660,7 +670,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
+          this.cbGuardar(this.producto.IdProducto?this.producto:response.data.insertId)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error)

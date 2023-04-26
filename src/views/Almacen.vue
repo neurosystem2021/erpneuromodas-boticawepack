@@ -75,17 +75,15 @@
           </b-col>
         </b-row>
         <b-row>
-          <b-col md="3">
+          <br>
+          <b-col md="6">
+            <b-row>
+              <b-col md="3">
                 <b-form-group>
                   <label>Código de barra:</label>
                   <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
                 </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <br>
-          <b-col md="6">
-            <b-row>
+              </b-col>
               <b-col md="3">
                 <b-form-group>
                   <label>Categoría:</label>
@@ -128,20 +126,6 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>  
-              <b-col md="3">
-                <b-form-group>
-                  <label>Modelo:</label>
-                  <autocomplete
-                    :url="API + 'productos/modelos'"
-                    ref="inputModelo"
-                    anchor="ProductoModelo"
-                    label="writer"
-                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>
             </b-row>
           </b-col>
           <b-col md="6">
@@ -184,6 +168,20 @@
                     label="writer"
                     :on-select="val => generateFilter('genero', val.Genero)"
                     :onInput="(val) => !val ? generateFilter('genero', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Modelo:</label>
+                  <autocomplete
+                    :url="API + 'productos/modelos'"
+                    ref="inputModelo"
+                    anchor="ProductoModelo"
+                    label="writer"
+                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
+                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -256,6 +254,10 @@
                     </div>
                   </b-popover>
                 </template>
+
+                <template slot="presentaciones" slot-scope="data">
+                  <b-button size="sm" variant="info" @click="showPresentacion(data.item)"><i class="fas fa-list"></i></b-button>
+                </template>
                 
               </b-table>
           </b-col>
@@ -315,6 +317,54 @@
       </b-row>
       <br>
     </b-modal>
+    <b-modal size="md" ref="modalCant" hide-footer hide-header>
+      <div class="d-block text-center">
+        <h3 style="text-decoration:underline">{{ objProd.Producto}}</h3>
+        <h5>Presentaciones</h5>
+      </div>
+      <hr>
+      <b-row>
+        <b-col cols="6">
+          <b-card
+            align="center"
+            class="mb-3 contentCard">
+            <b-row>
+              <b-col md="12" class="nomCart">
+                <div>
+                  <b-row class="nomCart2">
+                    <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
+                  </b-row>
+                  <b-row class="nomCart2">
+                      <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="objProd.stock<=0" variant="danger">{{ objProd.stock | redondear(2) }}</b-badge>
+                      <b-badge v-else variant="success">{{ objProd.stock | redondear(2) }}</b-badge></h5>
+                  </b-row>
+                </div>
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
+        <b-col cols="6" v-for="objPro in PresentacionesProd" :key="objPro.IdProducto">
+          <b-card
+            align="center"
+            class="mb-3 contentCard"
+            v-if="objPro.cantidad>0">
+            <b-row>
+              <b-col md="12" class="nomCart">
+                <div>
+                  <b-row class="nomCart2">
+                    <h6 class="text-uppercase">{{ objPro.nombre }}</h6>
+                  </b-row>
+                  <b-row class="nomCart2">
+                      <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad) | redondear(2)}}</b-badge>
+                      <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad) | redondear(2)}}</b-badge></h5>
+                  </b-row>
+                </div>
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-modal>
 
   </div>
 </template>
@@ -365,7 +415,8 @@ export default {
             { key: 'Color', sortable: true },
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
             { key: 'Genero', sortable: true },
-            { key: 'stock', sortable: false, variant: '', class:'text-center'}
+            { key: 'stock', sortable: false, variant: '', class:'text-center'},
+            { key: 'presentaciones', label: 'Stock P.', sortable: false, class:'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -379,7 +430,9 @@ export default {
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      objProd:{},
+      PresentacionesProd:[],
     }
   },
   watch: {
@@ -388,10 +441,11 @@ export default {
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
+       this.axios.get(this.API + 'productos/puntoventa/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
+            idAlmacen: this.almacen.IdAlmacen,
+            noLimit: 1
           }
         }).then((response) => {
              this.itemsStock = response.data
@@ -529,6 +583,15 @@ export default {
       }
      
     },
+    showPresentacion(prod){
+      this.objProd = prod
+      this.objProd.stock = this.getStock(prod.IdProducto)
+      this.PresentacionesProd = []
+      if(prod.PreciosPorProducto !='' && prod.PreciosPorProducto !=null){
+          this.PresentacionesProd = JSON.parse(prod.PreciosPorProducto)
+      }
+      this.$refs['modalCant'].show()
+    },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
     },
@@ -631,5 +694,21 @@ export default {
     .modal-xl .modal-dialog {
         max-width: 1200px;
     }
+}
+
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nomCart2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.precioCart{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

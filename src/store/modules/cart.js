@@ -83,24 +83,26 @@ const actions = {
     let cantidad = false
     let setSuma = false
     let setPrecioCosto = false
+    let esId = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
+      esId = obje.esId
     }
 
     if(typeof producto === 'object') {
 
       if (setPrecioCosto) {
-        producto.precio = producto.PrecioCosto
-        producto.nuevoPrecioContado = producto.PrecioContado || 0
+        //producto.precio = producto.PrecioCosto
+        //producto.nuevoPrecioContado = producto.PrecioContado || 0
       }
 
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      axios.get(API + 'productos/id/' + producto+(esId?'esId?esId=1':'')).then((response) => {
         if (response.data) {
           let obj = response.data
 
@@ -109,8 +111,7 @@ const actions = {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             obj.nuevoPrecioContado = 0
-            obj.Presentacion = obj.ProductoMedicion
-            obj.CantidadPresentacion = 1
+            
           } else {
             obj.descuento = 0
             obj.cantidad = 0
@@ -125,7 +126,11 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-        
+
+          obj.CantidadPresentacion = 1
+          obj.EsPresentacion = 0
+          obj.Presentacion = obj.ProductoMedicion
+
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {
@@ -158,10 +163,11 @@ const actions = {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
-    axios.get(API + 'productos/stock', {
+    axios.get(API + 'productos/puntoventa/stock', {
       params: {
         idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
+        idAlmacen: obj.IdAlmacen,
+        noLimit: 1
       }
     }).then((response) => {
         commit('OBTENER_STOCK', response.data)

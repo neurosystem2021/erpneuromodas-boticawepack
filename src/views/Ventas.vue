@@ -1,8 +1,6 @@
 <template>
     <div>
         <Menu v-if="false"></Menu>
-
-        <br />
         <b-container fluid class="ancho" id="conten">
             <div>
                 <div class="float-right">
@@ -681,7 +679,7 @@ export default {
             }
             this.actualizarPrecioConvenio(obj)
         },
-        onSetProducto (obj, precio = false) {
+        onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
             if(precio){
@@ -855,7 +853,8 @@ export default {
             let sinStock = 0
             let totalCero = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
+                    this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
@@ -967,7 +966,7 @@ export default {
 @media only screen and (min-width: 560px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 250px)
+        width: calc(100% - 250px) !important;
     }
 }
 @media only screen and (max-width: 750px) {
