@@ -70,10 +70,10 @@ export default {
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data.result
-          this.proveedor.Proveedor = data.RazonSocial
-          this.proveedor.Direccion = data.Direccion
+          this.$toasted.info('Proveedor encontrado, se llenarán sus datos')                  
+          var data = response.data
+          this.proveedor.Proveedor = data.razonSocial
+          this.proveedor.Direccion = data.direccion
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el RUC')        
@@ -83,7 +83,7 @@ export default {
     guardarProveedor() {
       this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
-        this.$toasted.show('Proveedor guardado correctamente')
+        this.$toasted.success('Proveedor guardado correctamente')
         this.$refs.proveedorForm.hide()
       })
       .catch((error) => {
