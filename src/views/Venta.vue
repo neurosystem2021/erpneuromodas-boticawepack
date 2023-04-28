@@ -2005,8 +2005,7 @@ export default {
                     } catch (error) {
   
                     }
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
-                    this.$swal({
+                    /*this.$swal({
                         position: 'center',
                         icon: 'success',
                         title: '¡Venta <strong>'+ response.data.serie +' - '+ response.data.numero + '</strong> realizada con éxito!',
@@ -2014,12 +2013,14 @@ export default {
                         confirmButtonText: 'Ok',
                         target: document.getElementById('conten'),
                         confirmButtonColor:'#1D9828',
-                    })
+                    })*/
                     this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
                     this.$refs.carrito.pagocon = ''
+                    this.$toasted.success('Venta realizada con exito')
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
