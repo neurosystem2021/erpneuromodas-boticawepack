@@ -469,7 +469,9 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'eventPresImagen', label: '' },
                     { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
+                    { key: 'eventPresent', label: '' },
+                    { key: 'Presentacion', label: 'Presentación' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -825,16 +827,13 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant, precio) {
-            if (cant) {
-                obj.cantidad = cant
-                //let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                //obj.precio = preciosPorProducto.precio || 0
-                obj.precio = precio || obj.PrecioContado
-                return obj
-            }
+        onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            if(precio){
+                obj.precio = precio || 0
+            }
+           
             return obj
         },
         onAddProducto (obj) {
@@ -1038,7 +1037,8 @@ export default {
             //let igualLote = 0
             this.productos.forEach(pro => {
                 console.log(pro);
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
+                    this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
 
