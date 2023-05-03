@@ -1,54 +1,73 @@
 <template>
     <b-col md="12">
-        <b-modal size="md" ref="modalCant" hide-footer :no-close-on-esc="true">
-          <div class="d-block text-center">
-            <h3 style="text-decoration:underline">{{ objProd.Producto}}</h3>
-            <h5>Presentaciones</h5>
-          </div>
-          <hr>
-          <b-row>
-            <b-col cols="6">
-              <b-card
-                align="center"
-                class="mb-3">
+        <b-modal ref="modalCant" size="lg" id="modalCantidad" hide-footer hide-header>
+                <div class="d-block text-center">
+                    <h3 style="text-decoration:underline">{{ objProd.Producto}}</h3>
+                    <h5>Presentaciones</h5>
+                </div>
+                <hr>
                 <b-row>
-                  <b-col md="12" class="nomCart">
-                    <div>
-                      <b-row class="nomCart2">
-                        <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
-                      </b-row>
-                      <b-row class="nomCart2">
-                        <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="objProd.stock<=0" variant="danger">{{ objProd.stock | redondear(2) }}</b-badge>
-                        <b-badge v-else variant="success">{{ objProd.stock }}</b-badge></h5>
-                      </b-row>
-                    </div>
-                  </b-col>
+                <b-col cols="6">
+                    <b-card
+                    align="center"
+                    class="mb-3 contentCard"
+                    @click="setProductoUni(objProd)"
+                    >
+                    <b-row>
+                        <b-col md="6" class="nomCart">
+                        <div>
+                            <b-row class="nomCart2">
+                                <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
+                            </b-row>
+                            <b-row class="nomCart2">
+                            <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="objProd.stock<=0" variant="danger">{{ objProd.stock | redondear(2) }}</b-badge>
+                            <b-badge v-else variant="success">{{ objProd.stock | redondear(2) }}</b-badge></h5>
+                            </b-row>
+                        </div>
+                        </b-col>
+                        <b-col md="6" class="text-left">
+                        <h5>x1</h5>
+                        <span><b >Precio C: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br>
+                        <b>Precio V: </b>S/ {{ objProd.PrecioContado | redondear(2) }}
+                        </b-col>
+                    </b-row>
+                    </b-card>
+                </b-col>
+
+                <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+                    <b-card
+                    v-if="parseFloat(d.cantidad) > 0"
+                    align="center"
+                    class="mb-3 contentCard"
+                    :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+                    @click="() => {
+                        if ( parseFloat(d.cantidad) ) {
+                        setProductoCant(d)
+                        }
+                    }"
+                    >
+                    <b-row>
+                        <b-col md="6" class="nomCart" >
+                        <div>
+                            <b-row class="nomCart2">
+                            <h6 class="text-uppercase">{{ d.nombre }}</h6>
+                            </b-row>
+                            <b-row class="nomCart2">
+                            <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/d.cantidad)<=0" variant="danger">{{ (objProd.stock/d.cantidad) | redondear(2)}}</b-badge>
+                            <b-badge v-else variant="success">{{ (objProd.stock/d.cantidad) | redondear(2)}}</b-badge></h5>
+                            </b-row>
+                        </div>
+                        </b-col>
+                        <b-col md="6" class="text-left">
+                        <h5>x{{ d.cantidad }}</h5>
+                        <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span><br>
+                        <b>Precio V: </b>S/ {{ d.precio | redondear(2) }}
+                        </b-col>
+                    </b-row>
+                    </b-card>
+                </b-col>
                 </b-row>
-              </b-card>
-            </b-col>
-            <b-col cols="6" v-for="objPro in PresentacionesProd" :key="objPro.IdProducto">
-              
-              <b-card
-                align="center"
-                class="mb-3"
-                v-if="objPro.cantidad>0">
-                <b-row>
-                  <b-col md="12" class="nomCart">
-                    <div>
-                      <b-row class="nomCart2">
-                        <h6 class="text-uppercase">{{ objPro.nombre }}</h6>
-                      </b-row>
-                      <b-row class="nomCart2">
-                        <h6 style="margin-right:5px">Stock:</h6><h5><b-badge v-if="(objProd.stock/objPro.cantidad)<=0" variant="danger">{{ (objProd.stock/objPro.cantidad) | redondear(2) }}</b-badge>
-                        <b-badge v-else variant="success">{{ (objProd.stock/objPro.cantidad) | redondear(2) }}</b-badge></h5>
-                      </b-row>
-                    </div>
-                  </b-col>
-                </b-row>
-              </b-card>
-            </b-col>
-          </b-row>
-        </b-modal>
+            </b-modal>
         <b-modal ref="modalIndi" size="xl" id="modalIndicacion" hide-footer hide-header>
           <div class="d-block text-center">
             <h5 class="font-weight-normal">Indicaciones para:</h5>
@@ -91,6 +110,113 @@
             </b-col>
           </b-row>
         </b-modal>
+
+        <!-- MODALS TOUCH -->
+
+        <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngPre" id="ingPre" size="sm" hide-footer class="ingPre" title="Precio" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngDesc" id="ingDesc" size="sm" hide-footer class="ingDesc" title="Descuento" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <!-- MODALS TOUCH -->
+
         <b-row style="height:34vh; overflow-y: scroll; background: #FFFFFF;">
             <b-col md="12">
                 <b-table id="carrito" small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
@@ -103,101 +229,46 @@
                     v-model="productos[data.index].indicacion"></textarea>
                 </template>
 
-                <template slot="presentaciones" slot-scope="data">
+                <!--<template slot="presentaciones" slot-scope="data">
                   <b-button size="sm" variant="info" @click="showPresentacion(data.item)"><i class="fas fa-list"></i></b-button>
-                </template>
+                </template>-->
 
-                <template slot="eventPres" slot-scope="data">
+                <!--<template slot="eventPres" slot-scope="data">
                   <b-button :disabled="bloquearInput?true:false || esDelivery" size="sm" variant="info" @click="showIndicaciones(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
-                </template>
+                </template>-->
 
-                <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-                  <div style="display: flex; justify-content: space-evenly; align-items: center;">
-                    <input
-                    v-model="productos[data.index].cantxPrecio"
-                    type="number"
-                    style="width: 100px"
-                    step="0.001"
-                    min="0"
-                    @focus="abrirPop1(data.index)"
-                    :disabled="bloquearInput?true:false"
-                    @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
-                    placeholder="Cantidad"
-                    class="form-control"/>
-                  <span>x{{productos[data.index].cantidadPres}}</span>
-                  </div>
-                  <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
-                    <label><b style="text-decoration: underline;">{{productos[capturaIndex].Producto}}</b></label>
-                    <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
-                      <table class="calc__numbers calc__numbers2">
-                        <tbody>
-                            <tr>
-                                <td class="botones" @click="addNumber('7');">7</td>
-                                <td class="botones" @click="addNumber('8');">8</td>
-                                <td class="botones" @click="addNumber('9');">9</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('4');">4</td>
-                                <td class="botones" @click="addNumber('5');">5</td>
-                                <td class="botones" @click="addNumber('6');">6</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('1');">1</td>
-                                <td class="botones" @click="addNumber('2');">2</td>
-                                <td class="botones" @click="addNumber('3');">3</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber(0);">0</td>
-                                <td class="botones" @click="addPoint('.');">.</td>
-                                <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
-                            </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <div style="text-align: center; width: 100%; height: 100%;">
-                        <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(data.index)">Ingresar</b-button>
-                        <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
-                      </div>
-                  </b-modal>
+                <template slot="eventPresent" slot-scope="data">
+                  <b-button style="margin-top: 70%;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
                 </template>
 
                 <template slot="cantidad" slot-scope="data">
-                <input
+                <div style="margin-top: 21%;">
+                  <input
                     v-model="productos[data.index].cantidad"
                     type="number"
                     style="width: 90px; font-weight:bold"
-                    :disabled="bloquearInput?true:false || esDelivery || true"
                     min="0"
-                    step="1"
                     autocomplete="off"
+                    @focus="abrirPop1(data.index)"
                     v-bind:class="{ new: data.item.IdProducto==productoChange }"
                     @input="(val) => {
-                    changeCant(val.target.value,productos[data.index])
-                    $emit('onInputCantidad', val.target.value)
-                      if(!productos[data.index].PreciosPorProducto) {
-                        return
-                      }
-                      if(!precioHabilitado){
-                        let arr = JSON.parse(productos[data.index].PreciosPorProducto || '[]');
-                        arr.map((r)=>{
-                          r.cantidad = Number(r.cantidad || 0)
-                          r.precio = Number(r.precio || 0)
-                        })
-                        let arreglado = arr.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
-                        let cambio = false
-                        arreglado.map(r=>{
-                          if(r.cantidad>0 && r.precio>0 && val.target.value >=r.cantidad){
-                            productos[data.index].precio = r.precio
-                            cambio = true
-                          }
-                        })
-                        if(!cambio){
-                          productos[data.index].precio = productos[data.index].PrecioContado
-                        }
-                      } 
+                    $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
                     }"
                     class="form-control"
                     placeholder="Cantidad"/>
+                    <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0;">
+                      <p style="color: #007bff; text-align: center; font-weight: bold;">{{ productos[data.index].cantidad * productos[data.index].CantidadPresentacion }} unid.</p>
+                    </b-form-text>
+                  </div>
+                </template>
+                <template slot="Presentacion" slot-scope="data" >
+                  <b-form-input
+                    v-model="productos[data.index].Presentacion"
+                    type="text"
+                    style="text-align:center; font-weight:bold; width: 120px;"
+                    autocomplete="false"
+                    readonly
+                    ></b-form-input>
                 </template>
                 <template slot="precio" slot-scope="data">
                 <input
@@ -210,42 +281,8 @@
                     placeholder="Precio"
                     autocomplete="off"
                     @input="setNuevoPrecioContado(data.index)"
-                    :v-on="setNuevoPrecioContado(data.index)"
                     class="form-control"
                     />
-                  <b-modal ref="modalIngPre" id="ingPre" size="sm" hide-footer class="ingPre" title="Precio" hide-header-close>
-                    <label><b style="text-decoration: underline;">{{productos[capturaIndex].Producto}}</b></label>
-                    <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
-                      <table class="calc__numbers calc__numbers2">
-                        <tbody>
-                            <tr>
-                                <td class="botones" @click="addNumber('7');">7</td>
-                                <td class="botones" @click="addNumber('8');">8</td>
-                                <td class="botones" @click="addNumber('9');">9</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('4');">4</td>
-                                <td class="botones" @click="addNumber('5');">5</td>
-                                <td class="botones" @click="addNumber('6');">6</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('1');">1</td>
-                                <td class="botones" @click="addNumber('2');">2</td>
-                                <td class="botones" @click="addNumber('3');">3</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber(0);">0</td>
-                                <td class="botones" @click="addPoint('.');">.</td>
-                                <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
-                            </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <div style="text-align: center; width: 100%; height: 100%;">
-                        <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(data.index)">Ingresar</b-button>
-                        <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
-                      </div>
-                  </b-modal>
                 </template>
                 <template slot="subtotal" slot-scope="data">
                 {{ getSubtotal(data.index) }}
@@ -269,42 +306,9 @@
                     step="0.01"
                     @focus="abrirPop3(data.index)"
                     style="width: 80px"
-                    @input="(val)=>ActualizarDesc(data.index,val.target.value)"    
+                    @input="(val)=>{ actualizarProd(productos[data.index])}" 
                     value="0"
                     class="form-control"/>
-                  <b-modal ref="modalIngDesc" id="ingDesc" size="sm" hide-footer class="ingDesc" title="Descuento" hide-header-close>
-                    <label><b style="text-decoration: underline;">{{productos[capturaIndex].Producto}}</b></label>
-                    <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
-                      <table class="calc__numbers calc__numbers2">
-                        <tbody>
-                            <tr>
-                                <td class="botones" @click="addNumber('7');">7</td>
-                                <td class="botones" @click="addNumber('8');">8</td>
-                                <td class="botones" @click="addNumber('9');">9</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('4');">4</td>
-                                <td class="botones" @click="addNumber('5');">5</td>
-                                <td class="botones" @click="addNumber('6');">6</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber('1');">1</td>
-                                <td class="botones" @click="addNumber('2');">2</td>
-                                <td class="botones" @click="addNumber('3');">3</td>
-                            </tr>
-                            <tr>
-                                <td class="botones" @click="addNumber(0);">0</td>
-                                <td class="botones" @click="addPoint('.');">.</td>
-                                <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
-                            </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <div style="text-align: center; width: 100%; height: 100%;">
-                        <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(data.index)">Ingresar</b-button>
-                        <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
-                      </div>
-                  </b-modal>
                 </template>
 
                 <template slot="total" slot-scope="data">
@@ -515,7 +519,7 @@ export default {
     fields: {
       default () {
         return [
-            { key: 'presentaciones', label: '', sortable: false, class:'text-center stocksize'},
+            //{ key: 'presentaciones', label: '', sortable: false, class:'text-center stocksize'},
             { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
             { key: 'Producto', class:'fontsize thsize' },
             //{ key: 'Indicaciones', label: 'Indicaciones' , class:'thsize'},
@@ -524,8 +528,10 @@ export default {
             // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
             // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
             /*{ key: 'ProductoMedicion', label: 'Medición' },*/
-            { key: 'cantxPrecio', variant: 'warning', class:'text-center thsize' },
-            { key: 'cantidad', class:'thsize' },
+            //{ key: 'cantxPrecio', variant: 'warning', class:'text-center thsize' },
+            { key: 'eventPresent', label: '' },
+            { key: 'Presentacion', label: 'Presentación', class:'text-center stocksize' },
+            { key: 'cantidad', class:'text-center thsize' },
             { key: 'precio', label: 'Precio' , class:'thsize' },
             //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
             { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center thsize' }, 
@@ -600,10 +606,14 @@ export default {
       obtenerStok: 'obtenerStock',
       limpiarCart: 'limpiarCarrito',
     }),
+    actualizaDesc(index,prod){
+      //Vue.delete(this.productos[index], 'descuento');
+      Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
+      this.actualizarProd(prod)
+    },
     changeCant (val, prod, index) {
       if (val) {
-        prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
+        prod.cantidad = val
         //prod.cantidad = Number(val)
       }
       this.$nextTick(() => {
@@ -615,6 +625,7 @@ export default {
         return
       }
       this.capturaIndex = index
+      this.objProd=this.productos[index];
       this.$refs['modalIngCant'].show()
       this.$refs['modalIngPre'].hide()
       this.$refs['modalIngDesc'].hide()
@@ -624,6 +635,7 @@ export default {
         return
       }
       this.capturaIndex = index
+      this.objProd=this.productos[index];
       this.$refs['modalIngPre'].show()
       this.$refs['modalIngCant'].hide()
       this.$refs['modalIngDesc'].hide()
@@ -633,6 +645,7 @@ export default {
         return
       }
       this.capturaIndex = index
+      this.objProd=this.productos[index];
       this.$refs['modalIngDesc'].show()
       this.$refs['modalIngCant'].hide()
       this.$refs['modalIngPre'].hide()
@@ -660,8 +673,8 @@ export default {
       this.cantidadInput==''?this.cantidadInput=1:this.cantidadInput
 
       if (this.$refs['modalIngCant'].is_show) {
-        this.productos[index].cantxPrecio= this.cantidadInput;
-        this.changeCant(this.cantidadInput,this.productos[index],index)
+        this.productos[index].cantidad= this.cantidadInput;
+        this.actualizaDesc(index,this.productos[index])
       }
       if (this.$refs['modalIngPre'].is_show) {
         this.productos[index].precio = this.cantidadInput;
@@ -684,12 +697,12 @@ export default {
       this.$refs['modalIngDesc'].hide()
     },
     showPresentacion (obj) {
-      this.objProd = obj
-      this.PresentacionesProd = []
-      if(obj.PreciosPorProducto !='' && obj.PreciosPorProducto !=null){
-          this.PresentacionesProd = JSON.parse(obj.PreciosPorProducto)
+      if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
+          this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
+          this.objProd = obj
+          this.$refs['modalCant'].show()
+          return
       }
-      this.$refs['modalCant'].show()
     },
     setIndicacion(obj){
       this.$nextTick(()=>{
@@ -750,62 +763,6 @@ export default {
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
-    // loadBarcode (e) {
-    //   e.preventDefault()
-    //   let idProducto = this.loadCode;
-    //   if (idProducto) {
-    //     this.add([idProducto, (obj) => {
-    //       if (obj) {
-    //         this.$emit('onAddProducto')
-    //         this.$toasted.show('Producto añadido correctamente')
-    //       } else {
-    //         this.$toasted.show('No se encontró ningun producto')
-    //       }
-    //       this.loadCode = ''
-    //     }, { setPrecio: this.setPrecio,  setSuma: true }, true])
-    //   }
-    // },
-    loadBarcode (e) {
-      e.preventDefault()
-      let idProducto = this.loadCode;
-      if (idProducto) {
-        let params = {codigoBarra: idProducto}
-        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
-        .then((response) => {
-          if (response.data.IdProducto) {
-            this.setProducto(response.data)
-          } else {
-            this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
-          }
-        })
-      }
-    },
-    /*alterarBuscadorProductos() {
-      this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
-      this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
-        console.log('paste')
-        this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
-      }
-      this.$refs.autocompleteProducto.handleKeyDown = (e) =>{
-        let key = e.keyCode;
-        if (key == 13) {
-          if(this.pasteCode) {
-            e.preventDefault()
-            let idProducto = this.pasteCode.substring(2, this.pasteCode.length -2);
-            this.add([idProducto, () => {
-              this.$emit('onAddProducto')
-            }])
-          } else {
-            e.preventDefault()
-            this.handleKeyDown(e) 
-          }   
-        } else {
-          this.handleKeyDown(e)
-        }
-        this.pasteCode = false
-      }
-    },*/
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
@@ -834,90 +791,57 @@ export default {
       }
     },
     setProducto (obj) {
-      let precios = 1;
       this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
-      this.loadCode = ''
+      this.medicionPro = obj.ProductoMedicion
       this.preciosProd = []
-      if (!this.isVentas) {
-        obj.estadoPxP = true
-        obj.PreciosPorProducto = ''
+      this.objProd = {}
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+
+      let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
+
+      if (fpp.length==4) {
         this.setProductoUni(obj)
         return
       }
-      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-      if(obj.precioConvenio){
-        precios++;
-        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
-      }
-      if(obj.PrecioEspecial){
-        precios++;
-       this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
-      }
-      if(precios==1){
-        this.setProductoUni(obj,obj.PrecioContado)
-        return
-      }else{
-        this.objProd = {}
-        this.$refs['modalCant'].show()
-        this.objProd = obj
-      }
+
+      this.$refs['modalCant'].show()
+      this.objProd = obj
     },  
     setProductoUni (obj) {
-      this.objProd.cantxPrecio = 1
-      this.$refs.autocompleteProducto.setValue('')
-      //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      let existe= this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        if(existe){
-          if(this.isVentas){
-            this.$toasted.success('Precio Modificado')
-          }else{
-            this.$toasted.success('El producto ya está en la lista')
-          }
-          
-        }else{
-          this.$toasted.success('Producto añadido correctamente')
-        }
-        
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
-      // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
-      obj.cantidadPres = obj.cantidad
-      this.actualizarProd({Producto:obj,Pos:this.indexProdSelect})
-      this.$refs.barcodeInput.focus()
-    },
-    setProductoCant (prod) {
-      this.objProd.cantxPrecio = 1
-      this.cant = prod.cantidad
-      let obj = this.objProd
-      this.$refs.autocompleteProducto.setValue('')
-      //obj.FLETE = 0
-      // this.objProd.precio = 0
-      // this.objProd.cantidad = 0
-      obj.precio = 0
+      obj.precio = obj.PrecioContado
       obj.cantidad = 1
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
-      obj.cantidadPres = this.cant
+      obj.indicacion = ''
+      obj.Presentacion = obj.ProductoMedicion
+      obj.CantidadPresentacion = 1
+      obj.EsPresentacion = 0
+      obj = this.onSetProducto(obj)
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
-      }, false, false, this.cliente.EsVIP])
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+      }, { setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
-      this.actualizarProd(obj)
-      this.$refs.barcodeInput.focus()
+    },
+    setProductoCant (prod) {
+      let obj = {...this.objProd}
+      obj.Presentacion = prod.nombre
+      obj.CantidadPresentacion = prod.cantidad
+      obj.precio = prod.precio
+      obj.cantidad = 1
+      obj.EsPresentacion = 1
+      obj.subt = ''
+      obj.Descripcion = prod.nombre
+      obj.descuento = 0
+      obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+      this.add([obj, () => {
+        this.$emit('onAddProducto', obj)
+        this.$toasted.success('Producto añadido correctamente')
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+      }, { setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+      this.$refs['modalCant'].hide()
     },
     showIndicaciones(obj) {
       this.productoSelect = obj

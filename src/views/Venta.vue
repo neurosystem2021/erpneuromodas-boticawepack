@@ -453,11 +453,11 @@
                     </b-row>
                 </b-col>
             </b-row>
-        
-            <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+
+            <b-modal ref="modalCant" size="lg" id="modalCantidad" hide-footer hide-header>
                 <div class="d-block text-center">
-                <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
-                <h5>{{objProd.Producto}}</h5>
+                    <h3 style="text-decoration:underline">{{ objProd.Producto}}</h3>
+                    <h5>Presentaciones</h5>
                 </div>
                 <hr>
                 <b-row>
@@ -468,11 +468,17 @@
                     @click="setProductoUni(objProd)"
                     >
                     <b-row>
-                        <b-col md="7" class="nomCart">
-                        <h5 class="text-uppercase">{{medicionPro}}</h5>
+                        <b-col md="6" class="nomCart">
+                        <div>
+                            <b-row class="nomCart2">
+                                <h6 class="text-uppercase">{{ objProd.ProductoMedicion }}</h6>
+                            </b-row>
+                        </div>
                         </b-col>
-                        <b-col md="5" class="text-left">
-                        <b>Precio: </b>S/ {{ precioCont }}
+                        <b-col md="6" class="text-left">
+                        <h5>x1</h5>
+                        <span><b >Precio C: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br>
+                        <b>Precio V: </b>S/ {{ objProd.PrecioContado | redondear(2) }}
                         </b-col>
                     </b-row>
                     </b-card>
@@ -491,19 +497,24 @@
                     }"
                     >
                     <b-row>
-                        <b-col md="7" class="nomCart" >
-                        <h5 style="text-transform:uppercase">{{ d.nombre }}</h5>
+                        <b-col md="6" class="nomCart" >
+                        <div>
+                            <b-row class="nomCart2">
+                            <h6 class="text-uppercase">{{ d.nombre }}</h6>
+                            </b-row>
+                        </div>
                         </b-col>
-                        <b-col md="5" class="text-left">
+                        <b-col md="6" class="text-left">
                         <h5>x{{ d.cantidad }}</h5>
-                        <b>Precio: </b>S/ {{ d.precio }}
+                        <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span><br>
+                        <b>Precio V: </b>S/ {{ d.precio | redondear(2) }}
                         </b-col>
                     </b-row>
                     </b-card>
                 </b-col>
                 </b-row>
             </b-modal>
-            
+
         </b-container>
     </div>
 </template>
@@ -832,7 +843,7 @@ export default {
             this.tabActive = 0
         },
         obtenerStockBuscador(){
-            axios.get(API + 'calculo/productos/stock', {
+            axios.get(API + 'productos/puntoventa/stock', {
                 params: {
                     idProductos: this.productosCategoria.map(prod => prod.IdProducto),
                     idAlmacen: this.venta.almacen.IdAlmacen
@@ -864,52 +875,31 @@ export default {
             this.preciosProd = []
             this.objProd = {}
             this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-            //this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-            
-            /*if(obj.precioConvenio){
-                precios++;
-                this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
-            }
-            if(obj.PrecioEspecial){
-                precios++;
-            this.preciosProd.push({nombre:"P. Esp", cantidad: 1,  precio:obj.PrecioEspecial})
-            }*/
+            let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
 
-            let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
+            this.setProductoUni(obj)
 
-            if(fPP.length==4){
-                obj.cantxPrecio=1
-                this.setProductoUni(obj)
-                return
-            }
             this.indexProdSelect = null
-            this.$refs['modalCant'].show()
+            //this.$refs['modalCant'].show()
             this.objProd = obj
         },
         setProductoUni(obj) {
-            this.objProd.cantxPrecio = 1
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0
             this.venta.pago.delivery.monto = 0
             obj.precio = obj.PrecioContado
             obj.cantidad = 0
-            //obj.cantxPrecio = 1
             obj.EsVentaNew = true;
             obj.descuento = 0
             obj.nuevoPrecioContado = 0
             obj.indicacion = ''
-            obj.precioHabilitado = this.precioHabilitado
+            obj.Presentacion = obj.ProductoMedicion
+            obj.CantidadPresentacion = 1
+            obj.EsPresentacion = 0
             obj = this.onSetProducto(obj)
-            obj.cantidadPres = obj.cantidad
-            //this.$refs['modalCant'].show()
             this.add([obj, () => {
-                   this.$refs.carrito.productoChange = null
-                    this.$refs.carrito.productoChange = obj.IdProducto
-                    setTimeout(() => {
-                         this.$refs.carrito.productoChange = null
-                    }, 300);
+                this.$emit('onAddProducto', obj)   
                 this.$toasted.success('Producto añadido correctamente')
-                //this.loadMovimientoLotes(obj.IdProducto)
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
             }, { setPrecioCosto: false }, false, false])
             this.loadCode=''
@@ -919,49 +909,31 @@ export default {
             this.$refs.barcodeInput.focus()
         },
         setProductoCant (prod) {
-            this.objProd.cantxPrecio = 1
-            this.cant = prod.cantidad
-            let obj = this.objProd
+            let obj = {...this.objProd}
+            obj.Presentacion = prod.nombre
+            obj.CantidadPresentacion = prod.cantidad
+            obj.EsPresentacion = 1
             obj.subt = ''
-            //this.$refs.autocompleteProducto.setValue('')
-            //obj.FLETE = 0
-            // this.objProd.precio = 0
-            // this.objProd.cantidad = 0
             obj.Descripcion = prod.nombre
             obj.EsVentaNew = true;
             obj.precio = 0
             obj.cantidad = 0
-            //obj.IdLote = 0
-            //obj.TieneIgv = 0
             obj.descuento = 0
             obj.nuevoPrecioContado = 0
-            obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
-            obj.cantidadPres = this.cant
-            if(this.indexProdSelect == null){
+            obj = this.onSetProducto(obj, prod.precio, prod.precioc)
                 this.add([obj, () => {
                 this.$emit('onAddProducto', obj)
                 this.$toasted.success('Producto añadido correctamente')
-                //this.loadMovimientoLotes(obj.IdProducto)
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
             }, false, false])
 
-            }else{
-                this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
-                this.indexProdSelect = null
-            }
-
             this.$refs['modalCant'].hide()
-            
-            //this.actualizarProd(obj)
             this.$refs.barcodeInput.focus()
         },
-        showPresentacion (obj, index=null) {
-            if (!obj.PreciosPorProducto !== '') {
+        showPresentacion (obj) {
+            if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
                 this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
                 this.objProd = obj
-                this.indexProdSelect = index
-                this.precioCont = obj.PrecioContado
-                this.medicionPro = obj.ProductoMedicion
                 this.$refs['modalCant'].show()
                 return
             }
@@ -1092,19 +1064,21 @@ export default {
                 })
             },
         loadBarcode (e) {
-            e.preventDefault()
+            if (e) {
+                e.preventDefault()
+            }
             let idProducto = this.loadCode;
             if (idProducto) {
-                let params = {codigoBarra: idProducto}
-                this.axios.get(this.API + 'productosbarra/id/' + idProducto, {params: params})
-                .then((response) => {
-                if (response.data.IdProducto) {
-                    this.setProducto(response.data)
+                this.add([idProducto, (obj) => {
+                if (obj) {
+                    this.$emit('onAddProducto')
+                    this.$toasted.show('Producto añadido correctamente')
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
                 } else {
-                    this.loadCode = ''
-                    this.$toasted.show('No se encontró ningun producto')    
+                    this.$toasted.show('No se encontró ningun producto')
                 }
-                })
+                this.loadCode = ''
+                }, { setPrecio: true,  setSuma: true }, {isBarCode: true}])
             }
         },
         //Fin de nuevos metodos de venta
@@ -1473,15 +1447,13 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant, precio) {
-            if (cant) {
-                obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || precio
-                return obj
-            }
+        onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            if(precio){
+                obj.precio = precio || 0
+            }
+           
             return obj
         },
         onAddProducto (obj) {
@@ -1856,7 +1828,8 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'COSTODELIVERY') && ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined))) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
+                    this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {

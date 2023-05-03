@@ -335,16 +335,17 @@
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="'Precio '+i" class="text-center" >
+          <b-card :header="'Presentacion '+i" class="text-center">
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
                 type="text"
-                style="text-transform:uppercase"
+                style="text-transform:uppercase; font-weight: bold;"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
                 ></b-form-input>
             </b-form-group>
-            <b-form-group>
+
+            <b-form-group class="text-left">
               <label>Cantidad:</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
@@ -353,9 +354,19 @@
                 step="0.01"
                 />
             </b-form-group>
-            
-            <b-form-group>
-              <label>Precio:</label>
+
+            <b-form-group class="text-left">
+              <label>Precio Costo:</label>
+              <input 
+                v-model="producto.precios[i-1].precioc"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+
+            <b-form-group class="text-left">
+              <label>Precio Venta:</label>
               <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
@@ -363,15 +374,10 @@
                 step="0.00001"
                 />
             </b-form-group>
-
-            <b-form-group>
-              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</label>
-            </b-form-group>
-
           </b-card>
         </b-col>
       </b-row>
-    </b-form-group>
+      </b-form-group>
 
       <hr />
       <b-row>
@@ -407,7 +413,7 @@
           </b-form-group>
         </b-col>
         <b-col md="2">
-            <b-form-group>
+            <!--<b-form-group>
               <label>Lote: <span style="font-weight:bold">{{serieNumero}}</span></label>
               <br>
               <b-form-select
@@ -415,14 +421,14 @@
               @change="(val) => changeMovimiento(val)"
               v-model="hashMovimiento" :options="movimientoLotes">
               </b-form-select>
-            </b-form-group>
+            </b-form-group>-->
         </b-col>
         <b-col md="3">
-            <b-form-group style="text-align: center;">
+            <!--<b-form-group style="text-align: center;">
               <label>Fecha Vencimiento:</label>
               <br>
               <div style=" margin-top:7px" v-html="fechaVenMovimiento"></div>
-            </b-form-group>
+            </b-form-group>-->
         </b-col>
         <b-col md="4">
           <label>Cantidad:</label>
@@ -579,6 +585,13 @@ export default {
           this.producto.Imagen                = newVal.Imagen
           if (newVal.PreciosPorProducto) {
             this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+          }else{
+            this.producto.precios = [
+              {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+              {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+              {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+              {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
+            ]
           }
           }).catch((error) => {
             console.log(error)
@@ -781,10 +794,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'Precio 1', cantidad: 0, precio: 0},
-          {nombre: 'Precio 2', cantidad: 0, precio: 0},
-          {nombre: 'Precio 3', cantidad: 0, precio: 0},
-          {nombre: 'Precio 4', cantidad: 0, precio: 0}
+          {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0}
         ]
       }
     },
@@ -816,7 +829,7 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId,this.producto.precios, this.producto)
+          this.cbGuardar(this.producto.IdProducto?this.producto:response.data.insertId)
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)

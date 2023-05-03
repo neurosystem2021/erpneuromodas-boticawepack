@@ -13,24 +13,18 @@ const mutations = {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
-        productos.unshift(item)
+        productos.push(item)
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad = Number(productos[index].cantidad)+1
       }
     } else {
-      if (!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVentaNew) {
-        productos.unshift(item)
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {        
+        productos.push(item)
       }
       else{
-        let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
-
-        productos[index].cantxPrecio = Number(productos[index].cantxPrecio) + 1
-        productos[index].cantidad = productos[index].cantxPrecio*item.cantidadPres
-        productos[index].precio = item.precio
-        productos[index].cantidadPres = item.cantidadPres
-
-        let prod = Object.assign({}, productos[index]);
-        productos.splice(index, 1,prod)
+        let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+        productos.splice(index2, 1)
+        productos.splice(index2, 0, item)
       }
     }
   },
@@ -44,9 +38,9 @@ const mutations = {
       return p;
     })
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, obj) {
-    //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
-    productos.splice(obj.Pos, 1, obj.Producto)
+  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
+    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    productos.splice(index, 1, prod)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
@@ -101,12 +95,14 @@ const actions = {
 
     if(typeof producto === 'object') {
       if (setPrecioCosto) {
-        producto.precio = producto.PrecioCosto
-        producto.nuevoPrecioContado = producto.PrecioContado
+        //producto.precio = producto.PrecioCosto
+        //producto.nuevoPrecioContado = producto.PrecioContado
       }
       if (isClienteVip) {
         producto.precio = producto.precioConvenio || producto.precio;
       }
+
+      producto.setSuma = setSuma;
 
       let arr = [
         {"desc": producto.ProductoDesc},
@@ -139,9 +135,11 @@ const actions = {
           if(setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            obj.nuevoPrecioContado = 0
           } else {
             obj.cantidad = 0
-            obj.precio = 0
+            obj.precio = obj.PrecioCosto
+            obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
           if (isClienteVip) {
@@ -190,6 +188,9 @@ const actions = {
             obj.Descripcion = ''
           }
           obj.EsObsequio = 0
+          obj.CantidadPresentacion = 1
+          obj.EsPresentacion = 0
+          obj.Presentacion = obj.ProductoMedicion
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {
@@ -222,10 +223,11 @@ const actions = {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
-    axios.get(API + 'calculo/productos/stock', {
+    axios.get(API + 'productos/puntoventa/stock', {
       params: {
         idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
+        idAlmacen: obj.IdAlmacen,
+        noLimit: 1
       }
     }).then((response) => {
         commit('OBTENER_STOCK', response.data)
