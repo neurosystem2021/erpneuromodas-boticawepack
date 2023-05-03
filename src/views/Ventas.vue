@@ -1038,7 +1038,7 @@ export default {
             this.productos.forEach(pro => {
                 console.log(pro);
                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
-                    this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
+                    //this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
 
@@ -1046,7 +1046,7 @@ export default {
                     totalCero += 1
                 }
 
-                pro.Descripcion = ('' + pro.Descripcion).trim()
+                pro.Descripcion = (''+pro.Presentacion).trim()
                 /*let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
                 if(lote > 1){
                     igualLote += 1 
@@ -1055,7 +1055,7 @@ export default {
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
+                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
                 this.inProgress = false            
                 return;
             }
@@ -1228,6 +1228,7 @@ export default {
                           Fecha: response.data.fecha,
                         }
                         this.venta.dataInfoDocVenta = dataInfoDocVenta
+                        this.venta.reps = 2
                         this.ultimaVentaData = this.venta
                         let ventaJson= JSON.stringify(this.venta)
                         let left = (screen.width/2)-(800/2)
