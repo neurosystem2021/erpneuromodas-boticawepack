@@ -42,8 +42,11 @@
             :per-page="perPage"
             :current-page="currentPage">
           
-              <template slot="Reimprimir" slot-scope="data">
+              <template slot="Visualizar" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+              </template>
+              <template slot="Reimprimir" slot-scope="data">
+                <b-button variant="primary" @click="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></b-button>
               </template>
           </b-table>
             <b-row>
@@ -85,7 +88,8 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true },
-            { key: 'Reimprimir' }
+            { key: 'Visualizar' },
+            { key: 'Reimprimir', label:'Reimprimir', class:'text-center' }
       ],
       totalRows: 50,
       perPage: 10,
@@ -125,7 +129,60 @@ export default {
           // Returning an empty array, allows table to correctly handle busy state in case of error
           return []
         })
-      }
+      },
+      reimprimir(idDocVenta){
+          this.axios.get(this.API + 'ventas/reimpresion/rapida?idDocVenta=' + idDocVenta)
+          .then((response) => {
+            let venta = {
+              CampoDireccion: response.data.venta.CampoDireccion,
+              FechaCredito: response.data.venta.FechaCredito,
+              EsCredito: response.data.venta.EsCredito,
+              PagoCon: response.data.venta.PagoCon,
+              dataInfoDocVenta:{
+                Fecha: response.data.venta.FechaDoc,
+                Numero: response.data.venta.Numero,
+                Serie: response.data.venta.Serie,
+              },
+              cliente:{
+                Cliente: response.data.venta.Cliente,
+                Direccion: response.data.venta.Direccion,
+                DniRuc: response.data.venta.DniRuc,
+              },
+              productos:response.data.productos,
+              tipoVenta:{
+                CodSunat: response.data.venta.CodSunat,
+              },
+              vendedor: {
+                Usuario: response.data.venta.UsuarioReg,
+              },
+              reps: 1
+            }
+            let ventaJson= JSON.stringify(venta)
+            let left = (screen.width/2)-(800/2)
+                let top = (screen.height/2)-(800/2)
+                let winName='Impresion';
+                let winURL='http://localhost:5000/imprimir/getdata.php';
+                let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                let form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", winURL);
+                form.setAttribute("target",winName);  
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'venta';
+                input.value = ventaJson;
+                form.appendChild(input);
+                document.body.appendChild(form);                       
+                window.open('', winName,windowoption);
+                form.target = winName;
+                form.submit();                 
+                document.body.removeChild(form);  
+          })
+          .catch((error) => {
+              console.log(error)
+              this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
+      },
   },
   components: {
   }

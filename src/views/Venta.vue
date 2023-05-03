@@ -334,7 +334,7 @@
                             <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                             <b-button type="button" size="sm" v-if="!this.$route.query.idPreOrden && !this.$route.query.idPedido" :disabled="inProgress" variant="primary"  @click="guardarProforma">Crear Proforma</b-button>
                             <b-button type="submit" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
-                            <b-button v-if="ultimaVenta"  variant="primary" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
+                            <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
                             <b-button v-if="Object.keys(ultimaComanda).length !==0 " variant="info" @click="imprimirUltimaComanda">Imprimir última Comanda</b-button>
                         </b-col>
                     </b-row>
@@ -1829,18 +1829,21 @@ export default {
             let totalCero = 0 
             this.productos.forEach(pro => {
                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
-                    this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
+                    //this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                pro.Descripcion = (''+pro.Presentacion).trim()
+
             });
-            /*if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
-                this.$toasted.error('No se puede vender un producto sin stock');
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
+                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
                 this.inProgress = false            
                 return;
-            }*/
+            }
             if(totalCero >= 1) {
                 //this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.$swal({
@@ -1906,9 +1909,8 @@ export default {
                     this.$toasted.show(response.data.error)    
                 }else {
                     try {
-                        /*this.venta.productos.map((pro)=>{
+                        this.venta.productos.map((pro)=>{
                             delete pro.nuevoPrecioContado
-                            delete pro.Descripcion
                             delete pro.disabledProf
                             delete pro.normalPrecioContado
                             delete pro.Imagen
@@ -1919,8 +1921,66 @@ export default {
                             delete pro.precioHabilitado
                             delete pro.CodigoBarra
                             delete pro.stock
+                            delete pro.IdProductoMarca
+                            delete pro.IdProductoFormaFarmaceutica
+                            delete pro.IdProductoMedicion
+                            delete pro.IdProductoCategoria
+                            delete pro.ProductoDesc
+                            delete pro.ProductoDesc2
+                            delete pro.ProductoDesc3
+                            delete pro.ProductoDescCorto
+                            delete pro.PrecioContado
+                            delete pro.Codigo
+                            delete pro.Dosis
+                            delete pro.PrecioEspecial
+                            delete pro.PrecioPorMayor
+                            delete pro.StockPorMayor
+                            delete pro.StockMinimo
+                            delete pro.Anulado
+                            delete pro.FechaReg
+                            delete pro.UsuarioReg
+                            delete pro.FechaMod
+                            delete pro.UsuarioMod
+                            delete pro.Hash
+                            delete pro.ControlaStock
+                            delete pro.VentaEstrategica
+                            delete pro.PorcentajeUtilidad
+                            delete pro.IdBloque
+                            delete pro.Genero
+                            delete pro.Color
+                            delete pro.Botapie
+                            delete pro.ProductoModelo,
+                            delete pro.ProductoPresentacion,
+                            delete pro.EsPadre
+                            delete pro.precioConvenio
+                            delete pro.EsHabitacion
+                            delete pro.EstadoHabitacion
+                            delete pro.Piso
+                            delete pro.IdPreOrden
+                            delete pro.IdClienteReserva
+                            delete pro.FechaReserva
+                            delete pro.FechaAlquiler
+                            delete pro.Vuelo
+                            delete pro.FechaAlquiler
+                            delete pro.FechaAlquilerFin
+                            delete pro.EstaSucio
+                            delete pro.ControlaStockMinimo
+                            delete pro.ProductoCategoria
+                            delete pro.ProductoMarca
+                            delete pro.ProductoMedicion
+                            delete pro.StockIngresoUnd
+                            delete pro.StockSalidaUnd
+                            delete pro.StockSalidaVentaUnd
+                            delete pro.StockSalidaVentaCaja
+                            delete pro.EsObsequio
+                            delete pro.cantxPrecio
+                            delete pro.subt
+                            delete pro.cantidadPres
+                            delete pro.subtotal
+                            delete pro.total
                         });
                         delete this.venta.cliente.Anulado
+                        delete this.venta.cliente.IdCliente
                         delete this.venta.cliente.FechaReg
                         delete this.venta.cliente.UsuarioReg
                         delete this.venta.cliente.FechaMod
@@ -1963,18 +2023,47 @@ export default {
                         delete this.venta.puntosAplicados
                         delete this.venta.totalCart
                         delete this.venta.puntoVenta
+                        delete this.venta.NroComprobanteModifica
+                        delete this.venta.CodSunatModifica
+                        delete this.venta.NotaIdMotivo
+                        delete this.venta.IdPreOrden
+                        delete this.venta.almacen
+                        delete this.venta.FechaDoc
+                        delete this.venta.pago
+                        delete this.venta.NotaDescMotivo
+                        delete this.venta.diasValidosProf
+                        delete this.venta.EsOrganizacion
+                        delete this.venta.NombreOrganizacion
+                        delete this.venta.Serie
+                        delete this.venta.Numero
                         let dataInfoDocVenta = {
                           Serie:  response.data.serie,
                           Numero: response.data.numero,
                           Fecha: response.data.fecha,
                         }
                         this.venta.dataInfoDocVenta = dataInfoDocVenta
+                        this.venta.reps = 1
+                        this.ultimaVentaData = this.venta
                         let ventaJson= JSON.stringify(this.venta)
-                        var left = (screen.width/2)-(800/2)
-                        var top = (screen.height/2)-(800/2)
-                        let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                        window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
-                        */
+                        let left = (screen.width/2)-(800/2)
+                        let top = (screen.height/2)-(800/2)
+                        let winName='Impresion';
+                        let winURL='http://localhost:5000/imprimir/getdata.php';
+                        let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                        let form = document.createElement("form");
+                        form.setAttribute("method", "post");
+                        form.setAttribute("action", winURL);
+                        form.setAttribute("target",winName);  
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'venta';
+                        input.value = ventaJson;
+                        form.appendChild(input);
+                        document.body.appendChild(form);                       
+                        window.open('', winName,windowoption);
+                        form.target = winName;
+                        form.submit();                 
+                        document.body.removeChild(form);
                     } catch (error) {
   
                     }
@@ -1993,7 +2082,7 @@ export default {
                     this.$refs.inputCliente.setValue('')
                     this.$refs.carrito.pagocon = ''
                     this.$toasted.success('Venta realizada con exito')
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
+                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
@@ -2016,22 +2105,28 @@ export default {
             })
         },
         imprimirUltimaVenta(){
-            window.open('/imprimir/index.php?IdDocVenta=' +this.ultimaVenta,'_blank');
-            return;
-            let tablet = this.venta.vendedor.EsTablet
-            if(tablet==1){
-                window.open('/imprimir/index.php?IdDocVenta=' +this.ultimaVenta+'&preview=1','_blank');
-            } else if(tablet==2){
-                window.open('neuroprinterred://factura.vip?iddocventa='+this.ultimaVenta+'&token=' + this.APPTOKEN)
-            }else{
-                try {
+            try {
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
-                var left = (screen.width/2)-(800/2)
-                var top = (screen.height/2)-(800/2)
-                let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
-                window.open('http://localhost:5000/imprimir/getdata.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
-                } catch (error) {
-                }
+                let left = (screen.width/2)-(800/2)
+                let top = (screen.height/2)-(800/2)
+                let winName='Impresion';
+                let winURL='http://localhost:5000/imprimir/getdata.php';
+                let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                let form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", winURL);
+                form.setAttribute("target",winName);  
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'venta';
+                input.value = ventaJson;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                window.open('', winName,windowoption);
+                form.target = winName;
+                form.submit();                 
+                document.body.removeChild(form);  
+            } catch (error) {
             }
         },
         probarImpresora(){

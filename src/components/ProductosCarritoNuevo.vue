@@ -27,8 +27,8 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x1</h5>
-                        <span><b >Precio C: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br>
-                        <b>Precio V: </b>S/ {{ objProd.PrecioContado | redondear(2) }}
+                        <span><b >COSTO: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br>
+                        <b>VENTA: </b>S/ {{ objProd.PrecioContado | redondear(2) }}
                         </b-col>
                     </b-row>
                     </b-card>
@@ -60,8 +60,8 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x{{ d.cantidad }}</h5>
-                        <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span><br>
-                        <b>Precio V: </b>S/ {{ d.precio | redondear(2) }}
+                        <span><b>COSTO: </b>S/ {{ d.precioc | redondear(2) }}</span><br>
+                        <b>VENTA: </b>S/ {{ d.precio | redondear(2) }}
                         </b-col>
                     </b-row>
                     </b-card>
