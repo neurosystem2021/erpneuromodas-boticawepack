@@ -594,13 +594,16 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
+            
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
             .then(res => {
                 this.setPuntoVenta(res.data)
-                this.getNumeroVenta()
+                //this.getNumeroVenta()
             })
         },
         setPuntoVenta (obj) {
