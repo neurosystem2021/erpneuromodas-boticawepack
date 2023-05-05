@@ -15,8 +15,8 @@
               type="text"
               class="form-control upper"
               ></b-form-input>
-              <b-form-text id="input-formatter-help">
-                Dejar en blanco para autogenerar
+              <b-form-text id="input-formatter-help" style="color:red !important">
+                Dejar en blanco para autogenerar, no modificar codigos generados por el sistema (S)
               </b-form-text>
           </b-form-group>
           <b-form-group>
