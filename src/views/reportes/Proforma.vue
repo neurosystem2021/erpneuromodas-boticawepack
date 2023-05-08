@@ -40,7 +40,7 @@
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
-            <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}</td>
+            <td class="desc"><h3>{{ prod.Producto }}</h3><span v-if="prod.Descripcion!=''"><b style="text-transform: uppercase;">( {{ prod.Descripcion }} )</b></span></td>
             <td class="unit">S/ {{ prod.Precio | moneda }}</td>
             <td class="ca" v-if="prod.Ancho === 0" >-</td>
             <td class="ca" v-else >{{ prod.Ancho }}</td>

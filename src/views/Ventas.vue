@@ -725,6 +725,10 @@ export default {
                 return
             }
 
+            this.productos.forEach(pro => {
+                pro.Descripcion = (''+pro.Descripcion).trim().toUpperCase()
+            });
+
             this.venta.productos = this.productos
             
             this.axios.post(this.API + 'proformas', this.venta)
@@ -785,6 +789,7 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+                pro.Descripcion = (''+pro.Descripcion).trim()
             });
 
             if(totalCero >= 1) {

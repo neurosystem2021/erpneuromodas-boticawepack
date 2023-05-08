@@ -109,6 +109,7 @@
             type="number"
             min="0"
             step="0.01"
+            style="width:95px"
             class="form-control"
             value="0"/>
             <b-form-text>
