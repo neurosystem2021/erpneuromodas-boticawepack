@@ -943,7 +943,9 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
-            this.productos.forEach(pro => {
+            let noDescrip = 0
+            let infoDescrip = ''
+            this.productos.forEach((pro,index) => {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
                 }
@@ -952,6 +954,10 @@ export default {
                     totalCero += 1
                 }
                 pro.Descripcion = (''+pro.Descripcion).trim()
+                if(pro.Descripcion ==''){
+                    noDescrip +=1
+                    infoDescrip = (index+1) +" "+ pro.Producto
+                }
             });
 
 /*             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
@@ -959,6 +965,12 @@ export default {
                 this.inProgress = false            
                 return;
             } */
+
+            if(noDescrip >= 1) {
+                this.$toasted.error('El item '+ infoDescrip + ' no tiene descripcion, si no tiene debe colocar un punto',{duration:3000});
+                this.inProgress = false
+                return;
+            }
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');

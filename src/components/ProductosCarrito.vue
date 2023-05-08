@@ -94,7 +94,7 @@
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
             placeholder="Cantidad"
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -237,7 +237,7 @@
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="2"
-            style="width: 170px"
+            style="width: 180px; font-weight: bold;"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -480,13 +480,13 @@ export default {
       obtenerStok: 'obtenerStock',
     }),
 
-    changeCant (val, prod) {
+    changeCant (val, prod, index) {
       if (val) {
         prod.cantidad = prod.cantidadPres
         prod.cantidad *= val
       }
       this.$nextTick(() => {
-        this.actualizarProd(prod)
+        this.actualizarProd({Producto:prod,Pos:index})
       })
     },
 
@@ -685,7 +685,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
@@ -709,7 +709,7 @@ export default {
       }, false, false, this.cliente.EsVIP])
       this.$refs['modalCant'].hide()
       obj.cantidadPres = this.cant
-      this.actualizarProd(obj)
+      //this.actualizarProd(obj)
       this.$refs.barcodeInput.focus()
     },
     showPresentacion (obj) { 
@@ -782,6 +782,7 @@ export default {
     ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(val))
+      this.actualizarProd({Producto:this.productos[index],Pos:index})
     },
     getSubtotal(index) {
       
