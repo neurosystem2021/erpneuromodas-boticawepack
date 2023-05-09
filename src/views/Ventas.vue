@@ -966,11 +966,11 @@ export default {
                 return;
             } */
 
-            if(noDescrip >= 1) {
+            /*if(noDescrip >= 1) {
                 this.$toasted.error('El item '+ infoDescrip + ' no tiene descripcion, si no tiene debe colocar un punto',{duration:3000});
                 this.inProgress = false
                 return;
-            }
+            }*/
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
