@@ -505,6 +505,7 @@ export default {
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
+                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
                     { key: 'descuento', label: 'Desc.'},
