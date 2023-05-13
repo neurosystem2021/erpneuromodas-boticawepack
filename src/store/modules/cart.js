@@ -55,6 +55,17 @@ const mutations = {
     })
     //state.productos[index].stock = item.stock
     // Vue.set(state.productos[index], 'stock', item.stock)
+  },
+  OBTENER_CANTIDAD (state, obj) {
+    state.productos = state.productos.map((prod) => {
+      if(obj.opc==0 && prod.ControlaStock==1){
+        prod.cantidad = (prod.StockMinimo || 0) - (prod.stock || 0)
+      }
+      if(obj.opc==1 && prod.ControlaStock==0){
+        prod.cantidad = (prod.StockMinimo || 0) - (obj.data || 0)
+      }
+      return prod
+    })
   }
 }
 
@@ -140,19 +151,28 @@ const actions = {
   },
   obtenerStock({ commit, state }, obj) {
     if (state.productos.length) {
-      axios.get(API + 'productos/stock', {
+      axios.get(API + 'productos/puntoventa/stock', {
         params: {
           idProductos: state.productos.map(prod => prod.IdProducto),
-          idAlmacen: obj.IdAlmacen
+          idAlmacen: obj.IdAlmacen,
+          noLimit: 1
         }
       }).then((response) => {
           commit('OBTENER_STOCK', response.data)
+          setTimeout(() => {
+            if(obj.CalculoCantidad==1){
+              commit('OBTENER_CANTIDAD', {opc: 0, stock: 0})
+            }
+          }, 150);
       })
       .catch((error) => {
         console.log(error)
       })
     }
-  }
+  },
+  obtenercantidad ({ commit }, data) {
+    commit('OBTENER_CANTIDAD', {opc: 1, data: data})
+  },
 }
 
 export default {

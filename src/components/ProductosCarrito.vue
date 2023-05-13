@@ -7,7 +7,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'sortBy':'stock', 'sortDesc': 1}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -27,9 +27,9 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
-          <b-badge variant="danger">Productos Vencidos</b-badge>
-          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
-          <b-badge variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
+          <b-badge variant="danger" v-if="isVentas">Productos Vencidos</b-badge>
+          <b-badge variant="warning" v-if="isVentas">proximos a vencer 4 meses</b-badge>
+          <b-badge variant="primary" v-if="isVentas">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data" >
@@ -48,12 +48,14 @@
             :disabled="bloquearInput?true:false"
             type="number"
             class="form-control"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.01"
             @input="(val) => {
+              if(isVentas){
               $emit('onInputCantidad', val.target.value)
               productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
+              }
             }"
             placeholder="Cantidad"/>
         </template>
@@ -66,7 +68,7 @@
             min="0"
             step="0.00001"
             class="form-control"
-            :readonly="(idPerfil != 1) ? true : false"
+            :readonly="(idPerfil != 1 && isVentas) ? true : false"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"/>
         </template>
@@ -121,6 +123,7 @@
             min="0"
             step="0.01"
             value="0"
+            style="width: 100px;"
             class="form-control"
             />
             <b-form-text>
@@ -228,6 +231,7 @@ export default {
     setPrecio: Boolean,
     idAlmacen: Number,
     isVentas:Boolean,
+    isOrdenCompra:Boolean,
     bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
@@ -272,7 +276,7 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos () {
-      if (this.idAlmacen) {
+      if (this.idAlmacen && this.isVentas) {
         return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       }
       return this.API + 'productos'
@@ -326,7 +330,8 @@ export default {
       add: 'agregarProducto',
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      actualizarTotal: 'actualizarTotalCart',
+      obtenercant: "obtenercantidad"
     }),
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
@@ -383,6 +388,9 @@ export default {
         }
       }).then((response) => {
         Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
+        if(this.isOrdenCompra){
+          this.obtenercant(response.data.stock)
+        }
         //console.log(response.data.stock)
           //return response.data.stock
       })
@@ -419,7 +427,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
-      if (this.idAlmacen) {
+      if (this.idAlmacen && this.isVentas) {
         let style = 'ss'
         let styleBag = 'ss'
         // cambiar color los vencidos
@@ -558,7 +566,7 @@ export default {
       }
 
       if (total <= 0) {
-        alert('El total de un producto no puede ser menor o igual a 0')
+        //alert('El total de un producto no puede ser menor o igual a 0')
         Vue.set(this.productos[index], 'descuento', 0)
         return
       }

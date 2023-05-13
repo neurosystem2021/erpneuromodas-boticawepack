@@ -12,6 +12,7 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import ProductosSimilares from '@/views/ProductosSimilares.vue'
 import Configuraciones from '@/views/Configuraciones.vue'
 import ProductosVencer from '@/views/ProductosVencer.vue'
+import OrdenCompra from '@/views/OrdenCompra.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -22,6 +23,7 @@ import ClientesVip from '@/views/reportes/ClientesVip.vue'
 
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import Ordenes from '@/views/reportes/Ordenes.vue'
 
 Vue.use(Router)
 
@@ -122,6 +124,16 @@ export default new Router({
       path: '/productosvencer',
       name: 'ProductosVencer',
       component: ProductosVencer
+    },
+    {
+      path: '/ordencompra',
+      name: 'OrdenCompra',
+      component: OrdenCompra
+    },
+    {
+      path: '/reportes/ordenes',
+      name: 'Ordenes',
+      component: Ordenes
     },
   ]
 })
