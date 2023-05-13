@@ -476,11 +476,6 @@ return false
         return;
       }
 
-      if (faltaStock) {
-          this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
-          this.inProgress = false            
-          return;
-      }
 
       if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
