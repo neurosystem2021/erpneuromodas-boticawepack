@@ -116,6 +116,16 @@
           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)" style="margin-top:2px;"><i class="fas fa-list"></i></b-button>
         </template>
 
+        <template slot="Presentacion" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Presentacion"
+            type="text"
+            style="text-align:center; font-weight:bold; width: 120px;"
+            autocomplete="false"
+            readonly
+            ></b-form-input>
+        </template>
+
         <template slot="obsequio" slot-scope="data">
           <div class="obsequio" v-if="tipoMov==0">
             <b-form-checkbox
@@ -143,6 +153,9 @@
             }"
             placeholder="Cantidad"
             class="form-control"/>
+            <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0;">
+              <p style="color: #007bff; text-align: center; font-weight: bold;">{{ productos[data.index].cantidad * productos[data.index].CantidadPresentacion }} unid.</p>
+            </b-form-text>
         </template>
         <template slot="precio" slot-scope="data">
           <input
@@ -498,6 +511,7 @@ export default {
           //{ key: 'ProductoMedicion', label: 'Medición' },
           { key: 'eventPres', label: '' },
           //{ key: 'cantxPrecio', variant: 'warning' },
+          { key: 'Presentacion', label: 'Presentación', class:'text-center centrarTd' },
           { key: 'cantidad' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'precio', label: 'P/U' },

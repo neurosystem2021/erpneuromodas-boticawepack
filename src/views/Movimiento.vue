@@ -243,6 +243,7 @@ export default {
             { key: 'ProductoMarca', label: 'Marca' },
             { key: 'eventPres', label: '' },
             //{ key: 'cantxPrecio', variant: 'warning' },
+            { key: 'Presentacion', label: 'Presentación', class:'text-center centrarTd' },
             { key: 'cantidad' },
             { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
             { key: 'precio', label: 'P/U' },
@@ -539,10 +540,16 @@ return false
 }
 </script>
 <style>
+  td.centrarTd {
+    vertical-align: top !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
   .input-group {
     /*margin: 0.25rem 0 !important;*/
   }
   .anchomov{
-    width: calc(100% - 120px) !important;
+    width: calc(100% - 300px) !important;
   }
 </style>
