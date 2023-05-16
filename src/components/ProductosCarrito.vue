@@ -468,7 +468,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Anaquel' },
+          //{ key: 'ProductoPresentacion', label: 'Anaquel' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'eventPres', label: '' },
           { key: 'cantxPrecio', variant: 'warning' },

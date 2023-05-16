@@ -497,7 +497,7 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
-                    { key: 'ProductoPresentacion', label: 'Anaquel' },
+                    //{ key: 'ProductoPresentacion', label: 'Anaquel' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
