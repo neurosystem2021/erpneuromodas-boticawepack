@@ -268,6 +268,11 @@
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+        <b-row>
+          <b-col class="text-center">
+              <b-button variant="success" size="sm" :href="hrefXls" target="_blank">Exportar Excel</b-button>
+          </b-col>
+        </b-row>
       </b-modal>
 
       <b-modal size="md" ref="modalCant" hide-footer hide-header>
@@ -420,7 +425,10 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
-    }
+    },
+    hrefXls () {
+      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&categoria='+this.productoSelect.ProductoCategoria).replace('#','');
+    },
   },
   methods: {
     clickVerValorizado() {
