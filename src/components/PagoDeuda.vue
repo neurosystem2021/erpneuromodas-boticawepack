@@ -95,12 +95,13 @@
                                     <td>{{(item.NotaCreApli).toFixed(2)}}</td>
                                     <td>{{ (item.Saldo).toFixed(2) }}</td>
                                     <td>
-                                        <b-form-input v-model="item.aplicar"
+                                        <input v-model="item.aplicar"
                                             type="number"
                                             step="0.01"
                                             min="0"
 
-                                            placeholder="0"></b-form-input>
+                                            placeholder="0"
+                                            class="form-control"/>
                                     </td>
                                     <td>
                                         <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
