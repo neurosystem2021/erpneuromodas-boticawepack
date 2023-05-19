@@ -136,7 +136,7 @@
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="3">
-      <table class="table tabla-prestados">
+      <table class="table tabla-prestados" v-show="esVenta">
         <thead>
           <tr>
             <th>Productos Prestados</th>

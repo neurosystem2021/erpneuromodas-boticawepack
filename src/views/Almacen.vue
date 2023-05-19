@@ -365,7 +365,7 @@ export default {
           .then(res => {
             this.setAlmacen(response.data)
             this.$refs.inputAlmacen.setValue(res.data.Almacen)
-            this.$refs.inputAlmacen.$refs.input.disabled = true
+            this.$refs.inputAlmacen.$refs.input.disabled = false
           })
       })
       .catch((error) => {

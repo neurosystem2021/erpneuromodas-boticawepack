@@ -178,7 +178,7 @@
             </b-col>
           <hr v-if="producto.EsBalonEnvase"/>
 
-          <b-form-group>
+          <!--<b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -187,7 +187,7 @@
                      @input="checkIsHijo">
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
-          </b-form-group>
+          </b-form-group>-->
           
         </b-col>
       </b-row>
