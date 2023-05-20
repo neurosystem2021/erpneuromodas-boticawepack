@@ -76,6 +76,15 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="9">
+                                <b-form-group>
+                                    <label>OBSERVACIÓN: </label>
+                                    <input v-model="venta.Observacion"
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="Observación" />
+                                </b-form-group>
+                            </b-col>
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
@@ -398,6 +407,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
+                Observacion:'',
                 cliente: {},
                 tipoVenta: {
                     IdTipoDoc: 7,
@@ -682,6 +692,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Observacion = (this.venta.Observacion+'').toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
