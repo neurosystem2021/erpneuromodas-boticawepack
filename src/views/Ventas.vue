@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
+        <b-container fluid class="ancho">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -14,13 +14,13 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" ></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-show="false">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-show="false">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -33,7 +33,7 @@
                         <b-row>
                             <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -63,7 +63,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -84,7 +84,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -179,7 +179,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -1340,4 +1340,33 @@ export default {
     font-size: 30px;
 }
 
+</style>
+<style>
+@media only screen and (min-width: 700px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
+}
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
+    }
+}
+
+@media only screen and (max-width: 900px) {
+    #modalPagoDeuda .modal-dialog{
+        max-width: 100% !important;
+        margin: 5px !important;
+    }
+
+    #modalPagoDeuda{
+        padding: 0 !important;
+    }
+
+}
 </style>

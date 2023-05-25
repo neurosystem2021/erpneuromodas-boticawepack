@@ -264,8 +264,8 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
