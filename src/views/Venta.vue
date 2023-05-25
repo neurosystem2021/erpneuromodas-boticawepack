@@ -876,11 +876,13 @@ export default {
             this.objProd = {}
             this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
             let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
-
-            this.setProductoUni(obj)
+            if(fpp.length==4){
+                this.setProductoUni(obj)
+                return
+            }
 
             this.indexProdSelect = null
-            //this.$refs['modalCant'].show()
+            this.$refs['modalCant'].show()
             this.objProd = obj
         },
         setProductoUni(obj) {
@@ -1908,7 +1910,7 @@ export default {
                     this.inProgress = false
                     this.$toasted.show(response.data.error)    
                 }else {
-                    try {
+                    /*try {
                         this.venta.productos.map((pro)=>{
                             delete pro.nuevoPrecioContado
                             delete pro.disabledProf
@@ -2066,7 +2068,7 @@ export default {
                         document.body.removeChild(form);
                     } catch (error) {
   
-                    }
+                    }*/
                     /*this.$swal({
                         position: 'center',
                         icon: 'success',
@@ -2082,7 +2084,7 @@ export default {
                     this.$refs.inputCliente.setValue('')
                     this.$refs.carrito.pagocon = ''
                     this.$toasted.success('Venta realizada con exito')
-                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
+                    
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
@@ -2095,6 +2097,7 @@ export default {
                     this.loadClienteVarios()
                     this.$router.replace('/venta')
                     //this.$refs.inputNombreCliente.$refs.input.required = true  
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                      this.emitirauto(response.data.insertId)
                 }
             })
@@ -2105,6 +2108,7 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank','noopener');
             try {
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
                 let left = (screen.width/2)-(800/2)
