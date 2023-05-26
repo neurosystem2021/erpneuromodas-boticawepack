@@ -200,7 +200,7 @@ import config from '@/store/config.js'
     export default {
         mounted () {
             this.initForm()
-            this.getVendedor()
+            //this.getVendedor()
         },
         data () {
             return {
@@ -219,6 +219,7 @@ import config from '@/store/config.js'
             show (val) {
                 if(val){
                     this.initForm()
+                    this.getVendedor()
                 }
             }
         },
@@ -241,6 +242,7 @@ import config from '@/store/config.js'
                 }
             },
             getVendedor () {
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 let usuario = sessionStorage.getItem('User')
                 this.axios.get(this.API + 'usuarios/' + usuario)
                 .then((response) => {
@@ -312,6 +314,10 @@ import config from '@/store/config.js'
             },
             guardarPago (evt) {
                 evt.preventDefault()
+                if(!this.vendedor.Usuario){
+                    this.$toasted.show('No se cargo correctamente el usuario, recargue la pagina')
+                    return
+                }
                 let importe = 0
                 let cuentaSelec= true
                 this.documentos.map(doc => {
@@ -362,7 +368,9 @@ import config from '@/store/config.js'
                     cuentas: cuentasId
                 })
                 .then((response) => {
-                    console.log(response.data)
+                    if(response.data.error){
+                        this.$toasted.success(response.data.msg)
+                    }else{
                     this.$toasted.success('Se pagó la deuda del cliente.')
                     if(this.cajaBanco.cliente){
                         this.cargarDeuda(this.cajaBanco.cliente) 
@@ -371,6 +379,7 @@ import config from '@/store/config.js'
                     //this.show = false
                     //this.initForm()
                     // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
+                    }
                 })
                 .catch((error) => {
                     console.log(error)
