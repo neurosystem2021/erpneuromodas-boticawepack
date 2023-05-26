@@ -226,10 +226,11 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="this.activaSubProducto">
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
+                     :disabled="!this.hideQuitarX"
                      :value="1"
                      :unchecked-value="0"
                      @input="checkIsHijo">
@@ -287,6 +288,7 @@
               v-model="producto.PrecioCosto"
               step="0.0001"
               type="number"
+              @input="actualizarPorcentajeUtilidad"
               class="form-control"
               />
           </b-form-group>
@@ -367,6 +369,7 @@
           <producto-form-det 
             @onUpdateProductos="calcularPreciosPaquete"
             :id-producto="producto.IdProducto" 
+            :hideQuitar="hideQuitarX"
             v-if="showProductoDet && show" 
             ref="productoDet"
             ></producto-form-det>
@@ -423,16 +426,27 @@ export default {
       productosDet: [],
       file: '',
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      categoriaItems:[]
+      categoriaItems:[],
+      activaSubProducto: true,
+      hideQuitarX: true
     }
   },
   beforeMount () {
     this.initForm()
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ['showButton', 'productoUpdate', 'cbGuardar', 'hideQuitar'],
   watch: {
     show (val) {
       if(val){
+        this.activaSubProducto=true;
+        this.hideQuitarX = true;
+        if (this.productoUpdate.IdProducto) {
+          if (this.productoUpdate.EsPadre==0) {
+            this.activaSubProducto=false;
+          }else {
+            this.hideQuitarX = false;
+          }
+        }
         //this.cargarCatOferta()
       }
 
@@ -566,8 +580,8 @@ export default {
       let sumatoriaContado = 0
       prodDetalles.forEach(prod => {
         if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad
+          sumatoriaCosto += (prod.PrecioDet || 0) * prod.Cantidad
+          sumatoriaContado += (prod.PrecioDet || 0) * prod.Cantidad
         }
       });
       sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
@@ -703,6 +717,11 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      if(this.$refs.productoDet.productos.length<=0) {
+        this.$toasted.show('Tiene que ingresar Subproductos')
+        return
+      }
 
       // Agregar producto DET
       if (this.showProductoDet) {

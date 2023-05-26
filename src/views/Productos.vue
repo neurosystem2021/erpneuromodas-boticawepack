@@ -42,10 +42,10 @@
             :per-page="perPage"
             :current-page="currentPage">
               <template slot="PrecioCosto" slot-scope="data" >
-                {{(items[data.index].PrecioCosto).toFixed(2)}}
+                {{ data.item.PrecioCosto | redondear(2) }}
               </template>
               <template slot="PrecioContado" slot-scope="data" >
-                {{(items[data.index].PrecioContado).toFixed(2)}}
+                {{ data.item.PrecioContado | redondear(2) }}
               </template>
             </b-table>
             <b-row>

@@ -6,7 +6,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40' }"
+            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40', nopadre:(isVentas?0:1) }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -338,8 +338,13 @@
               <img src="static/moto-delivery.png" style="width: 24px" />
           </div>
           <div v-else>
-            <div>{{ data.item.stock }}</div>
+            <div v-if="data.item.ControlaStock==1">
             <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+            <div v-if="!data.item.EsPadre" style="font-weight:bold">{{data.item.stock }}</div>
+          </div>
+          <div v-else style="font-weight:bold">
+            ---
+          </div>
           </div>
         </template>
       </b-table>
@@ -826,6 +831,10 @@ export default {
           styleStock = 'table-danger'
         }else{
           styleStock = 'table-success'
+        }
+
+        if (data.EsPadre == 1) {
+          styleStock = ''
         }
 
         return `
