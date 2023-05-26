@@ -139,7 +139,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
                                             <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -163,7 +163,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Yape</td>
+                                            <td>Yape/Plin</td>
                                             <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -187,7 +187,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Delivery</td>
+                                            <td>Transferencia</td>
                                             <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -637,7 +637,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.delivery.monto))
         },
     },
     computed: {
