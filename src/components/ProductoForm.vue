@@ -180,16 +180,6 @@
               />
           </b-form-group>
           <b-form-group v-if="false">
-            <label>Precio X Mayor:</label>
-            <input 
-              v-model="producto.PrecioPorMayor"
-              type="number"
-              min="0"
-              step="0.0001"
-              class="form-control"
-              />
-          </b-form-group>
-          <b-form-group v-if="false">
             <label>Stock X Mayor:</label>
             <input 
               v-model="producto.StockPorMayor"
@@ -300,6 +290,18 @@
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio X Mayor:</label>
+            <input 
+              v-model="producto.PrecioPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              class="form-control"
+              />
           </b-form-group>
         </b-col>
         <b-col md="6"  v-if="false">
@@ -758,6 +760,7 @@ export default {
         StockMinimo: 0,
         StockPorMayor: 0,
         PrecioContado: 0,
+        PrecioCosto: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
         PrecioEspecial: 0,

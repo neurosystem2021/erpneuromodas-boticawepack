@@ -64,6 +64,7 @@
                      :unchecked-value="0">
             Marcar si es un cliente VIP
           </b-form-checkbox>
+          <b-form-text>Al cliente VIP el Precio a aplicarse será el Precio X Mayor</b-form-text>
         </b-col>
       </b-row>
       <b-row>

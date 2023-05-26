@@ -58,6 +58,7 @@
                     <b-col><label for="input-concepto">Concepto:</label>
                         <b-form-input v-model="cajaBanco.Concepto"
                             id="input-concepto"
+                            autocomplete="off"
                             required
                             type="text"
                             placeholder=""></b-form-input>
@@ -95,17 +96,17 @@
                     </b-row>
                 <b-row class="mb-1">
                     <b-col>
-                        <table class="table b-table table-sm">
+                        <table class="table b-table table-sm" id="tablaPago">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha</th>
                                     <th>FechaVen</th>
-                                    <th>Tipo</th>
+                                    <!--<th>Tipo</th>-->
                                     <th>Correlativo</th>
                                     <th>Total</th>
                                     <th>Aplicado</th>
-                                    <th>Apli. Nota</th>
+                                    <!--<th>Apli. Nota</th>-->
                                     <th>Saldo</th>
                                     <th class="text-center">Aplicar</th>
                                     <th class="text-center">Cuenta</th>
@@ -117,25 +118,26 @@
                                     <td class="text-center">{{ item.IdDocVenta }}</td>
                                     <td>{{ item.FechaDoc }}</td>
                                     <td>{{ item.FechaCredito }}</td>
-                                    <td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
+                                    <!--<td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
                                     <td v-else-if="item.IdTipoDoc==7">BOLETA ELEC.</td>
                                     <td v-else-if="item.IdTipoDoc==3">NOTA DE VENTA</td>
-                                    <td v-else>OTRO</td>
+                                    <td v-else>OTRO</td>-->
                                     <td>{{ item.Correlativo }}</td>
                                     <td>{{ (item.Total).toFixed(2) }}</td>
                                     <td  class="text-center">{{ (item.Aplicado).toFixed(2) }}</td>
-                                    <td>{{(item.NotaCreApli).toFixed(2)}}</td>
+                                    <!--<td>{{(item.NotaCreApli).toFixed(2)}}</td>-->
                                     <td>{{ (item.Saldo).toFixed(2) }}</td>
                                     <td>
                                         <input v-model="item.aplicar"
                                             type="number"
                                             step="0.01"
                                             min="0"
+                                            style="width: 100px;"
                                             class="form-control"
                                             placeholder="0"/>
                                     </td>
                                     <td>
-                                        <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
+                                        <b-form-select style="width: 150px;" v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
                                     </td>   
                                 </tr>
                                 <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
@@ -160,7 +162,7 @@
                         </div>
                         <hr>
                         <br><br>
-                        <table class="table b-table table-sm">
+                        <table class="table b-table table-sm" id="tablaPago">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -213,6 +215,13 @@ import config from '@/store/config.js'
                 fechaHasta: this.$moment().format("YYYY-MM-DD")
             }
         },
+        watch: {
+            show (val) {
+                if(val){
+                    this.initForm()
+                }
+            }
+        },
         methods: {
             initForm () {
                 this.vendedor = {}
@@ -223,6 +232,8 @@ import config from '@/store/config.js'
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
                 this.$refs.inputCliente.setValue('')
+                this.fechaDesde = this.$moment().format("YYYY-MM-01"),
+                this.fechaHasta = this.$moment().format("YYYY-MM-DD")
             },
             buscarDeudas(){
                 if(this.cajaBanco.cliente){
@@ -235,7 +246,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.setVendedor(response.data)
                     this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                    // this.$refs.inputVendedor.$refs.input.disabled = true
+                    this.$refs.inputVendedor.$refs.input.disabled = true
                 })
                 .catch((error) => {
                     console.log(error)
@@ -352,9 +363,13 @@ import config from '@/store/config.js'
                 })
                 .then((response) => {
                     console.log(response.data)
-                    this.$toasted.show('Se pagó la deuda del cliente.')
-                    this.show = false
-                    this.initForm()
+                    this.$toasted.success('Se pagó la deuda del cliente.')
+                    if(this.cajaBanco.cliente){
+                        this.cargarDeuda(this.cajaBanco.cliente) 
+                    }
+                    this.cajaBanco.Concepto = ''
+                    //this.show = false
+                    //this.initForm()
                     // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {

@@ -31,7 +31,7 @@ const mutations = {
   ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
     productos = productos.map(p => {
       if (cliente.EsVIP) {
-        p.precio = p.precioConvenio || p.precio
+        p.precio = p.PrecioPorMayor || p.precio
       } else {
         p.precio = p.PrecioContado
       }

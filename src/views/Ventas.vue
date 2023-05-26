@@ -157,7 +157,7 @@
                         </b-row>
                     </b-col>
                     <b-col md="3">
-                        <b-form-group class="text-center" v-if="venta.cliente.Cliente">
+                        <!--<b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
                             </div>
@@ -177,10 +177,10 @@
                         </b-form-text>
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
-                        </b-form-text>
+                        </b-form-text>-->
                     </b-col>
-                    <b-col md="2" class="ocularMovil">
-                        <b-form-group class="text-center">
+                    <b-col md="2">
+                        <b-form-group class="text-center ocularMovil">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
                             </div>
@@ -198,6 +198,9 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
+                            <div class="text-center">
+                                <b-badge style="font-size: 0.8rem;" variant="primary" v-if="venta.vendedor.EsMayorista>0">MAYORISTA</b-badge>
+                            </div>
                         </b-form-group>
                         <b-form-group v-show="false">
                             <label>Comisionista</label>
@@ -215,6 +218,7 @@
                         </b-form-group>
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
+                        
                     </b-col>
                 </b-row>
                 <br>
@@ -754,7 +758,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -824,12 +828,12 @@ export default {
                 })
             }
             
-            //this.actualizarPrecioConvenio(obj)
+            this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
         onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = (this.venta.vendedor.EsMayorista>0?obj.PrecioPorMayor:obj.PrecioContado)  || 0
             if(precio){
                 obj.precio = precio || 0
             }
@@ -1093,7 +1097,7 @@ export default {
                     this.$toasted.show(response.data.msg)
                     return; 
                 }else{
-                    try {
+                    /*try {
                         this.venta.productos.map((pro)=>{
                             delete pro.nuevoPrecioContado
                             delete pro.disabledProf
@@ -1252,7 +1256,7 @@ export default {
                         document.body.removeChild(form);
                     } catch (error) {
   
-                    }
+                    }*/
 
                 // limpiar preorden seleccionado
                     this.$router.replace('/ventas')
@@ -1272,7 +1276,7 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
-                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
 
                 }
                  
@@ -1286,6 +1290,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank','noopener');
+            return;
             try {
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
                 let left = (screen.width/2)-(800/2)
@@ -1342,10 +1348,10 @@ export default {
 
 </style>
 <style>
-@media only screen and (min-width: 700px) and (max-width: 1800px) {
+@media only screen and (min-width: 700px) and (max-width: 4000px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 250px) !important;
     }
 }
 @media only screen and (max-width: 750px) {
@@ -1366,6 +1372,11 @@ export default {
 
     #modalPagoDeuda{
         padding: 0 !important;
+    }
+
+    #tablaPago{
+        overflow-x: scroll;
+        display: block;
     }
 
 }
