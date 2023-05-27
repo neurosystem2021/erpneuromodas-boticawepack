@@ -38,6 +38,7 @@
             type="number"
             style="width: 75px"
             min="0"
+            step="0.01"
             @input="(val) => {
                 $emit('onInputCantidad', val.target.value)
                 if (esVenta) {
