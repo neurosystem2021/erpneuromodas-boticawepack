@@ -61,7 +61,7 @@
                 type="email"></b-form-input>
             </b-form-group>
           </b-col>
-          <b-col>
+          <!--<b-col>
             <b-form-group>
                 <label>Linea de Crédito</label>
                 <b-form-input 
@@ -69,7 +69,7 @@
                 type="number"></b-form-input>
             </b-form-group>
           </b-col>
-          <!--<b-col>
+          <b-col>
             <b-form-group>
                 <label>Nacionalidad:</label>
                 <b-form-input 

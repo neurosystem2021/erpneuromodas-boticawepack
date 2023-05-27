@@ -54,14 +54,14 @@
                 type="email"></b-form-input>
             </b-form-group>
           </b-col>
-          <b-col>
+          <!--<b-col>
             <b-form-group>
                 <label>Linea de Crédito</label>
                 <b-form-input 
                 v-model="cliente.LineaCredito"
                 type="number"></b-form-input>
             </b-form-group>
-          </b-col>
+          </b-col>-->
       </b-row>
       <b-row>
         <b-col>

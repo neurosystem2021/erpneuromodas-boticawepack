@@ -177,10 +177,10 @@
                         </b-form-text>
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
-                        </b-form-text>-->
+                        </b-form-text>
                         <b-badge class="mt-2" style="font-size: 1rem;" variant="primary" v-if="venta.cliente.LineaCredito> 0">Linea de Crédito: S/ {{ venta.cliente.LineaCredito }} </b-badge><br>
                         <b-badge class="mt-2" style="font-size: 1rem;" variant="warning" v-if="venta.cliente.LineaCredito> 0">Usado: S/ {{ LineaUsada }} </b-badge><br>
-                        <b-badge class="mt-2" style="font-size: 1rem;" variant="success" v-if="venta.cliente.LineaCredito> 0">Saldo Disponible: S/ {{ LineaSaldo }} </b-badge><br>
+                        <b-badge class="mt-2" style="font-size: 1rem;" variant="success" v-if="venta.cliente.LineaCredito> 0">Saldo Disponible: S/ {{ LineaSaldo }} </b-badge><br>-->
                     </b-col>
                     <b-col md="2">
                         <b-form-group class="text-center ocularMovil">
@@ -837,7 +837,7 @@ export default {
             
             this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
-            this.obtenerLineaConsumida(obj.IdCliente)
+            // this.obtenerLineaConsumida(obj.IdCliente)
         },
         obtenerLineaConsumida(val){
             this.LineaSaldo = 0
@@ -1040,11 +1040,11 @@ export default {
                 return
             }*/
 
-            if(this.venta.EsCredito && this.totalCart > this.LineaSaldo && this.venta.cliente.LineaCredito > 0){
+            /*if(this.venta.EsCredito && this.totalCart > this.LineaSaldo && this.venta.cliente.LineaCredito > 0){
                 this.$toasted.show('El monto total de la venta no debe pasar al saldo de linea de credito disponible', { duration: 4000 })
                 this.inProgress = false
                 return 
-            }
+            }*/
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {

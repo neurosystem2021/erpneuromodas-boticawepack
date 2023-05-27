@@ -251,7 +251,7 @@
         </table>
       </b-row>
 
-      <b-row class="credito">
+      <b-row>
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -377,7 +377,7 @@
 
       <b-row>
         <b-col v-if="totalIngresosPagoCliente">
-          <h5>Ingresos Pago Cliente (NO SUMA)</h5>
+          <h5>Ingresos Pago Cliente</h5>
           <table class="table b-table table-sm">
             <thead>
               <tr>
@@ -397,6 +397,35 @@
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos Pago Cliente</b></td>
                 <td class="total"><b>S/. {{ totalIngresosPagoCliente | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos Deposito </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3"></td>
+                <td class="total"><b>Total Ingresos tarjeta</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -457,6 +486,7 @@ export default {
       ingresos: [],
       salidas: [],
 	    adelantos: [],
+      ingresosTarjeta: [],
       turno: null,
       turnos: [
         { value: null, text: 'Seleccione un Turno' },
@@ -473,7 +503,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosSinPagoCliente - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosPagoCliente + this.totalIngresosSinPagoCliente - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
@@ -495,6 +525,13 @@ export default {
       });
       return total 
     },*/
+    totalIngresosTarjeta () {
+      let total = 0
+      this.ingresosTarjeta.forEach(ingresoTar => {
+        if (!ingresoTar.Anulado) total += ingresoTar.Importe
+      });
+      return total 
+    },
     totalIngresosSinPagoCliente () {
       let total = 0
       this.ingresosSinPagoCliente.forEach(ingreso => {
@@ -698,7 +735,8 @@ export default {
       })
       .then(res => {
         console.log(res.data);
-        this.ingresos = res.data
+        this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
+        this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
       }).catch(err => {
         console.log(err)
       }) 
