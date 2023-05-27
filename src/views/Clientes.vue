@@ -40,7 +40,11 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+            <template slot="EsVIP"  slot-scope="data">
+              <b-badge variant="success" v-if="data.item.EsVIP==1">SI</b-badge>
+            </template>
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -83,8 +87,9 @@ export default {
             { key: 'Cliente', sortable: true },
             { key: 'DniRuc', sortable: true },
             { key: 'Direccion', sortable: true },
-            { key: 'Puntos', sortable: true },
-            { key: 'EsVIP', sortable: true },
+            //{ key: 'Puntos', sortable: true },
+            { key: 'LineaCredito', label: 'Linea de Crédito', sortable: true },
+            { key: 'EsVIP', label: 'Es VIP', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

@@ -130,7 +130,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -160,7 +160,7 @@
             v-model="productos[data.index].precio"
             :disabled="productos[data.index].disabled || bloquearInput?true:false || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
-            style="width: 105px"
+            style="width: 110px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -551,7 +551,7 @@ export default {
     },
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     setSubtotal(index, val,prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)

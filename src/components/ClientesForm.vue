@@ -63,14 +63,22 @@
           </b-col>
           <b-col>
             <b-form-group>
+                <label>Linea de Crédito</label>
+                <b-form-input 
+                v-model="cliente.LineaCredito"
+                type="number"></b-form-input>
+            </b-form-group>
+          </b-col>
+          <!--<b-col>
+            <b-form-group>
                 <label>Nacionalidad:</label>
                 <b-form-input 
                 v-model="cliente.Nacionalidad"
                 type="text"></b-form-input>
             </b-form-group>
-          </b-col>
+          </b-col>-->
       </b-row>
-      <b-row>
+      <!--<b-row>
           <b-col>
             <b-form-group>
                 <label>Sexo:</label>
@@ -85,7 +93,7 @@
                 type="text"></b-form-input>
             </b-form-group>
           </b-col>
-      </b-row>
+      </b-row>-->
       <b-row>
         <b-col>
           <b-form-checkbox 
@@ -96,14 +104,14 @@
           </b-form-checkbox>
           <b-form-text>Al cliente VIP el Precio a aplicarse será el Precio X Mayor</b-form-text>
         </b-col>
-        <b-col>
+        <!--<b-col>
           <b-form-group>
             <label>Fecha Nacimiento:</label>
             <b-form-input 
               v-model="cliente.FechaNacimiento"
               type="date"></b-form-input>
           </b-form-group>
-        </b-col>
+        </b-col>-->
       </b-row>
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
@@ -136,6 +144,7 @@ export default {
         Ocupacion:'',
         FechaNacimiento: '',
         Nacionalidad: '',
+        LineaCredito: 0
       }
     }
   },
@@ -217,7 +226,7 @@ export default {
       .then((response) => {
         // console.log(response);
         this.$emit('onAddCliente', response.data)
-        this.$toasted.show('Cliente guardado correctamente')
+        this.$toasted.info('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
         this.cliente = {}
       })

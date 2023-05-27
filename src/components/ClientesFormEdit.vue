@@ -26,7 +26,6 @@
           <b-form-group>
             <label>Nombre Comercial:</label>
             <b-form-input 
-                required="required"
                 v-model="cliente.NombreComercial"
                 type="text"></b-form-input>
           </b-form-group>
@@ -55,6 +54,14 @@
                 type="email"></b-form-input>
             </b-form-group>
           </b-col>
+          <b-col>
+            <b-form-group>
+                <label>Linea de Crédito</label>
+                <b-form-input 
+                v-model="cliente.LineaCredito"
+                type="number"></b-form-input>
+            </b-form-group>
+          </b-col>
       </b-row>
       <b-row>
         <b-col>
@@ -67,7 +74,7 @@
           <b-form-text>Al cliente VIP el Precio a aplicarse será el Precio X Mayor</b-form-text>
         </b-col>
       </b-row>
-      <b-row>
+      <!--<b-row>
         <b-col>
           <b-form-checkbox id="checkbox2"
                      v-model="cliente.esComisionista"
@@ -76,7 +83,7 @@
             Marcar si es un comisionista
           </b-form-checkbox>
         </b-col>
-      </b-row>
+      </b-row>-->
       <div slot="modal-footer" >
         <b-btn  variant="primary" type="submit">
            Guardar
@@ -146,7 +153,7 @@ export default {
       this.axios.post(this.API + 'clientes', this.cliente)
       .then((response) => {
         this.$emit('onAddCliente', response.data)
-        this.$toasted.show('Cliente guardado correctamente')
+        this.$toasted.info('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
       })
       .catch((error) => {

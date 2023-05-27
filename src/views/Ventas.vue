@@ -178,6 +178,9 @@
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
                         </b-form-text>-->
+                        <b-badge class="mt-2" style="font-size: 1rem;" variant="primary" v-if="venta.cliente.LineaCredito> 0">Linea de Crédito: S/ {{ venta.cliente.LineaCredito }} </b-badge><br>
+                        <b-badge class="mt-2" style="font-size: 1rem;" variant="warning" v-if="venta.cliente.LineaCredito> 0">Usado: S/ {{ LineaUsada }} </b-badge><br>
+                        <b-badge class="mt-2" style="font-size: 1rem;" variant="success" v-if="venta.cliente.LineaCredito> 0">Saldo Disponible: S/ {{ LineaSaldo }} </b-badge><br>
                     </b-col>
                     <b-col md="2">
                         <b-form-group class="text-center ocularMovil">
@@ -485,7 +488,9 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            ventaSinStock:0
+            ventaSinStock:0,
+            LineaSaldo: 0,
+            LineaUsada: 0,
         }
     },
     watch: {
@@ -632,6 +637,8 @@ export default {
             this.puntosAplicados = 0
             this.descuentoPuntos = {}
             this.descuentoGeneral = 0
+            this.LineaSaldo = 0
+            this.LineaUsada = 0
         },
         setTipoVenta (obj) {
             console.log(obj);
@@ -830,6 +837,26 @@ export default {
             
             this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
+            this.obtenerLineaConsumida(obj.IdCliente)
+        },
+        obtenerLineaConsumida(val){
+            this.LineaSaldo = 0
+            this.LineaUsada = 0
+            this.axios.get(this.API + 'cliente/deudas/monto', {
+                params: {
+                    IdCliente: val,
+                }
+            })
+            .then((response) => {
+                if(response.data){
+                    this.LineaSaldo = response.data.Saldo
+                    this.LineaUsada = response.data.Usado
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                this.$toasted.show('Ha ocurrido un error, no se obtuvo la linea consumida')
+            })
         },
         onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
@@ -1012,6 +1039,12 @@ export default {
                 this.inProgress = false
                 return
             }*/
+
+            if(this.venta.EsCredito && this.totalCart > this.LineaSaldo && this.venta.cliente.LineaCredito > 0){
+                this.$toasted.show('El monto total de la venta no debe pasar al saldo de linea de credito disponible', { duration: 4000 })
+                this.inProgress = false
+                return 
+            }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
