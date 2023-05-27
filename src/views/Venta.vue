@@ -92,6 +92,22 @@
                                     <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                     <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                 </b-form-select>
+
+                                <b-input-group v-if="venta.cliente.DniRuc == '00000000'" class="mb-3">
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsOrganizacion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Es Organización
+                                        </b-form-checkbox>
+                                        <input v-model="venta.NombreOrganizacion"
+                                                type="text"
+                                                style="text-transform:uppercase; margin-top: -8px;"
+                                                class="form-control"
+                                                required
+                                                placeholder="Nombre de la Organización" v-if="venta.EsOrganizacion" />
+                                </b-input-group>
                             </b-form-group>
 
                         </b-col>
@@ -319,6 +335,17 @@
                                             <label style="font-weight:bold">Direccion Entrega:</label>
                                             <b-form-textarea required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese direccion" rows="3" autocomplete="off" v-model="venta.DireccionEntrega" ref="inputDireccionEntrega" type="text" name="DireccionEntrega" id="DireccionEntrega"></b-form-textarea>
                                         </b-form-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row style="border-top:2px solid  #C0C0C0;" class="mt-2">
+                                    <b-col md="12" class="text-left mt-2">
+                                        <label><b>Observación</b></label>
+                                        <textarea 
+                                            class="form-control"
+                                            placeholder="Ingrese alguna observación al comprobante."
+                                            rows="3"
+                                            v-model="venta.Observacion">
+                                        </textarea>
                                     </b-col>
                                 </b-row>
                             </template>
@@ -1240,7 +1267,10 @@ export default {
                 EsParaLlevar: 0,
                 nombreLlevar: '',
                 selectOpcionVenta: 0,
-                DireccionEntrega: ''
+                DireccionEntrega: '',
+                EsOrganizacion: 0,
+                NombreOrganizacion: '',
+                Observacion:'',
             }
             this.isNota = false
             this.bloquearInput = false
@@ -1428,6 +1458,10 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                if(this.venta.cliente.DniRuc == '00000000'){
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -1437,6 +1471,10 @@ export default {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
                         this.venta.CampoDireccion = this.venta.cliente.Direccion
+                        if(this.venta.cliente.DniRuc == '00000000'){
+                            this.venta.EsOrganizacion = 0
+                            this.venta.NombreOrganizacion = ''
+                        }
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
@@ -1887,6 +1925,8 @@ export default {
             } 
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).toUpperCase()
+            this.venta.Observacion = (''+this.venta.Observacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 if(response.data.actualizar){
