@@ -478,11 +478,11 @@ return false
       }
 
 
-      if (igualProducto) {
+      /*if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
           this.inProgress = false            
           return;
-      }
+      }*/
 
       /*if (faltaFechaVen) {
         this.$toasted.show('Ingrese la fecha de vencimiento del producto')

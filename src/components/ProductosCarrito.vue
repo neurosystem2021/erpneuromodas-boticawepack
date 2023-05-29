@@ -132,7 +132,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -148,7 +148,7 @@
               $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
                 if(productos[data.index].EsObsequio==1){
                     productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
+                    //productos[data.index].nuevoPrecioContado = 0
                 }
             }"
             placeholder="Cantidad"
@@ -605,7 +605,7 @@ export default {
     },
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     setSubtotal(index, val,prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)
@@ -906,7 +906,7 @@ export default {
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.actualizarProd(obj)
+        //this.actualizarProd(obj)
       },{ setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
@@ -963,7 +963,7 @@ export default {
     actualizaDesc(index,prod){
       //Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
-      this.actualizarProd(prod)
+      this.actualizarProd({Producto:prod,Pos:index})
     },
     ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');
