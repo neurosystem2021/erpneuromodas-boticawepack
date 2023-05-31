@@ -100,7 +100,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -110,7 +110,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td colspan="2" style="background:#57B223">TOTAL</td>
             <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
           </tr>
