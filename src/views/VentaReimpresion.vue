@@ -155,7 +155,8 @@ export default {
               vendedor: {
                 Usuario: response.data.venta.UsuarioReg,
               },
-              reps: 1
+              reps: 1,
+              abrirCaja: 0
             }
             let ventaJson= JSON.stringify(venta)
             let left = (screen.width/2)-(800/2)

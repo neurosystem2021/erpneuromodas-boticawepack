@@ -2043,6 +2043,7 @@ export default {
                         }
                         this.venta.dataInfoDocVenta = dataInfoDocVenta
                         this.venta.reps = 1
+                        this.venta.abrirCaja = 1
                         this.ultimaVentaData = this.venta
                         let ventaJson= JSON.stringify(this.venta)
                         let left = (screen.width/2)-(800/2)
@@ -2106,6 +2107,7 @@ export default {
         },
         imprimirUltimaVenta(){
             try {
+                this.ultimaVentaData.abrirCaja = 0;
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
                 let left = (screen.width/2)-(800/2)
                 let top = (screen.height/2)-(800/2)
