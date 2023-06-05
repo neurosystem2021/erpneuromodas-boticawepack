@@ -593,8 +593,10 @@ export default {
               {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
             ]
           }
+          this.$refs.file.value=null
           }).catch((error) => {
             console.log(error)
+            this.$refs.file.value=null
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
           })
@@ -603,7 +605,7 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
+        this.$refs.file.value=null
         this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
