@@ -471,7 +471,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       } else {
         return this.API + 'productos'
       }
