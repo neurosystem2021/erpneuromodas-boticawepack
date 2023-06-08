@@ -71,6 +71,10 @@
                   <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
                 </b-form-group>
               </b-col>
+              <b-col md="1">
+                <br>
+                <b-button :variant="mostrarPrecio?'secondary':'success'" @click="ocultarNav()"><i v-if="mostrarPrecio" class="fas fa-eye-slash"></i><i v-else class="fas fa-eye"></i></b-button>
+              </b-col>
             </b-row>
           </b-col>
         </b-row>
@@ -210,8 +214,8 @@
               <tbody>
                 <tr>
                   <td>{{ productoSelect.Producto }}</td>
-                  <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
-                  <td class="text-center">{{ productoSelect.PrecioContado }}</td>
+                  <td class="text-center">{{ mostrarPrecio?productoSelect.PrecioCosto:'' }}</td>
+                  <td class="text-center">{{ mostrarPrecio?productoSelect.PrecioContado:'' }}</td>
                   <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>
                 </tr>
               </tbody>
@@ -309,7 +313,8 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      idPerfil: sessionStorage.getItem('idPerfil')
+      idPerfil: sessionStorage.getItem('idPerfil'),
+      mostrarPrecio: false,
     }
   },
   watch: {
@@ -362,6 +367,9 @@ export default {
     }
   },
   methods: {
+    ocultarNav(){
+      this.mostrarPrecio=!this.mostrarPrecio
+    },
     getSumaValorizado () {
       this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
         .then( response => {
