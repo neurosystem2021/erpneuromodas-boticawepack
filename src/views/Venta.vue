@@ -2045,7 +2045,7 @@ export default {
                         this.venta.reps = 1
                         this.venta.abrirCaja = 1
                         this.ultimaVentaData = this.venta
-                        let ventaJson= JSON.stringify(this.venta)
+                        /*let ventaJson= JSON.stringify(this.venta)
                         let left = (screen.width/2)-(800/2)
                         let top = (screen.height/2)-(800/2)
                         let winName='Impresion';
@@ -2064,7 +2064,7 @@ export default {
                         window.open('', winName,windowoption);
                         form.target = winName;
                         form.submit();                 
-                        document.body.removeChild(form);
+                        document.body.removeChild(form);*/
                     } catch (error) {
   
                     }
@@ -2083,7 +2083,7 @@ export default {
                     this.$refs.inputCliente.setValue('')
                     this.$refs.carrito.pagocon = ''
                     this.$toasted.success('Venta realizada con exito')
-                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                     this.inProgress = false
                     this.tieneIgv = false
                     this.ultimaVenta = response.data.insertId
@@ -2106,6 +2106,8 @@ export default {
             })
         },
         imprimirUltimaVenta(){
+            window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank','noopener');
+            return
             try {
                 this.ultimaVentaData.abrirCaja = 0;
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
