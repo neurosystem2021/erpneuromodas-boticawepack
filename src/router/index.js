@@ -11,6 +11,7 @@ import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
+import Reservas from '@/views/Reservas.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -30,6 +31,7 @@ import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
+import ReporteReservas from '@/views/reportes/ReporteReservas.vue'
 
 Vue.use(Router)
 
@@ -176,5 +178,15 @@ export default new Router({
       name: 'ArticulosResumen',
       component: ArticulosResumen
     },
+    {
+      path: '/reservas',
+      name: 'Reservas',
+      component: Reservas
+    },
+    {
+      path: '/reportes/reservas',
+      name: 'ReporteReservas',
+      component: ReporteReservas
+    }
   ]
 })

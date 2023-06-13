@@ -1,6 +1,6 @@
 <template>
   <div v-if="show">
-    <b-form-group v-if="hideQuitar">
+    <b-form-group>
       <label>Agrega Subproductos:</label>
       <b-input-group>
         <autocomplete
@@ -22,17 +22,15 @@
           <th>Id</th>
           <th>Producto</th>
           <th>Cantidad</th>
-          <th>Precio</th>
-          <th class="text-center" v-if="hideQuitar">Quitar</th>
+          <th class="text-center">Quitar</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProductoDet }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" v-model="prod.Cantidad" required @input="emitUpdate" /></td>
-          <td><input type="number" step="0.001" class="form-control" v-model="prod.PrecioDet" required @input="emitUpdate" /></td>
-          <td class="text-center" v-if="hideQuitar"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
+          <td><input type="number" class="form-control" step="0.0001" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
     </table>
@@ -52,7 +50,15 @@ export default {
       productos: []
     }
   },
-  props: ['idProducto','hideQuitar'],
+  props: ['idProducto'],
+    watch: {
+    show (val) {
+      if(this.show==true){
+        this.getProductosDet ();
+      }
+      
+    }
+  },
   methods: {
     emitUpdate () {
       this.$emit('onUpdateProductos', this.productos)
@@ -90,7 +96,7 @@ export default {
         idProducto: data.IdProducto
       }}).then(res => {
         let esPadre = res.data.esPadre
-        if (esPadre || data.EsPadre==1) {
+        if  (esPadre) {
           this.$toasted.show('No puede agregar un producto padre')
         } else {
           data.IdProductoDet = data.IdProducto

@@ -30,6 +30,11 @@
             </div>
             <br /><br />
             <b-row>
+                <b-col md="12" v-if="this.$route.query.idProyecto">
+                    <div class="form-inline">
+                        <h4>Pago de Reserva: <b-badge variant="dark">{{this.$route.query.idProyecto}}</b-badge> </h4>
+                    </div>
+                </b-col>
                 <b-col md="12" v-if="this.$route.query.idPedido">
                     <div class="form-inline">
                         <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
@@ -227,6 +232,7 @@
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
+                <br>
                 <b-row>
                     <b-col> 
                         <productos-carrito 
@@ -424,6 +430,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
+                        <b-button type="button" @click="LimpiarPuntoVenta" variant="dark" v-if="this.$route.query.idProyecto">Anular Pago Reserva</b-button>
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
@@ -458,6 +465,12 @@ export default {
         this.loadClienteVarios()
         this.escucharPedidos()
         this.configStock()
+
+        if(this.$route.query.idProyecto && this.$route.query.idCliente ){
+            console.log("Probar");
+        }else{
+            this.loadClienteVarios()
+        }
     },
     data () {
         return {
@@ -497,7 +510,7 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
-                    { key: 'ProductoPresentacion', label: 'Anaquel' },
+                    //{ key: 'ProductoPresentacion', label: 'Anaquel' },
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
@@ -781,6 +794,45 @@ export default {
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
+        LimpiarPuntoVenta(){
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputAlmacen.setValue('VENTA')
+            this.$refs.inputPuntoVenta.setValue('CAJA1')
+            this.$refs.inputCliente.setValue('')
+            this.$refs.carrito.pagocon = ''
+            //this.$refs.inputNombreCliente.$refs.input.required = true  
+            this.tieneIgv = false
+            this.initForm()
+            this.limpiarCart()
+            this.getVendedor()
+            this.loadClienteVarios()
+            //this.getImpresoraCocina()
+            this.$router.replace('/ventas')
+            this.$toasted.info('Se actualizó la página')
+        },
+        getProyecto(){
+            this.axios.get(this.API + 'proyecto', { params: {
+				IdProyecto: this.$route.query.idProyecto,
+			} }).then(res => {
+				if(res.data){
+                    this.adelanto=res.data.Adelantos
+                    this.adelantosPreOrden = res.data.AdelantosArreglo
+                    this.$refs.inputCliente.setValue(res.data.Cliente)
+                    this.venta.CampoDireccion = res.data.Direccion
+                    this.venta.cliente.IdCliente = res.data.IdCliente
+                    this.venta.cliente.Cliente = res.data.Cliente
+                    this.venta.cliente.Direccion = res.data.Direccion
+                    this.venta.cliente.DniRuc = res.data.DniRuc
+                    console.log( this.venta.cliente.IdCliente);
+                    res.data.Detalle.map((item) => {
+                        this.add([item, () => {
+                           
+                        }, {cantidad: item.Cantidad, precio: item.Precio } ])
+                    })
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
+				}
+			})
+        },
         getVendedor () {
             let usuario = sessionStorage.getItem('User')
             this.axios.get(this.API + 'usuarios/' + usuario)
@@ -795,6 +847,9 @@ export default {
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
+                if(this.$route.query.idProyecto && this.$route.query.idCliente ){
+                    this.getProyecto()
+                }
             })
             .catch((error) => {
                 console.log(error)
@@ -1102,6 +1157,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.IdPedido = this.$route.query.idPedido || null
+            this.venta.IdProyecto = this.$route.query.idProyecto || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)

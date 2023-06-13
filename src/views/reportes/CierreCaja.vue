@@ -71,117 +71,6 @@
       </b-row>
       
       <b-row>
-        <b-col v-if="totalIngresos">
-          <h5>Ingresos Caja Principal</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-        <b-col v-if="totalSalidas">
-          <h5>Salidas</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-      </b-row>
-      
-
-      <b-row>
-        <b-col v-if="totalIngresosTarjeta">
-          <h5>Ingresos de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.Cuenta }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
-                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-      </b-row>
-
-      <b-row>
-          <b-col v-if="totalAdelantos">
-            <h5>Descontar Adelantos</h5><br>
-            <table class="table b-table table-sm adelantos">
-              <thead>
-                <tr>
-                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in adelantos" :key="index">
-                  <td>{{ item.IdCajaBanco }}</td>
-                  <td>{{ item.FechaDoc }}</td>
-                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
-                  <td>S/. {{ item.Importe | redondear }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="2"></td>
-                  <td class="total"><b>Total Adelantos</b></td>
-                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
-                </tr>
-              </tfoot>
-            </table>
-          </b-col>
-      </b-row>
-
-      <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -495,6 +384,117 @@
       </b-row>
 
       <br>
+
+      <b-row>
+        <b-col v-if="totalIngresos">
+          <h5>Ingresos Caja Principal</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresos" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+        <b-col v-if="totalSalidas">
+          <h5>Salidas</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      
+
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+
+      <b-row>
+          <b-col v-if="totalAdelantos">
+            <h5>Descontar Adelantos</h5><br>
+            <table class="table b-table table-sm adelantos">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in adelantos" :key="index">
+                  <td>{{ item.IdCajaBanco }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
+                  <td>S/. {{ item.Importe | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="total"><b>Total Adelantos</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+      </b-row>
 
       <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
