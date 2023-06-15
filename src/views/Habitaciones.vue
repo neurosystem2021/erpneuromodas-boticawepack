@@ -472,6 +472,7 @@ export default {
 				IdProforma: this.IdProforma
 			}).then(res => {
 				this.$toasted.success('Guardado correctamente')
+				this.getHabitaciones()
 				this.show = false
 			})
 
@@ -622,7 +623,7 @@ export default {
 		sumProductos() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
-				total = this.$refs.preOrdenProductos.sumProductos + this.totalGastos - this.totalAdelantos
+				total = this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos
 			}
 			return Math.abs(total).toFixed(2)
 		},
@@ -680,7 +681,7 @@ export default {
 			this.totalAdelantos = sumatoriaAde
 
 			if (this.$refs.preOrdenProductos) {
-			  this.totalSumaProductos =Math.abs(this.$refs.preOrdenProductos.sumProductos + this.totalGastos - this.totalAdelantos).toFixed(2)  
+			  this.totalSumaProductos =Math.abs(this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)  
 			}
 			
 		},

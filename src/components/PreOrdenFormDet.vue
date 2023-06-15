@@ -80,7 +80,9 @@ export default {
     sumProductos() {
       var sum = 0;
       this.productos.map(prod => {
-        sum += (prod.Cantidad * prod.Precio) || 0
+        if(prod.EsManoDeObra==0){
+          sum += (prod.Cantidad * prod.Precio) || 0
+        }
       })
       return sum;
     },
