@@ -718,7 +718,7 @@ export default {
     guardarProducto(e) {
       e.preventDefault();
 
-      if(this.$refs.productoDet.productos.length<=0) {
+      if(this.$refs.productoDet.productos.length<=0 && this.producto.EsPadre==1) {
         this.$toasted.show('Tiene que ingresar Subproductos')
         return
       }
