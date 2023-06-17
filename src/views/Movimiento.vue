@@ -160,23 +160,23 @@
                   </b-col>
                   <b-col md="8">
                     <b-form-group>
-                      <label>Fecha Contable:</label>
+                      <label>Fecha del Comprobante:</label>
                       <b-form-input
                         v-model="movimiento.MovimientoFecha"
-                        type="datetime-local"
+                        type="date"
                         step="1"
                         placeholder="Fecha Contable"
                         ></b-form-input>
 
                     </b-form-group>
-                    <b-form-group>
+                    <!--<b-form-group>
                       <label>Fecha Stock:</label>
                       <b-form-input
                         v-model="movimiento.FechaStock"
                         type="date"
                         placeholder="Fecha Stock"
                         ></b-form-input>
-                    </b-form-group>
+                    </b-form-group>-->
                     <b-form-group>
                       <label>Tipo de cambio:</label>
                       <input v-model.number="movimiento.TipoCambio"
@@ -299,7 +299,7 @@ return false
         Moneda: 'PEN',
         FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
-        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
+        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DD") : this.$moment().format("YYYY-MM-DD"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
@@ -391,6 +391,12 @@ return false
     guardarMovimiento (evt) {
       evt.preventDefault();
       this.inProgress = true
+
+      if(this.movimiento.MovimientoFecha==''){
+        this.$toasted.show('Por favor ingrese la fecha del comprobante')        
+        this.inProgress = false            
+        return
+      }
       
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show('Por favor seleccione un proveedor')        
