@@ -25,7 +25,7 @@
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
           </b-input-group-append>
         </b-input-group>
         <b-badge v-if="isVentas" variant="danger">Productos sin stock</b-badge>
@@ -132,7 +132,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -148,7 +148,7 @@
               $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
                 if(productos[data.index].EsObsequio==1){
                     productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
+                    //productos[data.index].nuevoPrecioContado = 0
                 }
             }"
             placeholder="Cantidad"
@@ -359,7 +359,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index],data.index)"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -458,7 +458,8 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoSelect: {},
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      indexPos: null,
     }
   },
   watch: {
@@ -605,7 +606,7 @@ export default {
     },
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     setSubtotal(index, val,prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)
@@ -819,7 +820,8 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
-    editarProducto(Pro){
+    editarProducto(Pro,index){
+      this.indexPos = index
       this.productoSelect = Pro
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
@@ -836,10 +838,17 @@ export default {
         if(typeof obj === 'object'){
           obj.ProductoMedicion = obj.medicion? (obj.medicion.ProductoMedicion || 'UNIDAD') : 'UNIDAD'
           obj.Presentacion = obj.medicion? (obj.medicion.ProductoMedicion || 'UNIDAD') : 'UNIDAD'
+          obj.ProductoMarca = obj.marca? (obj.marca.ProductoMarca || 'S/M') : 'S/M'
           obj.CantidadPresentacion = 1
           obj.EsPresentacion = 0
           obj.PreciosPorProducto = JSON.stringify(obj.precios)
           obj = this.onSetProducto(obj)
+          if(this.indexPos!=null){
+            this.actualizarProd({Producto:obj,Pos:this.indexPos})
+            this.indexPos = null
+            this.$emit('onAddProducto')
+            return
+          }
         }
         this.add([obj, (obj) => {
           this.$emit('onAddProducto')
@@ -906,7 +915,7 @@ export default {
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.actualizarProd(obj)
+        //this.actualizarProd(obj)
       },{ setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
@@ -963,7 +972,7 @@ export default {
     actualizaDesc(index,prod){
       //Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
-      this.actualizarProd(prod)
+      this.actualizarProd({Producto:prod,Pos:index})
     },
     ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');

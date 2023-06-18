@@ -306,7 +306,7 @@
                     step="0.01"
                     @focus="abrirPop3(data.index)"
                     style="width: 80px"
-                    @input="(val)=>{ actualizarProd(productos[data.index])}" 
+                    @input="(val)=>{ actualizarProd({Producto:productos[data.index],Pos:data.index})}"
                     value="0"
                     class="form-control"/>
                 </template>
@@ -609,7 +609,7 @@ export default {
     actualizaDesc(index,prod){
       //Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
-      this.actualizarProd(prod)
+      this.actualizarProd({Producto:prod,Pos:index})
     },
     changeCant (val, prod, index) {
       if (val) {
@@ -710,7 +710,7 @@ export default {
           this.productoSelect.indicacion = ''
         }
         this.productoSelect.indicacion = this.productoSelect.indicacion +" -"+ obj.Indicacion
-        this.actualizarProd(this.productoSelect)
+        //this.actualizarProd(this.productoSelect)
       })
       
     },
@@ -881,7 +881,7 @@ export default {
       this.getSubtotal(index)
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
-      this.updateManoDeObraNeta(index)
+      //this.updateManoDeObraNeta(index)
     },
     ActualizarDesc(index,val){
       Vue.delete(this.productos[index], 'descuento');
