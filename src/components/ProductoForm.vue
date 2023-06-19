@@ -831,13 +831,13 @@ export default {
       })
       .then((response) => {
         if (this.cbGuardar) {
-          this.cbGuardar(this.producto.IdProducto?this.producto:response.data.insertId)
+          this.cbGuardar(this.producto.IdProducto?this.producto:response.data.insertId,this.producto.precios )
         }
         if (response.data.error) {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
           return
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.info('Producto guardado correctamente')
         }
 
         // this.initForm()
