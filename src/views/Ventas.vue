@@ -42,7 +42,8 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <b-input-group prepend="Doc." class="mt-2">
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -73,9 +74,10 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="Alm." class="mt-2">
+                                    <label>Almacen:</label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -95,9 +97,10 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="P.V." class="mt-2">
+                                    <label>Punto de Venta:</label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -113,9 +116,10 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12" style="margin-top:-10px">
+                            <b-col md="12">
                                 <b-form-group>
-                                    <b-input-group prepend="Cliente ">
+                                    <label>Cliente:</label>
+                                    <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             style="width:40%"
@@ -133,7 +137,7 @@
                                         <input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
-                                            class="form-control"
+                                            class="form-control ocularMovil2"
                                             placeholder="Cod. Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -165,7 +169,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil2">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -188,7 +192,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil2">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -252,7 +256,7 @@
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <b-input-group prepend="S/" append="Descuento">
+                                                <b-input-group prepend="S/">
                                                     <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
@@ -1274,10 +1278,28 @@ export default {
 .big-text {
     font-size: 30px;
 }
+.tablaMetodo {
+    display: none !important;
+}
 @media only screen and (max-width: 700px) {
   /* For desktop: */
     .ocularMovil{
         display: none;
+    }
+}
+@media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
+}
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil2{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
     }
 }
 
