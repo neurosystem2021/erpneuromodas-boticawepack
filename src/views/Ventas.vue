@@ -12,7 +12,7 @@
         <b-container class="bv-example-row"  id="conten">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil2">
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -21,13 +21,13 @@
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil2">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" class="ocularMovil2">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -47,7 +47,8 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -60,6 +61,7 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
+                                    </b-input-group>
                                 </b-form-group>
                                  <b-form-group v-if="isNota">
                                     <label>Doc. Referencia:</label>
@@ -77,7 +79,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -98,7 +100,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -136,7 +138,7 @@
                                         <input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
-                                            class="form-control"
+                                            class="form-control ocularMovil2"
                                             placeholder="Codigo de Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -191,7 +193,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil2">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -255,7 +257,7 @@
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <b-input-group prepend="S/" append="Descuento">
+                                                <b-input-group prepend="S/">
                                                     <input
                                                         v-model="descuentoGeneral"
                                                         min="0"
@@ -1248,6 +1250,28 @@ export default {
 
     100% {
          transform: translatex(-120vw)
+    }
+}
+
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none !important;
+    }
+}
+@media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
+}
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil2{
+        display: none !important;
+    }
+    .mostrarSerie{
+      display: inline !important;
     }
 }
 </style>
