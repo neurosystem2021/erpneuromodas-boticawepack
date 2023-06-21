@@ -152,7 +152,7 @@
                     anchor="ProductoModelo"
                     label="writer"
                     :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
+                    :onInput="val => generateFilter('modelo', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -423,7 +423,7 @@ export default {
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},
       filter: '',
-      sortBy: 'IdProducto',
+      sortBy: 'Producto',
       sortDesc: false,
       productoSelect: {},
       kardexSelect: [],
