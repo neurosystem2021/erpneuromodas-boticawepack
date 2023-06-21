@@ -12,6 +12,10 @@
 			</div>
 		</header>
 		<main>
+      <div>
+        <span style="white-space: break-spaces; font-size: 15.2px;">Es grato dirigirme a ustedes para expresarle un respetuoso y cordial saludo y a la vez poner a vuestra consideración la Oferta Económica, según detalle el siguiente:</span>
+      </div>
+      <br>
       <div id="details" class="clearfix">
         <div id="client">
           <div class="to">PROFORMA A:</div>
@@ -67,8 +71,15 @@
       </table>
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div><b>NOTA:</b></div>
+        <div class="notice"><li>Precio incluye todo tipo de gastos e impuestos.</li></div>
+        <div class="notice"><li>Combustible de calidad y cantidad de acuerdo a los estándares de Osinergmin.</li></div>
+        <div class="notice"><li>La proforma tiene validez hasta nueva variación de combustibles a nivel nacional según Osinergmin.</li></div>
+        <div class="notice"><li>El pago es al contado en efectivo o depósito en cuenta corriente BCP y BBVA.</li></div>
+        <div class="notice"><li>La entrega del combustible es en nuestra estación de servicio.</li></div>
+      </div>
+      <div style="text-align:center">
+        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
       </div>
     </main>
     <!--<footer>
@@ -114,6 +125,9 @@ export default {
 			.then(res => {
 				this.empresa = res.data
 			})
+    },
+    imprimir(){
+      window.print();
     }
   }
 }
@@ -121,4 +135,9 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
+@media print {
+  #printBtn {
+    display: none;
+  }
+}
 </style>

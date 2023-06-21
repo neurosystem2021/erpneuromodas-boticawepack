@@ -43,10 +43,11 @@
   #logo {
     float: left;
     margin-top: 8px;
+    position: absolute;
   }
   
   #logo img {
-    height: 70px;
+    height: 59px;
   }
   
   #company {
@@ -56,7 +57,7 @@
   
   
   #details {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
   }
   
   #client {
@@ -91,7 +92,7 @@
   }
   
   #invoice .date {
-    font-size: 1.1em;
+    font-size: 1.2em;
     color: #777777;
   }
   
@@ -129,6 +130,7 @@
   table .no {
     color: #FFFFFF;
     font-size: 1.6em;
+    text-align: center;
     background: #57B223;
   }
   
@@ -188,7 +190,7 @@
   
   #thanks{
     font-size: 2em;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
   }
   
   #notices{
