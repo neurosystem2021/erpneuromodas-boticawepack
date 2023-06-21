@@ -215,6 +215,7 @@ const actions = {
               obj.nuevoPrecioContado = obj.PrecioContado || 0
             }else{
               obj.nuevoPrecioContado = 0
+              obj.EsVentaNew=true
             }
           }else{
             obj.nuevoPrecioContado = 0

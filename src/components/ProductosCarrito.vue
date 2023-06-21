@@ -6,7 +6,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40' }"
+            :customParams="{ 'sortBy':'Producto', 'sortDesc': 0 ,limit: '40' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -27,7 +27,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</b-form-text>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Modelo, Categoria, Marca)</b-form-text>
       </b-form-group>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>

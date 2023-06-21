@@ -87,7 +87,7 @@
                   <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
@@ -115,7 +115,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Marca:</label>
                   <autocomplete
@@ -143,8 +143,8 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>-->
-              <b-col md="3">
-                <!--<b-form-group>
+              <b-col md="2">
+                <b-form-group>
                   <label>Modelo:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
@@ -155,7 +155,7 @@
                     :onInput="(val) => !val ? generateFilter('modelo', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>-->
+                </b-form-group>
               </b-col>
             </b-row>
           </b-col>
@@ -435,6 +435,7 @@ export default {
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
+            { key: 'ProductoModelo', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
@@ -651,7 +652,7 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputCodigoBarra.value='';
-      // this.$refs.inputModelo.setValue('')
+      this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
