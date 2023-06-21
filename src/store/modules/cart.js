@@ -33,6 +33,7 @@ const mutations = {
         p.precio = p.precioConvenio || p.precio
       } else {
         p.precio = p.PrecioContado
+        p.PorcentajeUtilidad = parseFloat(((p.precio - p.PrecioCosto)/p.PrecioCosto) * 100).toFixed(2);
       }
       return p;
     })

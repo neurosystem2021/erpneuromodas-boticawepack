@@ -164,11 +164,25 @@
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
+            @input="() => { setNuevoPrecioContado(data.index); actualizarPorcentajeUtilidad(data.index);}"
             />
         </template>
         <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
+          <div v-if="isVentas">
+            {{ getSubtotal(data.index) }}
+          </div>
+          <div v-else>
+            <input
+            type="number"
+            style="width: 105px"
+            min="0"
+            step="0.00001"
+            placeholder="Subtotal"
+            class="form-control"
+            v-model="productos[data.index].subt"
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <b>{{ getSubtotal(data.index) }}</b>
+          </div>
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -225,7 +239,7 @@
             :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
-            style="width: 80px"
+            style="width: 98px"
             type="number" 
             step="0.01"
             @input="cambiarPrecio(data.index, productos[data.index])" 
@@ -552,6 +566,13 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    setSubtotal(index, val, prod) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 4)
+      Vue.set(this.productos[index], 'precio', precio)
+    },
+    actualizarPorcentajeUtilidad (index) {
+      this.productos[index].PorcentajeUtilidad = this.$options.filters.redondear(((this.productos[index].precio - this.productos[index].PrecioCosto)/this.productos[index].PrecioCosto) * 100, 2)
+    },
     setAltImg(event) { 
         event.target.src = "static/no-photo.png" 
     },
@@ -589,7 +610,7 @@ export default {
 
     cambiarPrecio (index, prod) {
       var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+      this.productos[index].precio = this.$options.filters.redondear(this.productos[index].PrecioCosto + utilidad, 2)
     },
     
     addManoDeObra (index, e) {

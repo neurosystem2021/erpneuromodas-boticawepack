@@ -342,7 +342,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -360,12 +360,12 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.yape.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -383,7 +383,28 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.yape.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: middle !important;">YAPE / PLIN</td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.yape.descripcion"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.yape.monto"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -500,7 +521,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.yape.monto))).toFixed(2)
         }
     },
     computed: {
@@ -644,7 +665,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    yape: { IdMetodoPago: 4, monto:0 }
                 },
                 IdPreOrden: [],
                 CampoDireccion: 'Direccion',
@@ -978,9 +1000,31 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))?0:parseFloat(this.venta.pago.yape.monto)
+
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.yape.monto))?0:parseFloat(this.venta.pago.yape.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago YAPE / PLIN no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
@@ -1034,6 +1078,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let menosUtilidad = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -1042,7 +1087,17 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                if (pro.PorcentajeUtilidad<0 || pro.PorcentajeUtilidad=='-0.00') {
+                    menosUtilidad += 1
+                }
             });
+
+            if (menosUtilidad>=1) {
+                this.$toasted.error('No se puede vender un producto con utilidad negativa');
+                this.inProgress = false            
+                return;
+            }
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
