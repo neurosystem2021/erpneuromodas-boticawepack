@@ -9,8 +9,7 @@
 			</div>
         	<b-row>
 				<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
-					<b-card :bg-variant="getVariant(hab)"
-									class="text-center">
+					<b-card :bg-variant="getVariant(hab)" :class="hab.EstadoHabitacion==3?getClaseTexto(hab):'text-center text-light'">
 									
 							<h5>{{ hab.Producto }}</h5>
 							<h5>{{ hab.Cliente }}</h5>
@@ -23,10 +22,13 @@
 								<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 							</ul>
 							<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-								<li class="text-warning"><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
+								<li class="text-center text-dark bg-white">
+									<b><u>FECHA</u></b><br>
+									<b>{{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b>
+								</li>
 							</ul>
 							<div slot="footer">
-								<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
+								<b-btn v-show="hab.EstadoHabitacion !== 1" @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
 								<!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
 								<!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
 									<label>Seleccione un cliente:</label>
@@ -50,7 +52,7 @@
 									<br />
 									<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
 								</b-popover>-->
-								<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
+								<b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
 								<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
 									<label>Seleccione un cliente:</label>
 									<b-input-group>
@@ -503,9 +505,19 @@ export default {
 				}) */
 			})
 		},
+		getClaseTexto(hab) {
+			if (hab.FechaAlquilerFin<this.$moment().format('YYYY-MM-DD')) {
+				return 'text-center text-light'
+			}
+			return 'text-center text-dark'
+		},
 		getVariant(hab) {
+			if (hab.EstadoHabitacion == 3) {
+				if (hab.FechaAlquilerFin<this.$moment().format("YYYY-MM-DD")) return 'danger'
+				return 'warning'
+			}
 			if (hab.EstadoHabitacion == 2) return 'warning'
-			if (hab.EstadoHabitacion == 3) return 'danger'
+			//if (hab.EstadoHabitacion == 3) return 'danger'
             if (hab.EstadoHabitacion == 1 && hab.EstaSucio == 1) return 'secondary'
 			return 'success'
 		},
@@ -736,11 +748,9 @@ export default {
 <style scoped>
 h5 {
 	font-size: 1.2rem;
-	color: #ffffff;
 }
 h6 {
 	font-size: 1rem;
-	color: #DBDBDB;
 }
 .card-footer {
 	padding-left: 0;
@@ -752,9 +762,9 @@ h6 {
 .detalle {
 	list-style: none;
     padding: 0;
+	margin-bottom: 0px;
 	text-align: left;
-	font-size: 0.8rem;
-	color: #363636;
+	font-size: 1rem;
 }
 .horaFechaImpreso{
  	display: none;
