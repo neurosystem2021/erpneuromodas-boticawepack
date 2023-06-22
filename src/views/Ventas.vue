@@ -1088,7 +1088,7 @@ export default {
                     totalCero += 1
                 }
 
-                if (pro.PorcentajeUtilidad<0 || pro.PorcentajeUtilidad=='-0.00') {
+                if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
                     menosUtilidad += 1
                 }
             });
