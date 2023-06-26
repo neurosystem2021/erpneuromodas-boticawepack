@@ -325,7 +325,6 @@
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
-                :disabled="(idPerfil == 1) ? false : true"
                 type="text"
                 style="text-transform:uppercase"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
@@ -336,7 +335,6 @@
               <label>Cantidad:</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
-                :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
                 step="0.01"
@@ -347,7 +345,6 @@
               <label>Precio:</label>
               <input 
                 v-model="producto.precios[i-1].precio"
-                :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
                 step="0.00001"
