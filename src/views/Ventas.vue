@@ -5,37 +5,35 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid class="bv-example-row">
+        <b-container fluid class="ancho">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" ></proformas>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" v-show="false">
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" v-show="false">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
                 </div>
             </div>
             <br /><br />
-            <br class="S_linea" /><br class="S_linea"/>
-            <br class="ocularMovil2" /><br class="ocularMovil2"/>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
                         <b-row>
                             <b-col md="4" style="margin-top:-15px">
                                 <b-form-group>
-                                    <label>Tipo de Venta: <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -65,7 +63,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px" class="ocularMovil2">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -86,7 +84,7 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" style="margin-top:-15px" class="ocularMovil2">
+                            <b-col md="4" style="margin-top:-15px" class="ocularMovil">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -158,7 +156,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3" class="ocularMovil2">
+                    <b-col md="3">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -181,7 +179,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" class="ocularMovil2">
+                    <b-col md="2" class="ocularMovil">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -240,13 +238,12 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
-                                        <tr class="ocularMovil2">
+                                        <tr>
                                             <td  class="text-center">Opciones</td>
                                         </tr>
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
-                                                <label class="ocularMovil2">Descuento:</label>
-                                                <b-input-group prepend="S/">
+                                                <b-input-group prepend="S/" append="Descuento">
                                                     <input
                                                         :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
@@ -289,8 +286,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label class="ocularMovil2">Proforma válido por:</label>
-                                                <b-input-group append="días">
+                                                <b-input-group prepend="Proforma válidez: " append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -398,9 +394,8 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <br/><br/>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -474,7 +469,9 @@ export default {
                     /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'eventPresImagen', label: '' },
                     { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
+                    { key: 'eventPresent', label: '' },
+                    { key: 'Presentacion', label: 'Presentación' },
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -830,16 +827,13 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant, precio) {
-            if (cant) {
-                obj.cantidad = cant
-                //let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                //obj.precio = preciosPorProducto.precio || 0
-                obj.precio = precio || obj.PrecioContado
-                return obj
-            }
+        onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
+            if(precio){
+                obj.precio = precio || 0
+            }
+           
             return obj
         },
         onAddProducto (obj) {
@@ -1043,7 +1037,8 @@ export default {
             //let igualLote = 0
             this.productos.forEach(pro => {
                 console.log(pro);
-                if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stockMovimiento) || pro.stock == undefined)) {
+                if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
+                    //this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
                     sinStock += 1
                 }
 
@@ -1051,6 +1046,7 @@ export default {
                     totalCero += 1
                 }
 
+                pro.Descripcion = (''+pro.Presentacion).trim()
                 /*let lote = this.productos.filter(p => p.hashMovimiento == pro.hashMovimiento && p.IdProducto == pro.IdProducto).length
                 if(lote > 1){
                     igualLote += 1 
@@ -1059,7 +1055,7 @@ export default {
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
+                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
                 this.inProgress = false            
                 return;
             }
@@ -1097,6 +1093,167 @@ export default {
                     this.$toasted.show(response.data.msg)
                     return; 
                 }else{
+                    try {
+                        this.venta.productos.map((pro)=>{
+                            delete pro.nuevoPrecioContado
+                            delete pro.disabledProf
+                            delete pro.normalPrecioContado
+                            delete pro.Imagen
+                            delete pro.indicacion
+                            delete pro.IdImpresora
+                            delete pro.PreciosPorProducto
+                            delete pro.PrecioCosto
+                            delete pro.precioHabilitado
+                            delete pro.CodigoBarra
+                            delete pro.stock
+                            delete pro.IdProductoMarca
+                            delete pro.IdProductoFormaFarmaceutica
+                            delete pro.IdProductoMedicion
+                            delete pro.IdProductoCategoria
+                            delete pro.ProductoDesc
+                            delete pro.ProductoDesc2
+                            delete pro.ProductoDesc3
+                            delete pro.ProductoDescCorto
+                            delete pro.PrecioContado
+                            delete pro.Codigo
+                            delete pro.Dosis
+                            delete pro.PrecioEspecial
+                            delete pro.PrecioPorMayor
+                            delete pro.StockPorMayor
+                            delete pro.StockMinimo
+                            delete pro.Anulado
+                            delete pro.FechaReg
+                            delete pro.UsuarioReg
+                            delete pro.FechaMod
+                            delete pro.UsuarioMod
+                            delete pro.Hash
+                            delete pro.ControlaStock
+                            delete pro.VentaEstrategica
+                            delete pro.PorcentajeUtilidad
+                            delete pro.IdBloque
+                            delete pro.Genero
+                            delete pro.Color
+                            delete pro.Botapie
+                            delete pro.ProductoModelo,
+                            delete pro.ProductoPresentacion,
+                            delete pro.EsPadre
+                            delete pro.precioConvenio
+                            delete pro.EsHabitacion
+                            delete pro.EstadoHabitacion
+                            delete pro.Piso
+                            delete pro.IdPreOrden
+                            delete pro.IdClienteReserva
+                            delete pro.FechaReserva
+                            delete pro.FechaAlquiler
+                            delete pro.Vuelo
+                            delete pro.FechaAlquiler
+                            delete pro.FechaAlquilerFin
+                            delete pro.EstaSucio
+                            delete pro.ControlaStockMinimo
+                            delete pro.ProductoCategoria
+                            delete pro.ProductoMarca
+                            delete pro.ProductoMedicion
+                            delete pro.StockIngresoUnd
+                            delete pro.StockSalidaUnd
+                            delete pro.StockSalidaVentaUnd
+                            delete pro.StockSalidaVentaCaja
+                            delete pro.EsObsequio
+                            delete pro.cantxPrecio
+                            delete pro.subt
+                            delete pro.cantidadPres
+                            delete pro.subtotal
+                            delete pro.total
+                        });
+                        delete this.venta.cliente.Anulado
+                        delete this.venta.cliente.IdCliente
+                        delete this.venta.cliente.FechaReg
+                        delete this.venta.cliente.UsuarioReg
+                        delete this.venta.cliente.FechaMod
+                        delete this.venta.cliente.UsuarioMod
+                        delete this.venta.cliente.FechaNacimiento
+                        delete this.venta.cliente.Nacionalidad
+                        delete this.venta.cliente.Direccion3
+                        delete this.venta.cliente.Telefono
+                        delete this.venta.cliente.Email
+                        delete this.venta.cliente.Puntos
+                        delete this.venta.cliente.EsVIP
+                        delete this.venta.cliente.Direccion2
+                        delete this.venta.cliente.Sexo
+                        delete this.venta.cliente.Ocupacion
+                        delete this.venta.cliente.NombreComercial
+                        delete this.venta.cliente.esComisionista
+                        delete this.venta.idProductos
+                        delete this.venta.vendedor.APPTOKEN
+                        delete this.venta.vendedor.APPURL
+                        delete this.venta.vendedor.Anulado
+                        delete this.venta.vendedor.FechaReg
+                        delete this.venta.vendedor.UsuarioReg
+                        delete this.venta.vendedor.FechaMod
+                        delete this.venta.vendedor.UsuarioMod
+                        delete this.venta.vendedor.NombreImpresora
+                        delete this.venta.tipoVenta.LimitItems
+                        delete this.venta.almacen.Almacen
+                        delete this.venta.puntoVenta.PuntoVenta
+                        delete this.venta.vendedor.Almacen
+                        delete this.venta.vendedor.IdUsuarioPerfil
+                        delete this.venta.vendedor.Password
+                        delete this.venta.comisionista
+                        delete this.venta.IdPedido
+                        delete this.venta.adelantosPreOrden
+                        delete this.venta.almacen.DescuentoActivo
+                        delete this.venta.vendedor.DescuentoActivo
+                        delete this.venta.vendedor.IdAlmacen
+                        delete this.venta.vendedor.IdDocVentaPuntoVenta
+                        delete this.venta.vendedor.IdTipoDoc
+                        delete this.venta.puntosAplicados
+                        delete this.venta.totalCart
+                        delete this.venta.puntoVenta
+                        delete this.venta.NroComprobanteModifica
+                        delete this.venta.CodSunatModifica
+                        delete this.venta.NotaIdMotivo
+                        delete this.venta.IdPreOrden
+                        delete this.venta.almacen
+                        delete this.venta.FechaDoc
+                        delete this.venta.pago
+                        delete this.venta.NotaDescMotivo
+                        delete this.venta.diasValidosProf
+                        delete this.venta.EsOrganizacion
+                        delete this.venta.NombreOrganizacion
+                        delete this.venta.Serie
+                        delete this.venta.Numero
+
+                        let dataInfoDocVenta = {
+                          Serie:  response.data.serie,
+                          Numero: response.data.numero,
+                          Fecha: response.data.fecha,
+                        }
+                        this.venta.dataInfoDocVenta = dataInfoDocVenta
+                        this.venta.reps = 2
+                        this.ultimaVentaData = this.venta
+                        let ventaJson= JSON.stringify(this.venta)
+                        let left = (screen.width/2)-(800/2)
+                        let top = (screen.height/2)-(800/2)
+                        let winName='Impresion';
+                        let winURL='http://localhost:5000/imprimir/getdata.php';
+                        let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                        let form = document.createElement("form");
+                        form.setAttribute("method", "post");
+                        form.setAttribute("action", winURL);
+                        form.setAttribute("target",winName);  
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'venta';
+                        input.value = ventaJson;
+                        form.appendChild(input);
+                        document.body.appendChild(form);                       
+                        window.open('', winName,windowoption);
+                        form.target = winName;
+                        form.submit();                 
+                        document.body.removeChild(form);
+                    } catch (error) {
+  
+                    }
+
                 // limpiar preorden seleccionado
                     this.$router.replace('/ventas')
                     this.$toasted.success('Venta realizada con exito')
@@ -1115,7 +1272,7 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
                 }
                  
@@ -1127,6 +1284,31 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
+        },
+        imprimirUltimaVenta(){
+            try {
+                let ventaJson= JSON.stringify(this.ultimaVentaData)
+                let left = (screen.width/2)-(800/2)
+                let top = (screen.height/2)-(800/2)
+                let winName='Impresion';
+                let winURL='http://localhost:5000/imprimir/getdata.php';
+                let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                let form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", winURL);
+                form.setAttribute("target",winName);  
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'venta';
+                input.value = ventaJson;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                window.open('', winName,windowoption);
+                form.target = winName;
+                form.submit();                 
+                document.body.removeChild(form);  
+            } catch (error) {
+            }
         },
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
@@ -1160,30 +1342,31 @@ export default {
 
 </style>
 <style>
-.S_linea {
-    display: none;
+@media only screen and (min-width: 700px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px) !important;
+    }
 }
 @media only screen and (max-width: 750px) {
   /* For desktop: */
     .ocularMovil{
         display: none;
     }
-}
-/*@media only screen and (min-width: 777px) and (max-width: 1800px) {
-    .ancho{
-        width: calc(100% - 300px)
-    }
-}*/
-@media only screen and (max-width: 750px) {
-  /* For desktop: */
-    .ocularMovil2{
-        display: none;
-    }
     .mostrarSerie{
       display: inline !important;
     }
-    .S_linea {
-        display: block;
+}
+
+@media only screen and (max-width: 900px) {
+    #modalPagoDeuda .modal-dialog{
+        max-width: 100% !important;
+        margin: 5px !important;
     }
+
+    #modalPagoDeuda{
+        padding: 0 !important;
+    }
+
 }
 </style>

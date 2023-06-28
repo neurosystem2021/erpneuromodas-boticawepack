@@ -3,13 +3,14 @@
         <b-button @click="show=true" variant="outline-primary">Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
-            <b-modal id="modalConfigVenta" 
+            <b-modal id="modalPagoDeuda" 
                 title="Cobrar deuda cliente" 
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">
+                body-text-variant="dark"
+                no-close-on-backdrop>
                 
                 <b-row class="mb-1">
                     <b-col><label for="input-cliente">Cliente:</label>
@@ -62,7 +63,36 @@
                             placeholder=""></b-form-input>
                     </b-col>
                 </b-row>
-                <br>
+                <b-row class="mb-1">
+                    <b-col md="5">
+                        <b-form-group>
+                        <label>Fecha Inicio:</label>
+                        <b-form-input
+                            v-model="fechaDesde"
+                            type="date"
+                            step="1"
+                            placeholder="Fecha Inicio">
+                        </b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col md="5">
+                        <b-form-group>
+                        <label>Fecha Fin:</label>
+                        <b-form-input
+                            v-model="fechaHasta"
+                            type="date"
+                            step="1"
+                            placeholder="Fecha Inicio">
+                        </b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col md="2" class="text-center">
+                        <b-form-group>
+                        <br>
+                        <b-button :disabled="!this.cajaBanco.cliente" @click="buscarDeudas" variant="primary" size="md">Buscar</b-button>
+                        </b-form-group>
+                    </b-col>
+                    </b-row>
                 <b-row class="mb-1">
                     <b-col>
                         <table class="table b-table table-sm">
@@ -89,6 +119,7 @@
                                     <td>{{ item.FechaCredito }}</td>
                                     <td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
                                     <td v-else-if="item.IdTipoDoc==7">BOLETA ELEC.</td>
+                                    <td v-else-if="item.IdTipoDoc==3">NOTA DE VENTA</td>
                                     <td v-else>OTRO</td>
                                     <td>{{ item.Correlativo }}</td>
                                     <td>{{ (item.Total).toFixed(2) }}</td>
@@ -178,6 +209,8 @@ import config from '@/store/config.js'
                 vendedor: {},
                 show: false,
                 cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
+                fechaDesde: this.$moment().format("YYYY-MM-01"),
+                fechaHasta: this.$moment().format("YYYY-MM-DD")
             }
         },
         methods: {
@@ -190,6 +223,11 @@ import config from '@/store/config.js'
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
                 this.$refs.inputCliente.setValue('')
+            },
+            buscarDeudas(){
+                if(this.cajaBanco.cliente){
+                    this.cargarDeuda(this.cajaBanco.cliente) 
+                }
             },
             getVendedor () {
                 let usuario = sessionStorage.getItem('User')
@@ -213,7 +251,12 @@ import config from '@/store/config.js'
             cargarDeuda (cliente) {
                 this.cajaBanco.cliente = cliente
 
-                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
+                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente, {
+                    params: {
+                        fechaDesde: this.fechaDesde,
+                        fechaHasta: this.fechaHasta
+                    }
+                })
                 .then((response) => {
                     response.data.map(data=>data.NotasCredito=JSON.parse(data.NotasCredito) )
                     this.documentos = response.data
@@ -242,7 +285,12 @@ import config from '@/store/config.js'
             },
             cargarPagos (cliente) {
                 let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
+                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente,{
+                    params: {
+                        fechaDesde: this.fechaDesde,
+                        fechaHasta: this.fechaHasta
+                    }
+                })
                 .then((response) => {
                    this.pagos = response.data
                 })
@@ -318,7 +366,7 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
-#modalConfigVenta .modal-dialog{
-    max-width: 65% !important;
+#modalPagoDeuda .modal-dialog{
+    max-width: 75%;
 }
 </style>
