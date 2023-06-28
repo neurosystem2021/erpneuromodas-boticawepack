@@ -1230,7 +1230,7 @@ export default {
                         this.venta.dataInfoDocVenta = dataInfoDocVenta
                         this.venta.reps = 2
                         this.ultimaVentaData = this.venta
-                        let ventaJson= JSON.stringify(this.venta)
+                        /*let ventaJson= JSON.stringify(this.venta)
                         let left = (screen.width/2)-(800/2)
                         let top = (screen.height/2)-(800/2)
                         let winName='Impresion';
@@ -1249,7 +1249,7 @@ export default {
                         window.open('', winName,windowoption);
                         form.target = winName;
                         form.submit();                 
-                        document.body.removeChild(form);
+                        document.body.removeChild(form);*/
                     } catch (error) {
   
                     }
@@ -1272,6 +1272,7 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                     //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
 
                 }
@@ -1287,6 +1288,8 @@ export default {
         },
         imprimirUltimaVenta(){
             try {
+                window.open('/imprimir/index.php?IdDocVenta=' + this.ultimaVenta,'_blank','noopener');
+                return
                 let ventaJson= JSON.stringify(this.ultimaVentaData)
                 let left = (screen.width/2)-(800/2)
                 let top = (screen.height/2)-(800/2)
