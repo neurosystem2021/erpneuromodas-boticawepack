@@ -383,6 +383,7 @@ export default {
             ], 
             carrito: {
                 fields: [
+                    { key: 'itemNum', label: '#', class:'text-center thclass' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
                     { key: 'eventPres', label: 'Img' },
@@ -982,5 +983,9 @@ export default {
     .mostrarSerie{
       display: inline !important;
     }
+}
+td.thclass  {
+    font-weight: bold !important;
+    vertical-align: middle;
 }
 </style>

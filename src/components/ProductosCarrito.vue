@@ -188,6 +188,7 @@
             :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
+            step="0.01"
             min="0"
             @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index, productos[data.index]);
               if(setPrecio && productos[data.index].StockPorMayor > 0  && productos[data.index].PrecioPorMayor > 0 ){
@@ -645,6 +646,7 @@ export default {
     setProductoUni (obj) {
       obj.precio = 0
       obj.cantidad = 0
+      obj.itemNum = this.productos.length+1;
       obj.Presentacion = obj.ProductoMedicion
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0

@@ -14,6 +14,9 @@ const mutations = {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
         productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       } else {
         productos[index].cantidad = Number(productos[index].cantidad)+1
         productos[index].descuento = (Math.round(((productos[index].PorcentajeLiquidacion>0?productos[index].PorcentajeLiquidacion:0)*(productos[index].PrecioContado>0?productos[index].PrecioContado:0)/100)* 10) / 10)*productos[index].cantidad
@@ -21,6 +24,9 @@ const mutations = {
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
         productos.push(item)
+        productos.map((pro, index)=>{
+          pro.itemNum=(index+1)
+        })
       }
       else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
@@ -46,6 +52,9 @@ const mutations = {
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
+    productos.map((pro, index)=>{
+      pro.itemNum=(index+1)
+    })
   },
   LLENAR_PRODUCTOS_FILTRADOS (state, items) {
     state.productosFiltrados = items
