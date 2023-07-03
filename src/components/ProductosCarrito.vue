@@ -113,7 +113,9 @@
             @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
             placeholder="Cantidad"
             class="form-control"/>
-          <span>x{{productos[data.index].cantidadPress}}</span>
+            <div class="text-left ml-1">
+              <b>x{{productos[data.index].cantidadPress}} Uni.</b>
+            </div>
         </template>
         <template slot="eventPres" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
@@ -214,7 +216,7 @@
           <b-form-input
             v-model="productos[data.index].Presentacion"
             type="text"
-            style="text-align:center; font-weight:bold"
+            style="text-align:center; font-weight:bold; font-size: 0.8rem; width: 110px;"
             autocomplete="false"
             readonly
             ></b-form-input>
@@ -251,6 +253,7 @@
             min="0"
             step="0.01"
             value="0"
+            style="width: 95px;"
             class="form-control"/>
             <b-form-text>
             </b-form-text>
@@ -396,7 +399,7 @@ export default {
           { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
           { key: 'eventPres', label: '', class:'text-center stocksize' },
           { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
-          { key: 'cantidad', class:'stocksize' },
+          //{ key: 'cantidad', class:'stocksize' },
           { key: 'precio', label: 'P/U', class:'stocksize' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'stocksize' },
           { key: 'igv', label: 'IGV', class:'stocksize' },
@@ -767,7 +770,7 @@ export default {
         let styleStock = ''
 
         if(data.stock>0){
-          styleStock = 'table-success'
+          styleStock = 'table-info'
         }else{
           styleStock = 'table-danger'
         }
@@ -919,6 +922,11 @@ export default {
 td.stocksize{
   text-align: center !important; 
   vertical-align: middle !important;
+}
+td.stocksize2{
+  text-align: left !important; 
+  vertical-align: middle !important;
+  border-right: 2px #dee2e6 solid;
 }
 .contentCard {
   cursor: pointer;
