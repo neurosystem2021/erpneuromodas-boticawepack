@@ -171,11 +171,11 @@
                 <td><b>IGV</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
-              <tr>
+              <tr v-show="!isOrdenCompra">
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-show="!isOrdenCompra">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
