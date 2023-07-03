@@ -247,6 +247,7 @@
                     v-model="productos[data.index].cantidad"
                     type="number"
                     style="width: 90px; font-weight:bold"
+                    step="0.01"
                     min="0"
                     autocomplete="off"
                     @focus="abrirPop1(data.index)"
