@@ -390,12 +390,11 @@
             ></producto-form-det>
         </b-col>
       </b-row>
-      <hr />
       <b-row v-if="producto.IdProducto">
-        <b-col md="12">
+        <b-col md="12" v-show="false">
           <label>Impresión de Codigo Barras</label>
         </b-col>
-        <b-col md="3">
+        <b-col md="3" v-show="false">
           <b-form-group>
               <label>Almacen:</label>
               <autocomplete
@@ -412,7 +411,7 @@
               </autocomplete>
           </b-form-group>
         </b-col>
-        <b-col md="2">
+        <b-col md="2" v-if="false">
             <!--<b-form-group>
               <label>Lote: <span style="font-weight:bold">{{serieNumero}}</span></label>
               <br>
@@ -423,7 +422,7 @@
               </b-form-select>
             </b-form-group>-->
         </b-col>
-        <b-col md="3">
+        <b-col md="3" v-if="false">
             <!--<b-form-group style="text-align: center;">
               <label>Fecha Vencimiento:</label>
               <br>
@@ -431,19 +430,21 @@
             </b-form-group>-->
         </b-col>
         <b-col md="4">
-          <label>Cantidad:</label>
-        <b-input-group>
-          <b-form-input v-model="cantidadCodigoBarra"
-                  type="number"
-                  style="width:80px;"></b-form-input>
-          <b-input-group-append>
-             <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra +'&hash='+lote+'&serieNumero='+serieNumero" >Código de barra</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-
         </b-col>
       </b-row>
       <div slot="modal-footer" >
+        <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
+          <b-input-group>
+            <b-form-input
+              v-model="cantidadCodigoBarra"
+              type="number"
+              style="width:80px;"
+            ></b-form-input>
+            <b-input-group-append>
+              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+            </b-input-group-append>
+          </b-input-group>
+        </div>
         <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>-->
