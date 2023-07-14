@@ -5,8 +5,24 @@
       <div>
           <div class="no-print">
               <b-row align-h="end" class=" no-print">
-                    <label v-if="!this.$route.params.id" >Vendedor:</label>
+                <label v-if="!this.$route.params.id">Almacen:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
+                  <b-form-group size="sm">
+                    <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                </b-form-group>
+                </b-col>
+
+                <label v-if="!this.$route.params.id && false" >Vendedor:</label>
+                <b-col cols="3" v-if="!this.$route.params.id && false">
                     <b-form-group size="sm" >
                         <autocomplete
                             required="required"
@@ -441,7 +457,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      almacen: {},
     }
   },
   computed: {
@@ -553,12 +570,22 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
             // this.$refs.inputVendedor.$refs.input.disabled = true
 
             if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              //this.$refs.inputVendedor.$refs.input.disabled = true
             }
+            this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(res.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              //if(response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+              //}
+            }).catch((err)=>{
+              this.$toasted.show('Ha ocurrido un error, actualice la pagina y vuelva a intentarlo')
+            })
         })
         .catch((error) => {
             console.log(error)
@@ -573,21 +600,30 @@ export default {
       this.getIngresos()
       this.getSalidas()
     },
+    setAlmacen (obj) {
+      this.almacen = obj;
+      this.loadData()
+    },
     setVendedor (obj) {
         this.vendedor = obj
-        this.loadData()
+        //this.loadData()
     },
     cerrarCaja () {
       if (!this.turno) {
         this.$toasted.show('Seleccione un Turno')
         return
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      if(!(this.almacen.IdAlmacen>0)){
+        this.$toasted.show('No se cargo el almacen actualice la pagina')
+        return
+      }
+      let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          //user: sessionStorage.getItem("User")
-          user:         this.vendedor.Usuario,
+          user: sessionStorage.getItem("User"),
+          //user:         this.vendedor.Usuario,
+          idAlmacen: this.almacen.IdAlmacen,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -627,7 +663,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -646,7 +685,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -663,7 +705,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
