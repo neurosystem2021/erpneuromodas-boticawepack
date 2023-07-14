@@ -513,7 +513,6 @@ export default {
                 ]
             },
             ventaSinStock:0,
-            APIADMIN: 'https://admin.factura.vip:5000/',
         }
     },
     watch: {
@@ -1141,9 +1140,6 @@ export default {
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
                 //this.emitirauto(response.data.insertId)
-                if(sessionStorage.getItem('HostUrl') && response.data.eselectronico==1 && response.data.emision==1){
-                    this.emitirComprobante(response.data.insertId, sessionStorage.getItem('HostUrl'), response.data.ruc,  response.data.serie,  response.data.numero,  response.data.codsunat,  response.data.eselectronico)
-                }
             })
             .catch((error) => {
                 console.log(error)
@@ -1165,23 +1161,6 @@ export default {
             .catch((error) => {
                 this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
             })
-        },
-        emitirComprobante(id, url, ruc, serie, numero, codsunat, eselectronico){
-            if(eselectronico == 1){
-                this.axios.post(this.APIADMIN + 'api/facturacion/sistema/comprobante/agregar', {
-                    Id: id,
-                    Url: url,
-                    Ruc: ruc,
-                    Serie: serie,
-                    Numero: numero,
-                    CodSunat: codsunat,
-                    EsElectronico: eselectronico,
-                })
-                .then((response) => {
-                })
-                .catch((error) => {
-                })
-            }
         },
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
