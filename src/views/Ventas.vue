@@ -496,7 +496,8 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            TieneIgvComprobante:false
         }
     },
     watch: {
@@ -636,6 +637,7 @@ export default {
             this.infoDelivery = {}
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
+            this.tieneIgv = false
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -644,6 +646,7 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
+            this.TieneIgvComprobante = false
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
@@ -661,8 +664,17 @@ export default {
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
+            this.TieneIgvComprobante = (obj.TieneIgv==1?true:false)
+            if(this.TieneIgvComprobante != this.tieneIgv){
+                if(this.TieneIgvComprobante){
+                    this.$toasted.show('El comprobante de referencia tiene IGV, seleccione NOTA DE CREDITO/IGV ELEC.',{duration:3000})
+                }else{
+                    this.$toasted.show('El comprobante de referencia no tiene IGV, seleccione NOTA DE CREDITO ELEC.',{duration:3000})
+                }
+            }
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
+                
             }
             this.axios.get(this.API + 'ventas/solonumero', {
                 params: {
@@ -1003,6 +1015,17 @@ export default {
 
             //Nota de Creadito
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                if(this.TieneIgvComprobante != this.tieneIgv){
+                    if(this.TieneIgvComprobante){
+                        this.$toasted.show('El comprobante de referencia tiene IGV, seleccione NOTA DE CREDITO/IGV ELEC.',{duration:3000})
+                    }else{
+                        this.$toasted.show('El comprobante de referencia no tiene IGV, seleccione NOTA DE CREDITO ELEC.',{duration:3000})
+                    }
+                    
+                    this.inProgress = false
+                    return 
+                }
+                
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
                     this.inProgress = false
