@@ -33,7 +33,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA"
+                                        initValue="BOLETA ELEC."
                                         class="font-weight-bold"
                                         label="writer"
                                         placeholder=""
@@ -939,7 +939,7 @@ export default {
             }
         },
         LimpiarPuntoVenta(){
-            this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.$refs.inputAlmacen.setValue('PRINCIPAL')
             this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
             this.$refs.inputCliente.setValue('')
@@ -1204,10 +1204,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '03'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -2077,7 +2077,7 @@ export default {
                         target: document.getElementById('conten'),
                         confirmButtonColor:'#1D9828',
                     })*/
-                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
                     this.$refs.inputCliente.setValue('')
