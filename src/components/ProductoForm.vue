@@ -111,7 +111,7 @@
           </b-form-group>
 
          
-          <b-form-group>
+          <b-form-group v-show="false">
             <label>Anaquel:</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
@@ -278,7 +278,22 @@
           
         </b-col>
       </b-row>
-
+      <label>Anaquel - Almacen</label>
+      <b-row>
+          <b-col md="6" v-for="(an, index) in producto.anaqueles" :key="index" class="mb-4" v-show="(index+1)<almacenes.length">
+            <b-form-select v-model="an.id" :options="almacenes" size="md"/>
+            <autocomplete
+                :url="API + 'productos/presentacionesdet'"
+                :ref="'inputPresentaciondet'+index"
+                anchor="Anaquel"
+                label="writer"
+                :placeholder.sync="an.nombre"
+                :on-select="val => an.nombre = val.Anaquel && val.Anaquel.toUpperCase()"
+                :onInput="val => an.nombre = val && val.toUpperCase()"
+                :classes="{input: 'form-control upper'}">
+            </autocomplete>
+            </b-col>
+      </b-row>
       <hr/>
       <b-row>
         <b-col md="6">
@@ -428,7 +443,8 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       categoriaItems:[],
       activaSubProducto: true,
-      hideQuitarX: true
+      hideQuitarX: true,
+      almacenes:[{ value: null, text: '-- SELECCIONE ALMACEN --' }],
     }
   },
   beforeMount () {
@@ -540,6 +556,9 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+        if (newVal.Anaqueles && newVal.Anaqueles != null && newVal.Anaqueles != 'null') {
+          this.producto.anaqueles = JSON.parse(newVal.Anaqueles)
+        }
         }).catch((error) => {
             console.log(error)
             this.initForm()
@@ -553,6 +572,7 @@ export default {
 
         //this.$refs.inputCodigoBarra.$el.disabled = false
       }
+      this.cargarAlmacenes()
     }
   },
   methods: {
@@ -572,6 +592,19 @@ export default {
         
       })
     },*/
+    cargarAlmacenes(){
+        this.axios.get(this.API + 'almacenes')
+        .then((response) => {
+            this.almacenes=[{ value: null, text: '-- SELECCIONE ALMACEN --' }]
+            response.data.map(c=>{
+                this.almacenes.push({value:c.IdAlmacen,text:c.Almacen})
+                })
+        })
+        .catch((error) => {
+            console.log(error)
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+    },
     handleFileUpload() {
       this.file = this.$refs.file.files[0]
     },
@@ -707,6 +740,14 @@ export default {
           {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
           {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
           {nombre: 'OFERTA', cantidad: 0, precio: 0}
+        ],
+        anaqueles:[
+          { id: null, nombre:''},
+          { id: null, nombre:''},
+          { id: null, nombre:''},
+          { id: null, nombre:''},
+          { id: null, nombre:''},
+          { id: null, nombre:''}
         ]
       }
     },
@@ -723,6 +764,33 @@ export default {
         return
       }
 
+      this.producto.anaqueles.map((d)=>{
+        if(d.id==null){
+          d.nombre = ''
+        }
+        d.nombre = (''+d.nombre).toUpperCase().trim()
+
+      })
+
+      for (let index = 0; index < (this.almacenes.length-1); index++) {
+        if(index >= (this.almacenes.length-1)){
+          this.producto.anaqueles[index].id = null
+        }
+      }
+
+      let igualAlm = 0
+      this.producto.anaqueles.map((r)=>{
+        let fil = this.producto.anaqueles.filter((f)=>f.id==r.id)
+        if(fil.length>=2 && r.id!=null){
+          igualAlm++
+        }
+      })
+
+      if(igualAlm>1){
+        this.$toasted.show('No puede seleccionar 2 almacenes iguales en Anaquel - Almacen')
+        return
+      }
+
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
@@ -731,7 +799,8 @@ export default {
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
-        PreciosPorProducto: this.producto.precios 
+        PreciosPorProducto: this.producto.precios,
+        Anaqueles: this.producto.anaqueles
       })
       .then((response) => {
         if (this.cbGuardar) {
@@ -772,6 +841,12 @@ export default {
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
+      console.log(ref);
+      this.$refs[ref].handleDoubleClick()
+    },
+    focusAutocompletedet (ref) {
+      // this.$refs[ref].type = ""
+      console.log(ref);
       this.$refs[ref].handleDoubleClick()
     },
     crearCategoria () {

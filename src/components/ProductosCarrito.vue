@@ -348,6 +348,10 @@
 
         </template>
 
+        <template slot="Anaquel" slot-scope="data">
+          {{ obtenerAnaquel(data.item) }}
+        </template>
+
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
               <img src="static/moto-delivery.png" style="width: 24px" />
@@ -606,6 +610,15 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    obtenerAnaquel(data){
+      if(data.Anaqueles && data.Anaqueles!='null' && this.idAlmacen>0){
+        let obj = JSON.parse(data.Anaqueles)
+        let anaquel = obj.find((d)=>d.id==this.idAlmacen)
+        return anaquel?anaquel.nombre:''
+      }
+      return ''
+
+    },
     setSubtotal(index, val, prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
       Vue.set(this.productos[index], 'precio', precio)
