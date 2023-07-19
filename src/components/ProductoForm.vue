@@ -240,7 +240,7 @@
               />
           </b-form-group>
 
-          <b-form-group v-if="true">
+          <b-form-group v-show="false">
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>

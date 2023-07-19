@@ -408,7 +408,7 @@ export default {
       fields: [
             { key: 'CodigoBarra', label: 'Código', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ImagenProducto', label:'Img.'},
+            //{ key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', label: 'Artículo', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo', sortable: true },
