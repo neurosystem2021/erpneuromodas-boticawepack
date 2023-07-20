@@ -200,7 +200,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="false">
             <label>Precio X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
@@ -210,7 +210,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="false">
             <label>Stock X Mayor:</label>
             <input 
               v-model="producto.StockPorMayor"
@@ -276,7 +276,7 @@
               </b-form-text>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-show="false">
           <b-form-group>
             <label>Precio Convenio:</label>
             <input v-model="producto.PrecioConvenio"
