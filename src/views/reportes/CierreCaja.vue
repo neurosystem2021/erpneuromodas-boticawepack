@@ -498,7 +498,8 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'modaspau'
+      empresa: 'modaspau',
+      cargaCorrecta: false,
     }
   },
   computed: {
@@ -640,8 +641,16 @@ export default {
         this.loadData()
     },
     cerrarCaja () {
+      if (!this.cargaCorrecta) {
+        this.$toasted.error('Aun no se carga las ventas espere porfavor...')
+        return
+      }
       if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
+        this.$toasted.error('Seleccione un Turno')
+        return
+      }
+      if(this.ventas.length==0){
+        this.$toasted.error('No tiene ventas para cerrar caja')
         return
       }
       let r = confirm('¿Está seguro de cerrar la caja?')
@@ -685,6 +694,7 @@ export default {
         })
     },
     getVentas () {
+      this.cargaCorrecta = false
       let params = {
         idCierre: this.$route.params.id
       }
@@ -697,6 +707,7 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        this.cargaCorrecta = true
         this.loadDetalles()
 		this.getAdelantos()
       }).catch(err => {
