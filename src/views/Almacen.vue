@@ -257,6 +257,7 @@
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
               <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="info" size="lg" @click="opcionesExportar()">Existencias</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -265,6 +266,41 @@
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
+      </b-modal>
+
+      <b-modal size="lg" ref="modalExportar" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">Opciones de Exportación</h3>
+        </div>
+        <hr>
+        <h5>Exportar existencias según rango de fechas:</h5>
+        <b-row>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="exportar.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="exportar.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4" class="centrarClase">
+              <b-button  block variant="success" :href="hrefXlsFechas" size="md" target="_blank" :disabled="exportar.fechaHasta=='' || exportar.fechaDesde=='' || !(almacen.IdAlmacen>0)">Exportar</b-button>
+          </b-col>
+        </b-row>
       </b-modal>
   </div>
 </template>
@@ -315,6 +351,10 @@ export default {
       currentPage: 1,
       idPerfil: sessionStorage.getItem('idPerfil'),
       mostrarPrecio: false,
+      exportar: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
     }
   },
   watch: {
@@ -364,9 +404,15 @@ export default {
     titleKardex () {
       return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
       this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
-    }
+    },
+    hrefXlsFechas () {
+      return ('/api/index.php/productos/kardexnuevo/stock/' + this.almacen.IdAlmacen +'?fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta).replace('#','');
+    },
   },
   methods: {
+    opcionesExportar(){
+      this.$refs['modalExportar'].show()
+    },
     ocultarNav(){
       this.mostrarPrecio=!this.mostrarPrecio
     },
