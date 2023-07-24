@@ -135,7 +135,7 @@ export default {
         tipoKardex = 'kardexvalorizado'
       }
 
-      return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+      return ('/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+encodeURIComponent(this.producto.IdProducto)+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
     },
     kardexSaldo () {
       let saldo = 0
