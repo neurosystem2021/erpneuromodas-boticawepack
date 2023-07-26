@@ -356,7 +356,8 @@
               </b-row>
             </b-col>
             <b-col cols="4" class="text-center mt-1">
-               <slot name="infoLlevar"></slot>
+               <slot name="infoLlevar" v-if="false"></slot>
+               <slot name="puntosTem"></slot>
             </b-col>
             <b-col md="5" class="text-center mt-1">
               <table class="table b-table border table-footer" style="font-size:0.85rem">

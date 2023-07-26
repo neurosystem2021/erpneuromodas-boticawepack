@@ -438,6 +438,7 @@ return false
       let igualProducto = false
       let faltaStock = false
       let faltaCantidad = false
+      let productoInfo = ''
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true
@@ -454,8 +455,10 @@ return false
           faltaFechaVen = true
         }*/
 
-        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
-        if(pro > 1){
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio==0).length
+        let proob = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio==1).length
+        if(pro > 1 || proob > 1 ){
+        productoInfo = prod.Producto
         igualProducto = true
         }
 
@@ -478,11 +481,11 @@ return false
       }
 
 
-      /*if (igualProducto) {
-          this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
+      if (igualProducto) {
+          this.$toasted.error('('+productoInfo+') No puede realizar movimiento de 2 productos iguales, solo se acepta un obsequio y una compra del mismo',{duration:4000});
           this.inProgress = false            
           return;
-      }*/
+      }
 
       /*if (faltaFechaVen) {
         this.$toasted.show('Ingrese la fecha de vencimiento del producto')

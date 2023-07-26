@@ -290,10 +290,10 @@
                                     <b-col md="12" class="mt-1">
                                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                                     </b-col>
-                                    <!--<b-col md="12" class="mt-1">
-                                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                                    </b-col>-->
                                     <b-col md="12" class="mt-1">
+                                        <config-venta @onUpdateConfig="loadClienteVarios()"></config-venta>
+                                    </b-col>
+                                    <b-col md="12" class="mt-1" v-if="false">
                                         <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                                     </b-col>
                                 </b-row>
@@ -321,6 +321,27 @@
                                         </b-form-group>
                                     </b-col>
                                 </b-row>
+                            </template>
+                            <template slot="puntosTem">
+                                <b-col md="12" v-if="venta.cliente.DniRuc != '00000000'">
+                                    <div class="puntos">
+                                        Tiene <b-badge variant="success">{{ (venta.cliente.Puntos || 0) | redondeoMenor }}</b-badge> Puntos
+                                    </div>
+                                    <b-input-group class="mt-2" prepend="Apli." :append="descuentoPuntos.descuento | redondear" v-if="venta.cliente.Puntos && descuentoGeneral == 0 && !isNota">
+                                        <b-form-input
+                                            v-model="puntosAplicados"
+                                            min="0"
+                                            :disabled="productos.length==0"
+                                            :max="venta.cliente.Puntos"
+                                            @input="aplicarPuntos"
+                                            autocomplete="off"
+                                            type="number"
+                                        ></b-form-input>
+                                    </b-input-group>
+                                    <b-form-text v-if="descuentoPuntos.ValorPunto">
+                                    1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
+                                    </b-form-text>
+                                </b-col>
                             </template>
                         </productos-carrito-nuevo> 
                     </b-row>
@@ -1222,10 +1243,10 @@ export default {
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
-                    efectivo: { IdMetodoPago: 1, monto: 0 },
-                    visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 },
-                    delivery: { IdMetodoPago: 4, monto: 0 },
+                    efectivo: { IdMetodoPago: 1, monto: 0, descripcion:'' },
+                    visa: { IdMetodoPago: 2, monto: 0, descripcion:'' },
+                    mastercard: { IdMetodoPago: 3, monto: 0, descripcion:'' },
+                    delivery: { IdMetodoPago: 4, monto: 0, descripcion:'' },
                 },
                 idProductos:[],
                 NroComprobanteModifica: '',
@@ -1247,6 +1268,7 @@ export default {
             this.adelantosPreOrden=[]
             this.descuentoGeneral = 0
             this.precioHabilitado = false
+            this.puntosAplicados = 0
         },
         setOpcionVenta(opc){
             this.venta.nombreLlevar = ''
@@ -1549,6 +1571,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0   
             this.venta.pago.delivery.monto = 0   
+            this.puntosAplicados=0
 /*             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -1683,6 +1706,21 @@ export default {
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.delivery.monto))?0:parseFloat(this.venta.pago.delivery.monto)
+
+            if(totalPagos<=0){
+                this.$swal({
+                    position: 'center',
+                    icon: 'info',
+                    title: 'La venta no puede ser negativa o cero',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Entiendo',
+                    target: document.getElementById('conten'),
+                    confirmButtonColor:'#0275d8'
+                })
+                this.inProgress = false
+                return
+            }
+
             if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
                 this.inProgress = false            
@@ -1840,7 +1878,7 @@ export default {
 
             });
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
-                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
+                this.$toasted.error('No se puede vender un producto sin stock, no cuenta con unidades para la presentacion.',{duration: 3000});
                 this.inProgress = false            
                 return;
             }
@@ -2201,7 +2239,8 @@ export default {
     margin-bottom: 0;
 }
 .puntos {
-    font-size: 52px;
+    font-size: 1.15rem;
+    font-weight: bold;
 }
 .big-text {
     font-size: 30px;
