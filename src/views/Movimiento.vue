@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="8">
@@ -248,6 +248,11 @@ export default {
       limpiar: 'limpiarCarrito',
       obtenerStok: 'obtenerStock'
     }),
+    prevent (evt) {
+      if (evt.target.tagName !== 'TEXTAREA') {
+          evt.preventDefault();
+      }
+    },
     onSetProducto (obj, cant, precio) {
       if (cant) {
           obj.cantidad = cant
