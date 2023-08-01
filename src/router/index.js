@@ -6,6 +6,7 @@ import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
+import Remision from '@/views/Remision.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -13,6 +14,7 @@ import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 Vue.use(Router)
 
@@ -73,6 +75,16 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
-    }
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
+    },
   ]
 })
