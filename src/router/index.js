@@ -7,6 +7,7 @@ import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
+import Remision from '@/views/Remision.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -17,6 +18,7 @@ import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import Formato from '@/views/reportes/Formato.vue'
 
@@ -109,6 +111,16 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
-    }
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
+    },
   ]
 })
