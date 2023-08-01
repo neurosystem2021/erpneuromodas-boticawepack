@@ -111,6 +111,15 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="6">
+                                <b-form-group>
+                                    <label>OBSERVACIÓN:</label>
+                                    <input v-model="venta.Observacion"
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="Observación" />
+                                </b-form-group>
+                            </b-col>
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
@@ -579,6 +588,7 @@ export default {
             this.venta = {
                 EsCredito: 0,
                 Serie: '',
+                Observacion:'',
                 Numero: '',
                 cliente: {},
                 comisionista: {},
@@ -1024,6 +1034,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Observacion = (this.venta.Observacion+'').toUpperCase()
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
