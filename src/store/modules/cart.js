@@ -75,11 +75,15 @@ const actions = {
     let cantidad = false
     let setSuma = false
     let setPreOr = false
+    let fechaVen = false
+    let idLote = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
       setPreOr =obje.setPreOr
+      fechaVen = obje.fechaVen
+      idLote = obje.idLote
     }
 
     if(typeof producto === 'object') {
@@ -116,6 +120,14 @@ const actions = {
 
           if(setPreOr){
             obj.precio = setPreOr
+          }
+
+          if(fechaVen){
+            obj.FechaVen = fechaVen
+          }
+
+          if(idLote){
+            obj.IdLote = idLote
           }
 
           if (setSuma) {
