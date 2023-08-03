@@ -41,6 +41,7 @@
                                         required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
+                                        :customParams="{idAlmacen: venta.almacen.IdAlmacen, pv: 1}"
                                         anchor="TipoDoc"
                                         initValue="NOTA DE VENTA"
                                         label="writer"
@@ -1094,6 +1095,7 @@ export default {
                 }else{
                 // limpiar preorden seleccionado
                     this.$toasted.success('Venta realizada con exito')
+                    let almacenId = this.venta.almacen.IdAlmacen
                     try {
                     this.venta.productos.map((pro)=>{
                         delete pro.nuevoPrecioContado
@@ -1227,7 +1229,9 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    if(almacenId!=2){
+                        window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    }    
 
                 }
                  
