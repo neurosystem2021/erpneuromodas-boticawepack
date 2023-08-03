@@ -23,7 +23,7 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" :tipoCambio="tipoCambioPro"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -449,6 +449,7 @@ export default {
     tipo: String,
     setPrecio: Boolean,
     tipoCambio: Number,
+    tipoCambioPro: Number,
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,

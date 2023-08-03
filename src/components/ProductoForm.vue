@@ -273,7 +273,7 @@
       <b-row>
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Costo:</label>
+            <label>Precio de Costo: <b>(En $ {{ producto.PrecioCostoDol | redondear(2) }})</b></label>
             <input
               v-model="producto.PrecioCosto"
               step="0.0001"
@@ -284,7 +284,7 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Venta:</label>
+            <label>Precio de Venta: <b>(En $ {{ producto.PrecioContadoDol | redondear(2) }})</b></label>
             <input v-model="producto.PrecioContado"
               type="number"
               step="0.00001"
@@ -418,7 +418,7 @@ export default {
   beforeMount () {
     this.initForm()
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ['showButton', 'productoUpdate', 'cbGuardar','tipoCambio'],
   watch: {
     show (val) {
       if(val){
@@ -514,6 +514,8 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+        this.producto.PrecioContadoDol = Math.round((this.producto.PrecioContado / this.tipoCambio) * 100) / 100
+        this.producto.PrecioCostoDol = Math.round((this.producto.PrecioCosto / this.tipoCambio) * 100) / 100
         }).catch((error) => {
             console.log(error)
             this.initForm()
@@ -680,7 +682,9 @@ export default {
           {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
           {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
           {nombre: 'OFERTA', cantidad: 0, precio: 0}
-        ]
+        ],
+        PrecioCostoDol:0,
+        PrecioContadoDol: 0,
       }
     },
     keyDownInput(e) {

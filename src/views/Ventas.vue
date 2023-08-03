@@ -242,7 +242,8 @@
                             :isVentas="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto"
-                            :esDelivery="venta.EsDelivery">
+                            :esDelivery="venta.EsDelivery"
+                            :tipoCambioPro="tipoCambioPro">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -435,6 +436,7 @@ export default {
         this.loadClienteVarios()
         this.escucharPedidos()
         this.configStock()
+        this.loadTipoCambio()
     },
     data () {
         return {
@@ -489,7 +491,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            ventaSinStock:0
+            ventaSinStock:0,
+            tipoCambioPro: 0,
         }
     },
     watch: {
@@ -523,6 +526,13 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        loadTipoCambio () {
+            this.tipoCambioPro = 0
+            this.axios.get(this.API + 'tipocambio/usd')
+            .then(res => {
+                this.tipoCambioPro = res.data
+            })
+        },
         configStock () {
             this.axios.get(this.API + 'config/stock')
                 .then(res => {
