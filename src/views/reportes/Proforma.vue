@@ -2,8 +2,8 @@
 	<div id="invoice-container">
 		<header class="clearfix" style="height: 120px;">
 			<div id="logo">
-        <img v-if="proforma.IdAlmacen !== 3 && proforma.IdAlmacen !== 4" src="/resources/images/logo.png">
-				<img v-if="proforma.IdAlmacen == 3 || proforma.IdAlmacen == 4" src="/resources/images/logotowan.png">
+        <img v-if="proforma.IdAlmacen !== 10 && proforma.IdAlmacen !== 4" src="/resources/images/logo.png">
+				<img v-if="proforma.IdAlmacen == 10 || proforma.IdAlmacen == 4" src="/resources/images/logotowan.png">
 			</div>
 			<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
@@ -61,7 +61,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="5"></td>
+            <td colspan="6"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -71,7 +71,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="5"></td>
+            <td colspan="6"></td>
             <td colspan="2">TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>

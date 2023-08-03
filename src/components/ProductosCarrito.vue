@@ -490,6 +490,7 @@ export default {
                 <th style="width: 150px">Forma.</th>
                 <th style="width: 200px">Compuestos</th>
                 <th style="width: 90px">F. V.</th>
+                <th style="width: 100px">Lote</th>
                 <th class="table-success" style="width: 65px">Precio.</th>
                 <th>V.E.</th>
               </tr>
@@ -502,6 +503,7 @@ export default {
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td style="font-size:10px">${data.CompuestosProducto}</td>
                 <td style="font-size:12px"><b>${data.FechaVen==null?'Sin Fecha':data.FechaVen}</b></td>
+                <td style="font-size:12px"><b>${data.IdLote==null || data.IdLote==0?'Sin Lote':data.IdLote}</b></td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
                 <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
               </tr>
