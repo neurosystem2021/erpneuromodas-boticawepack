@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
-      <b-container class="bv-example-row">
+      <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row">
         <b-row>
           <b-col md="4">
             <b-form-group>
@@ -84,7 +84,11 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage"
-            @row-clicked="myRowClickHandler"></b-table>
+            @row-clicked="myRowClickHandler">
+            <template slot="Saldo" slot-scope="data">
+                {{ data.item.Saldo | redondear(2) }}
+            </template>
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
