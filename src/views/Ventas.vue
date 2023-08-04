@@ -167,6 +167,15 @@
                                     </b-row>
                                 </b-form-group>
                             </b-col>
+                            <b-col md="6" class="mb-1">
+                                <b-form-group horizontal label="Nº Placa:">
+                                    <input v-model="venta.Placa"
+                                            type="text"
+                                            class="form-control"
+                                            style="text-transform:uppercase"
+                                            placeholder="Placa" />
+                                </b-form-group>
+                            </b-col>
                         </b-row>
                     </b-col>
                     <b-col md="3" class="ocularMovil2">
@@ -621,6 +630,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
+                Placa: '',
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
@@ -714,6 +724,7 @@ export default {
                         IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
                     }
                 }).then((response) => {
+                    this.venta.Placa = response.data[0].Placa
                 this.axios.get(this.API + 'cliente', {
                     params: {
                         idCliente: response.data[0].IdCliente
@@ -1104,6 +1115,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
@@ -1306,7 +1318,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 200px)
     }
 }
 </style>

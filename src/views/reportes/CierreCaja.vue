@@ -5,8 +5,24 @@
       <div>
           <div class="no-print">
               <b-row align-h="end" class=" no-print">
-                    <label v-if="!this.$route.params.id" >Vendedor:</label>
+                <label v-if="!this.$route.params.id">Almacen:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
+                  <b-form-group size="sm">
+                    <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                </b-form-group>
+                </b-col>
+
+                <label v-if="!this.$route.params.id && false" >Vendedor:</label>
+                <b-col cols="3" v-if="!this.$route.params.id && false">
                     <b-form-group size="sm" >
                         <autocomplete
                             required="required"
@@ -69,117 +85,7 @@
           </tfoot>
         </table>
       </b-row>
-      
-      <b-row>
-        <b-col v-if="totalIngresos">
-          <h5>Ingresos Caja Principal</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-        <b-col v-if="totalSalidas">
-          <h5>Salidas</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-      </b-row>
-      
-
-      <b-row>
-        <b-col v-if="totalIngresosTarjeta">
-          <h5>Ingresos de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.Cuenta }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
-                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-      </b-row>
-
-      <b-row>
-          <b-col v-if="totalAdelantos">
-            <h5>Descontar Adelantos</h5><br>
-            <table class="table b-table table-sm adelantos">
-              <thead>
-                <tr>
-                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in adelantos" :key="index">
-                  <td>{{ item.IdCajaBanco }}</td>
-                  <td>{{ item.FechaDoc }}</td>
-                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
-                  <td>S/. {{ item.Importe | redondear }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="2"></td>
-                  <td class="total"><b>Total Adelantos</b></td>
-                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
-                </tr>
-              </tfoot>
-            </table>
-          </b-col>
-      </b-row>
+   
 
       <b-row>
         <h5>Ventas Efectivo</h5><br>
@@ -494,6 +400,117 @@
         </table>
       </b-row>
 
+      <b-row>
+        <b-col v-if="totalIngresos">
+          <h5>Ingresos Caja Principal</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresos" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+        <b-col v-if="totalSalidas">
+          <h5>Salidas</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      
+
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+
+      <b-row>
+          <b-col v-if="totalAdelantos">
+            <h5>Descontar Adelantos</h5><br>
+            <table class="table b-table table-sm adelantos">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in adelantos" :key="index">
+                  <td>{{ item.IdCajaBanco }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
+                  <td>S/. {{ item.Importe | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="total"><b>Total Adelantos</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+      </b-row>
+
       <br>
 
       <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
@@ -531,7 +548,8 @@ export default {
       cierre: {},
       vendedor: {},
       productosVendidos: [],
-      productosVendidosTotal: 0
+      productosVendidosTotal: 0,
+      almacen: {},
     }
   },
   computed: {
@@ -655,12 +673,22 @@ export default {
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
             this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
             // this.$refs.inputVendedor.$refs.input.disabled = true
 
             if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              //this.$refs.inputVendedor.$refs.input.disabled = true
             }
+            this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+            .then(res => {
+              this.setAlmacen(res.data)
+              this.$refs.inputAlmacen.setValue(res.data.Almacen)
+              //if(response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true
+              //}
+            }).catch((err)=>{
+              this.$toasted.show('Ha ocurrido un error, actualice la pagina y vuelva a intentarlo')
+            })
         })
         .catch((error) => {
             console.log(error)
@@ -670,6 +698,10 @@ export default {
     imprimir () {
       window.print();
     },
+    setAlmacen (obj) {
+      this.almacen = obj;
+      this.loadData()
+    },
     loadData () {
       this.getVentas()
       this.getIngresos()
@@ -677,19 +709,24 @@ export default {
     },
     setVendedor (obj) {
         this.vendedor = obj
-        this.loadData()
+        //this.loadData()
     },
     cerrarCaja () {
       if (!this.turno) {
         this.$toasted.show('Seleccione un Turno')
         return
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      if(!(this.almacen.IdAlmacen>0)){
+        this.$toasted.show('No se cargo el almacen actualice la pagina')
+        return
+      }
+      let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          //user: sessionStorage.getItem("User")
-          user:         this.vendedor.Usuario,
+          user: sessionStorage.getItem("User"),
+          //user:         this.vendedor.Usuario,
+          idAlmacen: this.almacen.IdAlmacen,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -746,7 +783,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -768,7 +808,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -785,7 +828,10 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
