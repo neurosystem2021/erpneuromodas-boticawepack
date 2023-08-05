@@ -499,15 +499,59 @@ export default {
         event.target.src = "static/no-photo.png" 
     },
     clickVerValorizado() {
-      let pass = window.prompt('Escriba su contraseña')
-      if (pass) {
-        this.axios.post(this.API + 'login', {
-          user: sessionStorage.getItem('User'),
-          password: pass
-        }).then(r => {
-          if (r.data) {
-            this.verValorizado = true;
+      let user = sessionStorage.getItem('User')
+      if((''+user).trim().toLowerCase() == 'admin'){
+        this.$swal({
+        title: 'Autorización de Administrador',
+        html: `<form onsubmit="event.preventDefault();"><label>Ver Valorizado</label>
+        <input type="password" id="password" class="swal2-input" placeholder="Ingrese su contraseña"></form>`,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Autorizar',
+        cancelButtonText: 'Cancelar',
+        allowEscapeKey: false,
+        allowEnterKey:false,
+        focusConfirm: false,
+          preConfirm: () => {
+            const password = this.$swal.getPopup().querySelector('#password').value
+            if (!password) {
+            this.$swal.showValidationMessage('Ingrese la contraseña de administrador/produccion')
+                if(this.$swal.getPopup().querySelector('#password')){
+                    this.$swal.getPopup().querySelector('#password').focus(); 
+                }
+            }
+            return {password: password }
+        }
+        }).then((result) => {
+          if (result.isConfirmed==true?result.value.password:result.isConfirmed) {
+              this.axios.post(this.API + 'login', {
+              user: 'admin',
+              password: result.value.password
+              }).then(r => {
+                if (r.data) {
+                  this.verValorizado = true;
+                }else{
+                  this.$swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: '¡No autorizado para mostrar valorizado!',
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: 'Cerrar',
+                  })
+                }
+            })
           }
+        })
+      }else{
+        this.$swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '¡No autorizado para mostrar valorizado!',
+          showConfirmButton: false,
+          showCancelButton: true,
+          cancelButtonText: 'Cerrar',
         })
       }
     },
