@@ -695,7 +695,7 @@ export default {
             // console.log(res);
           })
 
-        this.$refs.productoForm.hide()
+        //this.$refs.productoForm.hide()
       })
       .catch((error) => {
         console.log(error)
