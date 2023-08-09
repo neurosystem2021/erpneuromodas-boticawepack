@@ -871,7 +871,7 @@ export default {
                 })
             }
             
-            this.actualizarPrecioConvenio(obj)
+            //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
         onSetProducto (obj, cant, precio) {
