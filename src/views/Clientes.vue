@@ -85,6 +85,7 @@ export default {
             { key: 'Direccion', sortable: true },
             { key: 'Puntos', sortable: true },
             { key: 'EsVIP', sortable: true },
+            { key: 'esComisionista', label:'Comisionista',  sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

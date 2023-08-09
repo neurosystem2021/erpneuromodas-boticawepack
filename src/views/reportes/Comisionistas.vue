@@ -132,9 +132,24 @@ export default {
   },
   methods: {
     pagarAComisionista (e, cliente) {
+      let importe = e.target.parentElement.previousElementSibling.value
+      if(importe > cliente.Comision){
+        this.$toasted.error('El importe ingresado no debe ser mayor al total de la comision')
+        return
+      }
+
+      if(!(cliente.Comision > 0)){
+        this.$toasted.error('La comision debe ser mayor a cero para pagar')
+        return
+      }
+
+      if(!(importe > 0)){
+        this.$toasted.error('La importe ingresado debe ser mayor a cero')
+        return
+      }
+
       let r = confirm('Desea pagar al comisionista')
       if (r) {
-        let importe = e.target.parentElement.previousElementSibling.value
 
         this.axios.post(this.API + 'cliente/comisionistas/pagar', {
           cliente: cliente,
@@ -143,6 +158,7 @@ export default {
         .then((response) => {
           this.$toasted.success('Pago a comisionista realizado')
           Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+          e.target.parentElement.previousElementSibling.value = ''
         })
         .catch((error) => {
           console.log(error)
