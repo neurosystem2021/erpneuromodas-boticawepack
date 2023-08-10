@@ -172,7 +172,7 @@
             <input 
               required="required"
               v-model="producto.PorcentajeUtilidad"
-              :disabled="(idPerfil == 1) ? false : true"
+              :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
               @input="actualizarPrecioContado"
               type="number"
               step="0.0001"
@@ -266,7 +266,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              :disabled="(idPerfil == 1) ? false : true"
+              :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
               step="0.0001"
               type="number"
               class="form-control"
@@ -277,7 +277,7 @@
           <b-form-group>
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
-              :disabled="(idPerfil == 1) ? false : true"
+              :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
               type="number"
               step="0.0001"
               @input="actualizarPorcentajeUtilidad"
@@ -292,7 +292,7 @@
           <b-form-group>
             <label>Precio Convenio:</label>
             <input v-model="producto.precioConvenio"
-              :disabled="(idPerfil == 1) ? false : true"
+              :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
               type="number"
               step="0.0001"
               class="form-control"
@@ -308,7 +308,7 @@
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
-                :disabled="(idPerfil == 1) ? false : true"
+                :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
                 type="text"
                 style="text-transform:uppercase"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
@@ -319,7 +319,7 @@
               <label>Cantidad:</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
-                :disabled="(idPerfil == 1) ? false : true"
+                :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
                 type="number"
                 class="form-control"
                 step="0.01"
@@ -330,7 +330,7 @@
               <label>Precio:</label>
               <input 
                 v-model="producto.precios[i-1].precio"
-                :disabled="(idPerfil == 1) ? false : true"
+                :disabled="(idPerfil == 1 || idPerfil == 12) ? false : true"
                 type="number"
                 class="form-control"
                 step="0.001"
