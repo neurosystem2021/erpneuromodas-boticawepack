@@ -1,6 +1,6 @@
 <template>
     <b-col md="12">
-      <b-row>
+      <b-row v-show="false">
         <b-col md="12">
           <b-form-group>
             <b-input-group>
@@ -30,7 +30,7 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row style="height:35vh; overflow-y: scroll; background: #FFFFFF;">
+      <b-row style="height:30vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="selec" slot-scope="data">
@@ -162,8 +162,8 @@
       </b-col>
     </b-row>
     <b-row style="border-top: 3px solid #C0C0C0;">
-          <b-col md="4">
-            <br>
+          <b-col md="4" style="border-right: 3px solid rgb(192, 192, 192);">
+            <slot name="infoSurtidor"></slot>
             <b-row style="justify-content: center;" v-if="false">
               <table class="calc__numbers">
                 <tbody>
