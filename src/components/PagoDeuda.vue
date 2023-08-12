@@ -300,6 +300,7 @@ import config from '@/store/config.js'
                     cajaBanco: this.cajaBanco,
                     documentos: this.documentos,
                     vendedor: this.vendedor,
+                    idAlmacen: this.vendedor.IdAlmacen,
                     cuentas: cuentasId
                 })
                 .then((response) => {
