@@ -465,7 +465,8 @@ export default {
         { value: 3, text: 'Noche' }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      cargaCorrecta: false,
     }
   },
   computed: {
@@ -619,6 +620,10 @@ export default {
         this.loadData()
     },
     cerrarCaja () {
+      if (!this.cargaCorrecta) {
+        this.$toasted.error('Aun no se carga las ventas espere porfavor...')
+        return
+      }
       if (!this.turno) {
         this.$toasted.show('Seleccione un Turno')
         return
@@ -664,6 +669,7 @@ export default {
         })
     },
     getVentas () {
+      this.cargaCorrecta = false
       let params = {
         idCierre: this.$route.params.id
       }
@@ -676,6 +682,7 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        this.cargaCorrecta = true
         this.loadDetalles()
 		this.getAdelantos()
       }).catch(err => {
