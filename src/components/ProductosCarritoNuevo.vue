@@ -50,7 +50,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 105px"
+            style="width: 110px"
             step="0.000001"
             min="0"
             class="form-control"
@@ -66,7 +66,7 @@
             type="number"
             :readonly="(type === 'mov') ? false : true"
             min="0"
-            style="width: 105px"
+            style="width: 110px"
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -81,7 +81,7 @@
               type="number"
               min="0"
               step="0.00001"
-              style="width: 105px"
+              style="width: 110px"
               placeholder="Subtotal"
               @input="val => setSubtotal(data.index, val.target.value)"
               class="form-control"/>
@@ -116,7 +116,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:80px"
+            style="width:110px"
             v-model="productos[data.index].nuevoPrecioContado"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -135,7 +135,7 @@
             v-model="productos[data.index].descuento"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 105px"
+            style="width: 110px"
             min="0"
             step="0.01"
             class="form-control"
@@ -148,7 +148,7 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <!--<b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>-->
         </template>
 
         <template slot="show_details" slot-scope="row">

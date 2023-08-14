@@ -416,7 +416,7 @@
                                     <template slot="infoSurtidor">
                                         <b-row style="justify-content: center; margin-top:10px;">
                                             <b-col md="12" class="text-center mb-1">
-                                                <b-button type="button" variant="info" size="sm" @click="limpiarPuntoVenta"><i class="fas fa-redo"></i> LIMPIAR</b-button>
+                                                <b-button type="button" variant="info" size="sm" @click="limpiarPuntoVenta"><i class="fas fa-redo"></i> LIMPIAR PUNTO DE VENTA</b-button>
                                             </b-col>
                                             <b-col md="12">
                                                 <table class="table b-table table-sm" id="tablaVentaSurtidorSelec">
@@ -452,7 +452,7 @@
                                         </b-row>-->
                                         <b-row style="justify-content: center; margin-top:10px">
                                             <b-col>
-                                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
                                             </b-col>
                                         </b-row>
                                     </template>
@@ -493,7 +493,7 @@
                             </b-collapse>
                         </b-col>
                     </b-row>
-                    <b-row  style="height:90vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start; align-items: center; display: flex; justify-content: center;">     
+                    <b-row  style="height:88.8vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start; align-items: center; display: flex; justify-content: center;">     
                         <b-col md="10" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)" :class="{'seleccionProducto': producto.IdProducto == idProductoSelect }">
                             <b-row style="margin: 0;">
                                 <b-col md="7">
@@ -513,7 +513,7 @@
                 </b-col>
             </b-row>
             
-            <br class="d-none d-lg-block d-xl-block"/><br class="d-none d-lg-block d-xl-block"/>
+            <br class="d-none d-lg-block d-xl-block"/>
 
             <b-modal id="modalPanelSurtidor" size="lg" ref="modalPanelSurtidor" title="PANEL DE VENTA">
                 <div class="d-block text-center">
@@ -670,7 +670,25 @@ export default {
             add:'agregarProducto'
         }),
         guardarVentasSeleccionadas(){
+            this.limpiarCart()
+            let preciosub = 0
+            let preciodet = 0
+            let items = 0
             this.ventaSeleccionadas = this.ventaSurtidor.filter((vs)=>vs.Seleccion)
+            this.ventaSeleccionadas.map((vs)=>{
+                items ++
+                preciosub += Number(vs.veImporte)
+                preciodet += Number(vs.vePrecio)
+            })
+            let obj = Object.assign({}, this.productoSelect)
+            obj.descuento = 0
+            obj.precio = Math.round((preciodet / items) * 100) / 100 
+            obj.sutotal = Math.round(preciosub * 100) / 100;
+            obj.cantidad = Math.round( preciosub / (preciodet / items) * 10000) / 10000;
+            this.$toasted.info('Producto agregado')
+            this.add([obj, () => {
+                this.onAddProducto(obj)
+            }])
             this.$refs['modalPanelSurtidor'].hide()
         },
         onCambioSeleccion(index,e){
@@ -680,9 +698,6 @@ export default {
             } else {
                 e.target.parentNode.classList.remove('seleccionado')
             }
-
-
-            tablaVentaSurtidor
 
             this.itemTotal = 0
             this.montoTotal = 0
@@ -703,355 +718,19 @@ export default {
             this.montoTotal = 0
             this.cantidadTotal = 0
             this.ventaSurtidor = []
-            this.ventaSurtidor = [
-                { 
-                    veID: 2914000,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914001,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914002,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914003,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914004,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914005,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914006,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914007,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914008,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914009,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914010,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914011,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914012,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914013,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914014,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914015,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914016,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914017,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914018,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914019,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914020,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914021,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914022,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914023,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914024,
-                    veHoraPC: "2023-08-02 18:08:26",
-                    veHoraCS: "2023-08-02 18:08:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "0.883",
-                    veImporte: "6.000",
-                    veEstado: 1,
-                },
-                { 
-                    veID: 2914025,
-                    veHoraPC: "2023-08-02 18:15:26",
-                    veHoraCS: "2023-08-02 18:15:32",
-                    veCara: 5,
-                    veManguera: 0,
-                    vePago: 0,
-                    veProducto: "GLP",
-                    vePrecio: "6.800",
-                    veVolumen: "1.030",
-                    veImporte: "7.000",
-                    veEstado: 1,
-                },
-            ]
-
-            this.ventaSurtidor.map((vs)=>{
-                vs.Seleccion = false
+            let params = {
+                veCara: this.idCara,
+                veEstado: 0,
+                veProducto: this.productoSelect.CodigoBarra
+            }
+            this.axios.get(this.APISURTIDOR+'/sale/api/aventa/',{
+                params: params
             })
-            this.$refs['modalPanelSurtidor'].show()
-            return;
-            this.axios.get(this.API+'surtidor/panel')
             .then((response) => {
-                this.datosSurtidor = response.data
+                this.ventaSurtidor = response.data
+                this.ventaSurtidor.map((vs)=>{
+                    vs.Seleccion = false
+                })
                 this.$refs['modalPanelSurtidor'].show()
             })
             .catch((error) => {
@@ -1060,7 +739,7 @@ export default {
             })    
         },
         setCara(event){
-            
+            this.idCara = event
         },
         setAltImg(event) { 
             event.target.src = "static/no-photo.png" 
@@ -1124,6 +803,10 @@ export default {
             }
         },
         setProducto (obj) {
+            if(this.ventaSeleccionadas.length>0){
+                this.$toasted.info('Tiene ventas seleccionadas, limpie el punto de venta',{duration:3000})
+                return
+            }
         obj = Object.assign({}, obj);
         //obj.FLETE = 0
         obj.precio = 0
@@ -1973,6 +1656,6 @@ export default {
     }
 
     .seleccionProducto {
-        border: 4px solid red;
+        border: 7.5px solid #007bff !important;
     }
 </style>
