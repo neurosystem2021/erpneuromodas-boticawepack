@@ -892,6 +892,15 @@ export default {
       obj.EsPresentacion = 0
       obj = this.onSetProducto(obj)
 
+      if(this.indexPos!=null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$emit('onAddProducto')
+        this.$refs['modalCant'].hide()
+        this.$refs.barcodeInput.focus()
+        return
+      }
+
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -913,6 +922,14 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+      if(this.indexPos!=null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$emit('onAddProducto')
+        this.$refs['modalCant'].hide()
+        this.$refs.barcodeInput.focus()
+        return
+      }
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         //this.actualizarProd(obj)
@@ -924,6 +941,7 @@ export default {
       if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.indexPos = index
         this.$refs['modalCant'].show()
         return
       }
