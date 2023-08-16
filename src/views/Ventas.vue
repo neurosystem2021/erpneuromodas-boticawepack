@@ -81,7 +81,7 @@
                                         v-model="venta.EsConsumoVale"
                                         :value="1"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='01'" class="mt-1">
-                                        <b>VENTA PARA CONSUMO CON VALES</b>
+                                        <b>CONSUMO CON VALES</b>
                                     </b-form-checkbox> 
                                     <b-form-checkbox
                                         v-model="venta.EsVale"
@@ -510,7 +510,7 @@
                             </b-row>
                             <b-row class="text-center" style="margin-top:2px; border-top: 1px solid #E6E6E6;">
                                 <b-col>
-                                    <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:275px" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                    <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:265px; padding: 4px;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
                                 </b-col>               
                             </b-row>
                         </b-col>
@@ -529,7 +529,7 @@
                     </b-row>
                 </div>
                 <hr>
-                <div class="d-block text-center" style="overflow-y: scroll; height: 40vh;">
+                <div class="d-block text-center" style="overflow-y: scroll; height: 45vh;">
                     <table class="table b-table table-sm" id="tablaVentaSurtidor">
                         <thead>
                             <tr>

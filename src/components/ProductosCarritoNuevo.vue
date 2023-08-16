@@ -30,7 +30,7 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row style="height:30vh; overflow-y: scroll; background: #FFFFFF;">
+      <b-row style="height:28vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="selec" slot-scope="data">
