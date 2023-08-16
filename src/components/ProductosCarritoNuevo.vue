@@ -48,7 +48,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==2 }"
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || idPerfil != 1"
             type="number"
             style="width: 110px"
             step="0.000001"
@@ -77,7 +77,7 @@
             <input
               v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
               v-model="productos[data.index].sutotal"
-              :disabled="bloquearInput?true:false"
+              :disabled="bloquearInput?true:false || idPerfil != 1"
               type="number"
               min="0"
               step="0.00001"
@@ -92,7 +92,7 @@
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || idPerfil != 1"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
             :unchecked-value="0">
@@ -118,7 +118,7 @@
           <input
             style="width:110px"
             v-model="productos[data.index].nuevoPrecioContado"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || idPerfil != 1"
             type="number"
             min="0"
             step="0.01"
@@ -133,7 +133,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==3 }"
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput?true:false || idPerfil != 1"
             type="number"
             style="width: 110px"
             min="0"
@@ -148,7 +148,7 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <!--<b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>-->
+          <b-button variant="danger" size="sm" v-if="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -194,7 +194,7 @@
               </table>
             </b-row>
           </b-col>
-          <b-col cols="3" class="text-center mt-1">
+          <b-col md="3" class="text-center mt-1">
               <slot name="infoLlevar"></slot>
           </b-col>
           <b-col md="5" class="text-center mt-1">
@@ -284,6 +284,7 @@ export default {
       productosData:[],
       accionBoton: 1,
       productoSelectIndex:null,
+      idPerfil: sessionStorage.getItem('IdPerfil')
     }
   },
   watch: {

@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid class="bv-example-row">
+        <b-container fluid class="bv-example-row" id="conten">
             <b-row>
                 <b-col md="9" style="border-right: 3px solid #C0C0C0; background: white">
                     <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
@@ -160,7 +160,7 @@
                                     </b-col>
                                     
                                     <b-col md="8">
-                                        <b-form-group>
+                                        <b-form-group style="margin-bottom: 0 !important;">
                                             <b-input-group class="mt-2">            
                                                 <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                                 <autocomplete
@@ -188,7 +188,7 @@
 
                                                 </b-input-group-append>
                                             </b-input-group>
-                                            <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                            <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-1">
                                                 <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
                                                 <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                                 <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
@@ -450,8 +450,8 @@
                                                 <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                                             </b-col>
                                         </b-row>-->
-                                        <b-row style="justify-content: center; margin-top:10px">
-                                            <b-col>
+                                        <b-row style="justify-content: center; margin-top:5px">
+                                            <b-col md="12">
                                                 <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
                                             </b-col>
                                         </b-row>
@@ -465,15 +465,20 @@
                     <b-row>
                         <b-col class="text-center">
                             <b-row>
-                                <b-col md="7" style="margin-bottom: -8px;">
+                                <b-col>
+                                    <b-button size="md" block :variant="idSurtidor>0?'dark':'danger'"><b>{{ (idSurtidor>0?'SURTIDOR '+idSurtidor:'SIN SURTIDOR') }}</b></b-button>
+                                </b-col>
+                            </b-row>
+                            <b-row class="mt-2" style="margin-bottom: 3px;">
+                                <b-col md="7">
                                     <b-form-group horizontal label="Cara" class="mb-0">
                                         <b-input-group>
-                                            <b-form-select v-model="idCara" :options="itemsCara" v-on:change="setCara($event)" class="mb-3" size="md" required/>
+                                            <b-form-select v-model="idCara" :options="itemsCaraSelect" v-on:change="setCara($event)" class="mb-3" size="md" required/>
                                         </b-input-group>
                                     </b-form-group>
                                 </b-col>
-                                <b-col md="5" style="margin-bottom: -8px;">
-                                    <b-button size="md" block variant="primary" @click="abrirPanelSurtidor"><i class="fas fa-desktop"></i> Panel</b-button>
+                                <b-col md="5">
+                                    <b-button size="md" block variant="primary" @click="abrirPanelSurtidor" :disabled="idSurtidor==0"><i class="fas fa-desktop"></i> Panel</b-button>
                                 </b-col>
                             </b-row>
                             <!--<b-button v-b-toggle.collapse-1 variant="primary">ACCESOS DIRECTOS</b-button>-->
@@ -493,11 +498,11 @@
                             </b-collapse>
                         </b-col>
                     </b-row>
-                    <b-row  style="height:88.8vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start; align-items: center; display: flex; justify-content: center;">     
+                    <b-row  style="height:75vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start; align-items: center; display: flex; justify-content: center;">     
                         <b-col md="10" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)" :class="{'seleccionProducto': producto.IdProducto == idProductoSelect }">
                             <b-row style="margin: 0;">
                                 <b-col md="7">
-                                    <label class="font-weight-bold" style="font-size:0.8rem; cursor:pointer">{{producto.Producto}}</label>
+                                    <label class="font-weight-bold" style="font-size:0.7rem; cursor:pointer">{{producto.Producto}}</label>
                                 </b-col>
                                 <b-col md="5" style="align-items: center; justify-content: center; display: flex;">
                                     <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
@@ -505,7 +510,7 @@
                             </b-row>
                             <b-row class="text-center" style="margin-top:2px; border-top: 1px solid #E6E6E6;">
                                 <b-col>
-                                    <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:180px" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                    <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:275px" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
                                 </b-col>               
                             </b-row>
                         </b-col>
@@ -524,7 +529,7 @@
                     </b-row>
                 </div>
                 <hr>
-                <div class="d-block text-center" style="overflow-y: scroll; height: 60vh;">
+                <div class="d-block text-center" style="overflow-y: scroll; height: 40vh;">
                     <table class="table b-table table-sm" id="tablaVentaSurtidor">
                         <thead>
                             <tr>
@@ -585,6 +590,7 @@ export default {
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
+        this.obtenerSurtidor()
     },
     data () {
         return {
@@ -637,11 +643,8 @@ export default {
             TieneIgvComprobante:false,
             MontoTotal: 0,
             MontoConsumido: 0,
-            itemsCara: [
-            { value: 0, text: '0' },
-                { value: 1, text: '1' },
-            ],
-            idCara: 0,
+            idCara: null,
+            idSurtidor: 0,
             ventaSurtidor:[],
             itemTotal: 0,
             montoTotal: 0,
@@ -649,6 +652,23 @@ export default {
             ventaSeleccionadas:[],
             productoSelect: {},
             idProductoSelect: null,
+            surtidores:[
+                {
+                    IdSurtidor: 1,
+                    itemsCara: [
+                        { value: 0, text: '0' },
+                        { value: 1, text: '1' },
+                    ],
+                },
+                {
+                    IdSurtidor: 2,
+                    itemsCara: [
+                        { value: 3, text: '3' },
+                        { value: 4, text: '4' },
+                    ],
+                }
+            ],
+            itemsCaraSelect:[]
         }
     },
     watch: {
@@ -669,6 +689,24 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        obtenerSurtidor(){
+            this.idSurtidor = 0
+            this.itemsCaraSelect = []
+            this.idCara = null
+            let id = sessionStorage.getItem('IdSurtidor')
+            if(!(id > 0)){
+                this.$toasted.show("No se especifico un surtidor, ingrese nuevamente",{duration:4000})
+                return
+            }
+            let surtidor = this.surtidores.find((s)=>s.IdSurtidor == id)
+            if(surtidor){
+                this.idSurtidor = surtidor.IdSurtidor
+                this.itemsCaraSelect = surtidor.itemsCara
+                this.idCara = surtidor.itemsCara[0].value
+            }else{
+                this.$toasted.show("No se especifico un surtidor, ingrese nuevamente",{duration:4000})
+            }
+        },
         guardarVentasSeleccionadas(){
             this.limpiarCart()
             let preciosub = 0
@@ -922,7 +960,7 @@ export default {
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
-            if(obj.CodSunat=='12' || obj.TieneIgv==1){
+            /*if(obj.CodSunat=='12' || obj.TieneIgv==1){
                 let pass = window.prompt('Escriba su contraseña')
                 if ((''+pass).trim()!='') {
                     this.axios.post(this.API + 'login', {
@@ -966,7 +1004,7 @@ export default {
                 }else{
                     this.noAutorizado()
                 }
-            } else{
+            } else{*/
                 this.isNota = false
                 this.bloquearInput=false
                 this.venta.NroComprobanteModifica = ''
@@ -993,7 +1031,7 @@ export default {
                 }
                 this.venta.tipoVenta = obj
                 this.getNumeroVenta()
-            }
+            //}
  
         },
         noAutorizado(){
@@ -1512,15 +1550,27 @@ export default {
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
-            .then((response) => {
-                console.log(response)
-                this.ultimaVentaCliente=''
-                this.$toasted.success('Venta realizada con exito')
-                this.ultimaVenta = response.data.insertId
-                this.limpiarDespuesVenta()
+            .then(async (response) => {
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
-                this.$refs.carrito.pagocon = 0
+                if(response.data.error){
+                    this.inProgress = false
+                    this.$toasted.show(response.data.msg, {duration: 5000})
+                    return;
+                }else{
+                    try {
+                    let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                    } catch (error) {
+                        
+                    }
+                    this.ultimaVentaCliente=''
+                    this.$toasted.success('Venta realizada con exito')
+                    this.ultimaVenta = response.data.insertId
+                    this.limpiarDespuesVenta()
+
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    this.$refs.carrito.pagocon = 0
+                }
+
             })
             .catch((error) => {
                 console.log(error)
