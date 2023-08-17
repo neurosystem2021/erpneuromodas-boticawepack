@@ -511,13 +511,13 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  + this.totalVentasTransferencia - this.totalSalidas
+      return this.totalVentasEfectivo - this.totalSalidas
     },
     totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia
+      return this.totalVentasEfectivo
     },
     totalSalidas () {
       let total = 0
