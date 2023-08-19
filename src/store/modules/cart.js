@@ -24,10 +24,11 @@ const mutations = {
       else{
         let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
 
-        productos[index].cantxPrecio = Number(productos[index].cantxPrecio) + 1
-        productos[index].cantidad = productos[index].cantxPrecio*item.cantidadPres
+        //productos[index].cantxPrecio = Number(productos[index].cantxPrecio) + 1
+        //productos[index].cantidad = productos[index].cantxPrecio*item.cantidadPres
         productos[index].precio = item.precio
-        productos[index].cantidadPres = item.cantidadPres
+        productos[index].nuevoPrecioContado = item.PrecioContado
+        //productos[index].cantidadPres = item.cantidadPres
 
         let prod = Object.assign({}, productos[index]);
         productos.splice(index, 1,prod)
@@ -202,6 +203,7 @@ const actions = {
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
+            obj.EsVentaNew = true
 
             let preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
             let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -213,6 +215,7 @@ const actions = {
             if(!isVentas){
               obj.precio = obj.PrecioCosto
               obj.nuevoPrecioContado = obj.PrecioContado || 0
+              console.log(obj.nuevoPrecioContado);
             }else{
               obj.nuevoPrecioContado = 0
             }

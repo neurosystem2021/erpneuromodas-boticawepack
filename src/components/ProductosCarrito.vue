@@ -31,7 +31,7 @@
         <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</b-form-text>
       </b-form-group>
 
-      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+      <!--<b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">PRESENTACIONES</h3>
           <h5>{{objProd.Producto}}</h5>
@@ -79,6 +79,59 @@
             </b-card>
           </b-col>
         </b-row>
+      </b-modal>-->
+
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
+          <h5>Precios Disponibles</h5>
+        </div>
+        <hr>
+        <b-row>
+          <b-col cols="6" v-if="false">
+            <b-card
+              align="center"
+              class="mb-3 contentCard"
+              @click="setProductoUni(objProd, precioCont)"
+            >
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">UNI</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>1
+                  <br>
+                  <b>Pre: </b>S/ {{ precioCont }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+
+          <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+            <b-card
+              v-if="d.cantidad != 0"
+              align="center"
+              class="mb-3 contentCard"
+              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
+              @click="() => {
+                if ( parseFloat(d.cantidad) ) {
+                  setProductoUni(objProd, d.precio)
+                }
+              }"
+            >
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>{{ d.cantidad }}
+                  <br>
+                  <b>Precio: </b>S/ {{ d.precio }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+        </b-row>
       </b-modal>
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
@@ -106,13 +159,15 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
-          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
-          <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
-            <div style="text-align:center">
-              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
-            </div>
-          </b-popover>
+          <div style="width: 75px;">
+            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+            <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+              <div style="text-align:center">
+                <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+              </div>
+            </b-popover>
+          </div>
         </template>
 
         <template slot="obsequio" slot-scope="data">
@@ -150,17 +205,17 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || esDelivery || true"
+            :disabled="bloquearInput?true:false"
             type="number"
             autocomplete="off"
-            style="width: 90px; font-weight:bold"
+            style="width: 100px; font-weight:bold"
             class="form-control"
             step="1"
             min="0"
             @input="(val) => {
-              changeCant(val.target.value,productos[data.index])
+              changeCant(val.target.value,productos[data.index],data.index)
               $emit('onInputCantidad', val.target.value)
-                if(!productos[data.index].PreciosPorProducto) {
+                /*if(!productos[data.index].PreciosPorProducto) {
                 return
                 }
               if(!precioHabilitado){
@@ -180,7 +235,7 @@
                 if(!cambio){
                   productos[data.index].precio = productos[data.index].PrecioContado
                 }
-              } 
+              } */
             }"
             placeholder="Cantidad"/>
         </template>
@@ -188,7 +243,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 90px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             class="form-control"
@@ -525,10 +580,10 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Anaquel' },
+          { key: 'ProductoModelo', label: 'Modelo/Color' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'eventPres', label: '' },
-          { key: 'cantxPrecio', variant: 'warning' },
+          //{ key: 'cantxPrecio', variant: 'warning' },
           // { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
@@ -824,7 +879,7 @@ export default {
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = true;
 
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+      /*this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       
       if (fPP.length==4) {
@@ -837,9 +892,29 @@ export default {
       this.indexProdSelect = null
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      this.objProd = obj*/
+
+      if (!this.isVentas) {
+        obj.PreciosPorProducto = ''
+        this.setProductoUni(obj)
+        return
+      }
+      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+      if(obj.precioConvenio){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+      }
+      if(obj.PrecioEspecial){
+       this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+      }
+      this.objProd = {}
       this.objProd = obj
+      if(this.preciosProd.length == 1){
+        this.setProductoUni(obj,obj.PrecioContado)
+      }else{
+        this.$refs['modalCant'].show()
+      }
     },  
-    setProductoUni (obj) {
+    setProductoUni (obj, precio = false) {
       this.objProd.cantxPrecio = 1
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
@@ -851,7 +926,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
+      obj = this.onSetProducto(obj,false,precio)
       obj.cantidadPres = obj.cantidad
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
@@ -898,12 +973,27 @@ export default {
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
-    showPresentacion (obj) {
-      if (!obj.PreciosPorProducto !== '') {
+    showPresentacion (obj, index) {
+      /*if (!obj.PreciosPorProducto !== '') {
         this.precioCont = obj.PrecioContado
         obj.estadoPxP = false
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.$refs['modalCant'].show()
+        return
+      }*/
+      if(this.isVentas){
+        this.preciosProd = []
+        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
+        if(obj.precioConvenio){
+        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+        }
+        if(obj.PrecioEspecial){
+        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+        }
+        obj.EsVentaNew = true;
+        this.objProd = obj
+        this.indexProdSelect = index
         this.$refs['modalCant'].show()
         return
       }

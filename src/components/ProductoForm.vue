@@ -324,11 +324,21 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio Convenio:</label>
+            <label>Precio Distribuidor:</label>
             <input v-model="producto.precioConvenio"
               type="number"
               step="0.0001"
               class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Especial:</label>
+            <input v-model="producto.PrecioEspecial"
+              type="number"
+              class="form-control"
+              step="0.001"
               />
           </b-form-group>
         </b-col>
@@ -546,6 +556,7 @@ export default {
         this.producto.PrecioCosto           = newVal.PrecioCosto
         this.producto.PrecioContado         = newVal.PrecioContado
         this.producto.precioConvenio        = newVal.precioConvenio
+        this.producto.PrecioEspecial        = newVal.PrecioEspecial
         this.producto.EsHabitacion          = newVal.EsHabitacion
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
@@ -559,7 +570,9 @@ export default {
         if (newVal.Anaqueles && newVal.Anaqueles != null && newVal.Anaqueles != 'null') {
           this.producto.anaqueles = JSON.parse(newVal.Anaqueles)
         }
+        this.$refs.file.value=null
         }).catch((error) => {
+            this.$refs.file.value=null
             console.log(error)
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
@@ -569,7 +582,7 @@ export default {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
-
+        this.$refs.file.value=null
         //this.$refs.inputCodigoBarra.$el.disabled = false
       }
       this.cargarAlmacenes()
@@ -722,6 +735,7 @@ export default {
         PrecioContado: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
+        PrecioEspecial:0,
         // Botapie: '',
         // Genero: '',
         categoria: {},

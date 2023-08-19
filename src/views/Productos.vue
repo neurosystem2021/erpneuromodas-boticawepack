@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container fluid class="ancho bv-example-row">
+      <b-container fluid class="ancho bv-example-row" style="width: calc(100% - 200px)">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -95,7 +95,7 @@ export default {
             { key: 'PorcentajeUtilidad', label: 'Porcentaje Utilidad', sortable: true },
             { key: 'PrecioCosto', label: 'Precio Compra', sortable: true },
             { key: 'PrecioContado', label: 'Precio Venta', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },
+            //{ key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,

@@ -36,7 +36,7 @@
                       </template>
 
                       <template slot="Total" slot-scope="data">
-                        S/ {{ data.item.Total | moneda }}
+                        {{ data.item.Total | moneda }}
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
@@ -172,6 +172,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 69% !important;
+    max-width: 88% !important;
 }
 </style>

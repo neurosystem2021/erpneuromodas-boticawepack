@@ -510,10 +510,12 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
+                    { key: 'ProductoModelo', label: 'Modelo' },
+                    { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Anaquel', label: 'Anaquel' },
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
+                    //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'cantidad' },
@@ -867,15 +869,15 @@ export default {
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
         },
-        onSetProducto (obj, cant, precio) {
-            if (cant && precio) {
+        onSetProducto (obj, cant,precio) {
+        if (cant) {
                 obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant && e.precio===precio)
+                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
                 obj.precio = preciosPorProducto.precio || 0
                 return obj
             }
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio || 0
             return obj
         },
         onAddProducto (obj) {
