@@ -736,7 +736,7 @@ export default {
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
-            if(obj.CodSunat=='12' || obj.TieneIgv==1){
+            /*if(obj.CodSunat=='12' || obj.TieneIgv==1){
                 let pass = window.prompt('Escriba su contraseña')
                 if ((''+pass).trim()!='') {
                     this.axios.post(this.API + 'login', {
@@ -780,7 +780,7 @@ export default {
                 }else{
                     this.noAutorizado()
                 }
-            } else{
+            } else{*/
                 this.isNota = false
                 this.bloquearInput=false
                 this.venta.NroComprobanteModifica = ''
@@ -807,12 +807,12 @@ export default {
                 }
                 this.venta.tipoVenta = obj
                 this.getNumeroVenta()
-            }
+            //}
  
         },
         noAutorizado(){
             this.venta.tipoVenta= {
-                IdTipoDoc: 7,
+                IdTipoDoc: 12,
                 TipoDoc: 'BOLETA/IGV ELEC.',
                 LimitItems: 0,
                 CodSunat: '03',
