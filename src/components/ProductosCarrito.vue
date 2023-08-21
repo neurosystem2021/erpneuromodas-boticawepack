@@ -210,7 +210,7 @@
             autocomplete="off"
             style="width: 100px; font-weight:bold"
             class="form-control"
-            step="1"
+            step="0.1"
             min="0"
             @input="(val) => {
               changeCant(val.target.value,productos[data.index],data.index)
