@@ -87,7 +87,7 @@
                                     <td>{{ item.FechaDoc }}</td>
                                     <td>{{ item.FechaCredito }}</td>
                                     <td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
-                                    <td v-else-if="item.IdTipoDoc==7">BOLETA ELEC.</td>
+                                    <td v-else-if="item.IdTipoDoc==7 || item.IdTipoDoc==12 ">BOLETA ELEC.</td>
                                     <td v-else>OTRO</td>
                                     <td>{{ item.Correlativo }}</td>
                                     <td>{{ (item.Total).toFixed(2) }}</td>

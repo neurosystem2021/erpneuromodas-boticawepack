@@ -66,7 +66,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="BOLETA/IGV ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -510,7 +510,7 @@ export default {
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
-            tieneIgv: false,
+            tieneIgv: true,
             venta: {},
             bloquearInput:false,
             ultimaVentaCliente:'',
@@ -694,8 +694,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 12,
+                    TipoDoc: 'BOLETA/IGV ELEC.',
                     LimitItems: 0,
                     CodSunat: '03',
 
@@ -730,7 +730,7 @@ export default {
 
             this.isNota = false
             this.bloquearInput = false 
-            this.tieneIgv = false
+            this.tieneIgv = true
             this.MontoConsumido = 0
             this.MontoTotal = 0
             //this.loadFirstAlmacen()
@@ -813,7 +813,7 @@ export default {
         noAutorizado(){
             this.venta.tipoVenta= {
                 IdTipoDoc: 7,
-                TipoDoc: 'BOLETA ELEC.',
+                TipoDoc: 'BOLETA/IGV ELEC.',
                 LimitItems: 0,
                 CodSunat: '03',
             }
@@ -825,7 +825,7 @@ export default {
             this.venta.ConsumoId = 0
             this.MontoConsumido = 0
             this.MontoTotal = 0
-            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
             this.getVendedor()
             this.$toasted.error('No autorizado')
 
@@ -1114,12 +1114,12 @@ export default {
         },
         limpiarDespuesVenta () {
             this.inProgress = false
-            this.tieneIgv = false
+            this.tieneIgv = true
             this.initForm()
             this.limpiarCart()
             this.getVendedor()
             this.loadClienteVarios()
-            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
            // this.$refs.inputAlmacen.setValue('VENTA')
             //this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
