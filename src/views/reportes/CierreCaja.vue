@@ -905,6 +905,12 @@ th {
 }
 .anulado td{
   /*font-style: italic;*/
+  background-color: #F2DEDE;
+  text-decoration: line-through;
+}
+.anulado td th{
+  /*font-style: italic;*/
+  background-color: #F2DEDE;
   text-decoration: line-through;
 }
 .credito {
