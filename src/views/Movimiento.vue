@@ -357,6 +357,12 @@ export default {
           return          
       }
 
+      if(this.movimiento.FechaStock == '') {
+          this.$toasted.show('Debe seleccionar una Fecha Stock')
+          this.inProgress = false            
+          return          
+      }
+
       let faltaLlenar = false
       this.productos.forEach((prod, index) => {
         if (prod.total <= 0) {
@@ -384,7 +390,7 @@ export default {
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
           this.$refs.inputMoneda.setValue('PEN')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })
