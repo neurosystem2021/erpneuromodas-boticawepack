@@ -340,7 +340,8 @@
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="2">
-      <slot name="adicional"></slot>
+      <!--<slot name="adicional"></slot>-->
+      <slot name="tipoVenta"></slot>
     </b-col>
     <b-col md="3">
           <table class="table b-table border table-footer">

@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
+    <div :class="{'fondo-empresa0': (this.empresa === 'canicruzfact'),'fondo-empresa1': (this.empresa === 'canicruzpre')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -9,11 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                            <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
-                            <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="canicruzfact">VENTA DE PRODUCTOS (FACTURACION)</option>
+                            <option value="canicruzpre">VENTA DE PREPARADOS (NOTAS DE VENTA)</option>
                         </select>
 
                     </b-button-group>
@@ -418,6 +415,27 @@
                                     </tbody>
                                 </table>
                             </template>
+                            <template slot="tipoVenta">
+                                <b-row class="m-1" v-if="this.empresa != 'canicruzfact'">
+                                    <b-col md="12" class="text-left">
+                                       <h6>Opción Comanda</h6>
+                                    </b-col>
+                                    <b-col md="12" class="text-left">
+                                        <b-form-radio-group id="radios1"
+                                            v-model="venta.selectOpcionVenta"
+                                            :options="opcionesVenta"
+                                            @change="(val) => {cambioOpcVenta(val)}"
+                                            name="radioOptions">
+                                        </b-form-radio-group>
+                                    </b-col>
+                                    <b-col md="12">
+                                        <b-form-group>
+                                            <label style="font-weight:bold">Nombre:</label>
+                                            <b-form-input style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese cliente" autocomplete="off" v-model="venta.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar"></b-form-input>
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                            </template>
                         </productos-carrito>
                     </b-col>
                 </b-row>
@@ -456,7 +474,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'modasjes');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'canicruzfact');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -466,10 +484,10 @@ export default {
     },
     async mounted () {
         // this.getNumeroVenta()
-        await this.getVendedor()
         if (sessionStorage.getItem('empresa')) {
             this.empresa = sessionStorage.getItem('empresa');
         }
+        await this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.escucharPedidos()
@@ -526,8 +544,12 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'modasjes',
-            rubroTexto: '---'
+            empresa: 'canicruzfact',
+            rubroTexto: '---',
+            opcionesVenta: [
+                { text: 'Normal', value: 0 },
+                { text: 'Para llevar', value: 1 },
+            ],
         }
     },
     watch: {
@@ -562,6 +584,10 @@ export default {
             add:'agregarProducto'
         }),
         //Nuevos metodos de venta
+        cambioOpcVenta(val){
+            console.log(val);
+            console.log("hola");
+        },
         habilitarPrecio(){
             this.$swal({
             title: 'Autorización de Administrador',
@@ -723,6 +749,7 @@ export default {
                 diasValidosProf: 0,
                 idProforma: 0,
                 anioNumeroProforma:'',
+                selectOpcionVenta: 0,
             }
             this.isNota = false
             this.bloquearInput=false
@@ -849,9 +876,27 @@ export default {
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
-            this.getNumeroVenta()
+            //this.getNumeroVenta()
         },
         getVendedor (user) {
+            if(this.empresa == 'canicruzpre'){
+                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                this.venta.tipoVenta = {
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
+                    LimitItems: 0,
+                    CodSunat: '12'
+                }
+            }else{
+                console.log("HOLA BOLETA");
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.venta.tipoVenta = {
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
+                    LimitItems: 0,
+                    CodSunat: '03'
+                }
+            }
             let usuario = sessionStorage.getItem('User')
             if (user) {
                 usuario = user
@@ -867,7 +912,7 @@ export default {
                 this.$refs.inputAlmacen.$refs.input.disabled = true
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
-                this.getTipoDoc(response.data.IdTipoDoc)
+                //this.getTipoDoc(response.data.IdTipoDoc)
             })
             .catch((error) => {
                 console.log(error)
@@ -876,7 +921,7 @@ export default {
         },
         setVendedor (obj) {
             // console.log(obj)
-            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+            //if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
             this.venta.vendedor = obj
         },
@@ -1070,6 +1115,7 @@ export default {
                 //this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '?empresa=' + this.empresa,'_blank');
@@ -1194,30 +1240,141 @@ export default {
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async(response) => {
-
-                // limpiar preorden seleccionado
-                this.$router.replace('/ventas')
                 this.$toasted.success('Venta realizada con exito')
+                if(this.empresa == 'canicruzfact'){
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
+                }else{
+                    try {
+                        this.venta.productos.map((pro)=>{
+                            delete pro.nuevoPrecioContado
+                            delete pro.disabledProf
+                            delete pro.normalPrecioContado
+                            delete pro.Anulado
+                            delete pro.Botapie
+                            delete pro.Codigo
+                            delete pro.CodigoBarra
+                            delete pro.Color
+                            delete pro.ControlaStock
+                            delete pro.Dosis
+                            delete pro.EsPadre
+                            delete pro.FechaMod
+                            delete pro.FechaReg
+                            delete pro.Genero
+                            delete pro.Hash
+                            delete pro.IdBloque
+                            delete pro.IdProducto
+                            delete pro.IdProductoCategoria
+                            delete pro.IdProductoFormaFarmaceutica
+                            delete pro.IdProductoMarca
+                            delete pro.IdProductoMedicion
+                            delete pro.IdProductoTalla
+                            delete pro.PorcentajeUtilidad
+                            delete pro.PrecioContado
+                            delete pro.PrecioCosto
+                            delete pro.PrecioPorMayor
+                            delete pro.ProductoCategoria
+                            delete pro.ProductoDesc
+                            delete pro.ProductoDescCorto
+                            delete pro.ProductoMarca
+                            delete pro.ProductoMedicion
+                            delete pro.ProductoModelo
+                            delete pro.ProductoTalla
+                            delete pro.StockMinimo
+                            delete pro.StockPorMayor
+                            delete pro.UsuarioMod
+                            delete pro.UsuarioReg
+                            delete pro.VentaEstrategica
+                            delete pro.stock
+                            delete pro.ProductoDesc2
+                            delete pro.ProductoDesc3
+                            delete pro.PrecioEspecial
+                            delete pro.ProductoPresentacion
+                            delete pro.precioConvenio
+                            delete pro.EsHabitacion
+                            delete pro.Piso
+                            delete pro.EstadoHabitacion
+                            delete pro.IdPreOrden
+                            delete pro.IdClienteReserva
+                            delete pro.FechaReserva
+                            delete pro.FechaAlquiler
+                            delete pro.Vuelo
+                            delete pro.FechaAlquilerFin
+                            delete pro.EstaSucio
+                            delete pro.PreciosPorProducto
+                            delete pro.Imagen
+                            delete pro.Anaquel
+                            delete pro.StockIngresoUnd
+                            delete pro.StockSalidaUnd
+                            delete pro.StockSalidaVentaUnd
+                            delete pro.StockSalidaVentaCaja
+                            delete pro.cantxPrecio
+                            delete pro.cantidadPres 
+                            delete pro.subtotal
+                            delete pro.total 
+                            delete pro.hashMovimiento
+                            delete pro.stockMovimiento
+                            delete pro.SerieNumero
+                            delete pro.fechaVenMovimiento
+
+                        });
+                        delete this.venta.cliente.Anulado
+                        delete this.venta.cliente.FechaReg
+                        delete this.venta.cliente.UsuarioReg
+                        delete this.venta.cliente.FechaMod
+                        delete this.venta.cliente.UsuarioMod
+                        delete this.venta.cliente.FechaNacimiento
+                        delete this.venta.cliente.Nacionalidad
+                        delete this.venta.cliente.Direccion3
+                        delete this.venta.cliente.Telefono
+                        delete this.venta.cliente.Email
+                        delete this.venta.cliente.Puntos
+                        delete this.venta.cliente.EsVIP
+                        delete this.venta.cliente.Direccion2
+                        delete this.venta.cliente.Sexo
+                        delete this.venta.cliente.Ocupacion
+                        delete this.venta.cliente.NombreComercial
+                        delete this.venta.cliente.esComisionista
+                        delete this.venta.idProductos
+                        delete this.venta.vendedor.APPTOKEN
+                        delete this.venta.vendedor.APPURL
+                        delete this.venta.vendedor.Anulado
+                        delete this.venta.vendedor.FechaReg
+                        delete this.venta.vendedor.UsuarioReg
+                        delete this.venta.vendedor.FechaMod
+                        delete this.venta.vendedor.UsuarioMod
+                        delete this.venta.vendedor.Password
+                        delete this.venta.puntoVenta
+                        delete this.venta.almacen
+                        let dataInfoDocVenta = {
+                            Serie:  response.data.serie,
+                            Numero: response.data.numero,
+                            Fecha: response.data.fecha,
+                        }
+                        this.venta.dataInfoDocVenta = dataInfoDocVenta
+                        let ventaJson= JSON.stringify(this.venta)
+                        var left = (screen.width/2)-(800/2)
+                        var top = (screen.height/2)-(800/2)
+                        let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top='+top+', left='+left
+                        window.open('http://localhost:5000/imprimir/getcmd.php?venta='+encodeURIComponent(ventaJson), "Impresión", params)
+                    
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+
+                this.$router.replace('/ventas')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
                 this.initForm()
                 this.limpiarCart()
-                //await this.loadFirstAlmacen()
-                //await this.loadFirstPuntoVenta()
                 this.getVendedor()
-                //this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                //this.$refs.inputAlmacen.setValue('VENTA')
-                //this.$refs.inputPuntoVenta.setValue('CAJA1')
+                
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
-                //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 this.$refs.carrito.loadCode = ''
-                //this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)

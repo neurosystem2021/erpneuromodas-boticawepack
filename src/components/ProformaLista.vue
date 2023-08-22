@@ -12,11 +12,8 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                            <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
-                            <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="canicruzfact">VENTA DE PRODUCTOS (FACTURACION)</option>
+                            <option value="canicruzpre">VENTA DE PREPARADOS (NOTAS DE VENTA)</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
@@ -97,7 +94,7 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
-                empresaselec: sessionStorage.getItem('empresa') || 'modasjes'
+                empresaselec: sessionStorage.getItem('empresa') || 'canicruzfact'
             }
         },
         props: ['idAlmacen','empresa'],
