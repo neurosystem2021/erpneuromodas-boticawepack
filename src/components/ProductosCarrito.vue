@@ -11,7 +11,7 @@
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
-            :on-select="abrirCalcularM2"
+            :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>

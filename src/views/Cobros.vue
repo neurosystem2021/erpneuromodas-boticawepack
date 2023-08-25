@@ -128,7 +128,7 @@
         <br />
         <br />
         
-      <b-modal size="lg" ref="modalCobrar" hide-footer :title="'COBRAR VENTA: '+titulo">
+      <b-modal size="lg" ref="modalCobrar" id="modalCobrar" hide-footer :title="'COBRAR VENTA: '+titulo">
         <b-row>
           <b-col md="6">
             <table>
@@ -176,6 +176,17 @@
           </b-col>
         </b-row>
         <hr>
+        <b-row>
+          <b-col>
+            <h6>Información:</h6>
+            <textarea 
+            class="form-control"
+            placeholder="Información adicional de método de pago"
+            cols="12" rows="2"
+            v-model="infoCobro"></textarea>
+          </b-col>
+        </b-row>
+        <hr v-if="productoSelect.PorEntregar==1">
         <b-row v-if="productoSelect.PorEntregar==1">
           <b-col>
             <h5>OBS:</h5>
@@ -205,17 +216,17 @@
           <tfoot>
             <tr>
               <td colspan="3"></td>
-              <td><b>SUBTOTAL</b></td>
+              <td class="text-center"><b>SUBTOTAL</b></td>
               <td class="table-primary" style="vertical-align: middle !important;">S/ {{productoSelect.SubTotal | moneda}} </td>
             </tr>
             <tr v-if="productoSelect.DescuentoTotal>0">
               <td colspan="3"></td>
-              <td><b>DESCUENTO</b></td>
+              <td class="text-center"><b>DESCUENTO</b></td>
               <td class="table-danger" style="vertical-align: middle !important;">- S/ {{productoSelect.DescuentoTotal | moneda}} </td>
             </tr>
             <tr>
               <td colspan="3"></td>
-              <td><b>TOTAL</b></td>
+              <td class="text-center"><b>TOTAL</b></td>
               <td class="table-success" style="vertical-align: middle !important;">S/ {{productoSelect.Total | moneda}} </td>
             </tr>
           </tfoot>
@@ -263,7 +274,8 @@ export default {
       titulo: '',
       inProgress: false,
       vendedor: {},
-      almacen:{}
+      almacen:{},
+      infoCobro:'',
     }
   },
   methods: {
@@ -306,6 +318,7 @@ export default {
         .then((response) => {
           if(response.data){
             if(response.data.Pagado==0){
+              this.infoCobro = ''
               this.productoSelect = response.data
               this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
               this.$refs.modalCobrar.show()
@@ -429,7 +442,7 @@ export default {
         }).then((result) => {
             if (result.isConfirmed) {
               this.inProgress = true
-              this.axios.post(this.API + 'venta/cobrar', {IdDocVenta: idDocVenta, Usuario: sessionStorage.getItem('User') || 'xx'})
+              this.axios.post(this.API + 'venta/cobrar', {IdDocVenta: idDocVenta, Usuario: sessionStorage.getItem('User') || 'xx', Info: this.infoCobro})
               .then((response) => {
                 if(response.data){
                   this.$swal({
@@ -490,5 +503,8 @@ export default {
 }
 .centrar{
 vertical-align: middle !important;
+}
+#modalCobrar .modal-dialog {
+  max-width: 75% !important;
 }
 </style>

@@ -216,8 +216,8 @@
               Controla Stock
             </b-form-checkbox>
           </b-form-group>
-          <hr>
-          <b-form-group>
+          <hr v-if="false">
+          <b-form-group v-if="false">
             <b-form-checkbox
                    v-model="producto.EsCaja"
                    :value="1"
@@ -270,7 +270,7 @@
       </b-row>
 
       <hr/>
-      <b-row class="rendimiento">
+      <b-row class="rendimiento" v-if="false">
         <b-col md="4">
           <b-form-group>
             <label>Rendimiento (M²):</label>
@@ -371,40 +371,44 @@
       <hr>
       <b-row v-if="false">
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
+          <b-card :header="'Presentacion '+i" class="text-center">
             <b-form-group>
               <b-form-input
                 v-model="producto.precios[i-1].nombre"
-                :disabled="(idPerfil == 1) ? false : true"
                 type="text"
-                style="text-transform:uppercase"
+                style="text-transform:uppercase; font-weight: bold;"
                 @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
                 ></b-form-input>
             </b-form-group>
 
-            <b-form-group>
+            <b-form-group class="text-left">
               <label>Cantidad:</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
-                :disabled="(idPerfil == 1) ? false : true"
                 type="number"
                 class="form-control"
                 step="0.01"
                 />
             </b-form-group>
             
-            <b-form-group>
-              <label>Precio:</label>
+            <b-form-group class="text-left">
+              <label>Precio Costo:</label>
               <input 
-                v-model="producto.precios[i-1].precio"
-                :disabled="(idPerfil == 1) ? false : true"
+                v-model="producto.precios[i-1].precioc"
                 type="number"
                 class="form-control"
                 step="0.00001"
                 />
             </b-form-group>
-            <b-form-group>
-              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear }}</label>
+
+            <b-form-group class="text-left">
+              <label>Precio Venta:</label>
+              <input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
             </b-form-group>
           </b-card>
         </b-col>
@@ -577,6 +581,13 @@ export default {
         this.producto.EsCaja                = newVal.EsCaja
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }else{
+          this.producto.precios = [
+            {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+            {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
+          ]
         }
         }).catch((error) => {
             console.log(error)
@@ -749,10 +760,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          {nombre: 'PRECIO 1', cantidad: 0, precio: 0},
-          {nombre: 'PRECIO 2', cantidad: 0, precio: 0},
-          {nombre: 'PRECIO 3', cantidad: 0, precio: 0},
-          {nombre: 'OFERTA', cantidad: 0, precio: 0}
+          {nombre: 'NOMBRE 1', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 2', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 3', cantidad: 0, precioc: 0, precio: 0},
+          {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
         ]
       }
     },

@@ -4,7 +4,7 @@
 
         <Menu v-if="false"></Menu>
 
-        <b-container fluid class="ancho"  id="conten">
+        <b-container fluid class="ancho"  id="conten" style="width: calc(100% - 200px)">
             <div>
                 <div class="float-right">
                     <!--<b-button-group size="sm" class="ocularMovil">
@@ -322,7 +322,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                <b-input-group prepend="Validez Proforma:" append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
