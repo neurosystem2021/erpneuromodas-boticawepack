@@ -1093,7 +1093,7 @@ export default {
                 }
             });
 
-            if (menosUtilidad>=1) {
+            if (menosUtilidad>=1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto con utilidad negativa');
                 this.inProgress = false            
                 return;
