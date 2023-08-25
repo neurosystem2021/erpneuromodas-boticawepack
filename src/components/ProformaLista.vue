@@ -94,7 +94,7 @@ import { mapActions } from 'vuex'
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
-                empresaselec: sessionStorage.getItem('empresa') || 'hoqui'
+                empresaselec: sessionStorage.getItem('empresa') || 'titi'
             }
         },
         props: ['idAlmacen','empresa'],
