@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
+    <div :class="{'fondo-empresa0': (this.empresa === 'hoqui'),'fondo-empresa1': (this.empresa === 'titi')}">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -9,11 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                            <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
-                            <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="hoqui">EMPRESA HOQUI</option>
+                            <option value="titi">EMPRESA TITI</option>
                         </select>
 
                     </b-button-group>
@@ -456,7 +453,7 @@ export default {
             
             var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
             newUrl = new URL(newUrl);
-            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'modasjes');
+            newUrl.searchParams.append('empresa', sessionStorage.getItem('empresa') || 'hoqui');
             url = newUrl.toString();
             arguments[1] = url
             
@@ -526,7 +523,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            empresa: 'modasjes',
+            empresa: 'hoqui',
             rubroTexto: '---'
         }
     },

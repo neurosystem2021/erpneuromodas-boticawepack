@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
+  <div :class="{'fondo-empresa0': (this.empresa === 'hoqui'),'fondo-empresa1': (this.empresa === 'titi')}">
     <br>
     <b-container class="bv-example-row">
       <div>
@@ -7,11 +7,8 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                          <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
-                          <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
-                          <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
-                          <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
-                          <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
+                          <option value="hoqui">EMPRESA HOQUI</option>
+                          <option value="titi">EMPRESA TITI</option>
                       </select>
                   </b-button-group>
               </div>
@@ -429,31 +426,10 @@ import CierresCaja from '@/components/CierresCaja.vue'
 
 export default {
   beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'modasjes';
+    let empresa = sessionStorage.getItem('empresa') || 'hoqui';
 
-    switch (this.$route.query.empresa) {
-      case 'modasm':{
-        empresa = 'modasm';
-        break;
-      }
-        
-      case 'modasgio':{
-        empresa = 'modasgio';
-        break;
-      } 
-      
-      case 'modasjun':{
-        empresa = 'modasjun';
-        break;
-      }
-
-      case 'modaspau':{
-        empresa = 'modaspau';
-        break;
-      }
-    
-      default:
-        break;
+    if (this.$route.query.empresa === 'titi') {
+      empresa = 'titi';
     }
     
     // Interceptos XMLHttpRequest
@@ -498,7 +474,7 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'modasjes',
+      empresa: 'hoqui',
       cargaCorrecta: false,
     }
   },
