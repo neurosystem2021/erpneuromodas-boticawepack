@@ -230,6 +230,15 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.EsServicio"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Es Servicio
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Stock Minimo:</label>
             <input   
               required="required"
@@ -495,6 +504,7 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.PrecioConvenio = newVal.PrecioConvenio
         this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
+        this.producto.EsServicio = newVal.EsServicio
         this.producto.Imagen = newVal.Imagen
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
         if (newVal.PreciosPorProducto) {
@@ -620,6 +630,7 @@ export default {
         PorcentajeLiquidacion: 0,
         PrecioCosto: 0,
         ControlaStockMinimo:0,
+        EsServicio: 0,
         categoria: {},
         marca: {},
         Imagen: null,

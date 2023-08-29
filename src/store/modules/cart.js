@@ -93,12 +93,14 @@ const actions = {
     let setSuma = false
     let setPrecioCosto = false
     let esId = false
+    let setDescripcion = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
       esId = obje.esId
+      setDescripcion = obje.setDescripcion
     }
 
     if(typeof producto === 'object') {
@@ -134,6 +136,12 @@ const actions = {
 
           if (setSuma) {
             obj.setSuma = true
+          }
+
+          if (setDescripcion) {
+            obj.DescripcionC = setDescripcion
+          }else{
+            obj.DescripcionC = ''
           }
 
           obj.CantidadPresentacion = 1

@@ -180,6 +180,12 @@
 
         <template slot="eventPresent" slot-scope="data">
           <b-button style="margin-top: 2px;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <div style="text-align:center">
+              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+            </div>
+          </b-popover>
         </template>
 
         <template slot="cantidad" slot-scope="data">
@@ -187,7 +193,7 @@
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 110px"
+            style="width: 100px"
             step="0.01"
             min="0"
             @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index, productos[data.index]);
@@ -249,6 +255,15 @@
             autocomplete="false"
             readonly
             ></b-form-input>
+        </template>
+        <template slot="DescripcionC" slot-scope="data">
+          <textarea
+            :disabled="bloquearInput?true:false"
+            class="form-control"
+            placeholder="Descripción"
+            cols="16" rows="3"
+            style="text-transform: uppercase;"
+            v-model="productos[data.index].DescripcionC"></textarea>
         </template>
         <template slot="precioVenta" slot-scope="data">
           <input
@@ -646,6 +661,7 @@ export default {
     setProductoUni (obj) {
       obj.precio = 0
       obj.cantidad = 0
+      obj.DescripcionC = ''
       obj.itemNum = this.productos.length+1;
       obj.Presentacion = obj.ProductoMedicion
       obj.CantidadPresentacion = 1
@@ -668,6 +684,7 @@ export default {
       let obj = {...this.objProd}
       obj.Presentacion = prod.nombre
       obj.CantidadPresentacion = prod.cantidad
+      obj.DescripcionC = ''
       obj.precio = 0
       obj.cantidad = 1
       obj.EsPresentacion = 1

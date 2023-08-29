@@ -386,7 +386,8 @@ export default {
                     { key: 'itemNum', label: '#', class:'text-center thclass' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
-                    { key: 'eventPres', label: 'Img' },
+                    { key: 'DescripcionC', label: 'Descripcion' },
+                    //{ key: 'eventPres', label: 'Img' },
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
@@ -866,6 +867,7 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+                pro.DescripcionC = (''+pro.DescripcionC).trim().toUpperCase()
             });
 
             if(totalCero >= 1) {
@@ -972,7 +974,7 @@ export default {
 @media only screen and (min-width: 560px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 250px) !important;
+        width: calc(100% - 200px) !important;
     }
 }
 @media only screen and (max-width: 750px) {
