@@ -28,7 +28,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</b-form-text>
+        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Dimensiones)</b-form-text>
       </b-form-group>
 
       <!--<b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -580,7 +580,7 @@ export default {
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' },
+          { key: 'ProductoModelo', label: 'Dimensiones' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'eventPres', label: '' },
           //{ key: 'cantxPrecio', variant: 'warning' },

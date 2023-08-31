@@ -145,7 +145,7 @@
               </b-col>-->
               <b-col md="2">
                 <b-form-group>
-                  <label>Modelo/Color:</label>
+                  <label>Dimensiones:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
                     ref="inputModelo"
@@ -436,7 +436,7 @@ export default {
             { key: 'ImagenProducto', label:'Img.'},
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo/Color', sortable: true },
+            { key: 'ProductoModelo', label: 'Dimensiones', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,

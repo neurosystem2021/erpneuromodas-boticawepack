@@ -2,14 +2,14 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/logop.png" style="height: 70px;">
+				<img src="/resources/images/banner-proforma.jpg">
 			</div>
-			<div id="company">
+			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
 				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
 				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>
+			</div>-->
 		</header>
 		<main>
       <div id="details" class="clearfix">
@@ -86,11 +86,11 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:1.2rem">{{ prod.Producto }}</h3></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:1.2rem">{{ prod.ProductoMarca }}</h3></td>
-            <td class="qty" style="font-size:1.3rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.3rem">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:1.3rem">
+            <td class="desc" style="font-size:0.95rem"><h3 style="color:black; font-size:0.95rem">{{ prod.Producto }}</h3></td>
+            <td class="desc" style="font-size:0.95rem"><h3 style="color:black; font-size:0.95rem">{{ prod.ProductoMarca }}</h3></td>
+            <td class="qty" style="font-size:0.95rem">{{ prod.Cantidad }}</td>
+            <td class="unit" style="font-size:0.95rem">S/. {{ prod.Precio | moneda }}</td>
+            <td class="total" style="font-size:0.95rem">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -111,8 +111,8 @@
           </tr>-->
           <tr>
             <td colspan="4"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#28cbe4">TOTAL</td>
+            <td style="background:#28cbe4">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -131,9 +131,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid #28cbe4; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #28cbe4; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>

@@ -510,7 +510,7 @@ export default {
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
-                    { key: 'ProductoModelo', label: 'Modelo' },
+                    { key: 'ProductoModelo', label: 'Dimensiones' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Anaquel', label: 'Anaquel' },
                     { key: 'Descripcion', label: 'Descripción'},
