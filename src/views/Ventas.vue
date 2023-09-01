@@ -506,6 +506,7 @@ export default {
             carrito: {
                 fields: [
                     //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+                    { key: 'itemNum', label: '#', class:'text-center thclass' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label:'Codigo' },
                     { key: 'VentaEstrategica', label: '' },
@@ -513,7 +514,7 @@ export default {
                     { key: 'ProductoModelo', label: 'Modelo' },
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'Anaquel', label: 'Anaquel' },
-                    { key: 'Descripcion', label: 'Descripción'},
+                    //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     //{ key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -1304,7 +1305,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 350px)
     }
 }
 @media only screen and (max-width: 750px) {
@@ -1320,7 +1321,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 200px)
+        width: calc(100% - 250px)
     }
 }
 </style>

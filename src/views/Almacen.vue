@@ -579,7 +579,7 @@ export default {
     setAlmacen (obj) {
       console.log(obj)
       this.almacen = obj
-      this.limpiarFiltros()
+      //this.limpiarFiltros()
       console.log(this.filter)
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },

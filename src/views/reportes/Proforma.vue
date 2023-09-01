@@ -86,11 +86,11 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:1.2rem">{{ prod.Producto }}</h3></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:1.2rem">{{ prod.ProductoMarca }}</h3></td>
-            <td class="qty" style="font-size:1.3rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.3rem">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:1.3rem">
+            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:0.95rem">{{ prod.Producto }}</h3></td>
+            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:0.95rem">{{ prod.ProductoMarca }}</h3></td>
+            <td class="qty" style="font-size:0.95rem">{{ prod.Cantidad }}</td>
+            <td class="unit" style="font-size:0.95rem">S/. {{ prod.Precio | moneda }}</td>
+            <td class="total" style="font-size:0.95rem">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>

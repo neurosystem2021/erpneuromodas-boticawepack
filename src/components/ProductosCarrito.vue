@@ -188,6 +188,12 @@
           </div>
         </template>
 
+        <template slot="itemNum" slot-scope="data">
+          <div>
+          {{  (data.index+1) }}
+          </div>
+        </template>
+
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <input
             v-model="productos[data.index].cantxPrecio"
@@ -574,11 +580,12 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'itemNum', label: '#', class:'text-center thclass' },
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          { key: 'Descripcion', label: 'Descripción'},
+          //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
@@ -1252,5 +1259,8 @@ export default {
       height: 80vh;
       width: auto;
     }
+  }
+  #modalCantidad .modal-dialog {
+      max-width: 40% !important;
   }
 </style>
