@@ -27,8 +27,8 @@
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
-          <b-badge variant="danger">Productos Vencidos</b-badge>
-          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
+          <!--<b-badge variant="danger">Productos Vencidos</b-badge>-->
+          <b-badge variant="primary">En descripción del producto solo indicar datos relevantes (Modelo, Chasis, Motor, Carroceria, Etc)</b-badge>
       </b-form-group>
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
@@ -83,6 +83,11 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
+        <template slot="itemNum" slot-scope="data">
+          <div>
+          {{  (data.index+1) }}
+          </div>
+        </template>
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
@@ -104,6 +109,7 @@
             type="number"
             min="0"
             step="0.01"
+            style="width: 95px;"
             :value="0"></b-form-input>
             <b-form-text>
             </b-form-text>
@@ -114,6 +120,7 @@
             v-model="productos[data.index].Descripcion"
              @input="(val) => productos[data.index].Descripcion = val && val.toUpperCase()"
             :disabled="bloquearInput?true:false"
+            style="width: 260px ;"
             placeholder="Descripción" />
         </template>   
 
@@ -226,10 +233,11 @@ export default {
     fields: {
       default () {
         return [
+          { key: 'itemNum', label: '#', class:'text-center thclass' },
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoMedicion', label: 'Medicion' },
+          { key: 'ProductoMedicion', label: 'Med.' },
           { key: 'cantidad' },
           { key: 'precio', label: 'P/U' },
           { key: 'subtotal', label: 'SubTotal', variant: 'success' },

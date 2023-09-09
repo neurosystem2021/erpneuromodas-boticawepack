@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid style="width: calc(90%);" class="bv-example-row">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -178,6 +178,18 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-2" style="margin-top: -18px;">
+                    <b-col md="7">
+                        <label>Observación:</label>
+                        <b-form-textarea
+                        v-model="venta.Observacion"
+                        @input="(val) => venta.Observacion = val && val.toUpperCase()"
+                        :disabled="bloquearInput?true:false"
+                        style="width: 100% ;"
+                        rows="2"
+                        placeholder="Detalle información de descuentos, regalos, trámites a ofrecer en el comprobante." />
                     </b-col>
                 </b-row>
                 <b-row>
@@ -394,6 +406,7 @@ export default {
             ],
             carrito: {
                 fields: [
+                    { key: 'itemNum', label: '#', class:'text-center thclass' },
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'CodigoBarra', label: 'Código' },
                     { key: 'Producto' },
@@ -488,7 +501,8 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
-                diasValidosProf: 0      
+                diasValidosProf: 0,
+                Observacion: '',
             }
 
             this.isNota = false
@@ -830,10 +844,11 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Observacion = (''+this.venta.Observacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.ultimaVenta = response.data.insertId
                 this.limpiarDespuesVenta()
                 this.$refs.carrito.pagocon = 0
