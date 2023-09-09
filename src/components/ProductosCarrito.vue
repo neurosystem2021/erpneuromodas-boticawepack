@@ -139,7 +139,7 @@
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
         </div>
         <b-row style="display:flex; justify-content:center; align-items:center">
-          <b-img :src="productoUrl" class="imagenGrande"></b-img>
+          <b-img :src="productoUrl" class="imagenGrande" @error="setAltImg"></b-img>
         </b-row>
       </b-modal>
 
@@ -157,9 +157,9 @@
         </div>
       </b-modal>
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" id="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <div style="width: 75px;">
+          <div v-bind:class="{ ventasAnchoImg: isVentas }">
             <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
             <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
             <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
@@ -258,7 +258,7 @@
             />
         </template>
         <template slot="subtotal" slot-scope="data">
-          <div v-if="isVentas">
+          <div v-if="true" class="text-center">
             {{ getSubtotal(data.index) }}
           </div>
           <div v-else>
@@ -324,6 +324,41 @@
             </b-form-text>
         </template>
 
+        <template slot="extra" slot-scope="data" >
+          <div style="width: 270px;" v-if="productos[data.index].EsVehiculo">
+            <div v-if="(tipoMov==1 || tipoMov==2)">
+              <b-form-select v-if="!isNota"
+                style="width: 155px;"
+                :disabled="bloquearInput?true:false"
+                @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
+              </b-form-select>
+            </div>
+            <div v-else>
+              <b-input-group size="sm" prepend="Chasis" style="font-weight: bold;">
+                <b-form-input
+                v-model="productos[data.index].Chasis"
+                type="text"
+                required
+                style="text-transform: uppercase;"
+                autocomplete="off"
+                ></b-form-input>  
+              </b-input-group>
+              <b-input-group size="sm" prepend="Motor" class="mt-1" style="font-weight: bold;">
+                <b-form-input
+                v-model="productos[data.index].Motor"
+                type="text"
+                required
+                style="text-transform: uppercase;"
+                autocomplete="off"
+                ></b-form-input>
+              </b-input-group>
+            </div>
+          </div>
+          <div v-else>
+          </div>
+        </template>
+
         <template slot="utilidad" slot-scope="data">
           <input 
             :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
@@ -373,9 +408,9 @@
           <textarea 
             :disabled="bloquearInput?true:false"
             class="form-control"
-            placeholder="Descripción"
-            cols="9" rows="1"
-            style="width: 150px"
+            placeholder=""
+            cols="9" rows="2"
+            style="width: 150px; text-transform: uppercase; font-size:0.8rem;"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -534,7 +569,8 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoNombre:'',
       productoUrl:'',
-      modalAbiertCode: false
+      modalAbiertCode: false,
+      movimientoLotes: {},
     }
   },
   created() {
@@ -565,6 +601,8 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
+    almacenDestino:Number,
+    almacenOrigen:Number,
     bloquearInput:Boolean,
     esDelivery:Boolean,
     onSetProducto: {
@@ -580,15 +618,14 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'itemNum', label: '#', class:'text-center thclass' },
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'CodigoBarra', label: 'Código'},
+          //{ key: 'itemNum', label: '#', class:'text-center thclass' },
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center thclass' },
+          // { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
-          //{ key: 'Descripcion', label: 'Descripción'},
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' },
-          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+          //{ key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoModelo', label: 'Modelo' },
+          //{ key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'eventPres', label: '' },
           //{ key: 'cantxPrecio', variant: 'warning' },
           // { key: 'ProductoMedicion', label: 'Medición' },
@@ -598,8 +635,10 @@ export default {
           { key: 'igv', label: 'IGV' },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
+          { key: 'precioVenta', label: 'P. Venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
+          { key: 'Descripcion', label: 'Descripcion'},
+          { key: 'extra', label: 'Chasis / Motor', variant: 'secondary' },
           { key: 'acciones', label: ''}
         ]
       },
@@ -672,6 +711,98 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    changeMovimiento(hash, idProducto, index) {
+      if  (hash) {
+        // Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
+        let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
+        let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
+        if (stock) {
+          // this.productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', stock)
+            Vue.set(this.productos[index], 'SerieNumero', serieNumero)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'stockMovimiento', 0)
+            Vue.set(this.productos[index], 'SerieNumero', '----')
+          })
+        }
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
+        let hoy      = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en4meses  = this.$moment().add(4,'months').unix();
+        let style = 'bg-success'
+        if(fechaVenUnix && fechaVenUnix < hoy) {
+          style = 'bg-danger text-white'
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
+          style = 'bg-warning'
+        }
+        if (fechaVen) {
+          this.$nextTick(() => {
+            if(!this.isVentas){
+              if(this.movTipo!=0 &&  this.movTipo!=undefined ){
+               this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+               this.productos[index].IdLote = IdLote 
+               this.productos[index].Lote = Lote 
+                //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
+                //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
+              }
+            }else{
+                 this.productos[index].Lote = Lote 
+                 try {
+                  this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
+                 } catch (error) {
+                  
+                 }
+              }
+             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
+          })
+        } else {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], 'fechaVenMovimiento', '')
+          })
+        }
+          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+    loadMovimientoLotes ($idProducto) {
+      this.movimientoLotes[$idProducto]=[]
+      console.log(this.tipoMov);
+      console.log(this.almacenDestino,this.almacenOrigen);
+      this.axios.get(this.API + 'movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
+        .then((response) => {
+          if(response.data.length > 0){
+            let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a,b) => {
+              return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
+            })
+            
+            this.$nextTick(() => {
+              Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
+              this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
+            })
+            
+            this.movimientoLotes[$idProducto] = response.data.map(l => ({
+              value: l.hashMovimiento,
+              text : l.Lote,
+              Stock : l.Stock,
+              IdLote: l.IdLote,
+              Lote: l.Lote,
+              FechaVen: l.FechaVen,
+              SerieNumero: l.Serie + '-' + l.Numero
+            }))
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     obtenerAnaquel(data){
       if(data.Anaqueles && data.Anaqueles!='null' && this.idAlmacen>0){
         let obj = JSON.parse(data.Anaqueles)
@@ -882,6 +1013,8 @@ export default {
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
+      obj.Chasis = ''
+      obj.Motor = ''
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = true;
@@ -932,12 +1065,15 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
+      obj.Chasis = ''
+      obj.Motor = ''
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj,false,precio)
       obj.cantidadPres = obj.cantidad
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
+        this.loadMovimientoLotes(obj.IdProducto)
         //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
       this.loadCode=''
@@ -1262,5 +1398,18 @@ export default {
   }
   #modalCantidad .modal-dialog {
       max-width: 40% !important;
+  }
+  .ventasAnchoImg {
+    width: 75px;
+  }
+  td.thclass {
+    vertical-align: middle !important;
+  }
+
+  #tablaCarrito td {
+    vertical-align: middle !important;
+  }
+  #tablaCarrito .input-group-text {
+    font-weight: bold;
   }
 </style>

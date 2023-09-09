@@ -132,7 +132,7 @@
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group  v-show="false">
             <label>1ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
@@ -180,7 +180,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
@@ -211,14 +211,23 @@
           <hr>
           <b-form-group>
             <b-form-checkbox
+                   v-model="producto.EsVehiculo"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Vehículo
+            </b-form-checkbox>
+          </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
                    v-model="producto.VentaEstrategica"
                    :value="1"
                    :unchecked-value="0">
               Producto con Venta Estrategica
             </b-form-checkbox>
           </b-form-group>
-          <hr>
-          <b-form-group>
+          <hr v-show="producto.EsVehiculo==0">
+          <b-form-group v-show="producto.EsVehiculo==0">
             <b-form-checkbox
                    v-model="producto.ControlaStock"
                    :value="1"
@@ -278,8 +287,8 @@
           
         </b-col>
       </b-row>
-      <label>Anaquel - Almacen</label>
-      <b-row>
+      <label v-if="false">Anaquel - Almacen</label>
+      <b-row v-if="false">
           <b-col md="6" v-for="(an, index) in producto.anaqueles" :key="index" class="mb-4" v-show="(index+1)<almacenes.length">
             <b-form-select v-model="an.id" :options="almacenes" size="md"/>
             <autocomplete
@@ -564,6 +573,7 @@ export default {
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.VentaEstrategica      = newVal.VentaEstrategica
         this.producto.TienePresentacion     = newVal.TienePresentacion
+        this.producto.EsVehiculo            = newVal.EsVehiculo
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -742,6 +752,7 @@ export default {
         marca: {},
         IdOfertaCategoria: null,
         VentaEstrategica: 0,
+        EsVehiculo: 0,
         // modelo: {},
         //talla: {},
         medicion: {
@@ -772,6 +783,10 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      if(this.producto.EsVehiculo == 1){
+        this.producto.ControlaStock = 1
+      }
 
       if(this.$refs.productoDet.productos.length<=0 && this.producto.EsPadre==1) {
         this.$toasted.show('Tiene que ingresar Subproductos')

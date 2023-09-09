@@ -195,7 +195,9 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
+                tipo="mov" :tipoMov="movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"
+                :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
+                :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -350,6 +352,7 @@ return false
         }
       }
       this.movimiento.movimientoTipo = obj
+      console.log(obj);
 
       this.cargarNumero()
     },
@@ -419,6 +422,10 @@ return false
         if(!(prod.cantidad > 0)){
           faltaCantidad = true
         }
+
+        prod.Chasis = (""+(prod.Chasis || '')).toUpperCase().trim()
+        prod.Motor = (""+(prod.Motor || '')).toUpperCase().trim()
+        prod.Descripcion = (""+(prod.Descripcion || '')).toUpperCase().trim()
       })
 
       if (faltaCantidad) {
@@ -484,7 +491,7 @@ return false
   @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 150px)
+        width: calc(100%)
     }
   }
 </style>
