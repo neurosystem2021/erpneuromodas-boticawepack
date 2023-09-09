@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container class="bv-example-row">
           <b-row>
               <b-col md="8">
@@ -179,9 +179,11 @@
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
-                      <b-form-input v-model="movimiento.TipoCambio"
+                      <input v-model="movimiento.TipoCambio"
                         type="number"
-                        placeholder="Tipo de cambio"></b-form-input>
+                        class="form-control"
+                        step="0.00001"
+                        placeholder="Tipo de cambio"/>
                     </b-form-group>
                   </b-col>
                 </b-row>
@@ -238,6 +240,11 @@ export default {
       buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito'
     }),
+    prevent (evt) {
+        if (evt.target.tagName !== 'TEXTAREA') {
+            evt.preventDefault();
+        }
+    },
     loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {

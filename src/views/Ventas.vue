@@ -22,7 +22,7 @@
                 </div>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
+            <b-form @submit="guardarVenta"  @keydown.enter="prevent">
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -180,14 +180,13 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-row class="mb-2" style="margin-top: -18px;">
+                <b-row class="mb-2" style="margin-top: -15px;">
                     <b-col md="7">
                         <label>Observación:</label>
                         <b-form-textarea
                         v-model="venta.Observacion"
-                        @input="(val) => venta.Observacion = val && val.toUpperCase()"
                         :disabled="bloquearInput?true:false"
-                        style="width: 100% ;"
+                        style="width: 100%; text-transform: uppercase;"
                         rows="2"
                         placeholder="Detalle información de descuentos, regalos, trámites a ofrecer en el comprobante." />
                     </b-col>
@@ -216,14 +215,16 @@
                                         <tr v-if="puntosAplicados == 0">
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
-                                                    <b-form-input
+                                                    <input
                                                         v-model="descuentoGeneral"
                                                         :disabled="bloquearInput?true:false"
                                                         min="0"
                                                         value="0"
-                                                        @input="aplicarDescuentoGeneral"
+                                                        @input="(val)=>aplicarDescuentoGeneral(val.target.value)"
                                                         type="number"
-                                                    ></b-form-input>
+                                                        step="0.01"
+                                                        class="form-control"
+                                                    />
                                                 </b-input-group>
                                                 <b-form-text>
                                                     Descuento general a toda la venta.
@@ -280,14 +281,15 @@
                                                 ></b-form-input>
                                             </td>
                                             <td>
-                                                <b-form-input
+                                                <input
                                                     v-model="venta.pago.efectivo.monto"
                                                     :disabled="bloquearInput?true:false"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                ></b-form-input>
+                                                    class="form-control"
+                                                />
                                             </td>
                                         </tr>
                                         <tr>
@@ -442,6 +444,11 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        prevent (evt) {
+            if (evt.target.tagName !== 'TEXTAREA') {
+                evt.preventDefault();
+            }
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -508,6 +515,8 @@ export default {
             this.isNota = false
             this.bloquearInput = false
             this.loadFirstAlmacen()
+            this.descuentoGeneral = 0
+            this.puntosAplicados = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
