@@ -250,6 +250,7 @@
                     step="0.01"
                     min="0"
                     autocomplete="off"
+                    :disabled="bloquearInput?true:false"
                     @focus="abrirPop1(data.index)"
                     v-bind:class="{ new: data.item.IdProducto==productoChange }"
                     @input="(val) => {
@@ -278,6 +279,7 @@
                     style="width: 90px"
                     min="0"
                     step="0.001"
+                    :disabled="bloquearInput?true:false || idPerfil != 1"
                     @focus="abrirPop2(data.index)"
                     placeholder="Precio"
                     autocomplete="off"
