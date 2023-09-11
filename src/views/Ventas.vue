@@ -9,8 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="hoqui">EMPRESA HOQUI</option>
-                            <option value="titi">EMPRESA TITI</option>
+                            <option value="hoqui">SANTOS LLANOS RAFAEL NEBER</option>
+                            <option value="titi">INVERSIONES & SERVICIOS GIOSARA S.A.C</option>
                         </select>
 
                     </b-button-group>
