@@ -12,8 +12,8 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="hoqui">EMPRESA HOQUI</option>
-                            <option value="titi">EMPRESA TITI</option>
+                            <option value="hoqui">SANTOS LLANOS RAFAEL NEBER</option>
+                            <option value="titi">INVERSIONES & SERVICIOS GIOSARA S.A.C</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
