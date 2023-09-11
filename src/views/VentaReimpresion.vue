@@ -45,6 +45,9 @@
               <template slot="Reimprimir" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               </template>
+              <template slot="Total" slot-scope="data">
+                  {{ (data.item.CodSunat == '07' && data.item.NotaIdMotivo == '03'  ? 0 : data.item.Total)  | redondear(2)  }}
+              </template>
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">

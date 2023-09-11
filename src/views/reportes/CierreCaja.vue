@@ -38,7 +38,7 @@
               <td>{{ item.Cliente }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo }}</td>
+              <td>S/. {{ (item.CodSunat == '07' && item.NotaIdMotivo == '03'? 0 : item.Efectivo) }}</td>
             </tr>
           </tbody>
           <tfoot>
