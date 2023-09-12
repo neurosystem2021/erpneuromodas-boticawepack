@@ -471,6 +471,7 @@ export default {
         this.loadClienteVarios()
         this.escucharPedidos()
         this.getRubro()
+        this.configStock()
     },
     data () {
         return {
@@ -524,7 +525,8 @@ export default {
                 ]
             },
             empresa: 'hoqui',
-            rubroTexto: '---'
+            rubroTexto: '---',
+            ventaSinStock: 0,
         }
     },
     watch: {
@@ -558,6 +560,15 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+            .then(res => {
+                this.ventaSinStock = res.data
+            })
+            .catch((err)=>{
+                this.ventaSinStock = 0
+            })
+        },
         //Nuevos metodos de venta
         habilitarPrecio(){
             this.$swal({
@@ -1163,7 +1174,7 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
