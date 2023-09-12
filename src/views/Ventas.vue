@@ -399,7 +399,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            idPerfil: sessionStorage.getItem('idPerfil')
+            idPerfil: sessionStorage.getItem('IdPerfil')
         }
     },
     watch: {
