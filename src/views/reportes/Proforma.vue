@@ -2,7 +2,8 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg">
+        <img v-if="this.$route.query.empresa === 'titi'" src="/resources/images/banner-proformai.jpg">
+        <img v-else src="/resources/images/banner-proformar.jpg">
 			</div>
 			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
@@ -191,6 +192,7 @@ export default {
 			.then(res => {
 				this.proforma = res.data
         this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
+        document.title = "PROFORMA " + (this.$route.query.empresa === 'titi'?'ISGIOSARA':'RSANTOS') + " " + this.proforma.Anio + "-" + this.proforma.Numero
 			})
     },
     calcularFechaHasta(actual,dias){
