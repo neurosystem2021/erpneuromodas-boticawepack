@@ -23,7 +23,7 @@
                         :per-page="perPage"
                         :current-page="currentPage">
                          <template slot="imprimir" slot-scope="data">
-                            <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden">Imprimir</b-btn>
+                            <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden" rel="noopener">Imprimir</b-btn>
                           </template>
                     </b-table>
                     <b-row>

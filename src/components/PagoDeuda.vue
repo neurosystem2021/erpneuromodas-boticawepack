@@ -146,7 +146,7 @@
                                     <td>{{ pago.Cuenta }}</td>
                                     <td>{{ pago.Concepto }}</td>
                                     <td>{{ pago.Importe.toFixed(2) }}</td>
-                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank" rel="noopener">Imprimir</b-btn></td>
                                 </tr>
                             </tbody>
                         </table>

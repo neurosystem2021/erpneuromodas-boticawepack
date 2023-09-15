@@ -1089,6 +1089,8 @@ export default {
                 //this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
+                this.getVendedor()
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '?empresa=' + this.empresa,'_blank');

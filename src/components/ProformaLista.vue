@@ -34,11 +34,11 @@
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresaselec" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresaselec" variant="primary" target="_blank" rel="noopener">Ver</b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresaselec" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma + '&empresa=' + empresaselec" variant="primary" target="_blank" rel="noopener">Ver Ticket</b-button>
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
@@ -180,6 +180,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 65% !important;
+    max-width: 85% !important;
 }
 </style>

@@ -104,7 +104,7 @@
                 </template>
 
                 <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'" rel="noopener">{{data.item.TipoDoc}}</a>
                 </template>
 
                 <template slot="Entregar" slot-scope="data">
