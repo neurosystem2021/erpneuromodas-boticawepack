@@ -656,8 +656,8 @@ export default {
                 {
                     IdSurtidor: 1,
                     itemsCara: [
-                        { value: 0, text: '0' },
-                        { value: 1, text: '1' },
+                        { value: 4, text: '4' },
+                        { value: 5, text: '5' },
                     ],
                 },
                 {
