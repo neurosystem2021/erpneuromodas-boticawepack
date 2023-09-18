@@ -3,11 +3,16 @@
     <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
+        <b-col md="12" style="margin-top: -10px; margin-bottom: -10px;">
+            <b-btn v-if="showNew" variant="success" size="md" @click="eliminaId"><b>Nuevo</b></b-btn>    
+            <hr style="margin-top: 5px;"/> 
+        </b-col>
+
         <b-col md="6">
-          <b-form-group>
-            <label>Código barra:</label>
+        <b-form-group>
+          <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
               v-model="producto.CodigoBarra"
@@ -51,7 +56,7 @@
               ></b-form-input>
           </b-form-group>
 
-           <b-form-group>
+          <b-form-group>
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
@@ -304,14 +309,14 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
         <b-btn  variant="primary" type="submit">
-           Guardar
+           {{this.mensajeBtn}}
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
            Close
@@ -331,6 +336,8 @@ import ProductoFormDet from '@/components/ProductoFormDet'
 export default {
   data () {
     return {
+      mensajeBtn: 'Crear',
+      showNew:false,
       showProductoDet: true,
       cantidadCodigoBarra: 1,
       title: 'Nuevo Producto',
@@ -350,7 +357,9 @@ export default {
     show (val) {
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto && !this.nuevo) {
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+        this.mensajeBtn='Guardar'
+        this.showNew = true;
+        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >> '
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
           ProductoCategoria: newVal.ProductoCategoria
@@ -363,6 +372,7 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
+        this.producto.Producto = newVal.Producto.split('-').slice(0,-1).join()
        
        // this.$refs.inputCategoria.setValue('')
         this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
@@ -417,6 +427,8 @@ export default {
       } else {
 
         this.title = 'Nuevo Producto'
+        this.showNew = false;
+        this.mensajeBtn = 'Crear';
         this.clearForm()
 
         this.$refs.inputCodigoBarra.$el.disabled = false
@@ -456,6 +468,13 @@ export default {
           }
         })
       }
+    },
+    eliminaId(){
+      delete this.producto.IdProducto;
+      this.mensajeBtn = 'Crear';
+      this.title = "Nuevo Producto"
+      this.showNew = false;
+      this.$refs.inputCodigoBarra.setValue('');
     },
     actualizarPrecioContado () {
       var precioCosto = this.producto.PrecioCosto
