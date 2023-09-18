@@ -142,6 +142,7 @@
             type="number"
             style="width: 90px"
             min="0"
+            step="0.001"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
                 if(productos[data.index].EsObsequio==1){
