@@ -77,7 +77,7 @@
                                 </b-input-group>
                             </b-col>
                             <b-col md="4" class="docInfo mt-2">
-                                    <b-form-checkbox
+                                    <!--<b-form-checkbox
                                         v-model="venta.EsConsumoVale"
                                         :value="1"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='01'" class="mt-1">
@@ -89,7 +89,7 @@
                                         @change="estadoVale()"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1">
                                         <b>ES UN VALE</b>
-                                    </b-form-checkbox> 
+                                    </b-form-checkbox>-->
                                  <b-input-group prepend="Doc. Referenc" v-if="isNota">
                                     <autocomplete
                                         required="required"
@@ -109,7 +109,7 @@
                                 <b-input-group v-if="isNota" style="margin-bottom:-20px">
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-input-group>
-                                <b-input-group prepend="Venta Consumo" v-if="venta.EsVale==1">
+                                <!--<b-input-group prepend="Venta Consumo" v-if="venta.EsVale==1">
                                     <autocomplete
                                         required="required"
                                         ref="inputDocRef"
@@ -122,7 +122,7 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
-                                </b-input-group>
+                                </b-input-group>-->
                             </b-col>
                         </b-row>
                         <b-row>
@@ -481,12 +481,15 @@
                                     <b-button size="md" block variant="primary" @click="abrirPanelSurtidor" :disabled="idSurtidor==0"><i class="fas fa-desktop"></i> Panel</b-button>
                                 </b-col>
                             </b-row>
-                            <!--<b-button v-b-toggle.collapse-1 variant="primary">ACCESOS DIRECTOS</b-button>-->
-                            <b-collapse id="collapse-1" class="mt-2">
+                            <b-button v-b-toggle.collapse-1 variant="warning" block class="mb-1" style="margin-top: -10px; font-weight: bold;">ACCESOS DIRECTOS</b-button>
+                            <b-collapse id="collapse-1" class="mt-1 mb-1">
+                                <b-col md="12" class="mt-1">
+                                    <vale-lista></vale-lista>
+                                </b-col>
                                 <b-col md="12" class="mt-1">
                                     <pago-deuda></pago-deuda>
                                 </b-col>
-                                <b-col md="12" class="mt-1">
+                                <!--<b-col md="12" class="mt-1">
                                     <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                                 </b-col>
                                 <b-col md="12" class="mt-1">
@@ -494,7 +497,7 @@
                                 </b-col>
                                 <b-col md="12" class="mt-1">
                                     <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                                </b-col>        
+                                </b-col>-->      
                             </b-collapse>
                         </b-col>
                     </b-row>
@@ -578,7 +581,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-
+import ValeLista from '@/components/ValeLista.vue'
 
 export default {
     beforeMount () {
@@ -1014,7 +1017,7 @@ export default {
                 this.venta.NotaDescMotivo = ''
                 this.TieneIgvComprobante = false
                 this.venta.EsConsumoVale = 0
-                this.venta.EsVale = 0
+                this.venta.EsVale = obj.EsVale
                 this.venta.ConsumoId = 0
                 this.MontoConsumido = 0
                 this.MontoTotal = 0
@@ -1393,17 +1396,17 @@ export default {
 
             this.inProgress = true
             
-            if(this.venta.EsVale == 1 && this.venta.ConsumoId == 0){
+            /*if(this.venta.EsVale == 1 && this.venta.ConsumoId == 0){
                 this.$toasted.show('Debe seleccionar una venta consumo...')
                 this.inProgress = false
                 return 
-            }
+            }*/
 
             if(this.venta.EsVale == 0){
                 this.venta.ConsumoId = 0
             }
 
-            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
+            /*if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
                 this.$toasted.show('El monto de la venta debe ser menor o igual al disponible: '+(this.MontoTotal - this.MontoConsumido),{duration:3000})
                 this.inProgress = false            
                 return  
@@ -1414,7 +1417,7 @@ export default {
                 this.$refs.inputPlaca.focus()
                 this.inProgress = false
                 return 
-            }
+            }*/
 
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
@@ -1558,7 +1561,9 @@ export default {
                     return;
                 }else{
                     try {
-                    let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                        if(this.venta.tipoVenta.CodSunat != '07' && this.ventaSeleccionadas.length > 0){
+                            let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                        }
                     } catch (error) {
                         
                     }
@@ -1589,7 +1594,8 @@ export default {
         ConfigVenta,
         Proformas,
         PagoDeuda,
-        PreOrdenLista
+        PreOrdenLista,
+        ValeLista
     }
 }
 </script>
