@@ -22,7 +22,7 @@
         <tbody>
             <tr v-for="(prod, i) in kardexSaldo" :key="i">
                 <td>{{ prod.Fecha }}</td>
-                <td>{{ prod.UsuarioReg }}</td>
+                <td style="text-transform: uppercase;">{{ prod.UsuarioReg }}</td>
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
                 <td>{{ prod.Nombres }}</td>
                 <td :class="{'table-info': prod.CantidadPresentacion > 0}">{{ prod.CantidadPresentacion>0?( Number(prod.IngresoCantidad) +  Number(prod.SalidaCantidad)) / prod.CantidadPresentacion:'' }} - {{ prod.Descripcion }}</td>
