@@ -23,6 +23,9 @@
                         :per-page="perPage"
                         :current-page="currentPage">
                         
+                      <template slot="IdTurno" slot-scope="data">
+                        {{ data.item.IdTurno == 1 ? 'MAÑANA' : (data.item.IdTurno == 2? 'TARDE':'NOCHE') }}
+                      </template>
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja + '&empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
                         <b-button :href="'/api/index.php/cierrecaja/pdfresumen/' + data.item.IdCierreCaja +'?empresa=' + empresa" variant="success" >PDF Resumen</b-button>
