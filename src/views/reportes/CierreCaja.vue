@@ -1,7 +1,7 @@
 <template>
   <div :class="{'fondo-empresa0': (this.empresa === 'modasm'),'fondo-empresa1': (this.empresa === 'modasgio'),'fondo-empresa2': (this.empresa === 'modasjes'),'fondo-empresa3': (this.empresa === 'modasjun'),'fondo-empresa4': (this.empresa === 'modaspau')}">
     <br>
-    <b-container class="bv-example-row">
+    <b-container id="contenCierre" class="bv-example-row">
       <div>
           <div class="no-print">
               <div class="float-left"  v-if="!this.$route.params.id">
@@ -36,7 +36,7 @@
                         <b-form-select v-model="turno" :options="turnos" />
                     </b-button-group>
                     <b-button-group size="sm">
-                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+                        <b-button variant="outline-success" :disabled="isProcess" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
                     </b-button-group>
                     <b-button-group size="sm">
                         <cierres-caja :empresa="empresa"></cierres-caja>
@@ -500,6 +500,7 @@ export default {
       vendedor: {},
       empresa: 'modasjes',
       cargaCorrecta: false,
+      isProcess: false
     }
   },
   computed: {
@@ -655,18 +656,43 @@ export default {
       }
       let r = confirm('¿Está seguro de cerrar la caja?')
       if (r) {
-        this.axios.post(this.API + 'cierrecaja', {
-          idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
-          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
-          salidas:      this.totalSalidas,
-          total:        this.granTotal,
-          totalVentas:  this.totalVentas
+        this.isProcess = true
+        this.axios.get(this.API + 'validar/cierre', {
+          params:{
+            IdTurno:  this.turno,
+            User: sessionStorage.getItem("User") || '',
+          }
         }).then(res => {
-          this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
-          // console.log(res)
+          if(res.data.success){
+            this.axios.post(this.API + 'cierrecaja', {
+              idTurno:      this.turno,
+              user: sessionStorage.getItem("User"),
+              //user:         this.vendedor.Usuario,
+              ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+              salidas:      this.totalSalidas,
+              total:        this.granTotal,
+              totalVentas:  this.totalVentas
+            }).then(res => {
+              this.loadData()
+              this.$toasted.show('¡Caja cerrada!')
+              this.isProcess = false
+              // console.log(res)
+            }).catch(err => {
+              this.$toasted.error('Ha ocurrido un error')
+              this.isProcess = false
+            })
+          }else{
+            this.$swal({
+                    icon: 'error',
+                    title: '<strong>'+res.data.msg+'</strong>',
+                    target: document.getElementById('contenCierre'),
+                    footer: 'Por favor verificar sus cierres'
+                })
+            this.isProcess = false
+          }
+        }).catch(err => {
+            this.$toasted.error('Ha ocurrido un error')
+            this.isProcess = false
         })
       }
     },
