@@ -32,12 +32,12 @@
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
-                <td class="celda" style="text-transform: uppercase">: Soles</td>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Placa</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.PlacaFormat }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
+                <td class="celda" style="text-transform: uppercase">: Soles</td>
               </tr>
             </tbody>
           </table>
@@ -63,6 +63,10 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
               </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+              </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
@@ -74,22 +78,22 @@
       <table border="0" cellspacing="0" cellpadding="0">
         <thead>
           <tr>
-            <th class="no">#</th>
+            <th class="no" style="font-size: 0.9em;">#</th>
             <th></th>
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="qty">CANT.</th>
-            <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
+            <th class="desc" style="font-size: 0.9em;">DESCRIPCIÓN</th>
+            <th class="qty" style="font-size: 0.9em;">CANT.</th>
+            <th class="unit" style="font-size: 0.9em;">PRECIO U.</th>
+            <th class="total" style="font-size: 0.9em;">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
-            <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:1.1rem">
+            <td class="no" style="text-align: center; vertical-align: middle;">{{ index+1 }}</td>
+            <td style="text-align: center; vertical-align: middle;"><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:0.75rem">{{ prod.Producto }}</h3>{{ prod.Descripcion }}</td>
+            <td class="qty" style="font-size:0.75rem">{{ prod.Cantidad }}</td>
+            <td class="unit" style="font-size:0.75rem">S/. {{ prod.Precio | moneda }}</td>
+            <td class="total" style="font-size:0.75rem">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -100,8 +104,8 @@
         <tfoot>
           <tr>
             <td colspan="3"></td>
-            <td colspan="2">SUBTOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="font-size:0.85rem; font-weight: bold;">SUBTOTAL</td>
+            <td style="font-size:0.85rem; font-weight: bold;">S/. {{ subTotal | redondear }}</td>
           </tr>
           <!--<tr>
             <td colspan="2"></td>
@@ -110,8 +114,8 @@
           </tr>-->
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#57B223; font-size:0.85rem; font-weight: bold;">TOTAL</td>
+            <td style="background:#57B223; font-size:0.85rem; font-weight: bold;">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
