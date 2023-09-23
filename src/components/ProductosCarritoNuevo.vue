@@ -202,7 +202,7 @@
               <tbody>
                 <tr>
                   <td>
-                    <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success" :disabled="EsVale==1"><i class="fas fa-credit-card" ></i></b-button>
+                    <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success" :disabled="EsVale==1 || EsVale==2"><i class="fas fa-credit-card" ></i></b-button>
                     <b-popover target="popover-metodopago" title="Metodo de pago" triggers="focus">
                     <slot name="metodopago"></slot>
                     </b-popover>
