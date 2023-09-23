@@ -46,6 +46,7 @@
                                         required="required"
                                         ref="inputVendedor"
                                         :url="API + 'usuarios'"
+                                        :customParams="{soloVendedores: 1}"
                                         anchor="NombreUsuario"
                                         label="writer"
                                         :on-select="setVendedor" 
@@ -413,6 +414,19 @@
                                             </tbody>
                                         </table>
                                     </template>
+                                    <template slot="infoDetalle">
+                                        <b-row v-if="venta.tipoVenta.CodSunat == '12'">
+                                            <b-col md="12" class="text-center">
+                                                <label><b>==== Detalles del comprobante ====</b></label>
+                                                <b-form-textarea
+                                                v-model="venta.Detalles"
+                                                :disabled="bloquearInput?true:false"
+                                                style="width: 100%; text-transform: uppercase; font-weight: bold; colo:black"
+                                                rows="3"
+                                                placeholder="Detalles e información del comprobante." />
+                                            </b-col>
+                                        </b-row>
+                                    </template>
                                     <template slot="infoLlevar">
                                         <b-row style="justify-content: center;">
                                             <b-col>
@@ -725,7 +739,8 @@ export default {
                 NotaDescMotivo: '',
                 EsConsumoVale: 0,
                 EsVale: 0,
-                ConsumoId: 0
+                ConsumoId: 0,
+                Detalles: ''
             }
 
             this.isNota = false
@@ -971,12 +986,12 @@ export default {
         getVendedor () {
             this.$refs.inputAlmacen.$refs.input.disabled = true
             this.$refs.inputPuntoVenta.$refs.input.disabled = true
-            this.$refs.inputVendedor.$refs.input.disabled = true
+            //this.$refs.inputVendedor.$refs.input.disabled = true
             let usuario = sessionStorage.getItem('User')
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 // this.$refs.inputVendedor.$refs.input.disabled = true
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.loadAlmacen(response.data.IdAlmacen)
@@ -1324,6 +1339,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.Km = (''+this.venta.Km).toUpperCase()
+            this.venta.Detalles = (this.venta.tipoVenta.CodSunat == '12'?(''+this.venta.Detalles).trim().toUpperCase():'') 
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)

@@ -163,6 +163,7 @@
     </b-row>
     <b-row style="border-top: 3px solid #C0C0C0;">
           <b-col md="4">
+            <slot name="infoDetalle"></slot>
             <br>
             <b-row style="justify-content: center;" v-if="false">
               <table class="calc__numbers">
