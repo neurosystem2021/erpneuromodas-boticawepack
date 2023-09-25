@@ -83,7 +83,9 @@ import { mapActions } from 'vuex'
                         this.filter = ''
                         this.show = false
                     })
-
+                    setTimeout(() => {
+                        this.obtenerStok({ IdAlmacen: this.idAlmacen })      
+                    }, 2000);
                     this.$emit('onSelectPreOrden', item.IdCliente)
                 })
                 //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
