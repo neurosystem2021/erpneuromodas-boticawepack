@@ -78,7 +78,7 @@
                                 </b-input-group>
                             </b-col>
                             <b-col md="4" class="docInfo mt-2">
-                                    <h4 v-if="venta.EsFacturaVale == 1"><b-badge variant="danger">FACTURAR VALES DE CRÉDITO</b-badge></h4>
+                                    <h4 v-if="venta.EsFacturaVale == 1"><b-badge variant="danger">FACTURAR VALES DE CRÉDITO S/ {{  venta.MontoVales | redondear(2) }}</b-badge></h4>
                                     <!--<b-form-checkbox
                                         v-model="venta.EsConsumoVale"
                                         :value="1"
@@ -708,11 +708,11 @@ export default {
                 this.ventaPrueba = 0
             })
         },
-        cargarValesInfo(idCliente){
+        cargarValesInfo(obj){
             this.venta.IdDocVentas = []
             this.venta.EsFacturaVale = 0
             this.axios.get(this.API + 'vales/clientes/detalle/facturar', {
-                params: {idCliente:idCliente}
+                params: {idCliente: obj.id, idDocVentas: obj.idDocVentas}
             })
             .then((response) => {
                 if (response.data.success) {
@@ -727,6 +727,7 @@ export default {
                         }, false ])
                     })     
                     this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen }) 
+                    this.venta.MontoVales = obj.monto
                     this.venta.EsFacturaVale = 1
                     this.venta.tipoVenta = {
                         IdTipoDoc: 7,
@@ -739,7 +740,7 @@ export default {
                     this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                     this.venta.IdDocVentas = response.data.iddocventas.map(idv=>idv.idDocVenta)
                     this.getNumeroVenta()
-                    this.bloquearInput = true
+                    //this.bloquearInput = true
                 } else {
                     this.$toasted.show('No se encontro al cliente')
                 }
@@ -1011,7 +1012,8 @@ export default {
                 ConsumoId: 0,
                 EsFacturaVale: 0,
                 EsFacturaValeNC: 0,
-                IdDocVentas: []
+                IdDocVentas: [],
+                MontoVales: 0
             }
 
             this.isNota = false

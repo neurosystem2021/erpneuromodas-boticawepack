@@ -45,9 +45,11 @@
                             <table class="table b-table table-sm prod-detalle">
                                 <thead>
                                     <tr>
+                                    <th>Seleccionar</th>
                                     <th>Id</th>
                                     <th>Fecha</th>
                                     <th>Vendedor</th>
+                                    <th>Placa</th>
                                     <th>Tipo</th>
                                     <th>Serie</th>
                                     <th>Numero</th>
@@ -60,17 +62,32 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item, index) in row.item.Detalle" :key="index">
-                                        <td>{{ item.idDocVenta }}</td>
-                                        <td>{{ item.FechaDoc }}</td>
-                                        <td>{{ item.UsuarioReg }}</td>
-                                        <td>{{ item.TipoDoc }}</td>
-                                        <td>{{ item.Serie }}</td>
-                                        <td>{{ item.Numero }}</td>
-                                        <td>{{ item.Producto }}</td>
-                                        <td>{{ item.Cantidad }}</td>
-                                        <td>{{ item.Precio }}</td>
-                                        <td>{{ item.Total | redondear(2) }}</td>
-                                        <td><b-btn size="sm" variant="info" :href="'/imprimir/index.php?IdDocVenta=' + item.idDocVenta" target="_blank" rel="noopener"><i class="fas fa-print"></i></b-btn></td>
+                                        <td :class="{'table-s': item.Seleccion}">
+                                            <b-form-checkbox
+                                                v-model="item.Seleccion"
+                                                :value="1"
+                                                class="mt-1"
+                                                @input="(opc) => actualizarMonto(row.index,row.item,item,opc)"
+                                                :unchecked-value="0">
+                                            </b-form-checkbox>
+                                        </td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.idDocVenta }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.FechaDoc }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.UsuarioReg }}</td>
+                                        <td :class="{'table-s': item.Seleccion}"><b>{{ item.Placa }}</b></td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.TipoDoc }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Serie }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Numero }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Producto }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Cantidad }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Precio }}</td>
+                                        <td :class="{'table-s': item.Seleccion}">{{ item.Total | redondear(2) }}</td>
+                                        <td :class="{'table-s': item.Seleccion}"><b-btn size="sm" variant="info" :href="'/imprimir/index.php?IdDocVenta=' + item.idDocVenta" target="_blank" rel="noopener"><i class="fas fa-print"></i></b-btn></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="13">
+                                            <b-button class="mt-2" variant="success" size="md" @click="facturarVales(row.item.IdCliente, row.item.Cliente, row.item)">FACTURAR S/. {{ row.item.Pagar | redondear(2) }} DE VALES</b-button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -79,7 +96,7 @@
                       </template> 
 
                       <template slot="Facturar" slot-scope="data">
-                        <b-button variant="success" size="md" @click="facturarVales(data.item.IdCliente, data.item.Cliente)">Facturar</b-button>
+                        
                       </template>
 
                     </b-table>
@@ -125,7 +142,7 @@ import config from '@/store/config.js'
                 fields: [ 'detalles',
                     { key: 'DniRuc', label: 'Documento' } , 'Cliente',
                     { key: 'CantidadVales', label: 'Vales Realizados' },
-                    { key: 'MontoVales', label: 'Monto Total' }, 'Facturar',  ],
+                    { key: 'MontoVales', label: 'Monto Total' }, ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1,
@@ -133,15 +150,40 @@ import config from '@/store/config.js'
             }
         },
         methods: {
-            facturarVales(id, cliente){
-                let r = confirm('¿Se va facturar los vales de '+cliente+', está seguro?')
+            facturarVales(id, cliente, obj){               
+                if(obj.IdDocVentas.length==0){
+                    this.$toasted.show('Debe seleccionar vales para facturar')
+                    return
+                }
+                let r = confirm('¿Se va facturar los vales seleccionados de '+cliente+', está seguro?')
                 if (r) {
-                    this.$emit('facturar', id)
+                    let data = {
+                        id:id,
+                        cliente: cliente,
+                        idDocVentas: obj.IdDocVentas,
+                        monto: obj.Pagar
+                    }
+                    this.$emit('facturar', data)
                     this.show = false
                 }
             },
             selectCierre (item) {
                // console.log(item)
+                
+            },
+            actualizarMonto(index, item, det, opc ){
+                console.log(det);
+                if(opc==1){
+                    this.items[index].Pagar = (this.items[index].Pagar || 0) + det.Total
+                    this.items[index].IdDocVentas.push(det.idDocVenta)
+                }else{
+                    this.items[index].Pagar = (this.items[index].Pagar || 0) - det.Total
+                    let index2 = this.items[index].IdDocVentas.indexOf(det.idDocVenta);
+                    if (index2 > -1) {
+                        this.items[index].IdDocVentas.splice(index2, 1);
+                    }
+
+                }
                 
             },
             myProvider (ctx) {
@@ -153,6 +195,7 @@ import config from '@/store/config.js'
                 this.items = result.data
                 this.items.map(d=>{
                     d.Detalle = []
+                    d.IdDocVentas = []
                 })
                 //this.totalRows = this.items.length
                 // Here we could override the busy state, setting isBusy to false
@@ -182,6 +225,8 @@ import config from '@/store/config.js'
                     }) 
                 }else{
                     this.items[index].Detalle = []
+                    this.items[index].Pagar = 0
+                    this.items[index].IdDocVentas = []
                     row.toggleDetails()
                 }
     
@@ -196,5 +241,9 @@ import config from '@/store/config.js'
 
  #table-vales td {
     vertical-align: middle;
+ }
+
+ #table-vales .table-s{
+    background-color: #c3e6cb !important;
  }
 </style>
