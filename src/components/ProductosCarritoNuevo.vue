@@ -64,7 +64,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
-            :readonly="(type === 'mov') ? false : true && idPerfil != 1"
+            :readonly="(type === 'mov') ? false : true && idPerfil != 1 || bloquearInput?true:false"
             min="0"
             style="width: 110px"
             step="0.00001"
