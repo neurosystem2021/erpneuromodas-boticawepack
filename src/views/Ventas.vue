@@ -65,6 +65,7 @@
                                         required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
+                                        :customParams="{ EsFacturaVale: venta.EsFacturaVale}"
                                         anchor="TipoDoc"
                                         initValue="BOLETA ELEC."
                                         label="writer"
@@ -77,7 +78,8 @@
                                 </b-input-group>
                             </b-col>
                             <b-col md="4" class="docInfo mt-2">
-                                    <b-form-checkbox
+                                    <h4 v-if="venta.EsFacturaVale == 1"><b-badge variant="danger">FACTURAR VALES DE CRÉDITO S/ {{  venta.MontoVales | redondear(2) }}</b-badge></h4>
+                                    <!--<b-form-checkbox
                                         v-model="venta.EsConsumoVale"
                                         :value="1"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='01'" class="mt-1">
@@ -89,7 +91,7 @@
                                         @change="estadoVale()"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1">
                                         <b>ES UN VALE</b>
-                                    </b-form-checkbox> 
+                                    </b-form-checkbox>-->
                                  <b-input-group prepend="Doc. Referenc" v-if="isNota">
                                     <autocomplete
                                         required="required"
@@ -109,7 +111,7 @@
                                 <b-input-group v-if="isNota" style="margin-bottom:-20px">
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-input-group>
-                                <b-input-group prepend="Venta Consumo" v-if="venta.EsVale==1">
+                                <!--<b-input-group prepend="Venta Consumo" v-if="venta.EsVale==1">
                                     <autocomplete
                                         required="required"
                                         ref="inputDocRef"
@@ -122,7 +124,7 @@
                                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
-                                </b-input-group>
+                                </b-input-group>-->
                             </b-col>
                         </b-row>
                         <b-row>
@@ -452,7 +454,9 @@
                                         </b-row>-->
                                         <b-row style="justify-content: center; margin-top:5px">
                                             <b-col md="12">
+                                                <b-button :disabled="inProgress" variant="danger" size="sm" @click="limpiarPuntoVenta" class="mb-3" v-if="venta.EsFacturaVale == 1">CANCELAR FACTURACION</b-button>
                                                 <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
+                                                <h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>
                                             </b-col>
                                         </b-row>
                                     </template>
@@ -481,12 +485,15 @@
                                     <b-button size="md" block variant="primary" @click="abrirPanelSurtidor" :disabled="idSurtidor==0"><i class="fas fa-desktop"></i> Panel</b-button>
                                 </b-col>
                             </b-row>
-                            <!--<b-button v-b-toggle.collapse-1 variant="primary">ACCESOS DIRECTOS</b-button>-->
-                            <b-collapse id="collapse-1" class="mt-2">
+                            <b-button v-b-toggle.collapse-1 variant="warning" block class="mb-1" style="margin-top: -10px; font-weight: bold;" v-if="idPerfil==1">ACCESOS DIRECTOS</b-button>
+                            <b-collapse id="collapse-1" class="mt-1 mb-1">
+                                <b-col md="12" class="mt-1">
+                                    <vale-lista @facturar="cargarValesInfo"></vale-lista>
+                                </b-col>
                                 <b-col md="12" class="mt-1">
                                     <pago-deuda></pago-deuda>
                                 </b-col>
-                                <b-col md="12" class="mt-1">
+                                <!--<b-col md="12" class="mt-1">
                                     <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
                                 </b-col>
                                 <b-col md="12" class="mt-1">
@@ -494,7 +501,7 @@
                                 </b-col>
                                 <b-col md="12" class="mt-1">
                                     <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                                </b-col>        
+                                </b-col>-->      
                             </b-collapse>
                         </b-col>
                     </b-row>
@@ -578,7 +585,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-
+import ValeLista from '@/components/ValeLista.vue'
 
 export default {
     beforeMount () {
@@ -591,6 +598,7 @@ export default {
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.obtenerSurtidor()
+        this.estadoSistema()
     },
     data () {
         return {
@@ -668,7 +676,9 @@ export default {
                     ],
                 }
             ],
-            itemsCaraSelect:[]
+            itemsCaraSelect:[],
+            idPerfil: sessionStorage.getItem('IdPerfil'),
+            ventaPrueba: 0,
         }
     },
     watch: {
@@ -689,6 +699,56 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        estadoSistema(){
+            this.axios.get(this.API + 'config/sistema')
+            .then(res => {
+                this.ventaPrueba = res.data
+            })
+            .catch((err)=>{
+                this.ventaPrueba = 0
+            })
+        },
+        cargarValesInfo(obj){
+            this.venta.IdDocVentas = []
+            this.venta.EsFacturaVale = 0
+            this.axios.get(this.API + 'vales/clientes/detalle/facturar', {
+                params: {idCliente: obj.id, idDocVentas: obj.idDocVentas}
+            })
+            .then((response) => {
+                if (response.data.success) {
+                    this.$refs.inputCliente.setValue(response.data.cliente.Cliente)
+                    this.venta.cliente = response.data.cliente
+                    this.venta.CampoDireccion = this.venta.cliente.Direccion
+                    this.getUltimaVentaCliente(this.venta.cliente.IdCliente)
+                    let productos = response.data.productos
+                    this.limpiarCart()
+                    productos.map((item) => {
+                        this.add([item, () => {
+                        }, false ])
+                    })     
+                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen }) 
+                    this.venta.MontoVales = obj.monto
+                    this.venta.EsFacturaVale = 1
+                    this.venta.tipoVenta = {
+                        IdTipoDoc: 7,
+                        TipoDoc: 'BOLETA ELEC.',
+                        LimitItems: 0,
+                        CodSunat: '03'
+                    }
+                    this.venta.EsVale = 0
+                    this.venta.ConsumoId = 0
+                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                    this.venta.IdDocVentas = response.data.iddocventas.map(idv=>idv.idDocVenta)
+                    this.getNumeroVenta()
+                    //this.bloquearInput = true
+                } else {
+                    this.$toasted.show('No se encontro al cliente')
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        },
         obtenerSurtidor(){
             this.idSurtidor = 0
             this.itemsCaraSelect = []
@@ -949,7 +1009,11 @@ export default {
                 NotaDescMotivo: '',
                 EsConsumoVale: 0,
                 EsVale: 0,
-                ConsumoId: 0
+                ConsumoId: 0,
+                EsFacturaVale: 0,
+                EsFacturaValeNC: 0,
+                IdDocVentas: [],
+                MontoVales: 0
             }
 
             this.isNota = false
@@ -1014,7 +1078,7 @@ export default {
                 this.venta.NotaDescMotivo = ''
                 this.TieneIgvComprobante = false
                 this.venta.EsConsumoVale = 0
-                this.venta.EsVale = 0
+                this.venta.EsVale = obj.EsVale
                 this.venta.ConsumoId = 0
                 this.MontoConsumido = 0
                 this.MontoTotal = 0
@@ -1059,6 +1123,10 @@ export default {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
             this.venta.IdComprobanteModifica = obj.IdDocVenta
+            this.venta.EsFacturaValeNC = obj.EsFacturaVale
+            if(obj.EsFacturaVale == 1){
+                this.$toasted.info('Es una factura de vales realizados, los vales pasarán a pendiente',{duration:5000})
+            }
             this.TieneIgvComprobante = (obj.TieneIgv==1?true:false)
             if(this.TieneIgvComprobante != this.tieneIgv){
                 if(this.TieneIgvComprobante){
@@ -1393,17 +1461,17 @@ export default {
 
             this.inProgress = true
             
-            if(this.venta.EsVale == 1 && this.venta.ConsumoId == 0){
+            /*if(this.venta.EsVale == 1 && this.venta.ConsumoId == 0){
                 this.$toasted.show('Debe seleccionar una venta consumo...')
                 this.inProgress = false
                 return 
-            }
+            }*/
 
             if(this.venta.EsVale == 0){
                 this.venta.ConsumoId = 0
             }
 
-            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
+            /*if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
                 this.$toasted.show('El monto de la venta debe ser menor o igual al disponible: '+(this.MontoTotal - this.MontoConsumido),{duration:3000})
                 this.inProgress = false            
                 return  
@@ -1414,7 +1482,7 @@ export default {
                 this.$refs.inputPlaca.focus()
                 this.inProgress = false
                 return 
-            }
+            }*/
 
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
@@ -1558,7 +1626,9 @@ export default {
                     return;
                 }else{
                     try {
-                    let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                        if(this.venta.tipoVenta.CodSunat != '07' && this.ventaSeleccionadas.length > 0 && this.ventaPrueba == 0){
+                            let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                        }
                     } catch (error) {
                         
                     }
@@ -1589,7 +1659,8 @@ export default {
         ConfigVenta,
         Proformas,
         PagoDeuda,
-        PreOrdenLista
+        PreOrdenLista,
+        ValeLista
     }
 }
 </script>

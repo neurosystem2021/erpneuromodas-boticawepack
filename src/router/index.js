@@ -20,6 +20,7 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Vales from '@/views/reportes/Vales.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 
 
 Vue.use(Router)
@@ -116,6 +117,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
+    },
+    {
+      path: '/vales-facturados',
+      name: 'ValesFacturados',
+      component: ValesFacturados
     },
   ]
 })

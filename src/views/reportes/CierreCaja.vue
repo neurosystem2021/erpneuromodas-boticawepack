@@ -181,7 +181,7 @@
       </b-row>
 
       <b-row>
-        <h5>Ventas Vale (No Suma)</h5><br>
+        <h5>Ventas Vale Crédito (No Suma)</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -189,7 +189,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasVale" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado}">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -202,7 +202,35 @@
             <tr>
               <td colspan="4"></td>
               <td class="total"><b>Total Vale</b></td>
-              <td class="total"><b>S/. {{ totalVentasVale | redondear }}</b></td>
+              <td class="total"><b>S/. {{ totalVentasValeCredito | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row>
+        <h5>Ventas Canje (No Suma)</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasValeCanje" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>{{ item.Placa }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Canje</b></td>
+              <td class="total"><b>S/. {{ totalVentasCanje | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -399,6 +427,30 @@ export default {
     ventasVale () {
       return this.ventas.filter(venta => {
         return venta.EsVale == 1
+      })
+    },
+    totalVentasValeCredito() {
+      let total = 0
+      this.ventasValeCredito.forEach(venta => {
+        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+      });
+      return total
+    },
+    ventasValeCredito () {
+      return this.ventas.filter(venta => {
+        return venta.EsVale == 1 && venta.CodSunat == '13'
+      })
+    },
+    totalVentasCanje() {
+      let total = 0
+      this.ventasValeCanje.forEach(venta => {
+        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+      });
+      return total
+    },
+    ventasValeCanje () {
+      return this.ventas.filter(venta => {
+        return venta.EsVale == 2 && venta.CodSunat == '14'
       })
     },
     totalVentasMastercard () {
