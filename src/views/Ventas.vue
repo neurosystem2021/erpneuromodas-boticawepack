@@ -59,6 +59,7 @@
                                         required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
+                                        :customParams="{idAlmacen: venta.almacen.IdAlmacen, pv: 1}"
                                         anchor="TipoDoc"
                                         initValue="BOLETA ELEC."
                                         label="writer"
@@ -906,6 +907,15 @@ export default {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.$refs.inputVendedor.$refs.input.disabled = true
+                if(response.data.IdAlmacen == 2){
+                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                    this.venta.tipoVenta = {
+                        IdTipoDoc: 3,
+                        TipoDoc: 'NOTA DE VENTA',
+                        LimitItems: 0,
+                        CodSunat: '12'
+                    }
+                }
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
