@@ -420,6 +420,7 @@ return false
       let faltaLlenar = false
       let sinStock = 0
       let faltaCantidad = false
+      let igualProducto = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
@@ -432,7 +433,20 @@ return false
         if(!(prod.cantidad > 0)){
           faltaCantidad = true
         }
+
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1).length
+        if(pro > 1){
+          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
+          igualProducto = true
+        }
+
       })
+
+      if (igualProducto) {
+        this.$toasted.show('Solo puede agregar 2 veces el producto y uno tiene que ser obsequio',{duration:4000})
+        this.inProgress = false
+        return;
+      }
 
       if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
