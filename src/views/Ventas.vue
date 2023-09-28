@@ -78,6 +78,15 @@
                                 </b-input-group>
                             </b-col>
                             <b-col md="4" class="docInfo mt-2">
+                                    <b-input-group prepend="Ref." v-if="venta.tipoVenta.CodSunat=='13'" >
+                                        <input v-model="venta.RefVale"
+                                                type="text"
+                                                ref="inputKm"
+                                                required
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                placeholder="Referencia del vale" />
+                                    </b-input-group>
                                     <h4 v-if="venta.EsFacturaVale == 1"><b-badge variant="danger">FACTURAR VALES DE CRÉDITO S/ {{  venta.MontoVales | redondear(2) }}</b-badge></h4>
                                     <!--<b-form-checkbox
                                         v-model="venta.EsConsumoVale"
@@ -142,7 +151,6 @@
                                         <b-input-group prepend="Km">
                                             <input v-model="venta.Km"
                                                     type="text"
-                                                    ref="inputKm"
                                                     style="text-transform:uppercase;"
                                                     class="form-control"
                                                     placeholder="Kilometraje" />
@@ -197,6 +205,14 @@
                                             </b-form-select>
 
                                         </b-form-group>
+                                        <b-input-group prepend="Obs.">
+                                        <textarea v-model="venta.Observacion"
+                                                type="text"
+                                                rows="2"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                placeholder="Observaciones del comprobante"></textarea>
+                                        </b-input-group>
                                     </b-col>
                                     <b-col md="12" v-if="false">
                                         <b-form-group style="margin-top:-5px">
@@ -1013,7 +1029,9 @@ export default {
                 EsFacturaVale: 0,
                 EsFacturaValeNC: 0,
                 IdDocVentas: [],
-                MontoVales: 0
+                MontoVales: 0,
+                RefVale: '',
+                Observacion: '',
             }
 
             this.isNota = false
@@ -1551,6 +1569,12 @@ export default {
                 return          
             }
 
+            if(this.venta.tipoVenta.CodSunat == '13' && (''+this.venta.RefVale).toUpperCase().trim()==''){
+                this.$toasted.show('Ingrese una referencia VÁLIDA para el VALE DE CREDITO')
+                this.inProgress = false            
+                return    
+            }
+
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if(this.TieneIgvComprobante != this.tieneIgv){
                     if(this.TieneIgvComprobante){
@@ -1617,6 +1641,8 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.Km = (''+this.venta.Km).toUpperCase()
+            this.venta.RefVale = (this.venta.tipoVenta.CodSunat == '13'?(''+this.venta.RefVale).toUpperCase().trim():'')
+            this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async (response) => {
 
