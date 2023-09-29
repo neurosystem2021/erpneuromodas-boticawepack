@@ -29,15 +29,82 @@
               <cierres-caja></cierres-caja>
             </b-button-group>
             <b-button-group size="sm">
-              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR TICKET</b-button>
             </b-button-group>
           </b-col>
       </b-row>
       <br class="no-print" /><br class="no-print" />
-
-      <h2 class="text-center">Resumen de Productos</h2>
+      <div class="alinear">
+        <h2 class="text-center">Cierre de Caja</h2> 
+        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+        <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      </div>
       <br>
       <b-row>
+        <b-col cols="5">
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Gran Total S/.</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+          </tbody>
+        </table>          
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ totalSalidas | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Crédito S/.</td>
+              <td>{{ totalVentasCredito | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Yape/Plin S/.</td>
+              <td>{{ totalVentasMastercard | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Vales de Crédito S/.</td>
+              <td>{{ totalVentasValeCredito | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Canjes S/.</td>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        </b-col>
+      </b-row>
+
+      <h2 class="text-center no-print">Resumen de Productos</h2>
+      <br>
+      <b-row class="no-print">
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -62,10 +129,11 @@
         </table>
       </b-row>
 
-      <h2 class="text-center">Cierre de Caja</h2> 
+      <!--<h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-      <b-row>
+      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>-->
+      <hr class="no-print">
+      <b-row class="no-print">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -94,7 +162,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Tarjeta</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -124,7 +192,7 @@
 
       
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Yape / Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -152,7 +220,7 @@
         </table>
       </b-row>
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -180,7 +248,7 @@
         </table>
       </b-row>
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Vale Crédito (No Suma)</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -208,8 +276,8 @@
         </table>
       </b-row>
 
-      <b-row>
-        <h5>Ventas Canje (No Suma)</h5><br>
+      <b-row class="no-print">
+        <h5>Ventas Canje</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -236,7 +304,7 @@
         </table>
       </b-row>
 
-      <b-row class="credito">
+      <b-row class="credito no-print">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -264,7 +332,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <b-col v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
@@ -320,7 +388,7 @@
 
       <br>
 
-      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -365,7 +433,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
@@ -641,5 +709,12 @@ th {
   .no-print {
     display: none;
   }
+}
+.alinear * {
+  text-align: left !important;
+}
+.tableResumen {
+  width: 100%;
+  font-weight: bold;
 }
 </style>
