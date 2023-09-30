@@ -157,10 +157,10 @@
                                         </b-input-group>
                                         <div v-if="venta.cliente.Cliente && ultimaVentaCliente!='' && venta.cliente.DniRuc != '00000000'" class="text-center mt-1">
                                             <b-row>
-                                                <b-col md="3">
-                                                    <b-img style="width:50px" src="static/last-buy.png"></b-img>
+                                                <b-col md="2">
+                                                    <b-img style="width:35px" src="static/last-buy.png"></b-img>
                                                 </b-col>
-                                                <b-col md="8" style="align-items: center; justify-content: end; display: flex;">
+                                                <b-col md="9" style="align-items: start; justify-content: start; display: flex;">
                                                     <label style="font-weight:bold; font-size:0.95rem">
                                                         {{ultimaVentaCliente}}
                                                     </label>
@@ -205,14 +205,6 @@
                                             </b-form-select>
 
                                         </b-form-group>
-                                        <b-input-group prepend="Obs.">
-                                        <textarea v-model="venta.Observacion"
-                                                type="text"
-                                                rows="2"
-                                                style="text-transform:uppercase;"
-                                                class="form-control"
-                                                placeholder="Observaciones del comprobante"></textarea>
-                                        </b-input-group>
                                     </b-col>
                                     <b-col md="12" v-if="false">
                                         <b-form-group style="margin-top:-5px">
@@ -432,7 +424,19 @@
                                         </table>
                                     </template>
                                     <template slot="infoSurtidor">
-                                        <b-row style="justify-content: center; margin-top:10px;">
+                                        <b-row>
+                                            <b-col md="12" class="text-center">
+                                                <label><b>== Observaciones del comprobante ==</b></label>
+                                                <b-form-textarea
+                                                v-model="venta.Observacion"
+                                                :disabled="bloquearInput?true:false"
+                                                style="width: 100%; text-transform: uppercase; font-weight: bold; colo:black"
+                                                rows="3"
+                                                class="form-control"
+                                                placeholder="Observaciones del comprobante" />
+                                            </b-col>
+                                        </b-row>
+                                        <!--<b-row style="justify-content: center; margin-top:10px;">
                                             <b-col md="12" class="text-center mb-1">
                                                 <b-button type="button" variant="info" size="sm" @click="limpiarPuntoVenta"><i class="fas fa-redo"></i> LIMPIAR PUNTO DE VENTA</b-button>
                                             </b-col>
@@ -460,7 +464,7 @@
                                                     </tbody>
                                                 </table>    
                                             </b-col>
-                                        </b-row>
+                                        </b-row>-->
                                     </template>
                                     <template slot="infoLlevar">
                                         <!--<b-row style="justify-content: center;">
@@ -472,7 +476,7 @@
                                             <b-col md="12">
                                                 <b-button :disabled="inProgress" variant="danger" size="sm" @click="limpiarPuntoVenta" class="mb-3" v-if="venta.EsFacturaVale == 1">CANCELAR FACTURACION</b-button>
                                                 <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
-                                                <h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>
+                                                <!--<h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>-->
                                             </b-col>
                                         </b-row>
                                     </template>
@@ -484,7 +488,7 @@
                 <b-col md="3">
                     <b-row>
                         <b-col class="text-center">
-                            <b-row>
+                            <!--<b-row>
                                 <b-col>
                                     <b-button size="md" block :variant="idSurtidor>0?'dark':'danger'"><b>{{ (idSurtidor>0?'SURTIDOR '+idSurtidor:'SIN SURTIDOR') }}</b></b-button>
                                 </b-col>
@@ -500,7 +504,7 @@
                                 <b-col md="5">
                                     <b-button size="md" block variant="primary" @click="abrirPanelSurtidor" :disabled="idSurtidor==0"><i class="fas fa-desktop"></i> Panel</b-button>
                                 </b-col>
-                            </b-row>
+                            </b-row>-->
                             <b-button v-b-toggle.collapse-1 variant="warning" block class="mb-1" style="margin-top: -10px; font-weight: bold;" v-if="idPerfil==1">ACCESOS DIRECTOS</b-button>
                             <b-collapse id="collapse-1" class="mt-1 mb-1">
                                 <b-col md="12" class="mt-1">
@@ -543,7 +547,7 @@
             
             <br class="d-none d-lg-block d-xl-block"/>
 
-            <b-modal id="modalPanelSurtidor" size="lg" ref="modalPanelSurtidor" title="PANEL DE VENTA">
+            <!--<b-modal id="modalPanelSurtidor" size="lg" ref="modalPanelSurtidor" title="PANEL DE VENTA">
                 <div class="d-block text-center">
                     <b-row>
                         <b-col md="2"><b><h4>Items:  {{  itemTotal }}</h4></b></b-col>
@@ -588,6 +592,55 @@
                     Cerrar
                     </b-btn>
                 </div>
+            </b-modal>-->
+            <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+                <div class="d-block text-center">
+                    <h3 style="text-decoration: underline;">{{productoSelect.Producto}}</h3>
+                    <h5>Precios Disponibles</h5>
+                </div>
+                <hr>
+                <b-row>
+                    <b-col cols="6">
+                        <b-card
+                            align="center"
+                            class="mb-3 contentCard"
+                            style="cursor: pointer;"
+                            @click="() => {
+                                setProductoUni(productoSelect, true, productoSelect.PrecioContado)
+                            }"
+                        >
+                            <b-row>
+                            <b-col md="6" class="nomCartP">
+                                <h5 class="text-uppercase">VENTA</h5>
+                            </b-col>
+                            <b-col md="6" class="nomCartP2">
+                                <b class="mr-1">Precio: </b> S/ {{ productoSelect.PrecioContado | moneda }}
+                            </b-col>
+                            </b-row>
+                        </b-card>
+                    </b-col>
+                    <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+                        <b-card
+                            align="center"
+                            class="mb-3 contentCard"
+                            style="cursor: pointer;"
+                            @click="() => {
+                            if ( parseFloat(d.precio) > 0 ) {
+                                setProductoUni(productoSelect, true, d.precio)
+                            }
+                            }"
+                        >
+                            <b-row>
+                            <b-col md="6" class="nomCartP">
+                                <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                            </b-col>
+                            <b-col md="6" class="nomCartP2">
+                                <b class="mr-1">Precio: </b> S/ {{ d.precio | moneda }}
+                            </b-col>
+                            </b-row>
+                        </b-card>
+                    </b-col>
+                </b-row>
             </b-modal>
         </b-container>
     </div>
@@ -613,8 +666,8 @@ export default {
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
-        this.obtenerSurtidor()
-        this.estadoSistema()
+        //this.obtenerSurtidor()
+        //this.estadoSistema()
     },
     data () {
         return {
@@ -658,6 +711,7 @@ export default {
                     //{ key: 'ProductoMedicion', label: 'Medicion' },
                     { key: 'cantidad',class:'thsize' },
                     { key: 'precio', label: 'Precio',class:'thsize'  },
+                    { key: 'eventPres', label:'', class:'productosize thsize'},
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center thsize' }, 
                     { key: 'descuento', label: 'Descuento',  class:'thsize'},
                     { key: 'total', label: 'Total', variant: 'danger',class:'fontsize thsize' },
@@ -695,6 +749,7 @@ export default {
             itemsCaraSelect:[],
             idPerfil: sessionStorage.getItem('IdPerfil'),
             ventaPrueba: 0,
+            preciosProd: [],
         }
     },
     watch: {
@@ -713,7 +768,8 @@ export default {
             aplicarDescuento: 'aplicarDescuentoGeneral',
             limpiarCart: 'limpiarCarrito',
             obtenerStok: 'obtenerStock',
-            add:'agregarProducto'
+            add:'agregarProducto',
+            actualizarProd : 'actualizarProducto',
         }),
         estadoSistema(){
             this.axios.get(this.API + 'config/sistema')
@@ -917,32 +973,41 @@ export default {
             }
         },
         setProducto (obj) {
-            if(this.ventaSeleccionadas.length>0){
+        /*    if(this.ventaSeleccionadas.length>0){
                 this.$toasted.info('Tiene ventas seleccionadas, limpie el punto de venta',{duration:3000})
                 return
-            }
+            }*/
         obj = Object.assign({}, obj);
-        //obj.FLETE = 0
-        obj.precio = 0
-        obj.cantidad = 0
-        //obj.IdLote = 0
-        //obj.TieneIgv = 0
-        obj.descuento = 0
-        obj.nuevoPrecioContado = 0
-        this.idProductoSelect = obj.IdProducto
         this.productoSelect = obj
-        /*obj = this.onSetProducto(obj)
-        let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
-        if(existe==undefined){
-                this.$toasted.info('Producto agregado')
-        }else{
-                this.$toasted.error('El producto ya esta agregado')
+        this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+        this.preciosProd = this.preciosProd.filter(p => p.precio > 0)
+        if (this.preciosProd.length==0) {
+            this.setProductoUni(obj)
+            return
         }
-        this.add([obj, () => {
-            this.onAddProducto(obj)
-        }])*/
-
-        // Vue.set(this.productos, obj.IdProducto, obj)
+        this.$refs['modalCant'].show()
+        },
+        setProductoUni(obj, seleccion = false, precio = false){
+            obj.precio = 0
+            obj.cantidad = 0
+            //obj.IdLote = 0
+            //obj.TieneIgv = 0
+            obj.descuento = 0
+            obj.sutotal = ''
+            obj.nuevoPrecioContado = 0
+            this.idProductoSelect = obj.IdProducto
+            obj = this.onSetProducto(obj, precio)
+            let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
+            if(existe==undefined){
+                    this.$toasted.info('Producto agregado')
+                    this.add([obj, () => {
+                        this.onAddProducto(obj)
+                        this.actualizarProd(obj)
+                    }])
+            }else{
+                    this.$toasted.error('El producto ya esta agregado')
+            }
+            this.$refs['modalCant'].hide()
         },
         limpiarPuntoVenta(){
             this.ultimaVentaCliente=''
@@ -1358,9 +1423,10 @@ export default {
                 console.log(error)
             })
         },
-        onSetProducto (obj) {
+        onSetProducto (obj, precio) {
+            console.log(precio);
             obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+            obj.precio = precio > 0 ? precio : (obj.PrecioContado || 0)
             return obj
         },
         onAddProducto (obj) {
@@ -1651,13 +1717,13 @@ export default {
                     this.$toasted.show(response.data.msg, {duration: 5000})
                     return;
                 }else{
-                    try {
+                    /*try {
                         if(this.venta.tipoVenta.CodSunat != '07' && this.ventaSeleccionadas.length > 0 && this.ventaPrueba == 0){
                             let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
                         }
                     } catch (error) {
                         
-                    }
+                    }*/
                     this.ultimaVentaCliente=''
                     this.$toasted.success('Venta realizada con exito')
                     this.ultimaVenta = response.data.insertId
@@ -1803,6 +1869,22 @@ export default {
     }
 
     .seleccionProducto {
-        border: 7.5px solid #007bff !important;
+        /*border: 7.5px solid #007bff !important;*/
+    }
+    .nomCartP2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    }
+    .nomCartP {
+        display: flex;
+        align-items: center;
+        border-right: 2px solid black;
+        justify-content: center;
+        align-content: center;
+    }
+    #modalCantidad .modal-dialog{
+        max-width: 47% !important;
     }
 </style>

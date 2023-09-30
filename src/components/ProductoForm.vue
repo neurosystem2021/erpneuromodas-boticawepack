@@ -167,7 +167,6 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               step="0.0001"
               class="form-control"
@@ -186,6 +185,31 @@
                 Original - {{ producto.precioContadoNormal | redondear }}
               </b-form-text>
           </b-form-group>
+        </b-col>
+      </b-row>
+      <hr>
+      <b-row>
+        <b-col md="3" v-for="i in 4" :key="i.id">
+          <b-card :header="producto.precios[i-1].nombre" class="text-center">
+            <!--<b-form-group>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                type="text"
+                style="text-transform:uppercase; font-weight: bold;"
+                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
+                ></b-form-input>
+            </b-form-group>-->
+
+            <b-form-group class="text-left">
+              <label>Precio Venta:</label>
+              <input 
+                v-model="producto.precios[i-1].precio"
+                type="number"
+                class="form-control"
+                step="0.001"
+                />
+            </b-form-group>
+          </b-card>
         </b-col>
       </b-row>
 
@@ -315,6 +339,16 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.MasMovido = newVal.MasMovido
         this.$refs.file.value=null
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
+        }else{
+          this.producto.precios = [
+            {nombre: 'PRECIO 1', precio: 0},
+            {nombre: 'PRECIO 2', precio: 0},
+            {nombre: 'PRECIO 3', precio: 0},
+            {nombre: 'PRECIO 4', precio: 0},
+          ]
+        }
       } else {
 
         this.title = 'Nuevo Producto'
@@ -412,7 +446,13 @@ export default {
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"GALONES"
-        }
+        },
+        precios: [
+          {nombre: 'PRECIO 1', precio: 0},
+          {nombre: 'PRECIO 2', precio: 0},
+          {nombre: 'PRECIO 3', precio: 0},
+          {nombre: 'PRECIO 4', precio: 0},
+        ]
       }
     },
     guardarProducto(e) {
@@ -424,7 +464,10 @@ export default {
       }
         // console.log(JSON.stringify(this.producto))
       this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
-      this.axios.post(this.API + 'productos', this.producto)
+      this.axios.post(this.API + 'productos', {
+        ...this.producto, 
+        PreciosPorProducto: this.producto.precios 
+      })
       .then((response) => {
         console.log(response)
         if (this.cbGuardar) {
@@ -434,7 +477,7 @@ export default {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
           return
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.success('Producto guardado correctamente')
         }
 
         // this.initForm()
