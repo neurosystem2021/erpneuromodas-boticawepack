@@ -143,6 +143,18 @@
         </b-row>
       </b-modal>
 
+      <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{ objProd.Producto }} - {{ objProd.ProductoModelo }}</h3>
+          <h4>CHASIS / MOTOR</h4>
+        </div>
+        <b-row>
+          <b-col>
+            
+          </b-col>
+        </b-row>
+      </b-modal>
+
       <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
         <div class="d-block text-center">
           <div id="codigoBarraStyle">
@@ -161,12 +173,18 @@
         <template slot="eventPres" slot-scope="data">
           <div v-bind:class="{ ventasAnchoImg: isVentas }">
             <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
-            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
             <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
               <div style="text-align:center">
                 <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
               </div>
             </b-popover>
+          </div>
+        </template>
+
+        <template slot="eventVehi" slot-scope="data">
+          <div style="width: 37.5px; text-align: center;">
+            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="primary" @click="showSeleccionar(productos[data.index],data.index)"><i class="fas fa-car"></i></b-button>
           </div>
         </template>
 
@@ -340,6 +358,7 @@
                 v-model="productos[data.index].Chasis"
                 type="text"
                 required
+                :readonly="isVentas"
                 style="text-transform: uppercase;"
                 autocomplete="off"
                 ></b-form-input>  
@@ -349,6 +368,7 @@
                 v-model="productos[data.index].Motor"
                 type="text"
                 required
+                :readonly="isVentas"
                 style="text-transform: uppercase;"
                 autocomplete="off"
                 ></b-form-input>
@@ -711,6 +731,10 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    showSeleccionar(obj, index){
+      this.objProd = obj
+      this.$refs['modalSeleccionar'].show()
+    },
     changeMovimiento(hash, idProducto, index) {
       if  (hash) {
         // Stock
@@ -1017,7 +1041,7 @@ export default {
       obj.Motor = ''
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = false;
 
       /*this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -1061,7 +1085,7 @@ export default {
       //obj.FLETE = 0
       obj.precio = obj.PrecioContado
       obj.cantidad = 0
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = false;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
@@ -1070,17 +1094,20 @@ export default {
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj,false,precio)
       obj.cantidadPres = obj.cantidad
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-        this.loadMovimientoLotes(obj.IdProducto)
-        //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
+      if(this.indexProdSelect == null){
+        this.add([obj, () => {
+          this.$emit('onAddProducto', obj)
+          this.$toasted.success('Producto añadido correctamente')
+          //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+        }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
+      }else{
+        this.$toasted.info('Precio actualizado')
+        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+        this.indexProdSelect = null
+      }
       this.loadCode=''
-      // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
-      //this.actualizarProd(obj)
     },
     setProductoCant (prod) {
       this.objProd.cantxPrecio = 1
@@ -1093,7 +1120,7 @@ export default {
       // this.objProd.cantidad = 0
       obj.precio = 0
       obj.cantidad = 1
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = false;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
@@ -1134,7 +1161,7 @@ export default {
         if(obj.PrecioEspecial){
         this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
         }
-        obj.EsVentaNew = true;
+        obj.EsVentaNew = false;
         this.objProd = obj
         this.indexProdSelect = index
         this.$refs['modalCant'].show()
@@ -1397,7 +1424,7 @@ export default {
     }
   }
   #modalCantidad .modal-dialog {
-      max-width: 40% !important;
+      max-width: 45% !important;
   }
   .ventasAnchoImg {
     width: 75px;
@@ -1411,5 +1438,11 @@ export default {
   }
   #tablaCarrito .input-group-text {
     font-weight: bold;
+  }
+  td.td-acciones{
+    width: 75px;
+  }
+  th.th-chasis{
+    text-align: center;
   }
 </style>
