@@ -74,6 +74,9 @@
             :per-page="perPage"
             :current-page="currentPage">
             
+            <template slot="ComisionTotal" slot-scope="data">
+              {{ data.item.ComisionTotal || redondear(2) }}
+            </template>
             <template slot="pagar" slot-scope="data">
               <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="Monto" style="width:30px">
@@ -122,8 +125,8 @@ export default {
         saldo += v.Comision
         
       })
-      this.totalComision = Math.round(total)
-      this.totalSaldoComision = Math.round(saldo)
+      this.totalComision = Math.round(total * 100) / 100
+      this.totalSaldoComision = Math.round(saldo * 100) / 100
     }
   },
   computed: {
@@ -166,6 +169,11 @@ export default {
   methods: {
     pagarAComisionista (e, cliente) {
       let importe = e.target.parentElement.previousElementSibling.value
+      if(!(importe>0)){
+        this.$toasted.show('Debe ingresar un monto')
+        return
+      }
+
        if( importe <= cliente.Comision ){
           let r = confirm('Desea pagar al comisionista')
          if (r) {
@@ -218,8 +226,8 @@ export default {
       let promise = this.axios.get( this.API + 'cliente/comisionistas' + params )
       return promise.then((response) => {
         this.items = response.data.map(d => {
-          d.ComisionTotal = Math.round(d.ComisionTotal)
-          d.Comision = Math.round(d.Comision)
+          d.ComisionTotal = Math.round(d.ComisionTotal * 100) / 100
+          d.Comision = Math.round(d.Comision * 100) / 100
           return d
         })
         //this.totalRows = this.items.length
