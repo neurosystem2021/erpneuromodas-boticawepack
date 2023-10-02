@@ -1653,7 +1653,7 @@ export default {
                 }else{
                     try {
                         if(this.venta.tipoVenta.CodSunat != '07' && this.ventaSeleccionadas.length > 0 && this.ventaPrueba == 0){
-                            let repuesta = await this.axios.put(this.APISURTIDOR+'/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
+                            let repuesta = await this.axios.put(this.APISURTIDOR+'/sale/api/aventa/update', { ids: this.ventaSeleccionadas.map(vs => vs.veID),})
                         }
                     } catch (error) {
                         
