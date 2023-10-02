@@ -147,6 +147,14 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.EsMarket"
+                   :value="1"
+                   :unchecked-value="0">
+              Producto de Market
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -338,6 +346,7 @@ export default {
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.MasMovido = newVal.MasMovido
+        this.producto.EsMarket = newVal.EsMarket
         this.$refs.file.value=null
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
@@ -435,6 +444,7 @@ export default {
         StockMinimo: 0,
         PrecioContado: '',
         MasMovido: 0,
+        EsMarket: 0,
         PrecioContado: 0,
         // Botapie: '',
         // Genero: '',

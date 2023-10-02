@@ -9,7 +9,7 @@
                 style="width:45%"
                 :url="APIProductos"
                 :onShouldRenderChild="renderChild"
-                :customParams="{'sinMovidos': 1}"
+                :customParams="{'sinMovidos': 1, 'noMarket': 1}"
                 anchor="Producto"
                 label="writer"
                 placeholder="Agregar Producto"
@@ -78,7 +78,7 @@
             <input
               v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
               v-model="productos[data.index].sutotal"
-              :disabled="bloquearInput?true:false || idPerfil != 1"
+              :disabled="bloquearInput?true:false"
               type="number"
               min="0"
               step="0.00001"

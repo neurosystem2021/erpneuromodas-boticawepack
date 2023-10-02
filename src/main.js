@@ -13,6 +13,7 @@ import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
 
+import VueSweetalert2 from 'vue-sweetalert2';
 const browser = detect();
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -33,7 +34,7 @@ Vue.use(Toasted, {
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
-
+Vue.use(VueSweetalert2)
 // Componentes 
 Vue.component('autocomplete', Autocomplete)
 Vue.component('editable',{

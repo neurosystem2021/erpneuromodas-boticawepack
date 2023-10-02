@@ -9,6 +9,8 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Remision from '@/views/Remision.vue'
+import VentasMarket from '@/views/VentasMarket.vue'
+import CategoriasNuevo from '@/views/CategoriasNuevo.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -128,6 +130,16 @@ export default new Router({
       path: '/reportes/cantidades',
       name: 'ReporteCantidad',
       component: ReporteCantidad
+    },
+    {
+      path: '/ventas/market',
+      name: 'VentasMarket',
+      component: VentasMarket
+    },
+    {
+      path: '/categoriasnuevo',
+      name: 'CategoriasNuevo',
+      component: CategoriasNuevo
     },
   ]
 })
