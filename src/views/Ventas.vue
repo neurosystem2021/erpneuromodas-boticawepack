@@ -209,6 +209,7 @@
                                 required="required"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
+                                :customParams="{idPerfil: idPerfil}"
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedorManual" 
@@ -310,7 +311,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                <b-input-group prepend="Prof. válida por:" append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -446,7 +447,7 @@
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" v-if="venta.vendedor.IdUsuarioPerfil == 1 || venta.vendedor.IdUsuarioPerfil == 14" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta + '&empresa=' + empresa">Imprimir última Venta</b-button>
                         <br />
                         <br />
@@ -511,7 +512,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf: 1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -548,6 +549,7 @@ export default {
             },
             empresa: 'imperiop2',
             ventaSinStock: 0,
+            idPerfil: sessionStorage.getItem('IdPerfil') || 0
         }
     },
     watch: {
@@ -730,7 +732,7 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0,
+                diasValidosProf: 1,
                 idProforma: 0,
                 anioNumeroProforma:'',
             }
@@ -1078,7 +1080,7 @@ export default {
                 this.$toasted.info('Proforma Guardada con exito')
                 //this.limpiarDespuesVenta()
                 this.loadClienteVarios()
-                this.diasValidosProf=0;
+                this.diasValidosProf=1;
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -1086,6 +1088,7 @@ export default {
                 this.limpiarCart()
                 this.$refs.inputCliente.setValue('')
                 this.$refs.inputVendedor.setValue('')
+                this.getVendedor()
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId + '?empresa=' + this.empresa,'_blank');
             })
             .catch((error) => {
