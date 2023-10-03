@@ -28,7 +28,7 @@
                         </autocomplete>
                     </b-form-group>
                 </b-col>-->
-                <b-col cols="7">
+                <b-col cols="9">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
                     </b-button-group>
@@ -39,19 +39,70 @@
                         <cierres-caja :empresa="empresa"></cierres-caja>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR TICKET</b-button>
                     </b-button-group>
                 </b-col>
               </b-row>
                      </div>
       </div>
       <br class="no-print" /><br class="no-print" />
-
-      <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      <div class="alinear">
+        <h2 class="text-center">Cierre de Caja</h2> 
+        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
+        <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+      </div>
+      <br>
       <b-row>
+        <b-col cols="5">
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Gran Total S/.</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+          </tbody>
+        </table>          
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ totalSalidas | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Crédito S/.</td>
+              <td>{{ totalVentasCredito | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Yape/Plin S/.</td>
+              <td>{{ totalVentasMastercard | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        </b-col>
+      </b-row>
+
+      <b-row class="no-print">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -114,7 +165,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <h5>Ventas Visa</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -178,8 +229,8 @@
 
       
 
-      <b-row>
-        <h5>Ventas Mastercard</h5><br>
+      <b-row class="no-print">
+        <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -233,14 +284,76 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
+              <td class="total"><b>Total Yape/Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
       </b-row>
+  
+      <b-row class="no-print">
+        <h5>Ventas Transferencia</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
 
-      <b-row class="credito">
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <td>{{ item.TransferenciaDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Transferencia</b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row class="credito no-print"">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -303,7 +416,7 @@
       </b-row>
 
 
-      <b-row>
+      <b-row class="no-print">
         <b-col v-if="totalIngresos">
           <h5>Ingresos Caja Principal</h5><br>
           <table class="table b-table table-sm">
@@ -357,7 +470,7 @@
       </b-row>
       
 
-      <b-row>
+      <b-row class="no-print">
         <b-col v-if="totalIngresosTarjeta">
           <h5>Ingresos de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
@@ -386,7 +499,7 @@
         </b-col>
       </b-row>
 
-      <b-row>
+      <b-row class="no-print">
           <b-col v-if="totalAdelantos">
             <h5>Descontar Adelantos</h5><br>
             <table class="table b-table table-sm adelantos">
@@ -416,7 +529,7 @@
 
       <br>
 
-      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -481,10 +594,10 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
+      return this.totalVentasEfectivo - this.totalSalidas
     },
     totalVentas () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
@@ -558,6 +671,18 @@ export default {
     ventasMastercard () {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0  && !venta.EsCredito
+      })
+    },
+    totalVentasTransferencia () {
+      let total = 0
+      this.ventasTransferencia.forEach(venta => {
+        if (!venta.Anulado) total += venta.Transferencia
+      });
+      return total
+    },
+    ventasTransferencia() {
+      return this.ventas.filter(venta => {
+        return venta.Transferencia > 0  && !venta.EsCredito
       })
     },
     totalVentasCredito () {
@@ -805,5 +930,12 @@ th {
   .si-print {
     display: block;
   }
+}
+.alinear * {
+  text-align: left !important;
+}
+.tableResumen {
+  width: 100%;
+  font-weight: bold;
 }
 </style>
