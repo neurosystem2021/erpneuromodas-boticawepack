@@ -547,7 +547,7 @@ export default {
                 ]
             },
             empresa: 'imperiop2',
-            ventaSinStock: 0
+            ventaSinStock: 0,
         }
     },
     watch: {
