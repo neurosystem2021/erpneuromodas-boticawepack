@@ -102,7 +102,7 @@
         </b-col>
       </b-row>
 
-      <h2 class="text-center no-print">Resumen de Productos</h2>
+      <h3 class="text-center no-print">Resumen de Productos (Referencial)</h3>
       <br>
       <b-row class="no-print">
         <table class="table b-table table-sm">
@@ -122,7 +122,7 @@
           <tfoot>
             <tr>
               <td colspan="2"></td>
-              <td class="total"><b>Total Monto</b></td>
+              <td class="total"><b>Total Monto Referencial</b></td>
               <td class="total"><b>S/. {{ productosVendidosTotal | redondear}}</b></td>
             </tr>
           </tfoot>
@@ -138,7 +138,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -146,6 +146,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
+              <td>{{ item.Placa }}</td>
               <td>{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Efectivo | redondear }}</td>
@@ -153,7 +154,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Efectivo</b></td>
               <td class="total"><b>S/. {{ totalVentasEfectivo | redondear}}</b></td>
             </tr>
@@ -167,7 +168,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -175,6 +176,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
+              <td>{{ item.Placa }}</td>
               <td>{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Visa | redondear }}</td>
@@ -182,7 +184,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Tarjeta</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
@@ -197,7 +199,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -205,6 +207,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
+              <td>{{ item.Placa }}</td>
               <td>{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Mastercard | redondear}}</td>
@@ -212,7 +215,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Yape / Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
@@ -225,7 +228,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -233,6 +236,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
+              <td>{{ item.Placa }}</td>
               <td>{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Transferencia | redondear}}</td>
@@ -240,7 +244,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Transferencia</b></td>
               <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
@@ -253,7 +257,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -433,7 +437,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas
     },
     totalSalidas () {
       let total = 0

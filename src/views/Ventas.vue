@@ -139,14 +139,26 @@
                         <b-row>
                             <b-col md="9">
                                 <b-row>
-                                    <b-col md="4" class="docInfo mt-2">
+                                    <b-col md="4" class="docInfo mt-2" id="autoPlaca">
                                         <b-input-group prepend="Placa" class="mb-1">
-                                            <input v-model="venta.Placa"
+                                            <!--<input v-model="venta.Placa"
                                                     type="text"
                                                     ref="inputPlaca"
                                                     style="text-transform:uppercase;"
                                                     class="form-control"
-                                                    placeholder="Placa" />
+                                                    placeholder="Placa" />-->
+                                            <autocomplete
+                                                :url="API + 'placa/clientes'"
+                                                ref="inputPlaca"
+                                                anchor="Placa"
+                                                :customParams="{idCliente: venta.cliente.IdCliente}"
+                                                label="writer"
+                                                placeholder="Placa"
+                                                :on-select="val => venta.Placa = val.Placa && val.Placa.toUpperCase()"
+                                                :onInput="val => venta.Placa = val && val.toUpperCase()"
+                                                :onFocus="focusAutocomplete.bind(null, 'inputPlaca')"                
+                                                :classes="{input: 'form-control upper'}">
+                                            </autocomplete>
                                          </b-input-group>
                                         <b-input-group prepend="Km">
                                             <input v-model="venta.Km"
@@ -342,6 +354,7 @@
                                                             v-model="venta.pago.efectivo.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -365,6 +378,7 @@
                                                             v-model="venta.pago.visa.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -389,6 +403,7 @@
                                                             v-model="venta.pago.mastercard.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -413,6 +428,7 @@
                                                             v-model="venta.pago.transferencias.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -1105,6 +1121,7 @@ export default {
                     this.isNota = true
                     this.limpiarCart()
                     this.venta.Placa = ''
+                    this.$refs.inputPlaca.setValue('');       
                 }
                 if (obj.TieneIgv) {
                     this.tieneIgv = true
@@ -1180,6 +1197,7 @@ export default {
                     }
                 }).then((response) => {
                     this.venta.Placa = response.data[0].Placa || ''
+                    this.$refs.inputPlaca.setValue((response.data[0].Placa || ''));  
                     this.venta.Km = response.data[0].Km || ''
                     this.venta.DescripcionEmbarcacion = response.data[0].DescripcionEmbarcacion
                 this.axios.get(this.API + 'cliente', {
@@ -1221,6 +1239,7 @@ export default {
                 }
             }).then((response) => {
                 this.venta.Placa = ''
+                this.$refs.inputPlaca.setValue(''); 
                 this.venta.Km = ''
                 this.venta.DescripcionEmbarcacion = ''
                 this.axios.get(this.API + 'cliente', {
@@ -1433,6 +1452,7 @@ export default {
            // this.$refs.inputAlmacen.setValue('VENTA')
             //this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
+            this.$refs.inputPlaca.setValue('')
             // this.$refs.inputVendedor.setValue('')
             this.$refs.carrito.pagocon = ''
             this.ventaSeleccionadas = []
@@ -1484,6 +1504,13 @@ export default {
                 this.inProgress = false
                 return 
             }*/
+
+            if(this.venta.tipoVenta.CodSunat == '13' && ((''+this.venta.Placa).trim()=='' || (''+this.venta.Placa).trim()=='.') ){
+                this.$toasted.show('La placa para un VALE DE CREDITO es REQUERIDO', { duration:4000 })
+                this.inProgress = false
+                this.$refs.inputPlaca.focus()   
+                return
+            }
 
             if(this.venta.EsVale == 0){
                 this.venta.ConsumoId = 0
@@ -1639,7 +1666,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
-            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase().trim();
             this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.venta.RefVale = (this.venta.tipoVenta.CodSunat == '13'?(''+this.venta.RefVale).toUpperCase().trim():'')
             this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
@@ -1804,5 +1831,9 @@ export default {
 
     .seleccionProducto {
         border: 7.5px solid #007bff !important;
+    }
+
+    #autoPlaca .focus-list a {
+        background-color: #38cc5a;
     }
 </style>
