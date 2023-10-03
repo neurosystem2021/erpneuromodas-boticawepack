@@ -447,7 +447,7 @@
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" v-if="venta.vendedor.IdUsuarioPerfil == 1 || venta.vendedor.IdUsuarioPerfil == 14" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" v-if="idPerfil == 1 || idPerfil == 14" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta + '&empresa=' + empresa">Imprimir última Venta</b-button>
                         <br />
                         <br />
@@ -920,10 +920,11 @@ export default {
                 if(obj.IdProforma>0){
                     this.venta.idProforma = obj.IdProforma
                     this.venta.anioNumeroProforma = obj.Anio+'-'+obj.Numero
+                    this.getVendedor(obj.UsuarioReg)
                     delete obj.productos
                     this.axios.post(this.API + 'verificar/crear/cliente', {data:obj})
                     .then((response) => {
-                            console.log(response.data);
+                            //console.log(response.data);
                             this.$refs.inputCliente.setValue(response.data.Cliente)
                             this.venta.cliente = response.data
                             this.venta.CampoDireccion = this.venta.cliente.Direccion
@@ -1083,7 +1084,7 @@ export default {
                 this.diasValidosProf=1;
                 this.inProgress = false
                 this.tieneIgv = false
-                this.ultimaVenta = response.data.insertId
+                //this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.$refs.inputCliente.setValue('')
