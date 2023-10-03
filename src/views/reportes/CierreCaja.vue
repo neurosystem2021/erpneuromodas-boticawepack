@@ -42,15 +42,7 @@
       </div>
       <br>
       <b-row>
-        <b-col cols="5">
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr>
-              <td>Gran Total S/.</td>
-              <td>{{ granTotal | redondear }}</td>
-            </tr>
-          </tbody>
-        </table>          
+        <b-col cols="5">         
         <table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
             <tr>
@@ -85,6 +77,10 @@
               <td>Transferencia S/.</td>
               <td>{{ totalVentasTransferencia | redondear }} </td>
             </tr>
+            <tr>
+              <td>Canjes S/.</td>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr>
           </tbody>
         </table>
         <table class="table b-table table-sm table-striped table-bordered tableResumen">
@@ -93,12 +89,20 @@
               <td>Vales de Crédito S/.</td>
               <td>{{ totalVentasValeCredito | redondear }} </td>
             </tr>
-            <tr>
-              <td>Canjes S/.</td>
-              <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
           </tbody>
         </table>
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Gran Total Efectivo S/.</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+            <tr>
+              <td>Gran Total General S/.</td>
+              <td>{{ granTotalGeneral | redondear }}</td>
+            </tr>
+          </tbody>
+        </table> 
         </b-col>
       </b-row>
 
@@ -392,7 +396,7 @@
 
       <br>
 
-      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL EFECTIVO: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -436,8 +440,11 @@ export default {
     getFechaCierre () {
       //return this.$route.params.id ? 
     },
+    granTotalGeneral () {
+      return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
+    },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
