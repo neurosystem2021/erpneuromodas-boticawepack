@@ -92,7 +92,7 @@ import { mapActions } from 'vuex'
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
                     { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket','Eliminar' ],
                 totalRows: 50,
-                perPage: 5,
+                perPage: 10,
                 currentPage: 1,
                 empresaselec: sessionStorage.getItem('empresa') || 'imperiop1'
             }
