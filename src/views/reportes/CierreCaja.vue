@@ -94,11 +94,15 @@
         <table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
             <tr>
+              <td>Gran Total Combustible S/.</td>
+              <td>{{ granTotalVenta | redondear }}</td>
+            </tr>
+            <tr>
               <td>Gran Total Efectivo S/.</td>
               <td>{{ granTotal | redondear }}</td>
             </tr>
             <tr>
-              <td>Gran Total General S/.</td>
+              <td>Gran Total Final S/.</td>
               <td>{{ granTotalGeneral | redondear }}</td>
             </tr>
           </tbody>
@@ -440,11 +444,14 @@ export default {
     getFechaCierre () {
       //return this.$route.params.id ? 
     },
+    granTotalVenta () {
+      return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje
+    },
     granTotalGeneral () {
       return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
