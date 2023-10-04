@@ -1048,6 +1048,7 @@ export default {
                 MontoVales: 0,
                 RefVale: '',
                 Observacion: '',
+                IdSurtidor: 0,
             }
 
             this.isNota = false
@@ -1670,6 +1671,7 @@ export default {
             this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.venta.RefVale = (this.venta.tipoVenta.CodSunat == '13'?(''+this.venta.RefVale).toUpperCase().trim():'')
             this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
+            this.venta.IdSurtidor = this.idSurtidor
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async (response) => {
 

@@ -27,6 +27,10 @@
                         <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
                       </template>
 
+                      <template slot="IdTurno" slot-scope="data">
+                        {{ data.item.IdTurno==1?'MAÑANA':(data.item.IdTurno==2?'TARDE':'NOCHE') }}
+                      </template>
+
                     </b-table>
                     <b-row>
                     <b-col md="6" class="my-1">
@@ -67,7 +71,7 @@ import config from '@/store/config.js'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdCierreCaja', 'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
+                fields: [ 'IdCierreCaja', 'FechaCierre', { key: 'IdTurno', label: 'Turno'}, 'UsuarioReg', 'ver' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
