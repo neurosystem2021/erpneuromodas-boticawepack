@@ -19,12 +19,14 @@
             <label>Nombre del Proveedor:</label>
             <b-form-input 
               v-model="proveedor.Proveedor"
+              autocomplete="off"
               type="text"></b-form-input>
           </b-form-group>
           <b-form-group>
             <label>Dirección:</label>
             <b-form-input 
               v-model="proveedor.Direccion"
+              autocomplete="off"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
@@ -87,7 +89,7 @@ export default {
         this.$refs.proveedorForm.hide()
       })
       .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo o verifique si ya existe')
       })
     }
   }

@@ -13,6 +13,7 @@ import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Venta from '@/views/Venta.vue'
 import CategoriasNuevo from '@/views/CategoriasNuevo.vue'
+import Proveedores from '@/views/Proveedores.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -169,6 +170,11 @@ export default new Router({
       path: '/categoriasnuevo',
       name: 'CategoriasNuevo',
       component: CategoriasNuevo
+    },
+    {
+      path: '/proveedores',
+      name: 'Proveedores',
+      component: Proveedores
     },
   ]
 })
