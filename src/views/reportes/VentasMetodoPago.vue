@@ -36,9 +36,9 @@
             </b-col>
             <b-col md="3" class="my-1">
               <br>
-              <b-button variant="success" size="md" @click="verArticulos">Generar</b-button>
-              <!--<b-button variant="success" size="md" :href="hrefXls" target="_blank">Exportar</b-button>-->
-              <b-button variant="primary" size="md" @click="imprimir">Imprimir</b-button>
+              <b-button class="mr-1" variant="success" size="md" @click="verArticulos">Generar</b-button>
+              <b-button class="mr-1" variant="primary" size="md" @click="imprimir">Imprimir</b-button>
+              <b-button class="mr-1" variant="success" size="md" :href="hrefXls" :disabled="fechaDesde == '' || fechaHasta == ''" target="_blank"><i class="fas fa-file-excel"></i> Exportar Excel</b-button>
             </b-col>
           </b-row>
           <b-row class="si-print" style="display:none">
@@ -55,7 +55,7 @@
             <table class="table table-hover b-table table-sm tbmetodopago">
               <thead>
                 <tr>
-                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Pagado</th>
+                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Estado</th><th>Pagado</th>
                 </tr>
               </thead>
               <tbody>
@@ -66,12 +66,13 @@
                   <td>{{ item.Placa }}</td>
                   <td class="table-success">{{ item.VisaDesc }}</td>
                   <td style="text-transform: uppercase ;">{{ item.UsuarioReg }}</td>
+                  <td>{{ estadoVenta(item) }}</td>
                   <td>S/. {{ item.Visa | redondear }}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="6"></td>
                   <td class="total"><b>Total Tarjeta</b></td>
                   <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
                 </tr>
@@ -84,7 +85,7 @@
             <table class="table table-hover b-table table-sm tbmetodopago">
               <thead>
                 <tr>
-                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Pagado</th>
+                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Estado</th><th>Pagado</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,12 +96,13 @@
                   <td>{{ item.Placa }}</td>
                   <td class="table-success">{{ item.MastercardDesc }}</td>
                   <td style="text-transform: uppercase ;">{{ item.UsuarioReg }}</td>
+                  <td>{{ estadoVenta(item) }}</td>
                   <td>S/. {{ item.Mastercard | redondear}}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="6"></td>
                   <td class="total"><b>Total Yape / Plin</b></td>
                   <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
                 </tr>
@@ -113,7 +115,7 @@
             <table class="table table-hover b-table table-sm tbmetodopago">
               <thead>
                 <tr>
-                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Pagado</th>
+                  <th>Recibo</th><th>Fecha</th><th width="40%">Cliente</th><th>Placa</th><th>Detalle</th><th>Vendedor</th><th>Estado</th><th>Pagado</th>
                 </tr>
               </thead>
               <tbody>
@@ -124,12 +126,13 @@
                   <td>{{ item.Placa }}</td>
                   <td class="table-success">{{ item.TransferenciaDesc }}</td>
                   <td style="text-transform: uppercase ;">{{ item.UsuarioReg }}</td>
+                  <td>{{ estadoVenta(item) }}</td>
                   <td>S/. {{ item.Transferencia | redondear}}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="5"></td>
+                  <td colspan="6"></td>
                   <td class="total"><b>Total Transferencia</b></td>
                   <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
                 </tr>
@@ -161,7 +164,7 @@ export default {
   },
   computed: {
     hrefXls () {
-      return '/api/index.php/reporte/articulosresumen?fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta;
+      return '/api/index.php/reporte/metodopago/ventas?fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta+'&idMetodoPago='+this.idMetodoPago;
     },
     setMetodoPago(ev){
 
@@ -204,7 +207,7 @@ export default {
     },
   },
   methods: {
-    VendedorVenta (venta) {
+    estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
     verArticulos () {
@@ -246,5 +249,9 @@ export default {
 .tbmetodopago thead th{
   vertical-align: middle;
   text-align: center;
+}
+.anulado td{
+  /*font-style: italic;*/
+  text-decoration: line-through;
 }
 </style>

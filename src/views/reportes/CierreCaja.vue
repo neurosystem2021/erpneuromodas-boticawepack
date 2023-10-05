@@ -101,10 +101,6 @@
               <td>Gran Total Efectivo S/.</td>
               <td>{{ granTotal | redondear }}</td>
             </tr>
-            <tr>
-              <td>Gran Total Final S/.</td>
-              <td>{{ granTotalGeneral | redondear }}</td>
-            </tr>
           </tbody>
         </table> 
         </b-col>
@@ -451,7 +447,7 @@ export default {
       return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
