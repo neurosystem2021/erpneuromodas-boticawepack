@@ -150,8 +150,8 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ item.EfectivoDesc }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.EfectivoDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Efectivo | redondear }}</td>
             </tr>
@@ -180,8 +180,8 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ item.VisaDesc }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.VisaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Visa | redondear }}</td>
             </tr>
@@ -211,8 +211,8 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ item.MastercardDesc }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.MastercardDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Mastercard | redondear}}</td>
             </tr>
@@ -240,8 +240,8 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ item.TransferenciaDesc }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Transferencia | redondear}}</td>
             </tr>
@@ -269,7 +269,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
             </tr>
@@ -297,7 +297,7 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.Placa }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
             </tr>
@@ -466,7 +466,7 @@ export default {
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado  && venta.CodSunat!='07') total += venta.Efectivo
+        if (venta.CodSunat!='07') total += venta.Efectivo
       });
       return total
     },
@@ -478,7 +478,7 @@ export default {
     totalVentasVisa () {
       let total = 0
       this.ventasVisa.forEach(venta => {
-        if (!venta.Anulado) total += venta.Visa
+        total += venta.Visa
       });
       return total
     },
@@ -490,7 +490,7 @@ export default {
     totalVentasTransferencia() {
       let total = 0
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia
+        total += venta.Transferencia
       });
       return total
     },
@@ -502,7 +502,7 @@ export default {
     totalVentasVale() {
       let total = 0
       this.ventasVale.forEach(venta => {
-        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+        total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
       });
       return total
     },
@@ -514,7 +514,7 @@ export default {
     totalVentasValeCredito() {
       let total = 0
       this.ventasValeCredito.forEach(venta => {
-        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+        total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
       });
       return total
     },
@@ -526,7 +526,7 @@ export default {
     totalVentasCanje() {
       let total = 0
       this.ventasValeCanje.forEach(venta => {
-        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+        total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
       });
       return total
     },
@@ -538,7 +538,7 @@ export default {
     totalVentasMastercard () {
       let total = 0
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard
+        total += venta.Mastercard
       });
       return total
     },
@@ -550,7 +550,7 @@ export default {
     totalVentasCredito () {
       let total = 0
       this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total
+        total += venta.Total
       });
       return total
     },
