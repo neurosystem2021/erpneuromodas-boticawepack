@@ -30,7 +30,7 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row style="height:28vh; overflow-y: scroll; background: #FFFFFF;">
+      <b-row style="height:30vh; overflow-y: scroll; background: #FFFFFF;">
       <b-col md="12">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="selec" slot-scope="data">
@@ -148,7 +148,7 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" v-if="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <b-button variant="danger" size="sm" v-if="(bloquearInput?true:false || idPerfil == 1) && ventaSeleccionadas==0" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -203,6 +203,11 @@
                 <tr>
                   <td>
                     <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success" :disabled="EsVale==1 || EsVale==2"><i class="fas fa-credit-card" ></i></b-button>
+                    <br>
+                    <b-badge v-if="idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                    <b-badge v-if="idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                    <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                    <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSFERENCIA</b-badge>
                     <b-popover target="popover-metodopago" title="Metodo de pago" triggers="focus">
                     <slot name="metodopago"></slot>
                     </b-popover>
@@ -300,6 +305,8 @@ export default {
     setPrecio: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
+    idMetodoPago: Number,
+    ventaSeleccionadas: Number,
     igvTotal: Boolean,
     EsVale: Number,
     onSetProducto: {

@@ -220,7 +220,7 @@
                                         <b-input-group prepend="Obs.">
                                         <textarea v-model="venta.Observacion"
                                                 type="text"
-                                                rows="2"
+                                                rows="1"
                                                 style="text-transform:uppercase;"
                                                 class="form-control"
                                                 placeholder="Observaciones del comprobante"></textarea>
@@ -291,6 +291,8 @@
                                     :bloquearInput="bloquearInput" 
                                     :fields="carrito.fields"
                                     :idAlmacen="venta.almacen.IdAlmacen"
+                                    :idMetodoPago="venta.IdMetodoPago"
+                                    :ventaSeleccionadas="ventaSeleccionadas.length"
                                     :onSetProducto="onSetProducto">
 
                                     <template slot="operaciones">
@@ -908,24 +910,28 @@ export default {
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.efectivo.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 1;
                     break;
                 case 2:
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.visa.monto =this.totalCart;
+                    this.venta.IdMetodoPago = 2;
                     break;
                 case 3:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.mastercard.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 3;
                     break;
                 case 4:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.transferencias.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 4;
                     break;
             
                 default:
@@ -947,18 +953,23 @@ export default {
         obj.nuevoPrecioContado = 0
         this.idProductoSelect = obj.IdProducto
         this.productoSelect = obj
-        /*obj = this.onSetProducto(obj)
-        let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
-        if(existe==undefined){
-                this.$toasted.info('Producto agregado')
-        }else{
-                this.$toasted.error('El producto ya esta agregado')
-        }
-        this.add([obj, () => {
-            this.onAddProducto(obj)
-        }])*/
 
         // Vue.set(this.productos, obj.IdProducto, obj)
+            if(this.idPerfil == 1){
+                let r = confirm('¿Administrador, se agregará el producto: '+obj.Producto+'?')
+                if (r) {
+                    obj = this.onSetProducto(obj)
+                    let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
+                    if(existe==undefined){
+                        this.$toasted.info('Producto agregado')
+                        this.add([obj, () => {
+                            this.onAddProducto(obj)
+                        }])
+                    }else{
+                        this.$toasted.error('El producto ya esta agregado')
+                    }
+                }
+            }
         },
         limpiarPuntoVenta(){
             this.ultimaVentaCliente=''
@@ -1027,10 +1038,10 @@ export default {
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
-                    efectivo: { IdMetodoPago: 1, monto: 0 },
-                    visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 },
-                    transferencias: { IdMetodoPago: 4, monto: 0 }
+                    efectivo: { IdMetodoPago: 1, monto: 0 , descripcion: '' },
+                    visa: { IdMetodoPago: 2, monto: 0, descripcion: '' },
+                    mastercard: { IdMetodoPago: 3, monto: 0, descripcion: '' },
+                    transferencias: { IdMetodoPago: 4, monto: 0, descripcion: '' }
                 },
                 CampoDireccion: 'Direccion',
                 DescripcionEmbarcacion: '',
@@ -1049,6 +1060,7 @@ export default {
                 RefVale: '',
                 Observacion: '',
                 IdSurtidor: 0,
+                IdMetodoPago: 1,
             }
 
             this.isNota = false
@@ -1388,6 +1400,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0
             this.venta.pago.transferencias.monto = 0
+            this.venta.IdMetodoPago = 1
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
@@ -1396,6 +1409,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0
             this.venta.pago.transferencias.monto = 0
+            this.venta.IdMetodoPago = 1
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -1552,6 +1566,25 @@ export default {
             }
             if((isNaN(parseFloat(this.venta.pago.transferencias.monto))?0:parseFloat(this.venta.pago.transferencias.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago yape/plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+
+            //Validaciones de metodo de pago
+            if(this.venta.pago.visa.monto > 0 && (''+this.venta.pago.visa.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago TARJETA debe tener una referencia', { duration:5000 })
+                this.inProgress = false            
+                return  
+            }
+
+            if(this.venta.pago.mastercard.monto > 0 && (''+this.venta.pago.mastercard.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago YAPE/PLIN debe tener una referencia', { duration:5000 })
+                this.inProgress = false            
+                return  
+            }
+
+            if(this.venta.pago.transferencias.monto > 0 && (''+this.venta.pago.transferencias.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago TRANSFERENCIA debe tener una referencia', { duration:5000 })
                 this.inProgress = false            
                 return  
             }
