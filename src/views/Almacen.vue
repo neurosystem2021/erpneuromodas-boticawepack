@@ -308,7 +308,7 @@
         <br /><br />
       </b-container>
 
-      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
+      <b-modal id="kardexModal" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
       
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <b-row>
@@ -741,6 +741,9 @@ export default {
   }
   .imagenGrande{
     width: 100%;
+  }
+  #kardexModal .modal-dialog {
+    max-width: 95% !important;
   }
 </style>
 

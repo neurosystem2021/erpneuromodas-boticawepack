@@ -6,6 +6,7 @@
                 <th rowspan="2">FECHA</th>
                 <th rowspan="2">USUARIO</th>
                 <th rowspan="2">COMPROBANTE</th>
+                <th rowspan="2">RUC/DNI</th>
                 <th rowspan="2">PROVEEDOR/CLIENTE</th>
                 <th colspan="2">INGRESOS</th>
                 <th colspan="2">SALIDAS</th>
@@ -23,6 +24,7 @@
                 <td>{{ prod.Fecha }}</td>
                 <td>{{ prod.UsuarioReg }}</td>
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
+                <td>{{ prod.DniRuc }}</td>
                 <td>{{ prod.Nombres }}</td>
                 <td :class="{'table-warning': prod.IngresoCantidad > 0}">{{ prod.IngresoCantidad }}</td>
                 <td :class="{'table-warning': prod.IngresoPrecio > 0}"><b>{{ prod.IngresoPrecio > 0 ? prod.Moneda : '' }}</b> {{ prod.IngresoPrecio | redondear }}</td>
