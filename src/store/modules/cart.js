@@ -62,17 +62,19 @@ const actions = {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
+    let barcode = false
     if (obje) {
       setPrecio = obje.setPrecio
       cantidad = obje.cantidad
       setSuma = obje.setSuma
+      barcode = obje.barcode
     }
 
     if(typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      axios.get(API + 'productos/id/' + producto+(barcode?'?codigobarra=1':'')).then((response) => {
         if (response.data) {
           let obj = response.data
 

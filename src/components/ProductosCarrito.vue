@@ -223,8 +223,10 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'ProductoCategoria', label: 'Categoria'},
+          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: 'CodigoBarra', label: 'Código' },
           { key: 'Producto', label: 'Artículo' }, 
+          { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoMedicion', label: 'Medicion' },
           { key: 'cantidad' },
@@ -309,7 +311,7 @@ export default {
     },
     loadBarcode (e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(this.loadCode.length -2);
+      let idProducto = this.loadCode
 
       if (idProducto) {
         this.add([idProducto, (obj) => {
@@ -320,7 +322,7 @@ export default {
             this.$toasted.show('No se encontró ningun producto')
           }
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }, { setPrecio: this.setPrecio,  setSuma: true, barcode: true }])
       }
     },
     /*alterarBuscadorProductos() {
