@@ -149,8 +149,20 @@
           <h4>CHASIS / MOTOR</h4>
         </div>
         <b-row>
-          <b-col>
-            
+          <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
+            <b-card class="chasisCard" @click="setChasis(chasis)">
+              <b-row>
+                <b-col md="2" :style="{ backgroundColor: chasis.HexColor }"></b-col>
+                <b-col md="10">
+                  <b-row class="ml-1">
+                    <b class="mr-1">CHASIS: </b> {{ chasis.Chasis}}
+                  </b-row>
+                  <b-row class="ml-1">
+                    <b class="mr-1">MOTOR: </b> {{ chasis.Motor}}
+                  </b-row>
+                </b-col>
+              </b-row>
+            </b-card>
           </b-col>
         </b-row>
       </b-modal>
@@ -342,8 +354,8 @@
             </b-form-text>
         </template>
 
-        <template slot="extra" slot-scope="data" >
-          <div style="width: 270px;" v-if="productos[data.index].EsVehiculo">
+        <template slot="extra" slot-scope="data">
+          <div style="width: 250px;" v-if="productos[data.index].EsVehiculo">
             <div v-if="(tipoMov==1 || tipoMov==2)">
               <b-form-select v-if="!isNota"
                 style="width: 155px;"
@@ -359,7 +371,7 @@
                 type="text"
                 required
                 :readonly="isVentas"
-                style="text-transform: uppercase;"
+                style="text-transform: uppercase; font-weight: bold"
                 autocomplete="off"
                 ></b-form-input>  
               </b-input-group>
@@ -369,10 +381,11 @@
                 type="text"
                 required
                 :readonly="isVentas"
-                style="text-transform: uppercase;"
+                style="text-transform: uppercase; font-weight: bold;"
                 autocomplete="off"
                 ></b-form-input>
               </b-input-group>
+              <div style="width: 250px; height: 10px;" :style="estadoColor(productos[data.index].IdColor)"></div>
             </div>
           </div>
           <div v-else>
@@ -436,7 +449,24 @@
             v-model="productos[data.index].Descripcion"
             type="text"
             placeholder="Descripción"></b-form-input>-->
-        </template>        
+        </template>
+        
+        <template slot="color" slot-scope="data">
+          <div style="width: 140px">
+            <b-form-select id="selectColor" v-model="productos[data.index].IdColor" :options="colores" v-on:change="setColor($event)" class="mb-3" size="md" required/>
+          </div>
+          <!--<autocomplete
+            :ref="'autocompleteColor-'+data.index"
+            :url="API+'colores'"
+            :customParams="{'opc':1}"
+            anchor="ProductoColor"
+            label="writer"
+            placeholder="Seleccione Color"
+            :on-select="setColor(data.item,data.index)"
+            :onFocus="focusAutocompleteColor.bind(null, 'autocompleteColor-'+data.index)"
+            :classes="{input: 'form-control'}">
+          </autocomplete>-->
+        </template> 
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -549,6 +579,7 @@ Vue.use(VueQuagga)
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
+    this.cargarColores()
   },
   data () {
     return {
@@ -591,6 +622,9 @@ export default {
       productoUrl:'',
       modalAbiertCode: false,
       movimientoLotes: {},
+      colores: [],
+      chasisesDisponibles: [],
+      indexChasisSelect: null,
     }
   },
   created() {
@@ -657,7 +691,8 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'P. Venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'Descripcion', label: 'Descripcion'},
+          //{ key: 'Descripcion', label: 'Descripcion'},
+          { key: 'color', label: 'Color'},
           { key: 'extra', label: 'Chasis / Motor', variant: 'secondary' },
           { key: 'acciones', label: ''}
         ]
@@ -731,9 +766,58 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    setChasis(data){
+      if(this.indexChasisSelect == null){
+        this.$refs['modalSeleccionar'].hide()
+        this.$toasted.error('No se cargo el vehiculo, seleccione nuevamente')
+        return
+      }
+      console.log(data);
+      this.productos[this.indexChasisSelect].Chasis = data.Chasis
+      this.productos[this.indexChasisSelect].Motor = data.Motor
+      this.productos[this.indexChasisSelect].IdColor = data.IdColor
+      this.$toasted.info('Chasis y Motor asignado')
+      this.$refs['modalSeleccionar'].hide()
+    },
+    estadoColor(id){
+      let existe = this.colores.find(p=>p.value == id)
+      if(existe){
+        return { backgroundColor: existe.color, }
+      }else{
+        return { backgroundColor: 'transparent', }
+      }
+    },
+    cargarColores(){
+      this.axios.get(this.API + 'colores')
+      .then((response) => {
+        if(response.data.length>0){
+          this.colores = []
+          response.data.map((dat)=>{
+            this.colores.push({value: dat.IdProductoColor, text: dat.ProductoColor, color: dat.HexColor})
+          })
+        }
+        console.log(response);
+      })
+    },
+    setColor(e){
+      console.log(e);
+    },
     showSeleccionar(obj, index){
-      this.objProd = obj
-      this.$refs['modalSeleccionar'].show()
+      this.indexChasisSelect = null
+      this.axios.get(this.API + 'chasises/disponibles',{
+        params:{
+          IdAlmacen: this.idAlmacen,
+          IdProducto: obj.IdProducto
+        }
+      })
+      .then((response) => {
+        if(response.data.length>0){
+          this.objProd = obj
+          this.chasisesDisponibles = response.data
+          this.indexChasisSelect = index
+          this.$refs['modalSeleccionar'].show()
+        }
+      })
     },
     changeMovimiento(hash, idProducto, index) {
       if  (hash) {
@@ -1006,6 +1090,10 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
+    focusAutocompleteColor (ref) {
+      this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick()
+    },
     editarProducto(Pro){
       this.productoSelect = Pro
       this.$refs.productoFormEdit.show = true;
@@ -1039,6 +1127,7 @@ export default {
       this.objProd = {}
       obj.Chasis = ''
       obj.Motor = ''
+      obj.IdColor = 1
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = false;
@@ -1444,5 +1533,16 @@ export default {
   }
   th.th-chasis{
     text-align: center;
+  }
+  #selectColor option:first-child{
+    font-weight:bold
+  }
+  .chasisCard{
+    cursor: pointer;
+    margin: 3px;
+    
+  }
+  .card-body{
+    padding: 0.5rem !important;
   }
 </style>

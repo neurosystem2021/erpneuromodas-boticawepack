@@ -410,6 +410,8 @@ return false
       let faltaLlenar = false
       let sinStock = 0
       let faltaCantidad = false
+      let vehiculoCantidad = false
+      let noColor = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
@@ -423,10 +425,30 @@ return false
           faltaCantidad = true
         }
 
+        if(prod.cantidad != 1 && prod.EsVehiculo == 1){
+          vehiculoCantidad = true
+        }
+
+        if(prod.IdColor == 1 && prod.EsVehiculo == 1){
+          noColor = true
+        }
+
         prod.Chasis = (""+(prod.Chasis || '')).toUpperCase().trim()
         prod.Motor = (""+(prod.Motor || '')).toUpperCase().trim()
         prod.Descripcion = (""+(prod.Descripcion || '')).toUpperCase().trim()
       })
+
+      if (noColor) {
+        this.$toasted.show('Todo VEHICULO debe seleccionarse el color')
+        this.inProgress = false
+        return;
+      }
+
+      if (vehiculoCantidad) {
+        this.$toasted.show('Un producto es VEHICULO debe ingresar solo cantidad 1')
+        this.inProgress = false
+        return;
+      }
 
       if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
