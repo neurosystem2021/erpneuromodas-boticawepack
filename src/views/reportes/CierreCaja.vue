@@ -261,22 +261,23 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Estado</th><th>Pagado</th>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Ref.</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado, marcado: item.check}" @click="(e) =>  onCambioSeleccion(index, e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td style="text-decoration: none">{{ item.Placa }}</td>
+              <td style="text-decoration: none">{{ item.RefVale }}</td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Vale</b></td>
               <td class="total"><b>S/. {{ totalVentasValeCredito | redondear }}</b></td>
             </tr>
@@ -561,6 +562,14 @@ export default {
     }
   },
   methods: {
+    onCambioSeleccion(index,e){
+      this.ventasValeCredito[index].check = !this.ventasValeCredito[index].check
+      if (this.ventasValeCredito[index].check) {
+          e.target.parentNode.classList.add('marcado')
+      } else {
+          e.target.parentNode.classList.remove('marcado')
+      }    
+    },
     getVendedor () {
       let usuario = sessionStorage.getItem('User')
       this.axios.get(this.API + 'usuarios/' + usuario)
@@ -645,6 +654,9 @@ export default {
       })
       .then(res => {
         this.ventas = res.data
+        this.ventas.map((vt)=>{
+          vt.check = false
+        })
         if(this.ventas.length > 0){
           this.getProductos(this.ventas)
         }
@@ -730,5 +742,11 @@ th {
 .tableResumen {
   width: 100%;
   font-weight: bold;
+}
+.marcado{
+  padding: 0.5rem 0.5rem;
+  background-color: #d1e7dd;
+  border-bottom-width: 1px;
+  box-shadow: inset 0 0 0 9999px #d1e7dd;
 }
 </style>
