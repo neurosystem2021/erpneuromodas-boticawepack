@@ -149,6 +149,20 @@
           <h4>CHASIS / MOTOR</h4>
         </div>
         <b-row>
+          <b-col>
+            <b-input-group prepend="Buscar" class="mt-2 mb-2">
+                <b-form-input style="text-transform: uppercase;" ref="inputSearchChasis" autocomplete="off" @input="(val)=>{debounceInput(val); cargandoChasis = true; chasisesDisponibles = [];}" v-model="filtroChasis" :placeholder="'Buscar Chasis / Motor de ' + objProd.Producto"></b-form-input>
+                <b-input-group-append>
+                    <b-button variant="secondary" ref="buttonLimpiar" :disabled="!filtroChasis" @click="filtroChasis = '';  buscarChasis('')">Limpiar</b-button>
+                </b-input-group-append>
+            </b-input-group>
+          </b-col>
+        </b-row>
+        <hr>
+        <b-row>
+          <b-col v-if="cargandoChasis" style="display: flex; justify-content: center;  align-items: center; height:55.5vh;">
+              <vue-simple-spinner size="huge"></vue-simple-spinner>
+          </b-col>
           <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
             <b-card class="chasisCard" @click="setChasis(chasis)">
               <b-row>
@@ -484,7 +498,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -573,6 +587,8 @@ import config from '@/store/config.js'
 import sound from '../../static/beep.mp3'
 import Vue from "vue"
 import VueQuagga from "vue-quaggajs"
+import debounce  from 'lodash'
+import Spinner from 'vue-simple-spinner'
 
 Vue.use(VueQuagga)
 
@@ -625,6 +641,8 @@ export default {
       colores: [],
       chasisesDisponibles: [],
       indexChasisSelect: null,
+      filtroChasis: '',
+      cargandoChasis: false,
     }
   },
   created() {
@@ -766,6 +784,35 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    debounceInput: _.debounce(function (e) {
+        if(e.trim()==''){
+            this.$refs.barcodeInput.focus()
+            this.$refs.inputSearchChasis.focus()
+            this.buscarChasis(e)
+            return;
+        }
+        this.buscarChasis(e)
+    }, 250),
+    buscarChasis(e){
+      this.cargandoChasis = true
+      this.axios.get(this.API + 'chasises/disponibles',{
+        params:{
+          IdAlmacen: this.idAlmacen,
+          IdProducto: this.objProd.IdProducto,
+          q: (e+'').trim()
+        }
+      })
+      .then((response) => {
+        if(response.data.length>0){
+          this.chasisesDisponibles = response.data
+        }
+        /*this.$refs.barcodeInput.focus()
+        this.$refs.inputSearchChasis.blur()*/
+        this.cargandoChasis = false
+      }).catch((err)=>{
+        this.cargandoChasis = false
+      })
+    },
     setChasis(data){
       if(this.indexChasisSelect == null){
         this.$refs['modalSeleccionar'].hide()
@@ -804,10 +851,13 @@ export default {
     },
     showSeleccionar(obj, index){
       this.indexChasisSelect = null
+      this.filtroChasis = ''
+      this.cargandoChasis = false
       this.axios.get(this.API + 'chasises/disponibles',{
         params:{
           IdAlmacen: this.idAlmacen,
-          IdProducto: obj.IdProducto
+          IdProducto: obj.IdProducto,
+          q: this.filtroChasis
         }
       })
       .then((response) => {
@@ -815,6 +865,7 @@ export default {
           this.objProd = obj
           this.chasisesDisponibles = response.data
           this.indexChasisSelect = index
+          this.cargandoChasis = false
           this.$refs['modalSeleccionar'].show()
         }
       })
@@ -1416,7 +1467,8 @@ export default {
 		}
   },
   components: {
-    ProductoForm
+    ProductoForm,
+    'vue-simple-spinner':Spinner,
   }
 }
 </script>
@@ -1543,6 +1595,7 @@ export default {
     
   }
   .card-body{
-    padding: 0.5rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
   }
 </style>
