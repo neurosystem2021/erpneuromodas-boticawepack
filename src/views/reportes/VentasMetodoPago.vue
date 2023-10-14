@@ -59,7 +59,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+                <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
                   <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                   <td>{{ item.FechaDoc }}</td>
                   <td>{{ item.Cliente }}</td>
@@ -89,7 +89,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+                <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
                   <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                   <td>{{ item.FechaDoc }}</td>
                   <td>{{ item.Cliente }}</td>
@@ -119,7 +119,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+                <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
                   <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                   <td>{{ item.FechaDoc }}</td>
                   <td>{{ item.Cliente }}</td>
@@ -207,6 +207,13 @@ export default {
     },
   },
   methods: {
+    onCambioSeleccion(e){
+      if (!e.target.parentNode.classList.contains('marcado')) {
+          e.target.parentNode.classList.add('marcado')
+      } else {
+          e.target.parentNode.classList.remove('marcado')
+      }    
+    },
     estadoVenta (venta) {
       return venta.Anulado ? 'ANULADO' : 'APLICADO'
     },
@@ -253,5 +260,11 @@ export default {
 .anulado td{
   /*font-style: italic;*/
   text-decoration: line-through;
+}
+.marcado{
+  padding: 0.5rem 0.5rem;
+  background-color: #d1e7dd;
+  border-bottom-width: 1px;
+  box-shadow: inset 0 0 0 9999px #d1e7dd;
 }
 </style>
