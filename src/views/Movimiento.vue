@@ -232,7 +232,8 @@ export default {
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
       isTraslado:true,
-      isSalida:false
+      isSalida:false,
+      almacenPrincipal: 1,
     }
   },
   computed: {
@@ -370,6 +371,13 @@ return false
           IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
         })
       }
+
+      this.productos.map((r)=>{
+        r.Chasis = ''
+        r.Motor = ''
+        r.IdColor = 1
+        r.IdMovimientoDet = null
+      })
     },
     setAlmacenDestino (obj) {
       this.movimiento.almacenDestino = obj

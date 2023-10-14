@@ -151,7 +151,8 @@
         <b-row>
           <b-col>
             <b-input-group prepend="Buscar" class="mt-2 mb-2">
-                <b-form-input style="text-transform: uppercase;" ref="inputSearchChasis" autocomplete="off" @input="(val)=>{debounceInput(val); cargandoChasis = true; chasisesDisponibles = [];}" v-model="filtroChasis" :placeholder="'Buscar Chasis / Motor de ' + objProd.Producto"></b-form-input>
+                <b-form-input style="text-transform: uppercase;" ref="inputSearchChasis" autocomplete="off" @input="(val)=>{debounceInput(val); cargandoChasis = true; chasisesDisponibles = [];}" v-model="filtroChasis" :placeholder="'Buscar Chasis / Motor / Color de ' + objProd.Producto"></b-form-input>
+                <b-form-input v-show="false" style="text-transform: uppercase;" ref="inputSearchChasis2" autocomplete="off"></b-form-input>
                 <b-input-group-append>
                     <b-button variant="secondary" ref="buttonLimpiar" :disabled="!filtroChasis" @click="filtroChasis = '';  buscarChasis('')">Limpiar</b-button>
                 </b-input-group-append>
@@ -159,7 +160,7 @@
           </b-col>
         </b-row>
         <hr>
-        <b-row>
+        <b-row style="height:55.5vh;">
           <b-col v-if="cargandoChasis" style="display: flex; justify-content: center;  align-items: center; height:55.5vh;">
               <vue-simple-spinner size="huge"></vue-simple-spinner>
           </b-col>
@@ -209,8 +210,8 @@
         </template>
 
         <template slot="eventVehi" slot-scope="data">
-          <div style="width: 37.5px; text-align: center;">
-            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="primary" @click="showSeleccionar(productos[data.index],data.index)"><i class="fas fa-car"></i></b-button>
+          <div style="width: 37.5px; text-align: center;" v-if="data.item.EsVehiculo==1 && (isVentas || tipoMov==1 || tipoMov==2)">
+            <b-button size="sm" :disabled="bloquearInput?true:false" variant="primary" @click="showSeleccionar(productos[data.index],data.index)"><i class="fas fa-car"></i></b-button>
           </div>
         </template>
 
@@ -370,22 +371,14 @@
 
         <template slot="extra" slot-scope="data">
           <div style="width: 250px;" v-if="productos[data.index].EsVehiculo">
-            <div v-if="(tipoMov==1 || tipoMov==2)">
-              <b-form-select v-if="!isNota"
-                style="width: 155px;"
-                :disabled="bloquearInput?true:false"
-                @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
-                v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
-              </b-form-select>
-            </div>
-            <div v-else>
+            <div>
               <b-input-group size="sm" prepend="Chasis" style="font-weight: bold;">
                 <b-form-input
                 v-model="productos[data.index].Chasis"
                 type="text"
                 required
-                :readonly="isVentas"
-                style="text-transform: uppercase; font-weight: bold"
+                :readonly="isVentas || tipoMov==1 || tipoMov==2"
+                style="text-transform: uppercase; font-weight: bold; color: black;"
                 autocomplete="off"
                 ></b-form-input>  
               </b-input-group>
@@ -394,15 +387,13 @@
                 v-model="productos[data.index].Motor"
                 type="text"
                 required
-                :readonly="isVentas"
-                style="text-transform: uppercase; font-weight: bold;"
+                :readonly="isVentas || tipoMov==1 || tipoMov==2"
+                style="text-transform: uppercase; font-weight: bold; color: black;"
                 autocomplete="off"
                 ></b-form-input>
               </b-input-group>
               <div style="width: 250px; height: 10px;" :style="estadoColor(productos[data.index].IdColor)"></div>
             </div>
-          </div>
-          <div v-else>
           </div>
         </template>
 
@@ -466,7 +457,7 @@
         </template>
         
         <template slot="color" slot-scope="data">
-          <div style="width: 140px">
+          <div style="width: 140px" v-if="tipoMov!=1 && tipoMov!=2">
             <b-form-select id="selectColor" v-model="productos[data.index].IdColor" :options="colores" v-on:change="setColor($event)" class="mb-3" size="md" required/>
           </div>
           <!--<autocomplete
@@ -690,7 +681,7 @@ export default {
     fields: {
       default () {
         return [
-          //{ key: 'itemNum', label: '#', class:'text-center thclass' },
+          { key: 'itemNum', label: '#', class:'text-center thclass' },
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center thclass' },
           // { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
@@ -711,6 +702,7 @@ export default {
           { key: 'total', label: 'Total', variant: 'danger' },
           //{ key: 'Descripcion', label: 'Descripcion'},
           { key: 'color', label: 'Color'},
+          { key: 'eventVehi', label: '', },
           { key: 'extra', label: 'Chasis / Motor', variant: 'secondary' },
           { key: 'acciones', label: ''}
         ]
@@ -786,7 +778,7 @@ export default {
     }),
     debounceInput: _.debounce(function (e) {
         if(e.trim()==''){
-            this.$refs.barcodeInput.focus()
+            this.$refs.inputSearchChasis.focus()
             this.$refs.inputSearchChasis.focus()
             this.buscarChasis(e)
             return;
@@ -797,7 +789,7 @@ export default {
       this.cargandoChasis = true
       this.axios.get(this.API + 'chasises/disponibles',{
         params:{
-          IdAlmacen: this.idAlmacen,
+          IdAlmacen: this.isVentas?this.idAlmacen:this.almacenOrigen,
           IdProducto: this.objProd.IdProducto,
           q: (e+'').trim()
         }
@@ -806,8 +798,8 @@ export default {
         if(response.data.length>0){
           this.chasisesDisponibles = response.data
         }
-        /*this.$refs.barcodeInput.focus()
-        this.$refs.inputSearchChasis.blur()*/
+        this.$refs.barcodeInput.focus()
+        this.$refs.inputSearchChasis.focus()
         this.cargandoChasis = false
       }).catch((err)=>{
         this.cargandoChasis = false
@@ -822,6 +814,7 @@ export default {
       console.log(data);
       this.productos[this.indexChasisSelect].Chasis = data.Chasis
       this.productos[this.indexChasisSelect].Motor = data.Motor
+      this.productos[this.indexChasisSelect].IdMovimientoDet = data.IdMovimientoDet
       this.productos[this.indexChasisSelect].IdColor = data.IdColor
       this.$toasted.info('Chasis y Motor asignado')
       this.$refs['modalSeleccionar'].hide()
@@ -855,7 +848,7 @@ export default {
       this.cargandoChasis = false
       this.axios.get(this.API + 'chasises/disponibles',{
         params:{
-          IdAlmacen: this.idAlmacen,
+          IdAlmacen: this.isVentas?this.idAlmacen:this.almacenOrigen,
           IdProducto: obj.IdProducto,
           q: this.filtroChasis
         }
@@ -867,7 +860,11 @@ export default {
           this.indexChasisSelect = index
           this.cargandoChasis = false
           this.$refs['modalSeleccionar'].show()
+        }else{
+          this.$toasted.show('No existe chasises disponibles')
         }
+      }).catch((err)=>{
+        this.$toasted.show('Ha ocurrido un error')
       })
     },
     changeMovimiento(hash, idProducto, index) {
@@ -1171,6 +1168,7 @@ export default {
         }
     },
     setProducto (obj) {
+      this.$refs.autocompleteProducto.setValue('')
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
       this.loadCode = ''
@@ -1179,6 +1177,7 @@ export default {
       obj.Chasis = ''
       obj.Motor = ''
       obj.IdColor = 1
+      obj.IdMovimientoDet = null
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = false;
@@ -1231,6 +1230,7 @@ export default {
       obj.descuento = 0
       obj.Chasis = ''
       obj.Motor = ''
+      obj.IdMovimientoDet = null
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj,false,precio)
       obj.cantidadPres = obj.cantidad

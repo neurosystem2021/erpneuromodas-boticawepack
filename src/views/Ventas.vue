@@ -307,7 +307,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                <b-input-group prepend="Proforma válidez:" append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -1078,6 +1078,10 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             let proTieneVe = 0
+            let proEsVehiculo = 0
+            let proSinMovDet = 0
+            let movDetDuplicado = 0
+            let sinStockVehiculo = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
                     sinStock += 1
@@ -1087,6 +1091,33 @@ export default {
                     totalCero += 1
                 }
 
+                if(pro.cantidad != 1 && pro.EsVehiculo == 1){
+                    proEsVehiculo += 1
+                }
+
+                if(pro.IdMovimientoDet == null && pro.EsVehiculo == 1){
+                    proSinMovDet += 1
+                }
+
+                let count = this.productos.filter((p)=>p.IdMovimientoDet == pro.IdMovimientoDet && pro.EsVehiculo==1)
+                if(count.length > 1){
+                    movDetDuplicado +=1
+                }
+
+                let cantidadTotal = 0
+                this.productos.map((p)=>{
+                    if(p.IdProducto == pro.IdProducto){
+                        cantidadTotal += (p.cantidad || 0)
+                    }
+                    
+                })
+
+                if(((pro.stock <= 0) || (parseFloat(cantidadTotal) > pro.stock) || pro.stock==undefined) && pro.EsVehiculo == 1){
+                    sinStockVehiculo += 1
+                }
+
+                
+
                 if(pro.VentaEstrategica == 1 && this.venta.tipoVenta.CodSunat != '12') {
                     this.$toasted.error('El producto '+pro.Producto+' tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta',{duration: 4000});
                     proTieneVe += 1
@@ -1094,6 +1125,31 @@ export default {
             });
 
             if(proTieneVe >= 1){
+                this.inProgress = false            
+                return;
+            }
+
+            if (sinStockVehiculo >= 1) {
+                this.$toasted.error('No tiene stock de vehículos para las cantidades agregadas', {duration: 4000});
+                this.inProgress = false            
+                return;
+            }
+            
+            if (proSinMovDet >= 1) {
+                this.$toasted.error('En los vehículos se debe seleccionar CHASIS / MOTOR con el boton azul', {duration: 4000});
+                this.inProgress = false            
+                return;
+            }
+
+            if (movDetDuplicado >= 1) {
+                this.$toasted.error('Solo debe seleccionar un chasis por vehículo', {duration: 4000});
+                this.inProgress = false            
+                return;
+            }
+
+
+            if (proEsVehiculo >= 1) {
+                this.$toasted.error('Cantidad vendida de un vehículo solo debe ser 1');
                 this.inProgress = false            
                 return;
             }
@@ -1147,7 +1203,7 @@ export default {
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
-                this.emitirauto(response.data.insertId)
+                //this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
