@@ -176,7 +176,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -207,7 +207,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -236,7 +236,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -257,7 +257,7 @@
       </b-row>
 
       <b-row class="no-print">
-        <h5>Ventas Vale Crédito (No Suma)</h5><br>
+        <h5>Ventas Vale Crédito</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -265,7 +265,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado, marcado: item.check}" @click="(e) =>  onCambioSeleccion(index, e)" style="cursor: pointer;">
+            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -322,7 +322,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}" @click="(e) =>  onCambioSeleccion(e)" style="cursor: pointer;">
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -562,9 +562,8 @@ export default {
     }
   },
   methods: {
-    onCambioSeleccion(index,e){
-      this.ventasValeCredito[index].check = !this.ventasValeCredito[index].check
-      if (this.ventasValeCredito[index].check) {
+    onCambioSeleccion(e){
+      if (!e.target.parentNode.classList.contains('marcado')) {
           e.target.parentNode.classList.add('marcado')
       } else {
           e.target.parentNode.classList.remove('marcado')
