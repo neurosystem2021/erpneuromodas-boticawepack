@@ -42,6 +42,10 @@
             :per-page="perPage"
             :current-page="currentPage">
           
+              <template slot="Contrato" slot-scope="data">
+                  <a class="btn btn-primary" target="_blank" :href="'/api/index.php/word/venta?IdDocVenta=' + data.item.idDocVenta">Contrato</a>
+              </template>
+
               <template slot="Reimprimir" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               </template>
@@ -85,6 +89,7 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true },
+            { key: 'Contrato', sortable: true },
             { key: 'Reimprimir' }
       ],
       totalRows: 50,

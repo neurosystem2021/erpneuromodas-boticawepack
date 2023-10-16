@@ -254,6 +254,7 @@
                             :fields="carrito.fields"
                             :isVentas="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
+                            :almacen="venta.almacen.Almacen"
                             :onSetProducto="onSetProducto"
                             :esDelivery="venta.EsDelivery">
 

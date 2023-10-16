@@ -250,6 +250,58 @@
             </b-row>
           </b-modal>
 
+          <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-header>
+            <div class="d-block text-center">
+              <h3 style="text-decoration: underline;">{{ objProd.Producto }} - {{ objProd.ProductoModelo }}</h3>
+              <h4>CHASIS / MOTOR</h4>
+            </div>
+            <b-row>
+              <b-col>
+                <b-input-group prepend="Buscar" class="mt-2 mb-2">
+                    <b-form-input style="text-transform: uppercase;" ref="inputSearchChasis" autocomplete="off" @input="(val)=>{debounceInput(val); cargandoChasis = true; chasisesDisponibles = [];}" v-model="filtroChasis" :placeholder="'Buscar Chasis / Motor / Color de ' + objProd.Producto"></b-form-input>
+                    <b-form-input v-show="false" style="text-transform: uppercase;" ref="inputSearchChasis2" autocomplete="off"></b-form-input>
+                    <b-input-group-append>
+                        <b-button variant="secondary" ref="buttonLimpiar" :disabled="!filtroChasis" @click="filtroChasis = '';  buscarChasis('')">Limpiar</b-button>
+                    </b-input-group-append>
+                </b-input-group>
+              </b-col>
+            </b-row>
+            <hr>
+            <b-row style="height:55.5vh;">
+              <b-col v-if="cargandoChasis" style="display: flex; justify-content: center;  align-items: center; height:55.5vh;">
+                  <vue-simple-spinner size="huge"></vue-simple-spinner>
+              </b-col>
+              <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
+                <b-card class="chasisCard">
+                  <b-row>
+                    <b-col md="2" :style="{ backgroundColor: chasis.HexColor }"></b-col>
+                    <b-col md="10">
+                      <b-row class="ml-1">
+                        <b class="mr-1">CHASIS: </b> {{ chasis.Chasis}}
+                      </b-row>
+                      <b-row class="ml-1">
+                        <b class="mr-1">MOTOR: </b> {{ chasis.Motor}}
+                      </b-row>
+                    </b-col>
+                  </b-row>
+                </b-card>
+              </b-col>
+            </b-row>
+            <template #modal-footer>
+              <div class="w-100">
+                <p class="float-left"><b>{{ chasisesDisponibles.length }}</b> resultados para <b>{{ objProd.Producto }}</b> en <b>{{ almacen.Almacen }}</b></p>
+                <b-button
+                  variant="secondary"
+                  size="md"
+                  class="float-right"
+                  @click="$refs['modalSeleccionar'].hide()"
+                >
+                  Cerrar
+                </b-button>
+              </div>
+            </template>
+          </b-modal>
+
           <b-col md="12">
             <b-table small
               ref="tablaProductos"
@@ -279,6 +331,10 @@
                         {{ getStock(data.item.IdProducto) }}
                     </div>
                   </div>
+                </template>
+
+                <template slot="chasis" slot-scope="data">
+                  <b-button size="sm" variant="info" @click="showChasises(data.item)"><i class="fas fa-list"></i></b-button>
                 </template>
 
                 <template slot="ImagenProducto" slot-scope="data">
@@ -399,6 +455,8 @@
 <script>
 import config from '@/store/config.js'
 import ProductoKardex from '@/components/ProductoKardex'
+import debounce  from 'lodash'
+import Spinner from 'vue-simple-spinner'
 
 export default {
   mounted() {
@@ -437,7 +495,8 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo/Color', sortable: true },
-            { key: 'stock', sortable: false, variant: '', class:'text-center'}
+            { key: 'stock', sortable: false, variant: '', class:'text-center'},
+            { key: 'chasis', label: 'Chasises', sortable: false, class:'text-center'}
       ],
       totalRows: 50,
       perPage: 10,
@@ -453,7 +512,11 @@ export default {
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      chasisesDisponibles: [],
+      filtroChasis: '',
+      cargandoChasis: false,
+      objProd: {},
     }
   },
   watch: {
@@ -512,6 +575,58 @@ export default {
     },
   },
   methods: {
+    debounceInput: _.debounce(function (e) {
+        if(e.trim()==''){
+            this.$refs.inputSearchChasis.focus()
+            this.$refs.inputSearchChasis.focus()
+            this.buscarChasis(e)
+            return;
+        }
+        this.buscarChasis(e)
+    }, 250),
+    buscarChasis(e){
+      this.cargandoChasis = true
+      this.axios.get(this.API + 'chasises/disponibles',{
+        params:{
+          IdAlmacen: this.almacen.IdAlmacen,
+          IdProducto: this.objProd.IdProducto,
+          q: (e+'').trim()
+        }
+      })
+      .then((response) => {
+        this.cargandoChasis = false
+        if(response.data.length>0){
+          this.chasisesDisponibles = response.data
+        }
+        this.$refs.barcodeInput.focus()
+        this.$refs.inputSearchChasis.focus()
+      }).catch((err)=>{
+        this.cargandoChasis = false
+      })
+    },
+    showChasises(obj){
+      this.filtroChasis = ''
+      this.cargandoChasis = false
+      this.axios.get(this.API + 'chasises/disponibles',{
+        params:{
+          IdAlmacen: this.almacen.IdAlmacen,
+          IdProducto: obj.IdProducto,
+          q: this.filtroChasis
+        }
+      })
+      .then((response) => {
+        if(response.data.length>0){
+          this.objProd = obj
+          this.cargandoChasis = false
+          this.chasisesDisponibles = response.data
+          this.$refs['modalSeleccionar'].show()
+        }else{
+          this.$toasted.show('No existe chasises disponibles')
+        }
+      }).catch((err)=>{
+        this.$toasted.show('Ha ocurrido un error')
+      })
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url
@@ -683,7 +798,8 @@ export default {
     }
   },
   components: {
-    ProductoKardex
+    ProductoKardex,
+    'vue-simple-spinner':Spinner,
   }
 }
 </script>

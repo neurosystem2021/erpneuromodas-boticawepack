@@ -340,6 +340,12 @@ return false
         }
         this.isTraslado = false
         this.isSalida = true
+        this.productos.map((r)=>{
+          r.Chasis = ''
+          r.Motor = ''
+          r.IdColor = 1
+          r.IdMovimientoDet = null
+        })
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
@@ -351,6 +357,12 @@ return false
         if(this.$refs.inputAlmacenOrigen){
           this.$refs.inputAlmacenOrigen.setValue('')
         }
+        this.productos.map((r)=>{
+          r.Chasis = ''
+          r.Motor = ''
+          r.IdColor = 1
+          r.IdMovimientoDet = null
+        })
       }
       this.movimiento.movimientoTipo = obj
       console.log(obj);
@@ -420,6 +432,9 @@ return false
       let faltaCantidad = false
       let vehiculoCantidad = false
       let noColor = false
+      let sinSeleccionar = false
+      let movDetDuplicado = false
+      let sinStockVehiculo = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
@@ -441,12 +456,33 @@ return false
           noColor = true
         }
 
+        if(!(prod.IdMovimientoDet > 0) && prod.EsVehiculo == 1){
+          sinSeleccionar = true
+        }
+
+        let count = this.productos.filter((p)=>p.IdMovimientoDet == prod.IdMovimientoDet && prod.EsVehiculo==1)
+        if(count.length > 1){
+            movDetDuplicado = true
+        }
+
+        let cantidadTotal = 0
+        this.productos.map((p)=>{
+            if(p.IdProducto == prod.IdProducto){
+                cantidadTotal += (p.cantidad || 0)
+            }
+            
+        })
+
+        if(((prod.stock <= 0) || (parseFloat(cantidadTotal) > prod.stock) || prod.stock==undefined) && prod.EsVehiculo == 1){
+            sinStockVehiculo = true
+        }
+
         prod.Chasis = (""+(prod.Chasis || '')).toUpperCase().trim()
         prod.Motor = (""+(prod.Motor || '')).toUpperCase().trim()
         prod.Descripcion = (""+(prod.Descripcion || '')).toUpperCase().trim()
       })
 
-      if (noColor) {
+      if (noColor && (!this.isTraslado && !this.isSalida)) {
         this.$toasted.show('Todo VEHICULO debe seleccionarse el color')
         this.inProgress = false
         return;
@@ -473,6 +509,25 @@ return false
       if (sinStock>=1 && (this.isTraslado==true || this.isSalida==true)) {
         this.$toasted.show('No tiene stock para realizar el movimiento')
         this.inProgress = false
+        return;
+      }
+
+      if (sinSeleccionar && (this.isTraslado==true || this.isSalida==true)) {
+        this.$toasted.show('Tiene que seleccionar un chasis con el boton azul para la operacion')
+        this.inProgress = false
+        return;
+      }
+
+      if (sinStockVehiculo && (this.isTraslado==true || this.isSalida==true)) {
+        this.$toasted.error('No tiene stock de vehículos para las cantidades agregadas', {duration: 4000});
+        this.inProgress = false            
+        return;
+      }
+      
+
+      if (movDetDuplicado && (this.isTraslado==true || this.isSalida==true)) {
+        this.$toasted.error('Solo debe seleccionar un chasis por vehículo', {duration: 4000});
+        this.inProgress = false            
         return;
       }
 

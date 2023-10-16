@@ -143,7 +143,7 @@
         </b-row>
       </b-modal>
 
-      <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-footer hide-header>
+      <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{ objProd.Producto }} - {{ objProd.ProductoModelo }}</h3>
           <h4>CHASIS / MOTOR</h4>
@@ -165,7 +165,7 @@
               <vue-simple-spinner size="huge"></vue-simple-spinner>
           </b-col>
           <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
-            <b-card class="chasisCard" @click="setChasis(chasis)">
+            <b-card class="chasisCard" :class="{'no-seleccion': validarChasisExiste(chasis.IdMovimientoDet)}" @click="setChasis(chasis)">
               <b-row>
                 <b-col md="2" :style="{ backgroundColor: chasis.HexColor }"></b-col>
                 <b-col md="10">
@@ -180,6 +180,19 @@
             </b-card>
           </b-col>
         </b-row>
+        <template #modal-footer>
+          <div class="w-100">
+            <p class="float-left"><b>{{ chasisesDisponibles.length }}</b> resultados para <b>{{ objProd.Producto }}</b> en <b>{{ almacen }}</b></p>
+            <b-button
+              variant="secondary"
+              size="md"
+              class="float-right"
+              @click="$refs['modalSeleccionar'].hide()"
+            >
+              Cerrar
+            </b-button>
+          </div>
+        </template>
       </b-modal>
 
       <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
@@ -664,6 +677,7 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
+    almacen: String,
     almacenDestino:Number,
     almacenOrigen:Number,
     bloquearInput:Boolean,
@@ -776,6 +790,10 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    validarChasisExiste(idMovimiento){
+      let fil = this.productos.filter((d) => d.IdMovimientoDet == idMovimiento);
+      return fil.length>0
+    },
     debounceInput: _.debounce(function (e) {
         if(e.trim()==''){
             this.$refs.inputSearchChasis.focus()
@@ -811,7 +829,12 @@ export default {
         this.$toasted.error('No se cargo el vehiculo, seleccione nuevamente')
         return
       }
-      console.log(data);
+
+      if(this.validarChasisExiste(data.IdMovimientoDet)){
+        this.$toasted.show('Ya se encuentra asignado a un vehículo el chasis seleccionado')
+        return;
+      }
+
       this.productos[this.indexChasisSelect].Chasis = data.Chasis
       this.productos[this.indexChasisSelect].Motor = data.Motor
       this.productos[this.indexChasisSelect].IdMovimientoDet = data.IdMovimientoDet
@@ -1230,6 +1253,7 @@ export default {
       obj.descuento = 0
       obj.Chasis = ''
       obj.Motor = ''
+      obj.IdColor = 1
       obj.IdMovimientoDet = null
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj,false,precio)
@@ -1597,5 +1621,9 @@ export default {
   .card-body{
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+  }
+  .no-seleccion{
+    cursor: not-allowed !important;
+    border: 2px red solid;
   }
 </style>
