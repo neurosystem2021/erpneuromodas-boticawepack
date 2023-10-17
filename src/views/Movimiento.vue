@@ -340,12 +340,6 @@ return false
         }
         this.isTraslado = false
         this.isSalida = true
-        this.productos.map((r)=>{
-          r.Chasis = ''
-          r.Motor = ''
-          r.IdColor = 1
-          r.IdMovimientoDet = null
-        })
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
@@ -357,13 +351,13 @@ return false
         if(this.$refs.inputAlmacenOrigen){
           this.$refs.inputAlmacenOrigen.setValue('')
         }
-        this.productos.map((r)=>{
+      }
+      this.productos.map((r)=>{
           r.Chasis = ''
           r.Motor = ''
           r.IdColor = 1
           r.IdMovimientoDet = null
         })
-      }
       this.movimiento.movimientoTipo = obj
       console.log(obj);
 

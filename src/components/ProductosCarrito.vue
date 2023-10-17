@@ -167,13 +167,16 @@
           <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
             <b-card class="chasisCard" :class="{'no-seleccion': validarChasisExiste(chasis.IdMovimientoDet)}" @click="setChasis(chasis)">
               <b-row>
-                <b-col md="2" :style="{ backgroundColor: chasis.HexColor }"></b-col>
-                <b-col md="10">
+                <b-col md="3" style="height: 80px;"><b-img v-if="chasis.Imagen" :src="'/resources/images/colores/' + chasis.Imagen" alt="" width="80px"></b-img><div v-else style="height: 80px; margin-left: 10px;" :style="{ backgroundColor: chasis.HexColor }"></div></b-col>
+                <b-col md="9" style="display: grid; align-items: center;">
                   <b-row class="ml-1">
                     <b class="mr-1">CHASIS: </b> {{ chasis.Chasis}}
                   </b-row>
                   <b-row class="ml-1">
                     <b class="mr-1">MOTOR: </b> {{ chasis.Motor}}
+                  </b-row>
+                  <b-row class="ml-1">
+                    <span style="width: 250px; height: 10px;" :style="{ backgroundColor: chasis.HexColor }"></span>
                   </b-row>
                 </b-col>
               </b-row>
@@ -213,10 +216,10 @@
         <template slot="eventPres" slot-scope="data">
           <div v-bind:class="{ ventasAnchoImg: isVentas }">
             <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
-            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/'+(productos[data.index].EsVehiculo==1?'colores':'productos')+'/' + productos[data.index].Imagen)" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
             <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
               <div style="text-align:center">
-                <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+                <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/'+(productos[data.index].EsVehiculo==1?'colores':'productos')+'/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
               </div>
             </b-popover>
           </div>
@@ -839,6 +842,7 @@ export default {
       this.productos[this.indexChasisSelect].Motor = data.Motor
       this.productos[this.indexChasisSelect].IdMovimientoDet = data.IdMovimientoDet
       this.productos[this.indexChasisSelect].IdColor = data.IdColor
+      this.productos[this.indexChasisSelect].Imagen = data.Imagen
       this.$toasted.info('Chasis y Motor asignado')
       this.$refs['modalSeleccionar'].hide()
     },
@@ -1619,8 +1623,10 @@ export default {
     
   }
   .card-body{
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
+    padding-top: 0.7rem !important;
+    padding-bottom: 0.7rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
   }
   .no-seleccion{
     cursor: not-allowed !important;

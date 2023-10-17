@@ -274,13 +274,16 @@
               <b-col cols="6" v-for="(chasis, index) in chasisesDisponibles" :key="index">
                 <b-card class="chasisCard">
                   <b-row>
-                    <b-col md="2" :style="{ backgroundColor: chasis.HexColor }"></b-col>
-                    <b-col md="10">
+                    <b-col md="3" style="height: 80px;"><b-img v-if="chasis.Imagen" :src="'/resources/images/colores/' + chasis.Imagen" alt="" width="80px"></b-img><div v-else style="height: 80px; margin-left: 10px;" :style="{ backgroundColor: chasis.HexColor }"></div></b-col>
+                    <b-col md="9" style="display: grid; align-items: center;">
                       <b-row class="ml-1">
                         <b class="mr-1">CHASIS: </b> {{ chasis.Chasis}}
                       </b-row>
                       <b-row class="ml-1">
                         <b class="mr-1">MOTOR: </b> {{ chasis.Motor}}
+                      </b-row>
+                      <b-row class="ml-1">
+                        <span style="width: 250px; height: 10px;" :style="{ backgroundColor: chasis.HexColor }"></span>
                       </b-row>
                     </b-col>
                   </b-row>
