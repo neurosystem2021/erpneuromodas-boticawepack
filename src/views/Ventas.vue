@@ -979,6 +979,65 @@ export default {
                 return
             }
 
+
+            let totalCero = 0 
+            let proEsVehiculo = 0
+            let proSinMovDet = 0
+            let movDetDuplicado = 0
+            this.productos.forEach(pro => {
+
+
+                if(parseFloat(pro.total) <= 0) {
+                    totalCero += 1
+                }
+
+                if(pro.cantidad != 1 && pro.EsVehiculo == 1){
+                    proEsVehiculo += 1
+                }
+
+                if(pro.IdMovimientoDet == null && pro.EsVehiculo == 1){
+                    proSinMovDet += 1
+                }
+
+                let count = this.productos.filter((p)=>p.IdMovimientoDet == pro.IdMovimientoDet && pro.EsVehiculo==1)
+                if(count.length > 1){
+                    movDetDuplicado +=1
+                }
+     
+            });
+
+   
+            if (proSinMovDet >= 1) {
+                this.$toasted.error('En los vehículos se debe seleccionar CHASIS / MOTOR con el boton azul', {duration: 4000});
+                this.inProgress = false            
+                return;
+            }
+
+            if (movDetDuplicado >= 1) {
+                this.$toasted.error('Solo debe seleccionar un chasis por vehículo', {duration: 4000});
+                this.inProgress = false            
+                return;
+            }
+
+
+            if (proEsVehiculo >= 1) {
+                this.$toasted.error('Cantidad de proforma de un vehículo solo debe ser 1');
+                this.inProgress = false            
+                return;
+            }
+
+            if(totalCero >= 1) {
+                this.$toasted.error('No se puede hacer proforma de un producto en S/. 0.00');
+                this.inProgress = false
+                return;
+            }
+
+            if (this.totalCart <= 0) {
+                this.$toasted.show('La proforma en S/. 0.00 no está permitido')
+                this.inProgress = false            
+                return 
+            }
+
             this.venta.productos = this.productos
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
@@ -987,6 +1046,7 @@ export default {
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.diasValidosProf=0;
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {

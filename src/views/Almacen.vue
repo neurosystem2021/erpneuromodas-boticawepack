@@ -601,7 +601,7 @@ export default {
         if(response.data.length>0){
           this.chasisesDisponibles = response.data
         }
-        this.$refs.barcodeInput.focus()
+        this.$refs.inputCodigoBarra.focus()
         this.$refs.inputSearchChasis.focus()
       }).catch((err)=>{
         this.cargandoChasis = false

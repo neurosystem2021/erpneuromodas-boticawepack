@@ -126,17 +126,17 @@
               </autocomplete>
           </b-form-group>
 
-          <b-form-group>
+          <b-form-group v-show="producto.EsVehiculo==0">
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
 
-          <b-form-group  v-show="false">
-            <label>1ra Descripción:</label>
+          <b-form-group>
+            <label>Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc"
-              rows="2"
+              rows="3"
               v-model="producto._ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
               />
