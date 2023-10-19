@@ -243,6 +243,16 @@
             @input="val => calcularm2()"/>
           <br>
           <div v-show="!productoSelect.SoloLargo">
+          <label>Perdida:</label>
+          <input
+            type="number"
+            ref="inputPerdida"
+            v-model="perdida"
+            placeholder="Perdida"
+            class="form-control"
+            step="0.0001"
+            @input="val => calcularm2()"/>
+          <br>
           <label>Factor ({{factorNombre}}):</label>  
           <input
             type="number"
@@ -293,6 +303,7 @@ export default {
       M2: '',
       ancho: 0,
       largo: 0,
+      perdida: 0,
       factorNombre: '',
       factor: 0,
       pie2corte: 0,
@@ -497,6 +508,7 @@ export default {
       if(this.isVentas){   
           this.largo = 0
           this.ancho = 0
+          this.perdida = 0
           this.pie2corte = 0 
           this.precioCorte = 0
         if (obj.Ancho && obj.Largo) {
@@ -522,7 +534,7 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = this.productoSelect.PrecioContado*(this.productoSelect.TienePerdida==1?1.2:1)/(this.productoSelect.Largo/100)*this.largo/100
+        let precio = this.productoSelect.PrecioContado*(this.productoSelect.TienePerdida==1?(this.productoSelect.Largo==this.largo?1:1.2):1)/(this.productoSelect.Largo/100)*this.largo/100
         //let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
@@ -536,7 +548,7 @@ export default {
       // let largo = (largo == '0' ) ? false : prod.Largo;
 
       if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
-        this.pie2corte = ((this.ancho*this.largo/this.factor)*10)/10
+        this.pie2corte = (((Number(this.ancho)+Number(this.perdida>0?this.perdida:0))*(Number(this.largo)+Number(this.perdida>0?this.perdida:0))/this.factor)*10)/10
         let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
@@ -616,6 +628,7 @@ export default {
       this.setProducto (objCalculado, cantidad , precio )
       this.ancho = 0
       this.largo = 0
+      this.perdida = 0
       this.precioCorte = 0
       this.pie2corte = 0
       this.mensajeM2 = ''; 
