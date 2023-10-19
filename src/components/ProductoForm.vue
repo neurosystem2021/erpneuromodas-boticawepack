@@ -133,10 +133,10 @@
           </b-form-group>
 
           <b-form-group>
-            <label>Descripción:</label>
+            <label class="mt-3">Descripción (Capacidad, Peso, Año, etc):</label>
             <b-form-textarea 
               ref="inputProductoDesc"
-              rows="3"
+              rows="7"
               v-model="producto._ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
               />
@@ -275,11 +275,11 @@
             <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md"/>
           </b-form-group>
 
-          <b-form-group v-if="false">
-            <label>2da Descripción:</label>
+          <b-form-group>
+            <label>Extra (Regalos, Promociones, etc):</label>
             <b-form-textarea 
               ref="inputProductoDesc2"
-              rows="6"
+              rows="7"
               v-model="producto._ProductoDesc2"
               @input="(val) => producto.ProductoDesc2 = val"
               />
@@ -519,7 +519,7 @@ export default {
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
-        //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
+        this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
         //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
@@ -712,6 +712,7 @@ export default {
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
       this.$refs.inputProductoDesc.$el.value = ''
+      this.$refs.inputProductoDesc2.$el.value = ''
       this.initForm()
     },
     initForm () {

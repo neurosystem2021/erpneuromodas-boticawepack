@@ -1013,18 +1013,18 @@ export default {
                 return;
             }
 
-            if (movDetDuplicado >= 1) {
+            /*if (movDetDuplicado >= 1) {
                 this.$toasted.error('Solo debe seleccionar un chasis por vehículo', {duration: 4000});
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
 
-            if (proEsVehiculo >= 1) {
+            /*if (proEsVehiculo >= 1) {
                 this.$toasted.error('Cantidad de proforma de un vehículo solo debe ser 1');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede hacer proforma de un producto en S/. 0.00');
