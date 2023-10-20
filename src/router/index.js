@@ -11,6 +11,8 @@ import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
+import Mantenimiento from '@/views/Mantenimiento.vue'
+import Mecanicos from '@/views/Mecanicos.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -30,6 +32,7 @@ import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
+import ReporteMantenimiento from '@/views/reportes/ReporteMantenimiento.vue'
 
 Vue.use(Router)
 
@@ -175,6 +178,21 @@ export default new Router({
       path: '/reportes/articulosresumen',
       name: 'ArticulosResumen',
       component: ArticulosResumen
+    },
+    {
+      path: '/mantenimiento',
+      name: 'Mantenimiento',
+      component: Mantenimiento
+    },
+    {
+      path: '/reportes/Mantenimiento',
+      name: 'ReporteMantenimiento',
+      component: ReporteMantenimiento
+    },
+    {
+      path: '/mecanicos',
+      name: 'Mecanicos',
+      component: Mecanicos
     },
   ]
 })

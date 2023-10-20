@@ -216,7 +216,7 @@ export default {
       .then((response) => {
         // console.log(response);
         this.$emit('onAddCliente', response.data)
-        this.$toasted.show('Cliente guardado correctamente')
+        this.$toasted.info('Cliente guardado correctamente')
         this.$refs.clienteForm.hide()
         this.cliente = {}
       })

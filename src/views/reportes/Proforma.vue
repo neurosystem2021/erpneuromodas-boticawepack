@@ -70,7 +70,7 @@
           </table>
         </div>
       </div>
-      <h5 v-if="productosVehichulo.length > 0" class="mt-1">Vehículos:</h5>
+      <h6 v-if="productosVehichulo.length > 0" class="mt-1">Vehículos:</h6>
       <b-row v-for="(prod, index) in productosVehichulo" :key="index" class="mt-1">
         <b-col md="6" class="text-center" style="border-bottom: 3px solid #EEEEEE;">
           <img style="max-width: 230px; max-height: 230px" :src="'/resources/images/'+(prod.EsVehiculo==1?'colores':'productos')+'/' + prod.ImagenPro" />
@@ -78,9 +78,16 @@
         <b-col md="6" style="border-bottom: 3px solid #EEEEEE;">
           <b-row>
             <b-col md="12">
-              <h3 style="color:#64c42d; font-size:0.95rem; font-weight: bold; margin: 0;"><b>{{ prod.Producto }}</b></h3>
-              <b-form-text v-if="prod.EsVehiculo==1" style="text-transform: uppercase; font-size: 0.7rem; font-weight: 600; text-wrap: unset;">{{ (prod.IdColor>1?'COLOR: ':'') }}<span v-if="prod.IdColor>1" :style="{color:prod.HexColor}"><b>{{ prod.ProductoColor+' ' }}</b></span>{{ prod.ProductoDesc }}</b-form-text>
-              <b-form-text style="text-transform: uppercase; font-size: 0.7rem; font-weight: 600; text-wrap: unset;">{{ prod.ProductoDesc2 }}</b-form-text>
+              <h3 style="color:#0063f7; font-size:0.9rem; font-weight: bold; margin: 0;"><b>{{ prod.Producto }} - {{ prod.ProductoModelo }}</b></h3>
+              <b-form-text v-if="prod.EsVehiculo==1" style="text-transform: uppercase; font-size: 0.7rem; font-weight: 600; text-wrap: unset; color: black !important;">{{ (prod.IdColor>1?'COLOR: ':'') }}<span v-if="prod.IdColor>1" :style="{color:prod.HexColor}"><b>{{ prod.ProductoColor+' ' }}</b></span><br/>
+                <span
+                  style="color: black;"
+                  v-for="(line,lineNumber) of prod.ProductoDesc.split('\n')" 
+                  v-bind:key="lineNumber" >
+                  {{ line }}<br/>
+                </span>
+              </b-form-text>
+              <b-form-text style="text-transform: uppercase; font-size: 0.7rem; font-weight: 600; text-wrap: unset; color: black !important;">{{ prod.ProductoDesc2 }}</b-form-text>
             </b-col>
           </b-row>
           <b-row class="mt-1">
@@ -103,7 +110,7 @@
           </b-row>
         </b-col>
       </b-row>
-      <h5 v-if="productosNoVehiculo.length > 0 && productosVehichulo.length > 0" class="mt-1">Adicional:</h5>
+      <h6 v-if="productosNoVehiculo.length > 0 && productosVehichulo.length > 0" class="mt-1">Adicional:</h6>
       <table border="0" cellspacing="0" cellpadding="0" v-if="productosNoVehiculo.length > 0">
         <thead>
           <tr>
@@ -113,18 +120,18 @@
             <th class="desc">MARCA</th>
             <th class="qty">CANT.</th>
             <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
+            <th class="total" style="color: white;">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in productosNoVehiculo" :key="index">
             <td class="no text-center">{{ index+1 }}</td>
             <td class="text-center"><img style="max-width: 80px; max-height: 80px" :src="'/resources/images/'+(prod.EsVehiculo==1?'colores':'productos')+'/' + prod.ImagenPro" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#64c42d; font-size:0.85rem; font-weight: bold;">{{ prod.Producto }}</h3><b-form-text style="text-transform: uppercase;">{{ prod.ProductoDesc }}</b-form-text></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#64c42d; font-size:0.85rem; font-weight: bold;">{{ prod.ProductoMarca }}</h3></td>
-            <td class="qty" style="font-size:0.75rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:0.75rem" width="15%">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:0.75rem" width="15%">
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#0063f7; font-size:0.85rem; font-weight: bold;">{{ prod.Producto }}</h3><b-form-text style="text-transform: uppercase;">{{ prod.ProductoDesc }}</b-form-text></td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#0063f7; font-size:0.85rem; font-weight: bold;">{{ prod.ProductoMarca }}</h3></td>
+            <td class="qty" style="font-size:0.75rem; font-weight: bold;">{{ prod.Cantidad }}</td>
+            <td class="unit" style="font-size:0.75rem; font-weight: bold;" width="15%">S/. {{ prod.Precio | moneda }}</td>
+            <td class="total" style="font-size:0.75rem; color:white; font-weight: bold;" width="15%">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -137,8 +144,8 @@
         <tbody>
           <tr>
             <td colspan="4" width="40%"></td>
-            <td colspan="2" style="background:#6ed732; font-size:0.90rem; font-weight: bold; color: black;">VALOR TOTAL DE PROFORMA</td>
-            <td style="background:#6ed732; font-size:0.90rem; font-weight: bold; color: black;">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#0063f7; font-size:0.95rem; font-weight: bold; color: white;">VALOR TOTAL DE PROFORMA</td>
+            <td style="background:#0063f7; font-size:0.95rem; font-weight: bold; color: white;">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tbody>
       </table>
@@ -157,9 +164,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #6ed732; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid #0063f7; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #6ed732; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #0063f7; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>
@@ -213,6 +220,7 @@ export default {
           } 
         })
         this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
+        document.title = "PROFORMA " + this.proforma.Anio + "-" + this.proforma.Numero
 			})
     },
     calcularFechaHasta(actual,dias){
