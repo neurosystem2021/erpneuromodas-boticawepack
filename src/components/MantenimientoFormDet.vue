@@ -1,7 +1,7 @@
 <template>
     <div>
       <b-form-group>
-        <label>Agrega Productos:</label>
+        <label>Agrega Repuestos o Servicios:</label>
         <b-input-group>
           <autocomplete
             :url="API + 'productos'"

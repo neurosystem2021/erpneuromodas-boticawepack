@@ -61,6 +61,7 @@
                   <b-col>
                     <b-button variant="success" size="md" @click="actualizarTabla()" :disabled="fechaFin=='' || fechaIni==''"><i class="fas fa-search"></i> Buscar por Fecha de Registro</b-button>
               <b-button variant="info" size="md" @click="limpiarBusquador()">Limpiar</b-button>
+                    <b-button variant="success" size="md" @click="limpiarBusquador()" :href="hrefXls" target="_blank"><i class="fas fa-file-excel"></i> Excel</b-button>
                   </b-col>
             </b-row>
             </b-col>
@@ -91,9 +92,6 @@
                   <b-button variant="primary" v-if="data.item.IdProyecto!=null" @click="verDetalle(data.item.IdProyecto,data.item)"><i class="fas fa-eye"></i></b-button>
                 </template>
             </b-table>
-            <b-tfoot>
-
-            </b-tfoot>
               <b-row>
                   <b-col md="6" class="my-1">
                       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -116,6 +114,10 @@
                       <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Cliente }}</td>
                     </tr>
                     <tr>
+                      <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Registro</td>
+                      <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaReg }}</td>
+                    </tr>
+                    <tr>
                       <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Inicio</td>
                       <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaInicio }}</td>
                     </tr>
@@ -130,6 +132,10 @@
                     <tr>
                       <td class="celda" style="font-weight:bold; width:40% !important;">Comprobante</td>
                       <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Comprobante }}</td>
+                    </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:40% !important;">Mecanico</td>
+                      <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Mecanico }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -280,6 +286,7 @@
               { key: 'IdProyecto', label: 'ID', sortable: true },
               { key: 'Cliente', sortable: true },
               { key: 'DniRuc', sortable: true },
+              { key: 'Mecanico', sortable: true },
               { key: 'FechaReg', label: 'Fecha Registro', sortable: true },
               { key: 'FechaInicio', label: 'Fecha Inicio', sortable: true },
               { key: 'FechaFin', label: 'Fecha Fin', sortable: true },
@@ -297,6 +304,11 @@
         ],
         fechaIni: this.$moment().format("YYYY-MM-01"),
 			  fechaFin: this.$moment().format("YYYY-MM-DD") ,
+      }
+    },
+    computed: {
+      hrefXls () {
+        return '/api/index.php/reporte/proyecto/excel?&FechaIni='+this.fechaIni+'&FechaFin='+this.fechaFin+'&idAlmacen='+this.idAlmacen+'&filter='+(this.filter || '');
       }
     },
     methods: {

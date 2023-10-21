@@ -215,7 +215,7 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" id="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <div v-bind:class="{ ventasAnchoImg: isVentas }">
-            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+            <b-button size="sm" v-if="isVentas && !isNota" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
             <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/'+(productos[data.index].EsVehiculo==1?'colores':'productos')+'/' + productos[data.index].Imagen)" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
             <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
               <div style="text-align:center">
@@ -227,7 +227,7 @@
 
         <template slot="eventVehi" slot-scope="data">
           <div style="width: 37.5px; text-align: center;" v-if="data.item.EsVehiculo==1 && (isVentas || tipoMov==1 || tipoMov==2)">
-            <b-button size="sm" :disabled="bloquearInput?true:false" variant="primary" @click="showSeleccionar(productos[data.index],data.index)"><i class="fas fa-car"></i></b-button>
+            <b-button size="sm" v-if="!isNota" :disabled="bloquearInput?true:false" variant="primary" @click="showSeleccionar(productos[data.index],data.index)"><i class="fas fa-car"></i></b-button>
           </div>
         </template>
 
@@ -312,6 +312,7 @@
             type="number"
             style="width: 100px"
             min="0"
+            :disabled="bloquearInput?true:false"
             step="0.00001"
             class="form-control"
             placeholder="Precio"
@@ -473,7 +474,7 @@
         </template>
         
         <template slot="color" slot-scope="data">
-          <div style="width: 140px" v-if="tipoMov!=1 && tipoMov!=2">
+          <div style="width: 140px" v-if="tipoMov!=1 && tipoMov!=2 && productos[data.index].EsVehiculo==1">
             <b-form-select id="selectColor" v-model="productos[data.index].IdColor" :options="colores" v-on:change="setColor($event)" class="mb-3" size="md" required/>
           </div>
           <!--<autocomplete
@@ -680,6 +681,7 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
+    isNota: Boolean,
     almacen: String,
     almacenDestino:Number,
     almacenOrigen:Number,

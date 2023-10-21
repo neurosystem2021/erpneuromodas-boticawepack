@@ -120,7 +120,7 @@
             <th class="desc">MARCA</th>
             <th class="qty">CANT.</th>
             <th class="unit">PRECIO U.</th>
-            <th class="total" style="color: white;">TOTAL</th>
+            <th class="total" style="color: white; !important">TOTAL</th>
           </tr>
         </thead>
         <tbody>
@@ -131,7 +131,7 @@
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#0063f7; font-size:0.85rem; font-weight: bold;">{{ prod.ProductoMarca }}</h3></td>
             <td class="qty" style="font-size:0.75rem; font-weight: bold;">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:0.75rem; font-weight: bold;" width="15%">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:0.75rem; color:white; font-weight: bold;" width="15%">
+            <td class="total" style="font-size:0.75rem; color:white !important; font-weight: bold;" width="15%">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>

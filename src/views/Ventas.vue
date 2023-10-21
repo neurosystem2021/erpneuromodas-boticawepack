@@ -30,6 +30,11 @@
             </div>
             <br /><br />
             <b-row>
+                <b-col md="12" v-if="this.$route.query.idProyecto">
+                    <div class="form-inline">
+                        <h4>Pago de Mantenimiento: <b-badge variant="dark">{{this.$route.query.idProyecto}}</b-badge> </h4>
+                    </div>
+                </b-col>
                 <b-col md="12" v-if="this.$route.query.idPedido">
                     <div class="form-inline">
                         <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
@@ -236,8 +241,8 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
-                        <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
+                        <b-badge style="font-size: 1.03rem;" variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
+                        <b-badge style="font-size: 1.03rem;" variant="success" v-if="adelanto">Restante a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -250,6 +255,7 @@
                             :setPrecio="true"
                             ref="carrito" 
                             :showButton="false" 
+                            :isNota="isNota"
                             :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :isVentas="true"
@@ -438,8 +444,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
+                        <b-button type="button" @click="limpiarPuntoVenta" variant="dark" v-if="this.$route.query.idProyecto">Anular Mantenimiento</b-button>
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" v-if="!this.$route.query.idPedido && !this.$route.query.idProyecto"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
@@ -469,7 +476,12 @@ export default {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
+        if(this.$route.query.idProyecto && this.$route.query.idCliente ){
+            //console.log("Probar");
+            //this.getProyecto()
+        }else{
+            this.loadClienteVarios()
+        }
         this.escucharPedidos()
         this.configStock()
     },
@@ -489,7 +501,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf: 1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -565,6 +577,47 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        limpiarPuntoVenta(){
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.$refs.inputAlmacen.setValue('PRINCIPAL')
+            this.$refs.inputPuntoVenta.setValue('PRINCIPAL')
+            this.$refs.inputCliente.setValue('')
+            this.$refs.carrito.pagocon = ''
+            //this.$refs.inputNombreCliente.$refs.input.required = true  
+            this.tieneIgv = false
+            this.initForm()
+            this.limpiarCart()
+            this.getVendedor()
+            this.loadClienteVarios()
+            //this.getImpresoraCocina()
+            this.$router.replace('/ventas')
+            this.$toasted.info('Se actualizó la página')
+        },
+        getProyecto(){
+            this.axios.get(this.API + 'proyecto', { params: {
+				IdProyecto		: this.$route.query.idProyecto,
+			} }).then(res => {
+				if(res.data){
+                    this.adelanto=res.data.Adelantos
+                    this.adelantosPreOrden = res.data.AdelantosArreglo
+                    this.$refs.inputCliente.setValue(res.data.Cliente)
+                    this.venta.CampoDireccion = res.data.Direccion
+                    this.venta.cliente.IdCliente = res.data.IdCliente
+                    this.venta.cliente.Cliente = res.data.Cliente
+                    this.venta.cliente.Direccion = res.data.Direccion
+                    this.venta.cliente.DniRuc = res.data.DniRuc
+                    console.log( this.venta.cliente.IdCliente);
+                    res.data.Detalle.map((item) => {
+                        this.add([item, () => {
+                           
+                        }, {cantidad: item.Cantidad, precio: item.Precio } ])
+                    })
+                    setTimeout(() => {
+                        this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1}) 
+                    }, 200);
+				}
+			})
+        },
         configStock () {
             this.axios.get(this.API + 'config/stock')
                 .then(res => {
@@ -672,7 +725,7 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 1
             }
             this.isNota = false
             this.bloquearInput=false
@@ -816,6 +869,9 @@ export default {
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
+                if(this.$route.query.idProyecto && this.$route.query.idCliente ){
+                    this.getProyecto()
+                }
             })
             .catch((error) => {
                 console.log(error)
@@ -1045,7 +1101,7 @@ export default {
                 this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
-                this.diasValidosProf=0;
+                this.diasValidosProf=1;
                 this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -1190,7 +1246,7 @@ export default {
                 return;
             }
 
-            if (sinStockVehiculo >= 1) {
+            if (sinStockVehiculo >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No tiene stock de vehículos para las cantidades agregadas', {duration: 4000});
                 this.inProgress = false            
                 return;
@@ -1242,8 +1298,15 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.IdProyecto = this.$route.query.idProyecto || null
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
+
+                if(response.data.pagado){
+                    this.inProgress = false
+                    this.$toasted.show(response.data.error)
+                    return  
+                }
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')

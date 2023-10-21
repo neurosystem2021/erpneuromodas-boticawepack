@@ -140,6 +140,9 @@ const actions = {
         producto.precio = setPreOr
       }
       
+      if (precio) {
+        producto.precio = precio
+      }
       /*let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},

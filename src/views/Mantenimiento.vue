@@ -168,7 +168,7 @@
 						
 						<div slot="footer">
 							<b-button variant="dark" size="sm" @click="liberarProyecto(proyec.IdProyecto,proyec.Cliente)">LIBERAR</b-button>
-							<b-button variant="primary" size="sm" @click="abrirCarrito(proyec)">+</b-button>
+							<b-button variant="primary" size="sm" @click="abrirCarrito(proyec)"><i class="fas fa-eye"></i></b-button>
 						</div>
 				</b-card>
 			</b-col>
@@ -190,12 +190,19 @@
 									:disabled="!editarDescripcion"
 									class="form-control"
 									placeholder="Descripción"
-									cols="12" rows="3"
+									cols="12" rows="4"
 									style="width: 100%; text-transform:uppercase"
 									v-model="selectProyecto.Descripcion">
 									</textarea>
 									<b-button v-if="!editarDescripcion" style="margin-top:5px" variant="primary" size="sm" @click="editarDescripcionFun()"><i class="fas fa-pencil-alt fa-sm"></i> Editar Descripcion</b-button>
 									<b-button v-if="editarDescripcion" style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
+									<br>
+									<br>
+									<div class="text-left mt-2" v-if="selectProyecto.IdMecanico!=null">
+										<b style="padding: 4px; background: #ebf0ff; color:black">
+											<b>Mecanico Asignado: {{ selectProyecto.Mecanico  }}</b>
+										</b>
+									</div>
 								</b-col>
 								<b-col md="5">
 									<label>Imagen:</label>
