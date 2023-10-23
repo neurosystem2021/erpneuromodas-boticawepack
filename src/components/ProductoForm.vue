@@ -128,6 +128,23 @@
               @input="(val) => producto.Color = val && val.toUpperCase()"              
               ></b-form-input>-->
           </b-form-group>
+          <b-form-group>
+            <label>Institucion:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'productos/instituciones'"
+                ref="inputInstitucion"
+                anchor="Institucion"
+                label="writer"
+                :placeholder.sync="producto.Institucion"
+                :on-select="val => producto.Institucion = val.Institucion && val.Institucion.toUpperCase()"
+                :onInput="val => producto.Institucion = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputInstitucion')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
         </b-col>
 
         <b-col md="6">
@@ -200,7 +217,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Precio X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
@@ -210,7 +227,7 @@
               class="form-control"
               />
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-if="false">
             <label>Stock X Mayor:</label>
             <input 
               v-model="producto.StockPorMayor"
@@ -239,11 +256,21 @@
               class="form-control"
               />
           </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TienePresentacion"
+                   :value="1"
+                   :unchecked-value="0">
+              Tiene Presentacion
+            </b-form-checkbox>
+          </b-form-group>
 
           <b-form-group v-if="true">
             <label>Imagen:</label>
-            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <div class="text-center p-1">
+              <b-img :src="'/resources/images/productos/' + producto.Imagen" width="180px" fluid alt=""></b-img>
+            </div>
           </b-form-group>
           
         </b-col>
@@ -286,36 +313,32 @@
               />
           </b-form-group>
         </b-col>
-      </b-row>
-      <b-row>
         <b-col md="6">
+          <b-row>
+            <b-col>
+              <label>% de Liquidación:</label>
+              <input v-model="producto.PorcentajeLiquidacion"
+              type="number"
+              class="form-control"
+              step="1"
+              min="0"
+              max="100"
+              @input="(val)=>actualizarLiquidacion(val.target.value)"
+              />
+            </b-col>
+            <b-col>
+              <label>Precio Final:</label>
+              <br>
+              <div style="display:flex; justify-content: start; align-items: center; margin-top: 6px;">
+                <b>{{ precioLiquidacion }}</b>
+              </div>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
 
-        </b-col>
-        <b-col md="6">
-            
-            <b-row>
-              <b-col>
-                <label>% de Liquidación:</label>
-                <input v-model="producto.PorcentajeLiquidacion"
-                type="number"
-                class="form-control"
-                step="1"
-                min="0"
-                max="100"
-                @input="(val)=>actualizarLiquidacion(val.target.value)"
-                />
-              </b-col>
-              <b-col>
-                <label>Precio Final:</label>
-                <br>
-                <div style="display:flex; justify-content: start; align-items: center; margin-top: 6px;">
-                  <b>{{ precioLiquidacion }}</b>
-                </div>
-              </b-col>
-            </b-row>
-        </b-col>
-      </b-row>
-      <b-form-group>
+
+      <b-form-group v-if="producto.TienePresentacion==1">
       <hr>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
@@ -467,6 +490,8 @@ export default {
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
 
+        this.$refs.inputInstitucion.setValue(newVal.Institucion)
+
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         
         this.$refs.inputColor.setValue(newVal.Color)
@@ -496,6 +521,7 @@ export default {
         this.producto.PrecioConvenio = newVal.PrecioConvenio
         this.producto.ControlaStockMinimo   = newVal.ControlaStockMinimo
         this.producto.Imagen = newVal.Imagen
+        this.producto.TienePresentacion     = newVal.TienePresentacion
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
@@ -507,6 +533,7 @@ export default {
             {nombre: 'NOMBRE 4', cantidad: 0, precioc: 0, precio: 0},
           ]
         }
+        this.$refs.file.value=null
         this.actualizarLiquidacion()
 
       } else {
@@ -515,6 +542,7 @@ export default {
         this.showNew = false;
         this.mensajeBtn = 'Crear';
         this.clearForm()
+        this.$refs.file.value=null
       }
     }
   },
@@ -591,6 +619,7 @@ export default {
       this.$refs.inputMedicion.setValue('UNIDAD')
       this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
+      this.$refs.inputInstitucion.setValue('')
       this.$refs.inputColor.setValue('')
       //this.$refs.inputBotapie.setValue('')
 
@@ -620,6 +649,7 @@ export default {
         PorcentajeLiquidacion: 0,
         PrecioCosto: 0,
         ControlaStockMinimo:0,
+        TienePresentacion: 0,
         categoria: {},
         marca: {},
         Imagen: null,

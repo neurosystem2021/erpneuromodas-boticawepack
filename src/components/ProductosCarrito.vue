@@ -29,6 +29,7 @@
             <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
           </b-input-group-append>
         </b-input-group>
+        <b-form-text id="input-live-help">Busqueda avanzada (Institución, Producto)</b-form-text>
       </b-form-group>
 
       <div class="mostrarMovil">

@@ -32,7 +32,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA/IGV ELEC."
+                                        initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -467,8 +467,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 8,
-                    TipoDoc: 'BOLETA/IGV ELEC.',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 8,
                     CodSunat: '03',
                 },
@@ -788,7 +788,7 @@ export default {
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -923,7 +923,7 @@ export default {
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
+                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
