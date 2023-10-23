@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid style="width: calc(90%);" class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -42,8 +42,13 @@
             :per-page="perPage"
             :current-page="currentPage">
           
-              <template slot="Contrato" slot-scope="data">
-                  <a class="btn btn-primary" target="_blank" :href="'/api/index.php/word/venta?IdDocVenta=' + data.item.idDocVenta">Contrato</a>
+
+              <template slot="MedioPago" slot-scope="data">
+                  <a v-if="data.item.CodSunat!='07' && data.item.SinVehiculo==0" class="btn btn-primary" target="_blank" :href="'/api/index.php/word/venta?IdDocVenta=' + data.item.idDocVenta">Medio Pago</a>
+              </template>
+
+              <template slot="Carta" slot-scope="data">
+                  <a v-if="data.item.CodSunat!='07' && data.item.SinVehiculo==0" class="btn btn-primary" target="_blank" :href="'/api/index.php/word/venta/carta?IdDocVenta=' + data.item.idDocVenta">Carta Poder</a>
               </template>
 
               <template slot="Reimprimir" slot-scope="data">
@@ -89,7 +94,8 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true },
-            { key: 'Contrato', sortable: true },
+            { key: 'MedioPago', label:'Medio Pago', sortable: true },
+            { key: 'Carta', label:'Carta Poder', sortable: true },
             { key: 'Reimprimir' }
       ],
       totalRows: 50,
