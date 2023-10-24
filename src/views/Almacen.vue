@@ -188,6 +188,20 @@
               </b-col>
             </b-row>
           </b-col>
+          <b-col md="4">
+                <b-form-group>
+                  <label>Institución:</label>
+                  <autocomplete
+                    :url="API + 'productos/instituciones'"
+                    ref="inputInstitucion"
+                    anchor="Institucion"
+                    label="writer"
+                    :on-select="val => generateFilter('institucion', val.Institucion)"
+                    :onInput="(val) => !val ? generateFilter('institucion', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
         </b-row>
         <b-row>
           <b-col md="12" class="my-1">
@@ -628,6 +642,7 @@ export default {
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputModelo.setValue('')
+      this.$refs.inputInstitucion.setValue('')
       this.$refs.inputColor.setValue('')
       this.$refs.inputTalla.setValue('')
       this.$refs.inputGenero.setValue('')
