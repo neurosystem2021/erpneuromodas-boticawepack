@@ -83,6 +83,16 @@
                       </autocomplete>
                   </b-form-group>
 
+                  <b-form-group v-if="estadoVenta==1 && tipoDoc.CodSunat=='03'">
+                    <b-form-checkbox
+                        :disabled="false"
+                        v-model="ventaCero"
+                        :value="1"
+                        @change="(val)=>cambiarOpcion(val)"
+                        :unchecked-value="0">
+                        Ventas en <b>CERO</b>
+                    </b-form-checkbox>
+                  </b-form-group>
                 
                 
               </b-col>
@@ -221,7 +231,8 @@
         <b-row align-h="center" class="text-center">
             <b-col cols="12">
               <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
-              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicos</b-button>
+              <b-button v-if="estadoVenta == 1 && ventaCero == 1 && tipoDoc.CodSunat=='03'" :disabled="this.loading" variant="info" size="lg" @click="emitirResumenCero">Emitir Resumen Ventas en <b>CERO</b></b-button>
+              <b-button v-if="estadoVenta == 1 && ventaCero == 0" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicos</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -325,7 +336,8 @@ export default {
         { value: '09', text: 'DISMINUCION EN EL VALOR' },*/
       ],
       notaIdMotivo: null,
-      notaCredito: {}
+      notaCredito: {},
+      ventaCero: 0,
     }
   },
   watch: {
@@ -356,6 +368,71 @@ export default {
   computed: {
   },
   methods: {
+    emitirResumenCero(){
+
+      if(!this.fechaInicio){
+        this.$toasted.show('Debe seleccionar una fecha válida')
+        return
+      }
+
+      //console.log(this.items);
+      if(this.items.length==0){
+        this.$toasted.show('No hay documentos para crear resumen en CERO')
+        return
+      }
+      let existeFactura = false
+      let conIdResumen = false
+      let montoCero = false
+      this.items.map((r)=>{
+        if(r.CodSunat !="03"){
+          existeFactura = true
+        }
+
+        if(r.Ticket != null){
+          conIdResumen = true
+          this.$toasted.error('Error boleta: '+r.Serie+'-'+r.Numero)
+        }
+
+        if(r.Total > 0){
+          montoCero = true
+        }
+      })
+      if(montoCero){
+        this.$toasted.show('No se puede realizar resumen existe ventas con monto mayo a CERO')
+        return
+      }
+      if(existeFactura){
+        this.$toasted.show('No se puede crear resumen, existen facturas')
+        return
+      }
+      if(conIdResumen){
+        this.$toasted.show('No se puede crear resumen, existe una venta con un resumen asociado')
+        return
+      }
+      this.loading = true
+      this.axios.post(this.API + 'emitirelectronicoresumenboletacero', {
+        boletas: this.items,
+        statu: 1, // Statu 3 = dar de baja / 1 = emitir
+        codSunat: '03',
+        fechaReferencia: (''+this.fechaInicio).substring(0,10)
+      }).then(res => {
+        this.loading = false
+        if(res.data.Estado==null){
+          this.$toasted.error('ERROR AL CREAR RESUMEN')
+        }else{
+        this.$toasted.success('RESUMEN CREADO ' + res.data.msj_sunat)
+        this.$refs.tablaVentas.refresh()
+        }
+      }).catch((err)=>{
+        console.log(err);
+        this.loading = false
+        this.$toasted.show("Ha ocurrido un error")
+      })
+  
+    },
+    cambiarOpcion(val){
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+    },
     loadFirstAlmacen (cb) {
       this.axios.get(this.API + 'almacenes/primero')
         .then(res => {
@@ -387,8 +464,9 @@ export default {
       this.fechaFin = value
     },
     setTipoDoc (obj) {
-      console.log(obj)
+      //console.log(obj)
       this.tipoDoc = obj
+      this.ventaCero = 0
       if (this.tipoDoc.CodSunat == 3) {
         this.isBoleta = true
         this.fechaInicio = this.fechaReferencia
@@ -441,6 +519,18 @@ export default {
         return
       }
 
+      let montoCero = false
+      this.items.map((r)=>{
+        if(r.Total <= 0){
+          montoCero = true
+        }
+      })
+
+      if(montoCero){
+        this.$toasted.show('No se puede emitir... existen boletas con monto CERO, emitir resumen primero')
+        return
+      }
+
       this.loading = true
       let arr = []
 
@@ -450,7 +540,7 @@ export default {
             generarXml: true,
             docVenta: doc
           }).then((response) => {
-            console.log(response)
+            //console.log(response)
             if(response.data.Estado == 1) {
               this.$toasted.error('')                  
             } else {
@@ -466,11 +556,11 @@ export default {
         } else {
         for (let item of this.items) {
           if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
-          console.log(JSON.stringify(item))
+          //console.log(JSON.stringify(item))
               arr.push(await this.axios.post(this.API + 'emitirelectronico', {
                 docVenta: item
               }).then((response) => {
-                console.log(response)
+                //console.log(response)
                 if(response.data.Estado == 1) {
                   this.$toasted.error(response.data.msj_sunat)                  
                 } else {
@@ -546,7 +636,7 @@ export default {
               codSunat: this.tipoDoc.CodSunat
               // fechaReferencia: this.fechaReferencia
             }).then(res => {
-              console.log(res)
+              //console.log(res)
               this.$toasted.show('Comprobante Anulado')
               this.$refs.tablaVentas.refresh()
               this.loading = false
@@ -562,7 +652,7 @@ export default {
             codSunat: this.tipoDoc.CodSunat,
             fechaReferencia: this.fechaReferencia
           }).then(res => {
-            console.log(res)
+            //console.log(res)
             this.$toasted.show('Comprobante Anulado')
             this.$refs.tablaVentas.refresh()
             this.loading = false
@@ -617,7 +707,8 @@ export default {
       
       let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
       url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
+      url += '&ventasCero='+(this.estadoVenta==1 ? (this.ventaCero==1? 1 : 0) : 0 )
+//console.log(url)
       let promise = this.axios.get( url )
 
       return promise.then((result) => {
@@ -681,11 +772,11 @@ console.log(url)
       })
     },
     consultaElectronico (doc) {
-      console.log(doc)
+      //console.log(doc)
       let tipocomprobante = ''
       let cantidad=''
       let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
-      console.log(fecha)
+      //console.log(fecha)
 
       if (doc.CodSunat == '03') {
         tipocomprobante = '06'
