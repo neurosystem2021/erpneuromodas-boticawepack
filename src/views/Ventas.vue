@@ -489,6 +489,14 @@
                                         <b-row style="justify-content: center; margin-top:5px">
                                             <b-col md="12">
                                                 <b-button :disabled="inProgress" variant="danger" size="sm" @click="limpiarPuntoVenta" class="mb-3" v-if="venta.EsFacturaVale == 1">CANCELAR FACTURACION</b-button>
+                                                <b-form-checkbox
+                                                    class="m-2"
+                                                    v-if="idPerfil == 1 && !isNota && this.venta.tipoVenta.CodSunat == '03'"
+                                                    v-model="ventaMerma"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Venta monto en <b>CERO</b>
+                                                </b-form-checkbox>
                                                 <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
                                                 <h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>
                                             </b-col>
@@ -713,6 +721,7 @@ export default {
             itemsCaraSelect:[],
             idPerfil: sessionStorage.getItem('IdPerfil'),
             ventaPrueba: 0,
+            ventaMerma: 0,
         }
     },
     watch: {
@@ -1068,9 +1077,11 @@ export default {
             this.tieneIgv = false
             this.MontoConsumido = 0
             this.MontoTotal = 0
+            this.ventaMerma = 0
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
+            this.ventaMerma = 0
             /*if(obj.CodSunat=='12' || obj.TieneIgv==1){
                 let pass = window.prompt('Escriba su contraseña')
                 if ((''+pass).trim()!='') {
@@ -1660,6 +1671,8 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
             let totalCero = 0 
+            let totalMayorCero = 0
+            let sinCantidad = 0
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
                     sinStock += 1
@@ -1668,10 +1681,30 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                if(parseFloat(pro.total) > 0) {
+                    totalMayorCero += 1
+                }
+
+                if(parseFloat(+pro.cantidad) <= 0) {
+                    sinCantidad += 1
+                }
             });
 
-            if(totalCero >= 1) {
-                this.$toasted.error('No se puede enviar un producto en S/. 0.00');
+            if(totalMayorCero >= 1 && this.ventaMerma == 1) {
+                this.$toasted.error('En la venta con monto CERO el precio debe ser CERO en todos los productos',{duration: 2500});
+                this.inProgress = false
+                return;
+            }
+
+            if(sinCantidad >= 1 && this.ventaMerma == 1){
+                this.$toasted.error('En la venta con monto CERO la cantidad no debe se CERO, solo el precio',{duration: 2500});
+                this.inProgress = false
+                return;
+            }
+
+            if(totalCero >= 1 && this.ventaMerma != 1) {
+                this.$toasted.error('No se puede enviar un producto en S/. 0.00',{duration: 2500});
                 this.inProgress = false
                 return;
             }
@@ -1705,6 +1738,7 @@ export default {
             this.venta.RefVale = (this.venta.tipoVenta.CodSunat == '13'?(''+this.venta.RefVale).toUpperCase().trim():'')
             this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
             this.venta.IdSurtidor = this.idSurtidor
+            this.venta.ventaMerma = this.ventaMerma
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async (response) => {
 
