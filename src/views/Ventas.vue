@@ -82,14 +82,14 @@
                                         v-model="venta.EsConsumoVale"
                                         :value="1"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='01'" class="mt-1">
-                                        <b>VENTA PARA CONSUMO CON VALES</b>
+                                        <b style="font-size: 0.8rem;">VENTA PARA CONSUMO CON VALES</b>
                                     </b-form-checkbox> 
                                     <b-form-checkbox
                                         v-model="venta.EsVale"
                                         :value="1"
                                         @change="estadoVale()"
                                         :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1">
-                                        <b>ES UN VALE</b>
+                                        <b style="font-size: 0.8rem;">ES UN VALE</b>
                                     </b-form-checkbox> 
                                  <b-input-group prepend="Doc. Referenc" v-if="isNota">
                                     <autocomplete
@@ -196,6 +196,14 @@
                                             </b-form-select>
 
                                         </b-form-group>
+                                        <b-input-group style="margin-top: -20px;" prepend="Obs.">
+                                        <textarea v-model="venta.Observacion"
+                                            type="text"
+                                            rows="1"
+                                            style="text-transform:uppercase;"
+                                            class="form-control"
+                                            placeholder="Observaciones del comprobante"></textarea>
+                                        </b-input-group>
                                     </b-col>
                                     <b-col md="12" v-if="false">
                                         <b-form-group style="margin-top:-5px">
@@ -262,6 +270,7 @@
                                     :bloquearInput="bloquearInput" 
                                     :fields="carrito.fields"
                                     :idAlmacen="venta.almacen.IdAlmacen"
+                                    :ventaMerma="ventaMerma"
                                     :onSetProducto="onSetProducto">
 
                                     <template slot="operaciones">
@@ -428,7 +437,7 @@
                                         </b-row>
                                     </template>
                                     <template slot="infoLlevar">
-                                        <b-row style="justify-content: center;">
+                                        <b-row style="justify-content: center;" v-if="ventaMerma == 0">
                                             <b-col>
                                                 <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                                             </b-col>
@@ -438,6 +447,15 @@
                                                 <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                                             </b-col>
                                         </b-row>
+                                        <b-form-checkbox
+                                            class="m-2"
+                                            v-if="idPerfil == 1 && !isNota && this.venta.tipoVenta.CodSunat == '03'"
+                                            v-model="ventaMerma"
+                                            @change="(val) => cambioMerma(val)"
+                                            :value="1"
+                                            :unchecked-value="0">
+                                            Venta monto en <b>CERO</b>
+                                        </b-form-checkbox>
                                     </template>
                                 </productos-carrito-nuevo>
                             
@@ -562,7 +580,9 @@ export default {
             },
             TieneIgvComprobante:false,
             MontoTotal: 0,
-            MontoConsumido: 0
+            MontoConsumido: 0,
+            idPerfil: sessionStorage.getItem('IdPerfil'),
+            ventaMerma: 0,
         }
     },
     watch: {
@@ -583,6 +603,12 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        cambioMerma(val){
+            if(val== 0 && this.productos.length > 0){
+                this.$toasted.info('Se limpio los productos con precio cambiado',{duration: 3000})
+                this.limpiarCart()
+            }
+        },
         setAltImg(event) { 
             event.target.src = "static/no-photo.png" 
         },
@@ -740,7 +766,8 @@ export default {
                 EsConsumoVale: 0,
                 EsVale: 0,
                 ConsumoId: 0,
-                Detalles: ''
+                Detalles: '',
+                Observacion: '',
             }
 
             this.isNota = false
@@ -748,9 +775,15 @@ export default {
             this.tieneIgv = false
             this.MontoConsumido = 0
             this.MontoTotal = 0
+            this.ventaMerma = 0
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
+            if(this.ventaMerma == 1 && this.productos.length > 0){
+                this.$toasted.info('Se limpio los productos con precio cambiado',{duration: 3000})
+                this.limpiarCart()
+            }
+            this.ventaMerma = 0
             /*if(obj.CodSunat=='12' || obj.TieneIgv==1){
                 let pass = window.prompt('Escriba su contraseña')
                 if ((''+pass).trim()!='') {
@@ -1297,6 +1330,8 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
             let totalCero = 0 
+            let totalMayorCero = 0
+            let sinCantidad = 0
             this.productos.forEach(pro => {
                 if(pro.stock <= 0) {
                     sinStock += 1
@@ -1305,9 +1340,27 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                if(parseFloat(pro.total) > 0) {
+                    totalMayorCero += 1
+                }
+                if(parseFloat(+pro.cantidad) <= 0) {
+                    sinCantidad += 1
+                }
             });
 
-            if(totalCero >= 1) {
+            if(totalMayorCero >= 1 && this.ventaMerma == 1) {
+                this.$toasted.error('En la venta con monto CERO el precio debe ser CERO en todos los productos',{duration: 2500});
+                this.inProgress = false
+                return;
+            }
+            if(sinCantidad >= 1 && this.ventaMerma == 1){
+                this.$toasted.error('En la venta con monto CERO la cantidad no debe se CERO, solo el precio',{duration: 2500});
+                this.inProgress = false
+                return;
+            }
+
+            if(totalCero >= 1 && this.ventaMerma != 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
                 return;
@@ -1340,6 +1393,8 @@ export default {
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.venta.Detalles = (this.venta.tipoVenta.CodSunat == '12'?(''+this.venta.Detalles).trim().toUpperCase():'') 
+            this.venta.ventaMerma = this.ventaMerma
+            this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 console.log(response)
