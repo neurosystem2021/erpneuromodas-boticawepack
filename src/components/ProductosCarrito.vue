@@ -31,6 +31,8 @@
           <b-badge variant="danger">Productos Vencidos</b-badge>
           <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
           <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
+          <b-badge v-if="isVentas" style="background-color: #F6FC57 !important; color:black">Venta Estrategica</b-badge>
+          <b-badge v-if="isVentas" style="background-color: #39FF14 !important; color:black">Oferta</b-badge>
       </b-form-group>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
@@ -205,6 +207,16 @@
         <template slot="Lote" slot-scope="data" >
           <b-form-input
             v-model="productos[data.index].Lote"
+            type="text"
+            required
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Registro" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Registro"
             type="text"
             required
             v-bind:class="{ ventasAncho: isVentas }"
@@ -408,6 +420,7 @@ export default {
           { key: 'precioVenta', label: 'Precio venta', class:'stocksize' },
           { key: 'total', label: 'Total', variant: 'danger', class:'stocksize' },
           { key: 'Lote', label: 'C. Lote', class:'stocksize' },
+          { key: 'Registro', label: 'Reg. Sanitario', class:'stocksize' },
           { key: 'fechavencimiento', label: 'Vencimiento', class:'stocksize' },
           { key: 'acciones', label: '', class:'stocksize'}
         ]
@@ -495,6 +508,7 @@ export default {
         let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
         let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
         let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
+        let Registro = this.movimientoLotes[idProducto].find(m => m.value === hash).Registro
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -526,11 +540,13 @@ export default {
                this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
                this.productos[index].IdLote = IdLote 
                this.productos[index].Lote = Lote 
+               this.productos[index].Registro = Registro 
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
               }
             }else{
                  this.productos[index].Lote = Lote 
+                 this.productos[index].Registro = Registro 
                  try {
                   this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
                  } catch (error) {
@@ -716,6 +732,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.Registro = ''
       obj = this.onSetProducto(obj,presentacion)
       if(this.indexProdSelect == null){
       this.add([obj, () => {
@@ -768,6 +785,7 @@ export default {
         }*/
 
         let styleStock = ''
+        let styleCondition = ''
 
         if(data.stock>0){
           styleStock = 'table-info'
@@ -775,6 +793,13 @@ export default {
           styleStock = 'table-danger'
         }
 
+        if(data.VentaEstrategica==1){
+          styleCondition = 'background-color: #F6FC57 !important;'
+        }
+
+        if(data.Oferta==1){
+          styleCondition = 'background-color: #39FF14 !important;'
+        }
         // if (!data.ControlaStock) {
         //   data.stock = '---'
         // }
@@ -795,7 +820,7 @@ export default {
           }
         </style>
 
-        <div class="${style}">
+        <div class="${style}" style="${styleCondition}">
           <table id="table-render" style="width: 1050px; table-layout: fixed; word-wrap:break-word;">
             <thead>
               <tr style>
@@ -820,7 +845,7 @@ export default {
                 <td style="font-size:10px; padding-left:10px !important"><b>${data.Bloque}</b></td>
                 <td style="font-size:10px; padding-left:10px !important">${data.CompuestosProducto}</td>
                 <td class="table-success text-center"><b>${data.PrecioContado}</b></td>
-                <td class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
+                <td class="text-center"><b style="font-size: 1.1rem">${data.Oferta==1?'<i class="fas fa-smile" style="color:white;"></i>':(data.VentaEstrategica==1?'<i class="fas fa-star" style="color:white;"></i>':'')}</b></td>
               </tr>
             </tbody>
           </table>   
@@ -948,7 +973,7 @@ td.stocksize2{
   justify-content: center;
 }
 .ventasAncho{
-  width: 180px ;
+  width: 150px ;
 }
 </style>
 

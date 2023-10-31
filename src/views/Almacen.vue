@@ -124,18 +124,18 @@
                 </b-form-group>
               </b-col>  
               <b-col md="3">
-                <!--<b-form-group>
-                  <label>Modelo:</label>
+                <b-form-group>
+                  <label>Compuesto:</label>
                   <autocomplete
-                    :url="API + 'productos/modelos'"
-                    ref="inputModelo"
-                    anchor="ProductoModelo"
+                    :url="API + 'compuestos'"
+                    ref="inputCompuesto"
+                    anchor="ProductoCompuesto"
                     label="writer"
-                    :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
+                    :on-select="val => generateFilter('compuesto', val.ProductoCompuesto)"
+                    :onInput="(val) => !val ? generateFilter('compuesto', val) : false"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
-                </b-form-group>-->
+                </b-form-group>
               </b-col>
             </b-row>
           </b-col>
@@ -248,6 +248,12 @@
                   <b-button size="sm" variant="info" @click="showPresentacion(data.item)"><i class="fas fa-list"></i></b-button>
                 </template>
 
+                <template slot="CompuestosProducto" slot-scope="data">
+                  <div style="width: 180px; font-size: 0.5rem;">
+                    {{ data.item.CompuestosProducto }}
+                  </div>
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -267,6 +273,9 @@
 
       <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
+        <div v-if="productoSelect.CompuestosProducto!= '' && productoSelect.CompuestosProducto">
+          <label style="font-size: 0.85rem;"><b>COMPUESTOS: </b> {{ productoSelect.CompuestosProducto }}</label>
+        </div>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
         <b-row>
           <b-col class="text-center">
@@ -366,6 +375,7 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Laboratorio', sortable: true },
             { key: 'ProductoFormaFarmaceutica', label: 'Forma Farmacéutica', sortable: true },
+            { key: 'CompuestosProducto', label: 'Compuestos', sortable: true },
             { key: 'stock', label:'Stock G.', sortable: false, class:'text-center'},
             { key: 'presentaciones', label: 'Stock P.', sortable: false, class:'text-center'}
       ],
@@ -489,6 +499,7 @@ export default {
       this.limpiarClassRows()
       e.target.parentNode.classList.add('table-info')
 
+
       this.productoSelect = item
     },
     rowDblClick (item) {
@@ -545,7 +556,7 @@ export default {
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
       this.$refs.inputMarca.setValue('')
-      // this.$refs.inputModelo.setValue('')
+      this.$refs.inputCompuesto.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
@@ -556,7 +567,7 @@ export default {
       console.log(this.filter)
     },
     generateFilter (key, value) {
-      this.filters[key] = value
+      this.filters[key] = encodeURIComponent(value)
       
       let filter = ''
       for (var key in this.filters) {
