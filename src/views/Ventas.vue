@@ -461,8 +461,8 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'TICKET',
                     LimitItems: 0
                 },
                 almacen: {
@@ -757,6 +757,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.$refs.inputCliente.setValue('')
+                this.$refs.inputTipoVenta.setValue('TICKET')
 
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
@@ -842,7 +843,7 @@ export default {
                 this.limpiarCart()
                 this.getVendedor()
                 this.$refs.carrito.pagocon = 0
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('TICKET')
                 // this.$refs.inputAlmacen.setValue('VENTA')
                 // this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
