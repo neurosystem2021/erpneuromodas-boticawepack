@@ -34,7 +34,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="TICKET"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta"
