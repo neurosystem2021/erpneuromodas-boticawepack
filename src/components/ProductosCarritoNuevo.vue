@@ -48,7 +48,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==2 }"
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || idPerfil != 1"
+            :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
             step="0.000001"
@@ -78,7 +78,7 @@
             <input
               v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
               v-model="productos[data.index].sutotal"
-              :disabled="bloquearInput?true:false || idPerfil != 1"
+              :disabled="bloquearInput?true:false"
               type="number"
               min="0"
               step="0.00001"
@@ -134,7 +134,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==3 }"
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false || idPerfil != 1"
+            :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
             min="0"
@@ -207,6 +207,11 @@
                 <tr>
                   <td>
                     <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success" :disabled="EsVale==1 || EsVale==2"><i class="fas fa-credit-card" ></i></b-button>
+                    <br>
+                    <b-badge v-if="idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                    <b-badge v-if="idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                    <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                    <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSFERENCIA</b-badge>
                     <b-popover target="popover-metodopago" title="Metodo de pago" triggers="focus">
                     <slot name="metodopago"></slot>
                     </b-popover>
@@ -357,6 +362,7 @@ export default {
     setPrecio: Boolean,
     idAlmacen: Number,
     bloquearInput:Boolean,
+    idMetodoPago: Number,
     igvTotal: Boolean,
     EsVale: Number,
     onSetProducto: {

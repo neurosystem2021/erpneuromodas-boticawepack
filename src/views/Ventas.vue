@@ -271,6 +271,7 @@
                                     :bloquearInput="bloquearInput" 
                                     :fields="carrito.fields"
                                     :idAlmacen="venta.almacen.IdAlmacen"
+                                    :idMetodoPago="venta.IdMetodoPago"
                                     :onSetProducto="onSetProducto">
 
                                     <template slot="operaciones">
@@ -334,6 +335,7 @@
                                                             v-model="venta.pago.efectivo.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -357,6 +359,7 @@
                                                             v-model="venta.pago.visa.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -381,6 +384,7 @@
                                                             v-model="venta.pago.mastercard.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -405,6 +409,7 @@
                                                             v-model="venta.pago.transferencias.descripcion"
                                                             type="text"
                                                             placeholder="Descripcion"
+                                                            autocomplete="off"
                                                         ></b-form-input>
                                                     </td>
                                                     <td>
@@ -948,24 +953,28 @@ export default {
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.efectivo.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 1;
                     break;
                 case 2:
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.visa.monto =this.totalCart;
+                    this.venta.IdMetodoPago = 2;
                     break;
                 case 3:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.transferencias.monto = 0
                     this.venta.pago.mastercard.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 3;
                     break;
                 case 4:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.transferencias.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 4;
                     break;
             
                 default:
@@ -1076,10 +1085,10 @@ export default {
                 FechaCredito: this.$moment().format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
-                    efectivo: { IdMetodoPago: 1, monto: 0 },
-                    visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 },
-                    transferencias: { IdMetodoPago: 4, monto: 0 }
+                    efectivo: { IdMetodoPago: 1, monto: 0, descripcion: ''  },
+                    visa: { IdMetodoPago: 2, monto: 0, descripcion: ''  },
+                    mastercard: { IdMetodoPago: 3, monto: 0, descripcion: ''  },
+                    transferencias: { IdMetodoPago: 4, monto: 0, descripcion: ''  }
                 },
                 CampoDireccion: 'Direccion',
                 DescripcionEmbarcacion: '',
@@ -1097,6 +1106,7 @@ export default {
                 MontoVales: 0,
                 RefVale: '',
                 Observacion: '',
+                IdMetodoPago: 1,
             }
 
             this.isNota = false
@@ -1178,6 +1188,13 @@ export default {
                 }
                 this.venta.tipoVenta = obj
                 this.getNumeroVenta()
+                if(this.venta.tipoVenta.CodSunat=='13' ||  this.venta.tipoVenta.CodSunat=='14'){
+                    this.venta.pago.efectivo.monto = this.totalCart;
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencias.monto = 0
+                    this.venta.IdMetodoPago = 1
+                }
             //}
  
         },
@@ -1434,6 +1451,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0
             this.venta.pago.transferencias.monto = 0
+            this.venta.IdMetodoPago = 1
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
@@ -1442,6 +1460,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0
             this.venta.pago.transferencias.monto = 0
+            this.venta.IdMetodoPago = 1
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -1551,6 +1570,13 @@ export default {
                 return 
             }*/
 
+            if(this.venta.tipoVenta.CodSunat == '13' && ((''+this.venta.Placa).trim()=='' || (''+this.venta.Placa).trim()=='.') ){
+                this.$toasted.show('La placa para un VALE DE CREDITO es REQUERIDO', { duration:4000 })
+                this.inProgress = false
+                this.$refs.inputPlaca.focus()   
+                return
+            }
+
             if(this.venta.EsVale == 0){
                 this.venta.ConsumoId = 0
             }
@@ -1590,6 +1616,23 @@ export default {
             }
             if((isNaN(parseFloat(this.venta.pago.transferencias.monto))?0:parseFloat(this.venta.pago.transferencias.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago yape/plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+
+            //Validaciones de metodo de pago
+            if(this.venta.pago.visa.monto > 0 && (''+this.venta.pago.visa.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago TARJETA debe tener una referencia en descripcion', { duration:5000 })
+                this.inProgress = false            
+                return  
+            }
+            if(this.venta.pago.mastercard.monto > 0 && (''+this.venta.pago.mastercard.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago YAPE/PLIN debe tener una referencia en descripcion', { duration:5000 })
+                this.inProgress = false            
+                return  
+            }
+            if(this.venta.pago.transferencias.monto > 0 && (''+this.venta.pago.transferencias.descripcion).trim() ==''){
+                this.$toasted.show('El metodo de pago TRANSFERENCIA debe tener una referencia en descripcion', { duration:5000 })
                 this.inProgress = false            
                 return  
             }
@@ -1705,7 +1748,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
-            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase().trim();
             this.venta.Km = (''+this.venta.Km).toUpperCase()
             this.venta.RefVale = (this.venta.tipoVenta.CodSunat == '13'?(''+this.venta.RefVale).toUpperCase().trim():'')
             this.venta.Observacion = (''+this.venta.Observacion).toUpperCase().trim()
