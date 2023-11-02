@@ -22,6 +22,7 @@ import Vales from '@/views/reportes/Vales.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 import ReporteCantidad from '@/views/reportes/ReporteCantidad.vue'
+import VentasMetodoPago from '@/views/reportes/VentasMetodoPago.vue'
 
 
 Vue.use(Router)
