@@ -127,7 +127,10 @@
           <b-form-group v-if="true">
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <b-form-text id="input-formatter-help">
+              <b style="color: red;">*La imagen debe ser en formato PNG y 300 x 300 pixeles</b>
+            </b-form-text>
           </b-form-group>
 
           <b-form-group v-if="false">
@@ -613,7 +616,49 @@ export default {
   },
   methods: {
     handleFileUpload() {
-      this.file = this.$refs.file.files[0]
+      const file = this.$refs.file.files[0]
+      this.file = ''
+      if (!file) {
+        this.$refs.file.value=null
+        this.$toasted.error('Sin imagen, no se guardará', { duration: 4000 })
+        return;
+      }
+      
+      if (file.type != 'image/png') {
+        this.$toasted.error('La imagen debe ser en formato PNG de 300 x 300 pixeles, no se guardará', { duration: 5000 })
+        this.$refs.file.value = null
+        return;
+      }
+
+      try {
+        this.getBase64(file).then((base64) => {
+          const img = new Image();
+          img.src = base64.toString();
+          img.onload = () => {
+            if(img.width == 300 && img.height == 300){
+              this.file = file
+              console.log(this.file);
+              this.$toasted.info('La imagen se cargo correctamente, presione GUARDAR para registrarla en el producto.', { duration: 6000 })
+            }else{
+              this.$refs.file.value = null
+              this.$toasted.error("La imagen debe ser en formato PNG de 300 x 300 pixeles, no se guardará.", { duration: 5000 })
+            }
+          
+          };     
+        });    
+      } catch (error) {
+        this.$refs.file.value = null
+        this.$toasted.show("Ha ocurrido un error", { duration: 4000 })
+      }
+
+    },
+    getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
     },
     calcularPreciosPaquete (prodDetalles) {
       let sumatoriaCosto = 0
@@ -858,6 +903,7 @@ export default {
           })
           .then((res) => {
             // console.log(res);
+            this.$refs.file.value = null
           })
 
         this.$refs.productoForm.hide()
