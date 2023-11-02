@@ -536,11 +536,15 @@ export default {
       }
     },*/
     eliminarElectronico (venta) {
+      if(this.fechaInicio==''){
+        this.$toasted.show('Seleccione la Fecha de Referencia para la anulación')
+        return
+      }
       let r = confirm('¿Desea Anular la venta?')
       if (r == true) {
         this.loading = true
         
-        if (this.tipoDoc.CodSunat == '01') { // Factura
+        if (this.tipoDoc.CodSunat == '01' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '01')) { // Factura
           let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
           if (desc) {  
             this.axios.post(this.API + 'bajaelectronico', {
@@ -550,7 +554,7 @@ export default {
               // fechaReferencia: this.fechaReferencia
             }).then(res => {
               console.log(res)
-              this.$toasted.show('Factura Anulada')
+              this.$toasted.show('Comprobante Anulado')
               this.$refs.tablaVentas.refresh()
               this.loading = false
               //mensaje success
@@ -558,15 +562,15 @@ export default {
           }
         }
 
-        if (this.tipoDoc.CodSunat == '03') { // Boleta
+        if (this.tipoDoc.CodSunat == '03' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '03')) { // Boleta
           this.axios.post(this.API + 'emitirelectronicoboleta', {
             boletas: [venta],
             statu: 3, // Statu 3 = dar de baja / 1 = emitir
             codSunat: this.tipoDoc.CodSunat,
-            fechaReferencia: this.fechaReferencia
+            fechaReferencia: (''+this.fechaInicio).substring(0,10)
           }).then(res => {
             console.log(res)
-            this.$toasted.show('Boleta Anulada')
+            this.$toasted.show('Comprobante Anulado')
             this.$refs.tablaVentas.refresh()
             this.loading = false
           })
