@@ -129,5 +129,10 @@ export default new Router({
       name: 'ReporteCantidad',
       component: ReporteCantidad
     },
+    {
+      path: '/reportes/ventas/metodopago',
+      name: 'VentasMetodoPago',
+      component: VentasMetodoPago
+    },
   ]
 })
