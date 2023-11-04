@@ -246,6 +246,17 @@
             <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md"/>
           </b-form-group>
 
+          <b-form-group>
+            <label>Pedi2.pe:</label><br>
+            <b-form-checkbox
+                     v-model="producto.MostrarApp"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Mostrar en Pedi2
+            </b-form-checkbox>
+          </b-form-group>
+
           <b-form-group v-if="false">
             <label>2da Descripción:</label>
             <b-form-textarea 
@@ -500,6 +511,7 @@ export default {
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
+        this.producto.MostrarApp            = newVal.MostrarApp
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -646,6 +658,7 @@ export default {
         // Color: '',
         PorcentajeUtilidad: '',
         ControlaStockMinimo:0,
+        MostrarApp: 0,
         StockMinimo: 0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
