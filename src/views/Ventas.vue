@@ -5,7 +5,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container fluid class="ancho">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -717,5 +717,10 @@ export default {
 .big-text {
     font-size: 30px;
 }
-
+@media only screen and (min-width: 777px) and (max-width: 1900px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(90%)
+    }
+}
 </style>

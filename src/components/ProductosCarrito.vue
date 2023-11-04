@@ -31,7 +31,7 @@
           <input
             v-model="productos[data.index].cantidad"
             type="number"
-            style="width: 80px"
+            style="width: 100px"
             min="0"
             @input="(val) => $emit('onInputCantidad', val.target.value)"
             placeholder="Cantidad"
@@ -41,7 +41,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 80px"
+            style="width: 100px"
             min="0"
             step="0.00001"
             placeholder="Precio"
@@ -96,6 +96,7 @@
             min="0"
             step="0.01"
             value="0"
+            style="width: 100px;"
             class="form-control"/>
             <b-form-text>
             </b-form-text>
@@ -118,10 +119,12 @@
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>
+          <textarea
+            class="form-control"
+            placeholder="Descripción"
+            cols="15" rows="2"
+            v-model="productos[data.index].Descripcion">
+          </textarea>
         </template>        
 
         <template slot="total" slot-scope="data">
@@ -368,6 +371,7 @@ export default {
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
+      obj.Descripcion = ''
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
