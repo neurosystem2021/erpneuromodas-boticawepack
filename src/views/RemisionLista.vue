@@ -87,6 +87,8 @@
                       &nbsp;&nbsp;
                       <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
                       &nbsp;&nbsp;
+                      <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
+                      &nbsp;&nbsp;
                       <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
                       &nbsp;&nbsp;
                   </div>
@@ -202,6 +204,24 @@ export default {
           this.$toasted.success(response.data.msj_sunat)
           this.loading = false
         }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
+      });
+    },
+    async validarElectronico (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'validarguiaelectronica/' + doc.IdDocVentaRemision ).then((response) => {
+        if(response.data.Estado == 1) {
+          this.$toasted.error(response.data.msj_sunat)                  
+          this.loading = false
+        } else {
+          this.$toasted.success(response.data.msj_sunat)
+          this.loading = false
+        }
+        this.$nextTick(() => {
+          this.$refs.tablaVentas.refresh()
+        })
       });
     },
     getDetalles (idDocVentaRemision) {
