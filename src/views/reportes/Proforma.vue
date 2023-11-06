@@ -77,7 +77,7 @@
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 7 dias posteriores.</div>
+        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
     </main>
     <!--<footer>
