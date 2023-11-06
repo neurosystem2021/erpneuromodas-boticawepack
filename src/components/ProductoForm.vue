@@ -241,20 +241,20 @@
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
 
-          <b-form-group>
-            <label>Categoria Oferta en APP:</label>
-            <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" class="mb-3" size="md"/>
-          </b-form-group>
-
-          <b-form-group>
-            <label>Pedi2.pe:</label><br>
+          <b-form-group v-if="producto.IdProducto" style="border: 1.7px dashed #0020FF; padding: 10px; ">
+            <label>Pedi2.pe:</label> <img src="static/logo.png" style="width: 32px" /><br>
             <b-form-checkbox
                      v-model="producto.MostrarApp"
                      :value="1"
                      :unchecked-value="0"
                      >
-              Mostrar en Pedi2
+              Mostrar en Pedi2.pe
             </b-form-checkbox>
+            <hr>
+            <label>Categoria oferta en APP:</label>
+            <b-form-select v-model="producto.IdOfertaCategoria" :options="categoriaItems" v-on:change="setOferta($event)" class="mb-3" size="md"/>
+            <label v-if="producto.IdOfertaCategoria!=null">Orden a mostrar:</label>
+            <b-form-select v-if="producto.IdOfertaCategoria!=null" v-model="producto.PosOferta" :options="itemsPosOferta" class="mb-3" size="md" required/>
           </b-form-group>
 
           <b-form-group v-if="false">
@@ -413,7 +413,8 @@ export default {
       productosDet: [],
       file: '',
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      categoriaItems:[]
+      categoriaItems:[],
+      itemsPosOferta: [],
     }
   },
   beforeMount () {
@@ -424,6 +425,11 @@ export default {
     show (val) {
       if(val){
         this.cargarCatOferta()
+        this.itemsPosOferta = []
+        this.itemsPosOferta.push({ value : 10000 , text : "== SELECCIONE POSICION OFERTA =="})
+        for (let index = 1; index <= 100; index++) {
+          this.itemsPosOferta.push({ value : index, text: index})
+        }
       }
 
       let newVal = this.productoUpdate  || {}
@@ -512,6 +518,7 @@ export default {
         this.producto.Imagen                = newVal.Imagen
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.MostrarApp            = newVal.MostrarApp
+        this.producto.PosOferta             = newVal.PosOferta
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -531,6 +538,15 @@ export default {
     }
   },
   methods: {
+    setOferta(e){
+      console.log(e);
+      if(e == null){
+        this.$toasted.info('Se quitó el orden de la oferta')
+        this.producto.PosOferta = 10000
+      }else{
+        this.$toasted.info('Seleccione el orden que se mostrará en la lista')
+      }
+    },
     cargarCatOferta(){
       this.categoriaItems = []
       this.axios.get(this.API + 'categorias/oferta')
@@ -656,6 +672,7 @@ export default {
         // Color: '',
         PorcentajeUtilidad: '',
         ControlaStockMinimo:0,
+        PosOferta: 10000,
         MostrarApp: 0,
         StockMinimo: 0,
         PrecioContado: 0,
@@ -689,6 +706,11 @@ export default {
     guardarProducto(e) {
       e.preventDefault();
 
+      if(this.producto.IdOfertaCategoria != null && this.producto.PosOferta == 10000){
+        this.$toasted.error('Seleccione un orden si el producto es oferta.', {duration: 3000})
+        return
+      }
+
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos
@@ -707,7 +729,7 @@ export default {
           this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
           return
         } else {
-          this.$toasted.show('Producto guardado correctamente')
+          this.$toasted.success('Producto guardado correctamente')
         }
 
         // this.initForm()

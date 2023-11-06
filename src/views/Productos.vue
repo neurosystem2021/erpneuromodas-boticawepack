@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid style="width: calc(80%) !important;" class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -40,7 +40,16 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+            <template slot="PosOferta" slot-scope="data">
+              <h4><b-badge variant="success" style="width: 100px;" v-if="data.item.PosOferta < 10000">{{ data.item.PosOferta }}</b-badge></h4>
+            </template>
+
+            <template slot="MostrarApp" slot-scope="data">
+              <h4><b-badge variant="info" style="width: 50px;" v-if="data.item.MostrarApp == 1">SI</b-badge></h4>
+            </template>
+          
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -86,6 +95,8 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
+            { key: 'PosOferta', label: 'Orden Oferta', sortable: true },
+            { key: 'MostrarApp', label: 'En App', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
