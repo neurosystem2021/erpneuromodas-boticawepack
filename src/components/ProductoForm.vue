@@ -430,7 +430,7 @@ export default {
         for (let index = 1; index <= 100; index++) {
           this.itemsPosOferta.push({ value : index, text: index})
         }
-      }
+      
 
       let newVal = this.productoUpdate  || {}
       if (newVal.IdProducto && !this.nuevo) {
@@ -523,8 +523,10 @@ export default {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
         this.$refs.file.value=null
+        this.file=''
         }).catch((error) => {
             this.$refs.file.value=null
+            this.file=''
             console.log(error)
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
@@ -535,7 +537,9 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
         this.$refs.file.value=null
+        this.file=''
         this.$refs.inputCodigoBarra.$el.disabled = false
+      }
       }
     }
   },
@@ -554,8 +558,9 @@ export default {
       this.axios.get(this.API + 'categorias/oferta')
       .then((response) => {
         if(response.data){
+            this.categoriaItems.push({value:null,text:'=== SIN OFERTA ==='})
             response.data.map((cat)=>{
-                this.categoriaItems.push({value:null,text:'=== SIN OFERTA ==='})
+                
                 this.categoriaItems.push({value:cat.IdProductoCategoria,text:cat.ProductoCategoria})
             })
         }else{
