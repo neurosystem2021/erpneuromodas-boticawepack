@@ -284,12 +284,12 @@ export default {
     loadMapa(){
         if(this.idEmpresa != null){
             this.mymap = new L.map('mapid', { touchZoom: false, attributionControl: false, scrollWheelZoom: false, doubleClickZoom: false, closePopupOnClick: false  }).setView([this.empresa.Latitud,this.empresa.Longitud], 13);
-            L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+            L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g",
             {
             maxZoom: 22,
             id: "mapbox/streets-v11",
             accessToken:
-                "pk.eyJ1IjoicmVuem85MjIxIiwiYSI6ImNraDRhZ2NxbzA5eHEycW92d2Y1cGhldWUifQ.1zWCqGLtZfq_VSSWJx23Pg",
+                "sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g",
             }).addTo(this.mymap);
             this.clienteLayer = L.layerGroup().addTo(this.mymap);
             this.empresaLayer = L.layerGroup().addTo(this.mymap);
