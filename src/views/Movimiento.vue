@@ -322,6 +322,7 @@ return false
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
          this.limpiarCart()
+         this.movimiento.alterarProductos = 0
       }else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 }
         this.movimiento.almacenOrigen = { IdAlmacen: 1 }
@@ -374,6 +375,7 @@ return false
       let igualProducto = false
       let faltaStock = false
       let faltaLote = false
+      let faltaRegistro = false
       this.productos.forEach((prod, index) => {
         if ((((prod.cantidad || 0)  * (prod.precio || 0)) <= 0 ) || ((prod.nuevoPrecioContado || 0) <= 0)) {
           this.$toasted.show('Se requiere los precios del producto '+prod.Producto)
@@ -400,6 +402,11 @@ return false
           faltaLote = true
           this.$toasted.error('Por favor especifique un LOTE del producto: '+prod.Producto);
         }
+
+        if((''+prod.Registro).trim()=='' || prod.Registro== undefined){
+          faltaRegistro = true
+          this.$toasted.error('Por favor especifique un REGISTRO del producto: '+prod.Producto);
+        }
         
       })
       if (faltaStock) {
@@ -409,6 +416,11 @@ return false
       }
 
       if (faltaLote) {
+          this.inProgress = false            
+          return;
+      }
+
+      if (faltaRegistro) {
           this.inProgress = false            
           return;
       }

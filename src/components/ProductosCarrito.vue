@@ -509,6 +509,7 @@ export default {
         let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
         let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
         let Registro = this.movimientoLotes[idProducto].find(m => m.value === hash).Registro
+        console.log(Registro);
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -586,7 +587,8 @@ export default {
               IdLote: l.IdLote,
               Lote: l.Lote,
               FechaVen: l.FechaVen,
-              SerieNumero: l.Serie + '-' + l.Numero
+              SerieNumero: l.Serie + '-' + l.Numero,
+              Registro: l.Registro
             }))
           }
         })
