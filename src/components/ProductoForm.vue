@@ -241,6 +241,15 @@
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
 
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TienePresentacion"
+                   :value="1"
+                   :unchecked-value="0">
+              Tiene Presentacion
+            </b-form-checkbox>
+          </b-form-group>
+
           <b-form-group v-if="producto.IdProducto" style="border: 1.7px dashed #0020FF; padding: 10px; ">
             <label>Pedi2.pe:</label> <img src="static/logo.png" style="width: 32px" /><br>
             <b-form-checkbox
@@ -310,10 +319,32 @@
               />
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-row>
+            <b-col>
+              <label>% de Liquidación:</label>
+              <input v-model="producto.PorcentajeLiquidacion"
+              type="number"
+              class="form-control"
+              step="1"
+              min="0"
+              max="100"
+              @input="(val)=>actualizarLiquidacion(val.target.value)"
+              />
+            </b-col>
+            <b-col>
+              <label>Precio Final:</label>
+              <br>
+              <div style="display:flex; justify-content: start; align-items: center; margin-top: 6px;">
+                <b>{{ precioLiquidacion }}</b>
+              </div>
+            </b-col>
+          </b-row>
+        </b-col>
       </b-row>
 
-      <hr>
-      <b-row>
+      <hr  v-if="producto.TienePresentacion==1">
+      <b-row  v-if="producto.TienePresentacion==1">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
@@ -519,6 +550,8 @@ export default {
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.MostrarApp            = newVal.MostrarApp
         this.producto.PosOferta             = newVal.PosOferta
+        this.producto.TienePresentacion     = newVal.TienePresentacion
+        this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -606,6 +639,10 @@ export default {
         })
       }
     },
+    actualizarLiquidacion(){
+      this.precioLiquidacion = this.producto.PrecioContado -  Math.round(((this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0)*(this.producto.PrecioContado>0?this.producto.PrecioContado:0)/100)* 10) / 10;
+      this.actualizarPorcentajeUtilidad()
+    },
     actualizarPrecioContado () {
       var precioCosto = Number(this.producto.PrecioCosto)
       var utilidad = Number(this.producto.PorcentajeUtilidad)
@@ -677,8 +714,9 @@ export default {
         _ProductoDesc3:'',
         CodigoBarra: '',
         // Color: '',
-        PorcentajeUtilidad: '',
+        PorcentajeUtilidad: 0,
         ControlaStockMinimo:0,
+        ControlaStock:1,
         PosOferta: 10000,
         MostrarApp: 0,
         StockMinimo: 0,
@@ -690,6 +728,8 @@ export default {
         categoria: {},
         marca: {},
         IdOfertaCategoria: null,
+        PorcentajeLiquidacion: 0,
+        TienePresentacion: 0,
         // modelo: {},
         //talla: {},
         medicion: {
@@ -723,6 +763,7 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos
       }
       // console.log(JSON.stringify(this.producto))
+      this.producto.PorcentajeLiquidacion = (this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0);
 
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
