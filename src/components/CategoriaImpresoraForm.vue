@@ -46,7 +46,7 @@
               ></b-form-input>
           </b-form-group>
         </b-col>
-        <b-col md="6">
+        <b-col md="6" v-if="false">
           <b-form-checkbox
             v-model="categoria.EsOferta"
             :value="1"
