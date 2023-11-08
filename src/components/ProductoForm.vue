@@ -765,6 +765,10 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.PorcentajeLiquidacion = (this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0);
 
+      if(this.producto.IdOfertaCategoria == null ){
+        this.producto.PosOferta = 10000
+      }
+
       this.axios.post(this.API + 'productos', {
         ...this.producto, 
         PreciosPorProducto: this.producto.precios 
