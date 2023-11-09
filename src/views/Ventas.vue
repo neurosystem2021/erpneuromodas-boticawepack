@@ -939,11 +939,11 @@ export default {
             }
 
             //No permitir la venta con Ruc si es boleta
-            if (esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
-                this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-                this.inProgress = false
-                return
-            }
+            //if (esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
+            //    this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
+            //    this.inProgress = false
+            //    return
+            //}
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
