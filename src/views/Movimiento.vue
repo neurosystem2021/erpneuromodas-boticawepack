@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid class="anchomov" id="conten">
           <b-row>
               <b-col md="8">
@@ -275,6 +275,11 @@ export default {
       obtenerStok: 'obtenerStock',
       limpiarCart: 'limpiarCarrito',
     }),
+    prevent (evt) {
+      if (evt.target.tagName !== 'TEXTAREA') {
+          evt.preventDefault();
+      }
+    },
     onAddProducto (obj) {
       if(this.isSalida){
         this.obtenerStok({
@@ -505,6 +510,8 @@ return false
         this.movimiento.alterarProductos = 0
       }
 
+      let r = confirm('¿Desea Guardar el Movimiento?')
+      if (r == true) {
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos
@@ -526,6 +533,9 @@ return false
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         this.inProgress = false
       })
+      }else {
+        this.inProgress = false
+      }
     },
     focusAutocomplete (ref) {
       //this.$refs[ref].type = ""
