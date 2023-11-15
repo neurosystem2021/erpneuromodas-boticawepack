@@ -410,7 +410,7 @@ return false
         
       })
       if (faltaStock) {
-          this.$toasted.error('No hay stock del producto para el movimiento seleccionado');
+          this.$toasted.error('No hay stock del producto para el LOTE seleccionado');
           this.inProgress = false            
           return;
       }

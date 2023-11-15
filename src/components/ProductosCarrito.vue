@@ -28,11 +28,11 @@
             <producto-form  v-if="false" :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
-          <b-badge variant="danger">Productos Vencidos</b-badge>
-          <b-badge variant="warning">proximos a vencer 4 meses</b-badge>
+          <b-badge style="background-color: #dc3545 !important; color:white">Productos Vencidos</b-badge>
+          <!--<b-badge variant="warning">proximos a vencer 4 meses</b-badge>-->
           <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
-          <b-badge v-if="isVentas" style="background-color: #F6FC57 !important; color:black">Venta Estrategica</b-badge>
-          <b-badge v-if="isVentas" style="background-color: #39FF14 !important; color:black">Oferta</b-badge>
+          <b-badge v-if="isVentas" style="background-color: #FFCE05 !important; color:black">Venta Estrategica</b-badge>
+          <b-badge v-if="isVentas" style="background-color: #28AA45 !important; color:white">Oferta</b-badge>
       </b-form-group>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
@@ -182,7 +182,7 @@
         </template>-->
 
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
-          <div v-if="isNota" style="width: 135px; text-align:center">
+          <!--<div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].Lote}}
             </div>
@@ -201,7 +201,46 @@
           <div style="text-align:center;" v-if="!isNota">
                 <small style="font-size:14px;">S: <span style="font-weight:bold;">{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</span> -  D: <span style="font-weight:bold; text-transform:uppercase">{{ productos[data.index].SerieNumero }}</span></small><br />
           </div>
-          <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+          <div style="font-size:19px" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
+          <div v-if="!isNota">
+            <!--<label style="font-weight: bold; font-size: 0.9rem;">{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</label>-->
+            <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+            <b-popover  placement="right" :target="'popover-lote' + data.index" :title="productos[data.index].Producto" triggers="focus">
+              <div style="text-align:center">
+                <b-form-select v-if="!isNota"
+                  style="width: 100%; text-align: center !important;"
+                  :disabled="bloquearInput?true:false"
+                  @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                  v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
+                </b-form-select>
+                <br>
+                <div class="text-left">
+                  Stock de Lote: <b>{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</b> 
+                </div>
+                <div class="text-left">
+                  Nro. Factura: <b>{{ productos[data.index].SerieNumero }}</b>
+                </div>
+                <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+                <div class="text-left">
+                  Registro Sanitario: <b>{{ productos[data.index].Registro }}</b> 
+                </div>
+                  
+                <!--<div style="text-align:center;" v-if="!isNota">
+                      <small style="font-size:14px;">Stock de lote: <span style="font-weight:bold;"></span> -  D: <span style="font-weight:bold; text-transform:uppercase"></span></small><br />
+                </div>-->
+                
+              </div>
+            </b-popover>
+          </div>
+          <div v-if="isNota" style="width: 70px;">
+            <div>
+              {{productos[data.index].Lote}}
+            </div>
+            <div>
+              {{productos[data.index].FechaVen}}
+            </div>
+          </div>
+
         </template>
 
         <template slot="Lote" slot-scope="data" >
@@ -399,9 +438,9 @@ export default {
       default () {
         return [
           { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-          { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center stocksize'  },
           //{ key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo', class:'stocksize' }, 
+          { key: 'movimiento', label: '', class:'text-center stocksize'  },
           { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
           //{ key: 'ProductoModelo', label: 'Modelo' }, 
           //{ key: 'Color', label: 'Color' }, 
@@ -492,6 +531,9 @@ export default {
       actualizarTotal: 'actualizarTotalCart',
       actualizarProd : 'actualizarProducto',
     }),
+    abrirLotes(target){
+      //this.$refs.popover.$emit('open')
+    },  
     changeCant (val, prod, index) {
       if (val) {
         prod.cantidad = prod.cantidadPress
@@ -554,7 +596,7 @@ export default {
                   
                  }
               }
-             Vue.set(this.productos[index], 'fechaVenMovimiento', `<small style="font-weight:bold" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
+             Vue.set(this.productos[index], 'fechaVenMovimiento', `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
           })
         } else {
           this.$nextTick(() => {
@@ -788,6 +830,7 @@ export default {
 
         let styleStock = ''
         let styleCondition = ''
+        let styleVencerText = ''
 
         if(data.stock>0){
           styleStock = 'table-info'
@@ -796,11 +839,17 @@ export default {
         }
 
         if(data.VentaEstrategica==1){
-          styleCondition = 'background-color: #F6FC57 !important;'
+          styleCondition = 'background-color: #FFCE05 !important;'
         }
 
         if(data.Oferta==1){
-          styleCondition = 'background-color: #39FF14 !important;'
+          styleCondition = 'background-color: #28AA45 !important; color:white !important;'
+          styleVencerText = 'color:white !important;'
+        }
+
+        if(data.Vencer==1){
+          styleCondition = 'background-color: #dc3545 !important; color:white !important;'
+          styleVencerText = 'color:white !important;'
         }
         // if (!data.ControlaStock) {
         //   data.stock = '---'
@@ -818,7 +867,7 @@ export default {
             border: 1px solid #eaeaea;
           }
           #table-render td, #table-render th {
-            color: #000000 !important;
+            color: #000000;
           }
         </style>
 
@@ -827,27 +876,27 @@ export default {
             <thead>
               <tr style>
                 <th class="table-info text-center" style="width: 60px;">Stock</th>
-                <th style="width: 250px; padding-left:10px !important">Producto</th>
-                <th style="width: 150px; padding-left:10px !important">Forma</th>
-                <th style="width: 100px; padding-left:10px !important">Medición</th>
-                <th style="width: 150px; padding-left:10px !important">Lab</th>                
-                <th style="width: 100px; padding-left:10px !important">Bloque</th>
-                <th style="width: 200px; padding-left:10px !important">Compuestos</th>
-                <th class="table-success text-center" style="width: 65px">Precio.</th>
-                <th class="text-center" style="width: 35px">V.E.</th>
+                <th style="width: 250px; padding-left:10px !important; ${styleVencerText}">Producto</th>
+                <th style="width: 150px; padding-left:10px !important; ${styleVencerText}">Forma</th>
+                <th style="width: 100px; padding-left:10px !important; ${styleVencerText}">Medición</th>
+                <th style="width: 150px; padding-left:10px !important; ${styleVencerText}">Lab</th>                
+                <th style="width: 100px; padding-left:10px !important; ${styleVencerText}">Bloque</th>
+                <th style="width: 200px; padding-left:10px !important; ${styleVencerText}">Compuestos</th>
+                <th class="table-success text-center" style="width: 65px;">Precio.</th>
+                <th class="text-center" style="width: 35px; ${styleVencerText}">V.E.</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td class="${styleStock} text-center"><b>${data.ControlaStock==1?data.stock:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'}</b></td>
-                <td style="padding-left:10px !important"><b>${data.Producto}</b></td>
-                <td style="padding-left:10px !important">${data.ProductoFormaFarmaceutica}</td>
-                <td style="padding-left:10px !important">${data.ProductoMedicion}</td>
-                <td style="padding-left:10px !important">${data.ProductoMarca}</td>
-                <td style="font-size:10px; padding-left:10px !important"><b>${data.Bloque}</b></td>
-                <td style="font-size:10px; padding-left:10px !important">${data.CompuestosProducto}</td>
+                <td style="padding-left:10px !important; ${styleVencerText}"><b>${data.Producto}</b></td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoFormaFarmaceutica}</td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoMedicion}</td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoMarca}</td>
+                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}"><b>${data.Bloque}</b></td>
+                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}">${data.CompuestosProducto}</td>
                 <td class="table-success text-center"><b>${data.PrecioContado}</b></td>
-                <td class="text-center"><b style="font-size: 1.1rem">${data.Oferta==1?'<i class="fas fa-smile" style="color:white;"></i>':(data.VentaEstrategica==1?'<i class="fas fa-star" style="color:white;"></i>':'')}</b></td>
+                <td class="text-center"><b style="font-size: 1.1rem">${data.Vencer==1?'<i class="fas fa-clock" style="color:white;"></i>':(data.Oferta==1?'<i class="fas fa-smile" style="color:white;"></i>':(data.VentaEstrategica==1?'<i class="fas fa-star" style="color:white;"></i>':''))}</b></td>
               </tr>
             </tbody>
           </table>   
@@ -955,6 +1004,10 @@ td.stocksize2{
   vertical-align: middle !important;
   border-right: 2px #dee2e6 solid;
 }
+td.stocksizepro{
+  text-align: left !important; 
+  vertical-align: middle !important;
+}
 .contentCard {
   cursor: pointer;
 }
@@ -976,6 +1029,13 @@ td.stocksize2{
 }
 .ventasAncho{
   width: 150px ;
+}
+td.vertical{
+  vertical-align: middle;
+  text-align: center;
+}
+.popover{
+    min-width: 290px !important;
 }
 </style>
 

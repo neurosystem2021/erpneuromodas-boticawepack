@@ -396,9 +396,9 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
                     //{ key: 'Lote', class:'text-center stocksize' },
-                    { key: 'movimiento', label: 'Lote', variant: 'primary', class:'text-center'  },
                     //{ key: 'CodigoBarra', label: 'Código', class:'stocksize' }, 
-                    { key: 'Producto', class:'text-left stocksize2' }, 
+                    { key: 'Producto', class:'text-left stocksizepro' }, 
+                    { key: 'movimiento', label: '', class:'text-center vertical stocksize2'  },
                     { key: 'ProductoFormaFarmaceutica', label: 'For. F.', class:'text-left stocksize2' }, 
                     { key: 'ProductoMarca', label: 'Lab.', class:'text-left stocksize2' },
                     //{ key: 'ProductoDescCorto', label: 'Anaquel', class:'text-center stocksize' },

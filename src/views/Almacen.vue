@@ -23,7 +23,9 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock <br>General</b>
-                  <div> {{ sumaStock | redondear }} </div>
+                  <br />
+                  <button class="btn btn-warning mb-2" v-if="!verStockGeneral" @click="clickVerStock">ver</button>
+                  <div v-if="verStockGeneral"> {{ sumaStock | redondear }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -131,8 +133,8 @@
                     ref="inputCompuesto"
                     anchor="ProductoCompuesto"
                     label="writer"
-                    :on-select="val => generateFilter('compuesto', val.ProductoCompuesto)"
-                    :onInput="(val) => !val ? generateFilter('compuesto', val) : false"
+                    :on-select="val => generateFilter('compuesto', val.ProductoCompuesto)"                    
+                    :onInput="val => generateFilter('compuesto', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -249,7 +251,7 @@
                 </template>
 
                 <template slot="CompuestosProducto" slot-scope="data">
-                  <div style="width: 180px; font-size: 0.5rem;">
+                  <div style="width: 200px; font-size: 0.7rem;">
                     {{ data.item.CompuestosProducto }}
                   </div>
                 </template>
@@ -384,6 +386,7 @@ export default {
       currentPage: 1,
       idPerfil: sessionStorage.getItem('IdPerfil'),
       verValorizado: false,
+      verStockGeneral: false,
       objProd:{},
       PresentacionesProd:[]
     }
@@ -452,6 +455,20 @@ export default {
             this.verValorizado = true;
             this.getSumaValorizado()
             this.getSumaValorizadoSin()
+          }
+        })
+      }
+    },
+    clickVerStock(){
+      let pass = window.prompt('Escriba su contraseña')
+      if (pass) {
+        this.axios.post(this.API + 'login', {
+          user: sessionStorage.getItem('User'),
+          password: pass
+        }).then(r => {
+          if (r.data) {
+            this.verStockGeneral = true;
+            this.getSumaStock()
           }
         })
       }
