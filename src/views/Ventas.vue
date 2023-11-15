@@ -380,7 +380,7 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button class="ocularMovil" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="mb-1" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
@@ -865,6 +865,9 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
+
+            let r = confirm('¿Se hará una proforma está seguro?')
+            if (r) {
             this.inProgress = true
 
             if(!this.productos.length) {
@@ -900,6 +903,7 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 this.inProgress = false
             })
+            }
         },
         guardarVenta (evt) {
             evt.preventDefault();
