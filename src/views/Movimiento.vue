@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container class="bv-example-row">
           <b-row>
               <b-col md="8">
@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="VENTA"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="VENTA"
+                        initValue="PRINCIPAL"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -240,6 +240,11 @@ export default {
       buscarAlmacenes: 'buscarAlmacenes',
       limpiar: 'limpiarCarrito'
     }),
+    prevent (evt) {
+      if (evt.target.tagName !== 'TEXTAREA') {
+          evt.preventDefault();
+      }
+    },
     afe (e) {
 return false
     },
@@ -363,7 +368,7 @@ return false
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })

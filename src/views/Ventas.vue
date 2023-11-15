@@ -858,7 +858,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-                this.$toasted.show('Venta realizada con exito')
+                this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
                 this.ultimaVenta = response.data.insertId
@@ -874,7 +874,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.limpiarDespuesVenta()
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 console.log(error)
