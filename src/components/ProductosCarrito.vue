@@ -63,7 +63,7 @@
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEditAnt" :producto-update="productoSelect"></producto-form>
             <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
           </b-input-group-append>
         </b-input-group>
@@ -71,7 +71,6 @@
       </b-row>
       </b-form-group>
       </div>
-
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
@@ -273,7 +272,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
+import ProductoForm from '@/components/ProductoForm'
 import config from '@/store/config.js'
 import sound from '../../static/beep.mp3'
 import Vue from "vue"
@@ -526,6 +525,7 @@ export default {
     editarProducto(datos){
       this.productoSelect = datos;
       this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEditAnt.show = true;
     },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
