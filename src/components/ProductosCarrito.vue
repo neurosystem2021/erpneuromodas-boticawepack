@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group class="ocultarMovil">
+      <b-form-group>
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
@@ -30,47 +30,6 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-
-      <div class="mostrarMovil">
-      <b-form-group>
-      <b-row>
-        <b-col md="6">
-          <b-input-group>
-          <autocomplete
-            ref="autocompleteProducto2"
-            :url="API + 'productos'"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto2')"
-            :classes="{input: 'form-control'}">
-          </autocomplete>
-        </b-input-group>
-        </b-col><br/>
-        </b-row>
-        <b-row>
-        <b-col md="6">
-          <b-input-group>
-          <input v-model="loadCode"
-          :disabled="bloquearInput?true:false"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  class="form-control"
-                  placeholder="Codigo de Barra" />
-          <b-input-group-append>
-            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
-            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
-            <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
-          </b-input-group-append>
-        </b-input-group>
-        </b-col>
-      </b-row>
-      </b-form-group>
-      </div>
 
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
@@ -529,7 +488,7 @@ export default {
     },
     setProducto (obj) {
       this.$refs.autocompleteProducto.setValue('')
-      this.$refs.autocompleteProducto2.setValue('')
+      //this.$refs.autocompleteProducto2.setValue('')
       //obj.FLETE = 0
       obj.precio = 0
       obj.cantidad = 0
