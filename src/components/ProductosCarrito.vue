@@ -208,7 +208,7 @@
             <b-popover  placement="right" :target="'popover-lote' + data.index" :title="productos[data.index].Producto" triggers="focus">
               <div style="text-align:center">
                 <b-form-select v-if="!isNota"
-                  style="width: 100%; text-align: center !important;"
+                  style="width: 100%; text-align: left !important;"
                   :disabled="bloquearInput?true:false"
                   @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
                   v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
@@ -267,7 +267,7 @@
           <b-form-input
             v-model="productos[data.index].Presentacion"
             type="text"
-            style="text-align:center; font-weight:bold; font-size: 0.8rem; width: 110px;"
+            style="text-align:center; font-weight:bold; font-size: 0.8rem; width: 140px;"
             autocomplete="false"
             readonly
             ></b-form-input>
@@ -1003,6 +1003,16 @@ td.stocksize2{
   text-align: left !important; 
   vertical-align: middle !important;
   border-right: 2px #dee2e6 solid;
+}
+th.stocksize2{
+  border-right: 2px #dee2e6 solid;
+}
+th.stocksize2th{
+  text-align: left !important; 
+  vertical-align: middle !important;
+}
+th.stocksize2th2{
+  width: 140px;
 }
 td.stocksizepro{
   text-align: left !important; 
