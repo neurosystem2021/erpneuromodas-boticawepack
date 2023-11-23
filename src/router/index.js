@@ -20,6 +20,7 @@ import Kardex from '@/views/reportes/Kardex.vue'
 import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
+import Vencimiento from '@/views/reportes/Vencimiento.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -114,6 +115,11 @@ export default new Router({
       path: '/reportes/articulosmovimientos',
       name: 'Articulosmovimientos',
       component: Articulosmovimientos
+    },
+    {
+      path: '/reportes/vencimiento',
+      name: 'Vencimiento',
+      component: Vencimiento
     },
   ]
 })
