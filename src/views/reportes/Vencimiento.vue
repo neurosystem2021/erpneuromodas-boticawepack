@@ -1,7 +1,7 @@
 <template>
     <div>
       <h2 align-h="center" class="text-center">Reporte de vencimiento</h2>
-        <b-container fluid style="width: calc(90%);" class="bv-example-row">
+        <b-container fluid style="width: calc(97%);" class="bv-example-row">
           <b-row>
             <b-col md="4" class="my-1" v-show="false">
               <b-form-group>
@@ -49,20 +49,22 @@
           </b-row>
           <b-row>
             <b-col md="12">
-                <table class="table table-hover b-table table-sm" id="tablaVencidos">
+                <table class="table table-hover table-bordered b-table table-sm" id="tablaVencidos">
                     <thead>
                         <tr>
                             <th>Hash</th>
                             <th>ID</th>
                             <th>Producto</th>
                             <th>Laboratorio</th>
-                            <th class="text-center">Lote</th>
+                            <th>Lote</th>
                             <th class="table-info text-center">Fecha Vencimiento</th>
                             <th>Registro</th>
-                            <th class="text-center">Serie</th>
-                            <th class="text-center">Numero</th>
-                            <th>Stock</th>
-                            <th class="text-center">Accion</th>
+                            <th>Serie</th>
+                            <th>Numero</th>
+                            <th class="table-success text-center">Stock</th>
+                            <th>RUC</th>
+                            <th>Proveedor</th>
+                            <th>Accion</th>
                         </tr>
                     </thead>
                     <tbody v-for="(item, index) in productos" :key="index">
@@ -71,12 +73,14 @@
                             <td>{{ item.IdProducto }}</td>
                             <td>{{ item.Producto }}</td>
                             <td>{{ item.ProductoMarca }}</td>
-                            <td class="text-center">{{ item.Lote }}</td>
+                            <td>{{ item.Lote }}</td>
                             <td class="table-info text-center">{{ item.FechaVen }}</td>
                             <td>{{ item.Registro }}</td>
-                            <td class="text-center">{{ item.Serie }}</td>
-                            <td class="text-center">{{ item.Numero }}</td>
-                            <td>{{ item.Stock | redondear(2) }}</td>
+                            <td>{{ item.Serie }}</td>
+                            <td>{{ item.Numero }}</td>
+                            <td class="table-success text-center">{{ item.Stock | redondear(2) }}</td>
+                            <td>{{ item.Ruc }}</td>
+                            <td>{{ item.Proveedor }}</td>
                             <td class="text-center"><span v-if="item.Vencer==0"><b-button @click="cambiarVencer(item.IdProducto, index)" variant="info">CAMBIAR A VENCIDO</b-button></span><span v-else><b-badge style="font-size: 1.2rem;" variant="danger">VENCIDO</b-badge></span></td>
                         </tr>
                     </tbody>
@@ -108,17 +112,6 @@
         sortDesc: false,
         items: [],
         isBusy: false,
-        fields: [
-              { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
-              { key: 'Cliente', label: 'Cliente', sortable: true },
-              { key: 'Correlativo', label: 'Serie', sortable: true },
-              { key: 'Total', label: 'Total', sortable: true},
-              { key: 'Aplicado', label: 'Aplicado', sortable: true},
-              { key: 'NotaCreApli', label: 'Apli. Nota Cred.', sortable: true},
-              { key: 'Saldo', label: 'Saldo', sortable: true },
-              { key: 'FechaDoc', label: 'Emision', sortable: true },
-              { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
-        ],
         totalRows: 50,
         perPage: 10,
         currentPage: 1,
