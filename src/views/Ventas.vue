@@ -480,7 +480,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf:1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -677,7 +677,7 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 1
             }
             this.isNota = false
             this.bloquearInput=false
@@ -986,7 +986,7 @@ export default {
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.loadComisionista()
-                this.diasValidosProf=0;
+                this.diasValidosProf=1;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
