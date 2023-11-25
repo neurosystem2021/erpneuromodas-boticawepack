@@ -212,7 +212,7 @@
                                 <b-form-group class="text-left mt-1" v-if="venta.ConsumoId>0">
                                     <b-badge style="font-size:13.5px" variant="primary">Monto Total: S/ {{ MontoTotal }} </b-badge>
                                     <b-badge style="font-size:13.5px" variant="danger">Monto Consumido: S/ {{ MontoConsumido }} </b-badge>
-                                    <b-badge style="font-size:13.5px" variant="success">Monto Disponible: S/ {{ MontoTotal - MontoConsumido }} </b-badge>
+                                    <b-badge style="font-size:13.5px" variant="success">Monto Disponible: S/ {{ (MontoTotal - MontoConsumido) | redondear(2) }} </b-badge>
                                 </b-form-group>
                                 <b-form-group class="text-center">
                                     <div class="big-text">
@@ -1178,8 +1178,8 @@ export default {
                 this.venta.ConsumoId = 0
             }
 
-            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > (this.MontoTotal - this.MontoConsumido)){
-                this.$toasted.show('El monto de la venta debe ser menor o igual al disponible: '+(this.MontoTotal - this.MontoConsumido),{duration:3000})
+            if(this.venta.EsVale == 1 && this.venta.ConsumoId > 0 && this.totalCart > Math.round((this.MontoTotal - this.MontoConsumido) * 100) / 100){
+                this.$toasted.show('El monto de la venta debe ser menor o igual al disponible: '+(Math.round((this.MontoTotal - this.MontoConsumido) * 100) / 100),{duration:3000})
                 this.inProgress = false            
                 return  
             }
