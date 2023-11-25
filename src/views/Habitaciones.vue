@@ -188,7 +188,7 @@
 											<tbody>
 												<tr><td>Total de Gastos</td></tr>
 												<tr><td><h3>{{ totalGastos | redondear }}</h3></td></tr>
-												<tr><td>Mano de obra neta</td></tr>
+												<tr><td>Mano de obra neta + Operativos</td></tr>
 												<tr><td><h3 :class="{'text-danger': totalManoObraNeta <= 0}">{{ totalManoObraNeta | redondear }}</h3></td></tr>
 											</tbody>
 											</table>
@@ -694,6 +694,13 @@ export default {
 
 			if (this.$refs.preOrdenProductos) {
 			  this.totalSumaProductos =Math.abs(this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)  
+			  if(this.$refs.preOrdenProductos.productos){
+				this.$refs.preOrdenProductos.productos.map((pro)=>{
+					if(pro.CodigoBarra == "GASTOS"){
+						this.totalManoObraNeta += ((pro.Cantidad * pro.Precio) || 0)
+					}
+				})
+			  }
 			}
 			
 		},
