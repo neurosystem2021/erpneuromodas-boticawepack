@@ -535,10 +535,11 @@ export default {
       //this.$refs.popover.$emit('open')
     },  
     changeCant (val, prod, index) {
-      if (val) {
-        prod.cantidad = prod.cantidadPress
-        prod.cantidad *= val
-      }
+      console.log(val);
+      //if (val) {
+        prod.cantidad = val * 1
+        //prod.cantidad *= val
+      //}
       this.$nextTick(() => {
         this.actualizarProd({Producto:prod,Pos:index})
       })

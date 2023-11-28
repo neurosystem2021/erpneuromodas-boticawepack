@@ -682,7 +682,7 @@ export default {
         },
         onSetProducto (obj,presentacion) {
             if(presentacion){
-                obj.cantidad = presentacion.cantidad || 1
+                obj.cantidad = 1
                 obj.precio = presentacion.precioventa || 0
                 return obj
             }

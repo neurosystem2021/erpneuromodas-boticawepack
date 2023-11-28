@@ -304,7 +304,7 @@ return false
     },
     onSetProducto (obj,presentacion) {
         if(presentacion){
-            obj.cantidad = presentacion.cantidad || 1
+            obj.cantidad = 1
             obj.nuevoPrecioContado = presentacion.precioventa || 0
             obj.precio = presentacion.preciocosto || 0
             return obj
@@ -378,6 +378,7 @@ return false
       let faltaRegistro = false
       this.productos.forEach((prod, index) => {
         if ((((prod.cantidad || 0)  * (prod.precio || 0)) <= 0 ) || ((prod.nuevoPrecioContado || 0) <= 0)) {
+          console.log(prod.cantidad, prod.precio);
           this.$toasted.show('Se requiere los precios del producto '+prod.Producto)
           faltaLlenar = true
         }
