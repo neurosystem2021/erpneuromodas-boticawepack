@@ -100,7 +100,7 @@ const actions = {
           }
 
           if (setPrecioCosto) {
-            obj.cantidad = 0
+            obj.cantidad = 1
             obj.precio = obj.PrecioCosto || 0
             obj.nuevoPrecioContado = obj.PrecioContado || 0
           }else{
