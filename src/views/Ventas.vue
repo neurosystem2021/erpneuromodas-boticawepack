@@ -127,6 +127,8 @@
                                         <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                                    </b-form-select>
+
                                         <b-input-group v-if="venta.cliente.DniRuc == '00000000'">
                                         <b-form-checkbox 
                                         :disabled="bloquearInput?true:false"
@@ -141,9 +143,7 @@
                                                 class="form-control"
                                                 required
                                                 placeholder="Nombre de la Organización" v-if="venta.EsOrganizacion" />
-                                    </b-input-group>
-                                    </b-form-select>
-
+                                        </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
