@@ -204,7 +204,7 @@ export default {
   data() {
     return {
       API: config.API,
-      APINODE: "http://198.211.103.92:5000",
+      APINODE: "http://localhost:5000",
       mymap: null,
       show: false,
       pedidos:[],
@@ -244,7 +244,8 @@ export default {
       pedidoIdMapa: null ,
       usuario: sessionStorage.getItem('User'),
       showPopover:false,
-      title:'Punto de Venta'
+      title:'Punto de Venta',
+      audio: new Audio("../../static/nuevassoli.mp3"),
     }
   },
   watch: {
@@ -341,6 +342,8 @@ export default {
     getPedidos(){
         if(this.idEmpresa != null){
             this.pedidos = []
+            this.audio.loop = true;
+            this.audio.pause();
             this.axios.get(this.APINODE + '/api/plataforma/pedidos', {
                 params: { 
                     IdEmpresa:this.idEmpresa
@@ -348,6 +351,11 @@ export default {
             }).then(res => {
                 if(res.data.success==true){
                     this.pedidos = res.data.data;
+                    if(this.pedidos.filter((p)=>p.Estado == 'E').length > 0){
+                        this.audio.play();
+                    }else{
+                        this.audio.pause();
+                    }
                     this.title = "("+this.pedidos.length+") Pedidos de Delivery"
                     this.pedidos.map(p=>{
                         p.showPopover = false
@@ -365,12 +373,14 @@ export default {
                         } 
                     }
                 }else if(res.data.success==false){
+                    this.audio.pause();
                     this.pedidos = []
                     this.title = "Punto de Venta"
                     if (this.mymap) {
                         this.emitirConsultaMotorizado()
                     }
                 }else{
+                    this.audio.pause();
                     this.pedidos = []
                     if (this.mymap) {
                         this.emitirConsultaMotorizado()
@@ -378,10 +388,12 @@ export default {
                 }
             }).catch(err => {
             this.pedidos = []
+            this.audio.pause();
             console.log(err)
             this.title = "Sin Delivery, Actualice"
             })
         }else{
+            this.audio.pause();
             this.title = "Sin Delivery, Actualice"
             this.$toasted.show('Servicio de delivery no disponible, porfavor actualice la pagina')
         }
@@ -506,6 +518,12 @@ export default {
                         this.$emit('onPagarDelivery', pedido)
                         this.show = false
                     }
+                    setTimeout(() => {
+                        if(this.pedidos.filter((p)=>p.Estado == 'E').length == 0){
+                            this.audio.pause();
+                        }   
+                    }, 1000);
+  
                 };
             }else if (res.data.success==false){
                 this.getPedidos();
