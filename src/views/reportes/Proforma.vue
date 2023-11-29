@@ -45,7 +45,7 @@
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ prod.Codigo }}</td>
-            <td class="qty">{{ prod.Cantidad/prod.CantidadPresentacion }}</td>
+            <td class="qty">{{ prod.Cantidad }}</td>
             <td>{{prod.Presentacion}}</td>
             <td class="desc"><h3>{{ prod.Producto }}</h3></td>
             <td class="">{{ prod.ProductoMarca }}</td>
@@ -54,7 +54,7 @@
             <td class="unit">S/. {{ prod.Precio | moneda }}</td>
             
             <td class="total">
-              S/. {{ (prod.Precio * prod.Cantidad/prod.CantidadPresentacion) - prod.Descuento | redondear }}<br>
+              S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
               <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
             </td>
           </tr>
@@ -109,7 +109,7 @@ export default {
 		subTotal () {
 			let sumatoria = 0
 			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad/prod.CantidadPresentacion * prod.Precio) - prod.Descuento
+				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
 			})
       return sumatoria
 		}

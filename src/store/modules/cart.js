@@ -126,6 +126,9 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
+          obj.cantidadPress = 1
+          obj.EsPresentacion = 0
+          obj.Presentacion = obj.ProductoMedicion
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {

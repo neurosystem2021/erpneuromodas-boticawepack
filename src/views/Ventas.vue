@@ -775,7 +775,7 @@ export default {
             
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                this.$toasted.show('Proforma Guardada con exito')
+                this.$toasted.info('Proforma Guardada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
 
@@ -836,7 +836,7 @@ export default {
             let precioBajo = 0;
             let totalCero = 0
             this.productos.map(pro => {
-                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stockMovimiento).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined) && this.venta.tipoVenta.CodSunat != '07') {
+                if ((parseFloat(pro.stock) <= 0 || parseFloat(pro.stockMovimiento/pro.cantidadPress).toFixed(2)  < parseFloat(pro.cantidad) || pro.stock == undefined) && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.show('El producto ' + pro.Producto + ' no tiene stock. No puede vender un producto sin stock');
                     sinStock += 1;
                 }

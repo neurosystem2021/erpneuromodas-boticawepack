@@ -249,7 +249,7 @@
             type="text"
             required
             v-bind:class="{ ventasAncho: isVentas }"
-            autocomplete="false"
+            autocomplete="off"
             ></b-form-input>
         </template>
 
@@ -259,7 +259,7 @@
             type="text"
             required
             v-bind:class="{ ventasAncho: isVentas }"
-            autocomplete="false"
+            autocomplete="off"
             ></b-form-input>
         </template>
 

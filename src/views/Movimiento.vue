@@ -394,7 +394,7 @@ return false
         }
 
         if(this.movimiento.movimientoTipo.Tipo!=0){
-          if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stockMovimiento).toFixed(2) < parseFloat(prod.cantidad) || prod.stock == undefined) ){
+          if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stockMovimiento/prod.cantidadPress).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined) ){
            faltaStock=true
           }
         }
@@ -456,7 +456,7 @@ return false
           this.limpiar()
           this.$refs.inputMovimiento.setValue('')
           this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+          this.$toasted.success('Movimiento guardado correctamente ')          
         }
         this.inProgress = false
       })

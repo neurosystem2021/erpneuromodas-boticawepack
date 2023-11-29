@@ -273,7 +273,7 @@
         <br /><br />
       </b-container>
 
-      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
+      <b-modal id="kardex" class="modalKardexAlm" size="lg" modal-class="modal-xl" v-model="showKardex" title="Kardex de producto">
         <b-alert show variant="warning">{{ titleKardex }}</b-alert>
         <div v-if="productoSelect.CompuestosProducto!= '' && productoSelect.CompuestosProducto">
           <label style="font-size: 0.85rem;"><b>COMPUESTOS: </b> {{ productoSelect.CompuestosProducto }}</label>
@@ -655,5 +655,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.modalKardexAlm .modal-dialog{
+  max-width: 85% !important;
 }
 </style>
