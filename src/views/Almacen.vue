@@ -450,7 +450,7 @@ export default {
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
+       this.axios.get(this.API + 'productos/puntoventa/stock', {
           params: {
             idProductos: items.map((item) => item.IdProducto),
             idAlmacen: this.almacen.IdAlmacen,
@@ -465,8 +465,6 @@ export default {
 
         // Cargar la sumatoria
         this.getSumaStock()
-        this.getSumaValorizado()
-        this.getSumaValorizadoSin()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -515,6 +513,8 @@ export default {
         }).then(r => {
           if (r.data) {
             this.verValorizado = true;
+            this.getSumaValorizado ()
+            this.getSumaValorizadoSin()
           }
         })
       }

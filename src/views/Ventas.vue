@@ -722,7 +722,9 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -740,7 +742,7 @@ export default {
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
-            this.getNumeroVenta()
+            //this.getNumeroVenta()
         },
         getVendedor (user) {
             let usuario = sessionStorage.getItem('User')
@@ -989,6 +991,14 @@ export default {
                     this.inProgress = false
                     return 
                 }
+
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
+
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
 
