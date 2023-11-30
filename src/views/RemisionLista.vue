@@ -172,12 +172,13 @@ export default {
   methods: {
     regenerarPDF (doc) {
       this.$refs.tablaVentas.refresh()
-      this.loading = true
+      window.open('/api/index.php/imprimirguiapdf/'+doc.IdDocVentaRemision,'_blank','noopener');
+      /*this.loading = true
       this.axios.post(this.API + 'generarpdfguiaelectronica/' + doc.IdDocVentaRemision ).then(res => {
         console.log(res)
         this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
         this.loading = false
-      })
+      })*/
     },
     setFechaReferencia () {
       this.generateFilter('fechaReferencia', this.fechaReferencia)

@@ -150,7 +150,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || esDelivery || true"
+            :disabled="(bloquearInput?true:false || esDelivery || true) && !noSubtotal"
             type="number"
             autocomplete="off"
             style="width: 90px; font-weight:bold"
@@ -377,7 +377,7 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -499,6 +499,7 @@ export default {
   props: {
     isVentas: Boolean,
     tipo: String,
+    noSubtotal: Boolean,
     setPrecio: Boolean,
     tipoCambio: Number,
     igvTotal: Boolean,

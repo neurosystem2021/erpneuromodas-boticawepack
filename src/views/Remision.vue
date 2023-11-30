@@ -223,7 +223,7 @@
                 <div class="row">
                     <label for="nroDocChofer" class="col-sm-4">Doc. del Chofer (DNI)</label>
                     <div class="input-group input-group-sm col-sm-8">
-                       <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer">
+                       <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer" autocomplete="off">
                       <div class="input-group-append">
                           <b-button size="sm" variant="outline-secondary" @click="consultaDocConductor()">Buscar</b-button>
                       </div>
@@ -234,28 +234,28 @@
               <div class="container mt-2">
                 <div class="row">
                   <label for="apellidosChofer" class="col-sm-4">Apellidos del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container mt-2">
                 <div class="row">
                   <label for="nombresChofer" class="col-sm-4">Nombres del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container mt-2">
                 <div class="row">
                   <label for="licenciaChofer" class="col-sm-4">Licencia del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer">
+                  <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer" autocomplete="off">
                 </div>
               </div>
 
               <div class="container">
                 <div class="row">
                   <label for="placaVehiculo" class="col-sm-4">N° de Placa Vehículo</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo">
+                  <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo" autocomplete="off">
                 </div>
               </div>
 

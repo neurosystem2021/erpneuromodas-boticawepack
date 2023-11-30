@@ -172,6 +172,6 @@ import { mapActions } from 'vuex'
 </script>
 <style>
 #modalProformas .modal-dialog {
-    max-width: 69% !important;
+    max-width: 85% !important;
 }
 </style>

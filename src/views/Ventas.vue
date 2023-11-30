@@ -58,6 +58,16 @@
                                     </autocomplete>
                                     </b-input-group>
                                 </b-form-group>
+                                 <b-input-group v-if="venta.cliente.DniRuc == '00000000' && (venta.tipoVenta.CodSunat=='03' || venta.tipoVenta.CodSunat== '12')" class="mb-1">
+                                    <b-form-checkbox
+                                    :disabled="bloquearInput?true:false"
+                                    v-model="venta.EsOrganizacion"
+                                    :value="1"
+                                    @change="(val)=>changeOrganizacion(val)"
+                                    :unchecked-value="0">
+                                        Es Organización
+                                    </b-form-checkbox>
+                                 </b-input-group>
                                  <b-form-group v-if="isNota">
                                     <label>Doc. Referencia:</label>
                                     <autocomplete
@@ -119,6 +129,14 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+                                    <b-input-group v-if="venta.EsOrganizacion">
+                                        <input v-model="venta.NombreOrganizacion"
+                                            type="text"
+                                            style="text-transform:uppercase;"
+                                            class="form-control"
+                                            ref="inputNombreOrganizacion"
+                                            placeholder="Nombre de la Organización"/>
+                                    </b-input-group>
                                     <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -298,7 +316,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                <b-input-group prepend="Proforma válidez:" append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
@@ -320,6 +338,7 @@
                                         </tr>
                                         <tr>
                                             <td>Efectivo</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
@@ -342,6 +361,7 @@
                                         </tr>
                                         <tr>
                                             <td>Tarjeta</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -365,6 +385,7 @@
                                         </tr>
                                         <tr>
                                             <td>Yape / Plin</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -388,6 +409,7 @@
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: middle !important;">Transferencia</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.transferencia.descripcion"
@@ -479,7 +501,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf:1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -550,6 +572,44 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        changeOrganizacion(val){
+            if(val){
+                this.$refs.inputCliente.$refs.input.disabled = true
+            }else{
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
+        },
+        metodoPagoCambio(opc){
+            switch (opc) {
+                case 1:
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.efectivo.monto = this.totalCart
+                    break;
+                case 2:
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.visa.monto =this.totalCart
+                    break;
+                case 3:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.mastercard.monto = this.totalCart
+                    break;
+                case 4:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = this.totalCart
+                    break;
+            
+                default:
+                    break;
+            }
+        },
         configStock () {
             this.axios.get(this.API + 'config/stock')
                 .then(res => {
@@ -656,7 +716,9 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 1,
+                EsOrganizacion: 0,
+                NombreOrganizacion: ''
             }
             this.isNota = false
             this.bloquearInput=false
@@ -676,6 +738,12 @@ export default {
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
+            }
+
+            if(obj.CodSunat=='01' || obj.CodSunat=='07'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+                this.$refs.inputCliente.$refs.input.disabled = false
             }
 
             if (obj.TieneIgv) {
@@ -835,6 +903,12 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+
+                if(this.venta.cliente.DniRuc != '00000000'){
+                    this.$refs.inputCliente.$refs.input.disabled = false
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -869,6 +943,8 @@ export default {
         },
         onAddProducto (obj) {
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             this.actualizarDescuento()
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
@@ -876,6 +952,8 @@ export default {
         },
         actualizarDescuento () {
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -969,8 +1047,8 @@ export default {
                 this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
-                this.diasValidosProf=0;
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                this.diasValidosProf=1
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 console.log(error)
@@ -1007,6 +1085,13 @@ export default {
                 this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
                 this.inProgress = false            
                 return  
+            }
+
+            if(this.venta.EsOrganizacion == 1 && (''+this.venta.NombreOrganizacion).trim()=='') {
+                this.$toasted.show('Complete el nombre de organizacion')
+                this.$refs.inputNombreOrganizacion.focus()
+                this.inProgress = false
+                return 
             }
 
             if (!this.venta.EsCredito) {
@@ -1047,6 +1132,12 @@ export default {
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
+                    return 
+                }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
                     return 
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
@@ -1108,6 +1199,14 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            if(this.venta.cliente.DniRuc != '00000000'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+            }
+            if(this.venta.EsOrganizacion){
+                this.venta.cliente.Cliente = this.venta.NombreOrganizacion
+            }
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
@@ -1129,7 +1228,7 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
@@ -1290,7 +1389,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 250px)
     }
 }
 @media only screen and (max-width: 750px) {
@@ -1306,7 +1405,7 @@ export default {
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
     .ancho{
-        width: calc(100% - 300px)
+        width: calc(100% - 250px)
     }
 }
 </style>

@@ -178,7 +178,8 @@ export default {
 			.then(res => {
 				this.proforma = res.data
         this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
-			})
+        document.title = "PROFORMA"+ " " + this.proforma.Anio + "-" + this.proforma.Numero
+      })
     },
     calcularFechaHasta(actual,dias){
     var date = new Date(actual);
