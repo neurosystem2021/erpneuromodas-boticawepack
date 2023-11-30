@@ -121,7 +121,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -784,7 +784,7 @@ export default {
     },*/
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
@@ -823,7 +823,7 @@ export default {
       this.objProd = {}
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = this.isVentas;
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -847,7 +847,7 @@ export default {
       //obj.FLETE = 0
       obj.precio = obj.PrecioContado
       obj.cantidad = 0
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = this.isVentas;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
@@ -876,7 +876,7 @@ export default {
       // this.objProd.cantidad = 0
       obj.precio = 0
       obj.cantidad = 1
-      obj.EsVentaNew = true;
+      obj.EsVentaNew = this.isVentas;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0

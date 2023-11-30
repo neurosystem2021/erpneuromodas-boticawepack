@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="8">
@@ -202,6 +202,7 @@
             <b-col cols="4">
               <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
               <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
+              <b-button v-if="ultimoMovimiento" target="_blank" variant="secondary" size="lg" :href="'/imprimir/index.php?hashMovimiento=' + ultimoMovimiento">Ver Lista</b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -247,6 +248,11 @@ export default {
       limpiar: 'limpiarCarrito',
       obtenerStok: 'obtenerStock'
     }),
+    prevent (evt) {
+      if (evt.target.tagName !== 'TEXTAREA') {
+          evt.preventDefault();
+      }
+    },
     onSetProducto (obj, cant, precio) {
       if (cant) {
           obj.cantidad = cant
@@ -407,6 +413,7 @@ return false
       let faltaLlenar = false
       let sinStock = 0
       let faltaCantidad = false
+      let igualProducto = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
@@ -419,6 +426,18 @@ return false
         if(!(prod.cantidad > 0)){
           faltaCantidad = true
         }
+
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1).length
+        if(pro > 1){
+          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
+          igualProducto = true
+        }
+
+        let proObs = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1).length
+        if(proObs > 1){
+          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
+          igualProducto = true
+        }
       })
 
       if (faltaCantidad) {
@@ -429,6 +448,12 @@ return false
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')
+        this.inProgress = false
+        return;
+      }
+
+      if (igualProducto) {
+        this.$toasted.show('Solo puede agregar 2 veces el producto y uno tiene que ser obsequio',{duration:4000})
         this.inProgress = false
         return;
       }
