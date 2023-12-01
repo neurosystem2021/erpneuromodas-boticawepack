@@ -558,10 +558,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
+                    IdTipoDoc: 7,
                     TipoDoc: 'BOLETA/IGV ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '03'
                 },
                 almacen: {
                     IdAlmacen: 1,
