@@ -732,7 +732,7 @@ export default {
     setProducto(obj){
       if(!this.isVentas){
         if(this.movTipo==undefined){
-          this.$toasted.show('Primero seleccione un tipo de movimiento')
+          this.$toasted.show('Primero seleccione un tipo de movimiento y el almacén',{duration: 4000})
           return
         }
       }
