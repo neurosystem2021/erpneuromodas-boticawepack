@@ -110,6 +110,21 @@
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
+                                    <b-input-group v-if="venta.cliente.DniRuc == '00000000'">
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsOrganizacion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Es Organización
+                                        </b-form-checkbox>
+                                        <input v-model="venta.NombreOrganizacion"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                required
+                                                placeholder="Nombre de la Organización" v-if="venta.EsOrganizacion" />
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -420,7 +435,9 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
-                CampoDireccion: 'Direccion'
+                CampoDireccion: 'Direccion',
+                EsOrganizacion: 0,
+                NombreOrganizacion: ''
             }
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
@@ -461,6 +478,10 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                if(this.venta.cliente.DniRuc == '00000000'){
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -470,6 +491,10 @@ export default {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
                         this.venta.CampoDireccion = this.venta.cliente.Direccion
+                        if(this.venta.cliente.DniRuc == '00000000'){
+                            this.venta.EsOrganizacion = 0
+                            this.venta.NombreOrganizacion = ''
+                        }
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
@@ -675,6 +700,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
