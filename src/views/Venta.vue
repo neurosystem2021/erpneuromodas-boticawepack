@@ -44,6 +44,16 @@
                             </b-input-group>
                         </b-col>
                         <b-col md="4" class="docInfo">
+                            <b-input-group v-if="venta.cliente.DniRuc == '00000000' && (venta.tipoVenta.CodSunat=='03' || venta.tipoVenta.CodSunat== '12')" class="mt-2">
+                                <b-form-checkbox class="mt-1"
+                                :disabled="bloquearInput?true:false"
+                                v-model="venta.EsOrganizacion"
+                                :value="1"
+                                @change="(val)=>changeOrganizacion(val)"
+                                :unchecked-value="0">
+                                    Es Organización
+                                </b-form-checkbox>
+                            </b-input-group>
                             <b-input-group prepend="Doc. Referenc" class="mt-2" v-if="isNota">
                                     <autocomplete
                                         required="required"
@@ -66,6 +76,14 @@
                         </b-col>
                         <b-col md="8" class="clienteInfo" style="margin-bottom:-20px">
                             <b-form-group>
+                                <b-input-group v-if="venta.EsOrganizacion" class="mt-2">
+                                <input v-model="venta.NombreOrganizacion"
+                                        type="text"
+                                        style="text-transform:uppercase;"
+                                        class="form-control"
+                                        ref="inputNombreOrganizacion"
+                                        placeholder="Nombre de la Organización"/>
+                                </b-input-group>
                                 <b-input-group class="mt-2">
                                     <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                     <autocomplete
@@ -111,7 +129,7 @@
                         </b-col>
                     </b-row>
                     <b-row>
-                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab">
+                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab" :idMetodoPago="venta.IdMetodoPago">
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -220,13 +238,11 @@
                                             <td>
                                                 <b-input-group prepend="S/" append="Descuento">
                                                     <input
-                                                        :disabled="bloquearInput?true:false || (venta.almacen.DescuentoActivo==0)"
+                                                        :disabled="bloquearInput?true:false"
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
                                                         @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
-                                                        type="number"
-                                                        step="0.01"
                                                         class="form-control"
                                                     />
                                                 </b-input-group>
@@ -665,6 +681,13 @@ export default {
             add:'agregarProducto',
             actualizarProd : 'actualizarProducto',
         }),
+        changeOrganizacion(val){
+            if(val){
+                this.$refs.inputCliente.$refs.input.disabled = true
+            }else{
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
+        },
         //Nuevos metodos de venta
         habilitarPrecio(){
             if(this.precioHabilitado){
@@ -898,7 +921,8 @@ export default {
             obj.EsPresentacion = 0
             obj = this.onSetProducto(obj)
             this.add([obj, () => {
-                this.$emit('onAddProducto', obj)   
+                this.$emit('onAddProducto', obj)  
+                this.onAddProducto(obj) 
                 this.$toasted.success('Producto añadido correctamente')
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
             }, { setPrecioCosto: false }, false, false])
@@ -966,24 +990,28 @@ export default {
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.delivery.monto = 0
                     this.venta.pago.efectivo.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 1;
                     break;
                 case 2:
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.delivery.monto = 0
                     this.venta.pago.visa.monto =this.totalCart;
+                    this.venta.IdMetodoPago = 2;
                     break;
                 case 3:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.delivery.monto = 0
                     this.venta.pago.mastercard.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 3;
                     break;
                 case 4:
                     this.venta.pago.efectivo.monto = 0
                     this.venta.pago.visa.monto = 0
                     this.venta.pago.mastercard.monto = 0
                     this.venta.pago.delivery.monto = this.totalCart;
+                    this.venta.IdMetodoPago = 4;
                     break;
             
                 default:
@@ -1238,7 +1266,10 @@ export default {
                 EsParaLlevar: 0,
                 nombreLlevar: '',
                 selectOpcionVenta: 0,
-                DireccionEntrega: ''
+                DireccionEntrega: '',
+                IdMetodoPago: 1,
+                EsOrganizacion: 0,
+                NombreOrganizacion: ''
             }
             this.isNota = false
             this.bloquearInput = false
@@ -1259,7 +1290,7 @@ export default {
             this.venta.CodSunatModifica = ''
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
-            //this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
+            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
                 this.limpiarCart();
@@ -1269,6 +1300,13 @@ export default {
                     this.anularPagoOrden()
                 }
             }
+
+            if(obj.CodSunat=='01' || obj.CodSunat=='07'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
+
             if (obj.TieneIgv) {
                 this.tieneIgv = true
             } else {
@@ -1325,7 +1363,8 @@ export default {
                      response.data.map((item) => {
                         this.add([item, () => {
                         }, false ])
-                    })     
+                    })   
+                    this.actualizarDescuento()
                     this.venta.NotaIdMotivo=null
                     this.bloquearInput=true
                     this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })              
@@ -1426,6 +1465,12 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+
+                if(this.venta.cliente.DniRuc != '00000000'){
+                    this.$refs.inputCliente.$refs.input.disabled = false
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -1457,6 +1502,10 @@ export default {
             return obj
         },
         onAddProducto (obj) {
+            this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.delivery.monto = 0
+            this.venta.IdMetodoPago = 1
             this.actualizarDescuento()
             //this.obtenerStok({
             //    IdAlmacen: this.venta.almacen.IdAlmacen
@@ -1549,6 +1598,7 @@ export default {
             this.venta.pago.visa.monto = 0
             this.venta.pago.mastercard.monto = 0   
             this.venta.pago.delivery.monto = 0   
+            this.venta.IdMetodoPago = 1
 /*             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -1703,6 +1753,12 @@ export default {
                 this.inProgress = false            
                 return  
             }
+            if(this.venta.EsOrganizacion == 1 && (''+this.venta.NombreOrganizacion).trim()=='') {
+                this.$toasted.show('Complete el nombre de organizacion')
+                this.$refs.inputNombreOrganizacion.focus()
+                this.inProgress = false
+                return 
+            }
             if (!this.venta.EsCredito) {
                 if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
                     //this.$toasted.show('Los pagos no coinciden con la venta')
@@ -1808,6 +1864,12 @@ export default {
                     this.inProgress = false
                     return 
                 }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
             if(!this.productos.length) {
@@ -1885,6 +1947,14 @@ export default {
             } 
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
+            if(this.venta.cliente.DniRuc != '00000000'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+            }
+            if(this.venta.EsOrganizacion){
+                this.venta.cliente.Cliente = this.venta.NombreOrganizacion
+            }
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 if(response.data.actualizar){

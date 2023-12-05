@@ -407,7 +407,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-if="isVentas">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
