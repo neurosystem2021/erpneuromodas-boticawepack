@@ -177,6 +177,7 @@
 import config from '@/store/config.js'
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css"
+import sound from '../../static/nuevassoli.mp3'
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -245,7 +246,7 @@ export default {
       usuario: sessionStorage.getItem('User'),
       showPopover:false,
       title:'Punto de Venta',
-      audio: new Audio("../../static/nuevassoli.mp3"),
+      audio: new Audio(sound),
     }
   },
   watch: {
@@ -343,7 +344,6 @@ export default {
         if(this.idEmpresa != null){
             this.pedidos = []
             this.audio.loop = true;
-            this.audio.pause();
             this.axios.get(this.APINODE + '/api/plataforma/pedidos', {
                 params: { 
                     IdEmpresa:this.idEmpresa
