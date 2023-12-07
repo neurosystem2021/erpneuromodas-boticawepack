@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
               <b-col md="8">
@@ -269,6 +269,11 @@ export default {
       obtenerStok: 'obtenerStock',
       limpiarCart: 'limpiarCarrito',
     }),
+    prevent (evt) {
+      if (evt.target.tagName !== 'TEXTAREA') {
+          evt.preventDefault();
+      }
+    },
     onAddProducto (obj) {
       if(this.isSalida){
         this.obtenerStok({
