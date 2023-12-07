@@ -204,7 +204,7 @@ export default {
   data() {
     return {
       API: config.API,
-      APINODE: "http://localhost:5000",
+      APINODE: "http://198.211.103.92:5000",
       mymap: null,
       show: false,
       pedidos:[],
