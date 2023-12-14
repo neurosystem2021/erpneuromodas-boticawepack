@@ -308,6 +308,7 @@
                                         </tr>
                                         <tr>
                                             <td>Efectivo</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -329,7 +330,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -352,7 +354,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Yape/Plin</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -371,6 +374,30 @@
                                                     type="number"
                                                     placeholder="S/."
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: middle !important;">Transferencia</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.transferencia.descripcion"
+                                                    :disabled="bloquearInput?true:false"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.transferencia.monto"
+                                                    :disabled="bloquearInput?true:false"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -486,7 +513,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
+             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))).toFixed(2);
         }
     },
     computed: {
@@ -515,6 +542,37 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        metodoPagoCambio(opc){
+            switch (opc) {
+                case 1:
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.efectivo.monto = this.totalCart
+                    break;
+                case 2:
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.visa.monto =this.totalCart
+                    break;
+                case 3:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.mastercard.monto = this.totalCart
+                    break;
+                case 4:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = this.totalCart
+                    break;
+            
+                default:
+                    break;
+            }
+        },
         configStock () {
             this.axios.get(this.API + 'config/stock')
                 .then(res => {
@@ -610,7 +668,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    transferencia: { IdMetodoPago: 4, monto: 0 }
                 },
                 idProductos:[],
                 NroComprobanteModifica: '',
@@ -839,12 +898,16 @@ export default {
         onAddProducto (obj) {
             this.actualizarDescuento()
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
             this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -956,19 +1019,26 @@ export default {
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)
 
             if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
+                this.$toasted.show('El metodo de pago Efectivo no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
             if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
+                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
             if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
+                this.$toasted.show('El metodo de pago Yape / Plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+
+            if((isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
@@ -1021,7 +1091,12 @@ export default {
                     this.inProgress = false
                     return 
                 }
-
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
 
@@ -1222,7 +1297,7 @@ export default {
                         delete this.venta.Serie
                         delete this.venta.Numero
 
-                        let dataInfoDocVenta = {
+                        /*let dataInfoDocVenta = {
                           Serie:  response.data.serie,
                           Numero: response.data.numero,
                           Fecha: response.data.fecha,
@@ -1249,7 +1324,7 @@ export default {
                         window.open('', winName,windowoption);
                         form.target = winName;
                         form.submit();                 
-                        document.body.removeChild(form);
+                        document.body.removeChild(form);*/
                     } catch (error) {
   
                     }
@@ -1272,7 +1347,7 @@ export default {
                     this.$refs.inputVendedor.setValue('')
                     this.$refs.inputComisionista.setValue('')
                     this.$refs.carrito.pagocon = 0
-                    //window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
 
                 }
                  

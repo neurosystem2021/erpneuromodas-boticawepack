@@ -688,10 +688,12 @@ export default {
         })
     },*/
     actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
+      var precioCosto = Number(this.producto.PrecioCosto)
+      var utilidad = Number(this.producto.PorcentajeUtilidad)
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      //var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+
+      var nuevoPrecioContado = precioCosto *(utilidad / 100) + precioCosto
 
       this.producto.precioContadoNormal = nuevoPrecioContado
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
@@ -699,10 +701,10 @@ export default {
 
     },
     actualizarPorcentajeUtilidad () {
-      var precioContado = this.producto.PrecioContado
-      var precioCosto = this.producto.PrecioCosto
+      var precioContado = Number(this.producto.PrecioContado)
+      var precioCosto = Number(this.producto.PrecioCosto)
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(((precioContado - precioCosto)/precioCosto) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
