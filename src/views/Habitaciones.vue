@@ -79,12 +79,12 @@
 								
 								<h5>S/. {{ hab.PrecioContado | moneda }}</h5>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
-									<li><b style="color:white">{{ hab.Cliente }}</b><li>
+									<li><b style="color:white">{{ hab.Cliente }}</b></li>
 									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
 									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
 								</ul>
 								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-									<li><b style="color:white; font-size:15px">{{ hab.Cliente }}</b><li>
+									<li><b style="color:white; font-size:15px">{{ hab.Cliente }}</b></li>
 									<li><b style="color:white">INICIO: {{ hab.FechaAlquiler }}</b></li>
 									<li><b style="color:white">FIN: {{ hab.FechaAlquilerFin }}</b></li>
 									<li style="margin-top:5px"><b style="font-size:15px; color:white">Total Personas:</b>  <b-badge variant="light" style="font-size:15px">{{ hab.Hospedados}}</b-badge> <b-button :id="i + 'popover-agregar' + index" size="sm" variant="light" style="margin-top:-5px"><i class="fas fa-user-plus"></i></b-button></li>
@@ -93,7 +93,7 @@
 										<b-input-group>
 											<autocomplete
 													required="required"
-													:ref="'inputCliente3' + index"
+													:ref="'inputCliente3' +pi+''+ index"
 													:url="API + 'clientes'"
 													anchor="ClienteDniRuc"
 													label="writer"
@@ -104,7 +104,7 @@
 											</autocomplete>
 											<b-input-group-append>
 												<!--<proveedores-tabla></proveedores-tabla>-->
-												<clientes-form :ruc="newDniRuc2" idModal="modal2" @onAddCliente="(obj) => { setHuesped(obj, index) }"></clientes-form>
+												<clientes-form :ruc="newDniRuc2" idModal="modal2" @onAddCliente="(obj) => { setHuesped(obj, pi+''+ index) }"></clientes-form>
 											</b-input-group-append>
 										</b-input-group>
 										<br />
@@ -129,7 +129,7 @@
 												placeholder="Próximo destino"></b-form-input>
 										</b-input-group>
 										<br>
-										<b-button variant="success" size="sm" @click="agregarHuesped(hab,index)">Agregar Huesped</b-button>	
+										<b-button variant="success" size="sm" @click="agregarHuesped(hab,pi+''+ index)">Agregar Huesped</b-button>	
 									</b-popover>
 								</ul>
 								<div slot="footer">
