@@ -87,6 +87,14 @@
               </autocomplete>
           </b-form-group>-->
 
+          <b-form-group>
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <b-form-text id="input-formatter-help">
+              <b style="color: red;">*La imagen debe ser en formato PNG y 500 x 500 pixeles</b>
+            </b-form-text>
+          </b-form-group>
           
           
         </b-col>
@@ -293,7 +301,8 @@ export default {
       productosDet: [],
       pie2total:0,
       pie:900,
-      preciototal:0
+      preciototal:0,
+      file: '',
     }
   },
   beforeMount () {
@@ -368,9 +377,12 @@ export default {
         this.producto.Rendimiento = newVal.Rendimiento
         this.producto.Ancho = newVal.Ancho
         this.producto.Largo = newVal.Largo
-
+        this.producto.Imagen = newVal.Imagen
+        this.$refs.file.value=null
+        this.file = ''
       } else {
-
+        this.$refs.file.value=null
+        this.file = ''
         this.title = 'Nuevo Producto'
         this.clearForm()
 
@@ -379,6 +391,54 @@ export default {
     }
   },
   methods: {
+    handleFileUpload() {
+      const file = this.$refs.file.files[0]
+      this.file = ''
+      if (!file) {
+        this.$refs.file.value=null
+        this.$toasted.error('Sin imagen, no se guardará', { duration: 4000 })
+        return;
+      }
+      
+      if (file.type != 'image/png') {
+        this.$toasted.error('La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará', { duration: 5000 })
+        this.$refs.file.value = null
+        this.file = ''
+        return;
+      }
+
+      try {
+        this.getBase64(file).then((base64) => {
+          const img = new Image();
+          img.src = base64.toString();
+          img.onload = () => {
+            if(img.width == 500 && img.height == 500){
+              this.file = file
+              console.log(this.file);
+              this.$toasted.info('La imagen se cargo correctamente, presione GUARDAR para registrarla en el producto.', { duration: 6000 })
+            }else{
+              this.file = ''
+              this.$refs.file.value = null
+              this.$toasted.error("La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará.", { duration: 5000 })
+            }
+          
+          };     
+        });    
+      } catch (error) {
+        this.file = ''
+        this.$refs.file.value = null
+        this.$toasted.show("Ha ocurrido un error", { duration: 4000 })
+      }
+
+    },
+    getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    },
     calcularm2(){
       this.pie2total = Math.round((this.producto.Ancho*this.producto.Largo/this.pie)*10)/10
       this.preciototal = this.pie2total*this.precioContado
@@ -486,6 +546,7 @@ export default {
         PrecioContado: '',
         // Botapie: '',
         // Genero: '',
+        Imagen: null,
         categoria: {},
         marca: {},
         // modelo: {},
@@ -520,6 +581,21 @@ export default {
         // this.initForm()
         // this.producto.talla = {}
         // this.$refs.inputTalla.setValue('')
+
+        let formData = new FormData();
+        formData.append('imagen', this.file);
+
+        this.axios({
+            method    : 'post',
+            url       : this.API + 'producto/imagen/' + response.data.insertId,
+            data      : formData,
+            headers   : { 'Content-Type': 'multipart/form-data' }
+          })
+          .then((res) => {
+            // console.log(res);
+            this.file = ''
+            this.$refs.file.value = null
+          })
 
         this.$refs.productoForm.hide()
       })

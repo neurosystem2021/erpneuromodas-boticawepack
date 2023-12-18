@@ -27,6 +27,14 @@
         </b-input-group>
       </b-form-group>
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+        <template slot="eventPres" slot-scope="data">
+          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <div style="text-align:center">
+              <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+            </div>
+          </b-popover>
+        </template>
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
@@ -263,6 +271,16 @@
       <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
       <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalCalcularM2.hide()}">Cerrar</b-btn>
     </b-modal>
+
+    <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+        </div>
+        <b-row style="display:flex; justify-content:center; align-items:center">
+          <b-img :src="productoUrl" class="imagenGrande"></b-img>
+        </b-row>
+      </b-modal>
+
   </b-row>
 </template>
 
@@ -297,7 +315,9 @@ export default {
       pie2corte: 0,
       mostrarInputs:false,
       indexFactor: null,
-      precioCorte:0
+      precioCorte:0,
+      productoNombre:'',
+      productoUrl:''
     }
   },
   watch: {
@@ -326,6 +346,7 @@ export default {
           { key: 'CodigoBarra', label: 'Código'},
           { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
+          { key: 'eventPres', label: '' },
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoMedicion', label: 'Medición' },
           { key: 'cantidad' },
@@ -632,7 +653,60 @@ export default {
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
+    setAltImg(event) { 
+        event.target.src = "static/no-photo.png" 
+    },
+    abrirImagen(producto,url){
+      this.productoNombre = producto
+      this.productoUrl = url
+      this.$refs['modalImagen'].show()
+    },
     renderChild(data) {
+      if(this.isVentas){
+
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 60%;
+            heigth: 60%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
+          #table-render td {
+            padding:1px
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr style="padding:0; margin:0">
+                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 80px">${data.ProductoMarca}</td>
+                <td style="width: 80px">${data.ProductoMedicion}</td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 5%">
+                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                </td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `
+      }
       return `
         <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / <b>S/. ${data.PrecioContado}</b>
       `
@@ -715,4 +789,13 @@ export default {
   padding: 5px 0 0 130px;
   justify-items: center;
 }
+</style>
+
+<style>
+  #modalImagen .modal-dialog {
+    max-width: 75% !important;
+  }
+  .imagenGrande{
+    width: 100%;
+  }
 </style>
