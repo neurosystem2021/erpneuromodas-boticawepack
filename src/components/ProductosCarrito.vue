@@ -51,7 +51,7 @@
             v-model="productos[data.index].precio"
             :disabled="bloquearInput?true:false"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -130,10 +130,10 @@
     <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="2">
       <table class="table tabla-prestados">
         <thead>
           <tr>

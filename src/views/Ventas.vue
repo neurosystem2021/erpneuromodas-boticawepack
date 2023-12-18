@@ -6,7 +6,7 @@
         <b-container class="bv-example-row">
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="false">
                         <retiros-fise></retiros-fise>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -280,6 +280,7 @@
                                         </tr>
                                         <tr>
                                             <td>Efectivo</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
@@ -300,7 +301,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>FISE</td>
+                                            <td>Tarjeta</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -322,8 +324,9 @@
                                                 />
                                             </td>
                                         </tr>
-                                        <!--<tr>
-                                            <td>Mastercard</td>
+                                        <tr>
+                                            <td>Yape/Plin</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -342,7 +345,29 @@
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
                                                 />
                                             </td>
-                                        </tr>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Transferencia</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.transferencia.descripcion"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.transferencia.monto"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </template>
@@ -391,7 +416,7 @@ export default {
         return {
             isNota: false,
             direccionTemp: '',
-            esDelivery: 1,
+            esDelivery: 0,
             dni: '',
             newDniRuc: '',
             ultimaVenta: '',
@@ -436,7 +461,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))
         }
     },
     computed: {
@@ -453,7 +478,42 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        metodoPagoCambio(opc){
+            switch (opc) {
+                case 1:
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.efectivo.monto = this.totalCart
+                    break;
+                case 2:
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.visa.monto =this.totalCart
+                    break;
+                case 3:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.transferencia.monto = 0
+                    this.venta.pago.mastercard.monto = this.totalCart
+                    break;
+                case 4:
+                    this.venta.pago.efectivo.monto = 0
+                    this.venta.pago.visa.monto = 0
+                    this.venta.pago.mastercard.monto = 0
+                    this.venta.pago.transferencia.monto = this.totalCart
+                    break;
+            
+                default:
+                    break;
+            }
+        },
         loadClienteVarios () {
+            this.$refs.inputRepartidor.setValue('');
+            this.venta.repartidor = {}
+            this.$refs.inputRepartidor.$refs.input.disabled = true
+            this.$refs.inputRepartidor.$refs.input.required = false
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
                     if (res.data.IdCliente) {
@@ -529,7 +589,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    transferencia: { IdMetodoPago: 4, monto: 0 }
                 },
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
@@ -539,6 +600,7 @@ export default {
             this.isNota = false
             this.bloquearInput = false
             this.loadFirstAlmacen()
+            this.esDelivery = 0
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -713,11 +775,17 @@ export default {
         },
         onAddProducto (obj) {
             this.actualizarDescuento()
+            this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
         actualizarDescuento () {
+            this.venta.pago.visa.monto = 0
+            this.venta.pago.mastercard.monto = 0
+            this.venta.pago.transferencia.monto = 0
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
             }
@@ -810,9 +878,31 @@ export default {
 
             this.inProgress = true
             let totalPagos = 0
-            totalPagos += parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += parseFloat(this.venta.pago.visa.monto)
-            totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)
+
+            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Efectivo no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Yape / Plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+            if((isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
 
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
@@ -831,6 +921,12 @@ export default {
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
+                    return 
+                }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
                     return 
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
@@ -895,6 +991,7 @@ export default {
                 this.$refs.inputCliente.setValue('')
                 // this.$refs.inputVendedor.setValue('')
                 this.$refs.carrito.pagocon = 0
+                this.loadClienteVarios()
 
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
             })
