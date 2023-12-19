@@ -290,6 +290,10 @@
                   </b-popover>
                 </template>
 
+                <template slot="Anaquel" slot-scope="data">
+                  {{ obtenerAnaquel(data.item) }}
+                </template>
+
               </b-table>
           </b-col>
           <b-row>
@@ -437,6 +441,7 @@ export default {
             { key: 'Producto', sortable: true },
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoModelo', label: 'Modelo/Color', sortable: true },
+            { key: 'Anaquel', label: 'Anaquel', sortable: false },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
@@ -512,6 +517,14 @@ export default {
     },
   },
   methods: {
+    obtenerAnaquel(data){
+      if(data.Anaqueles && data.Anaqueles!='null' && this.almacen.IdAlmacen>0){
+        let obj = JSON.parse(data.Anaqueles)
+        let anaquel = obj.find((d)=>d.id==this.almacen.IdAlmacen)
+        return anaquel?anaquel.nombre:''
+      }
+      return ''
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url
