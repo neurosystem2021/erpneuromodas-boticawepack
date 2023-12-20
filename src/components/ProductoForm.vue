@@ -10,7 +10,6 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
@@ -457,6 +456,7 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
 
+      this.producto.CodigoBarra = (''+this.producto.CodigoBarra).trim()
       this.axios.post(this.API + 'productos', this.producto)
       .then((response) => {
         if (this.cbGuardar) {
