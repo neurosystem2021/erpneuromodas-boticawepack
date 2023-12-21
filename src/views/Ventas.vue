@@ -294,7 +294,7 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
-                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
+                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery || true"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -1194,6 +1194,17 @@ export default {
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async(response) => {
+                if(response.data.error){
+                    this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                    })
+                    this.inProgress = false
+                    return
+                }
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
