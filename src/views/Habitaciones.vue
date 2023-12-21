@@ -466,7 +466,7 @@ export default {
 			var left = (screen.width/2)-(800/2);
 			var top = (screen.height/2)-(800/2);
 			var fechaHora = this.$moment().format("YYYY-MM-DD HH:mm:ss");
-			var schema = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h1>Hotel San Francisco<h1><h2>Reporte de Habitaciones<h2><h3 style='font-weight:bold'>Fecha y Hora: "+fechaHora+"</h3><h3>Habitaciones Sucias</h3><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
+			var schema = "<div style='text-align:center; font-family: monospace;font-weight:  bold;' ><h1>Hotel Terra<h1><h2>Reporte de Habitaciones<h2><h3 style='font-weight:bold'>Fecha y Hora: "+fechaHora+"</h3><h3>Habitaciones Sucias</h3><hr><table><thead><tr><th>HABITACIÓN</th><th>PISO</th><th>OCUPADO</th><th>LIMPIEZA</th></tr></thead><tbody>";
 			var habita = "";
 			for (let key in [1,2,3,4,5,6,7,8,9,10,11]) {
 				this.habitaciones.forEach(ha => {
