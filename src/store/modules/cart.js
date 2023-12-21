@@ -238,7 +238,7 @@ const actions = {
       params: {
         idProductos: state.productos.map(prod => prod.IdProducto),
         idAlmacen: obj.IdAlmacen,
-        noLimit: 1
+        limit: state.productos.length
       }
     }).then((response) => {
         commit('OBTENER_STOCK', response.data)

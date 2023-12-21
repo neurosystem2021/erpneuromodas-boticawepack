@@ -477,8 +477,8 @@ export default {
 
         // Cargar la sumatoria
         this.getSumaStock()
-        this.getSumaValorizado()
-        this.getSumaValorizadoSin()
+        //this.getSumaValorizado()
+        //this.getSumaValorizadoSin()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -532,12 +532,14 @@ export default {
         }).then(r => {
           if (r.data) {
             this.verValorizado = true;
+            this.getSumaValorizado()
+            this.getSumaValorizadoSin()
           }
         })
       }
     },
     getPrimerAlmacen(){
-        this.axios.get(this.API + '/almacenes/id/1').then(r => {
+        this.axios.get(this.API + 'almacenes/id/1').then(r => {
           if (r.data) {
             this.setAlmacen(r.data)
             this.$refs.inputAlmacen.setValue(r.data.Almacen)
@@ -671,7 +673,7 @@ export default {
         
         if(key == 'stock' || key == 'minimo') {
           // si la consulta se hace al stock jalar de otro endpoint
-          this.APISTOCK = 'productos/stock'
+          this.APISTOCK = 'productos/puntoventa/stock'
         }
       }
 
