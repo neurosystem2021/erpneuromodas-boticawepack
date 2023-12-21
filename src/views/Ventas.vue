@@ -1232,7 +1232,14 @@ export default {
             })
             .catch((error) => {
                 console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                //this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                })
                 this.inProgress = false
             })
         },
