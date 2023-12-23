@@ -319,11 +319,11 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <br/><br/>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <br/><br/>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
+                        <br v-if="ultimaVenta"/><br v-if="ultimaVenta" />
+                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -625,8 +625,8 @@ export default {
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
-                //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                //this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -751,7 +751,7 @@ export default {
             this.initForm()
             this.limpiarCart()
             this.getNumeroVenta()
-            this.$refs.inputTipoVenta.setValue('TICKET')
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
             this.$refs.inputAlmacen.setValue('VENTA')
             this.$refs.inputPuntoVenta.setValue('CAJA1')
             this.$refs.inputCliente.setValue('')
