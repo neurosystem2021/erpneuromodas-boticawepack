@@ -256,6 +256,7 @@
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             />
+            <div v-if="isVentas" class="text-center" style="font-size:0.8rem"><b>{{productos[data.index].PrecioCosto | moneda}}</b></div>
         </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
@@ -1262,5 +1263,8 @@ export default {
   }
   #modalCantidad .modal-dialog {
       max-width: 40% !important;
+  }
+  .tdcenter {
+    vertical-align: middle !important;
   }
 </style>
