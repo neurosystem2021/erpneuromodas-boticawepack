@@ -1145,7 +1145,17 @@ export default {
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async(response) => {
-
+                if(response.data.error){
+                    this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                    })
+                    this.inProgress = false
+                    return
+                }
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
                 this.$toasted.success('Venta realizada con exito')
@@ -1166,12 +1176,19 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&empresa=' + this.empresa,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                //this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                })
                 this.inProgress = false
             })
         },
