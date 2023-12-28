@@ -285,7 +285,8 @@
                                                         v-model="descuentoGeneral"
                                                         min="0"
                                                         value="0"
-                                                        :disabled="bloquearInput?true:false"
+                                                        step="0.01"
+                                                        :disabled="bloquearInput?true:false || idPerfil!=1"
                                                         @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
                                                         type="number"
                                                         class="form-control"
@@ -556,6 +557,7 @@ export default {
             descInstitucionalProp:0,
             almacenRaiz: (sessionStorage.getItem('IdAlmacen') || 0),
             soloVendedor: sessionStorage.getItem('IdPerfil') == 1 ? 0 : 1,
+            idPerfil: sessionStorage.getItem('IdPerfil'),
         }
     },
     watch: {
@@ -1173,6 +1175,12 @@ export default {
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
+                    return 
+                }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
                     return 
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
