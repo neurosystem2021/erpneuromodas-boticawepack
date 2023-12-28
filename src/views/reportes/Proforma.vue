@@ -120,7 +120,8 @@
         </tfoot>
       </table>
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
-        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+        <img style="max-width: 100%" v-if="this.$route.query.empresa === 'hoqui'" src="/resources/images/cuentasr.jpg">
+        <img style="max-width: 100%" v-else src="/resources/images/cuentasi.jpg">    
       </div>
       <br>
       <div id="notices">
