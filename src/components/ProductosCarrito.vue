@@ -29,6 +29,7 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
           <input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].cantidad"
             type="number"
             style="width: 100px"
@@ -39,6 +40,7 @@
         </template>
         <template slot="precio" slot-scope="data">
           <input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].precio"
             type="number"
             style="width: 100px"
@@ -53,6 +55,7 @@
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].TieneIgv"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
@@ -77,6 +80,7 @@
         </template>-->
         <template slot="precioVenta" slot-scope="data">
           <input
+            :disabled="bloquearInput?true:false"
             style="width:80px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
@@ -91,6 +95,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
@@ -104,6 +109,7 @@
 
         <template slot="FechaAlquiler" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].FechaAlquiler"
             type="date"
             placeholder="Fecha Fin"
@@ -112,6 +118,7 @@
 
         <template slot="FechaAlquilerFin" slot-scope="data">
           <b-form-input
+            :disabled="bloquearInput?true:false"
             v-model="productos[data.index].FechaAlquilerFin"
             type="date"
             placeholder="Fecha Fin"
@@ -120,6 +127,7 @@
 
         <template slot="Descripcion" slot-scope="data">
           <textarea
+            :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
             cols="15" rows="2"
@@ -131,11 +139,11 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" @click="quitarProducto(data.index)">X</b-button>
+          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+           <b-button size="sm" variant="info" :disabled="bloquearInput?true:false" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -183,6 +191,7 @@
                     type="text"
                     placeholder="Pagó con"
                     v-model="pagocon"
+                    :disabled="bloquearInput?true:false"
                     @input="asignarVuelto"></b-form-input><br>
                   <label>Vuelto:</label>
                   <b>S/  {{ vuelto | redondear }}</b>
@@ -223,7 +232,7 @@ export default {
   },
   props: {
     setPrecio: Boolean,
-
+    bloquearInput:Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
