@@ -12,7 +12,7 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
-                            <option value="modasm">EMP. MODAS MARIOS (PRENDAS DE VESTIR)</option>
+                            <option value="modasm">EMP. MARIOS SPORT F. (PRENDAS DE VESTIR)</option>
                             <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
                             <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
                             <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
