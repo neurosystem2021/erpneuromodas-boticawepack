@@ -130,7 +130,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -142,11 +142,12 @@
             type="number"
             style="width: 90px"
             min="0"
+            step="0.0001"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
                 if(productos[data.index].EsObsequio==1){
                     productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
+                    //productos[data.index].nuevoPrecioContado = 0
                 }
             }"
             placeholder="Cantidad"
@@ -162,7 +163,7 @@
             type="number"
             style="width: 105px"
             min="0"
-            step="0.00001"
+            step="0.0001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             class="form-control"/>
@@ -234,7 +235,7 @@
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
             min="0"
-            step="0.01"
+            step="0.0001"
             placeholder="Precio Venta"
             class="form-control"/>
             <b-form-text>
@@ -551,7 +552,7 @@ export default {
     },
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     setSubtotal(index, val,prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)

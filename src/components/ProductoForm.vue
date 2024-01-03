@@ -344,7 +344,7 @@
                 v-model="producto.precios[i-1].precioc"
                 type="number"
                 class="form-control"
-                step="0.00001"
+                step="0.0001"
                 />
             </b-form-group>
 
@@ -354,7 +354,7 @@
                 v-model="producto.precios[i-1].precio"
                 type="number"
                 class="form-control"
-                step="0.00001"
+                step="0.0001"
                 />
             </b-form-group>
           </b-card>

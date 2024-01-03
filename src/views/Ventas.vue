@@ -691,7 +691,7 @@ export default {
         setTipoVenta (obj) {
             console.log(obj);
             if(this.isNota==true){
-                this.limpiarCart();
+                //this.limpiarCart();
             }
             this.isNota = false
             this.bloquearInput = false
@@ -1093,6 +1093,13 @@ export default {
                 }
                 if(this.venta.NroComprobanteModifica == ''){
                     this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
+                
+                if(this.venta.CodSunatModifica=='12'){
+                    this.$toasted.show('No se puede hacer NOTA DE CREDITO de una NOTA DE VENTA')
                     this.inProgress = false
                     this.$refs.inputDocRef.focus();
                     return 
