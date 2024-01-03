@@ -16,9 +16,26 @@
               </b-form-group>
               <br />
             </b-col>
-            <b-col md="8" class="my-1">
+            <b-col md="12" class="my-1">
               <b-row>
-                <b-col md="4">
+                <b-col md="3">
+                  <b-form-group>
+                    <label>Almacen:</label>
+                    <autocomplete
+                        required="required"
+                        ref="inputAlmacen"
+                        :url="API + 'almacenes'"
+                        anchor="Almacen"
+                        initValue="PRINCIPAL"
+                        label="writer"
+                        placeholder=""
+                        :on-select="setAlmacen" 
+                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                        :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="3">
                   <b-form-group>
                     <label>Fecha Inicio:</label>
                     <b-form-input
@@ -29,7 +46,7 @@
                     </b-form-input>
                   </b-form-group>
                 </b-col>
-                <b-col md="4">
+                <b-col md="3">
                   <b-form-group>
                     <label>Fecha Fin:</label>
                     <b-form-input
@@ -40,7 +57,7 @@
                     </b-form-input>
                   </b-form-group>
                 </b-col>
-                <b-col md="4">
+                <b-col md="3">
                   <br>
                   <b-button :disabled="isProcess" class="mt-2" @click="generarFechas()" variant="primary" size="md">Generar</b-button>  
                 </b-col>
@@ -133,7 +150,7 @@
           try {
             const response = await this.axios.get(`${this.API}vencimiento`, { params:
               {
-                IdAlmacen: 1,
+                IdAlmacen: this.almacen.IdAlmacen || 1,
                 FechaInicio: this.vencimiento.fechaInicio,
                 FechaFin: this.vencimiento.fechaFin,
               }
