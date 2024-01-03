@@ -735,7 +735,9 @@ export default {
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            } 
         },
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
@@ -1069,6 +1071,17 @@ export default {
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
+                if(response.data.error){
+                    this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                    })
+                    this.inProgress = false
+                    return
+                }
 
                 // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
@@ -1088,12 +1101,19 @@ export default {
                 this.$refs.inputVendedor.setValue('')
                 //this.$refs.inputComisionista.setValue('')
                 this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
             })
             .catch((error) => {
                 console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                //this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                this.$swal({
+                    icon: 'warning',
+                    title: 'Validación de Serie y Número',
+                    text: 'No se efectuó la venta, por favor vuelva a presionar Efectuar Venta',
+                    target: document.getElementById('conten'),
+                    footer: 'Presione Efectuar Venta nuevamente'
+                })
                 this.inProgress = false
             })
         },
