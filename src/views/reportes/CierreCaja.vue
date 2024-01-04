@@ -464,7 +464,7 @@
 
       <b-row>
         <b-col v-if="totalIngresosPagoCliente">
-          <h5>Ingresos Pago Cliente (NO SUMA)</h5>
+          <h5>Ingresos Pago Cliente</h5>
           <table class="table b-table table-sm">
             <thead>
               <tr>
@@ -562,7 +562,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresosSinPagoCliente - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresosSinPagoCliente + this.totalIngresosPagoCliente - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia - this.totalSalidas
