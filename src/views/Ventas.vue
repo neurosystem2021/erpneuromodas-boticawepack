@@ -115,6 +115,14 @@
                             </b-col>
                             <b-col md="12" style="margin-top:-10px">
                                 <b-form-group>
+                                    <b-input-group v-if="venta.EsOrganizacion">
+                                        <input v-model="venta.NombreOrganizacion"
+                                            type="text"
+                                            style="text-transform:uppercase;"
+                                            class="form-control"
+                                            ref="inputNombreOrganizacion"
+                                            placeholder="Nombre de la Organización"/>
+                                    </b-input-group>
                                     <b-input-group prepend="Cliente ">
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -146,6 +154,17 @@
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
+
+                                    <b-input-group v-if="venta.cliente.DniRuc == '00000000' && (venta.tipoVenta.CodSunat=='03' || venta.tipoVenta.CodSunat== '12')" class="mb-1">
+                                        <b-form-checkbox
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsOrganizacion"
+                                        :value="1"
+                                        @change="(val)=>changeOrganizacion(val)"
+                                        :unchecked-value="0">
+                                        Es Organización
+                                        </b-form-checkbox>
+                                    </b-input-group>
 
                                     <b-row v-if="this.$route.query.idPedido">
                                         <b-col>
@@ -538,6 +557,13 @@ export default {
                     }
                 })
         },
+        changeOrganizacion(val){
+            if(val){
+                this.$refs.inputCliente.$refs.input.disabled = true
+            }else{
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
+        },
         prevent (evt) {
             if (evt.target.tagName !== 'TEXTAREA') {
                 evt.preventDefault();
@@ -619,6 +645,8 @@ export default {
                 },
                 IdPreOrden: [],
                 CampoDireccion: 'Direccion',
+                EsOrganizacion: 0,
+                NombreOrganizacion: '',
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
@@ -647,7 +675,11 @@ export default {
             if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
                 this.isNota = true
             }
-
+            if(obj.CodSunat=='01' || obj.CodSunat=='07'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
             if (obj.TieneIgv) {
                 this.tieneIgv = true
             } else {
@@ -814,6 +846,11 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                if(this.venta.cliente.DniRuc != '00000000'){
+                    this.$refs.inputCliente.$refs.input.disabled = false
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -980,7 +1017,12 @@ export default {
                 this.inProgress = false            
                 return  
             }
-
+            if(this.venta.EsOrganizacion == 1 && (''+this.venta.NombreOrganizacion).trim()=='') {
+                this.$toasted.show('Complete el nombre de organizacion')
+                this.$refs.inputNombreOrganizacion.focus()
+                this.inProgress = false
+                return 
+            }
             if (!this.venta.EsCredito) {
                 if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
@@ -1069,6 +1111,14 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            if(this.venta.cliente.DniRuc != '00000000'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+            }
+            if(this.venta.EsOrganizacion){
+                this.venta.cliente.Cliente = this.venta.NombreOrganizacion
+            }
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 if(response.data.error){
