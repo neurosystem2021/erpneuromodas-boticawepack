@@ -20,7 +20,7 @@
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm" v-show="false">
+                    <b-button-group size="sm">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -1397,8 +1397,10 @@ export default {
             this.venta.cliente = {}
         },
         eliminarComisionista () {
-            this.$refs.inputComisionista.setValue('')
-            this.venta.comisionista = {}
+            if(this.$refs.inputComisionista){
+                this.$refs.inputComisionista.setValue('')
+                this.venta.comisionista = {}
+            }
         },
     },
     components: {
