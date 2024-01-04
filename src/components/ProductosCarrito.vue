@@ -123,7 +123,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 100px"
-            step="0.001"
+            step="0.0001"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
@@ -173,6 +173,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
+            :disabled="tipo == 'mov' ? false : true"
             style="width: 90px"
             min="0"
             step="0.00001"
@@ -443,6 +444,7 @@ export default {
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
+    tipo: String,
     tipoCambio: Number,
     igvTotal: Boolean,
     tipoMov: Number,
