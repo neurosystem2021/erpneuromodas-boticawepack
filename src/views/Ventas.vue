@@ -20,7 +20,7 @@
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <b-button-group size="sm" v-if="idPerfil==1">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -508,7 +508,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            ventaSinStock:0
+            ventaSinStock:0,
+            idPerfil: sessionStorage.getItem('IdPerfil')
         }
     },
     watch: {
