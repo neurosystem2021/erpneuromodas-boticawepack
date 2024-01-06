@@ -161,7 +161,7 @@ export default {
           this.operacion.NombreCodigo = newVal.NombreCodigo || ''
           this.operacion.Operacion = newVal.Operacion || ''
           this.operacion.ComisionFija = newVal.ComisionFija
-          this.operacion.Tipo = newVal.Tipo || null
+          this.operacion.Tipo = newVal.Tipo
         }else{
           this.title = 'Nueva Operación'
           this.clearForm()

@@ -119,7 +119,6 @@
                                     <b-button size="sm" @click="actualizarVendedor" variant="outline-primary"><i class="fas fa-redo fa-lg"></i></b-button>
                                 </b-col>
                             </b-row>
-                            <hr>
                             <b-row>
                                 <b-col md="12">
                                     <b-form-group style="margin: 0 !important;">
@@ -207,7 +206,7 @@
                                         </b-input-group>
                                     </b-col>
                                 </b-row>
-                                <b-row v-if="operacion.tieneComision == 1">
+                                <b-row v-if="operacion.tieneComision == 1" style="margin-bottom: -10px;">
                                     <b-col md="6">
                                         <b-input-group prepend="Comision " class="mt-2 inputLineNumber">
                                             <input
@@ -223,11 +222,21 @@
                                         </b-input-group>
                                     </b-col>
                                     <b-col v-if="operacion.tieneComision == 1 && operacion.calculo == 1" md="6" class="mt-3" style="display: flex; align-items: center; justify-content: start;">
-                                        <h6 v-if="operacion.comisionFija == 0" style="margin-left: 20px;">Por cada S/ {{ operacion.montoMax | moneda }}, será S/ {{ operacion.montoComision | moneda }} <i v-if="operacion.ganancia==1" class="fas fa-arrow-up fa-lg text-success ml-1"></i></h6>
-                                        <h6 v-else style="margin-left: 20px;">Tiene una comisión fija de S/ {{ operacion.montoComision | moneda }} </h6>
+                                        <h6 v-if="operacion.comisionFija == 0" style="margin-left: 25px; font-size: 0.85rem;">Por cada S/ {{ operacion.montoMax | moneda }}, será S/ {{ operacion.montoComision | moneda }} <i v-if="operacion.ganancia==1" class="fas fa-arrow-up fa-lg text-success ml-1"></i></h6>
+                                        <h6 v-else style="margin-left: 25px; font-size: 0.85rem;">Tiene una comisión fija de S/ {{ operacion.montoComision | moneda }} </h6>
+                                    </b-col>
+                                    <b-col md="12" class="mt-2" style="display: flex; align-items: center; justify-content: start;" v-if="opcionEntidad==1">
+                                        <b-form-group>
+                                            <b-form-checkbox style="margin-left: 5px;"
+                                                    v-model="operacion.comisionIncluida"
+                                                    :value="1"
+                                                    :unchecked-value="0"
+                                                    >
+                                                <b>Comision Incluida en Operación</b>
+                                            </b-form-checkbox>
+                                        </b-form-group>
                                     </b-col>
                                 </b-row>
-                                <hr>
                                 <b-row v-if="operacion.requiereCodigo">
                                     <b-col>
                                         <b-form-group>
@@ -243,29 +252,28 @@
                                         </b-form-group>
                                     </b-col>
                                 </b-row>
-                                <b-row>
+                                <b-row class="mt-1">
                                     <b-col>
                                         <b-input-group prepend="Observación " class="mt-2 inputLineText">
                                             <textarea
                                                 v-model="operacion.observacion"
                                                 placeholder="Observación de la operación"
-                                                rows="2"
+                                                rows="1"
                                                 style="text-transform: uppercase;"
                                                 class="form-control">
                                             </textarea>
                                         </b-input-group>
                                     </b-col>
                                 </b-row>
-                                <hr v-if="operacion.total > 0">
                                 <b-row v-if="operacion.total > 0">
-                                    <b-col class="text-center">
+                                    <b-col class="text-center mt-3">
                                         <h4>TOTAL A RECIBIR: S/ {{ operacion.total | moneda }}</h4>
                                     </b-col>
                                 </b-row>
 
                                 <b-row align-h="center" class="text-center">
                                 <b-col cols="12">
-                                    <br />
+                                    <br>
                                     <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Guardar Operación</b-button>
                                     <br />
                                     <br />
@@ -363,6 +371,7 @@ export default {
                 this.operacion.comision = null
                 this.operacion.monto = null
                 this.operacion.observacion = ''
+                this.operacion.comisionIncluida = 0
                 if(this.$refs.inputTipoOperacion){
                     this.$refs.inputTipoOperacion.setValue('')
                 }
@@ -385,6 +394,7 @@ export default {
                     this.operacion.montoMax = 0
                     this.operacion.montoComision = 0
                     this.operacion.comision = null
+                    this.operacion.comisionIncluida = 0
                     this.getComision()
                 }
             }, 150);
@@ -466,6 +476,7 @@ export default {
                 this.operacion.comision = null
                 this.operacion.monto = null
                 this.operacion.observacion = ''
+                this.operacion.comisionIncluida = 0
             }, 100);
         },
         setEntidad(entidad){
@@ -489,6 +500,7 @@ export default {
                 this.operacion.comision = null
                 this.operacion.monto = null
                 this.operacion.observacion = ''
+                this.operacion.comisionIncluida = 0
             }, 100);
         },
         async getEntidades(){
@@ -532,7 +544,8 @@ export default {
                 observacion: '',
                 telefono: '',
                 total: 0,
-                usuario: sessionStorage.getItem('User') || null
+                usuario: sessionStorage.getItem('User') || null,
+                comisionIncluida: 0,
             }
             this.newDniRuc = ''
             this.idEntidadSelect = null
@@ -679,6 +692,7 @@ export default {
             this.operacion.codigo = (''+this.operacion.codigo).trim().toUpperCase()
             this.operacion.usuario = this.vendedor.Usuario
             this.operacion.operacionTipo = this.opcionEntidad
+            this.operacion.comisionIncluida = (this.opcionEntidad==1?this.operacion.comisionIncluida:0)
 
             this.$swal({
             target: document.getElementById('conten'),
@@ -767,6 +781,7 @@ export default {
             this.operacion.montoComision = obj.MontoComision
             this.operacion.calculo = obj.Calculo
             this.operacion.codigo = ''
+            this.operacion.comisionIncluida = 0
             this.getComision()
         },
         focusAutocompleteOperacion (ref) {
@@ -783,6 +798,7 @@ export default {
             this.operacion.montoMax = 0
             this.operacion.montoComision = 0
             this.operacion.comision = null
+            this.operacion.comisionIncluida = 0
         },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""

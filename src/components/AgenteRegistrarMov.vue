@@ -117,6 +117,7 @@
 
         if((''+this.movimiento.Concepto).trim()==''){
             this.$toasted.show('Ingrese un concepto del movimiento')
+            this.movimiento.Concepto = (''+this.movimiento.Concepto).trim().toUpperCase()
             return
         }
   

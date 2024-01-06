@@ -64,7 +64,9 @@
                                 </td>
                                 <td>{{ item.Cliente }}</td>
                                 <td class="table-primary text-center">S/ {{ item.Monto | moneda }}</td>
-                                <td class="table-info text-center">S/ {{ item.Comision | moneda }}</td>
+                                <td class="table-info text-center">S/ {{ item.Comision | moneda }} <br>
+                                    <b-badge style="font-size:0.65rem" :variant="item.ComisionIncluida==1?'primary':'success'">{{ item.ComisionIncluida==1?'INCLUIDA':'EFECTIVO' }}</b-badge>
+                                </td>
                                 <!--<td class="table-success text-center">S/ {{ item.Total | moneda }}</td>-->
                                 <td class="text-center"><b-badge style="font-size:0.8rem" :variant="item.Estado==1?'primary':(item.Estado==2?'success':'danger')">{{ item.Estado==1?'PENDIENTE':(item.Estado==2?'PROCESADO':'CANCELADO') }}</b-badge></td>
                                 <td class="text-center"><span class="btn text-info" size="sm" @click="infoComprobante(item)"><i class="fas fa-info fa-lg"></i></span></td>
@@ -87,11 +89,11 @@
         <hr v-if="totalIngresos>0 || totalEgresos>0">
         <b-row>
             <b-col v-if="totalIngresos>0">
-            <h5>INGRESOS CAJA</h5><br>
+            <h5>INGRESOS CAJA</h5>
             <table class="table b-table table-sm">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Ingreso</th><th class="text-center">Anular</th>
+                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Ingreso</th><th class="text-center" v-if="!visual">Anular</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -105,19 +107,18 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="2"></td>
-                    <td class="total"><b>Total Ingresos</b></td>
+                    <td colspan="3" class="total text-center"><b>Total Ingresos</b></td>
                     <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
                 </tr>
                 </tfoot>
             </table>
             </b-col>
             <b-col v-if="totalEgresos>0">
-            <h5>EGRESOS CAJA</h5><br>
+            <h5>EGRESOS CAJA</h5>
             <table class="table b-table table-sm">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Salida</th><th class="text-center">Anular</th>
+                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Salida</th><th class="text-center" v-if="!visual">Anular</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -131,14 +132,14 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="2"></td>
-                    <td class="total-salida"><b>Total Egresos</b></td>
+                    <td colspan="3" class="total-salida text-center"><b>Total Egresos</b></td>
                     <td class="total-salida"><b>S/. {{ totalEgresos | redondear }}</b></td>
                 </tr>
                 </tfoot>
             </table>
             </b-col>
         </b-row>
+        <b-alert variant="success" class="text-center" show><b>TOTAL EN CAJA: S/. {{ granTotal | redondear }}</b></b-alert>
         <agente-registrar-mov ref="movimientoModal" :usuario-reg="vendedor.Usuario" :cbGuardar="cargarCaja"></agente-registrar-mov>
       </b-container>
     </div>
@@ -179,6 +180,36 @@
       }
     },
     computed: {
+        granTotal () {
+            return this.totalIngresosOperacionMonto - this.totalEgresosOperacionMonto  + this.totalComision + this.totalIngresos - this.totalEgresos
+        },
+        totalComision () {
+            let total = 0
+            this.data.forEach(entidad => {
+                entidad.Comprobantes.forEach(comprobante => {
+                    if (!comprobante.Anulado && !comprobante.ComisionIncluida) total += comprobante.Comision
+                });     
+            });
+            return total
+        },
+        totalEgresosOperacionMonto () {
+            let total = 0
+            this.data.forEach(entidad => {
+                entidad.Comprobantes.forEach(comprobante => {
+                    if (!comprobante.Anulado && comprobante.Tipo == 1) total += comprobante.Monto
+                });
+            });
+            return total 
+        },
+        totalIngresosOperacionMonto () {
+            let total = 0
+            this.data.forEach(entidad => {
+                entidad.Comprobantes.forEach(comprobante => {
+                    if (!comprobante.Anulado && comprobante.Tipo == 0) total += comprobante.Monto
+                });     
+            });
+            return total
+        },
         totalEgresos () {
             let total = 0
             this.egresos.forEach(egreso => {
@@ -203,57 +234,7 @@
                 this.$toasted.error('No se cargo el usuario, actualice la pagina o vuelva a iniciar sesión')
                 return
             }
-
             this.$refs.movimientoModal.show = true;
-
-
-            /*let r = confirm('¿Se registrará un movimiento de caja, está seguro?')
-            if (r) {
-                this.$swal({
-                    title: 'Cerrando Caja...',
-                    allowEscapeKey: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        this.$swal.showLoading();
-                    }
-                })
-                try {
-                    const response = await this.axios.post(`${this.API}agente/cierrecaja/cerrar`, {
-                        Usuario: this.vendedor.Usuario
-                    });
-                    this.$swal.close()
-                    if(response.data.success){
-                        this.$swal({
-                            position: 'center',
-                            icon: 'success',
-                            title: '¡Caja Cerrada!',
-                            showConfirmButton: true,
-                            confirmButtonText: 'Aceptar',
-                            target: document.getElementById('conten'),
-                            confirmButtonColor:'#1D9828',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                        })
-                    }else{
-                        this.$swal({
-                            position: 'center',
-                            icon: 'warning',
-                            title: response.data.msg,
-                            showConfirmButton: true,
-                            confirmButtonText: 'Entiendo',
-                            target: document.getElementById('conten'),
-                            confirmButtonColor:'#3085d6',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                        })
-                    }
-                    this.getVendedor()
-                } catch (error) {
-                    console.log(error);
-                    this.$swal.close()
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                }
-            }*/
         },
         getCierre(id) {
             this.axios.get(this.API + 'agente/cierrecaja', {
