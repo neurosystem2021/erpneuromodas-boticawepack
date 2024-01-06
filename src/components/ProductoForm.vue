@@ -296,7 +296,7 @@
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
               type="number"
-              step="0.00001"
+              step="0.0001"
               @input="actualizarPorcentajeUtilidad"
               class="form-control"
               />

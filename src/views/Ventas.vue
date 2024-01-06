@@ -22,7 +22,7 @@
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" class="ocularMovil" v-if="idPerfil==1">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                         <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                     </b-button-group>
@@ -513,7 +513,8 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            ventaSinStock:0
+            ventaSinStock:0,
+            idPerfil: sessionStorage.getItem('IdPerfil'),
         }
     },
     watch: {
@@ -1044,6 +1045,18 @@ export default {
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
+                    return 
+                }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
+                if(this.venta.CodSunatModifica=='12'){
+                    this.$toasted.show('No se puede hacer NOTA DE CREDITO de una NOTA DE VENTA')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
                     return 
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text

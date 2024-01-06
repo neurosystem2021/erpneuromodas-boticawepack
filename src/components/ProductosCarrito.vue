@@ -106,7 +106,7 @@
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @change="setObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -140,7 +140,7 @@
             autocomplete="off"
             style="width: 90px; font-weight:bold"
             class="form-control"
-            step="1"
+            step="0.0001"
             min="0"
             @input="(val) => {
               changeCant(val.target.value,productos[data.index])
@@ -696,7 +696,7 @@ export default {
     },*/
     setObsequio(index){
       this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      //this.productos[index].nuevoPrecioContado = 0
     },
     focusAutocomplete (ref) {
       this.$refs[ref].type = ""
