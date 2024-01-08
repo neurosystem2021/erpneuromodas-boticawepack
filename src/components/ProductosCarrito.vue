@@ -718,8 +718,9 @@ export default {
     },
     changeCant (val, prod, index) {
       if (val>0) {
-        prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
+        //prod.cantidad *= Number(prod.cantidad)
+        //prod.cantidad = Number(prod.cantidadPres)
+        //prod.cantidad = Number(val)
       }
       prod.subt = ''
       this.$nextTick(() => {
