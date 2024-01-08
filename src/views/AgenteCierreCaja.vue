@@ -56,7 +56,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in entidad.Comprobantes" :key="index" :class="{anulado: item.Anulado}">
-                                <td>{{ item.IdComprobante}}</td>
+                                <td>{{ item.Correlativo}}</td>
                                 <td>{{ item.FechaDoc }}</td>
                                 <td>{{ item.Empresa }}</td>
                                 <td>{{ item.CategoriaEmpresa }} <br>
@@ -65,7 +65,7 @@
                                 <td>{{ item.Cliente }}</td>
                                 <td class="table-primary text-center">S/ {{ item.Monto | moneda }}</td>
                                 <td class="table-info text-center">S/ {{ item.Comision | moneda }} <br>
-                                    <b-badge style="font-size:0.65rem" :variant="item.ComisionIncluida==1?'primary':'success'">{{ item.ComisionIncluida==1?'INCLUIDA':'EFECTIVO' }}</b-badge>
+                                    <b-badge v-if="item.Comision>0" style="font-size:0.65rem" :variant="item.ComisionIncluida==1?'primary':'success'">{{ item.ComisionIncluida==1?'INCLUIDA':'EFECTIVO' }}</b-badge>
                                 </td>
                                 <!--<td class="table-success text-center">S/ {{ item.Total | moneda }}</td>-->
                                 <td class="text-center"><b-badge style="font-size:0.8rem" :variant="item.Estado==1?'primary':(item.Estado==2?'success':'danger')">{{ item.Estado==1?'PENDIENTE':(item.Estado==2?'PROCESADO':'CANCELADO') }}</b-badge></td>
@@ -763,7 +763,7 @@
 
   th, td {
     font-size: .9em;
-    vertical-align: middle;
+    vertical-align: middle !important;
   }
   .tdgris {
     background-color: #f1f1f1;

@@ -13,6 +13,7 @@ import Impresoras from '@/views/Impresoras.vue'
 import AgenteOperacion from '@/views/AgenteOperacion.vue'
 import AgenteCierreCaja from '@/views/AgenteCierreCaja.vue'
 import AgenteGeneral from '@/views/AgenteGeneral.vue'
+import AgenteReimpresion from '@/views/AgenteReimpresion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -187,6 +188,11 @@ export default new Router({
       path: '/agente/general',
       name: 'AgenteGeneral',
       component: AgenteGeneral
-    }
+    },
+    {
+      path: '/agente/reimpresion',
+      name: 'AgenteReimpresion',
+      component: AgenteReimpresion
+    },
   ]
 })

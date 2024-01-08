@@ -5,7 +5,7 @@
         <b-row>
           <b-col md="6">
             <b-form-group>
-              <label>Nombre de la Operación:</label>
+              <label>Nombre de la operación:</label>
               <b-form-input v-model="operacion.Operacion"
                 ref="inputNombreOperacion"
                 required="required"
@@ -37,7 +37,7 @@
                 ></b-form-input>
             </b-form-group>
             <b-form-group>
-              <label>Tipo de Operación</label>
+              <label>Tipo de operación:</label>
               <b-form-select v-model="operacion.Tipo" :options="itemsTipos" v-on:change="setTipo($event)" size="md"/>
             </b-form-group>
           </b-col>
@@ -71,11 +71,11 @@
                           :value="1"
                           :unchecked-value="0"
                           >
-                    Comision Fija
+                    Comision fija
                   </b-form-checkbox>
                 </b-form-group>
                 <b-form-group>
-                  <label>Comisión</label>
+                  <label>Comisión:</label>
                   <input   
                     required="required"
                     v-model="operacion.MontoComision"
@@ -85,7 +85,7 @@
                     />
                 </b-form-group>
                 <b-form-group v-if="!operacion.ComisionFija">
-                  <label>Comisión por cada</label>
+                  <label>Comisión por cada:</label>
                   <input   
                     required="required"
                     v-model="operacion.MontoMax"
@@ -108,6 +108,37 @@
               </b-form-group>
             </div>
 
+          </b-col>
+          <b-col md="12">
+            <hr>
+            <b-form-group>
+              <b-form-checkbox
+                      v-model="operacion.TieneEnlaceExterno"
+                      :value="1"
+                      :unchecked-value="0"
+                      >
+                Tiene enlaces externos
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="operacion.TieneEnlaceExterno">
+              <label>Enlace externo 1:</label>
+              <b-form-input v-model="operacion.EnlaceExterno1"
+                ref="inputEnlaceExterno1"
+                required="required"
+                type="text"
+                autocomplete="off"
+                :value="operacion.EnlaceExterno1"
+                ></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="operacion.TieneEnlaceExterno">
+              <label>Enlace externo 2:</label>
+              <b-form-input v-model="operacion.EnlaceExterno2"
+                ref="inputEnlaceExterno2"
+                type="text"
+                autocomplete="off"
+                :value="operacion.EnlaceExterno2"
+                ></b-form-input>
+            </b-form-group>
           </b-col>
         </b-row>
         <div slot="modal-footer" >
@@ -154,14 +185,17 @@ export default {
           this.operacion.IdOperacion = newVal.IdOperacion
           this.operacion.Ganancia = newVal.Ganancia
           this.operacion.Calculo = newVal.Calculo
-          this.operacion.MontoMax = newVal.MontoMax || 0
-          this.operacion.MontoComision = newVal.MontoComision || 0
+          this.operacion.MontoMax = (newVal.MontoMax>0?newVal.MontoMax:0)
+          this.operacion.MontoComision = (newVal.MontoComision>0?newVal.MontoComision:0)
           this.operacion.TieneComision = newVal.TieneComision
           this.operacion.RequiereCodigo = newVal.RequiereCodigo
           this.operacion.NombreCodigo = newVal.NombreCodigo || ''
           this.operacion.Operacion = newVal.Operacion || ''
           this.operacion.ComisionFija = newVal.ComisionFija
           this.operacion.Tipo = newVal.Tipo
+          this.operacion.EnlaceExterno1 = newVal.EnlaceExterno1 || ''
+          this.operacion.EnlaceExterno2 = newVal.EnlaceExterno2 || ''
+          this.operacion.TieneEnlaceExterno = newVal.TieneEnlaceExterno
         }else{
           this.title = 'Nueva Operación'
           this.clearForm()
@@ -187,7 +221,10 @@ export default {
         ComisionFija: 0,
         RequiereCodigo: 0,
         NombreCodigo: '',
-        Tipo: null
+        Tipo: null,
+        TieneEnlaceExterno: 0,
+        EnlaceExterno1: '',
+        EnlaceExterno2: '',
       }
     },
     focusAutocomplete (ref) {
@@ -232,7 +269,20 @@ export default {
         this.operacion.MontoMax = 0
       }
 
+      if(this.operacion.TieneEnlaceExterno){
+        if((''+this.operacion.EnlaceExterno1).trim().toUpperCase()==''){
+          this.$toasted.show('Complete el primer enlace externo')
+          this.operacion.EnlaceExterno1 = (''+this.operacion.EnlaceExterno1).trim()
+          this.operacion.EnlaceExterno2 = (''+this.operacion.EnlaceExterno2).trim()
+          return
+        }
+      }else{
+        this.operacion.EnlaceExterno1 = ''
+        this.operacion.EnlaceExterno2 = ''
+      }
 
+      this.operacion.EnlaceExterno1 = (''+this.operacion.EnlaceExterno1).trim()
+      this.operacion.EnlaceExterno2 = (''+this.operacion.EnlaceExterno2).trim()
       this.operacion.NombreCodigo = (this.operacion.RequiereCodigo?(''+this.operacion.NombreCodigo).trim().toUpperCase():'')
       this.operacion.Operacion = (''+this.operacion.Operacion).trim().toUpperCase()
       this.operacion.IdEntidad = this.idEntidad

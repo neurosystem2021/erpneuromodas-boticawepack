@@ -53,6 +53,12 @@
                                 </b-row>
                             </b-col>
                         </b-row>
+                        <b-row v-if="opcionEntidad==1" style="display: contents !important;">
+                            <b-col md="12" v-if="operacion.tieneEnlaceExterno">
+                                <h6 v-if="operacion.enlaceExterno1!=''"><b>Enlace 1: </b><a :href="operacion.enlaceExterno1" target="blank"> Abrir enlace de operación</a></h6>
+                                <h6 v-if="operacion.enlaceExterno2!=''"><b>Enlace 2: </b><a :href="operacion.enlaceExterno2" target="blank"> Abrir enlace de operación</a></h6>
+                            </b-col>
+                        </b-row>
                     </b-col>            
                 </b-row>
                 <hr>
@@ -225,7 +231,7 @@
                                         <h6 v-if="operacion.comisionFija == 0" style="margin-left: 25px; font-size: 0.85rem;">Por cada S/ {{ operacion.montoMax | moneda }}, será S/ {{ operacion.montoComision | moneda }} <i v-if="operacion.ganancia==1" class="fas fa-arrow-up fa-lg text-success ml-1"></i></h6>
                                         <h6 v-else style="margin-left: 25px; font-size: 0.85rem;">Tiene una comisión fija de S/ {{ operacion.montoComision | moneda }} </h6>
                                     </b-col>
-                                    <b-col md="12" class="mt-2" style="display: flex; align-items: center; justify-content: start;" v-if="opcionEntidad==1">
+                                    <b-col md="12" class="mt-2" style="display: flex; align-items: center; justify-content: start;" v-if="opcionEntidad==1 && operacion.tipo > 0">
                                         <b-form-group>
                                             <b-form-checkbox style="margin-left: 5px;"
                                                     v-model="operacion.comisionIncluida"
@@ -237,7 +243,7 @@
                                         </b-form-group>
                                     </b-col>
                                 </b-row>
-                                <b-row v-if="operacion.requiereCodigo">
+                                <b-row v-if="operacion.requiereCodigo" class="mt-2">
                                     <b-col>
                                         <b-form-group>
                                             <b-input-group :prepend="getCapitalize(operacion.nombreCodigo)" class="mt-2 inputLineRequerido">
@@ -358,20 +364,7 @@ export default {
             this.busquedaEmpresa = ''
             this.idCategoriaEmpresaSelect = null
             setTimeout(() => {
-                this.operacion.idServicio = null
-                this.operacion.operacion = ''
-                this.operacion.tieneComision = 0
-                this.operacion.comisionFija = 0
-                this.operacion.requiereCodigo = 0
-                this.operacion.nombreCodigo = ''
-                this.operacion.codigo = ''
-                this.operacion.ganancia = 0
-                this.operacion.montoMax = 0
-                this.operacion.montoComision = 0
-                this.operacion.comision = null
-                this.operacion.monto = null
-                this.operacion.observacion = ''
-                this.operacion.comisionIncluida = 0
+                this.limpiarOperacion()
                 if(this.$refs.inputTipoOperacion){
                     this.$refs.inputTipoOperacion.setValue('')
                 }
@@ -395,6 +388,10 @@ export default {
                     this.operacion.montoComision = 0
                     this.operacion.comision = null
                     this.operacion.comisionIncluida = 0
+                    this.operacion.tipo = 0
+                    this.operacion.tieneEnlaceExterno = 0
+                    this.operacion.enlaceExterno1 = ''
+                    this.operacion.enlaceExterno2 = ''
                     this.getComision()
                 }
             }, 150);
@@ -455,6 +452,26 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             }
         },
+        limpiarOperacion(){
+            this.operacion.idServicio = null
+            this.operacion.operacion = ''
+            this.operacion.tieneComision = 0
+            this.operacion.comisionFija = 0
+            this.operacion.requiereCodigo = 0
+            this.operacion.nombreCodigo = ''
+            this.operacion.codigo = ''
+            this.operacion.ganancia = 0
+            this.operacion.montoMax = 0
+            this.operacion.montoComision = 0
+            this.operacion.comision = null
+            this.operacion.monto = null
+            this.operacion.observacion = ''
+            this.operacion.comisionIncluida = 0
+            this.operacion.tipo = 0
+            this.operacion.tieneEnlaceExterno = 0
+            this.operacion.enlaceExterno1 = ''
+            this.operacion.enlaceExterno2 = ''
+        },
         setServiciosEntidad(val){
             this.opcionEntidad = val
             this.busquedaEmpresa = ''
@@ -463,20 +480,7 @@ export default {
             this.getCategoriaEmpresa()
             setTimeout(() => {
                 this.getEmpresas()
-                this.operacion.idServicio = null
-                this.operacion.operacion = ''
-                this.operacion.tieneComision = 0
-                this.operacion.comisionFija = 0
-                this.operacion.requiereCodigo = 0
-                this.operacion.nombreCodigo = ''
-                this.operacion.codigo = ''
-                this.operacion.ganancia = 0
-                this.operacion.montoMax = 0
-                this.operacion.montoComision = 0
-                this.operacion.comision = null
-                this.operacion.monto = null
-                this.operacion.observacion = ''
-                this.operacion.comisionIncluida = 0
+                this.limpiarOperacion()
             }, 100);
         },
         setEntidad(entidad){
@@ -487,20 +491,7 @@ export default {
             this.idEmpresaEntidadSelect = null
             this.nombreEntidadSelect = ''
             setTimeout(() => {
-                this.operacion.idServicio = null
-                this.operacion.operacion = ''
-                this.operacion.tieneComision = 0
-                this.operacion.comisionFija = 0
-                this.operacion.requiereCodigo = 0
-                this.operacion.nombreCodigo = ''
-                this.operacion.codigo = ''
-                this.operacion.ganancia = 0
-                this.operacion.montoMax = 0
-                this.operacion.montoComision = 0
-                this.operacion.comision = null
-                this.operacion.monto = null
-                this.operacion.observacion = ''
-                this.operacion.comisionIncluida = 0
+                this.limpiarOperacion()
             }, 100);
         },
         async getEntidades(){
@@ -546,6 +537,10 @@ export default {
                 total: 0,
                 usuario: sessionStorage.getItem('User') || null,
                 comisionIncluida: 0,
+                tipo: 0,
+                tieneEnlaceExterno: 0,
+                enlaceExterno1: '',
+                enlaceExterno2: '',
             }
             this.newDniRuc = ''
             this.idEntidadSelect = null
@@ -739,6 +734,7 @@ export default {
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                             })
+                            window.open('/imprimir/recibo.php?IdComprobante=' + respuesta.data.insertId,'_blank','noopener');
                         }else{
                             this.$swal({
                                 position: 'center',
@@ -782,6 +778,18 @@ export default {
             this.operacion.calculo = obj.Calculo
             this.operacion.codigo = ''
             this.operacion.comisionIncluida = 0
+            this.operacion.tipo = (this.opcionEntidad==1?obj.Tipo:0)
+            console.log(obj);
+            if(this.opcionEntidad==1){
+                this.operacion.tieneEnlaceExterno = obj.TieneEnlaceExterno
+                this.operacion.enlaceExterno1 = obj.EnlaceExterno1
+                this.operacion.enlaceExterno2 = obj.EnlaceExterno2
+            }else{
+                this.operacion.tieneEnlaceExterno = 0
+                this.operacion.enlaceExterno1 = ''
+                this.operacion.enlaceExterno2 = ''
+            }
+
             this.getComision()
         },
         focusAutocompleteOperacion (ref) {
@@ -799,6 +807,10 @@ export default {
             this.operacion.montoComision = 0
             this.operacion.comision = null
             this.operacion.comisionIncluida = 0
+            this.operacion.tipo = 0
+            this.operacion.tieneEnlaceExterno = 0
+            this.operacion.enlaceExterno1 = ''
+            this.operacion.enlaceExterno2 = ''
         },
         focusAutocomplete (ref) {
             // this.$refs[ref].type = ""
