@@ -139,7 +139,7 @@
             </table>
             </b-col>
         </b-row>
-        <b-alert variant="success" class="text-center" show><b>TOTAL EN CAJA: S/. {{ granTotal | redondear }}</b></b-alert>
+        <b-alert v-if="idCajaAbierta > 0" variant="success" class="text-center" show><b>TOTAL EN CAJA: S/. {{ granTotal | redondear }}</b></b-alert>
         <agente-registrar-mov ref="movimientoModal" :usuario-reg="vendedor.Usuario" :cbGuardar="cargarCaja"></agente-registrar-mov>
       </b-container>
     </div>
