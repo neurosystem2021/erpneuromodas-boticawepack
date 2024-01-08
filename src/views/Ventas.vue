@@ -41,6 +41,16 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
+                                <b-input-group v-if="venta.cliente.DniRuc == '00000000' && (venta.tipoVenta.CodSunat=='03' || venta.tipoVenta.CodSunat== '12')" class="mb-1">
+                                    <b-form-checkbox
+                                    :disabled="bloquearInput?true:false"
+                                    v-model="venta.EsOrganizacion"
+                                    :value="1"
+                                    @change="(val)=>changeOrganizacion(val)"
+                                    :unchecked-value="0">
+                                        Es Organización
+                                    </b-form-checkbox>
+                                </b-input-group>
                                 <b-form-group v-if="isNota">
                                     <label>Doc. Referencia:</label>
                                     <autocomplete
@@ -96,6 +106,14 @@
                             <b-col md="12">
                                 <b-form-group>
                                     <label>Cliente:</label>
+                                    <b-input-group v-if="venta.EsOrganizacion">
+                                        <input v-model="venta.NombreOrganizacion"
+                                            type="text"
+                                            style="text-transform:uppercase;"
+                                            class="form-control"
+                                            ref="inputNombreOrganizacion"
+                                            placeholder="Nombre de la Organización"/>
+                                    </b-input-group>
                                     
                                     <b-input-group>
                                             <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
@@ -423,6 +441,13 @@ export default {
             obtenerStok: 'obtenerStock',
             add:'agregarProducto'
         }),
+        changeOrganizacion(val){
+            if(val){
+                this.$refs.inputCliente.$refs.input.disabled = true
+            }else{
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
             .then(res => {
@@ -488,7 +513,9 @@ export default {
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
-                NotaDescMotivo: ''
+                NotaDescMotivo: '',
+                EsOrganizacion: 0,
+                NombreOrganizacion: '',
             }
 
             this.isNota = false
@@ -508,6 +535,11 @@ export default {
                 this.isNota = true
             }
 
+            if(obj.CodSunat=='01' || obj.CodSunat=='07'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+                this.$refs.inputCliente.$refs.input.disabled = false
+            }
 
             if (obj.TieneIgv) {
                 this.tieneIgv = true
@@ -641,6 +673,11 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                if(this.venta.cliente.DniRuc != '00000000'){
+                    this.$refs.inputCliente.$refs.input.disabled = false
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -764,7 +801,7 @@ export default {
 
                 this.limpiarDespuesVenta()
 
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 console.log(error)
@@ -787,6 +824,13 @@ export default {
                     this.inProgress = false            
                     return                
                 }
+            }
+
+            if(this.venta.EsOrganizacion == 1 && (''+this.venta.NombreOrganizacion).trim()=='') {
+                this.$toasted.show('Complete el nombre de organizacion')
+                this.$refs.inputNombreOrganizacion.focus()
+                this.inProgress = false
+                return 
             }
 
             if (!this.venta.cliente.DniRuc) {
@@ -838,6 +882,12 @@ export default {
                     this.inProgress = false
                     return 
                 }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.inProgress = false
+                    this.$refs.inputDocRef.focus();
+                    return 
+                }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
             
@@ -845,6 +895,14 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            if(this.venta.cliente.DniRuc != '00000000'){
+                this.venta.EsOrganizacion = 0
+                this.venta.NombreOrganizacion = ''
+            }
+            if(this.venta.EsOrganizacion){
+                this.venta.cliente.Cliente = this.venta.NombreOrganizacion
+            }
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).toUpperCase().trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
@@ -863,7 +921,7 @@ export default {
                 // this.$refs.inputVendedor.setValue('')
 
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 console.log(error)
