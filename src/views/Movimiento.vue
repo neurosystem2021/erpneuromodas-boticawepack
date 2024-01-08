@@ -414,6 +414,7 @@ return false
       let faltaStock = false
       let faltaLote = false
       let faltaRegistro = false
+      let faltaCantidad = false
       this.productos.forEach((prod, index) => {
         if ((((prod.cantidad || 0)  * (prod.precio || 0)) <= 0 ) || ((prod.nuevoPrecioContado || 0) <= 0)) {
           console.log(prod.cantidad, prod.precio);
@@ -447,6 +448,10 @@ return false
           this.$toasted.error('Por favor especifique un REGISTRO del producto: '+prod.Producto);
         }
         
+        if(!(prod.cantidad>0)){
+          faltaCantidad = true
+          this.$toasted.show('Se requiere cantidad del producto '+prod.Producto)
+        }
       })
       if (faltaStock && (this.isTraslado==true || this.isSalida==true)) {
           this.$toasted.error('No hay stock del producto para el LOTE seleccionado');
@@ -456,6 +461,11 @@ return false
 
       if(this.isTraslado==true || this.isSalida==true){
         this.movimiento.alterarProductos = 0
+      }
+      
+      if(faltaCantidad){
+        this.inProgress = false            
+        return;
       }
 
       if (faltaLote) {
