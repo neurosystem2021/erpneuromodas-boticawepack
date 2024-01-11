@@ -434,7 +434,8 @@ export default {
       cierre: {},
       vendedor: {},
       productosVendidos: [],
-      productosVendidosTotal: 0
+      productosVendidosTotal: 0,
+      cargaCorrecta: false,
     }
   },
   computed: {
@@ -442,7 +443,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotalVenta () {
-      return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje
+      return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje + this.totalVentasCredito
     },
     granTotalGeneral () {
       return this.totalVentasEfectivo + this.totalVentasMastercard +this.totalVentasVisa + this.totalVentasTransferencia + this.totalVentasValeCredito + this.totalVentasCanje + this.totalIngresos - this.totalSalidas
@@ -603,6 +604,14 @@ export default {
         this.$toasted.show('Seleccione un Turno')
         return
       }
+      if(!this.cargaCorrecta){
+        this.$toasted.show('No se cargo correctamente la informacion, actualice la pagina')
+        return
+      }
+      if(this.ventas.length==0){
+        this.$toasted.show('No tiene ventas para cerrar caja')
+        return
+      }
       let r = confirm('¿Está seguro de cerrar la caja?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
@@ -640,6 +649,7 @@ export default {
       })
     },
     getVentas () {
+      this.cargaCorrecta = false
       let params = {
         idCierre: this.$route.params.id
       }
@@ -652,6 +662,7 @@ export default {
         params: params
       })
       .then(res => {
+        this.cargaCorrecta = true
         this.ventas = res.data
         this.ventas.map((vt)=>{
           vt.check = false
@@ -660,6 +671,7 @@ export default {
           this.getProductos(this.ventas)
         }
       }).catch(err => {
+        this.cargaCorrecta = false
         console.log(err)
       })
     },
