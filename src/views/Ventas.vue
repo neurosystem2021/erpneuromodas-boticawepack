@@ -1081,12 +1081,24 @@ export default {
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+                    this.$refs.inputDocRef.setValue('')
                     this.inProgress = false
                     return 
                 }
                 if(!this.venta.NotaIdMotivo) {
                     this.$toasted.show('Debe seleccionar un Motivo')
                     this.inProgress = false
+                    return 
+                }
+                if(this.venta.NroComprobanteModifica == ''){
+                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
+                    this.$refs.inputDocRef.setValue('')
+                    this.inProgress = false
+                    return 
+                }
+                if(this.venta.NotaIdMotivo=='03' && parseFloat(this.totalCart)!=0){
+                    this.$toasted.show('En el motivo CORRECION POR ERROR EN LA DESCRIPCION, los montos deben ser 0')
+                    this.inProgress = false    
                     return 
                 }
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
@@ -1111,7 +1123,7 @@ export default {
                     totalCero += 1
                 }
 
-                if(pro.VentaEstrategica == 1 && this.venta.tipoVenta.CodSunat != '12') {
+                if(pro.VentaEstrategica == 1 && this.venta.tipoVenta.CodSunat != '12' && this.venta.tipoVenta.CodSunat != '07') {
                     this.$toasted.error('El producto '+pro.Producto+' tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta',{duration: 4000});
                     proTieneVe += 1
                 }
@@ -1128,13 +1140,13 @@ export default {
                 return;
             }
 
-            if(totalCero >= 1) {
+            if(totalCero >= 1 && (this.venta.tipoVenta.CodSunat != '07' && this.venta.NotaIdMotivo!='03')) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.inProgress = false
                 return;
             }
 
-            if (this.totalCart <= 0) {
+            if (this.totalCart <= 0 && (this.venta.tipoVenta.CodSunat != '07' && this.venta.NotaIdMotivo!='03')) {
                 this.$toasted.show('La venta en S/. 0.00 no está permitido')
                 this.inProgress = false            
                 return 
