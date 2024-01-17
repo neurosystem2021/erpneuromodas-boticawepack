@@ -340,7 +340,7 @@ export default {
         this.axios.get(this.API + 'venta/info', {params: params})
         .then((response) => {
           if(response.data){
-            if(response.data.Pagado==1 && response.data.Anulado==0 && response.data.PorEntregar==0){
+            if((response.data.Pagado==1 || response.data.EsCredito==1 ) && response.data.Anulado==0 && response.data.PorEntregar==0){
               this.productoSelect = response.data
                 let venta = {
                   Cliente: this.productoSelect.Cliente,
