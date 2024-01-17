@@ -95,7 +95,7 @@
                               <span v-if="data.item.PorEntregar==0"><b-button variant="info" size="sm" block @click="reImprimirEntrega(data.item.idDocVenta)"><i class='fas fa-print'></i></b-button></span>
                               <span v-else><b-badge variant="info"><b>POR ENTREGAR</b></b-badge></span>
                             </b> 
-                            <b v-else><b-button variant="info" size="sm" block @click="reImprimirEntrega(data.item.idDocVenta)"><i class='fas fa-print'></i></b-button></b>
+                            <b v-else><span v-if="data.item.PorEntregar==0"><b-button  variant="info" size="sm" block @click="reImprimirEntrega(data.item.idDocVenta)"><i class='fas fa-print'></i></b-button></span><span v-else><b-badge variant="info"><b>POR ENTREGAR</b></b-badge></span></b>
                           </div>
                         </span>
                     </div>
