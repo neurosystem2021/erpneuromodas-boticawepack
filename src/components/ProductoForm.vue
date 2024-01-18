@@ -571,8 +571,10 @@ export default {
           this.producto.anaqueles = JSON.parse(newVal.Anaqueles)
         }
         this.$refs.file.value=null
+        this.file=''
         }).catch((error) => {
-            this.$refs.file.value=null
+          this.$refs.file.value=null
+          this.file=''
             console.log(error)
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
@@ -583,6 +585,7 @@ export default {
         this.title = 'Nuevo Producto'
         this.clearForm()
         this.$refs.file.value=null
+        this.file=''
         //this.$refs.inputCodigoBarra.$el.disabled = false
       }
       this.cargarAlmacenes()
