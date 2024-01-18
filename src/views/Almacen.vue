@@ -267,7 +267,8 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <!--<b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>-->
+              <b-button variant="success" size="lg" @click="opcionesExportar()">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -335,6 +336,62 @@
         </b-row>
       </b-modal>
 
+      <b-modal size="lg" ref="modalExportar" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">Opciones de Exportación</h3>
+        </div>
+        <hr>
+        <b-row>
+          <b-col md="8" class="centrarClaseIzq">
+            <h5>Exportar stock hasta la fecha actual:</h5>
+          </b-col>
+          <b-col md="4" class="centrarClase">
+            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen + filter" target="_blank">Exportar Actual</b-button>
+          </b-col>
+        </b-row>
+        <hr>
+        <h5>Exportar stock según rango de fechas:</h5>
+        <b-row class="mt-3">
+          <b-col md="4">
+            <b-form-group>
+              <b-form-checkbox
+                      v-model="desdeInicio"
+                      :value="1"
+                      :unchecked-value="0"
+                      >
+                Desde el inicio del sistema
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row style="margin-top: -5px;">
+          <b-col md="4" v-if="!desdeInicio">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="exportar.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="exportar.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="4" class="centrarClase">
+              <b-button  block variant="success" @click="exportarFechas" size="md" target="_blank">Exportar por Fechas</b-button>
+          </b-col>
+        </b-row>
+      </b-modal>
   </div>
 </template>
 
@@ -388,7 +445,12 @@ export default {
       verValorizado: false,
       verStockGeneral: false,
       objProd:{},
-      PresentacionesProd:[]
+      PresentacionesProd:[],
+      exportar: {
+        fechaDesde: this.$moment().format("YYYY-01-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
+      desdeInicio: 1,
     }
   },
   watch: {
@@ -442,8 +504,30 @@ export default {
     hrefXls () {
       return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&categoria='+this.productoSelect.ProductoCategoria).replace('#','');
     },
+    hrefXlsFechas () {
+      return ('/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&desdeInicio='+this.desdeInicio+'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+ this.filter).replace('#','');
+    },
   },
   methods: {
+    exportarFechas(){
+      if(this.desdeInicio == 1 && this.exportar.fechaHasta==''){
+        this.$toasted.show('Ingrese una fecha final fin valida')
+        return
+      }
+
+      if(this.desdeInicio == 0 && (this.exportar.fechaDesde=='' || this.exportar.fechaHasta=='')){
+        this.$toasted.show('Ingrese una fecha de inicio y fin valida')
+        return
+      }
+
+      window.open('/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&desdeInicio='+this.desdeInicio+'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+ this.filter,'_blank','noopener')
+    },
+    opcionesExportar(){
+      this.desdeInicio = 1
+      this.exportar.fechaDesde = this.$moment().format("YYYY-MM-01"),
+      this.exportar.fechaHasta = this.$moment().format("YYYY-MM-DD")
+      this.$refs['modalExportar'].show()
+    },
     clickVerValorizado() {
       let pass = window.prompt('Escriba su contraseña')
       if (pass) {
@@ -655,5 +739,17 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.centrarClase {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.centrarClaseIzq {
+  display: flex;
+  justify-content: start;
+  align-content: center;
+  align-items: center;
 }
 </style>

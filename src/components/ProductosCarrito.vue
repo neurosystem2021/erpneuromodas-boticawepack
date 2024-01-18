@@ -538,6 +538,8 @@ export default {
       if (val) {
         prod.cantidad = prod.cantidadPress
         prod.cantidad *= val
+      }else {
+        prod.cantidad = null
       }
       this.$nextTick(() => {
         this.actualizarProd({Producto:prod,Pos:index})

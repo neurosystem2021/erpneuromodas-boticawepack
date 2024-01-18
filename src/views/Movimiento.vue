@@ -376,6 +376,7 @@ return false
       let faltaStock = false
       let faltaLote = false
       let faltaRegistro = false
+      let faltaCantidad = false
       this.productos.forEach((prod, index) => {
         if ((((prod.cantidad || 0)  * (prod.precio || 0)) <= 0 ) || ((prod.nuevoPrecioContado || 0) <= 0)) {
           this.$toasted.show('Se requiere los precios del producto '+prod.Producto)
@@ -407,12 +408,20 @@ return false
           faltaRegistro = true
           this.$toasted.error('Por favor especifique un REGISTRO del producto: '+prod.Producto);
         }
-        
+        if(!(prod.cantidad>0)){
+          faltaCantidad = true
+          this.$toasted.show('Se requiere cantidad del producto '+prod.Producto)
+        }
       })
       if (faltaStock) {
           this.$toasted.error('No hay stock del producto para el LOTE seleccionado');
           this.inProgress = false            
           return;
+      }
+
+      if(faltaCantidad){
+        this.inProgress = false            
+        return;
       }
 
       if (faltaLote) {
