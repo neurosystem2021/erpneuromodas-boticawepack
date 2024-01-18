@@ -15,7 +15,7 @@
           </b-col>
           <b-col md="6" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="6">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -24,6 +24,9 @@
             <b-col md="4">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
+            <b-col md="2">
+                <codigo-multiple></codigo-multiple>
+              </b-col>
             </b-row>
           </b-col>
 
@@ -71,6 +74,7 @@
 <script>
 import config from '@/store/config.js'
 import ProductoForm from '@/components/ProductoForm'
+import CodigoMultiple from '@/components/CodigoMultiple'
 
 export default {
   mounted() {
@@ -140,7 +144,8 @@ export default {
       }
   },
   components: {
-      ProductoForm
+      ProductoForm,
+      CodigoMultiple
   }
 }
 </script>
