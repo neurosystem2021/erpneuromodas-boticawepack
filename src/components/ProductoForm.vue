@@ -629,7 +629,7 @@ export default {
       }
       
       if (file.type != 'image/png') {
-        this.$toasted.error('La imagen debe ser en formato PNG de 300 x 300 pixeles, no se guardará', { duration: 5000 })
+        this.$toasted.error('La imagen debe ser en formato PNG de 400 x 400 pixeles, no se guardará', { duration: 5000 })
         this.$refs.file.value = null
         this.file=''
         return;
@@ -646,7 +646,7 @@ export default {
             }else{
               this.$refs.file.value = null
               this.file=''
-              this.$toasted.error("La imagen debe ser en formato PNG de 300 x 300 pixeles, no se guardará.", { duration: 5000 })
+              this.$toasted.error("La imagen debe ser en formato PNG de 400 x 400 pixeles, no se guardará.", { duration: 5000 })
             }
           
           };     
