@@ -23,7 +23,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock <br>General</b>
-                  <div> {{ sumaStock }} </div>
+                  <div> {{ sumaStock | redondear }} </div>
                 </div>
               </b-col>
               <b-col md="2">
@@ -84,7 +84,7 @@
               <b-col md="3">
                 <b-form-group>
                   <label>Código de barra:</label>
-                  <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                  <input ref="inputCodigoBarra" class="form-control" v-on:input="(val) => generateFilter('codigo', val.target.value, true)"/>
                 </b-form-group>
               </b-col>
               <b-col md="3">

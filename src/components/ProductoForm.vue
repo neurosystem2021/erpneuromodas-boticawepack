@@ -144,12 +144,31 @@
             <label>3ra Descripción:</label>
             <b-form-textarea 
               ref="inputProductoDesc3"
-              rows="6"
+              rows="5"
               v-model="producto._ProductoDesc3"
               @input="(val) => producto.ProductoDesc3 = val"
               />
           </b-form-group>
 
+          <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.EsMercaderia"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+                     Es Mercadería
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group>
+            <b-form-checkbox
+                     v-model="producto.EsServicio"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+                     Es Servicio
+            </b-form-checkbox>
+          </b-form-group>
         </b-col>
         <b-col md="6">
           <b-form-group>
@@ -446,6 +465,7 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       categoriaItems:[],
       itemsPosOferta: [],
+      precioLiquidacion: 0
     }
   },
   beforeMount () {
@@ -544,6 +564,7 @@ export default {
         this.producto.PrecioContado         = newVal.PrecioContado
         this.producto.precioConvenio        = newVal.precioConvenio
         this.producto.EsHabitacion          = newVal.EsHabitacion
+        this.producto.OpcContable           = newVal.OpcContable
         this.producto.Piso                  = newVal.Piso
         this.producto.ControlaStock         = newVal.ControlaStock
         this.producto.Imagen                = newVal.Imagen
@@ -552,11 +573,25 @@ export default {
         this.producto.PosOferta             = newVal.PosOferta
         this.producto.TienePresentacion     = newVal.TienePresentacion
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
+
+        switch (this.producto.OpcContable) {
+          case 1:
+            this.producto.EsMercaderia = 1
+            break;
+          case 2:
+            this.producto.EsServicio = 1
+          break;
+        
+          default:
+            break;
+        }
+
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
         this.$refs.file.value=null
         this.file=''
+        this.actualizarLiquidacion()
         }).catch((error) => {
             this.$refs.file.value=null
             this.file=''
@@ -732,6 +767,9 @@ export default {
         TienePresentacion: 0,
         // modelo: {},
         //talla: {},
+        EsServicio: 0,
+        EsMercaderia: 0,
+        OpcContable: 0,
         medicion: {
           IdProductoMedicion:6,
           ProductoMedicion:"UNIDAD"
@@ -752,6 +790,21 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      if(this.producto.EsMercaderia == 1 &&  this.producto.EsServicio == 1){
+        this.$toasted.show('El producto solo puede ser MERCADERIA o SERVICIO, no ambos...')  
+        return  
+      }
+      
+      if(this.producto.EsMercaderia == 0 && this.producto.EsServicio == 0){
+        this.$toasted.show('Debe seleccionar si el producto es MERCADERIA o SERVICIO')  
+        return  
+      }
+      if(this.producto.EsMercaderia == 1){
+        this.producto.OpcContable = 1
+      }else{
+        this.producto.OpcContable = 2
+      }
 
       if(this.producto.IdOfertaCategoria != null && this.producto.PosOferta == 10000){
         this.$toasted.error('Seleccione un orden si el producto es oferta.', {duration: 3000})

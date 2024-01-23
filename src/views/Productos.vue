@@ -131,6 +131,13 @@ export default {
 
         return promise.then((result) => {
           this.items = result.data
+
+
+          this.items.map((r)=>{
+            if (r.Anulado === 1) {
+              r._rowVariant = 'danger'
+            }
+          })
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
