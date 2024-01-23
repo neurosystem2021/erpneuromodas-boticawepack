@@ -854,6 +854,14 @@ export default {
           #table-render td, #table-render th {
             color: #000000 !important;
           }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
         </style>
         <div>
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
@@ -864,6 +872,9 @@ export default {
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 5%">
+                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                </td>
               </tr>
             </tbody>
           </table>   
