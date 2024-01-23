@@ -64,7 +64,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
-            :readonly="((type === 'mov') ? false : true) && ventaMerma != 1"
+            :readonly="((type === 'mov') ? false : true) && ventaMerma != 1 && idPerfil != 1"
             min="0"
             style="width: 105px"
             step="0.00001"
@@ -285,6 +285,7 @@ export default {
       productosData:[],
       accionBoton: 1,
       productoSelectIndex:null,
+      idPerfil: sessionStorage.getItem('IdPerfil'),
     }
   },
   watch: {

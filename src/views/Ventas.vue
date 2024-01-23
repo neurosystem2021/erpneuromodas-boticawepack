@@ -1025,7 +1025,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
