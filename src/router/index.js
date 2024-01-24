@@ -32,6 +32,7 @@ import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
+import ReporteProyectos from '@/views/reportes/ReporteProyectos.vue'
 
 Vue.use(Router)
 
@@ -194,5 +195,10 @@ export default new Router({
       name: 'AgenteReimpresion',
       component: AgenteReimpresion
     },
+    {
+      path: '/reportes/proyectos',
+      name: 'ReporteProyectos',
+      component: ReporteProyectos
+    }
   ]
 })

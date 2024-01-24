@@ -87,7 +87,7 @@
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
+            <td class="unit" style="font-size:1.1rem"><span v-if="prod.DisabledTotal === 0">S/. {{ prod.Precio | moneda }}</span></td>
             <td class="total" style="font-size:1.1rem">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
@@ -97,20 +97,20 @@
           </tr>
         </tbody>
         <tfoot>
-          <tr>
+          <tr style="font-size: 0.83rem;">
             <td colspan="3"></td>
-            <td colspan="2">SUBTOTAL</td>
+            <td colspan="2" class="text-right">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
-          <!--<tr>
-            <td colspan="2"></td>
-            <td colspan="2">TAX 25%</td>
-            <td>$1,300.00</td>
-          </tr>-->
+          <tr v-if="descuento > 0" style="font-size: 0.83rem;">
+            <td colspan="3"></td>
+            <td colspan="2" class="text-right">DESCUENTO</td>
+            <td>S/. {{ descuento | redondear }}</td>
+          </tr>
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#57B223" class="text-right">TOTAL</td>
+            <td style="background:#57B223">S/. {{ total | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -163,6 +163,20 @@ export default {
 	},
 	computed: {
 		subTotal () {
+			let sumatoria = 0
+			this.proforma.productos.forEach(prod => {
+				sumatoria += (prod.Cantidad * prod.Precio)
+			})
+      return sumatoria
+		},
+    descuento () {
+			let sumatoria = 0
+			this.proforma.productos.forEach(prod => {
+				sumatoria += prod.Descuento
+			})
+      return sumatoria
+		},
+    total () {
 			let sumatoria = 0
 			this.proforma.productos.forEach(prod => {
 				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento

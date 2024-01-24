@@ -63,6 +63,7 @@
 												anchor="ClienteDniRuc"
 												label="writer"
 												placeholder=""
+												:onInput="(val) => newDniRuc = val"
 												:on-select="setCliente" 
 												:classes="{input: 'form-control'}">
 										</autocomplete>
@@ -347,7 +348,8 @@ export default {
 			totalSumaProductos:0,
 			totalGastos:0,
 			totalAdelantos:0,
-			editarDescripcion:false
+			editarDescripcion:false,
+			newDniRuc:'',
 			}
 	},
 	computed: {
@@ -570,7 +572,8 @@ export default {
 				this.axios.post(this.API + 'habitaciones/alquilar', {
 					IdProducto: hab.IdProducto,
 					IdCliente: this.selectCliente.IdCliente,
-					cliente: this.selectCliente
+					cliente: this.selectCliente,
+					usuario: sessionStorage.getItem('User'),
 				}).then(res => {
 					this.getHabitaciones()
 					this.limpiarPopover()
@@ -586,6 +589,7 @@ export default {
 		setCliente(obj, index) {
 			if (index >= 0) {
 				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
+				this.newDniRuc=''
 			}
 			this.selectCliente = obj
 		},

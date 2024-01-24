@@ -295,6 +295,13 @@
                                                     :unchecked-value="0">
                                                     Por entregar
                                                 </b-form-checkbox>
+                                                <b-form-checkbox 
+                                                    :disabled="bloquearInput?true:false || venta.EsDelivery"
+                                                    v-model="venta.ProformaSinPrecio"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Sin precios en proforma
+                                                </b-form-checkbox>
                                             </td>
                                         </tr>
                                         <tr>
@@ -677,7 +684,8 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 1
+                diasValidosProf: 1,
+                ProformaSinPrecio: 0,
             }
             this.isNota = false
             this.bloquearInput=false
@@ -977,12 +985,17 @@ export default {
                 this.inProgress = false
                 return
             }
+            if(this.venta.ProformaSinPrecio == 1){
+                this.productos.map((p)=>{
+                    p.disabledProf = 1
+                })
+            }
 
             this.venta.productos = this.productos
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
-                this.$toasted.show('Proforma Guardada con exito')
+                this.$toasted.success('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
                 this.loadComisionista()
