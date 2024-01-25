@@ -164,7 +164,7 @@
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-            @input="() => { setNuevoPrecioContado(data.index); actualizarPorcentajeUtilidad(data.index);}"
+            @input="() => { setNuevoPrecioContado(data.index);}"
             />
         </template>
         <template slot="subtotal" slot-scope="data">
