@@ -1118,6 +1118,7 @@ export default {
             let sinStock = 0
             let totalCero = 0 
             //let igualLote = 0
+            let igualPro = 0
             this.productos.forEach(pro => {
                 console.log(pro);
                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
@@ -1134,7 +1135,22 @@ export default {
                 if(lote > 1){
                     igualLote += 1 
                 }*/
-                
+
+                let pre = this.productos.filter(p => p.IdProducto == pro.IdProducto && p.CantidadPresentacion == pro.CantidadPresentacion).length
+                if(pre > 1){
+                    this.$toasted.error('EXISTE LA MISMA PRESENTACION DE: '+pro.Producto+', AGREGUE SOLO PRESENTACIONES DIFERENTES.',{duration: 3000});
+                    igualPro += 1 
+                }
+
+                let sum = 0
+                this.productos.map(p=>{
+                    if(p.IdProducto == pro.IdProducto){
+                        sum += pro.cantidad*pro.CantidadPresentacion
+                    }
+                })
+                if(parseFloat(pro.stock).toFixed(2)  < parseFloat(sum)){
+                    sinStock+=1
+                }
             });
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
@@ -1143,6 +1159,11 @@ export default {
                 return;
             }
 
+            if (igualPro >= 1) {
+                this.inProgress = false            
+                return;
+            }
+            
             /*if (igualLote >= 1) {
                 this.$toasted.error('Debe seleccionar diferente lote por producto');
                 this.inProgress = false            

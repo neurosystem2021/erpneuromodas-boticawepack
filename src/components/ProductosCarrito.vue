@@ -121,7 +121,7 @@
         </template>
 
         <template slot="eventPresent" slot-scope="data">
-          <b-button style="margin-top: 2px;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button style="margin-top: 2px;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
         </template>
 
         <template slot="obsequio" slot-scope="data">
@@ -265,7 +265,7 @@
             min="0"
             style="width:100px"
             step="0.01"
-            @input="(val)=>{ actualizarProd(productos[data.index])}"        
+            @input="(val)=>{ actualizarProd({Producto: productos[data.index] ,Pos:data.index})}"         
             value="0"
             class="form-control"/>
             <b-form-text>
@@ -307,7 +307,7 @@
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -406,7 +406,8 @@ export default {
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoSelect: {},
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      indexPos: null,
     }
   },
   watch: {
@@ -751,6 +752,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     editarProducto(Pro){
+      this.indexPos = index
       this.productoSelect = Pro
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
@@ -771,6 +773,12 @@ export default {
           obj.EsPresentacion = 0
           obj.PreciosPorProducto = JSON.stringify(obj.precios)
           obj = this.onSetProducto(obj)
+          if(this.indexPos!=null){
+            this.actualizarProd({Producto:obj,Pos:this.indexPos})
+            this.indexPos = null
+            this.$emit('onAddProducto')
+            return
+          }
         }
         this.add([obj, (obj) => {
           this.$emit('onAddProducto')
@@ -785,6 +793,7 @@ export default {
       this.objProd = {}
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       obj.EsObsequio = 0
+      obj.EsVentaNew = this.isVentas
       let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
       if(!this.isVentas && this.padre=="compra"){
         if(this.movTipo==undefined){
@@ -817,9 +826,15 @@ export default {
       obj.Presentacion = obj.ProductoMedicion
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0
+      obj.EsVentaNew = this.isVentas
       obj = this.onSetProducto(obj)
       //obj.cantidadPres = obj.cantidad
-
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -848,11 +863,18 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.EsVentaNew = this.isVentas
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
       //obj.cantidadPres = this.cant
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
-        this.actualizarProd(obj)
+        //this.actualizarProd(obj)
       },{ setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
@@ -868,11 +890,12 @@ export default {
         return
       }
     },*/
-    showPresentacion (obj) {
+    showPresentacion (obj, index = null) {
       if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
         this.$refs['modalCant'].show()
+        this.indexPos = index
         return
       }
     },
@@ -920,7 +943,7 @@ export default {
     actualizaDesc(index,prod){
       //Vue.delete(this.productos[index], 'descuento');
       Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
-      this.actualizarProd(prod)
+      this.actualizarProd({Producto:prod,Pos:index})
     },
     getSubtotal(index) {
       
