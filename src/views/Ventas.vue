@@ -179,6 +179,14 @@
                         <b-form-text v-if="venta.cliente.EsVIP &&  false">
                            Cliente VIP con Precio Convenio
                         </b-form-text>
+
+                        <b-row>
+                            <b-col md="12">
+                                <b-form-group>
+                                    <b-button variant="primary" block @click="abrirViajes"><b><i class="fas fa-map-marked-alt"></i> VIAJES DISPONIBLES</b></b-button>
+                                </b-form-group>
+                            </b-col>
+                        </b-row>
                     </b-col>
                     <b-col md="2" class="ocularMovil" >
                         <b-form-group class="text-center">
@@ -218,7 +226,6 @@
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
-                <br>
                 <b-row>
                     <b-col> 
                         <productos-carrito 
@@ -388,6 +395,12 @@
                     </b-col>
                 </b-row>
             </b-form>
+            <b-modal ref="modalViajes" id="modalViajes" hide-footer hide-header>
+                <div class="d-block text-center">
+                <h3 style="text-decoration: underline;">VIAJES DISPONIBLES</h3>
+                <h5>--</h5>
+                </div>
+            </b-modal>
         </b-container>
     </div>
 </template>
@@ -494,6 +507,9 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        abrirViajes(){
+            this.$refs['modalViajes'].show()
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -715,7 +731,7 @@ export default {
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                // this.$refs.inputVendedor.$refs.input.disabled = true
+                this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -1086,5 +1102,10 @@ export default {
     .mostrarSerie{
       display: inline !important;
     }
+}
+</style>
+<style>
+#modalViajes .modal-dialog {
+    max-width: 75% !important;
 }
 </style>
