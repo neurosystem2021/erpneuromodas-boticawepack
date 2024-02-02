@@ -10,6 +10,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Conductores from '@/views/Conductores.vue'
+import Vehiculos from '@/views/Vehiculos.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -145,6 +146,11 @@ export default new Router({
       path: '/conductores',
       name: 'Conductores',
       component: Conductores
+    },
+    {
+      path: '/vehiculos',
+      name: 'Vehiculos',
+      component: Vehiculos
     },
   ]
 })

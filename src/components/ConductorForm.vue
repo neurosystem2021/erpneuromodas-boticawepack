@@ -96,6 +96,11 @@
             </b-col>
           </b-row>
           <div slot="modal-footer" >
+            <div style="left: 1rem;position: absolute;" v-if="conductor.IdConductor">
+              <b-btn  :variant="conductor.Anulado ? 'success':'danger'" @click="cambiarEstado(conductor)">
+                {{  conductor.Anulado ? 'Habilitar':'Anular' }}
+              </b-btn>
+            </div>
             <b-btn  variant="primary" type="submit">
               Guardar
             </b-btn>
@@ -126,7 +131,7 @@
     watch: {
       show (val) {
         if(val){
-          this.title = 'Editar de Conductor'
+          this.title = 'Editar Conductor'
           let newVal = this.conductorSelect  || {}
           if(newVal.IdConductor){
             this.conductor.IdConductor = newVal.IdConductor
@@ -147,9 +152,6 @@
       }
     },
     methods: {
-      setTipo(obj){
-        console.log(obj);
-      },
       clearForm () {
         this.initForm()
       },
@@ -170,67 +172,45 @@
         // this.$refs[ref].type = ""
         this.$refs[ref].handleDoubleClick()
       },
+      async cambiarEstado(conductor){
+        let r = confirm('¿Esta seguro de '+(conductor.Anulado ? 'Habilitar':'Anular')+' este conductor?')
+        if (r) {
+          try {
+            let respuesta = await this.axios.post(this.API + 'transporte/conductor/estado', {
+              IdConductor: conductor.IdConductor,
+              Estado: conductor.Anulado? 0 : 1
+            })
+            if (respuesta.data.updated) {
+              this.$toasted.info('El conductor con DNI ' + conductor.Dni + ' ha sido '+(conductor.Anulado ? 'Habilitado' : 'Anulado'))
+              if (this.cbGuardar) {
+                this.cbGuardar()
+              }
+              this.$refs.conductorForm.hide()
+            }
+          } catch (error) {
+            this.$toasted.error('Ha ocurrido un error')
+          }
+        }
+      },
       async guardarConductor(e) {
         e.preventDefault();
   
-        /*if(this.idEntidad == null){
-          this.$toasted.show('Ha ocurrido un error, porfavor actualice la pagina')
-          return
-        }
-  
-        if(this.conductor.Tipo == null){
-          this.$toasted.show('Debe seleccionar un tipo de operación referente a efectivo de caja')
-          return
-        }
-  
-        if(this.conductor.RequiereCodigo && (''+this.conductor.NombreCodigo).trim()==''){
-          this.$toasted.show('Debe ingresar el nombre de código para la operación')
-          return
-        }
-  
-        if(this.conductor.Calculo){
-          if(this.conductor.ComisionFija && !(this.conductor.MontoComision > 0)){
-            this.$toasted.show('Ingrese el monto de la comisión fija')
+        for (const [key, value] of Object.entries(this.conductor)) {
+          if((''+value).trim().toUpperCase()==''){
+            this.$toasted.show(`Complete el dato ${key} es requerido`)
+            this.conductor[key] = (''+value).trim()
             return
           }
-  
-          if(!this.conductor.ComisionFija && (!(this.conductor.MontoComision > 0) || !(this.conductor.MontoMax > 0))){
-            this.$toasted.show('Debe ingresar un monto de comisión y un monto de cada cuanto cobrar comisión')
-            return
-          }
-  
+
+          this.conductor[key] = (''+value).trim().toUpperCase()
         }
-  
-        //reniciar valores
-        if(!this.conductor.Calculo){
-          this.conductor.MontoComision = 0
-          this.conductor.ComisionFija = 0
-          this.conductor.MontoMax = 0
-        }
-  
-        if(this.conductor.TieneEnlaceExterno){
-          if((''+this.conductor.EnlaceExterno1).trim().toUpperCase()==''){
-            this.$toasted.show('Complete el primer enlace externo')
-            this.conductor.EnlaceExterno1 = (''+this.conductor.EnlaceExterno1).trim()
-            this.conductor.EnlaceExterno2 = (''+this.conductor.EnlaceExterno2).trim()
-            return
-          }
-        }else{
-          this.conductor.EnlaceExterno1 = ''
-          this.conductor.EnlaceExterno2 = ''
-        }
-  
-        this.conductor.EnlaceExterno1 = (''+this.conductor.EnlaceExterno1).trim()
-        this.conductor.EnlaceExterno2 = (''+this.conductor.EnlaceExterno2).trim()
-        this.conductor.NombreCodigo = (this.conductor.RequiereCodigo?(''+this.conductor.NombreCodigo).trim().toUpperCase():'')
-        this.conductor.Conductor = (''+this.conductor.Conductor).trim().toUpperCase()
-        this.conductor.IdEntidad = this.idEntidad*/
-  
+
+        this.conductor.usuario = sessionStorage.getItem('User')
         try {
             let repuesta = await this.axios.post(`${this.API}transporte/conductor`, this.conductor);
   
             if (repuesta.data.error) {
-              this.$toasted.show(repuesta.data.error)
+              this.$toasted.show(repuesta.data.msg)
               return
             } else {
               this.$toasted.success('Conductor guardado correctamente')

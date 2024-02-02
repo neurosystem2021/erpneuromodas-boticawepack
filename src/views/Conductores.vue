@@ -49,7 +49,7 @@
                     </b-col>
                 </b-row>
             </b-row>
-            <conductor-form ref="conductorForm" :conductorSelect="conductorSelect" @onAddConductor="actualizarTabla"></conductor-form>
+            <conductor-form ref="conductorForm" :conductorSelect="conductorSelect" :cbGuardar="actualizarTabla"></conductor-form>
             <br />
             <b-row align-h="center" class="text-center">
                 <b-col cols="4">
@@ -67,9 +67,6 @@ import ConductorForm from '@/components/ConductorForm.vue'
 
 export default {
     mounted() {
-        /*this.axios.get(this.API + 'conductores/count').then((response) => {
-          this.totalRows = response.data.total
-        })*/
     },
     data() {
         return {
@@ -100,8 +97,6 @@ export default {
         rowClick(item, index) {
             this.conductorSelect = item
             this.$refs.conductorForm.show = true;
-            //this.$refs.productoForm.producto.IdProducto = 'a'
-            //console.log(this.$refs.productoForm.$refs.productoForm)
         },
         actualizarTabla() {
             this.$refs.tablaConductores.refresh()
