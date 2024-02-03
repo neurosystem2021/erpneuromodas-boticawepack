@@ -4,28 +4,31 @@
         <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigVehiculoAsiento" :title="title" size="md" ref="vehiculoAsientoForm" v-model="show">
           <b-row>
             <b-button variant="success" class="ml-2" @click="agregarFila()">Agregar Fila</b-button>
-            <b-button variant="primary" class="ml-2" @click="agregarAsiento()">Agregar Asiento</b-button>
+            <b-button variant="primary" class="ml-2" @click="agregarObjeto(true)">Agregar Asiento</b-button>
+            <b-button variant="secondary" class="ml-2" @click="agregarObjeto(false)">Agregar Espacio Vacio</b-button>
           </b-row>
-          <b-row>
-            <b-col md="1">
-              <b-img src="static/cabeza.png"  alt=""></b-img>
-            </b-col>
-            <b-col md="10" style="display: grid; align-content: center;">
-              <b-row>
-                <b-col md="12" dir="ltr">
-                  <draggable class="m-2 row" tag="div" :list="fila" group="people" @change="log" v-for="(fila, i) in vehiculoData" :key="'fila-'+i" style="border: 2px dashed black; height: 75px;">
-                        <div v-for="(element, index) in fila"
-                          :key="element.id" style="background-color: #0cb70c; width: 58px; height: 62px; margin: 5px;"  >
-                          <b class="p-1" style="font-size: 1.5rem; color: black;">{{ element.id }}</b>
-                        </div>
-                  </draggable>
-                </b-col>
-              </b-row>
-            </b-col>
-            <b-col md="1">
-              <b-img src="static/cola.png"  alt=""></b-img>
-            </b-col>
-          </b-row>
+          <div style="overflow-x: scroll !important;">
+            <b-row style="width: 1150px !important;" class="m-1">
+              <div style="width: 139px;">
+                <b-img src="static/cabeza.png"  alt=""></b-img>
+              </div>
+              <div style="display: grid; align-content: center; width: 972px !important;">
+                <b-row>
+                  <b-col md="12" dir="ltr">
+                    <draggable class="m-2 row" tag="div" :list="fila" group="people" @change="log" v-for="(fila, i) in vehiculoData" :key="'fila-'+i" style="border: 2px dashed black; height: 75px;">
+                          <div v-for="(element, index) in fila"
+                            :key="element.id+'-'+(element.asiento?'asiento':'espacio')" :class="{'espacio': !element.asiento }" style="background-color: #0cb70c; width: 58px; height: 62px; margin: 5px;"  >
+                            <b class="p-1" style="font-size: 1.5rem; color: black;">{{ (element.asiento?element.id:'*') }}</b>
+                          </div>
+                    </draggable>
+                  </b-col>
+                </b-row>
+              </div>
+              <div md="1" style="width: 27px;">
+                <b-img src="static/cola.png"  alt=""></b-img>
+              </div>
+            </b-row>
+          </div>
           <div slot="modal-footer" >
             <b-btn  variant="secondary" @click="show=false">
               Cerrar
@@ -91,15 +94,21 @@
         }
         this.vehiculoData.push([])
       },
-      agregarAsiento(){
+      agregarObjeto(opc){
         if(!(this.vehiculoData.length > 0)){
-          this.$toasted.show('Debe tener una fila minimo para agregar asiento')
+          this.$toasted.show('Debe tener una fila minimo para agregar asiento u obstaculo')
+          return
+        }
+
+        if(this.vehiculoData[0].length==14){
+          this.$toasted.show('Debe mover los asientos a otra fila para seguir agregando')
           return
         }
         let maxNumber = 0
         let array = []
         this.vehiculoData.map((v)=>{
-          let maxValue = v.reduce((acc, value) => {
+          let dataFin = v.filter((v)=>v.asiento == opc)
+          let maxValue = dataFin.reduce((acc, value) => {
 	          return (acc = acc > value.id ? acc : value.id);
           }, 0);
 
@@ -113,7 +122,8 @@
         }
 
         maxNumber++
-        this.vehiculoData[0].push({id: maxNumber })
+        console.log(opc);
+        this.vehiculoData[0].push({id: maxNumber, asiento:opc })
       },
       //DRAG
       /*add: function() {
@@ -217,10 +227,13 @@
   </script>
   <style>
   #modalConfigVehiculoAsiento .modal-dialog{
-    max-width: 100% !important;
+    max-width: 1200px !important;
   }
 
   #modalConfigVehiculoAsiento {
     padding: 10px !important;
+  }
+  .espacio {
+    background-color: rgb(142, 56, 56) !important;
   }
   </style>
