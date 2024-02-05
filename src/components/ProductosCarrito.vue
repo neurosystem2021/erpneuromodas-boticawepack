@@ -850,6 +850,7 @@ export default {
       let obj = {...this.objProd}
       obj.Presentacion = prod.nombre
       obj.CantidadPresentacion = prod.cantidad
+      obj.PrecioCosto = prod.precioc 
       obj.precio = 0
       obj.cantidad = 1
       obj.EsPresentacion = 1
