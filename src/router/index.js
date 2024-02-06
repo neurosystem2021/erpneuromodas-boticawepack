@@ -9,6 +9,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Prestamos from '@/views/Prestamos.vue'
 import Repartidores from '@/views/Repartidores.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import Remision from '@/views/Remision.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -18,6 +19,7 @@ import Proforma from '@/views/reportes/Proforma.vue'
 import ReporteEntregas from '@/views/reportes/Entregas.vue'
 import DeudaCliente from '@/views/reportes/DeudaCliente.vue'
 import VentaVendedor from '@/views/reportes/VentaVendedor.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 Vue.use(Router)
 
@@ -103,6 +105,16 @@ export default new Router({
       path: '/reportes/kardex',
       name: 'Kardex',
       component: Kardex
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
     },
   ]
 })

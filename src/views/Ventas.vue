@@ -901,7 +901,7 @@ export default {
                 // this.$refs.inputVendedor.setValue('')
                 this.$refs.carrito.pagocon = 0
 
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
             })
             .catch((error) => {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
