@@ -174,15 +174,15 @@
             {{ getSubtotal(data.index) }}
           </div>
           <div v-else>
-            <!--<input
+            <input
             type="number"
-            style="width: 95px"
+            style="width: 105px"
             min="0"
             step="0.00001"
             placeholder="Subtotal"
             class="form-control"
             v-model="productos[data.index].subt"
-            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>-->
+            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
             <b>{{ getSubtotal(data.index) }}</b>
           </div>
         </template>
@@ -609,7 +609,7 @@ export default {
       //this.productos[index].nuevoPrecioContado = 0
     },
     setSubtotal(index, val,prod) {
-      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 5)
+      let precio = Math.round((val / this.productos[index].cantidad) * 1000)/1000
       Vue.set(this.productos[index], 'precio', precio)
       this.actualizarProd({Producto:prod,Pos:index})
     },
@@ -873,12 +873,12 @@ export default {
         //return
       }
       if (fpp.length==4) {
-        this.setProductoUni(obj)
+        this.setProductoUni({...obj})
         return
       }
       this.indexProdSelect = null
       this.$refs['modalCant'].show()
-      this.objProd = obj
+      this.objProd = {...obj}
     },  
     setProductoUni (obj) {
       this.$refs.autocompleteProducto.setValue('')
@@ -890,7 +890,14 @@ export default {
       obj.Presentacion = obj.ProductoMedicion
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0
+      obj.EsVentaNew = false
       obj = this.onSetProducto(obj)
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
 
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
@@ -912,7 +919,14 @@ export default {
       obj.Descripcion = prod.nombre
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.EsVentaNew = false
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
         this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         //this.actualizarProd(obj)
@@ -925,6 +939,7 @@ export default {
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
         this.$refs['modalCant'].show()
+        this.indexPos = index
         return
       }
     },
