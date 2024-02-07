@@ -896,6 +896,7 @@ export default {
             obj.Presentacion = obj.ProductoMedicion
             obj.CantidadPresentacion = 1
             obj.EsPresentacion = 0
+            obj.precioc = obj.PrecioCosto
             obj = this.onSetProducto(obj)
             this.add([obj, () => {
                 this.$emit('onAddProducto', obj)   
@@ -913,6 +914,7 @@ export default {
             obj.Presentacion = prod.nombre
             obj.CantidadPresentacion = prod.cantidad
             obj.EsPresentacion = 1
+            obj.precioc = prod.precioc 
             obj.subt = ''
             obj.Descripcion = prod.nombre
             obj.EsVentaNew = false;
