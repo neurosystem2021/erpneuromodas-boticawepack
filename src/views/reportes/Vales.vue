@@ -75,7 +75,9 @@
                     <b-badge v-else variant="danger" style="font-size: 1.1rem;">0</b-badge>
                 </template>
                 <template slot="Estado" slot-scope="data">
-                    <b-badge v-if="data.item.AnuladoConsumo==0" variant="primary" style="font-size: 0.9rem;">Activo</b-badge>
+                    <div v-if="data.item.AnuladoConsumo==0">
+                      <b-badge :variant="data.item.MontoDisponible <= 0 ? 'success' : 'primary'" style="font-size: 0.9rem;">{{ data.item.MontoDisponible <= 0 ? 'Completado' : 'Activo' }}</b-badge>
+                    </div>
                     <b-badge v-else variant="danger" style="font-size: 0.9rem;">Anulado N.C.</b-badge>
                 </template>
                 <template slot="Ver" slot-scope="data">
