@@ -10,6 +10,10 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
+import AgenteOperacion from '@/views/AgenteOperacion.vue'
+import AgenteCierreCaja from '@/views/AgenteCierreCaja.vue'
+import AgenteGeneral from '@/views/AgenteGeneral.vue'
+import AgenteReimpresion from '@/views/AgenteReimpresion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -166,6 +170,31 @@ export default new Router({
       component: Estadisticas
     },
     //Nuevo modulos de agente
+    {
+      path: '/agente/operacion',
+      name: 'AgenteOperacion',
+      component: AgenteOperacion
+    },
+    {
+      path: '/agente/cierrecaja',
+      name: 'AgenteCierreCaja',
+      component: AgenteCierreCaja
+    },
+    {
+      path: '/agente/cierrecaja/:id',
+      name: 'AgenteCierreCajaId',
+      component: AgenteCierreCaja
+    },
+    {
+      path: '/agente/general',
+      name: 'AgenteGeneral',
+      component: AgenteGeneral
+    },
+    {
+      path: '/agente/reimpresion',
+      name: 'AgenteReimpresion',
+      component: AgenteReimpresion
+    },
     {
       path: '/reportes/proyectos',
       name: 'ReporteProyectos',
