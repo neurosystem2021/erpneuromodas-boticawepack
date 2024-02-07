@@ -143,6 +143,8 @@ const actions = {
             obj.nuevoPrecioContado = obj.PrecioContado || 0
           }
 
+          obj.precioc = obj.PrecioCosto
+
           if (isClienteVip) {
             producto.precio = producto.precioConvenio || producto.precio;
           }

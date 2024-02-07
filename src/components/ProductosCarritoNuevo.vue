@@ -827,6 +827,7 @@ export default {
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0
       obj.EsVentaNew = false
+      obj.precioc = obj.PrecioCosto
       obj = this.onSetProducto(obj)
       if(this.indexPos != null){
         this.actualizarProd({Producto:obj,Pos:this.indexPos})
@@ -845,7 +846,7 @@ export default {
       let obj = {...this.objProd}
       obj.Presentacion = prod.nombre
       obj.CantidadPresentacion = prod.cantidad
-      obj.PrecioCosto = prod.precioc 
+      obj.precioc = prod.precioc 
       obj.precio = prod.precio
       obj.cantidad = 1
       obj.EsPresentacion = 1
