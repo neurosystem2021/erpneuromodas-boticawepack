@@ -218,7 +218,7 @@
         <!-- MODALS TOUCH -->
 
         <b-row style="height:34vh; overflow-y: scroll; background: #FFFFFF;">
-            <b-col md="12">
+            <b-col md="12" style="padding-right: 5px !important;">
                 <b-table id="carrito" small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
                 <template slot="Indicaciones" slot-scope="data">
                   <textarea 
@@ -238,11 +238,14 @@
                 </template>-->
 
                 <template slot="eventPresent" slot-scope="data">
-                  <b-button style="margin-top: 70%;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+                  <b-button style="font-size: 0.7rem;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
+                  <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0; width: 50px; font-size: 0.7rem;">
+                    <p style="color: #007bff; text-align: center; font-weight: bold;">{{ productos[data.index].cantidad * productos[data.index].CantidadPresentacion }} uni</p>
+                  </b-form-text>
                 </template>
 
                 <template slot="cantidad" slot-scope="data">
-                <div style="margin-top: 21%;">
+                <div>
                   <input
                     v-model="productos[data.index].cantidad"
                     type="number"
@@ -257,16 +260,13 @@
                     }"
                     class="form-control"
                     placeholder="Cantidad"/>
-                    <b-form-text style="padding: 0 !important; margin-bottom: -15px; margin-top: 0;">
-                      <p style="color: #007bff; text-align: center; font-weight: bold;">{{ productos[data.index].cantidad * productos[data.index].CantidadPresentacion }} unid.</p>
-                    </b-form-text>
                   </div>
                 </template>
                 <template slot="Presentacion" slot-scope="data" >
                   <b-form-input
                     v-model="productos[data.index].Presentacion"
                     type="text"
-                    style="text-align:center; font-weight:bold; width: 120px;"
+                    style="text-align:center; font-weight:bold; width: 95px; font-size: 0.85rem;"
                     autocomplete="false"
                     readonly
                     ></b-form-input>
@@ -486,7 +486,8 @@ export default {
       accionBoton: 1,
       productoChange:null,
       cantidadInput:'',
-      capturaIndex: 0
+      capturaIndex: 0,
+      indexPos: null,
     }
   },
   watch: {
@@ -536,7 +537,7 @@ export default {
             // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
             /*{ key: 'ProductoMedicion', label: 'Medición' },*/
             //{ key: 'cantxPrecio', variant: 'warning', class:'text-center thsize' },
-            { key: 'eventPresent', label: '' },
+            { key: 'eventPresent', label: '', class:'fontsize thsize' },
             { key: 'Presentacion', label: 'Presentación', class:'text-center stocksize' },
             { key: 'cantidad', class:'text-center thsize' },
             { key: 'precio', label: 'Precio' , class:'thsize' },
@@ -703,11 +704,12 @@ export default {
       this.$refs['modalIngPre'].hide()
       this.$refs['modalIngDesc'].hide()
     },
-    showPresentacion (obj) {
+    showPresentacion (obj, index = null) {
       if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
           this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
           this.objProd = obj
           this.$refs['modalCant'].show()
+          this.indexPos = index
           return
       }
     },
@@ -775,6 +777,7 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     editarProducto(Pro){
+      this.indexPos = index
       this.productoSelect = Pro
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
@@ -823,7 +826,14 @@ export default {
       obj.Presentacion = obj.ProductoMedicion
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0
+      obj.EsVentaNew = false
       obj = this.onSetProducto(obj)
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -835,6 +845,7 @@ export default {
       let obj = {...this.objProd}
       obj.Presentacion = prod.nombre
       obj.CantidadPresentacion = prod.cantidad
+      obj.PrecioCosto = prod.precioc 
       obj.precio = prod.precio
       obj.cantidad = 1
       obj.EsPresentacion = 1
@@ -842,7 +853,14 @@ export default {
       obj.Descripcion = prod.nombre
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.EsVentaNew = false
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+      if(this.indexPos != null){
+        this.actualizarProd({Producto:obj,Pos:this.indexPos})
+        this.indexPos = null
+        this.$refs['modalCant'].hide()
+        return
+      }
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -1056,7 +1074,7 @@ export default {
       margin-left: 20vw;
     }
     td.fontsize{
-      font-size: 0.8rem !important;
+      font-size: 0.75rem !important;
       font-weight: bold;
       text-align: center; 
       vertical-align: middle !important;

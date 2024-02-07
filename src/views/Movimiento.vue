@@ -326,8 +326,7 @@ return false
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
-        almacenDestino: { IdAlmacen: -1 },
-        user: sessionStorage.getItem("User")
+        almacenDestino: { IdAlmacen: -1 }
       }
     },
     onReset (evt) {
@@ -460,18 +459,6 @@ return false
           faltaFechaVen = true
         }*/
 
-        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1).length
-        if(pro > 1){
-          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
-          igualProducto = true
-        }
-
-        let proObs = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1).length
-        if(proObs > 1){
-          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
-          igualProducto = true
-        }
-
         if(this.movimiento.movimientoTipo.Tipo!=0){
           if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stockMovimiento){
            faltaStock=true
@@ -480,6 +467,12 @@ return false
 
         if(!(prod.cantidad > 0)){
           faltaCantidad = true
+        }
+
+        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1).length
+        if(pro > 1){
+          this.$toasted.show(prod.Producto + ', repite 2 veces', {duration:4000})
+          igualProducto = true
         }
         
       })
@@ -490,6 +483,11 @@ return false
         return;
       }
 
+      if (igualProducto) {
+        this.$toasted.show('Solo puede agregar 2 veces el producto y uno tiene que ser obsequio',{duration:4000})
+        this.inProgress = false
+        return;
+      }
 
       /*if (igualProducto) {
           this.$toasted.error('No puede realizar movimiento de 2 productos iguales, si son lotes diferentes relizalo en otro movimiento');
@@ -502,12 +500,6 @@ return false
         this.inProgress = false
         return;
       }*/
-
-      if (igualProducto) {
-        this.$toasted.show('Solo puede agregar 2 veces el producto y uno tiene que ser obsequio',{duration:4000})
-        this.inProgress = false
-        return;
-      }
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show('Falta llenar cantidad / precio')

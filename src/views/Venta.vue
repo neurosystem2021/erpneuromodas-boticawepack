@@ -842,7 +842,7 @@ export default {
                 return ;
             }
             this.buscarProducto(e)
-        }, 250),
+        }, 150),
         buscarProducto(val){
             this.productosCategoria = [];
             this.cargandoProductos = true;
@@ -894,17 +894,17 @@ export default {
             this.precioCont = obj.PrecioContado
             this.medicionPro = obj.ProductoMedicion
             this.loadCode = ''
-            obj.EsVentaNew = true;
+            obj.EsVentaNew = false;
             this.preciosProd = []
             this.objProd = {}
             this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
             let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
 
-            this.setProductoUni(obj)
+            this.setProductoUni({...obj})
 
             this.indexProdSelect = null
             //this.$refs['modalCant'].show()
-            this.objProd = obj
+            this.objProd = {...obj}
         },
         setProductoUni(obj) {
             this.venta.pago.visa.monto = 0
@@ -912,7 +912,7 @@ export default {
             this.venta.pago.delivery.monto = 0
             obj.precio = obj.PrecioContado
             obj.cantidad = 0
-            obj.EsVentaNew = true;
+            obj.EsVentaNew = false;
             obj.descuento = 0
             obj.nuevoPrecioContado = 0
             obj.indicacion = ''
@@ -939,7 +939,7 @@ export default {
             obj.EsPresentacion = 1
             obj.subt = ''
             obj.Descripcion = prod.nombre
-            obj.EsVentaNew = true;
+            obj.EsVentaNew = false;
             obj.precio = 0
             obj.cantidad = 0
             obj.descuento = 0
@@ -1889,6 +1889,8 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let igualPro = 0
+            let sum = 0
             this.productos.forEach(pro => {
                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
                     //this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
@@ -1900,9 +1902,28 @@ export default {
 
                 pro.Descripcion = (''+pro.Presentacion).trim()
 
+                let pre = this.productos.filter(p => p.IdProducto == pro.IdProducto && p.CantidadPresentacion == pro.CantidadPresentacion).length
+                if(pre > 1){
+                    this.$toasted.error('EXISTE LA MISMA PRESENTACION DE: '+pro.Producto+', AGREGUE SOLO PRESENTACIONES DIFERENTES.',{duration: 3000});
+                    igualPro += 1 
+                }
+                sum = 0
+                this.productos.map(p=>{
+                    if(p.IdProducto == pro.IdProducto){
+                        sum += (p.cantidad*p.CantidadPresentacion)
+                    }
+                })
+
+                if(parseFloat(pro.stock).toFixed(2)  < parseFloat(sum)){
+                    sinStock+=1
+                }
             });
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
+                this.inProgress = false            
+                return;
+            }
+            if (igualPro >= 1) {
                 this.inProgress = false            
                 return;
             }
@@ -2166,7 +2187,7 @@ export default {
                     this.loadClienteVarios()
                     this.$router.replace('/venta')
                     //this.$refs.inputNombreCliente.$refs.input.required = true  
-                     this.emitirauto(response.data.insertId)
+                    //this.emitirauto(response.data.insertId)
                 }
             })
             .catch((error) => {
