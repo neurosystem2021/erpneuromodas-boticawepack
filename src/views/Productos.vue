@@ -67,7 +67,7 @@
             </b-col>
         </b-row>
         <br /><br />
-        <b-modal id="modalVehiculoColor" size="lg" ref="modalVehiculoColor" hide-header>
+        <b-modal id="modalVehiculoColor" size="lg" ref="modalVehiculoColor" hide-header hide-footer>
           <div class="d-block text-center">
             <h3 style="text-decoration: underline;">{{ productoSelect.Producto }} - {{ productoSelect.ProductoModelo }}</h3>
             <h4>COLORES</h4>

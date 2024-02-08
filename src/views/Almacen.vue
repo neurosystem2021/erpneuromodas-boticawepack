@@ -250,7 +250,7 @@
             </b-row>
           </b-modal>
 
-          <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-header>
+          <b-modal id="modalSeleccionar" size="lg" ref="modalSeleccionar" hide-header hide-footer>
             <div class="d-block text-center">
               <h3 style="text-decoration: underline;">{{ objProd.Producto }} - {{ objProd.ProductoModelo }}</h3>
               <h4>CHASIS / MOTOR</h4>
