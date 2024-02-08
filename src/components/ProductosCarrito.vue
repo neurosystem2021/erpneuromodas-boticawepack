@@ -28,7 +28,7 @@
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-form-text id="input-live-help">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</b-form-text>
+        <b-form-text id="input-live-help" style="color: black !important;"><b>Busqueda avanzada (Producto, Categoria, Marca, Modelo) - Anteponer * para buscar por Palabra Clave</b></b-form-text>
       </b-form-group>
 
       <!--<b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>

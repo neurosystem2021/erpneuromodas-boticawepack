@@ -110,7 +110,21 @@
               ></b-form-input>
           </b-form-group>
 
-         
+          <b-form-group>
+            <label>Palabra Clave:</label>
+            <autocomplete
+                :url="API + 'productos/palabra'"
+                ref="inputPalabraClave"
+                anchor="PalabraClave"
+                label="writer"
+                :placeholder.sync="producto.PalabraClave"
+                :on-select="val => producto.PalabraClave = val.PalabraClave && val.PalabraClave.toUpperCase()"
+                :onInput="val => producto.PalabraClave = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputPalabraClave')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+          </b-form-group>
+
           <b-form-group v-show="false">
             <label>Anaquel:</label>
             <autocomplete
@@ -301,7 +315,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              step="0.0001"
+              step="0.00001"
               type="number"
               @input="actualizarPorcentajeUtilidad"
               class="form-control"
@@ -509,6 +523,8 @@ export default {
         this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
+        this.$refs.inputPalabraClave.setValue(newVal.PalabraClave)
+
         this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc
         //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
         //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
@@ -564,6 +580,7 @@ export default {
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.VentaEstrategica      = newVal.VentaEstrategica
         this.producto.TienePresentacion     = newVal.TienePresentacion
+        this.producto.PalabraClave          = newVal.PalabraClave
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -699,6 +716,7 @@ export default {
       // this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputPresentacion.setValue('')
+      this.$refs.inputPalabraClave.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
       this.$refs.inputProductoDesc.$el.value = ''
@@ -731,6 +749,7 @@ export default {
         ControlaStockMinimo:0,
         StockMinimo: 0,
         TienePresentacion: 0,
+        PalabraClave: '',
         PrecioCosto:0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
@@ -777,6 +796,8 @@ export default {
         this.$toasted.show('Tiene que ingresar Subproductos')
         return
       }
+
+      this.producto.PalabraClave = (''+this.producto.PalabraClave).toUpperCase()
 
       this.producto.anaqueles.map((d)=>{
         if(d.id==null){
