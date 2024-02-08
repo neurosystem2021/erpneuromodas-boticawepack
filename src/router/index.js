@@ -18,8 +18,10 @@ import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import Remision from '@/views/Remision.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import Formato from '@/views/reportes/Formato.vue'
+import RemisionLista from '@/views/RemisionLista.vue'
 
 Vue.use(Router)
 
@@ -100,6 +102,16 @@ export default new Router({
       path: '/reportes/kardex',
       name: 'Kardex',
       component: Kardex
+    },
+    {
+      path: '/remision',
+      name: 'Remision',
+      component: Remision
+    },
+    {
+      path: '/remision-lista',
+      name: 'RemisionLista',
+      component: RemisionLista
     },
     {
       path: '/reportes/articulosmovimientos',
