@@ -429,6 +429,7 @@ return false
       let sinSeleccionar = false
       let movDetDuplicado = false
       let sinStockVehiculo = false
+      let mismoChasis = false
       this.productos.forEach((prod, index) => {
         if((parseFloat(prod.stock) <= 0 || parseFloat(prod.stock).toFixed(2)  < parseFloat(prod.cantidad) || prod.stock == undefined)) {
             sinStock += 1
@@ -467,6 +468,15 @@ return false
             
         })
 
+        if(prod.EsVehiculo){
+          let count = this.productos.filter((f)=>((""+(f.Chasis || '')).toUpperCase().trim() == (""+(prod.Chasis || '')).toUpperCase().trim() || (""+(f.Motor || '')).toUpperCase().trim() == (""+(prod.Motor || '')).toUpperCase().trim()) && f.EsVehiculo==1).length
+          
+          if(count > 1 ){
+            this.$toasted.show('Se repite chasis en el item: ' + (index+1))
+            mismoChasis = true
+          }
+        }
+
         if(((prod.stock <= 0) || (parseFloat(cantidadTotal) > prod.stock) || prod.stock==undefined) && prod.EsVehiculo == 1){
             sinStockVehiculo = true
         }
@@ -475,6 +485,11 @@ return false
         prod.Motor = (""+(prod.Motor || '')).toUpperCase().trim()
         prod.Descripcion = (""+(prod.Descripcion || '')).toUpperCase().trim()
       })
+
+      if (mismoChasis > 0) {
+        this.inProgress = false
+        return;
+      }
 
       if (noColor && (!this.isTraslado && !this.isSalida)) {
         this.$toasted.show('Todo VEHICULO debe seleccionarse el color')

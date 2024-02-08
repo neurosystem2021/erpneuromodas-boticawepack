@@ -337,7 +337,7 @@
                 </template>
 
                 <template slot="chasis" slot-scope="data">
-                  <b-button size="sm" variant="info" @click="showChasises(data.item)"><i class="fas fa-list"></i></b-button>
+                  <b-button v-if="data.item.EsVehiculo" size="sm" variant="info" @click="showChasises(data.item)"><i class="fas fa-list"></i></b-button>
                 </template>
 
                 <template slot="ImagenProducto" slot-scope="data">

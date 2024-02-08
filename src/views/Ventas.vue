@@ -1200,7 +1200,7 @@ export default {
             let movDetDuplicado = 0
             let sinStockVehiculo = 0
             this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
+                if(pro.ControlaStock == 1 && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
                     sinStock += 1
                 }
 
