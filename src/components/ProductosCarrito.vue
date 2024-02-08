@@ -127,7 +127,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false"
+            :disabled="productos[data.index].disabled || bloquearInput?true:false || (idPerfil != 1)" 
             type="number"
             style="width: 90px"
             min="0"
