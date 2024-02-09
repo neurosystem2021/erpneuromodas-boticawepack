@@ -1,6 +1,9 @@
 <template>
 	<div id="invoice-container">
 		<header class="clearfix">
+      <br>
+      <br>
+      <br>
 			<div id="logo">
 				<img src="/resources/images/logo.png">
 			</div>
