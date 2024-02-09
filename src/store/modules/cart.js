@@ -19,7 +19,7 @@ const mutations = {
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVentaNew) {        
-        productos.push(item)
+        productos.unshift(item)
       }
       else{
         /*let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
