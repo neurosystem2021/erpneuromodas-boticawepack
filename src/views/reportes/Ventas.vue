@@ -231,7 +231,6 @@ export default {
       this.currentPage = 1
       this.vendedor = obj
       this.generateFilter('vendedor', obj.Usuario)
-  
     },
     getVentasAcumuladas() {
       if(this.filters.vendedor) {
@@ -251,12 +250,17 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
           }
         }).then((response) => {
           this.ventasAcumuladas = response.data.total
         })
       }
+      setTimeout(() => {
+        Vue.nextTick(() => this.$refs.tablaVentas.refresh())  
+      }, 100);
+      
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
@@ -265,7 +269,18 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
       this.limpiarFiltros()
-      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+      if(!this.filters.vendedor) {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
+      }
     },
     rowClick (item) {
       this.ventaSelect = item
@@ -314,9 +329,27 @@ export default {
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
+      this.$refs.inputTipoVenta.setValue('')
       this.ventasAcumuladas = 0
+      this.tipoDoc = {}
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
+      this.fechaFin = this.$moment().format("YYYY-MM-DD")
+      //this.vendedor.Usuario = ''
       // document.location.reload()
      //  this.getVentasAcumuladas()
+      if(!this.filters.vendedor) {
+        this.axios.get(this.API + 'ventas/total', {
+          params: {
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin,
+            idTipoDoc: this.tipoDoc.IdTipoDoc || '',
+            idAlmacen: this.almacen.IdAlmacen || 1
+          }
+        }).then((response) => {
+          this.ventasAcumuladas = response.data.total
+        })
+      }
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     generateFilter (key, value) {
       this.filters[key] = value
