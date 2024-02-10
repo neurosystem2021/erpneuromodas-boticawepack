@@ -88,7 +88,7 @@
                   <div class="row">
                     <label for="codUbigeoOrigen" class="col-sm-4">Ubigeo de Partida</label>
                     <div class="input-group input-group-sm col-sm-8">
-                      <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required autocomplete="off">
+                      <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required>
                       <div class="input-group-append">
                         <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
                       </div>
@@ -98,7 +98,7 @@
                 <div class="container">
                   <div class="row">
                     <label for="direccionOrigen" class="col-sm-4">Dirección de Partida</label>
-                    <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required autocomplete="off">
+                    <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required>
                   </div>
                 </div>
               </fieldset>
@@ -110,6 +110,34 @@
                 </legend>
                 <div class="container">
                   <div class="row">
+                      <div class="col-sm-12">
+                        <b-form-group>
+                          <b-form-radio-group id="docsistema"
+                              button-variant="primary"
+                              variant="primary"
+                              style="font-weight: bold;"
+                              v-model="remision.docSistema"
+                              :options="[
+                              { text: 'Sin Documento', value: 0 },
+                              { text: 'Documento Externo', value: 1 },
+                              { text: 'Documento Interno', value: 2 }
+                              ]"
+                              @input="setTipo"
+                              name="docsistema" />
+                        </b-form-group>
+                    </div>
+                  </div>
+                  <div class="row" v-if="remision.docSistema==1">
+                    <div class="col-sm-12">
+                        <label>Tipo de documento relacionado: </label>
+                        <b-form-select v-model="remision.codDocumentoReferencia" :options="itemTipoDoc" v-on:change="setTipoDocExt($event)" class="mb-3" size="md" required/>
+                    </div>
+                    <div class="col-sm-12" v-if="remision.codDocumentoReferencia!=null">
+                      <label for="documentoExterno">Número de documento: </label>
+                      <input type="text" class="form-control form-control-sm" id="documentoExterno" :placeholder="placeholderDocRef" v-model="remision.documentoReferencia" autocomplete="off" required>
+                    </div>
+                  </div>
+                  <div class="row" v-if="remision.docSistema==2">
                     <div class="col-sm-6">
                       <label>Importar Factura:</label>
                       <autocomplete
@@ -153,7 +181,12 @@
                 <div class="container">
                   <div class="row">
                     <label for="nroDocumentoCliente" class="col-sm-4">RUC</label>
-                    <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required autocomplete="off">
+                    <div class="input-group input-group-sm col-sm-8">
+                      <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required>
+                      <div class="input-group-append">
+                          <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUCCLIENTE()">Buscar</b-button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="container">
@@ -181,7 +214,7 @@
                   <div class="row">
                     <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
                     <div class="input-group input-group-sm col-sm-8">
-                      <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required autocomplete="off">
+                      <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required>
                       <div class="input-group-append">
                         <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
                       </div>
@@ -191,7 +224,7 @@
                 <div class="container">
                   <div class="row">
                     <label for="direccionDestino" class="col-sm-4">Dirección de Llegada</label>
-                    <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required autocomplete="off">
+                    <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required>
                   </div>
                 </div>
               </fieldset> 
@@ -320,12 +353,17 @@
           nroDocChofer: '',
           direccionCliente: '',
           idDocVenta: 0,
+          docSistema: 0,
+          documentoReferencia: '',
+          tipodocumentoReferencia: '',
+          codDocumentoReferencia: null,
         },
         cliente: {},
         carrito: {
           fields: [
             { key: 'CodigoBarra', label: 'Código' }, 
             { key: 'Producto' }, 
+            { key: 'ProductoMedicion', label: 'U. M.' }, 
             { key: 'cantidad' },
             { key: 'acciones', label: ''}
           ]
@@ -333,6 +371,18 @@
         SerieGRE:'',
         NumeroGRE:'',
         FechaDocGRE:'',
+        itemTipoDoc: [
+            { value: null, text: 'Seleccione', placeholder: '' },
+            { value: '01', text: 'Factura', placeholder: 'Ejemplo: N° F001 58543 - RUC N° 20100017450' },
+            { value: '03', text: 'Boleta de Venta', placeholder: 'Ejemplo: N° B001 58543 - RUC N° 20100017450' },
+            { value: '04', text: 'Liquidación de Compra', placeholder: 'Ejemplo: N° E001 2323 - RUC N° 20100017450' },
+            { value: '12', text: 'Ticket o cienta emitido por máquina registradora', placeholder: 'Ejemplo: N° 001 - RUC N° 20100017450' },
+            { value: '48', text: 'Comprobante de Operaciones - Ley N° 29972', placeholder: 'Ejemplo: N° 001 - RUC N° 20100017450' },
+            { value: '49', text: 'Constancia de Déposito - IVAP (Ley 28211)', placeholder: 'Escriba' },
+            { value: '80', text: 'Constancia de Déposito - Detracción', placeholder: 'Escriba' },
+            { value: '81', text: 'Código de autorizacion emitida por el SCOP N°: ', placeholder: 'Ejemplo: 61319528740' },
+        ],
+        placeholderDocRef: 'Escriba',
       }
     },
     computed: {
@@ -345,6 +395,24 @@
         limpiarCart: 'limpiarCarrito',
         add:'agregarProducto'
       }),
+      setTipoDocExt(val){
+        this.remision.codDocumentoReferencia = val
+
+        let item = this.itemTipoDoc.find(td=> td.value == val )
+
+        if(item){
+          this.placeholderDocRef = item.placeholder
+          this.remision.tipodocumentoReferencia = item.text
+        }else{
+          this.placeholderDocRef = 'Escriba'
+        }   
+      },
+      setTipo(val){
+        this.remision.codDocumentoReferencia = null
+        this.remision.documentoReferencia = ''
+        this.remision.tipodocumentoReferencia = ''
+        this.placeholderDocRef = ''
+      },
       afe (e) {
         return false
       },
@@ -383,6 +451,14 @@
             this.inProgress = false            
             return
         }
+
+
+
+        if(this.remision.docSistema != 0 && (''+this.remision.documentoReferencia).trim()==''){
+          this.$toasted.show('Debe ingresar un documento de referencia')
+          this.inProgress = false
+          return
+        }
         let faltaLlenar = false
         this.productos.forEach((prod, index) => {
           if (prod.cantidad <= 0) {
@@ -394,7 +470,20 @@
           this.inProgress = false
           return;
         }
+
+        let r = confirm('¿Desea guardar la guia de remision?')
+        if (r == true) {
+
         this.remision.placaVehiculo = (''+this.remision.placaVehiculo).toUpperCase();
+        if(this.remision.docSistema == 0){
+          this.remision.codDocumentoReferencia = ''
+          this.remision.documentoReferencia = ''
+          this.remision.tipodocumentoReferencia = ''
+          this.placeholderDocRef = ''
+        }
+
+        this.remision.documentoReferencia = (''+this.remision.documentoReferencia).trim()
+
         this.axios.post(this.API + 'remision', {
           remision: this.remision,
           productos: this.productos
@@ -429,8 +518,8 @@
             this.remision.descripcionMotivoTraslado = 'VENTA';
             this.remision.totalBultos = '';
             this.remision.idDocVenta = 0;
-            this.$refs.inputDocRef.setValue('');
-            this.$refs.inputMovRef.setValue('');
+            //this.$refs.inputDocRef.setValue('');
+            //this.$refs.inputMovRef.setValue('');
             this.limpiarCamposRefs();
             this.$toasted.success('Guia de remisión guardada correctamente ') 
             this.obtenerNumero();       
@@ -441,10 +530,18 @@
           this.$toasted.error('Ha ocurrido un error, vuelva a intentarlo')
           this.inProgress = false
         })
+        }else {
+          this.inProgress = false
+        }
       },
       focusAutocomplete (ref) {
-        //this.$refs[ref].type = ""
+        this.$refs[ref].type = ""
         this.$refs[ref].handleDoubleClick()
+        this.remision.codDocumentoReferencia = null
+        this.remision.documentoReferencia = ''
+        this.remision.tipodocumentoReferencia = ''
+        this.remision.idDocVenta = 0;
+        this.placeholderDocRef = ''
       },
       limpiarCamposRefs(){
         this.$refs.inputplacaVehiculo.disabled = true
@@ -461,6 +558,7 @@
         this.$refs.inputrazonSocialTransportista.disabled = false
         this.$refs.inputnroDocumentoTransportista.required = true
         this.$refs.inputrazonSocialTransportista.required = true
+        this.placeholderDocRef = ''
       },
       cambioModalidad(val){
         if(val.target.value=="01"){
@@ -564,6 +662,42 @@
             console.log(error)
         })
       },
+      consultarDNIRUCCLIENTE () {
+        if ((''+this.remision.nroDocumentoCliente).trim()=='' || this.remision.nroDocumentoCliente == undefined) {
+            this.$toasted.show('Debe ingresar un RUC de destinatario válido')
+            return
+        }
+        let esNumerico = Number.isInteger(parseInt(this.remision.nroDocumentoCliente))
+        if (!esNumerico) {
+            this.$toasted.show('El RUC debe ser numérico, editar RUC de destinatario')
+            return
+        }
+        
+        this.axios.get(this.API + 'consultarRUC', {
+            params: {
+                type: 'RUC',
+                numero: this.remision.nroDocumentoCliente
+            }
+        }).then((response) => {
+            if (response.data) {
+                if(response.data.success==false){
+                  this.$toasted.show('No se encontro al Transportista');
+                  return
+                }
+                this.$toasted.info('Transportista encontrado, se llenarán sus datos')                  
+                let data = response.data
+                this.remision.razonSocialCliente = data.razonSocial
+                this.remision.direccionCliente = data.direccion?data.direccion:''
+                document.getElementById("razonSocialCliente").value = data.razonSocial
+            } else {
+                this.$toasted.show('No se encontró el Transportista')                
+            }
+        })
+        .catch((error) => {
+            this.$toasted.show('No se encontró el Transportista')        
+            console.log(error)
+        })
+      },
       setMovRef (obj) {
         this.$set(this.remision, 'nroDocumentoCliente', '');
         this.$set(this.remision, 'razonSocialCliente', '');
@@ -571,6 +705,8 @@
         this.$refs.inputDocRef.setValue('');
         this.remision.idDocVenta = 0;
         this.remision.documentoReferencia = obj.NroComprobante;
+        this.remision.codDocumentoReferencia = '99'
+        this.remision.tipodocumentoReferencia = 'MOVIMIENTOS INTERNOS'
         this.limpiarCart();
         
         // Cargar producto del movimiento
@@ -621,8 +757,13 @@
         this.$set(this.remision, 'direccionCliente', '');
         this.$refs.inputMovRef.setValue('');
         this.limpiarCart();
+        let item = this.itemTipoDoc.find(it=>it.value == obj.CodSunat)
+        if(item){
+          this.remision.codDocumentoReferencia = item.value
+          this.remision.documentoReferencia = obj.NroComprobante;
+          this.remision.tipodocumentoReferencia = item.text
+        }
         this.remision.idDocVenta = obj.IdDocVenta
-        this.remision.documentoReferencia = obj.NroComprobante;
         //Cargar producto del documento afectado
         this.axios.get(this.API + 'venta/detalle/comprobante/guia', {
               params: {

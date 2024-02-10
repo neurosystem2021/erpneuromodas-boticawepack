@@ -854,8 +854,8 @@ export default {
                 return 
             }
 
-            if(this.venta.tipoVenta.CodSunat == '03' && this.totalCart>700){
-                this.$toasted.show('No puede emitir una BOLETA con monto superior a S/ 700, emita una FACTURA')
+            if(this.venta.tipoVenta.CodSunat == '03' && this.totalCart>700 && this.venta.cliente.DniRuc == '00000000'){
+                this.$toasted.show('No puede emitir una BOLETA con monto superior de S/ 700 a CLIENTE VARIOS, solicite su DNI al cliente',{duration:3000})
                 this.inProgress = false
                 return
             }

@@ -36,6 +36,7 @@
           <b-form-input
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
+            autocomplete="off"
             type="number"
             style="width: 75px"
             min="0"
@@ -134,7 +135,7 @@
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="3">
-      <table class="table tabla-prestados">
+      <table class="table tabla-prestados" v-if="!noSubtotal">
         <thead>
           <tr>
             <th>Productos Prestados</th>
