@@ -688,6 +688,9 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+                if(!(pro.cantidad>0)) {
+                    totalCero += 1
+                }
             });
 
             if(totalCero >= 1) {

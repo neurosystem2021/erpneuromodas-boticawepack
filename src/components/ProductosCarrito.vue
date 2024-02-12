@@ -110,7 +110,7 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val)
-              if(!productos[data.index].PreciosPorProducto) {
+              /*if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
                 return
               }
@@ -120,7 +120,7 @@
                 productos[data.index].precio = reg.precio
                 return
               }
-              productos[data.index].precio = productos[data.index].PrecioContado 
+              productos[data.index].precio = productos[data.index].PrecioContado */
             }"
             placeholder="Cantidad"></b-form-input>
         </template>
@@ -129,7 +129,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 80px"
+            style="width: 120px"
             min="0"
             step="0.0001"
             placeholder="Precio"
@@ -201,7 +201,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
+          <div v-if="!data.item.EsPadre">{{ data.item.stock | redondear(2) }}</div>
         </template>
 
       </b-table>
