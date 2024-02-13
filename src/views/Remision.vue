@@ -380,7 +380,7 @@
             { value: '48', text: 'Comprobante de Operaciones - Ley N° 29972', placeholder: 'Ejemplo: N° 001 - RUC N° 20100017450' },
             { value: '49', text: 'Constancia de Déposito - IVAP (Ley 28211)', placeholder: 'Escriba' },
             { value: '80', text: 'Constancia de Déposito - Detracción', placeholder: 'Escriba' },
-            { value: '81', text: 'Código de autorizacion emitida por el SCOP N°: ', placeholder: 'Ejemplo: 61319528740' },
+            { value: '81', text: 'Código de autorización emitida por el SCOP', placeholder: 'Ejemplo: 61319528740' },
         ],
         placeholderDocRef: 'Escriba',
       }
