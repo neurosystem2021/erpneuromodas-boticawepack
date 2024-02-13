@@ -38,7 +38,7 @@
             :disabled="bloquearInput?true:false"
             autocomplete="off"
             type="number"
-            style="width: 75px"
+            style="width: 95px"
             min="0"
             @input="(val) => {
                 $emit('onInputCantidad', val)

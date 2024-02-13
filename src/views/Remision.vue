@@ -175,9 +175,9 @@
             <b-col md="6">
               <fieldset class="scheduler-border">
                 <legend class="scheduler-border">
-                  <h5>Destinatario</h5>
+                  <h5>{{ remision.codMotivoTraslado=='02'?'Proveedor':'Destinatario' }}</h5>
                 </legend>
-                <h5>Datos del destinatario</h5>
+                <h5>Datos del {{ remision.codMotivoTraslado=='02'?'proveedor':'destinatario' }}</h5>
                 <div class="container">
                   <div class="row">
                     <label for="nroDocumentoCliente" class="col-sm-4">RUC</label>
