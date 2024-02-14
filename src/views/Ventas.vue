@@ -167,7 +167,16 @@
                                     </b-row>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="6" class="mb-1">
+                            <b-col md="6" class="mb-1" style="margin-top:-15px">
+                                <b-form-group horizontal label="Obs:">
+                                    <input v-model="venta.Observacion"
+                                            type="text"
+                                            class="form-control"
+                                            style="text-transform:uppercase"
+                                            placeholder="Observacion" />
+                                </b-form-group>
+                            </b-col>
+                            <b-col md="6" class="mb-1" style="margin-top:-15px">
                                 <b-form-group horizontal label="Nº Placa:">
                                     <input v-model="venta.Placa"
                                             type="text"
@@ -488,7 +497,7 @@ export default {
             tieneIgv: true,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf:1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -669,7 +678,8 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 1,
+                Observacion:'',
             }
             this.isNota = false
             this.bloquearInput=false
@@ -986,7 +996,7 @@ export default {
                 this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
-                this.diasValidosProf=0;
+                this.diasValidosProf=1;
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
@@ -1126,6 +1136,7 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.Observacion = (''+this.venta.Observacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
