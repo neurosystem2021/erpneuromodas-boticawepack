@@ -130,7 +130,7 @@
         <div class="notice"><b>CONDICION DE PAGO :</b> CONTADO COMERCIAL</div>
       </div>
       <br>
-      <div id="notices">
+      <div id="notices" style="text-align: center;">
         <img src="/resources/images/firma.jpg">
       </div>
       <div>
