@@ -242,7 +242,7 @@
                                                 </b-form-text>
                                             </td>
                                         </tr>
-                                        <tr v-if="false">
+                                        <tr>
                                             <td>
                                                 <b-form-checkbox
                                                     :disabled="bloquearInput?true:false || isNota"
@@ -258,6 +258,7 @@
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
+                                                    v-if="false"
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
