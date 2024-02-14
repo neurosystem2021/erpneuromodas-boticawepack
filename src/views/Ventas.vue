@@ -49,7 +49,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA"
+                                        initValue="BOLETA/IGV ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -485,7 +485,7 @@ export default {
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
-            tieneIgv: false,
+            tieneIgv: true,
             venta: {},
             bloquearInput:false,
             diasValidosProf:0,
@@ -637,10 +637,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
+                    IdTipoDoc: 7,
+                    TipoDoc: 'BOLETA/IGV ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '03'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -678,6 +678,7 @@ export default {
             this.infoDelivery = {}
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
+            this.tieneIgv = true
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -938,11 +939,13 @@ export default {
         },
         limpiarDespuesVenta () {
             this.inProgress = false
-            this.tieneIgv = false
+            this.tieneIgv = true
             this.initForm()
             this.limpiarCart()
             this.getVendedor()
             this.$refs.inputCliente.setValue('')
+            this.loadClienteVarios()
+            this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
             // this.getNumeroVenta()
             // this.$refs.inputTipoVenta.setValue('TICKET')
             // this.$refs.inputAlmacen.setValue('VENTA')
@@ -1130,14 +1133,14 @@ export default {
                 this.$router.replace('/ventas')
                 this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
-                this.tieneIgv = false
+                this.tieneIgv = true
                 this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                this.$refs.inputTipoVenta.setValue('BOLETA/IGV ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
