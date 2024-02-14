@@ -834,7 +834,7 @@ export default {
         `
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} - <b>S/ ${(data.PrecioContado > 0?data.PrecioContado.toFixed(2):data.PrecioContado)}<b>
       `
     },
     // setCantidad (index, val) {
