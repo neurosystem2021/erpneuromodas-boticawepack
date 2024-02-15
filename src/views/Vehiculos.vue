@@ -60,7 +60,7 @@
                 </b-row>
             </b-row>
             <vehiculo-form ref="vehiculoForm" :vehiculoSelect="vehiculoSelect" :cbGuardar="actualizarTabla"></vehiculo-form>
-            <vehiculo-asiento-form ref="vehiculoAsientoForm" :vehiculoSelect="vehiculoSelect" :cbGuardar="actualizarTabla"></vehiculo-asiento-form>
+            <vehiculo-asiento-config ref="vehiculoAsientoForm" :vehiculoSelect="vehiculoSelect" :cbGuardar="actualizarTabla"></vehiculo-asiento-config>
             <br />
             <b-row align-h="center" class="text-center">
                 <b-col cols="4">
@@ -75,7 +75,7 @@
 <script>
 import config from '@/store/config.js'
 import VehiculoForm from '@/components/VehiculoForm.vue'
-import VehiculoAsientoForm from '@/components/VehiculoAsientoForm.vue'
+import VehiculoAsientoConfig from '@/components/VehiculoAsientoConfig.vue'
 
 export default {
     mounted() {
@@ -153,7 +153,7 @@ export default {
     },
     components: {
         VehiculoForm,
-        VehiculoAsientoForm
+        VehiculoAsientoConfig
     }
 }
 </script>
