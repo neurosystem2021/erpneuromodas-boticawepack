@@ -138,6 +138,16 @@
 
                                 </b-form-group>
                             </b-col>
+                            <b-col md="12" class="mb-1" style="margin-top: -15px;">
+                                <label>Observación:</label>
+                                <b-form-group>
+                                    <input v-model="venta.Observacion"
+                                            type="text"
+                                            class="form-control"
+                                            style="text-transform:uppercase"
+                                            placeholder="Información extra al comprobante" />
+                                </b-form-group>
+                            </b-col>
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -584,7 +594,8 @@ export default {
                 NotaDescMotivo: '',
                 IdPreOrden: [],
                 CampoDireccion: '',
-                diasValidosProf: 0
+                diasValidosProf: 0,
+                Observacion:''
             }
             this.isNota = false
             this.bloquearInput=false
@@ -1015,6 +1026,7 @@ export default {
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
+            this.venta.Observacion = (''+this.venta.Observacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
