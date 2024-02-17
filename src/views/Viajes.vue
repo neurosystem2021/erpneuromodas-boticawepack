@@ -33,11 +33,16 @@
             <b-row>
                 <b-col>
                     <b-card v-for="(viaje, i) in viajes" :key="i">
-                        <b-row class="m-2" style="font-weight:bold">
+                        <b-row class="m-1" style="font-weight:bold">
                             <b-col md="2" class="text-center">
-                                <label>IMAGEN</label>
+                                <label style="margin-bottom: 0;">N° DE VIAJE</label><br>
+                                <label style="font-size: 1.3rem;"><b-badge>{{ viaje.IdViaje }}</b-badge></label>
                             </b-col>
-                            <b-col md="8" class="text-center">
+                            <b-col md="2" class="text-center">
+                                <label style="margin-bottom: 0;">FECHA</label><br>
+                                <label style="font-size: 1.2rem;"><b-badge variant="primary">{{ viaje.FechaViaje }}</b-badge></label>
+                            </b-col>
+                            <b-col md="2" class="text-center">
                                 <b-row>
                                     <label><b>ORIGEN: </b> {{ viaje.CiudadOrigen }}</label>   
                                 </b-row>
@@ -46,7 +51,7 @@
                                 </b-row>
                             </b-col>
                             <b-col md="2" class="text-center">
-                                <label>DOCUMENTO QUE MODIFICA</label>
+                                <label><b>SALIDA</b></label>
                             </b-col>
                         </b-row>
                     </b-card>

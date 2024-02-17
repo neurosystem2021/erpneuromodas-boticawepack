@@ -74,7 +74,6 @@
   </template>
   <script>
   import config from '@/store/config.js'
-  import draggable from "vuedraggable";
 
   export default {
     data () {
@@ -316,7 +315,6 @@
     computed : {
     },
     components: {
-      draggable
     }
   }
   </script>
