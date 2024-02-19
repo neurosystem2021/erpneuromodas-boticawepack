@@ -181,10 +181,25 @@
                         </b-form-text>
 
                         <b-row>
-                            <b-col md="12">
+                            <b-col md="12" v-if="IdViaje == null">
                                 <b-form-group>
                                     <b-button variant="primary" block @click="abrirViajes"><b><i class="fas fa-map-marked-alt"></i> VIAJES DISPONIBLES</b></b-button>
                                 </b-form-group>
+                            </b-col>
+                            <b-col md="12" v-else style="border: 1.5px dashed #007bff;">
+                                <b-row class="p-2">
+                                    <b-col md="10">
+                                        <b-row><label style="font-size: 0.85rem;"><b>RUTA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{  this.RutaViaje }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>FECHA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.FechaViaje }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>HORA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.HoraViaje }}</b-badge></label></b-row>
+                                    </b-col>
+                                    <b-col md="2">
+                                        <span class="btn btn-sm text-danger ml-1" style="font-size: 1.2rem; margin-top: -13px;" size="sm"><i class="fas fa-times fa-lg"></i></span>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+
+                                </b-row>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -397,9 +412,55 @@
             </b-form>
             <b-modal ref="modalViajes" id="modalViajes" hide-footer hide-header>
                 <div class="d-block text-center">
-                <h3 style="text-decoration: underline;">VIAJES DISPONIBLES</h3>
-                <h5>--</h5>
+                    <h4 style="text-decoration: underline;">VIAJES DISPONIBLES</h4>
                 </div>
+                <hr>
+                <b-row>
+                    <b-col md="2" class="text-right">
+                        <b-form-group>
+                            <b-form-input v-model="fechaBuscador" type="date" step="1">
+                            </b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col md="2" class="text-left">
+                        <b-form-group>
+                            <b-button @click="buscarViajes" variant="primary" size="md"><i class="fas fa-search"></i> Buscar Viajes</b-button>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <hr>
+                <b-row>
+                    <b-col md="12">
+                        <b-card v-for="(viaje, index) in viajes" :key="index" @click="seleccionarViaje(viaje)" class="cardViajeVenta" :class="{'enVentaB': viaje.Estado == 1, 'enViajeB': viaje.Estado == 2, 'completadoB': viaje.Estado == 3, 'canceladoB': viaje.Estado == 0 }">
+                            <b-row class="m-1" style="font-weight:bold">
+                                <b-col md="2" class="text-center">
+                                    <label style="margin-bottom: 0;"><b>N° VIAJE</b></label><br>
+                                    <label style="font-size: 1.4rem;"><b-badge>{{ viaje.IdViaje }}</b-badge></label>
+                                </b-col>
+                                <b-col md="3" class="text-center">
+                                    <label style="margin-bottom: 0;"><b>FECHA Y HORA DE SALIDA</b></label><br>
+                                    <label style="font-size: 1.4rem;"><b-badge variant="success">{{ viaje.FechaViaje }} </b-badge> <b-badge variant="success">{{ viaje.HoraViajeFormat }}</b-badge></label>
+                                </b-col>
+                                <b-col md="2" class="text-center">
+                                    <label style="margin-bottom: 0;"><b>RUTA</b></label><br>
+                                    <label style="font-size: 1.4rem;"><b-badge>{{ viaje.Nombre }}</b-badge></label>
+                                </b-col>
+                                <b-col md="3" class="text-center">
+                                    <b-row>
+                                        <label><b>ORIGEN: </b> {{ viaje.CiudadOrigen }}</label>   
+                                    </b-row>
+                                    <b-row>
+                                        <label><b>DESTINO: </b> {{ viaje.CiudadDestino }}</label>   
+                                    </b-row>
+                                </b-col>
+                                <b-col md="2" class="text-center">
+                                    <label style="margin-bottom: 0;"><b>ASIENTOS</b></label><br>
+                                    <label style="font-size: 1.4rem;"><b-badge variant="success">{{ viaje.AsientosOcupados }}</b-badge> / <b-badge variant="primary">{{ viaje.Asientos }}</b-badge></label>
+                                </b-col>
+                            </b-row>
+                        </b-card>
+                    </b-col>
+                </b-row>
             </b-modal>
         </b-container>
     </div>
@@ -473,7 +534,15 @@ export default {
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]
-            }
+            },
+            fechaBuscador: this.$moment().format("YYYY-MM-DD"),
+            viajes: [],
+            IdViaje: null,
+            RutaViaje: '',
+            FechaViaje: '',
+            HoraViaje: '',
+            IdAsiento: null,
+            NumeroAsiento: '',
         }
     },
     watch: {
@@ -507,8 +576,46 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
-        abrirViajes(){
-            this.$refs['modalViajes'].show()
+        seleccionarViaje(viaje){
+            this.IdViaje = viaje.IdViaje
+            this.RutaViaje = viaje.Nombre
+            this.FechaViaje = viaje.FechaViaje
+            this.HoraViaje = viaje.HoraViajeFormat
+            this.$refs['modalViajes'].hide()
+        },
+        async abrirViajes(){
+            this.fechaBuscador = this.$moment().format("YYYY-MM-DD")
+            this.viajes = []
+            try {
+                let respuesta = await this.axios.get(this.API + 'transporte/viajes', {
+                    params:{
+                        fechaInicio: this.fechaBuscador,
+                        unicaFecha: 1,
+                        estado: 1,
+                    }
+                })
+                this.$refs['modalViajes'].show()
+                this.viajes = respuesta.data
+            } catch (error) {
+                this.$toasted.error('Ha ocurrido un error')
+            }
+        },
+        async buscarViajes(){
+            this.viajes = []
+            if(this.fechaBuscador == ''){
+                return
+            }
+            try {
+                let respuesta = await this.axios.get(this.API + 'transporte/viajes', {
+                    params:{
+                        fechaInicio: this.fechaBuscador,
+                        unicaFecha: 1,
+                    }
+                })
+                this.viajes = respuesta.data
+            } catch (error) {
+                this.$toasted.error('Ha ocurrido un error')
+            }
         },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
@@ -610,6 +717,9 @@ export default {
             this.puntosAplicados = 0
             this.descuentoPuntos = {}
             this.descuentoGeneral = 0
+            this.IdViaje = null
+            this.RutaViaje = ''
+            this.FechaViaje =''
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -1107,5 +1217,18 @@ export default {
 <style>
 #modalViajes .modal-dialog {
     max-width: 75% !important;
+}
+.cardViajeVenta {
+    margin-bottom: 15px;
+    border: 2px solid rgba(0, 0, 0, 0.125) !important;
+    cursor: pointer;
+}
+
+.cardViajeVenta .card-body {
+    padding: 0.10rem !important;
+}
+
+.cardViajeVenta * {
+    cursor: pointer !important; 
 }
 </style>

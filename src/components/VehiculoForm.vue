@@ -33,21 +33,6 @@
   
             <b-col md="6">
                 <b-form-group>
-                    <label>Asientos:</label>
-                    <b-form-input v-model="vehiculo.Asientos"
-                    ref="inputAsientosVehiculo"
-                    required="required"
-                    type="number"
-                    step="1"
-                    autocomplete="off"
-                    style="text-transform: uppercase;"
-                    :value="vehiculo.Asientos"
-                    ></b-form-input>
-                </b-form-group>
-            </b-col>
-
-            <b-col md="6">
-                <b-form-group>
                     <label>Ejes:</label>
                     <b-form-input v-model="vehiculo.Ejes"
                     ref="inputEjesVehiculo"
@@ -118,7 +103,6 @@
             this.vehiculo.Placa = newVal.Placa
             this.vehiculo.Ejes = newVal.Ejes
             this.vehiculo.Propietario = newVal.Propietario
-            this.vehiculo.Asientos = newVal.Asientos
             this.vehiculo.Anulado = newVal.Anulado
           }else{
             this.title = 'Nuevo Vehiculo'
@@ -137,7 +121,6 @@
           Placa: '',
           Ejes: 0,
           Propietario: '',
-          Asientos: 0,
           Anulado: 0,
         }
       },
@@ -169,20 +152,20 @@
         e.preventDefault();
   
         for (const [key, value] of Object.entries(this.vehiculo)) {
-          if((''+value).trim().toUpperCase()=='' && key!='Asientos' && key!='Ejes'){
+          if((''+value).trim().toUpperCase()=='' && key!='Ejes'){
             this.$toasted.show(`Complete el dato ${key} es requerido`)
             this.vehiculo[key] = (''+value).trim()
             return
           }
 
-          if((key=='Asientos' || key=='Ejes') && !(value > 0)){
+          if((key=='Ejes') && !(value > 0)){
             this.$toasted.show(`Complete el dato ${key} es requerido y númerico`)
             return
           }
         }
 
         for (const [key, value] of Object.entries(this.vehiculo)) {
-          if(key!='Asientos' && key!='Ejes'){
+          if(key!='Ejes'){
             this.vehiculo[key] = (''+value).trim().toUpperCase()
           }
         }

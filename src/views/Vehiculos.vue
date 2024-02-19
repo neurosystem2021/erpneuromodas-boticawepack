@@ -35,7 +35,7 @@
                 </b-col>
 
                 <b-table small ref="tablaVehiculos" :filter="filter" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                    striped hover id="my-table" :busy.sync="isBusy" :items="myProvider"
+                    striped hover id="tablaVehiculos" :busy.sync="isBusy" :items="myProvider"
                     :fields="fields" :per-page="perPage" :current-page="currentPage">
 
                     <template slot="Anulado" slot-scope="data">
@@ -158,4 +158,8 @@ export default {
 }
 </script>
   
-<style></style>
+<style>
+    #tablaVehiculos td{
+        vertical-align: middle !important;
+    }
+</style>

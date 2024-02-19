@@ -232,32 +232,13 @@
       },
       initForm () {
         this.vehiculo = {
-          Plano: []
+          Plano: [],
+          Asientos: 0,
         }
       },
       focusAutocomplete (ref) {
         // this.$refs[ref].type = ""
         this.$refs[ref].handleDoubleClick()
-      },
-      async cambiarEstado(vehiculo){
-        let r = confirm('¿Esta seguro de '+(vehiculo.Anulado ? 'Habilitar':'Anular')+' este vehiculo?')
-        if (r) {
-          try {
-            let respuesta = await this.axios.post(this.API + 'transporte/vehiculo/estado', {
-              IdVehiculo: vehiculo.IdVehiculo,
-              Estado: vehiculo.Anulado? 0 : 1
-            })
-            if (respuesta.data.updated) {
-              this.$toasted.info('El vehiculo con Placa ' + vehiculo.Placa + ' ha sido '+(vehiculo.Anulado ? 'Habilitado' : 'Anulado'))
-              if (this.cbGuardar) {
-                this.cbGuardar()
-              }
-              this.$refs.vehiculoAsientoForm.hide()
-            }
-          } catch (error) {
-            this.$toasted.error('Ha ocurrido un error')
-          }
-        }
       },
       async guardarVehiculo(e) {
         e.preventDefault();
@@ -293,6 +274,7 @@
 
         this.vehiculo.usuario = sessionStorage.getItem('User')
         this.vehiculo.Plano = this.vehiculoData
+        this.vehiculo.Asientos = asientos.length
         try {
             let repuesta = await this.axios.post(`${this.API}transporte/vehiculo/plano`, this.vehiculo);
   
