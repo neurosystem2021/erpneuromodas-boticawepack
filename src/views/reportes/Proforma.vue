@@ -51,7 +51,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -61,7 +61,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="2"></td>
+            <td colspan="3"></td>
             <td colspan="2">GRAN TOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
