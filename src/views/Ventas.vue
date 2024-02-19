@@ -4,8 +4,7 @@
 
         <Menu v-if="false"></Menu>
 
-        <br class="ocularMovil"/>
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row mt-1">
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil">
@@ -183,22 +182,36 @@
                         <b-row>
                             <b-col md="12" v-if="IdViaje == null">
                                 <b-form-group>
-                                    <b-button variant="primary" block @click="abrirViajes"><b><i class="fas fa-map-marked-alt"></i> VIAJES DISPONIBLES</b></b-button>
+                                    <b-button variant="primary" block @click="abrirViajes"><b><i class="fas fa-map-marked-alt"></i> SELECCIONAR VIAJE</b></b-button>
                                 </b-form-group>
                             </b-col>
                             <b-col md="12" v-else style="border: 1.5px dashed #007bff;">
-                                <b-row class="p-2">
+                                <b-row class="p-2" style="border-bottom: 1.5px dashed #007bff;">
                                     <b-col md="10">
                                         <b-row><label style="font-size: 0.85rem;"><b>RUTA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{  this.RutaViaje }}</b-badge></label></b-row>
-                                        <b-row><label style="font-size: 0.85rem;"><b>FECHA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.FechaViaje }}</b-badge></label></b-row>
-                                        <b-row><label style="font-size: 0.85rem;"><b>HORA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.HoraViaje }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>ORIGEN: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{  this.Origen }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>DESTINO: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{  this.Destino }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>FECHA SALIDA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.FechaViaje }}</b-badge></label></b-row>
+                                        <b-row><label style="font-size: 0.85rem;"><b>HORA SALIDA: </b> <b-badge variant="primary" style="font-size: 0.85rem;">{{ this.HoraViaje }}</b-badge></label></b-row>
                                     </b-col>
                                     <b-col md="2">
-                                        <span class="btn btn-sm text-danger ml-1" style="font-size: 1.2rem; margin-top: -13px;" size="sm"><i class="fas fa-times fa-lg"></i></span>
+                                        <span @click="quitarViaje" class="btn btn-sm text-danger ml-1" style="font-size: 1.2rem; margin-top: -13px;" size="sm"><i class="fas fa-times fa-lg"></i></span>
                                     </b-col>
                                 </b-row>
-                                <b-row>
-
+                                <b-row v-if="IdAsiento == null" style="margin-bottom: -5px;">
+                                    <b-col md="12">
+                                        <b-form-group class="mt-2">
+                                            <b-button variant="warning" block @click="abrirAsientos"><b><i class="fas fa-shuttle-van"></i> SELECCIONAR ASIENTO</b></b-button>
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row class="p-2" v-else style="margin-bottom: -5px;">
+                                    <b-col md="6">
+                                        <b-row><label style="font-size: 1.2rem;"><b>ASIENTO: </b> <b-badge class="ml-1" variant="dark" style="font-size: 1.2rem;">{{ this.IdAsiento }}</b-badge></label></b-row>
+                                    </b-col>
+                                    <b-col md="6">
+                                        <b-button size="sm" style="font-size: 0.85rem;" variant="info" block @click="abrirAsientos"><b><i class="fas fa-sync-alt"></i> CAMBIAR</b></b-button>
+                                    </b-col>
                                 </b-row>
                             </b-col>
                         </b-row>
@@ -418,7 +431,7 @@
                 <b-row>
                     <b-col md="2" class="text-right">
                         <b-form-group>
-                            <b-form-input v-model="fechaBuscador" type="date" step="1">
+                            <b-form-input v-model="fechaBuscador" type="date" step="1" v-on:input="(val) => buscarViajes()">
                             </b-form-input>
                         </b-form-group>
                     </b-col>
@@ -446,10 +459,10 @@
                                     <label style="font-size: 1.4rem;"><b-badge>{{ viaje.Nombre }}</b-badge></label>
                                 </b-col>
                                 <b-col md="3" class="text-center">
-                                    <b-row>
+                                    <b-row class="ml-1">
                                         <label><b>ORIGEN: </b> {{ viaje.CiudadOrigen }}</label>   
                                     </b-row>
-                                    <b-row>
+                                    <b-row class="ml-1">
                                         <label><b>DESTINO: </b> {{ viaje.CiudadDestino }}</label>   
                                     </b-row>
                                 </b-col>
@@ -461,6 +474,31 @@
                         </b-card>
                     </b-col>
                 </b-row>
+            </b-modal>
+            <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalAsientos" :title="'SELECCIONE ASIENTO: '+Vehiculo" size="md" ref="modalAsientos">
+                <div style="overflow-x: scroll !important;">
+                    <b-row style="width: max-content; margin: 5px;">
+                        <div>
+                            <b-img src="static/cabeza.png" style="height: 322px;"  alt=""></b-img>
+                        </div>
+                        <div v-for="(fila, i) in VehiculoData" :key="'fila-'+i" style="margin: 2px; width: 70px !important; height: 322px;" >
+                            <div v-for="(element, index) in fila" :key="'asiento-'+index" @click="seleccionarAsiento(fila,i,element,index)" :class="{'espacio': element.opcion == 0, 'asiento': element.opcion == 1, 'objeto': element.opcion == 2, 'ocupado': element.ocupado == 1 }" style="width: 58px; height: 58px; margin: 5px; display: flex; justify-content: center; align-items: center;">
+                            <b-img v-if="element.opcion == 6" src="static/sshh.png" width="40px" height="40px" alt=""></b-img>
+                            <b-img v-if="element.opcion == 5" src="static/escalera.png" width="40px" height="40px" alt=""></b-img>
+                            <b-img v-if="element.opcion == 4" src="static/tv.png" width="40px" height="40px" alt=""></b-img>
+                            <label v-if="element.opcion == 1" style="font-size: 1.8rem; margin-bottom: 0 !important;"><b>{{ element.id }}</b></label>
+                            </div>
+                        </div>
+                        <div>
+                            <b-img src="static/cola.png" style="height: 322px;" alt=""></b-img>
+                        </div>
+                    </b-row>
+                </div>
+                <div slot="modal-footer" >
+                    <b-btn variant="secondary" @click="$refs['modalAsientos'].hide()" class="mr-2">
+                    Cerrar
+                    </b-btn>
+                </div>
             </b-modal>
         </b-container>
     </div>
@@ -541,8 +579,12 @@ export default {
             RutaViaje: '',
             FechaViaje: '',
             HoraViaje: '',
+            Origen: '',
+            Destino: '',
             IdAsiento: null,
-            NumeroAsiento: '',
+            IdVehiculo: null,
+            Vehiculo: '',
+            VehiculoData: [],
         }
     },
     watch: {
@@ -576,12 +618,58 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+        seleccionarAsiento(fila,indexfila,cuadro,indexcuadro){
+            if(cuadro.ocupado == 1){
+                return
+            }
+
+            if(cuadro.id == null){
+                return
+            }
+
+            this.$toasted.info('Asiento seleccionado: '+cuadro.id, { duration: 3000 })
+            this.IdAsiento = cuadro.id
+            this.$refs['modalAsientos'].hide()
+        },
+        quitarViaje(){
+            this.IdViaje = null
+            this.RutaViaje = ''
+            this.FechaViaje = ''
+            this.HoraViaje =  ''
+            this.IdAsiento =  null
+            this.Destino = ''
+            this.Origen = ''
+            this.IdVehiculo = null
+            this.Vehiculo = ''
+            this.VehiculoData = []
+        },
         seleccionarViaje(viaje){
             this.IdViaje = viaje.IdViaje
             this.RutaViaje = viaje.Nombre
             this.FechaViaje = viaje.FechaViaje
             this.HoraViaje = viaje.HoraViajeFormat
+            this.Destino = viaje.CiudadDestino
+            this.Origen = viaje.CiudadOrigen
+            this.IdVehiculo = viaje.IdVehiculo
+            this.Vehiculo = viaje.Vehiculo
+            this.VehiculoData = []
             this.$refs['modalViajes'].hide()
+        },
+        async abrirAsientos(){
+            this.VehiculoData = []
+            try {
+                let respuesta = await this.axios.get(this.API + 'transporte/viajes/asiento', {
+                    params:{
+                        idViaje: this.IdViaje,
+                        idVehiculo: this.IdVehiculo
+                    }
+                })
+                this.VehiculoData = respuesta.data
+                this.$refs['modalAsientos'].show()
+            } catch (error) {
+                console.log(error);
+                this.$toasted.error('Ha ocurrido un error')
+            }
         },
         async abrirViajes(){
             this.fechaBuscador = this.$moment().format("YYYY-MM-DD")
@@ -610,6 +698,7 @@ export default {
                     params:{
                         fechaInicio: this.fechaBuscador,
                         unicaFecha: 1,
+                        estado: 1,
                     }
                 })
                 this.viajes = respuesta.data
@@ -717,9 +806,7 @@ export default {
             this.puntosAplicados = 0
             this.descuentoPuntos = {}
             this.descuentoGeneral = 0
-            this.IdViaje = null
-            this.RutaViaje = ''
-            this.FechaViaje =''
+            this.quitarViaje()
         },
         setTipoVenta (obj) {
             this.isNota = false
@@ -1097,6 +1184,18 @@ export default {
                 return          
             }
 
+            if(this.IdViaje != null  && this.IdAsiento == null){
+                this.$toasted.show('Debe seleccionar un asiento para el viaje', {duration:3000})
+                this.inProgress = false            
+                return   
+            }
+
+            if(this.IdViaje != null  && this.IdAsiento != null && this.venta.cliente.DniRuc=="00000000"){
+                this.$toasted.show('La venta de un pasaje debe ser a un cliente con DNI', {duration:3000})
+                this.inProgress = false            
+                return   
+            }
+
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
@@ -1135,6 +1234,8 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
+            this.venta.IdViaje = this.IdViaje
+            this.venta.IdAsiento = this.IdAsiento
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
@@ -1143,7 +1244,11 @@ export default {
                     this.obtenerStok({IdAlmacen: this.venta.almacen.IdAlmacen})
                     this.$toasted.show(response.data.msg)
                     return; 
-                }else{
+                }else if(response.data.error){
+                    this.inProgress = false
+                    this.$toasted.show(response.data.msg)
+                    return; 
+                } else{
                 // limpiar preorden seleccionado
                     this.$router.replace('/ventas')
                     this.$toasted.success('Venta realizada con exito')
@@ -1230,5 +1335,29 @@ export default {
 
 .cardViajeVenta * {
     cursor: pointer !important; 
+}
+
+#modalAsientos .modal-dialog{
+    max-width: max-content !important;
+}
+
+.asiento {
+    background-color: #0cb70c;
+    color: white;
+    cursor: pointer;
+}
+.asiento * {
+    cursor: pointer;
+}
+.objeto {
+    background-color: rgb(102, 79, 79) !important;
+}
+.ocupado {
+    cursor: not-allowed;
+    background-color: #dc3545 !important;
+    color: white;
+}
+.ocupado *{
+    cursor: not-allowed;
 }
 </style>

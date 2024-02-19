@@ -46,7 +46,7 @@
                             </b-col>
                             <b-col md="2" class="text-center">
                                 <label style="margin-bottom: 0;"><b>FECHA Y HORA</b></label><br>
-                                <label style="font-size: 1.4rem;"><b-badge variant="primary">{{ viaje.FechaViaje }} </b-badge> <b-badge variant="primary">{{ viaje.HoraViajeFormat }}</b-badge></label>
+                                <label style="font-size: 1.3rem;"><b-badge variant="primary">{{ viaje.FechaViaje }} </b-badge> <b-badge variant="primary">{{ viaje.HoraViajeFormat }}</b-badge></label>
                             </b-col>
                             <b-col md="2" class="text-center">
                                 <b-row>
@@ -56,7 +56,7 @@
                                     <label><b>DESTINO: </b> {{ viaje.CiudadDestino }}</label>   
                                 </b-row>
                             </b-col>
-                            <b-col md="3" class="text-center">
+                            <b-col md="3" class="text-left">
                                 <b-row>
                                     <label><b>CONDUCTOR: </b> {{ viaje.Apellidos }} {{ viaje.Nombres }}</label>   
                                 </b-row>
@@ -130,6 +130,62 @@
                     </b-col>
                 </b-row>
             </b-modal>
+            <b-modal ref="modalLista" size="lg" id="modalLista" hide-header>
+                <b-row>
+                    <b-col md="12" class="text-center">
+                        <h4>N° VIAJE {{ viajeSelect.IdViaje }} - LISTA DE PASAJEROS</h4>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col md="12" class="text-left">
+                        <b-row>
+                            <b-col md="6">
+                                <label style="margin-bottom: 0 !important;"><b>RUTA: </b> {{ viajeSelect.Nombre }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>FECHA SALIDA: </b> {{ viajeSelect.FechaViaje }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>HORA SALIDA: </b> {{ viajeSelect.HoraViajeFormat }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>VEHICULO: </b> {{ viajeSelect.Vehiculo }} ({{ viajeSelect.Asientos  }}) - {{ viajeSelect.Placa  }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>ASIENTOS OCUPADOS: </b> {{ viajeSelect.AsientosOcupados }}</label><br>
+                            </b-col>
+                            <b-col md="6">
+                                <label style="margin-bottom: 0 !important;"><b>ORIGEN: </b> {{ viajeSelect.CiudadOrigen }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>DESTINO: </b> {{ viajeSelect.CiudadDestino }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>CONDUCTOR: </b> {{ viajeSelect.Apellidos }} {{ viajeSelect.Nombres }}</label><br>
+                                <label style="margin-bottom: 0 !important;"><b>ASIENTOS LIBRES: </b> {{ (viajeSelect.Asientos - viajeSelect.AsientosOcupados) }}</label><br>
+                            </b-col>
+                        </b-row>
+                    </b-col>
+                </b-row>
+                <b-row class="mt-2">
+                    <b-col md="12">
+                        <table id="tableConfig" class="table b-table table-hover table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="10%">Asiento</th>
+                                    <th class="text-left" width="45%">Cliente</th>
+                                    <th class="text-left" width="15%">DNI</th>
+                                    <th class="text-left" width="30%">Fecha de Compra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, i) in lista" :key="i">
+                                    <td class="text-center">{{ item.IdAsiento }}</td>
+                                    <td  class="text-left">{{ item.Cliente }}</td>
+                                    <td  class="text-left">{{ item.DniRuc }}</td>
+                                    <td  class="text-left">{{ item.FechaOcupacion }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </b-col>
+                </b-row>
+                <div slot="modal-footer" >
+                    <b-btn  variant="primary" class="mr-2">
+                    Imprimir
+                    </b-btn>
+                    <b-btn variant="secondary" @click="$refs['modalLista'].hide()">
+                    Cerrar
+                    </b-btn>
+                </div>
+            </b-modal>
             <viaje-form ref="viajeForm" :viaje-select="viajeSelect" :cbGuardar="buscarViajes"></viaje-form>
         </b-container>
     </div>
@@ -155,6 +211,7 @@ export default {
                 {value: 3, text: 'COMPLETADO', variant:'success'},
             ],
             viajeSelect: {},
+            lista: [],
         }
     },
     methods: {
@@ -202,8 +259,20 @@ export default {
         anularViaje(viaje, index){
 
         },
-        listarViaje(viaje, index){
-
+        async listarViaje(viaje, index){
+            this.lista = []
+            try {
+                let respuesta = await this.axios.get(this.API + 'transporte/viajes/lista', {
+                    params:{
+                        idViaje: viaje.IdViaje
+                    }
+                })
+                this.lista = respuesta.data
+                this.viajeSelect = viaje
+                this.$refs['modalLista'].show()
+            } catch (error) {
+                this.$toasted.error('Ha ocurrido un error')
+            }
         },
         getEstado(opc){
             let estado = this.itemsEstado.find((i)=>opc==i.value)
@@ -221,17 +290,17 @@ export default {
         },
         async buscarViajes(){
             try {
-            let respuesta = await this.axios.get(this.API + 'transporte/viajes', {
-                params:{
-                    fechaInicio: this.fechaInicio,
-                    fechaFin: this.fechaFin,
-                    rangoFecha: 1,
-                }
-            })
-            this.viajes = respuesta.data
-          } catch (error) {
-            this.$toasted.error('Ha ocurrido un error')
-          }
+                let respuesta = await this.axios.get(this.API + 'transporte/viajes', {
+                    params:{
+                        fechaInicio: this.fechaInicio,
+                        fechaFin: this.fechaFin,
+                        rangoFecha: 1,
+                    }
+                })
+                this.viajes = respuesta.data
+            } catch (error) {
+                this.$toasted.error('Ha ocurrido un error')
+            }
         },
         /*rowClick(item, index) {
             this.vehiculoSelect = item

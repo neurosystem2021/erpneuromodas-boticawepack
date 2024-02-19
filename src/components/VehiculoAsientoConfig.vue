@@ -4,13 +4,13 @@
         <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigVehiculoAsiento" :title="title" size="md" ref="vehiculoAsientoFormConfig" v-model="show">
           <b-row>
             <b-button variant="success" class="ml-2" @click="agregarColumna()">Agregar Columna</b-button>
-            <!--<b-button :variant="editar?'danger':'primary'" class="ml-2" @click="editarLugar()">{{ editar?'Parar edición':'Editar lugares' }}</b-button>
-            <b-button variant="primary" class="ml-2" @click="agregarObjeto(true)">Agregar Asiento</b-button>
-            <b-button variant="secondary" class="ml-2" @click="agregarObjeto(false)">Agregar Espacio Vacio</b-button>-->
           </b-row>
           <hr>
           <div style="overflow-x: scroll !important;">
             <b-row style="width: max-content; margin: 5px;">
+              <div>
+                  <b-img src="static/cabeza.png" style="height: 322px;"  alt=""></b-img>
+              </div>
               <div v-for="(fila, i) in vehiculoData" :key="'fila-'+i" style="margin: 2px; border: 1.2px dashed black; width: 70px !important; height: 375px;" >
                 <div v-for="(element, index) in fila" :key="'asiento-'+index" @click="accionLugar(fila,i,element,index)" :class="{'espacio': element.opcion == 0, 'asiento': element.opcion == 1, 'objeto': element.opcion == 2, 'abierto': element.open  }"  :id="i + 'popover-espacio' + index" style="border: 1.5px solid black; width: 58px; height: 58px; margin: 5px; display: flex; justify-content: center; align-items: center;">
                   <b-img v-if="element.opcion == 6" src="static/sshh.png" width="40px" height="40px" alt=""></b-img>
@@ -37,28 +37,10 @@
                   <span class="btn btn-sm text-danger ml-2" style="font-size: 1rem;" size="sm" @click="eliminarColumna(fila,i)"><i class="fas fa-trash fa-lg"></i></span> 
                 </div>
               </div>
+              <div>
+                <b-img src="static/cola.png" style="height: 322px;" alt=""></b-img>
+              </div>
             </b-row>
-
-            <!--<b-row style="width: 1150px !important;" class="m-1">
-              <div style="width: 139px;">
-                <b-img src="static/cabeza.png"  alt=""></b-img>
-              </div>
-              <div style="display: grid; align-content: center; width: 972px !important;">
-                <b-row>
-                  <b-col md="12" dir="ltr">
-                    <draggable class="m-2 row" tag="div" :list="fila" group="people" @change="log" v-for="(fila, i) in vehiculoData" :key="'fila-'+i" style="border: 2px dashed black; height: 75px;">
-                          <div v-for="(element, index) in fila"
-                            :key="element.id+'-'+(element.asiento?'asiento':'espacio')" :class="{'espacio': !element.asiento }" style="background-color: #0cb70c; width: 58px; height: 62px; margin: 5px;"  >
-                            <b class="p-1" style="font-size: 1.5rem; color: black;">{{ (element.asiento?element.id:'*') }}</b>
-                          </div>
-                    </draggable>
-                  </b-col>
-                </b-row>
-              </div>
-              <div md="1" style="width: 27px;">
-                <b-img src="static/cola.png"  alt=""></b-img>
-              </div>
-            </b-row>-->
           </div>
           <div slot="modal-footer" >
             <b-btn  variant="secondary" @click="show=false" class="mr-2">
@@ -84,17 +66,6 @@
         vehiculo: {},
         filas: 0,
         vehiculoData: [],
-        /*list1: [
-          { name: "John", id: 1 },
-          { name: "Joao", id: 2 },
-          { name: "Jean", id: 3 },
-          { name: "Gerard", id: 4 }
-        ],
-        list2: [
-          { name: "Juan", id: 5 },
-          { name: "Edgard", id: 6 },
-          { name: "Johnson", id: 7 }
-        ]*/
         editar: false,
       }
     },
@@ -154,16 +125,6 @@
           })
         })
         this.vehiculoData[indexfila][indexcuadro].open =true
-        if(!this.editar){
-          return
-        }
-
-        if(this.vehiculoData[indexfila][indexcuadro].opcion==2){
-          this.vehiculoData[indexfila][indexcuadro].opcion=0
-          return
-        }
-
-        this.vehiculoData[indexfila][indexcuadro].opcion++
       },
       editarLugar(){
         this.editar = !this.editar
@@ -172,61 +133,11 @@
         this.vehiculoData.splice(index, 1)
       },
       agregarColumna(){
-        /*if(this.vehiculoData.length > 4){
-          return
-        }*/
         let asientos = [
-          {id: null, opcion: 0, open: false },{id: null, opcion: 0, open: false },{id: null, opcion: 0, open: false },{id: null, opcion: 0, open: false },{id: null, opcion: 0, open: false }
+          {id: null, opcion: 0, open: false, ocupado: 0 },{id: null, opcion: 0, open: false, ocupado: 0 },{id: null, opcion: 0, open: false, ocupado: 0 },{id: null, opcion: 0, open: false, ocupado: 0 },{id: null, opcion: 0, open: false, ocupado: 0 }
         ]
         this.vehiculoData.push(asientos)
       },
-      agregarObjeto(opc){
-        if(!(this.vehiculoData.length > 0)){
-          this.$toasted.show('Debe tener una fila minimo para agregar asiento u obstaculo')
-          return
-        }
-
-        if(this.vehiculoData[0].length==14){
-          this.$toasted.show('Debe mover los asientos a otra fila para seguir agregando')
-          return
-        }
-        let maxNumber = 0
-        let array = []
-        this.vehiculoData.map((v)=>{
-          let dataFin = v.filter((v)=>v.asiento == opc)
-          let maxValue = dataFin.reduce((acc, value) => {
-	          return (acc = acc > value.id ? acc : value.id);
-          }, 0);
-
-          if(maxValue){
-            array.push(maxValue)
-          }
-        })
-
-        if(array.length>0){
-          maxNumber = Math.max(...array);
-        }
-
-        maxNumber++
-        console.log(opc);
-        this.vehiculoData[0].push({id: maxNumber, asiento:opc })
-      },
-      //DRAG
-      /*add: function() {
-        this.list.push({ name: "Juan" });
-      },
-      replace: function() {
-        this.list = [{ name: "Edgard" }];
-      },
-      clone: function(el) {
-        return {
-          name: el.name + " cloned"
-        };
-      },*/
-      log: function(evt) {
-        window.console.log(evt);
-      },
-      //FIN DRAG
       clearForm () {
         this.initForm()
       },
@@ -302,7 +213,7 @@
   </script>
   <style>
   #modalConfigVehiculoAsiento .modal-dialog{
-    max-width: 1200px !important;
+    max-width: max-content !important;
   }
 
   #modalConfigVehiculoAsiento {
@@ -311,13 +222,11 @@
   .abierto{
     border: red 1.5px solid !important;
   }
-  .espacio {
-    
-  }
   .asiento {
     background-color: #0cb70c;
+    color: white;
   }
   .objeto {
-    background-color: rgb(142, 56, 56) !important;
+    background-color: rgb(102, 79, 79) !important;
   }
   </style>
