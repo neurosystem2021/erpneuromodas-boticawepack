@@ -414,9 +414,9 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+       <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
-        </b-btn>
+        </b-btn>-->
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>

@@ -15,6 +15,7 @@
                         required="required"
                         ref="inputMovimiento"
                         :url="API + 'movimientos/tipos'"
+                        :customParams="{idPerfil: idPerfil}"
                         anchor="TipoMovimiento"
                         label="writer"
                         placeholder=""
@@ -230,7 +231,8 @@ export default {
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
       isTraslado:true,
-      isSalida:false
+      isSalida:false,
+      idPerfil: sessionStorage.getItem('IdPerfil'),
     }
   },
   computed: {
