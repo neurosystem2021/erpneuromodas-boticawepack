@@ -198,6 +198,7 @@
                                                 <b-form-checkbox
                                                     v-model="venta.EsCredito"
                                                     :value="1"
+                                                    :disabled="true"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
