@@ -95,7 +95,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
           <b-button  @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
@@ -413,7 +413,8 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoNombre:'',
-      productoUrl:''
+      productoUrl:'',
+      indexPos: null,
     }
   },
   watch: {
@@ -743,7 +744,24 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
+      obj.cantidadPres = 1
       obj = this.onSetProducto(obj)
+
+      if(this.indexPos != null){
+        this.actualizarProd(obj)
+        this.indexPos = null
+        this.$toasted.info('Se cambio de precios',{ duration: 5000 })
+        this.$refs['modalCant'].hide()
+        return
+      }
+
+      let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      if(existe){
+        this.$toasted.show('El producto '+obj.Producto+' ya se agrego anteriormente a la lista',{ duration: 7000 })
+        this.$refs['modalCant'].hide()
+        return
+      }
+
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -757,6 +775,7 @@ export default {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
+      obj.cantidadPres = this.cant
       this.$refs.autocompleteProducto.setValue('')
       //obj.FLETE = 0
       // this.objProd.precio = 0
@@ -768,6 +787,22 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
+      
+      if(this.indexPos != null){
+        this.actualizarProd(obj)
+        this.indexPos = null
+        this.$toasted.info('Se cambio de precios',{ duration: 5000 })
+        this.$refs['modalCant'].hide()
+        return
+      }
+
+      let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      if(existe){
+        this.$toasted.show('El producto '+obj.Producto+' ya se agrego anteriormente a la lista',{ duration: 7000 })
+        this.$refs['modalCant'].hide()
+        return
+      }
+
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -776,12 +811,13 @@ export default {
       obj.cantidadPres = this.cant
       this.actualizarProd(obj)
     },
-    showPresentacion (obj) {
+    showPresentacion (obj, index = null) {
       if (!obj.PreciosPorProducto !== '') {
         this.precioCont = obj.PrecioContado
         obj.estadoPxP = false
         this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
         this.objProd = obj
+        this.indexPos = index
         this.$refs['modalCant'].show()
         return
       }
