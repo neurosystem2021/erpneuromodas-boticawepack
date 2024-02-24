@@ -328,7 +328,7 @@
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="diasValidosProf"
                                                     min="0"
-                                                    value="0"
+                                                    value="1"
                                                     type="number"
                                                 ></b-form-input>
                                             </b-input-group>
@@ -455,7 +455,7 @@
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" v-if="venta.vendedor.IdUsuarioPerfil == 1 || venta.vendedor.IdUsuarioPerfil == 28" variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
                         <br />
@@ -504,7 +504,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf:1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
@@ -687,7 +687,7 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 0
+                diasValidosProf: 1
             }
             this.isNota = false
             this.bloquearInput=false
@@ -1009,7 +1009,8 @@ export default {
                 this.$toasted.info('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                 this.loadClienteVarios()
-                this.diasValidosProf=0;
+                this.diasValidosProf=1;
+                this.getVendedor()
                 window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
