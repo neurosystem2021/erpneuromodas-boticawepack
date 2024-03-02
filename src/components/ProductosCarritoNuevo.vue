@@ -61,10 +61,10 @@
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
+          <!-- Se borró esta linea para habilitar edición :readonly="(type === 'mov') ? false : true" -->
           <input
             v-model="productos[data.index].precio"
             type="number"
-            :readonly="(type === 'mov') ? false : true"
             min="0"
             style="width: 105px"
             step="0.00001"
