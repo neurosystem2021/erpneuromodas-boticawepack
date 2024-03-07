@@ -217,7 +217,7 @@
 
         <!-- MODALS TOUCH -->
 
-        <b-row style="height:34vh; overflow-y: scroll; background: #FFFFFF;">
+        <b-row style="height:50vh; overflow-y: scroll; background: #FFFFFF;">
             <b-col md="12" style="padding-right: 5px !important;">
                 <b-table id="carrito" small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
                 <template slot="Indicaciones" slot-scope="data">
@@ -462,6 +462,7 @@ import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
 export default {
   mounted() {
+  console.log('FROM PRODUCOS')
     // this.alterarBuscadorProductos()
   },
   data () {
@@ -1101,4 +1102,9 @@ export default {
     .bs-popover-bottom{
       max-width: 370px !important;
     }
+
+    td {
+    margin: 0 0.3rem !important;
+    padding: 0 0.3rem !important;
+}
 </style>

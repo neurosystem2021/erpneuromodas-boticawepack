@@ -13,7 +13,7 @@ const mutations = {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
-        productos.push(item)
+        productos.unshift(item)
       } else {
         productos[index].cantidad = Number(productos[index].cantidad)+1
       }
@@ -79,6 +79,7 @@ const mutations = {
 
 const actions = {
   agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
+    console.log(obje)
     let setPrecio = false
     let cantidad = false
     let precio = false

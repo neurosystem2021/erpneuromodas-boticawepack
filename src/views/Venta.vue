@@ -2,7 +2,7 @@
     <div>
         <b-container fluid class="bv-example-row" id="conten">
             <b-row>
-                <b-col md="6" style="border-right: 3px solid #C0C0C0; background: white">
+                <b-col md="7" style="border-right: 3px solid #C0C0C0; background: white">
                     <b-form @submit="guardarVenta" @keydown.enter="prevent">
                     <b-row>
                         <b-col md="12" v-if="precioHabilitado" style="margin-bottom:-10px">
@@ -356,7 +356,7 @@
                     </b-row>
                     </b-form>
                 </b-col>
-                <b-col md="6">
+                <b-col md="5">
                     <b-row class="headerInfo" style="background: #F4F4F4;">
                         <b-col md="5">
                             <b-input-group prepend="Vendedor" class="mt-2">
@@ -926,7 +926,7 @@ export default {
                 this.onAddProducto(obj) 
                 this.$toasted.success('Producto añadido correctamente')
                 this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 })
-            }, { setPrecioCosto: false }, false, false])
+            }, { setPrecioCosto: false, setSuma: true }, false, false])
             this.loadCode=''
 
             this.$refs['modalCant'].hide()
