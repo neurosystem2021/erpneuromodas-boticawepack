@@ -1103,7 +1103,7 @@ export default {
       max-width: 370px !important;
     }
 
-    td {
+    #carrito td {
     margin: 0 0.3rem !important;
     padding: 0 0.3rem !important;
 }
