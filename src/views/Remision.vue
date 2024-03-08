@@ -73,6 +73,7 @@
                       <option value="08">IMPORTACION</option>
                       <option value="09">EXPORTACION</option>
                       <option value="19">TRASLADO A ZONA PRIMARIA</option>
+                      <option value="06">DEVOLUCIÒN</option>
                       <option value="13">OTROS</option>
                     </select>
                   </div>
