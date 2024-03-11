@@ -137,7 +137,7 @@
                             </b-col>
                         </b-row>
                         <b-row>
-                            <b-col md="9">
+                            <b-col :md="venta.cliente.Cliente && venta.cliente.EsVIP ? '7' : '9'" >
                                 <b-row>
                                     <b-col md="4" class="docInfo mt-2" id="autoPlaca">
                                         <b-input-group prepend="Placa" class="mb-1">
@@ -238,23 +238,9 @@
                                     
                                 </b-row>
                             </b-col>
-                            <b-col md="3" >
-                                <b-form-group class="text-left mt-1" v-if="venta.ConsumoId>0">
-                                    <b-badge style="font-size:13.5px" variant="primary">Monto Total: S/ {{ MontoTotal }} </b-badge>
-                                    <b-badge style="font-size:13.5px" variant="danger">Monto Consumido: S/ {{ MontoConsumido }} </b-badge>
-                                    <b-badge style="font-size:13.5px" variant="success">Monto Disponible: S/ {{ MontoTotal - MontoConsumido }} </b-badge>
-                                </b-form-group>
-                                <b-form-group class="text-center">
-                                    <div class="big-text">
-                                        {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
-                                    </div>
-                                    {{ venta.FechaDoc }}
-                                </b-form-group>
-                            </b-col>
-                        </b-row>
-                        <b-row class="text-center">
-                            <b-col md="3" >
-                                <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
+
+                            <b-col :md="venta.cliente.Cliente && venta.cliente.EsVIP ? 2 : 3"  v-if="venta.cliente.Cliente && venta.cliente.EsVIP" >
+                                <div>
                                     <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                                         <div class="puntos">
                                             {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -274,6 +260,20 @@
                                     1 Punto equivale a: S/ {{ descuentoPuntos.ValorPunto | redondear }}
                                     </b-form-text>
                                 </div>
+                            </b-col>
+
+                            <b-col md="3" >
+                                <b-form-group class="text-left mt-1" v-if="venta.ConsumoId>0">
+                                    <b-badge style="font-size:13.5px" variant="primary">Monto Total: S/ {{ MontoTotal }} </b-badge>
+                                    <b-badge style="font-size:13.5px" variant="danger">Monto Consumido: S/ {{ MontoConsumido }} </b-badge>
+                                    <b-badge style="font-size:13.5px" variant="success">Monto Disponible: S/ {{ MontoTotal - MontoConsumido }} </b-badge>
+                                </b-form-group>
+                                <b-form-group class="text-center">
+                                    <div class="big-text">
+                                        {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
+                                    </div>
+                                    {{ venta.FechaDoc }}
+                                </b-form-group>
                             </b-col>
                         </b-row>
                         <br>
@@ -544,6 +544,9 @@
                                 <b-col md="12" class="mt-1">
                                     <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                                 </b-col>-->      
+                                <b-col md="12" class="mt-1">
+                                    <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
+                                </b-col>
                             </b-collapse>
                         </b-col>
                     </b-row>
