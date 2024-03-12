@@ -80,7 +80,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresos" :key="index" v-if="item.IdCuenta === 1">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -88,7 +88,7 @@
               </tr>
             </tbody>
             <tfoot>
-              <tr>
+              <tr v-if="ingresos.some(item => item.IdCuenta === 1)">
                 <td colspan="2"></td>
                 <td class="total"><b>Total Ingresos</b></td>
                 <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
@@ -105,7 +105,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
+              <tr v-for="(item, index) in salidas" :key="index" v-if="item.IdCuenta == 1">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -113,7 +113,7 @@
               </tr>
             </tbody>
             <tfoot>
-              <tr>
+              <tr v-if="salidas.some(item => item.IdCuenta == 1)">
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
@@ -144,9 +144,38 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="3"></td>
                 <td class="total"><b>Total Ingresos Tarjetas</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col v-if="totalEgresosTarjeta">
+          <h5>Egresos de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in egresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3"></td>
+                <td class="total"><b>Total Egresos Tarjetas</b></td>
+                <td class="total"><b>S/. {{ totalEgresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -519,6 +548,7 @@ export default {
       ventas: [],
       ingresos: [],
       ingresosTarjeta: [],
+      egresosTarjeta: [],
       salidas: [],
 	  adelantos: [],
       turno: null,
@@ -550,7 +580,7 @@ export default {
     totalSalidas () {
       let total = 0
       this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe
+        if (!salida.Anulado && salida.IdCuenta == 1) total += salida.Importe
       });
       return total 
     },
@@ -558,6 +588,13 @@ export default {
       let total = 0
       this.ingresosTarjeta.forEach(ingresoTar => {
         if (!ingresoTar.Anulado) total += ingresoTar.Importe
+      });
+      return total 
+    },
+    totalEgresosTarjeta () {
+      let total = 0
+      this.egresosTarjeta.forEach(egresoTar => {
+        if (!egresoTar.Anulado) total += egresoTar.Importe
       });
       return total 
     },
@@ -792,6 +829,8 @@ export default {
       })
       .then(res => {
         this.salidas = res.data
+        this.egresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
+        console.log(this.salidas)
       }).catch(err => {
         console.log(err)
       }) 
