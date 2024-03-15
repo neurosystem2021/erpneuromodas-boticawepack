@@ -159,6 +159,7 @@
                                                 :onFocus="focusAutocomplete.bind(null, 'inputPlaca')"                
                                                 :classes="{input: 'form-control upper'}">
                                             </autocomplete>
+                                            <lista-placas></lista-placas>
                                          </b-input-group>
                                         <b-input-group prepend="Km">
                                             <input v-model="venta.Km"
@@ -631,6 +632,7 @@ import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import ValeLista from '@/components/ValeLista.vue'
+import ListaPlacas from '@/components/ListaPlacas.vue'
 
 export default {
     beforeMount () {
@@ -1785,7 +1787,8 @@ export default {
         Proformas,
         PagoDeuda,
         PreOrdenLista,
-        ValeLista
+        ValeLista,
+        ListaPlacas,
     }
 }
 </script>
