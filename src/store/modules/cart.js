@@ -103,7 +103,7 @@ const actions = {
         producto.precio = producto.precioConvenio || producto.precio;
       }
 
-      let arr = [
+      /*let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},
         {"desc": producto.ProductoDesc3}
@@ -113,9 +113,10 @@ const actions = {
           arr[i].desc = ''
         }
         producto.Descripcion = arr[0].desc + '\n' + arr[1].desc + '\n' + arr[2].desc
-      }
+      }*/
 
       // console.log(producto);
+      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
       producto.disabledProf = 0
       
       commit('AGREGAR_PRODUCTO', producto)
