@@ -64,6 +64,9 @@
                             <th class="table-success text-center">Stock</th>
                             <th>RUC</th>
                             <th>Proveedor</th>
+                            <th class="table-primary text-center">P.Costo</th>
+                            <th class="table-primary text-center">P.Venta</th>
+                            <th class="table-success text-center">Total</th>
                             <th>Accion</th>
                         </tr>
                     </thead>
@@ -81,9 +84,21 @@
                             <td class="table-success text-center">{{ item.Stock | redondear(2) }}</td>
                             <td>{{ item.Ruc }}</td>
                             <td>{{ item.Proveedor }}</td>
+                            <td class="table-primary text-center">{{ item.PrecioCosto.toFixed(2) }}</td>
+                            <td class="table-primary text-center">{{ item.PrecioContado.toFixed(2) }}</td>
+                            <td class="table-success text-center">{{ ((item.Stock * item.PrecioContado) - (item.Stock * item.PrecioCosto)).toFixed(2) }}</td>
                             <td class="text-center"><span v-if="item.Vencer==0"><b-button @click="cambiarVencer(item.IdProducto, index)" variant="info">CAMBIAR A VENCIDO</b-button></span><span v-else><b-badge style="font-size: 1.2rem;" variant="danger">VENCIDO</b-badge></span></td>
-                        </tr>
+                          </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="11"></td> <!-- Espacio vacío para las primeras columnas -->
+                            <td class="table-success text-center "><strong>Total</strong></td>
+                            <td class="table-primary text-center">{{ sumarPreciosCosto(productos).toFixed(2) }}</td> <!-- Suma de PrecioCosto -->
+                            <td class="table-primary text-center">{{ sumarPreciosContado(productos).toFixed(2) }}</td> <!-- Suma de PrecioContado -->
+                            <td></td> <!-- Espacio vacío para la última columna -->
+                        </tr>
+                    </tfoot>
                 </table>
             </b-col>
           </b-row>
@@ -127,6 +142,13 @@
       }
     },
     methods: {
+      
+      sumarPreciosCosto(productos) {
+        return productos.reduce((total, item) => total + item.PrecioCosto, 0);
+      },
+      sumarPreciosContado(productos) {
+        return productos.reduce((total, item) => total + item.PrecioContado, 0);
+      },
       async generarFechas(){
         if(this.vencimiento.fechaInicio !='' && this.vencimiento.fechaFin != ''){
           this.isProcess = true

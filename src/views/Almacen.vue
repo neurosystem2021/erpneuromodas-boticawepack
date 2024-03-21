@@ -279,6 +279,36 @@
         <div v-if="productoSelect.CompuestosProducto!= '' && productoSelect.CompuestosProducto">
           <label style="font-size: 0.85rem;"><b>COMPUESTOS: </b> {{ productoSelect.CompuestosProducto }}</label>
         </div>
+        <b-row>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Inicio:</label>
+              <b-form-input
+                v-model="kardex.fechaDesde"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="5">
+            <b-form-group>
+              <label>Fecha Fin:</label>
+              <b-form-input
+                v-model="kardex.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>
         <b-row>
           <b-col class="text-center">
@@ -450,6 +480,10 @@ export default {
         fechaDesde: this.$moment().format("YYYY-01-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
+      kardex: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
+      },
       desdeInicio: 1,
     }
   },
@@ -606,11 +640,14 @@ export default {
     rowDblClick (item) {
       this.productoSelect = item
       this.showKardex = true
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01")
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD") 
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
           }
       }).then((response) => {
           this.kardexSelect = response.data
@@ -624,6 +661,20 @@ export default {
           this.PresentacionesProd = JSON.parse(prod.Presentaciones)
       }
       this.$refs['modalCant'].show()
+    },
+    kardexFechaRango(){
+      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
+          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
+          params: {
+              idAlmacen: this.almacen.IdAlmacen,
+              fechaHasta: this.kardex.fechaHasta,
+              fechaDesde: this.kardex.fechaDesde
+          }
+          }).then((response) => {
+              this.kardexSelect = response.data
+          })
+      }
+     
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh()
@@ -752,4 +803,17 @@ export default {
   align-content: center;
   align-items: center;
 }
+.centrarClase {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+  }
+  .centrarClaseIzq {
+    display: flex;
+    justify-content: start;
+    align-content: center;
+    align-items: center;
+  }
+</style>
 </style>
