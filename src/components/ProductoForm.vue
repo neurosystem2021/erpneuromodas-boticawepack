@@ -140,6 +140,14 @@
               />
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.MasMovido"
+                   :value="1"
+                   :unchecked-value="0">
+              Producto con más movimiento
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -306,6 +314,7 @@ export default {
         // this.producto.ProductoModelo = newVal.ProductoModelo
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
+        this.producto.MasMovido = newVal.MasMovido
         this.$refs.file.value=null
       } else {
 
@@ -392,6 +401,7 @@ export default {
         PorcentajeUtilidad: '',
         StockMinimo: 0,
         PrecioContado: '',
+        MasMovido: 0,
         // Botapie: '',
         // Genero: '',
         categoria: {},
