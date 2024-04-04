@@ -106,7 +106,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button size="sm":disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
@@ -133,7 +133,7 @@
           </div>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+        <template slot="cantxPrecio" slot-scope="data">
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -827,18 +827,18 @@ export default {
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
-      
-      if (fPP.length==4) {
+      //  Si hay exactamente 4 presentaciones con cantidad 0, se ejecuta el bloque de código dentro del if.
+      if (fPP.length==4 || this.preciosProd.length > 1) {
         obj.estadoPxP = true
+        this.indexProdSelect = null
+        this.$refs['modalCant'].show()
+        this.objProd = obj
+        return
+      }else{
         obj.cantxPrecio=1
         this.setProductoUni(obj)
-        return
       }
-
-      this.indexProdSelect = null
-      this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
     },  
     setProductoUni (obj) {
       this.objProd.cantxPrecio = 1
@@ -857,6 +857,7 @@ export default {
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
+
         //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
       }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
       this.loadCode=''
