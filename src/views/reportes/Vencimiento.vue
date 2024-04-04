@@ -86,7 +86,7 @@
                             <td>{{ item.Proveedor }}</td>
                             <td class="table-primary text-center">{{ item.PrecioCosto.toFixed(2) }}</td>
                             <td class="table-primary text-center">{{ item.PrecioContado.toFixed(2) }}</td>
-                            <td class="table-success text-center">{{ ((item.Stock * item.PrecioContado) - (item.Stock * item.PrecioCosto)).toFixed(2) }}</td>
+                            <td class="table-success text-center">{{ totalProducto(item).toFixed(2)}}</td>
                             <td class="text-center"><span v-if="item.Vencer==0"><b-button @click="cambiarVencer(item.IdProducto, index)" variant="info">CAMBIAR A VENCIDO</b-button></span><span v-else><b-badge style="font-size: 1.2rem;" variant="danger">VENCIDO</b-badge></span></td>
                           </tr>
                     </tbody>
@@ -96,6 +96,7 @@
                             <td class="table-success text-center "><strong>Total</strong></td>
                             <td class="table-primary text-center">{{ sumarPreciosCosto(productos).toFixed(2) }}</td> <!-- Suma de PrecioCosto -->
                             <td class="table-primary text-center">{{ sumarPreciosContado(productos).toFixed(2) }}</td> <!-- Suma de PrecioContado -->
+                            <td class="table-success text-center">{{ sumarPreciosTotal(productos).toFixed(2) }}</td> <!-- Suma de PrecioContado -->
                             <td></td> <!-- Espacio vacío para la última columna -->
                         </tr>
                     </tfoot>
@@ -141,14 +142,21 @@
         isProcess: false,
       }
     },
+     computed: {
+    totalProducto() {
+      return item => item.Stock * item.PrecioCosto;
+    }
+  },
     methods: {
-      
+      sumarPreciosTotal(productos) {
+        return productos.reduce((total, item) => total + this.totalProducto(item), 0);
+      },
       sumarPreciosCosto(productos) {
         return productos.reduce((total, item) => total + item.PrecioCosto, 0);
       },
       sumarPreciosContado(productos) {
         return productos.reduce((total, item) => total + item.PrecioContado, 0);
-      },
+        },
       async generarFechas(){
         if(this.vencimiento.fechaInicio !='' && this.vencimiento.fechaFin != ''){
           this.isProcess = true
