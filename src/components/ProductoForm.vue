@@ -130,9 +130,6 @@
             <label>Imagen:</label>
             <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
             <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
-            <b-form-text id="input-formatter-help">
-              <b style="color: red;">*La imagen debe ser en formato PNG y 500 x 500 pixeles</b>
-            </b-form-text>
           </b-form-group>
 
           <b-form-group>
@@ -614,15 +611,15 @@ export default {
         })
     },
     handleFileUpload() {
-      const file = this.$refs.file.files[0]
-      this.file = ''
+      this.file = this.$refs.file.files[0]
+      /*this.file = ''
       if (!file) {
         this.$refs.file.value=null
         this.file=''
         this.$toasted.error('Sin imagen, no se guardará', { duration: 4000 })
         return;
-      }
-      
+      }*/
+      /*
       if (file.type != 'image/png') {
         this.$toasted.error('La imagen debe ser en formato PNG de 300 x 300 pixeles, no se guardará', { duration: 5000 })
         this.$refs.file.value = null
@@ -650,7 +647,7 @@ export default {
         this.$refs.file.value = null
         this.file=''
         this.$toasted.show("Ha ocurrido un error", { duration: 4000 })
-      }
+      }*/
     },
     getBase64(file) {
       return new Promise((resolve, reject) => {
