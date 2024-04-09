@@ -196,7 +196,7 @@
             v-model="productos[data.index].PorcentajeUtilidad"
             style="width: 80px"
             type="number" 
-            step="0.01"
+            step="0.000001"
             :disabled="bloquearInput?true:false"
             @input="cambiarPrecio(data.index, productos[data.index])" 
             @mouseup="cambiarPrecio(data.index, productos[data.index])" 

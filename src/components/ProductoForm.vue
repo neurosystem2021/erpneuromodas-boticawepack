@@ -174,7 +174,7 @@
               @input="actualizarPrecioContado"
               type="number"
               min="0"
-              step="0.0001"
+              step="0.000001"
               class="form-control"
               />
           </b-form-group>
