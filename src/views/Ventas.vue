@@ -99,7 +99,7 @@
                                     <label>Cliente:</label>
                                     
                                     <b-input-group>
-                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                                             <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
                                             ref="inputCliente"
@@ -123,7 +123,7 @@
                                             
                                         </b-input-group-append>
                                     </b-input-group>
-                                    <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
                                         <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
@@ -185,7 +185,7 @@
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
-                            ref="carrito" 
+                            ref="carrito"
                             :showButton="false" 
                             :bloquearInput="bloquearInput"  
                             :fields="carrito.fields"
@@ -218,7 +218,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-form-checkbox
+                                                <b-form-checkbox 
                                                     v-model="venta.EsCredito"
                                                     :disabled="bloquearInput?true:false || isNota"
                                                     :value="1"
@@ -380,7 +380,7 @@ export default {
                 { value: '08', text: 'BONIFICACION' },
                 { value: '09', text: 'DISMINUCION EN EL VALOR' },
                 { value: '10', text: 'OTROS CONCEPTOS' }
-            ], 
+            ],
             carrito: {
                 fields: [
                     { key: 'itemNum', label: '#', class:'text-center thclass' },
@@ -438,7 +438,7 @@ export default {
                 .then(res => {
                     if (res.data.IdCliente) {
                         this.setCliente(res.data)
-                    }
+            }
                 })
         },
         loadFirstAlmacen () {
@@ -602,7 +602,7 @@ export default {
             this.$refs.inputAlmacen.setValue(obj.Almacen)
             // this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             if (this.productos.length) {
-                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             }
         },
         loadPuntoVenta (id) {
@@ -679,7 +679,6 @@ export default {
                     console.log(error)
                 })
             }
-            this.actualizarPrecioConvenio(obj)
         },
         onSetProducto (obj, precio = false, precioc = false) {
             obj.cantidad = 1
@@ -808,25 +807,25 @@ export default {
             totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
             if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
-                this.inProgress = false            
-                return  
+                this.inProgress = false
+                return 
             }
             if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago tarjeta no puede ser negativo')
-                this.inProgress = false            
-                return  
-            }
+                    this.inProgress = false            
+                    return                
+                }
             if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago mastercard no puede ser negativo')
                 this.inProgress = false            
-                return  
+                return          
             }
 
             if (!this.venta.EsCredito) {
                 if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false            
-                    return                
+                this.inProgress = false            
+                return 
                 }
             }
 
@@ -851,13 +850,13 @@ export default {
             }
             if(!this.productos.length) {
                 this.$toasted.show('No hay productos para vender')
-                this.inProgress = false            
-                return          
+                this.inProgress = false
+                return
             }
 
             // sin stock
             let sinStock = 0
-            let totalCero = 0
+            let totalCero = 0 
             this.productos.forEach(pro => {
                 if((parseFloat(pro.stock) <= 0 || parseFloat(pro.stock).toFixed(2)  < parseFloat(pro.cantidad*pro.CantidadPresentacion) || pro.stock == undefined )) {
                     //this.$toasted.error('Se requiere: '+(pro.cantidad*pro.CantidadPresentacion)+" unidades de "+pro.Producto+" para la presentacion "+ pro.Presentacion,{duration: 3000});
@@ -876,7 +875,7 @@ export default {
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
-                this.inProgress = false            
+                this.inProgress = false
                 return;
             }
 
