@@ -965,7 +965,7 @@ export default {
         `
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/.${data.PrecioContado}</b> 
       `
     },
     // setCantidad (index, val) {
