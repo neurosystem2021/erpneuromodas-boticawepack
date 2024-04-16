@@ -1114,6 +1114,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let menosUtilidad = 0
             let proTieneVe = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock==undefined)) {
@@ -1128,9 +1129,21 @@ export default {
                     this.$toasted.error('El producto '+pro.Producto+' tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta',{duration: 4000});
                     proTieneVe += 1
                 }
+                 /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
+                    menosUtilidad += 1
+                }*/
+                if((parseFloat(pro.precio)-pro.PrecioCosto < 0) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')){
+                    menosUtilidad += 1
+                }
             });
 
             if(proTieneVe >= 1){
+                this.inProgress = false            
+                return;
+            }
+
+            if (menosUtilidad>=1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender un producto con ganancia negativa');
                 this.inProgress = false            
                 return;
             }
