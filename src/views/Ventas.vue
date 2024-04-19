@@ -225,7 +225,7 @@
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
-                                :on-select="setVendedor" 
+                                :on-select="setVendedorManual" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
@@ -853,13 +853,16 @@ export default {
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
-        getVendedor () {
+        getVendedor (user) {
             let usuario = sessionStorage.getItem('User')
+            if (user) {
+                usuario = user
+            }
             this.axios.get(this.API + 'usuarios/' + usuario)
             .then((response) => {
                 this.setVendedor(response.data)
                 this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
+                //this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
                 // bloquear ambos inputs
@@ -879,6 +882,12 @@ export default {
 
             this.venta.vendedor = obj
         },
+
+        setVendedorManual (obj) {
+            this.venta.vendedor = obj
+            this.getVendedor(obj.Usuario)
+        },
+
         setComisionista (obj) {
             if (typeof obj === 'object') {
                 this.$refs.inputComisionista.setValue(obj.Cliente)
