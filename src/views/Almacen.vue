@@ -89,6 +89,7 @@
                   <autocomplete
                     :url="API + 'categorias'"
                     ref="inputCategoria"
+                    :debounce="600"
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
@@ -103,6 +104,7 @@
                   <autocomplete
                     :url="API + 'productos'"
                     ref="inputProducto"
+                    :debounce="600"
                     anchor="Producto"
                     label="writer"
                     :on-select="val => generateFilter('producto', val.Producto)"                    
@@ -117,6 +119,7 @@
                   <autocomplete
                     :url="API + 'marcas'"
                     ref="inputMarca"
+                    :debounce="600"
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
@@ -131,6 +134,7 @@
                   <autocomplete
                     :url="API + 'compuestos'"
                     ref="inputCompuesto"
+                    :debounce="600"
                     anchor="ProductoCompuesto"
                     label="writer"
                     :on-select="val => generateFilter('compuesto', val.ProductoCompuesto)"                    
@@ -640,7 +644,7 @@ export default {
     rowDblClick (item) {
       this.productoSelect = item
       this.showKardex = true
-      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01")
+      this.kardex.fechaDesde = this.$moment().format("YYYY-01-01")
       this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD") 
 
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
