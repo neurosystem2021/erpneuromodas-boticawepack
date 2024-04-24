@@ -331,7 +331,7 @@
               <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
-                step="0.001"
+                step="0.0001"
                 class="form-control"
                 />
             </b-form-group>
