@@ -960,6 +960,7 @@ export default {
             // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
+            let menosUtilidad = 0
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -968,7 +969,21 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
+
+                /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
+                    menosUtilidad += 1
+                }*/
+                if((parseFloat(pro.precio)-pro.PrecioCosto < 0) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')){
+                    menosUtilidad += 1
+                }
+
             });
+
+            if (menosUtilidad>=1 && this.venta.tipoVenta.CodSunat != '07') {
+                this.$toasted.error('No se puede vender un producto con ganancia negativa');
+                this.inProgress = false            
+                return;
+            }
 
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
