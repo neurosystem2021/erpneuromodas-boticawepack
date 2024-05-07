@@ -335,7 +335,6 @@ export default {
                 fields: [
                     { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
                     { key: 'Producto' }, 
-                    { key: 'Descripcion', label: 'Descripcion' },
                     { key: 'ProductoModelo', label: 'Modelo' }, 
                     { key: 'ProductoMarca', label: 'Marca' },
                     { key: 'ProductoTalla', label: 'Talla' },
@@ -681,8 +680,6 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
-
-                pro.Descripcion=(''+(pro.Descripcion?pro.Descripcion:'')).trim().toUpperCase()
             });
 
             if(totalCero >= 1) {

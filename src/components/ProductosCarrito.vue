@@ -40,7 +40,7 @@
           <b-form-input
             v-model="productos[data.index].precio"
             type="number"
-            style="width: 110px"
+            style="width: 75px"
             min="0"
             step="0.01"
             placeholder="Precio"
@@ -73,14 +73,6 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
-        <template slot="Descripcion" slot-scope="data">
-          <textarea
-            :disabled="bloquearInput?true:false"
-            class="form-control"
-            placeholder="Descripción"
-            cols="15" rows="3"
-            v-model="productos[data.index].Descripcion"></textarea>
-        </template>
         <template slot="precioVenta" slot-scope="data">
           <b-form-input
             style="width:80px"
@@ -99,7 +91,6 @@
             v-model="productos[data.index].descuento"
             type="number"
             min="0"
-            style="width:95px"
             step="0.01"
             :value="0"></b-form-input>
             <b-form-text>
@@ -353,7 +344,6 @@ export default {
       obj.cantidad = 0
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.Descripcion = ''
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj)

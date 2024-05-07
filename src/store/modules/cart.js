@@ -91,7 +91,6 @@ const actions = {
           if (setSuma) {
             obj.setSuma = true
           }
-          obj.Descripcion = ''
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
         
