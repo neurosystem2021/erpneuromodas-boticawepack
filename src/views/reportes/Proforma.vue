@@ -120,7 +120,7 @@
       <br>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
+        <div class="notice">LOS PRODUCTOS SERAN ENTREGADOS EN EL MISMO LOCAL COMERCIAL</div>
         <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
       <div>
