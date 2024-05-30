@@ -1037,6 +1037,13 @@ export default {
                 return
             }
 
+            var esEmpresa = this.venta.cliente.DniRuc.length < 9 ? true : false
+            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '03') {
+                this.$toasted.show('La boleta debe ser emitida a un usuario común')
+                this.inProgress = false
+                return
+            }
+
             var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
             if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
                 this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
