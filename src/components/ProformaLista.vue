@@ -2,15 +2,20 @@
     <div>
         <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
         
-        <b-form ref="formProformaModal" >    
+        <b-form ref="formProformaModal">    
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
-                headerTextVariant="light"
+                header-text-variant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">           
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                    <b-row class="mb-3">
+                    <b-col>
+                        <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                    </b-col>
+                    </b-row>
+                    <div class="table-responsive">
                     <b-table 
                         v-if="show"
                         id="table-proformas"
@@ -23,40 +28,45 @@
                         :per-page="perPage"
                         :current-page="currentPage">
 
-                      <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
-                      </template>
+                        <template slot="update" slot-scope="data">
+                        <b-button @click="selectProformas(data.item)" variant="success" size="sm">
+                            <i class="fas fa-pencil-alt"></i>
+                        </b-button>
+                        </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank" size="sm">Ver</b-button>
                       </template>
 
-                      <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
-                      </template>
+                        <template slot="verTicket" slot-scope="data">
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank" size="sm">Ver Ticket</b-button>
+                        </template>
 
-                      <template slot="Total" slot-scope="data">
+                        <template slot="Total" slot-scope="data">
                         {{ data.item.Total | moneda }}
-                      </template>
-                      
-                      <template slot="Eliminar" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-trash"></i></b-button>
-                      </template>
+                        </template>
+
+                        <template slot="Eliminar" slot-scope="data">
+                        <b-button @click="eliminarProf(data.item)" variant="danger" size="sm">
+                            <i class="fas fa-trash"></i>
+                        </b-button>
+                        </template>
 
                     </b-table>
-                    <b-row>
+                    </div>
+                    <b-row class="mt-3">
                     <b-col md="6" class="my-1">
                         <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
                     </b-col>
                     </b-row>
-                <div slot="modal-footer" >
+                <template slot="modal-footer">
                     <!--<b-btn size="sm" variant="success" type="submit">
                         Guardar
                     </b-btn>-->
                     <b-btn size="sm" variant="secondary" @click="show=false">
                         Cerrar
                     </b-btn>
-                </div>
+                </template>
             
             </b-modal>
         </b-form>
