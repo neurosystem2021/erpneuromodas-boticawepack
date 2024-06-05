@@ -572,7 +572,6 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
-import Quagga from "quagga";
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
@@ -731,16 +730,11 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock",
     }),
-    BusquedaProductos(busqueda) {
-      if (busqueda) {
-        return this.API + "productos/puntoventa/stock/" + busqueda;
-      } else {
-        return this.API + "productos";
-      }
-    },
-    abrirMicrofono() {
+    async abrirMicrofono() {
       console.log("si");
-      this.busqueda = "";
+      let url = this.APIProductos;
+
+      let q = "";
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
         return;
@@ -751,11 +745,10 @@ export default {
       this.recognition.interimResults = false;
       this.recognition.onresult = (event) => {
         if (event.results.length > 0) {
-          this.busqueda = event.results[0][0].transcript;
-          console.log(this.busqueda)
-          this.BusquedaProductos(this.busqueda);
+          q = event.results[0][0].transcript;
         }
       };
+      /// renderChild
 
       this.recognition.onerror = (event) => {
         console.error("Speech Recognition Error:", event);
@@ -763,8 +756,11 @@ export default {
       };
 
       this.recognition.onend = async () => {
-        console.log(this.busqueda)
-        this.BusquedaProductos(this.busqueda);
+        url =
+          url + `?q=${q}&sortBy=stock&sortDesc=1&limit=25`;
+
+        let data = await this.axios.get(url);
+        this.renderChild(data.data);
       };
       this.recognition.start();
     },
@@ -1072,9 +1068,11 @@ export default {
       if (this.idAlmacen) {
         let styleStock = "";
         if (data.stock <= 0) {
-          styleStock = "table-danger";
+          styleStock = "sinStock";
+        } else if (data.stock <= data.StockMinimo) {
+          styleStock = "StockMinimo";
         } else {
-          styleStock = "table-success";
+          styleStock = "correctoStock";
         }
 
         if (data.EsPadre == 1) {
@@ -1092,7 +1090,7 @@ export default {
             border: 1px solid #eaeaea;
           }
           #table-render td, #table-render th {
-            color: #000000 !important;
+            //color: #000000 !important;
           }
           .imagen{
             width: 100%;
@@ -1302,5 +1300,17 @@ export default {
   display: flex;
   justify-content: center;
   justify-items: center;
+}
+.StockMinimo {
+  color: #e65100 !important;
+  background: #ffeeba !important;
+}
+.sinStock {
+  color: red !important;
+  background: #f5c6cb;
+}
+.correctoStock {
+  color: #000 !important;
+  background: #c3e6cb;
 }
 </style>
