@@ -772,9 +772,9 @@
                     :key="index2"
                     @click="setProducto(producto)"
                     :class="
-                      producto.stock == 0
+                      producto.stock <= 0
                         ? 'sinStock'
-                        : producto.stock < producto.StockMinimo
+                        : producto.stock <= producto.StockMinimo
                         ? 'stockMinimo'
                         : 'default'
                     "
@@ -2919,7 +2919,7 @@ export default {
     Proformas,
     //OrdenesModal,
     //DeliveryModal,
-    "vue-simple-spinner": Spinner,
+    //"vue-simple-spinner": Spinner,
     ProductosCarritoNuevo,
   },
 };
