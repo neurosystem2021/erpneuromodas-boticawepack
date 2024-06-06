@@ -14,6 +14,7 @@
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
+            id="autocompleteProducto"
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
@@ -732,9 +733,12 @@ export default {
     }),
     async abrirMicrofono() {
       console.log("si");
-      let url = this.APIProductos;
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true,
+      });
 
-      let q = "";
+      let search = "";
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
         return;
@@ -745,10 +749,9 @@ export default {
       this.recognition.interimResults = false;
       this.recognition.onresult = (event) => {
         if (event.results.length > 0) {
-          q = event.results[0][0].transcript;
+          search = event.results[0][0].transcript;
         }
       };
-      /// renderChild
 
       this.recognition.onerror = (event) => {
         console.error("Speech Recognition Error:", event);
@@ -756,11 +759,14 @@ export default {
       };
 
       this.recognition.onend = async () => {
-        url =
-          url + `?q=${q}&sortBy=stock&sortDesc=1&limit=25`;
-
-        let data = await this.axios.get(url);
-        this.renderChild(data.data);
+        console.log(search)
+        this.$refs.autocompleteProducto.setValue(search);
+        setTimeout(() => {
+          
+          document
+          .getElementById("autocompleteProducto")
+          .dispatchEvent(inputEvent);
+        }, 10);
       };
       this.recognition.start();
     },
@@ -1114,12 +1120,12 @@ export default {
               : data.stock.toFixed(2)
             : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
+                <td style="width: 200px" class="${styleStock}"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
+                <td class="${styleStock}" style="width: 100px">${data.ProductoCategoria}</td>
+                <td class="${styleStock}" style="width: 100px">${data.ProductoMarca}</td>
+                <td class="${styleStock}" style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
                 <td style="width: 5%">
