@@ -1,8 +1,45 @@
 <template>
   <b-row>
+    <b-modal
+      v-model="modalAgregarNuevoProductos"
+      title="Listado de Productos"
+      size="xl"
+    >
+      <b-row>
+        <b-col cols="4">
+          <b-input
+            label="Buscar.."
+            placeholder="Buscar..."
+            class="my-2"
+            v-model="buscarProductos"
+          />
+        </b-col>
+        <b-col cols="12">
+          <b-table
+            :per-page="perPage"
+            :current-page="currentPage"
+            :items="productosFilter"
+            :fields="fieldsProductos"
+          >
+            <template v-slot:[item.selected]="{ res }">
+              HOLA- {{ res }}
+            </template>
+          </b-table>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="productosFilter.length"
+            :per-page="perPage"
+          ></b-pagination>
+        </b-col>
+      </b-row>
+    </b-modal>
     <b-col md="12">
       <b-form-group>
         <b-input-group>
+          <b-button variant="success" @click="abrirModalProductos()">
+            Agregar Producto
+          </b-button>
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
@@ -580,11 +617,25 @@ export default {
   data() {
     return {
       busqueda: "",
+      perPage: 10,
+      currentPage: 1,
+      fieldsProductos: [
+        { key: "selected", label: "" },
+        { key: "stock", label: "stock" },
+        { key: "Producto", label: "Producto" },
+        { key: "ProductoCategoria", label: "ProductoCategoria" },
+        { key: "ProductoMarca", label: "ProductoMarca" },
+        { key: "PrecioContado", label: "PrecioContado" },
+        { key: "Imagen", label: "Imagen" },
+      ],
+      modalAgregarNuevoProductos: false,
       API: config.API,
       loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
+      lstProductos: [],
+      buscarProductos: "",
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
@@ -721,6 +772,13 @@ export default {
       });
       return this.$options.filters.redondear(sumatoria);
     },
+    productosFilter() {
+      return this.lstProductos.filter(
+        (v) =>
+          this.buscarProductos === "" ||
+          v.Producto.toLowerCase().includes(this.buscarProductos.toLowerCase())
+      );
+    },
   },
   methods: {
     ...mapActions({
@@ -731,6 +789,24 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock",
     }),
+    async abrirModalProductos() {
+      // empresa: imperiop1
+      // empresa: imperiop2
+      // &sortBy=stock&sortDesc=1&limit=25&empresa=imperiop1
+      this.lstProductos = [];
+      let url1 = `${this.API}productos/puntoventa/stock/${this.idAlmacen}?empresa=imperiop1&sortBy=stock&sortDesc=1&limit=`;
+      let res1 = await this.axios(url1);
+      let url2 = `${this.API}productos/puntoventa/stock/${this.idAlmacen}?empresa=imperiop2&sortBy=stock&sortDesc=1&limit=`;
+      let res2 = await this.axios(url2);
+
+      res1.data.forEach((element) => {
+        this.lstProductos.push(element);
+      });
+      res2.data.forEach((element) => {
+        this.lstProductos.push(element);
+      });
+      this.modalAgregarNuevoProductos = !this.modalAgregarNuevoProductos;
+    },
     BusquedaProductos(busqueda) {
       if (busqueda) {
         return this.API + "productos/puntoventa/stock/" + busqueda;
@@ -752,7 +828,7 @@ export default {
       this.recognition.onresult = (event) => {
         if (event.results.length > 0) {
           this.busqueda = event.results[0][0].transcript;
-          console.log(this.busqueda)
+          console.log(this.busqueda);
           this.BusquedaProductos(this.busqueda);
         }
       };
@@ -763,7 +839,7 @@ export default {
       };
 
       this.recognition.onend = async () => {
-        console.log(this.busqueda)
+        console.log(this.busqueda);
         this.BusquedaProductos(this.busqueda);
       };
       this.recognition.start();
@@ -1303,4 +1379,22 @@ export default {
   justify-content: center;
   justify-items: center;
 }
+.modalNuevoProducto {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+/* .modal-content {
+  margin: 0 -600px;
+  min-width: 1600px !important;
+} */
+/* .modal-content {
+  min-width: 1600px !important;
+  margin: 0 !important;
+} */
+/* 
+@media (min-width: 576px) {
+  .modal-dialog {
+    margin: auto !important;
+  }
+} */
 </style>
