@@ -10,6 +10,7 @@
             :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
+            :debounce="600"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
