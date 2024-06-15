@@ -11,17 +11,27 @@
                 body-bg-variant="light"
                 body-text-variant="dark">           
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <b-table 
+                    <b-table  
                         v-if="show"
                         id="table-proformas"
                         ref="tableProformas"
                         striped hover 
                         :busy.sync="isBusy" 
                         :filter="filter"
-                        :items="myProvider" 
+                        :items="myProvider"
                         :fields="fields"
                         :per-page="perPage"
                         :current-page="currentPage">
+                  
+                      <template slot="Vendido" slot-scope="data">
+                            <b-button :variant="data.item.Vendido === 1 ? 'danger' : 'secondary'" 
+                            @click="data.item.Vendido === 0 ? showConfirmationModal(data.item) : toggleVendido(data.item)" 
+                            style="min-width: 5rem;">
+                            <span :style="data.item.Vendido === 1 ? 'font-weight: bold;' : ''">
+                            {{ data.item.Vendido === 1 ? 'Sí' : 'No' }}
+                            </span>
+                            </b-button>                                                            
+                      </template>
 
                       <template slot="update" slot-scope="data">
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
@@ -85,8 +95,9 @@ import { mapActions } from 'vuex'
                 items: [],
                 isBusy: false,
                 fields: [ 
-                    { key: 'IdProforma', label: 'Id' }, 
-                    { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
+                    { key: 'Vendido', label: 'Vendido',sortable: true} ,
+                    { key: 'IdProforma', label: 'Id' },
+                    { key: 'Anio', label: 'Año' }, 'Numero', 'Cliente',
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
                     { key: 'UsuarioReg', label: 'Empleado' }, { key: 'Total', label: 'Total' }, 'update', 'ver', 'verTicket','Eliminar' ],
                 totalRows: 50,
@@ -100,7 +111,7 @@ import { mapActions } from 'vuex'
                 add         : 'agregarProducto',
                 obtenerStok : 'obtenerStock',
                 limpiarCarrito: 'limpiarCarrito',
-            }),
+            }), 
             selectProformas (proforma) {
                 this.axios.get(this.API + 'proformas/detalle/nuevo', {
                     params: {
@@ -166,7 +177,65 @@ import { mapActions } from 'vuex'
                         })        
                     }
                 })
+            },
+
+            VendidoProf(item) {
+            const newValue = item.Vendido === 1 ? 0 : 1;
+            this.axios.put(`${this.API}proformas/updateVendido`, {
+                idP: item.IdProforma,
+                vendido: newValue
+            }).then(response => {
+                if(response.data.success) {
+                    item.Vendido = newValue;
+                    this.$toasted.success('¡Estado actualizado correctamente!');
+                } else {
+                    this.$toasted.error('Error al actualizar el estado');
+                }
+            }).catch(error => {
+                console.error('Error al actualizar el estado:', error);
+                this.$toasted.error('Ha ocurrido un error');
+            });
+        },
+
+        showConfirmationModal(item) {
+            this.$swal({
+                title: '¿Estás seguro de cambiar proforma a venta?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cambiar',
+                cancelButtonText: 'No, atrás',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.updateVendido(item);
+                }
+            });
+        },
+        toggleVendido(item) {
+            if (item.Vendido === 0) {
+                this.showConfirmationModal(item);
+            } else {
+                this.updateVendido(item);
             }
+        },
+        updateVendido(item) {
+            const newValue = item.Vendido === 1 ? 0 : 1;
+            this.axios.put(`${this.API}proformas/updateVendido`, {
+                idP: item.IdProforma,
+                vendido: newValue
+            }).then(response => {
+                if (response.data.success) {
+                    item.Vendido = newValue;
+                    this.$toasted.success('¡Estado actualizado correctamente!');
+                } else {
+                    this.$toasted.error('Error al actualizar el estado');
+                }
+            }).catch(error => {
+                this.$toasted.error('Ha ocurrido un error');
+            });
+        }
+
         }
     }
 </script>
