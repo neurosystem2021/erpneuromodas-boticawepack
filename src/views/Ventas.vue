@@ -163,6 +163,22 @@
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
 
+                                    <b-input-group>
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsGuia"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Es Guia
+                                        </b-form-checkbox>
+                                        <input v-model="venta.NombreGuia"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                required
+                                                placeholder="Digite su Guía" v-if="venta.EsGuia" />
+                                    </b-input-group>
+
                                     <b-row v-if="this.$route.query.idPedido">
                                         <b-col>
                                             <b-form-group>
@@ -718,6 +734,8 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
+                EsGuia: 0,
+                NombreGuia: '',
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
@@ -1244,6 +1262,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.NombreGuia = (''+this.venta.NombreGuia).trim().toUpperCase()
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.adelantosVentaPedido = this.adelantosVentaPedido.map(adpv => adpv.IdCajaBanco)
             this.venta.IdPedido = this.$route.query.idPedido || null
