@@ -74,8 +74,8 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" class="ocularMovil2">
-                                <b-form-group>
+                            <b-col md="4" >
+                                <b-form-group class="ocularMovil2">
                                     <label>Almacen:</label>
                                     <b-input-group>
                                     <autocomplete
