@@ -9,7 +9,7 @@ const state = {
 }
 
 const mutations = {
-  AGREGAR_PRODUCTO ({ productos }, item) {
+  AGREGAR_PRODUCTO({ productos }, item) {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
@@ -18,16 +18,16 @@ const mutations = {
         productos[index].cantidad += 1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVenta) {
+      if (!productos.find(producto => producto.IdProducto === item.IdProducto) || !item.EsVenta) {
         productos.unshift(item)
-      }else{
+      } else {
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
-        productos.splice(index2,0,item)
+        productos.splice(index2, 0, item)
       }
     }
   },
-  ACTUALIZAR_PRECIOCONVENIO ({ productos }, cliente) {
+  ACTUALIZAR_PRECIOCONVENIO({ productos }, cliente) {
     productos = productos.map(p => {
       if (cliente.EsVIP) {
         p.precio = p.precioConvenio || p.precio
@@ -37,21 +37,21 @@ const mutations = {
       return p;
     })
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
-    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+  ACTUALIZAR_PRODUCTO({ productos }, prod) {
+    let index = productos.findIndex(p => p.IdProducto === prod.IdProducto)
     productos.splice(index, 1, prod)
   },
-  ELIMINAR_PRODUCTO ({ productos }, index) {
+  ELIMINAR_PRODUCTO({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
     productos.splice(index, 1)
   },
-  LLENAR_PRODUCTOS_FILTRADOS (state, items) {
+  LLENAR_PRODUCTOS_FILTRADOS(state, items) {
     state.productosFiltrados = items
   },
-  LIMPIAR_CART (state) {
+  LIMPIAR_CART(state) {
     state.productos = []
   },
-  APLICAR_DESCUENTO (state, descuento) {
+  APLICAR_DESCUENTO(state, descuento) {
     let cantidadTotal = 0
     state.productos.forEach((prod, index) => {
       cantidadTotal += parseFloat(prod.cantidad)
@@ -61,10 +61,10 @@ const mutations = {
       return prod
     })
   },
-  ACTUALIZAR_TOTAL (state, total) {
+  ACTUALIZAR_TOTAL(state, total) {
     state.totalCart = total
   },
-  OBTENER_STOCK (state, items) {
+  OBTENER_STOCK(state, items) {
     state.productos = state.productos.map((prod) => {
       let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
       prod.stock = items[index] && items[index].stock
@@ -76,7 +76,7 @@ const mutations = {
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
+  agregarProducto({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
     let setPrecio = false
     let cantidad = false
     let precio = false
@@ -90,11 +90,11 @@ const actions = {
       precio = obje.precio
       setSuma = obje.setSuma
       setPrecioCosto = obje.setPrecioCosto
-      setPreOr =obje.setPreOr
+      setPreOr = obje.setPreOr
       isDelivery = obje.isDelivery
     }
 
-    if(typeof producto === 'object') {
+    if (typeof producto === 'object') {
       if (setPrecioCosto) {
         producto.precio = producto.PrecioCosto
         producto.nuevoPrecioContado = producto.PrecioContado || 0
@@ -107,10 +107,10 @@ const actions = {
         producto.cantidad = cantidad
       }
 
-      if(setPreOr){
+      if (setPreOr) {
         producto.precio = setPreOr
       }
-      
+
       /*let arr = [
         {"desc": producto.ProductoDesc},
         {"desc": producto.ProductoDesc2},
@@ -124,23 +124,26 @@ const actions = {
       }*/
 
       // console.log(producto);
-      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
+      producto.Descripcion = ('' + (producto.Descripcion || "")).trim()
       producto.disabledProf = 0
-      
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      let params = {}
+      let id_empresa = producto.Empresa ? producto.Empresa : ''
+      let params = {
+        id_empresa : id_empresa
+      }
 
       if (isBarCode) {
-        params = {codigoBarra: producto}
-      } 
+        params = { codigoBarra: producto }
+      }
 
-      axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
+      axios.get(API + 'productos/id/' + producto, { params: params }).then((response) => {
         if (response.data) {
           let obj = response.data
 
-          if(setPrecio) {
+          if (setPrecio) {
             obj.cantidad = 1
             obj.precio = obj.PrecioContado || 0
           } else {
@@ -160,35 +163,35 @@ const actions = {
             obj.precio = precio
           }
 
-          if(setPreOr){
+          if (setPreOr) {
             obj.precio = setPreOr
           }
-          
+
           if (setSuma) {
             obj.setSuma = true
           }
-          
-          if(actualizar){
+
+          if (actualizar) {
             obj.cantidad = 1
             obj.estadoPxP = false
             obj.precio = obj.PrecioContado
             obj.cantidadPres = 1
             obj.cantxPrecio = 1
-            if(!isVentas){
+            if (!isVentas) {
               obj.estadoPxP = true
               obj.cantidad = 0
               obj.precio = obj.PrecioCosto
               obj.nuevoPrecioContado = obj.PrecioContado || 0
-            }else{
+            } else {
               obj.nuevoPrecioContado = 0
             }
-          }else{
+          } else {
             obj.nuevoPrecioContado = 0
           }
 
           obj.descuento = 0
           //obj.nuevoPrecioContado = 0
-          
+
           /*let arr2 = [
             {"desc": obj.ProductoDesc},
             {"desc": obj.ProductoDesc2},
@@ -203,53 +206,53 @@ const actions = {
           obj.Descripcion = ''
           obj.EsObsequio = 0
           commit('AGREGAR_PRODUCTO', obj)
-          if (cb) cb(obj)   
+          if (cb) cb(obj)
         } else {
           if (cb) cb(false)
         }
       })
     }
   },
-  actualizarPrecioConvenio ({ commit }, cliente) {
+  actualizarPrecioConvenio({ commit }, cliente) {
     commit('ACTUALIZAR_PRECIOCONVENIO', cliente);
   },
-  actualizarProducto ({ commit }, prod) {
+  actualizarProducto({ commit }, prod) {
     commit('ACTUALIZAR_PRODUCTO', prod)
   },
-  eliminarProducto ({ commit }, index) {
+  eliminarProducto({ commit }, index) {
     commit('ELIMINAR_PRODUCTO', index)
   },
-  buscarProductos ({ commit }, search) {
+  buscarProductos({ commit }, search) {
     axios.get(API + 'productos?limit=10&q=' + search).then((response) => {
       commit('LLENAR_PRODUCTOS_FILTRADOS', response.data)
     })
   },
-  limpiarCarrito ({ commit }) {
+  limpiarCarrito({ commit }) {
     commit('LIMPIAR_CART')
   },
-  aplicarDescuentoGeneral ({ commit }, descuento) {
+  aplicarDescuentoGeneral({ commit }, descuento) {
     commit('APLICAR_DESCUENTO', descuento)
   },
-  actualizarTotalCart ({ commit }, total) {
+  actualizarTotalCart({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
-    axios.get(API + 'productos/stock', {
-      params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
-      }
-    }).then((response) => {
-        commit('OBTENER_STOCK', response.data)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+    // axios.get(API + 'productos/stock', {
+    //   params: {
+    //     idProductos: state.productos.map(prod => prod.IdProducto),
+    //     idAlmacen: obj.IdAlmacen
+    //   }
+    // }).then((response) => {
+    //   commit('OBTENER_STOCK', response.data)
+    // })
+    //   .catch((error) => {
+    //     console.log(error)
+    //   })
   }
 }
 
 export default {
-    state,
-    mutations,
-    actions
+  state,
+  mutations,
+  actions
 }
