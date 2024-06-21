@@ -7,10 +7,10 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1,'limit':20}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
-            :debounce="600"
+            :debounce="1000"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
