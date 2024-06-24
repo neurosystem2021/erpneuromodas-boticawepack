@@ -1685,7 +1685,23 @@ export default {
           .reduce((total, prod) => {
             return total + parseFloat(prod.total);
           }, 0);
+        let tipoPago = "";
+        for (const k in this.venta.pago) {
+          if (this.venta.pago[k].monto > 0) {
+            tipoPago = k;
+          }
+        }
+        console.log(tipoPago);
         let dataImprimir = {
+          vendedor: this.venta.vendedor.NombreUsuario,
+          tipoPago: tipoPago,
+          numero: this.venta.Numero,
+          serie: this.venta.Serie,
+          CodSunat: this.venta.tipoVenta.CodSunat,
+          IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+          LimitItems: this.venta.tipoVenta.LimitItems,
+          TipoDoc: this.venta.tipoVenta.TipoDoc,
+          empresa: element.value,
           nombre_comercial: empresa.razoncial,
           documento: empresa.ruc,
           direccion: empresa.direccion,
@@ -1725,33 +1741,26 @@ export default {
           //     element.monto = totalCarr;
           //   }
           // });
-
+          let comandaJson = JSON.stringify(dataImprimir);
+          // console.log(comandaJson);
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {
-              this.axios
-                .post("localhost:5000/getcmdped.php", dataImprimir)
+              await this.axios
+                .post(
+                  "http://localhost:5000/imprimir/getcmdped.php",
+                  comandaJson
+                )
                 .catch(err => {
-                  console.err(err);
+                  console.error(err);
                 });
-              // window
-              //   .open(
-              //     "/imprimir/index.php?IdDocVenta=" +
-              //       response.data.insertId +
-              //       "&id_empresa=" +
-              //       element.value,
-              //     "_blank"
-              //   )
-              //   .catch(error => {
-              //     console.log(error);
-              //   });
 
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
             })
             .catch(error => {
-              console.log(error);
-              this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+              console.error(error);
+              // this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
               this.inProgress = false;
             });
           this.$toasted.success("Venta realizada con exito");
