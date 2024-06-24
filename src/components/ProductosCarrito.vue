@@ -12,11 +12,15 @@
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
+            id="autocompleteProducto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
           >
           </autocomplete>
+          <b-button @click="abrirMicrofono()">
+            <i class="fas fa-microphone"></i>
+          </b-button>
           <input
             v-model="loadCode"
             :disabled="isNota"
@@ -655,7 +659,7 @@ export default {
       productoSelect: {},
       productoNombre: "",
       productoUrl: "",
-      indexPos: null,
+      indexPos: null
     };
   },
   watch: {
@@ -663,12 +667,12 @@ export default {
       this.asignarVuelto();
     },
     productos(prods) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
-    },
+    }
   },
   props: {
     isVentas: Boolean,
@@ -688,11 +692,11 @@ export default {
       type: Function,
       default(obj) {
         return obj;
-      },
+      }
     },
     showButton: {
       default: true,
-      type: Boolean,
+      type: Boolean
     },
     fields: {
       default() {
@@ -701,13 +705,13 @@ export default {
             key: "stock",
             label: "Stock",
             variant: "info",
-            class: "text-center",
+            class: "text-center"
           },
           {
             key: "movimiento",
             label: "Lote",
             variant: "info",
-            class: "text-center",
+            class: "text-center"
           },
           //{ key: 'CodigoBarra', label: 'Código'},
           //{ key: 'ProductoCategoria', label: 'Categoria'},
@@ -721,7 +725,7 @@ export default {
           {
             key: "Presentacion",
             label: "Presentación",
-            class: "text-center centrarTd",
+            class: "text-center centrarTd"
           },
           { key: "cantidad" },
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
@@ -733,17 +737,17 @@ export default {
           { key: "precioVenta", label: "Precio venta" },
           { key: "total", label: "Total", variant: "danger" },
           { key: "fechavencimiento", label: "Vencimiento" },
-          { key: "acciones", label: "" },
+          { key: "acciones", label: "" }
         ];
       },
-      type: Array,
+      type: Array
     },
-    noSubtotal: Boolean,
+    noSubtotal: Boolean
   },
   computed: {
     ...mapState({
-      productos: (state) => state.cart.productos,
-      filtrados: (state) => state.cart.productosFiltrados,
+      productos: state => state.cart.productos,
+      filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos() {
       if (this.idAlmacen) {
@@ -758,7 +762,7 @@ export default {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
         sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
             sumatoria -= value.descuento;
@@ -769,7 +773,7 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.total);
       });
 
@@ -783,7 +787,7 @@ export default {
         //sumatoria = sumatoria * 0.18
         sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.igv);
         });
       }
@@ -791,11 +795,11 @@ export default {
     },
     sumatoriaDescuento() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.descuento || 0);
       });
       return this.$options.filters.redondear(sumatoria);
-    },
+    }
   },
   methods: {
     ...mapActions({
@@ -804,8 +808,62 @@ export default {
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto",
-      obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStock"
     }),
+    abrirMicrofono() {
+      console.log("si");
+      this.busqueda = "";
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.onresult = async event => {
+        if (event.results.length > 0) {
+          this.busqueda = event.results[0][0].transcript;
+          document.getElementById("autocompleteProducto").focus();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        this.handleError(event.error);
+      };
+
+      this.recognition.onend = async () => {
+        // this.BusquedaProductos(this.busqueda);
+        const inputEvent = new Event("input", {
+          bubbles: true,
+          cancelable: true
+        });
+        let autocompleteInput = document.getElementById("autocompleteProducto");
+        setTimeout(() => {
+          document.getElementById("autocompleteProducto").value = this.busqueda;
+          autocompleteInput.dispatchEvent(inputEvent);
+        }, 200);
+      };
+      this.recognition.start();
+    },
+    handleError(error) {
+      this.errorMessage = "";
+      if (error === "no-speech") {
+        this.errorMessage =
+          "No se detectó ningún discurso. Por favor, inténtalo de nuevo.";
+      } else if (error === "audio-capture") {
+        this.errorMessage =
+          "No se pudo acceder al micrófono. Asegúrate de que esté correctamente conectado y de que el navegador tenga permisos para usarlo.";
+      } else if (error === "not-allowed") {
+        this.errorMessage =
+          "Permiso para usar el micrófono denegado. Por favor, habilita el acceso en la configuración de tu navegador.";
+      } else {
+        this.errorMessage =
+          "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+      }
+      alert(this.errorMessage);
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
@@ -842,7 +900,7 @@ export default {
     },
 
     addManoDeObra(index, e) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi < 0) {
         this.$toasted.error("Primero seleccione el producto MANODEOBRA");
 
@@ -869,18 +927,14 @@ export default {
     },
 
     updateManoDeObraNeta(index) {
-      let pManoObra = this.productos.find(
-        (p) => p.CodigoBarra === "MANODEOBRA"
-      );
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
-      this.productos
-        .filter((p) => p.EsManoDeObra)
-        .map((p) => {
-          precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
-        });
+      this.productos.filter(p => p.EsManoDeObra).map(p => {
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
 
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
         this.productos[pi].precio = precio;
@@ -917,11 +971,10 @@ export default {
     changeMovimiento(hash, idProducto, index) {
       if (hash) {
         // Stock
-        let stock = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
-        ).Stock;
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Stock;
         let serieNumero = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
+          m => m.value === hash
         ).SerieNumero;
         if (stock) {
           // this.productos[index].stockMovimiento = stock
@@ -937,11 +990,13 @@ export default {
         }
         // Fecha de vencimiento
         var fechaVen = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
+          m => m.value === hash
         ).FechaVen;
         let hoy = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
-        let en5dias = this.$moment().add(5, "days").unix();
+        let en5dias = this.$moment()
+          .add(5, "days")
+          .unix();
         let style = "bg-success";
         if (fechaVenUnix && fechaVenUnix < hoy) {
           style = "bg-danger";
@@ -953,13 +1008,14 @@ export default {
           this.$nextTick(() => {
             if (!this.isVentas) {
               if (this.movTipo != 0 && this.movTipo != undefined) {
-                this.productos[index].FechaVen =
-                  this.$moment(fechaVen).format("YYYY-MM-DD");
+                this.productos[index].FechaVen = this.$moment(fechaVen).format(
+                  "YYYY-MM-DD"
+                );
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
                 this.actualizarProd({
                   Producto: this.productos[index],
-                  Pos: index,
+                  Pos: index
                 });
               }
             }
@@ -991,12 +1047,12 @@ export default {
             (this.isVentas
               ? this.idAlmacen
               : this.movTipo == 0
-              ? this.almacenDestino
-              : this.almacenOrigen)
+                ? this.almacenDestino
+                : this.almacenOrigen)
         )
-        .then((response) => {
+        .then(response => {
           let indexProducto = this.productos.findIndex(
-            (p) => p.IdProducto === $idProducto
+            p => p.IdProducto === $idProducto
           );
           // Cargar por defecto lote próximo a vencer.
           let primeroVencer = response.data.reduce((a, b) => {
@@ -1018,15 +1074,15 @@ export default {
             );
           });
           //
-          this.movimientoLotes[$idProducto] = response.data.map((l) => ({
+          this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
             text: l.hashMovimiento,
             Stock: l.Stock,
             FechaVen: l.FechaVen,
-            SerieNumero: l.Serie + "-" + l.Numero,
+            SerieNumero: l.Serie + "-" + l.Numero
           }));
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -1038,7 +1094,7 @@ export default {
       if (idProducto) {
         this.add([
           idProducto,
-          (obj) => {
+          obj => {
             if (obj) {
               this.$emit("onAddProducto");
               this.$toasted.show("Producto añadido correctamente");
@@ -1048,7 +1104,7 @@ export default {
             this.loadCode = "";
           },
           { setPrecio: this.setPrecio, setSuma: true },
-          { isBarCode: true },
+          { isBarCode: true }
         ]);
       }
     },
@@ -1123,10 +1179,10 @@ export default {
         }
         this.add([
           obj,
-          (obj) => {
+          obj => {
             this.$emit("onAddProducto");
           },
-          { setPrecio: this.setPrecio, esId: true },
+          { setPrecio: this.setPrecio, esId: true }
         ]);
       }
     },
@@ -1139,7 +1195,7 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       obj.EsObsequio = 0;
       let fpp = this.preciosProd.filter(
-        (p) => p.cantidad === 0 || p.cantidad === "0" || p.cantidad === ""
+        p => p.cantidad === 0 || p.cantidad === "0" || p.cantidad === ""
       );
       if (!this.isVentas && this.padre == "compra") {
         if (this.movTipo == undefined) {
@@ -1184,7 +1240,7 @@ export default {
         },
         { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
         false,
-        this.cliente.EsVIP,
+        this.cliente.EsVIP
       ]);
 
       this.$refs["modalCant"].hide();
@@ -1216,7 +1272,7 @@ export default {
           this.$emit("onAddProducto", obj);
           //this.actualizarProd(obj)
         },
-        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
+        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false }
       ]);
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
@@ -1257,7 +1313,9 @@ export default {
       `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      }
       `;
     },
     // setCantidad (index, val) {
@@ -1353,11 +1411,11 @@ export default {
       } else {
         return "";
       }
-    },
+    }
   },
   components: {
-    ProductoForm,
-  },
+    ProductoForm
+  }
 };
 </script>
 
