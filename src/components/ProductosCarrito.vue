@@ -1,5 +1,21 @@
 <template>
   <b-row>
+    <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer hide-header>
+        <div class="d-block text-center">
+          ESCANEE EL CODIGO DE BARRA
+          <br />
+          <br />
+          <div id="codigoBarraStyle">
+            <v-quagga
+              :onDetected="onBarcodeScanned"
+              :readerSize="readerSize"
+              :readerTypes="detecteds"
+              :patchSize="'medium'"
+              class="cameraBarra"
+            ></v-quagga>
+          </div>
+        </div>
+      </b-modal>
     <b-col md="12">
       <b-form-group v-if="mostrarResponsive()">
         <b-input-group>
@@ -32,6 +48,7 @@
             placeholder="Codigo de Barra"
           />
           <b-input-group-append>
+            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="primary" @click="loadBarcode"
               ><i class="fas fa-search"></i
@@ -49,7 +66,7 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <b-form-group v-if="!mostrarResponsive()">
+      <b-form-group v-else>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -74,6 +91,7 @@
           </b-button>
         </b-input-group>
         <b-input-group>
+           <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
           <input
             v-model="loadCode"
             @keydown.enter.prevent="loadBarcode"
@@ -623,12 +641,38 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
+import sound from "../../static/beep.mp3";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
+Vue.use(VueQuagga);
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
   data() {
     return {
+      readerSize: {
+        width: 640,
+        height: 480
+      },
+      detecteds: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader"
+      ],
+      result: "",
+      format: "",
+      modalAbiertCode: false,
+
+      //
       busqueda: "",
       API: config.API,
       loadCode: "",
@@ -649,6 +693,14 @@ export default {
       productoNombre: "",
       productoUrl: ""
     };
+  },
+  created() {
+    // Add barcode scan listener and pass the callback function
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
+  destroyed() {
+    // Remove listener when component is destroyed
+    this.$barcodeScanner.destroy();
   },
   watch: {
     sumatoriaTotal(sum) {
@@ -781,7 +833,7 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
-   
+
     BusquedaProductos(busqueda) {
       if (busqueda) {
         return this.API + "productos/puntoventa/stock/" + busqueda;
@@ -940,39 +992,26 @@ export default {
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    // loadBarcode (e) {
-    //   e.preventDefault()
-    //   let idProducto = this.loadCode;
-
-    //   if (idProducto) {
-    //     this.add([idProducto, (obj) => {
-    //       if (obj) {
-    //         this.$emit('onAddProducto')
-    //         this.$toasted.show('Producto añadido correctamente')
-    //       } else {
-    //         this.$toasted.show('No se encontró ningun producto')
-    //       }
-    //       this.loadCode = ''
-    //     }, { setPrecio: this.setPrecio,  setSuma: true }, true])
-    //   }
-    // },
-
     loadBarcode(e) {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+      }
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = { codigoBarra: idProducto };
-        this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then(response => {
-            if (response.data.IdProducto) {
-              this.setProducto(response.data);
+        this.add([
+          idProducto,
+          obj => {
+            if (obj) {
+              this.$emit("onAddProducto");
+              this.$toasted.show("Producto añadido correctamente");
             } else {
-              this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
-          });
+            this.loadCode = "";
+          },
+          { setPrecio: this.setPrecio, setSuma: true }
+        ]);
       }
     },
 
@@ -1330,8 +1369,32 @@ export default {
       } else {
         return "";
       }
+    },
+    //
+    abrirCodigoBarra() {
+      console.log("abrirCodigoBarra");
+      this.$refs["modalCodigoBarra"].show();
+      this.modalAbiertCode = true;
+      this.result = "";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound);
+        audio.play();
+        if (this.result.length > 0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs["modalCodigoBarra"].hide();
+          this.modalAbiertCode = false;
+        }
+      }
+
+      // do something...
     }
   },
+
   components: {
     ProductoForm
   }
@@ -1378,5 +1441,59 @@ export default {
   display: flex;
   justify-content: center;
   justify-items: center;
+}
+
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 20em;
+  width: auto;
+  margin: 0 auto;
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: block;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
+  }
 }
 </style>

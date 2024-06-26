@@ -1609,7 +1609,6 @@ export default {
       if (screenWidth < 777) {
         mostrar = false;
       }
-      console.log("MostrarResponsive", mostrar);
       return mostrar;
     },
     anularPagoDelivery() {
