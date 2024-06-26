@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-form-group v-if="mostrarResponsive()">
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -18,11 +18,62 @@
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
+             id="autocompleteProducto"
           >
           </autocomplete>
           <b-button @click="abrirMicrofono()">
             <i class="fas fa-microphone"></i>
           </b-button>
+          <input
+            v-model="loadCode"
+            @keydown.enter.prevent="loadBarcode"
+            type="text"
+            class="form-control"
+            placeholder="Codigo de Barra"
+          />
+          <b-input-group-append>
+            <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"
+              ><i class="fas fa-search"></i
+            ></b-button>
+            <producto-form
+              :showButton="showButton"
+              :cbGuardar="
+                (id, pxp, obj) => {
+                  agregarGuardar(id, pxp, obj);
+                }
+              "
+              ref="productoFormEdit"
+              :producto-update="productoSelect"
+            ></producto-form>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+      <b-form-group v-if="!mostrarResponsive()">
+        <b-input-group>
+          <autocomplete
+            ref="autocompleteProducto"
+            :url="APIProductos"
+            :customParams="{
+              sortBy: isVentas ? 'stock' : 'IdProducto',
+              sortDesc: 1,
+              limit: '25',
+            }"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :classes="{ input: 'form-control' }"
+             id="autocompleteProducto"
+          >
+          </autocomplete>
+          <b-button @click="abrirMicrofono()">
+            <i class="fas fa-microphone"></i>
+          </b-button>
+        </b-input-group>
+        <b-input-group>
           <input
             v-model="loadCode"
             @keydown.enter.prevent="loadBarcode"
@@ -572,7 +623,6 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
-import Quagga from "quagga";
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
@@ -597,7 +647,7 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
-      productoUrl: "",
+      productoUrl: ""
     };
   },
   watch: {
@@ -605,12 +655,12 @@ export default {
       this.asignarVuelto();
     },
     productos(prods) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
-    },
+    }
   },
   props: {
     isVentas: Boolean,
@@ -626,11 +676,11 @@ export default {
       type: Function,
       default(obj) {
         return obj;
-      },
+      }
     },
     showButton: {
       default: true,
-      type: Boolean,
+      type: Boolean
     },
     fields: {
       default() {
@@ -639,7 +689,7 @@ export default {
             key: "stock",
             label: "Stock",
             variant: "info",
-            class: "text-center",
+            class: "text-center"
           },
           { key: "CodigoBarra", label: "Código" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
@@ -659,16 +709,16 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: "precioVenta", label: "Precio venta (S/)" },
           { key: "total", label: "Total", variant: "danger" },
-          { key: "acciones", label: "" },
+          { key: "acciones", label: "" }
         ];
       },
-      type: Array,
-    },
+      type: Array
+    }
   },
   computed: {
     ...mapState({
-      productos: (state) => state.cart.productos,
-      filtrados: (state) => state.cart.productosFiltrados,
+      productos: state => state.cart.productos,
+      filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos() {
       if (this.idAlmacen) {
@@ -683,7 +733,7 @@ export default {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
         sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
             sumatoria -= value.descuento;
@@ -694,7 +744,7 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.total);
       });
 
@@ -708,7 +758,7 @@ export default {
         //sumatoria = sumatoria * 0.18
         sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.igv);
         });
       }
@@ -716,11 +766,11 @@ export default {
     },
     sumatoriaDescuento() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.descuento || 0);
       });
       return this.$options.filters.redondear(sumatoria);
-    },
+    }
   },
   methods: {
     ...mapActions({
@@ -729,8 +779,9 @@ export default {
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto",
-      obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStock"
     }),
+   
     BusquedaProductos(busqueda) {
       if (busqueda) {
         return this.API + "productos/puntoventa/stock/" + busqueda;
@@ -738,8 +789,16 @@ export default {
         return this.API + "productos";
       }
     },
+    mostrarResponsive() {
+      let mostrar = true;
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 777) {
+        mostrar = false;
+      }
+
+      return mostrar;
+    },
     abrirMicrofono() {
-      console.log("si");
       this.busqueda = "";
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
@@ -749,22 +808,28 @@ export default {
       this.recognition.lang = "es-ES";
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.onresult = (event) => {
+      this.recognition.onresult = event => {
         if (event.results.length > 0) {
           this.busqueda = event.results[0][0].transcript;
-          console.log(this.busqueda)
-          this.BusquedaProductos(this.busqueda);
+          document.getElementById("autocompleteProducto").focus();
         }
       };
 
-      this.recognition.onerror = (event) => {
+      this.recognition.onerror = event => {
         console.error("Speech Recognition Error:", event);
         this.handleError(event.error);
       };
 
       this.recognition.onend = async () => {
-        console.log(this.busqueda)
-        this.BusquedaProductos(this.busqueda);
+        const inputEvent = new Event("input", {
+          bubbles: true,
+          cancelable: true
+        });
+        let autocompleteInput = document.getElementById("autocompleteProducto");
+        setTimeout(() => {
+          document.getElementById("autocompleteProducto").value = this.busqueda;
+          autocompleteInput.dispatchEvent(inputEvent);
+        }, 200);
       };
       this.recognition.start();
     },
@@ -823,7 +888,7 @@ export default {
     },
 
     addManoDeObra(index, e) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi < 0) {
         this.$toasted.error("Primero seleccione el producto MANODEOBRA");
 
@@ -850,18 +915,14 @@ export default {
     },
 
     updateManoDeObraNeta(index) {
-      let pManoObra = this.productos.find(
-        (p) => p.CodigoBarra === "MANODEOBRA"
-      );
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
-      this.productos
-        .filter((p) => p.EsManoDeObra)
-        .map((p) => {
-          precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
-        });
+      this.productos.filter(p => p.EsManoDeObra).map(p => {
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
 
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
         this.productos[pi].precio = precio;
@@ -904,7 +965,7 @@ export default {
         let params = { codigoBarra: idProducto };
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then((response) => {
+          .then(response => {
             if (response.data.IdProducto) {
               this.setProducto(response.data);
             } else {
@@ -962,7 +1023,7 @@ export default {
         this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
       }, 200);
 
-      let fPP = pxp.filter((p) => p.cantidad === 0 || p.cantidad === "0");
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
       if (fPP.length != 4) {
         obj.ProductoMedicion = obj.medicion.ProductoMedicion;
         obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
@@ -977,6 +1038,19 @@ export default {
     },
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
+      let variantStock = "";
+      switch (true) {
+        case obj.stock <= 0:
+          variantStock = "danger";
+          break;
+        case obj.stock <= obj.StockMinimo:
+          variantStock = "warning";
+          break;
+
+        default:
+          variantStock = "success";
+      }
+      obj._rowVariant = variantStock;
       obj.estadoPxP = false;
       this.loadCode = "";
       this.preciosProd = [];
@@ -986,7 +1060,7 @@ export default {
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(
-        (p) => p.cantidad === 0 || p.cantidad === "0"
+        p => p.cantidad === 0 || p.cantidad === "0"
       );
 
       if (!obj.PreciosPorProducto || fPP.length === 5) {
@@ -1019,7 +1093,7 @@ export default {
         },
         { setPrecioCosto: this.tipo == "mov" ? true : false },
         false,
-        this.cliente.EsVIP,
+        this.cliente.EsVIP
       ]);
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
@@ -1050,7 +1124,7 @@ export default {
         },
         false,
         false,
-        this.cliente.EsVIP,
+        this.cliente.EsVIP
       ]);
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
@@ -1111,10 +1185,10 @@ export default {
           data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
+              ? Number.isInteger(data.stock)
+                ? data.stock
+                : data.stock.toFixed(2)
+              : data.stock
         }</b></td>
                 <td style="width: 200px"><b>${data.Producto} - ${
           data.CodigoBarra
@@ -1143,7 +1217,9 @@ export default {
         `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
       `;
     },
     // setCantidad (index, val) {
@@ -1254,11 +1330,11 @@ export default {
       } else {
         return "";
       }
-    },
+    }
   },
   components: {
-    ProductoForm,
-  },
+    ProductoForm
+  }
 };
 </script>
 
