@@ -433,7 +433,7 @@ export default {
           this.indexFactor = val
           this.factorNombre="Vidriero"
           this.esPulgadas=0
-          this.factor = 900
+          this.factor = 870
           break;
         case 2:
           this.factorNombre="Pulgadas"
@@ -546,7 +546,7 @@ export default {
 
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       //halla el pie2
-      let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/900
+      let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/870
       // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
       // let largo = (largo == '0' ) ? false : prod.Largo;
 

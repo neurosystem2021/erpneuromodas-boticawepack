@@ -2,22 +2,35 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/logo.png">
-			</div>
-			<div id="company">
-				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
-				<div>{{ empresa.DIRECCION }}</div>
-				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
+				<img src="/resources/images/botica-header-trash.jpg">
 			</div>
 		</header>
 		<main>
       <div id="details" class="clearfix">
         <div id="client">
-          <div class="to">PROFORMA A:</div>
-          <h2 class="name">{{ proforma.Cliente }}</h2>
-          <div class="address">{{ proforma.ClienteDireccion }}</div>
-          <div class="email"><a :href="'mailto:' + proforma.ClienteEmail">{{ proforma.ClienteEmail }}</a></div>
+          <br>
+          <h5 class="to" style="color:black">PROFORMA A:</h5>
+          <table>
+            <tbody>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
+              </tr>
+
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
+                <td class="celda" style="text-transform: uppercase">: Soles</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div id="invoice">
           <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
@@ -72,6 +85,9 @@
           </tr>
         </tfoot>
       </table>
+      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+      </div>
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
         <div>NOTA:</div>
@@ -128,4 +144,14 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
+.celda{
+  text-align:left;
+  border: none !important;
+  background: white !important
+}
+@media print {
+  #printBtn {
+    display: none;
+  }
+}
 </style>
