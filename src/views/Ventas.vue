@@ -1691,7 +1691,6 @@ export default {
             tipoPago = k;
           }
         }
-        console.log(tipoPago);
         let dataImprimir = {
           vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
@@ -1743,26 +1742,34 @@ export default {
           // });
           let comandaJson = JSON.stringify(dataImprimir);
           // console.log(comandaJson);
+
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {
-              await this.axios
-                .post(
-                  "http://localhost:5000/imprimir/getcmdped.php",
-                  comandaJson
-                )
-                .catch(err => {
-                  console.error(err);
-                });
-
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
+              // -------------------------
+              await fetch("http://localhost:5000/imprimir/getcmdped.php", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: comandaJson
+              }).catch(error => console.error("Error:", error));
             })
             .catch(error => {
               console.error(error);
               // this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
               this.inProgress = false;
             });
+
+          // await this.axios
+          //   .post("http://localhost:5000/imprimir/getcmdped.php", comandaJson, {
+          //     baseURL: ""
+          //   })
+          //   .catch(err => {
+          //     console.error(err);
+          //   });
           this.$toasted.success("Venta realizada con exito");
         }
       });
@@ -1772,7 +1779,7 @@ export default {
 
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 3000);
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios

@@ -2,8 +2,8 @@ export default {
     proveedoresFiltrados: [],
     almacenesFiltrados: [],
     empresas: [
-        { value: "imperiop1", text: "EMP. FERRETERIA GOMEZ S.A.C" },
-        { value: "imperiop2", text: "EMP. ROLLING GOMEZ" },
+        { value: "imperiop2", text: "INVERSIONES CRISTAL EIRL" }, /// imperiop2 es la que se coge por defecto
+        { value: "imperiop1", text: "MUNDO DE LAS FLORES" },
 
     ],
     consideraAppendEmpresa:true,
