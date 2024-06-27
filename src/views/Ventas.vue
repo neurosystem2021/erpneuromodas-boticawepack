@@ -672,6 +672,10 @@ export default {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
                         this.venta.CampoDireccion = this.venta.cliente.Direccion
+                        if(this.venta.cliente.DniRuc == '00000000'){
+                        this.venta.EsOrganizacion = 0
+                        this.venta.NombreOrganizacion = ''
+                }
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
@@ -872,6 +876,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
             
             if(this.venta.cliente.DniRuc != '00000000'){
                 this.venta.EsOrganizacion = 0

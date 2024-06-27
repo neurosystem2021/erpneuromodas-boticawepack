@@ -2,7 +2,7 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/botica-header-trash.jpg">
+				<img src="/resources/images/botica-header-trash.jpg" style="width: 800px; height: 115px;">
 			</div>
 		</header>
 		<main>
@@ -143,6 +143,7 @@ export default {
 </script>
 
 <style scoped>
+
 @import '../../assets/css/invoice.css';
 .celda{
   text-align:left;
