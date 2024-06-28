@@ -465,6 +465,7 @@ export default {
         this.initForm()
     },
     async mounted () {
+        this.$store.state.bloquearCarrito  = true;
         // this.getNumeroVenta()
         await this.getVendedor()
         if (sessionStorage.getItem('empresa')) {

@@ -221,6 +221,7 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+    this.$store.state.bloquearCarrito = false;
   },
   data () {
     return {
