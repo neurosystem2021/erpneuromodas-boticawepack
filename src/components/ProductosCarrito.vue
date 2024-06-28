@@ -173,7 +173,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
+            :disabled="$store.state.bloquearCarrito"
             type="number"
             style="width: 95px"
             min="0"
