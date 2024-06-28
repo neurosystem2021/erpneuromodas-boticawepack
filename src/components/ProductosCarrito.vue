@@ -173,7 +173,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
+            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
             type="number"
             style="width: 95px"
             min="0"
@@ -252,7 +252,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput?true:false  || esDelivery"
+          :disabled=true
             v-model="productos[data.index].descuento"
             style="width:90px"
             type="number"
