@@ -54,7 +54,12 @@
             :current-page="currentPage">
           
               <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+                  <a class="btn btn-success" target="_blank"
+                  
+                   :href="`/imprimir/index.php?IdDocVenta=${data.item.idDocVenta}&preview=1&id_empresa=${empresa}`
+                   
+                   "
+                   >{{data.item.TipoDoc}}</a>
               </template>
           </b-table>
             <b-row>
