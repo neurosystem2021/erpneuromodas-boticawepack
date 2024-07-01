@@ -2,8 +2,19 @@
     <div>
     <h2 align-h="center" class="text-center" >Reporte de Cierre de Caja</h2>
       <br>
+
         <b-container class="bv-example-row">
           <b-row>
+            <b-col cols="12">
+               <b-form-select
+              v-model="empresa"
+              :options="$store.state.empresas"
+              size="lg"
+              style="font-weight: bold; width: 350px"
+              class="form-control my-2"
+              @change="cambiarEmpresa"
+            ></b-form-select>
+            </b-col>
             <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Almacen:</label>
@@ -11,6 +22,7 @@
                     required="required"
                     ref="inputAlmacen"
                     :url="API + 'almacenes'"
+                     :customParams="{ id_empresa: empresa }"
                     anchor="Almacen"
                     label="writer"
                     placeholder=""
@@ -98,13 +110,24 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
-  mounted() {
-    this.getVendedor()
+  async beforeMount() {
+    let empresa = sessionStorage.getItem("empresa");
+    if (!empresa) {
+      this.empresa = "imperiop2";
+      sessionStorage.setItem("empresa", this.empresa);
+    } else {
+      this.empresa = empresa;
+    }
   },
-  data () {
+  async mounted() {
+    await this.getVendedor();
+    await this.getCierres();
+  },
+  data() {
     return {
+      empresa: "",
       API: config.API,
       producto: {},
       almacen: {},
@@ -113,7 +136,7 @@ export default {
       fechaHasta: this.$moment().format("YYYY-MM-DD"),
       kardexSelect: [],
       cierres: []
-    }
+    };
   },
   computed: {
     // totalGeneral() {
@@ -126,97 +149,111 @@ export default {
     totalIngresos() {
       let total = 0;
       for (var i = 0; i < this.cierres.length; i++) {
-        total += this.cierres[i].Ingresos
+        total += this.cierres[i].Ingresos;
       }
-      return total
+      return total;
     },
     totalVentas() {
       let total = 0;
       for (var i = 0; i < this.cierres.length; i++) {
-        total += this.cierres[i].Ventas
+        total += this.cierres[i].Ventas;
       }
-      return total
+      return total;
     },
     totalSalidas() {
       let total = 0;
       for (var i = 0; i < this.cierres.length; i++) {
-        total += this.cierres[i].Salidas
+        total += this.cierres[i].Salidas;
       }
-      return total
+      return total;
     },
     totalSaldo() {
       let total = 0;
       for (var i = 0; i < this.cierres.length; i++) {
-        total += this.cierres[i].Total
+        total += this.cierres[i].Total;
       }
-      return total
+      return total;
     },
     totalGeneral() {
       let total = 0;
-      
+
       for (var i = 0; i < this.cierres.length; i++) {
         //if (!this.cierres[i].Ingresos && !this.cierres[i].Salidas) {
         //  continue;
         //} else {
-          total += this.cierres[i].Total
+        total += this.cierres[i].Total;
         //  break;
         //}
       }
 
-      return total
+      return total;
     }
   },
   methods: {
     getCierres() {
-      this.axios.get(this.API + 'cierrecaja/reporte', {
-        params: {
+      this.axios
+        .get(this.API + "cierrecaja/reporte", {
+          params: {
             idAlmacen: this.almacen.IdAlmacen,
-            fechaDesde: this.fechaDesde + ' 00:00:00',
-            fechaHasta: this.fechaHasta + ' 23:59:59'
-        }
-      }).then((response) => {
-        this.cierres = response.data
-      })
-    },
-    getVendedor () {
-      let usuario = sessionStorage.getItem('User')
-      this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            // this.setVendedor(response.data)
-            // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
-            this.loadAlmacen(response.data.IdAlmacen)
-            // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-            // bloquear ambos inputs
-            if (response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputAlmacen.$refs.input.disabled = true
-            }
-            // this.$refs.inputPuntoVenta.$refs.input.disabled = true
-            //this.getNumeroVenta()
+            fechaDesde: this.fechaDesde + " 00:00:00",
+            fechaHasta: this.fechaHasta + " 23:59:59",
+            id_empresa: this.empresa
+          }
         })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+        .then(response => {
+          this.cierres = response.data;
+        });
     },
-    loadAlmacen (id) {
-        this.axios.get(this.API + 'almacenes/id/' + id)
+    cambiarEmpresa() {
+      setTimeout(() => {
+        sessionStorage.setItem("empresa", this.empresa);
+        window.location.reload();
+        return false;
+      }, 50);
+    },
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + `usuarios/${usuario}`, {
+          params: { id_empresa: this.empresa }
+        })
+        .then(response => {
+          // this.setVendedor(response.data)
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.loadAlmacen(response.data.IdAlmacen);
+          // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
+          // bloquear ambos inputs
+          if (response.data.IdUsuarioPerfil !== 1) {
+            this.$refs.inputAlmacen.$refs.input.disabled = true;
+          }
+          // this.$refs.inputPuntoVenta.$refs.input.disabled = true
+          //this.getNumeroVenta()
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    loadAlmacen(id) {
+      this.axios
+        .get(this.API + "almacenes/id/" + id, {
+          params: { id_empresa: this.empresa }
+        })
         .then(res => {
-            this.setAlmacen(res.data)
-        })
+          this.setAlmacen(res.data);
+        });
     },
-    setAlmacen (obj) {
-      this.almacen = obj
-      this.$refs.inputAlmacen.setValue(obj.Almacen)
+    setAlmacen(obj) {
+      this.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    }, 
+      this.$refs[ref].handleDoubleClick();
+    }
   }
-}
+};
 </script>
 <style>
-    
-
 </style>

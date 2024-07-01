@@ -13,6 +13,7 @@ table<template>
               sortBy: isVentas ? 'stock' : 'IdProducto',
               sortDesc: 1,
               limit: '25',
+              id_empresa: empresa 
             }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
@@ -693,11 +694,21 @@ import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
 
 export default {
+  async beforeMount() {
+    let empresa = sessionStorage.getItem("empresa");
+    if (!empresa) {
+      this.empresa = "imperiop2";
+      sessionStorage.setItem("empresa", this.empresa);
+    } else {
+      this.empresa = empresa;
+    }
+  },
   mounted() {
     // this.alterarBuscadorProductos()
   },
   data() {
     return {
+      empresa: "",
       IdProducto: "",
       errorMessage: "",
       modalNuevoProductos: false,
