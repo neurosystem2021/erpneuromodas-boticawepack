@@ -67,88 +67,98 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 // import ModeloForm from '@/components/ModeloForm'
 export default {
-  data () {
+  data() {
     return {
-      title: 'Nueva Categoria',
+      title: "Nueva Categoria",
       API: config.API,
-      show: false, 
+      show: false,
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       categoria: {},
       nuevo: false,
-      impresoraItems: [
-      ],
-    }
+      impresoraItems: []
+    };
   },
-  props: ['categoriaUpdate', 'cbGuardar'],
+  props: ["categoriaUpdate", "cbGuardar"],
   watch: {
-    show (val) {
-      this.impresoraItems= [],
-      this.axios.get(this.API + 'impresoras').then((response) => {
-        if(response.data){
-            response.data.map((impresora)=>{
-                this.impresoraItems.push({value:impresora.IdImpresora,text:impresora.NombreImpresora})
-            })
-        }
-      })
-      let newVal = this.categoriaUpdate  || {}
+    show(val) {
+      this.impresoraItems = [];
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .get(this.API + "impresoras?id_empresa" + empresa)
+        .then(response => {
+          if (response.data) {
+            response.data.map(impresora => {
+              this.impresoraItems.push({
+                value: impresora.IdImpresora,
+                text: impresora.NombreImpresora
+              });
+            });
+          }
+        });
+      let newVal = this.categoriaUpdate || {};
       if (newVal.IdProductoCategoria && !this.nuevo) {
-        this.initForm()
-        this.title='Editar Categoria << '+newVal.IdProductoCategoria+' >>'
-        this.categoria.IdImpresora = newVal.IdImpresora
-        this.categoria.ProductoCategoria=newVal.ProductoCategoria
-        this.categoria.IdProductoCategoria = newVal.IdProductoCategoria
-        this.categoria.MostrarDelivery = newVal.MostrarDelivery
-        this.categoria.MostrarPuntoVenta = newVal.MostrarPuntoVenta
-        this.categoria.Orden = newVal.Orden
-        this.categoria.EsOferta = newVal.EsOferta
+        this.initForm();
+        this.title =
+          "Editar Categoria << " + newVal.IdProductoCategoria + " >>";
+        this.categoria.IdImpresora = newVal.IdImpresora;
+        this.categoria.ProductoCategoria = newVal.ProductoCategoria;
+        this.categoria.IdProductoCategoria = newVal.IdProductoCategoria;
+        this.categoria.MostrarDelivery = newVal.MostrarDelivery;
+        this.categoria.MostrarPuntoVenta = newVal.MostrarPuntoVenta;
+        this.categoria.Orden = newVal.Orden;
+        this.categoria.EsOferta = newVal.EsOferta;
       } else {
-        this.title='Nueva Categoria'
+        this.title = "Nueva Categoria";
         this.initForm();
       }
     }
   },
   methods: {
-    initForm () {
+    initForm() {
       this.categoria = {
-          ProductoCategoria: '',
-          IdImpresora: null,
-          MostrarDelivery: 0,
-          MostrarPuntoVenta:0,
-          Orden:0,
-          EsOferta:0,
-      }
+        ProductoCategoria: "",
+        IdImpresora: null,
+        MostrarDelivery: 0,
+        MostrarPuntoVenta: 0,
+        Orden: 0,
+        EsOferta: 0
+      };
     },
     guardarCategoriaImpresora(e) {
       e.preventDefault();
-      this.axios.post(this.API + 'categorias/impresora', {
-        ...this.categoria, 
-      })
-      .then((response) => {
-        if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
-        }
-        if (response.data.error) {
-          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
-          return
-        } else {
-          this.$toasted.show('Categoria guardada correctamente')
-        }
-        this.$refs.productoForm.hide()
-      })
-      .catch((error) => {
-        console.log(error)
-        this.$toasted.show('Ha ocurrido un error o la categoria ya existe, vuelva a intentarlo')
-      })
-    },
+       let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .post(this.API + "categorias/impresora?id_empresa="+empresa, {
+          ...this.categoria
+        })
+        .then(response => {
+          if (this.cbGuardar) {
+            this.cbGuardar(response.data.insertId);
+          }
+          if (response.data.error) {
+            this.$toasted.show(
+              response.data.error + " - " + response.data.codigoBarra
+            );
+            return;
+          } else {
+            this.$toasted.show("Categoria guardada correctamente");
+          }
+          this.$refs.productoForm.hide();
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show(
+            "Ha ocurrido un error o la categoria ya existe, vuelva a intentarlo"
+          );
+        });
+    }
   },
-  computed : {
-  },
-  components: {
-  }
-}
+  computed: {},
+  components: {}
+};
 </script>
 <style>
 </style>

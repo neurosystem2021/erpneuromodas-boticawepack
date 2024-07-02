@@ -54,7 +54,7 @@
                         </autocomplete>
 
                         <b-input-group-append>
-                          <!--<proveedores-tabla></proveedores-tabla>-->
+                          <!--<f-tabla></proveedores-tabla>-->
                           <proveedores-form :ruc="newRuc"></proveedores-form>
                         </b-input-group-append>
                       </b-input-group>

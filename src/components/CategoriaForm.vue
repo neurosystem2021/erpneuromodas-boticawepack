@@ -18,45 +18,45 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
-  data () {
+  data() {
     return {
       API: config.API,
       show: false,
       categoria: {},
       show: false
-    }
+    };
   },
-  props: ['showButton', 'cbGuardar'],
+  props: ["showButton", "cbGuardar"],
   methods: {
-    guardarCategoria () {
+    guardarCategoria() {
       if (!this.categoria.ProductoCategoria) {
-        return
+        return;
       }
 
-      this.categoria.ProductoCategoria = this.categoria.ProductoCategoria.toUpperCase()
-
-      this.axios.post(this.API + 'categorias', this.categoria)
-      .then((response) => {
-        this.$toasted.show('Categoría guardada correctamente')
-        if (this.cbGuardar) {
-          this.cbGuardar({
-            IdProductoCategoria: response.data.insertId,
-            ProductoCategoria: response.data.ProductoCategoria
-          })
-        }
-        this.categoria.ProductoCategoria = ''
-      })
-      .catch((error) => {
-        console.log(error)
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.categoria.ProductoCategoria = this.categoria.ProductoCategoria.toUpperCase();
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .post(this.API + "categorias?id_empresa=" + empresa, this.categoria)
+        .then(response => {
+          this.$toasted.show("Categoría guardada correctamente");
+          if (this.cbGuardar) {
+            this.cbGuardar({
+              IdProductoCategoria: response.data.insertId,
+              ProductoCategoria: response.data.ProductoCategoria
+            });
+          }
+          this.categoria.ProductoCategoria = "";
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
-}
+};
 </script>
 <style>
-
 </style>

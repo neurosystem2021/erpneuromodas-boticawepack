@@ -79,85 +79,93 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
-    export default {
-        mounted () {
-            this.obtenerDescuento()
-            this.obtenerComision()
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                porCada: 20,
-                puntos: 1,
-                valorPunto: 1,
-                valorComision: 1,
-            }
-        },
-        methods: {
-            obtenerDescuento () {
-                this.axios.get(this.API + 'ventas/descuento')
-                .then((response) => {
-                    this.porCada = response.data.PorCada,
-                    this.puntos = response.data.Puntos,
-                    this.valorPunto = response.data.ValorPunto
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            obtenerComision () {
-                // Para obtener el ValorComision
-                this.axios.get(this.API + 'ventas/comision')
-                .then((response) => {
-                    this.valorComision = response.data.valorComision
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            guardarConfigVenta (evt) {
-                evt.preventDefault()
-
-                this.axios.post(this.API + 'ventas/descuento', {
-                    porCada: this.porCada,
-                    puntos: this.puntos,
-                    valorPunto: this.valorPunto
-                })
-                .then((response) => {
-                    this.$emit('onUpdateConfig', response.data)
-                    this.obtenerDescuento()
-                    this.$toasted.show('Se actualizó la configuración')
-                    this.show = false
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            guardarConfigComision() {
-                // Comision
-                this.axios.post(this.API + 'ventas/comision', {
-                    valorComision: this.valorComision
-                }).then((response) => {
-                    this.$emit('onUpdateConfigComision', response.data)
-                    this.obtenerComision()
-                    this.$toasted.show('Se actualizó la configuración')
-                    this.show = false
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-
-            }
-        }
+export default {
+  mounted() {
+    this.obtenerDescuento();
+    this.obtenerComision();
+  },
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      porCada: 20,
+      puntos: 1,
+      valorPunto: 1,
+      valorComision: 1
+    };
+  },
+  methods: {
+    obtenerDescuento() {
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .get(this.API + "ventas/descuento", { id_empresa: empresa })
+        .then(response => {
+          this.porCada = response.data.PorCada;
+          this.puntos = response.data.Puntos;
+          this.valorPunto = response.data.ValorPunto;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    obtenerComision() {
+      // Para obtener el ValorComision
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .get(this.API + "ventas/comision", { id_empresa: empresa })
+        .then(response => {
+          this.valorComision = response.data.valorComision;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    guardarConfigVenta(evt) {
+      evt.preventDefault();
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .post(this.API + "ventas/descuento", {
+          porCada: this.porCada,
+          puntos: this.puntos,
+          valorPunto: this.valorPunto,
+          id_empresa: empresa
+        })
+        .then(response => {
+          this.$emit("onUpdateConfig", response.data);
+          this.obtenerDescuento();
+          this.$toasted.show("Se actualizó la configuración");
+          this.show = false;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    guardarConfigComision() {
+      // Comision
+      let empresa = sessionStorage.getItem("empresa");
+      this.axios
+        .post(this.API + "ventas/comision", {
+          valorComision: this.valorComision,
+          id_empresa: empresa
+        })
+        .then(response => {
+          this.$emit("onUpdateConfigComision", response.data);
+          this.obtenerComision();
+          this.$toasted.show("Se actualizó la configuración");
+          this.show = false;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
+  }
+};
 </script>
 <style>
-
 </style>

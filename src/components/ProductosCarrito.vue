@@ -1,4 +1,4 @@
-table<template>
+<template>
   <b-row>
     <b-col md="12">
       <b-form-group>
@@ -135,6 +135,7 @@ table<template>
         :fields="fields"
         ref="tablaCarrito"
         style="margin-top: -12px"
+        v-if="mostrarTablaProductos"
       >
         <template slot="eventPres" slot-scope="data">
           <b-button
@@ -143,8 +144,9 @@ table<template>
             :disabled="bloquearInput ? true : false"
             variant="info"
             @click="showPresentacion(productos[data.index])"
-            ><i class="fas fa-list"></i
-          ></b-button>
+            >
+            <i class="fas fa-list"></i>
+            </b-button>
           <b-button
             @click="
               abrirImagen(
@@ -231,32 +233,12 @@ table<template>
             type="number"
             style="width: 95px"
             class="form-control"
-            step="0.001"
+            step="0.001"            
             min="0"
             @input="
               (val) => {
                 $emit('onInputCantidad', val.target.value);
-                /*if(isVentas){
-                if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
-                return
-                }
-
-                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-                if(reg && reg.cantidad){
-                  productos[data.index].precio = reg.precio
-                  return
-                }
-                
-                productos[data.index].precio = productos[data.index].PrecioContado 
-              }else{
-                if(productos[data.index].EsObsequio==1){
-                    productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
-                }else{
-                    productos[data.index].precio = productos[data.index].PrecioCosto; 
-                }
-              }*/
+               recalcularTotalPorItem(productos[data.index]);
                 if (productos[data.index].EsObsequio == 1) {
                   productos[data.index].precio = 0;
                   productos[data.index].nuevoPrecioContado = 0;
@@ -494,7 +476,7 @@ table<template>
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="3">
-      <slot name="totalEmpresa"></slot>
+      <slot name="totalEmpresa"  v-if="mostrarTablaProductos"></slot>
     </b-col>
     <!-- <b-col md="2">
       <slot name="adicional"></slot>
@@ -708,6 +690,7 @@ export default {
   },
   data() {
     return {
+      mostrarTablaProductos: true,
       empresa: "",
       IdProducto: "",
       errorMessage: "",
@@ -1167,6 +1150,15 @@ export default {
       obj.cantidadPres = this.cant;
       this.actualizarProd(obj);
     },
+    recalcularTotalPorItem(item) {
+      let produc = { ...item };
+      item.subtotal = produc.cantidad * produc.precio;
+      item.total = produc.cantidad * produc.precio;
+      this.mostrarTablaProductos = false;
+      this.mostrarTablaProductos = !false;
+      this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+        .recalcularTotalPorEmpresaFlag;
+    },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
         this.precioCont = obj.PrecioContado;
@@ -1502,10 +1494,9 @@ export default {
 
       obj.cantidadPres = obj.cantidad;
       //this.actualizarProd(obj)
-      console.log(this.$store.state.recalcularTotalPorEmpresaFlag);
+
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
-      console.log(this.$store.state.recalcularTotalPorEmpresaFlag);
     },
     startRecognition() {
       // Verifica si el navegador soporta la Web Speech API

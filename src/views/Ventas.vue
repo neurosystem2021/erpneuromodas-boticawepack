@@ -879,18 +879,17 @@ export default {
       ).toFixed(2);
     },
     productos() {
-      console.log("´legó");
+      this.recalcularTotalesPorEmpresa();
+    },
+    recalcularTotalPorEmpresaFlag() {
       this.recalcularTotalesPorEmpresa();
     }
   },
   computed: {
     ...mapState({
       productos: state => state.cart.productos,
-      recalcularTotalPorEmpresaFlag: {
-        get() {
-          return this.$store.state.recalcularTotalPorEmpresaFlag;
-        }
-      },
+      recalcularTotalPorEmpresaFlag: state =>
+        state.recalcularTotalPorEmpresaFlag,
 
       totalCart: state => state.cart.totalCart
     }),
