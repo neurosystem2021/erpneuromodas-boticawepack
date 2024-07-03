@@ -39,7 +39,7 @@
       </div>
       <br class="no-print" /><br class="no-print" />
 
-      <h2 class="text-center">Cierre de Caja</h2> 
+      <h2 class="text-center">Cierre de Cajas</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : (cierre.IdTurno == 2? 'TARDE':'NOCHE') }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
@@ -200,6 +200,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Descripción</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -212,6 +213,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -263,6 +265,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Descrición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -275,6 +278,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -327,6 +331,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Descripción</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -339,6 +344,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -389,6 +395,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Descripción</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -401,6 +408,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -451,6 +459,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Descripción</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -463,6 +472,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
