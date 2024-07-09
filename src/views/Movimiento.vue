@@ -240,12 +240,13 @@ export default {
     if (!empresa) {
       this.empresa = "imperiop2";
       sessionStorage.setItem("empresa", this.empresa);
-    
     } else {
       this.empresa = empresa;
     }
   },
-  mounted() {},
+  mounted() {
+    this.$store.state.MostrarBotonMultipleEmpresa = false;
+  },
   data() {
     return {
       empresa: "",

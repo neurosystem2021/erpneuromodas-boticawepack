@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2">
+          <b-button @click="abrirModaProductos" variant="info" class="mx-2" v-if="$store.state.MostrarBotonMultipleEmpresa">
             Agregar Productos
           </b-button>
           <autocomplete
@@ -238,7 +238,7 @@
             @input="
               (val) => {
                 $emit('onInputCantidad', val.target.value);
-               recalcularTotalPorItem(productos[data.index]);
+               recalcularTotalPorItem(productos[data.index],data.index);
                 if (productos[data.index].EsObsequio == 1) {
                   productos[data.index].precio = 0;
                   productos[data.index].nuevoPrecioContado = 0;
@@ -481,7 +481,7 @@
     <!-- <b-col md="2">
       <slot name="adicional"></slot>
     </b-col> -->
-    <b-col md="3">
+    <b-col md="3" >
       <table class="table b-table border table-footer">
         <tbody>
           <tr v-if="sumatoriaDescuento > 0">
@@ -497,7 +497,7 @@
             <td class="table-danger">Descuento</td>
             <td class="table-danger">- {{ sumatoriaDescuento }}</td>
           </tr>
-          <tr>
+          <tr   v-if="mostrarTablaProductos">
             <td><b>SubTotal</b></td>
             <td class="table-danger">{{ sumatoriaSubTotal }}</td>
           </tr>
@@ -685,8 +685,32 @@ export default {
       this.empresa = empresa;
     }
   },
-  mounted() {
-    // this.alterarBuscadorProductos()
+  async mounted() {
+    let vm = this;
+    vm.lstProductos = [];
+    await vm.$store.state.empresas.forEach(async empresa => {
+      let url = `${
+        vm.API
+      }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
+        empresa.value
+      }&limit=`;
+      // url = new URL(url);
+      let res = await vm.axios(url);
+      await res.data.forEach(element => {
+        vm.lstProductos.push({
+          ...element,
+          Empresa: empresa.value,
+          Selected: false,
+          NombreEmpresa: empresa.text,
+          _rowVariant:
+            element.stock <= 0
+              ? "danger"
+              : element.stock < element.StockMinimo
+                ? "warning"
+                : "success"
+        });
+      });
+    });
   },
   data() {
     return {
@@ -824,7 +848,8 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.total);
+        console.log(value.total);
+        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento);
       });
 
       this.actualizarTotal(sumatoria);
@@ -1150,14 +1175,18 @@ export default {
       obj.cantidadPres = this.cant;
       this.actualizarProd(obj);
     },
-    recalcularTotalPorItem(item) {
+    recalcularTotalPorItem(item, index) {
       let produc = { ...item };
       item.subtotal = produc.cantidad * produc.precio;
       item.total = produc.cantidad * produc.precio;
       this.mostrarTablaProductos = false;
+
       this.mostrarTablaProductos = !false;
+      this.actualizarDescu(index);
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
+
+      // this.sumatoriaTotal();
     },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
@@ -1298,6 +1327,11 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio
       this.updateManoDeObraNeta(index);
+      this.mostrarTablaProductos = !false;
+      this.actualizarDescu(index);
+      this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+        .recalcularTotalPorEmpresaFlag;
+      // this.sumatoriaTotal();
     },
     actualizarDescu(index) {
       let obj = this.productos[index];
@@ -1363,34 +1397,6 @@ export default {
       vm.searchProducto = "";
       vm.modalNuevoProductos = !vm.modalNuevoProductos;
       vm.$store.state.consideraAppendEmpresa = false;
-      vm.lstProductos = [];
-      await vm.$store.state.empresas.forEach(async empresa => {
-        let url = `${
-          vm.API
-        }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
-          empresa.value
-        }&limit=`;
-        // url = new URL(url);
-        let res = await vm.axios(url);
-        await res.data.forEach(element => {
-          vm.lstProductos.push({
-            ...element,
-            Empresa: empresa.value,
-            Selected: false,
-            NombreEmpresa: empresa.text,
-            _rowVariant:
-              element.stock <= 0
-                ? "danger"
-                : element.stock < element.StockMinimo
-                  ? "warning"
-                  : "success"
-          });
-        });
-      });
-
-      // setTimeout(() => {
-      //   vm.$store.state.consideraAppendEmpresa = true;
-      // }, 100);
     },
 
     listadoProductos() {
@@ -1497,6 +1503,7 @@ export default {
 
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
+      this.sumatoriaSubTotal();
     },
     startRecognition() {
       // Verifica si el navegador soporta la Web Speech API

@@ -7,5 +7,7 @@ export default {
 
     ],
     consideraAppendEmpresa:true,
-    recalcularTotalPorEmpresaFlag:true
+    MostrarBotonMultipleEmpresa:false,
+    recalcularTotalPorEmpresaFlag:true,
+    listadoProductos:[]
 } 

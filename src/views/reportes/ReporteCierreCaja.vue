@@ -236,13 +236,9 @@ export default {
         });
     },
     loadAlmacen(id) {
-      this.axios
-        .get(this.API + "almacenes/id/" + id, {
-          params: { id_empresa: this.empresa }
-        })
-        .then(res => {
-          this.setAlmacen(res.data);
-        });
+      this.axios.get(this.API + "almacenes/id/" + id).then(res => {
+        this.setAlmacen(res.data);
+      });
     },
     setAlmacen(obj) {
       this.almacen = obj;

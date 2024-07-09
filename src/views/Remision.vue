@@ -253,32 +253,35 @@
 </template>
 
 <script>
-import Menu from '@/components/Menu'
-import ProductosCarrito from '@/components/ProductosCarrito'
-import { mapState, mapActions } from 'vuex'
-import config from '@/store/config.js'
+import Menu from "@/components/Menu";
+import ProductosCarrito from "@/components/ProductosCarrito";
+import { mapState, mapActions } from "vuex";
+import config from "@/store/config.js";
 export default {
-  data () {
+  data() {
     return {
       inProgress: false,
       API: config.API,
       remision: {
-        codUndPesoBruto: 'KGM',
-        codModalidadTraslado: '01',
-        codMotivoTraslado: '01',
-        descripcionMotivoTraslado:'VENTA',
+        codUndPesoBruto: "KGM",
+        codModalidadTraslado: "01",
+        codMotivoTraslado: "01",
+        descripcionMotivoTraslado: "VENTA",
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
       carrito: {
         fields: [
-          { key: 'CodigoBarra', label: 'Código' }, 
-          { key: 'Producto' }, 
-          { key: 'cantidad' },
-          { key: 'acciones', label: ''}
+          { key: "CodigoBarra", label: "Código" },
+          { key: "Producto" },
+          { key: "cantidad" },
+          { key: "acciones", label: "" }
         ]
       }
-    }
+    };
+  },
+  mounted() {
+    this.$store.state.MostrarBotonMultipleEmpresa = false;
   },
   computed: {
     ...mapState({
@@ -287,209 +290,240 @@ export default {
   },
   methods: {
     ...mapActions({
-      limpiarCart: 'limpiarCarrito',
-      add:'agregarProducto'
+      limpiarCart: "limpiarCarrito",
+      add: "agregarProducto"
     }),
-    afe (e) {
-      return false
+    afe(e) {
+      return false;
     },
-    motivoTrasladoChange (e) {
-      let descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
-      this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado
+    motivoTrasladoChange(e) {
+      let descripcionMotivoTraslado =
+        e.target.options[e.target.selectedIndex].text;
+      this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado;
     },
-    onReset (evt) {
+    onReset(evt) {
       evt.preventDefault();
     },
-    guardarRemision (evt) {
+    guardarRemision(evt) {
       evt.preventDefault();
-      this.inProgress = true
-      if(!this.productos.length) {
-          this.$toasted.show('No ha seleccionado ningun producto')
-          this.inProgress = false            
-          return
-      }
-      let faltaLlenar = false
-      this.productos.forEach((prod, index) => {
-        if (prod.cantidad <= 0) {
-          faltaLlenar = true
-        }
-      })
-      if (faltaLlenar) {
-        this.$toasted.show('Falta llenar cantidad')
-        this.inProgress = false
+      this.inProgress = true;
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
         return;
       }
-      this.axios.post(this.API + 'remision', {
-        remision: this.remision,
-        productos: this.productos
-      })
-      .then((response) => {
-        console.log(response);
-        
-        if (response.data.error) {
-          this.$toasted.show(response.data.error)
-        } else {
-          this.limpiarCart()
-          this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
-          this.remision.observacion = '';
-          this.remision.pesoBruto = '';
-          this.remision.codModalidadTraslado = '01';
-          this.remision.codMotivoTraslado = '01';
-          this.remision.codUbigeoOrigen = '';
-          this.remision.direccionOrigen = '';
-          this.remision.nroDocumentoCliente = '';
-          this.remision.razonSocialCliente = '';
-          this.remision.direccionCliente = '';
-          this.remision.codUbigeoDestino = '';
-          this.remision.direccionDestino = '';
-          this.remision.nroDocumentoTransportista = '';
-          this.remision.razonSocialTransportista = '';
-          this.remision.placaVehiculo = '';
-          this.remision.placaCarreta = '';
-          this.remision.nroDocChofer = '';
-          this.remision.licenciaChofer = '';
-          this.remision.descripcionMotivoTraslado = '';
-          this.remision.totalBultos = '';
-          this.$refs.inputDocRef.setValue('');
-          this.$refs.inputMovRef.setValue('');
-          this.$toasted.success('Movimiento guardado correctamente ')          
+      let faltaLlenar = false;
+      this.productos.forEach((prod, index) => {
+        if (prod.cantidad <= 0) {
+          faltaLlenar = true;
         }
-        this.inProgress = false
-      })
-      .catch((error) => {
-        this.$toasted.error('Ha ocurrido un error, vuelva a intentarlo')
-        this.inProgress = false
-      })
+      });
+      if (faltaLlenar) {
+        this.$toasted.show("Falta llenar cantidad");
+        this.inProgress = false;
+        return;
+      }
+      this.axios
+        .post(this.API + "remision", {
+          remision: this.remision,
+          productos: this.productos
+        })
+        .then(response => {
+          console.log(response);
+
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.limpiarCart();
+            this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
+            this.remision.observacion = "";
+            this.remision.pesoBruto = "";
+            this.remision.codModalidadTraslado = "01";
+            this.remision.codMotivoTraslado = "01";
+            this.remision.codUbigeoOrigen = "";
+            this.remision.direccionOrigen = "";
+            this.remision.nroDocumentoCliente = "";
+            this.remision.razonSocialCliente = "";
+            this.remision.direccionCliente = "";
+            this.remision.codUbigeoDestino = "";
+            this.remision.direccionDestino = "";
+            this.remision.nroDocumentoTransportista = "";
+            this.remision.razonSocialTransportista = "";
+            this.remision.placaVehiculo = "";
+            this.remision.placaCarreta = "";
+            this.remision.nroDocChofer = "";
+            this.remision.licenciaChofer = "";
+            this.remision.descripcionMotivoTraslado = "";
+            this.remision.totalBultos = "";
+            this.$refs.inputDocRef.setValue("");
+            this.$refs.inputMovRef.setValue("");
+            this.$toasted.success("Movimiento guardado correctamente ");
+          }
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.error("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    setMovRef (obj) {
-      this.$set(this.remision, 'nroDocumentoCliente', '');
-      this.$set(this.remision, 'razonSocialCliente', '');
-      this.$set(this.remision, 'direccionCliente', '');
-      this.$refs.inputDocRef.setValue('');
-      this.remision.documentoReferencia = '';
+    setMovRef(obj) {
+      this.$set(this.remision, "nroDocumentoCliente", "");
+      this.$set(this.remision, "razonSocialCliente", "");
+      this.$set(this.remision, "direccionCliente", "");
+      this.$refs.inputDocRef.setValue("");
+      this.remision.documentoReferencia = "";
       this.limpiarCart();
-      
+
       // Cargar producto del movimiento
-      this.axios.get(this.API + 'movimiento/detalle/comprobante', {
-            params: {
-              hashMovimiento: obj.Hash
-            }
-        }).then((response) => {
-          
+      this.axios
+        .get(this.API + "movimiento/detalle/comprobante", {
+          params: {
+            hashMovimiento: obj.Hash
+          }
+        })
+        .then(response => {
           if (response.data[0]) {
-            this.axios.get(this.API + 'proveedor', {
-              params: {
+            this.axios
+              .get(this.API + "proveedor", {
+                params: {
                   idProveedor: response.data[0].IdProveedor
-              }})
-              .then((response) => {
-                if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
-                  this.$set(this.remision, 'direccionCliente', response.data.Direccion);
-                  this.cliente = response.data;
-                } else {
-                  this.$toasted.show('No se encontro al cliente');
                 }
               })
-              .catch((error) => {
-                  console.log(error)
+              .then(response => {
+                if (response.data) {
+                  this.$set(
+                    this.remision,
+                    "nroDocumentoCliente",
+                    response.data.Ruc
+                  );
+                  this.$set(
+                    this.remision,
+                    "razonSocialCliente",
+                    response.data.Proveedor
+                  );
+                  this.$set(
+                    this.remision,
+                    "direccionCliente",
+                    response.data.Direccion
+                  );
+                  this.cliente = response.data;
+                } else {
+                  this.$toasted.show("No se encontro al cliente");
+                }
               })
-              // this.limpiarCart();
-              
-              response.data.map((item) => {
-                    item.estadoPxP = false
-                    let preciosProd = []
-                    item.precioCont = item.PrecioContado
-                    preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                    let fPP = preciosProd.filter(p => p.cantidad === 0)
-                    
-                    if (!item.PreciosPorProducto || fPP.length === 4) {
-                        item.estadoPxP = true
-                    }
-                this.add([item, () => {}, false ])
-              })             
+              .catch(error => {
+                console.log(error);
+              });
+            // this.limpiarCart();
+
+            response.data.map(item => {
+              item.estadoPxP = false;
+              let preciosProd = [];
+              item.precioCont = item.PrecioContado;
+              preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+              let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+              if (!item.PreciosPorProducto || fPP.length === 4) {
+                item.estadoPxP = true;
+              }
+              this.add([item, () => {}, false]);
+            });
           }
-      })
+        });
     },
-    setDocRef (obj) {
-      this.$set(this.remision, 'nroDocumentoCliente', '');
-      this.$set(this.remision, 'razonSocialCliente', '');
-      this.$set(this.remision, 'direccionCliente', '');
-      this.$refs.inputMovRef.setValue('');
+    setDocRef(obj) {
+      this.$set(this.remision, "nroDocumentoCliente", "");
+      this.$set(this.remision, "razonSocialCliente", "");
+      this.$set(this.remision, "direccionCliente", "");
+      this.$refs.inputMovRef.setValue("");
       this.limpiarCart();
       this.remision.documentoReferencia = obj.NroComprobante;
       //Cargar producto del documento afectado
-      this.axios.get(this.API + 'venta/detalle/comprobante', {
-            params: {
-                NroComprobante: obj.NroComprobante,
-                idDocVenta: obj.IdDocVenta
-            }
-        }).then((response) => {
-          this.axios.get(this.API + 'cliente', {
-            params: {
+      this.axios
+        .get(this.API + "venta/detalle/comprobante", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta
+          }
+        })
+        .then(response => {
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
                 idCliente: response.data[0].IdCliente
-            }})
-            .then((response) => {
-              if (response.data) {
-                this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
-                this.$set(this.remision, 'direccionCliente', response.data.Direccion);
-                
-                this.cliente = response.data;
-              } else {
-                this.$toasted.show('No se encontro al cliente');
               }
             })
-            .catch((error) => {
-                console.log(error)
+            .then(response => {
+              if (response.data) {
+                this.$set(
+                  this.remision,
+                  "nroDocumentoCliente",
+                  response.data.DniRuc
+                );
+                this.$set(
+                  this.remision,
+                  "razonSocialCliente",
+                  response.data.Cliente
+                );
+                this.$set(
+                  this.remision,
+                  "direccionCliente",
+                  response.data.Direccion
+                );
+
+                this.cliente = response.data;
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
             })
-            // this.limpiarCart();
-            
-            response.data.map((item) => {
-                  item.estadoPxP = false
-                  let preciosProd = []
-                  item.precioCont = item.PrecioContado
-                  preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                  let fPP = preciosProd.filter(p => p.cantidad === 0)
-                  
-                  if (!item.PreciosPorProducto || fPP.length === 4) {
-                      item.estadoPxP = true
-                  }
-              this.add([item, () => {
-              }, false ])
-            })             
-      })
-    },
+            .catch(error => {
+              console.log(error);
+            });
+          // this.limpiarCart();
+
+          response.data.map(item => {
+            item.estadoPxP = false;
+            let preciosProd = [];
+            item.precioCont = item.PrecioContado;
+            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+            let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+            if (!item.PreciosPorProducto || fPP.length === 4) {
+              item.estadoPxP = true;
+            }
+            this.add([item, () => {}, false]);
+          });
+        });
+    }
   },
   components: {
     Menu,
     ProductosCarrito
   }
-}
+};
 </script>
 <style>
-
-  fieldset .row {
-    margin-bottom: 5pX;
-  }
-  fieldset {
-    border: 1px solid #cacaca;
-    padding: 10px;
-    margin-bottom: 14px;
-  }
-  fieldset legend {
-    padding-left: 10px;
-    border: 1px solid #cacaca;
-  }
-  fieldset legend h5 {
-    margin: 4px;
-  }
-  fieldset > h5 {
-    border-bottom: 1px solid #cacaca;
-    padding-bottom: 4px;
-  }
-</style> 
+fieldset .row {
+  margin-bottom: 5px;
+}
+fieldset {
+  border: 1px solid #cacaca;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+fieldset legend {
+  padding-left: 10px;
+  border: 1px solid #cacaca;
+}
+fieldset legend h5 {
+  margin: 4px;
+}
+fieldset > h5 {
+  border-bottom: 1px solid #cacaca;
+  padding-bottom: 4px;
+}
+</style>

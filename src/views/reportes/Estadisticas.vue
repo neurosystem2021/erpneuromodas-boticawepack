@@ -2,23 +2,37 @@
   <div>
     <div>
       <b-card no-body>
+        <b-col md="12">
+                  <b-form-group>
+                    <label>Almacén:</label>
+                    <b-form-select
+                      v-model="empresa"
+                      :options="$store.state.empresas"
+                      size="lg"
+                      style="font-weight: bold; width: 350px"
+                      class="form-control my-2"
+                      @change="cambiarEmpresa"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-col>
         <b-tabs v-model="tabActive"  pills card>
           <b-tab title="Ventas Por Dia" @click="cambioOpcion(0)" active>
             <b-container class="bv-example-row" id="conten">
               <b-row>
-                <b-col md="4">
+                
+                <b-col md="3">
                   <b-form-group>
                     <label>Almacén:</label>
                     <b-form-select v-model="idAlmacen" :options="almacenes" v-on:change="setAlmacen($event)" class="mb-3" size="md"/>
                   </b-form-group>
                 </b-col>
-                <b-col md="4">      
+                <b-col md="3">      
                   <b-form-group>
                     <label>Seleccione Año:</label>
                     <b-form-select v-model="anioSelect" :options="anios" v-on:change="setAnio($event)" class="mb-3" size="md" required/>
                   </b-form-group>
                 </b-col>
-                <b-col md="4">      
+                <b-col md="3">      
                   <b-form-group>
                     <label>Seleccione Mes:</label>
                     <b-form-select v-model="mesSelect" :options="meses" v-on:change="setMes($event)" class="mb-3" size="md" required/>
@@ -109,183 +123,210 @@
   </div>
 </template>
 <script>
-import BarChart from '@/components/BarChart'
-import LineChart from '@/components/LineChart'
-import config from '@/store/config.js'
+import BarChart from "@/components/BarChart";
+import LineChart from "@/components/LineChart";
+import config from "@/store/config.js";
 export default {
-  mounted(){
-    this.initDia(0)
+  mounted() {
+    this.empresa = sessionStorage.getItem("empresa") || "imperiop2";
+    this.initDia(0);
     this.getAlmacenes();
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      meses:[
-        {value:1,text:"Enero",dias:31},{value:2,text:"Febrero",dias:29},{value:3,text:"Marzo",dias:31},
-        {value:4,text:"Abril",dias:30},{value:5,text:"Mayo",dias:31},{value:6,text:"Junio",dias:30},
-        {value:7,text:"Julio",dias:31},{value:8,text:"Agosto",dias:31},{value:9,text:"Septiembre",dias:30},
-        {value:10,text:"Octubre",dias:31},{value:11,text:"Noviembre",dias:30},{value:12,text:"Diciembre",dias:31}
+      empresa: "",
+      meses: [
+        { value: 1, text: "Enero", dias: 31 },
+        { value: 2, text: "Febrero", dias: 29 },
+        { value: 3, text: "Marzo", dias: 31 },
+        { value: 4, text: "Abril", dias: 30 },
+        { value: 5, text: "Mayo", dias: 31 },
+        { value: 6, text: "Junio", dias: 30 },
+        { value: 7, text: "Julio", dias: 31 },
+        { value: 8, text: "Agosto", dias: 31 },
+        { value: 9, text: "Septiembre", dias: 30 },
+        { value: 10, text: "Octubre", dias: 31 },
+        { value: 11, text: "Noviembre", dias: 30 },
+        { value: 12, text: "Diciembre", dias: 31 }
       ],
-      anios:[],
-      mesSelect:1,
-      tabActive:0,
+      anios: [],
+      mesSelect: 1,
+      tabActive: 0,
       anioSelect: Number(this.$moment().format("YYYY")),
       fechaDesde: this.$moment().format("YYYY-MM-01"),
       fechaHasta: this.$moment().format("YYYY-MM-DD"),
-      idAlmacen:0,
-      almacenes: [
-        { value: 0, text: 'TODOS' },
-      ],
-      
-    }
+      idAlmacen: 0,
+      almacenes: [{ value: 0, text: "TODOS" }]
+    };
   },
-  methods:{
-    initDia(idAlmacen){
-      let anioActual = Number(this.$moment().format("YYYY"))
-      let mesActual = Number(this.$moment().format("MM"))
-      this.anios=[]
-      this.anios.push({value:anioActual,text:''+anioActual})
+  methods: {
+    cambiarEmpresa() {
+      setTimeout(() => {
+        sessionStorage.setItem("empresa", this.empresa);
+        window.location.reload();
+        return false;
+      }, 50);
+    },
+    initDia(idAlmacen) {
+      let anioActual = Number(this.$moment().format("YYYY"));
+      let mesActual = Number(this.$moment().format("MM"));
+      this.anios = [];
+      this.anios.push({ value: anioActual, text: "" + anioActual });
       for (let index = 1; index <= 5; index++) {
-        this.anios.push({value:(anioActual-index),text:''+(anioActual-index)})
+        this.anios.push({
+          value: anioActual - index,
+          text: "" + (anioActual - index)
+        });
       }
-      let mesd = this.meses.find(ms=>ms.value==mesActual)
-      if(mesd !=undefined){
-        this.mesSelect = mesActual
-        this.anioSelect = anioActual
-        this.getDataDias(anioActual,mesActual,mesd.dias,idAlmacen)
-      }  
+      let mesd = this.meses.find(ms => ms.value == mesActual);
+      if (mesd != undefined) {
+        this.mesSelect = mesActual;
+        this.anioSelect = anioActual;
+        this.getDataDias(anioActual, mesActual, mesd.dias, idAlmacen);
+      }
     },
-    initMes(idAlmacen){
-      let anioActual = Number(this.$moment().format("YYYY"))
-      this.anios=[]
-      this.anios.push({value:anioActual,text:''+anioActual})
+    initMes(idAlmacen) {
+      let anioActual = Number(this.$moment().format("YYYY"));
+      this.anios = [];
+      this.anios.push({ value: anioActual, text: "" + anioActual });
       for (let index = 1; index <= 5; index++) {
-        this.anios.push({value:(anioActual-index),text:''+(anioActual-index)})
+        this.anios.push({
+          value: anioActual - index,
+          text: "" + (anioActual - index)
+        });
       }
-      this.anioSelect = anioActual
-      this.getDataMes(anioActual,idAlmacen)
+      this.anioSelect = anioActual;
+      this.getDataMes(anioActual, idAlmacen);
     },
-    setMes(e){
-      let mes = this.meses.find(ms=>ms.value==e)
-      if(mes !=undefined){
-        this.getDataDias(this.anioSelect,e,mes.dias,this.idAlmacen)
-      }
-    },
-    setAnio(e){
-      let mes = this.meses.find(ms=>ms.value==this.mesSelect)
-      if(mes !=undefined){
-        this.getDataDias(e,mes.value,mes.dias,this.idAlmacen)
+    setMes(e) {
+      let mes = this.meses.find(ms => ms.value == e);
+      if (mes != undefined) {
+        this.getDataDias(this.anioSelect, e, mes.dias, this.idAlmacen);
       }
     },
-    setAnioMes(e){
-      this.getDataMes(e,this.idAlmacen)
+    setAnio(e) {
+      let mes = this.meses.find(ms => ms.value == this.mesSelect);
+      if (mes != undefined) {
+        this.getDataDias(e, mes.value, mes.dias, this.idAlmacen);
+      }
     },
-    setAlmacen(id){
+    setAnioMes(e) {
+      this.getDataMes(e, this.idAlmacen);
+    },
+    setAlmacen(id) {
       switch (this.tabActive) {
         case 0:
-          this.initDia(id)
-        break;
+          this.initDia(id);
+          break;
 
         case 1:
-           this.initMes(id)
-        break;
+          this.initMes(id);
+          break;
 
         case 2:
-          
-        break;
-      
+          break;
+
         default:
           break;
       }
     },
-    getAlmacenes(){
-      this.almacenes = []
-      this.almacenes.push({ value: 0, text: 'TODOS' })
-      this.axios.get(this.API + '/almacenes').then(r => {
-        if (r.data) {
-          r.data.map(al=>{
-            this.almacenes.push({ value: al.IdAlmacen, text: al.Almacen })
-          })
-        }
-      })
-    },
-    getDataDias(anio, mes, dias, idAlmacen){
-      this.axios.get(this.API + 'ventas/estadistica/dia', {
-          params: {
-              anio: anio,
-              mes: mes,
-              idAlmacen: idAlmacen || this.idAlmacen
+    getAlmacenes() {
+      this.almacenes = [];
+      this.almacenes.push({ value: 0, text: "TODOS" });
+      this.axios
+        .get(`${this.API}/almacenes?id_empresa=${this.empresa}`)
+        .then(r => {
+          if (r.data) {
+            r.data.map(al => {
+              this.almacenes.push({ value: al.IdAlmacen, text: al.Almacen });
+            });
           }
-      })
-      .then((response) => {
-          this.$refs.chartGrafica.GraficarDias(mes.value,dias,response.data)
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+        });
     },
-    getDataMes(anio,idAlmacen){
-      this.axios.get(this.API + 'ventas/estadistica/mes', {
+    getDataDias(anio, mes, dias, idAlmacen) {
+      this.axios
+        .get(this.API + "ventas/estadistica/dia", {
           params: {
-              anio: anio,
-              idAlmacen: idAlmacen || this.idAlmacen
+            anio: anio,
+            mes: mes,
+            idAlmacen: idAlmacen || this.idAlmacen,
+            id_empresa: this.empresa
           }
-      })
-      .then((response) => {
-          this.$refs.chartGraficaMes.GraficarMes(response.data,this.meses)
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+        })
+        .then(response => {
+          this.$refs.chartGrafica.GraficarDias(mes.value, dias, response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    cambioOpcion(e){
+    getDataMes(anio, idAlmacen) {
+      this.axios
+        .get(this.API + "ventas/estadistica/mes", {
+          params: {
+            anio: anio,
+            idAlmacen: idAlmacen || this.idAlmacen,
+            id_empresa: this.empresa
+          }
+        })
+        .then(response => {
+          this.$refs.chartGraficaMes.GraficarMes(response.data, this.meses);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    cambioOpcion(e) {
       switch (e) {
         case 0:
-          this.initDia(0)
-          this.idAlmacen = 0
+          this.initDia(0);
+          this.idAlmacen = 0;
           break;
         case 1:
-          this.initMes(0)
-          this.idAlmacen = 0
-        break;
+          this.initMes(0);
+          this.idAlmacen = 0;
+          break;
 
         case 2:
-          this.idAlmacen = 0
-          this.fechaDesde = this.$moment().format("YYYY-MM-01")
-          this.fechaHasta = this.$moment().format("YYYY-MM-DD")
-        break;
-          
+          this.idAlmacen = 0;
+          this.fechaDesde = this.$moment().format("YYYY-MM-01");
+          this.fechaHasta = this.$moment().format("YYYY-MM-DD");
+          break;
+
         default:
           break;
       }
     },
-    fechaRango(){
-      if(this.fechaDesde==''){
-        this.$toasted.show("Ingrese una fecha validad en fecha Inicio")
-        return
+    fechaRango() {
+      if (this.fechaDesde == "") {
+        this.$toasted.show("Ingrese una fecha validad en fecha Inicio");
+        return;
       }
-      if(this.fechaHasta==''){
-        this.$toasted.show("Ingrese una fecha validad en fecha fin")
-        return
+      if (this.fechaHasta == "") {
+        this.$toasted.show("Ingrese una fecha validad en fecha fin");
+        return;
       }
-      this.axios.get(this.API + 'ventas/estadistica/rango', {
+      this.axios
+        .get(this.API + "ventas/estadistica/rango", {
           params: {
-              fechaDesde: this.fechaDesde,
-              fechaHasta: this.fechaHasta,
-              idAlmacen: this.idAlmacen
+            fechaDesde: this.fechaDesde,
+            fechaHasta: this.fechaHasta,
+            idAlmacen: this.idAlmacen,
+            id_empresa: this.empresa
           }
-      })
-      .then((response) => {
-          this.$refs.chartGraficaRango.GraficarRango(response.data)
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+        })
+        .then(response => {
+          this.$refs.chartGraficaRango.GraficarRango(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
   components: {
     BarChart,
     LineChart
   }
-}
+};
 </script>

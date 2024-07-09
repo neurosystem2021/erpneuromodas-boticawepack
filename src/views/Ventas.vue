@@ -783,7 +783,7 @@ export default {
     this.initForm();
   },
   async mounted() {
-    // this.getNumeroVenta()
+    this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
       this.empresa = sessionStorage.getItem("empresa");
@@ -1672,8 +1672,8 @@ export default {
         ? this.infoDelivery.Direccion || ""
         : "";
       // ------------------------- aqui paga
-
-      this.$store.state.empresas.forEach(async element => {
+      this.loading = true;
+      await this.$store.state.empresas.forEach(async element => {
         let data = { ...this.venta };
         let serie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
@@ -1691,6 +1691,7 @@ export default {
           }
         }
         let dataImprimir = {
+          NombreOrganizacion: this.venta.NombreOrganizacion,
           vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
           numero: this.venta.Numero,
@@ -1753,6 +1754,8 @@ export default {
                 headers: {
                   "Content-Type": "application/json"
                 },
+                mode: "cors",
+                cache: "default",
                 body: comandaJson
               }).catch(error => console.error("Error:", error));
             })
@@ -1772,11 +1775,11 @@ export default {
           this.$toasted.success("Venta realizada con exito");
         }
       });
-      this.inProgress = false;
 
       // this.$toasted.success("Venta realizada con exito");
 
       setTimeout(() => {
+        this.inProgress = false;
         window.location.reload();
       }, 3000);
     },
