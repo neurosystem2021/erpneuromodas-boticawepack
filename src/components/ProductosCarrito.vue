@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2" v-if="$store.state.MostrarBotonMultipleEmpresa">
+          <b-button @click="abrirModaProductos" variant="info" class="mx-2 ocularMovil" v-if="$store.state.MostrarBotonMultipleEmpresa">
             Agregar Productos
           </b-button>
           <autocomplete
@@ -985,7 +985,7 @@ export default {
     loadBarcode(e) {
       e.preventDefault();
       let idProducto = this.loadCode;
-      let id_empresa = producto.Empresa ? producto.Empresa : "";
+      let id_empresa = this.empresa;
       if (idProducto) {
         let params = { codigoBarra: idProducto, id_empresa: id_empresa };
         this.axios
@@ -1644,5 +1644,11 @@ export default {
 }
 .optionSelect {
   background: #e8f5e9 !important;
+}
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
+  }
 }
 </style>

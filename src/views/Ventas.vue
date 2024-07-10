@@ -115,7 +115,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="4">
+              <b-col md="4" class="ocularMovil">
                 <b-form-group>
                   <b-input-group prepend="Alm." class="mt-2">
                     <autocomplete
@@ -145,7 +145,7 @@
                   />
                 </b-form-group>
               </b-col>
-              <b-col md="4">
+              <b-col md="4" class="ocularMovil">
                 <b-form-group>
                   <b-input-group prepend="P.V." class="mt-2">
                     <autocomplete
@@ -285,7 +285,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="3">
+          <b-col md="3" class="ocularMovil">
             <b-form-group class="text-center" v-if="venta.cliente.Cliente">
               <div class="puntos">
                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -320,7 +320,7 @@
               </div>
               {{ venta.FechaDoc }}
             </b-form-group>
-            <b-form-group>
+            <b-form-group class="ocularMovil">
               <label>Vendedor:</label>
               <autocomplete
                 required="required"
@@ -1999,6 +1999,7 @@ export default {
   .ancho {
     width: calc(100% - 300px);
   }
+  
 }
 
 .fondo-empresa {

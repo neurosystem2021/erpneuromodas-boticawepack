@@ -25,6 +25,7 @@
               <autocomplete
                 required="required"
                 :url="API + 'categorias'"
+                :customParams="{ id_empresa: empresa }"
                 ref="inputCategoria"
                 anchor="ProductoCategoria"
                 label="writer"
@@ -50,7 +51,7 @@
                 anchor="ProductoMarca"
                 label="writer"
                 :placeholder.sync="producto.marca.ProductoMarca"
-                :on-select="setMarca"
+                :on-select="setMarca" :customParams="{ id_empresa: empresa }"
                 :onFocus="focusAutocomplete.bind(null, 'inputMarca')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
@@ -72,7 +73,7 @@
                 :placeholder.sync="producto.ProductoModelo"
                 :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
                 :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"     :customParams="{ id_empresa: empresa }"           
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
             </b-input-group>
@@ -118,6 +119,7 @@
                 ref="inputPresentacion"
                 anchor="ProductoPresentacion"
                 label="writer"
+                :customParams="{ id_empresa: empresa }"
                 :placeholder.sync="producto.ProductoPresentacion"
                 :on-select="val => producto.ProductoPresentacion = val.ProductoPresentacion && val.ProductoPresentacion.toUpperCase()"
                 :onInput="val => producto.ProductoPresentacion = val && val.toUpperCase()"
@@ -160,9 +162,9 @@
               required="required"
               :url="API + 'mediciones'"
               ref="inputMedicion"
-              initValue="UNIDAD"
+              initValue="UNIDADES"
               anchor="ProductoMedicion"
-              label="writer"
+              label="writer" :customParams="{ id_empresa: empresa }"
               :placeholder.sync="producto.medicion.ProductoMedicion"
               :on-select="setMedicion"
               :onFocus="focusAutocomplete.bind(null, 'inputMedicion')" 
@@ -405,8 +407,22 @@ export default {
       categoriaItems: []
     };
   },
-  beforeMount() {
-    this.initForm();
+  async beforeMount() {
+    this.empresa = sessionStorage.getItem("empresa") || "imperiop2";
+
+    await this.initForm();
+
+    setTimeout(async () => {
+      let res = await this.axios(
+        `${this.API}mediciones?id_empresa=${this.empresa}`
+      );
+      if (res.data.length > 0) {
+        this.producto.medicion = res.data.filter(
+          v => v.ProductoMedicion == "UNIDAD"
+        )[0];
+      }
+    }, 100);
+    console.log(this.producto);
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
@@ -420,12 +436,12 @@ export default {
         this.axios
           .get(
             this.API +
-              `ver_productos?id_empresa=${sessionStorage.getItem("empresa") ||
-                "imperiop2"}&id=${newVal.IdProducto}`
+              `ver_productos?id_empresa=${this.empresa}&id=${newVal.IdProducto}`
           )
           .then(response => {
             newVal = response.data;
             this.initForm();
+
             this.title = "Editar Producto << " + newVal.CodigoBarra + " >>";
             this.producto.categoria = {
               IdProductoCategoria: newVal.IdProductoCategoria,
@@ -513,6 +529,16 @@ export default {
           .catch(error => {
             console.log(error);
             this.initForm();
+            setTimeout(async () => {
+              let res = await this.axios(
+                `${this.API}mediciones?id_empresa=${this.empresa}`
+              );
+              if (res.data.length > 0) {
+                this.producto.medicion = res.data.filter(
+                  v => v.ProductoMedicion == "UNIDAD"
+                )[0];
+              }
+            }, 100);
             this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           });
       } else {
@@ -564,15 +590,9 @@ export default {
       let r = confirm("¿Esta seguro de Anular este producto?");
       if (r) {
         this.axios
-          .post(
-            this.API +
-              `productos/delete?id_empresa=${sessionStorage.getItem(
-                "empresa"
-              ) || "imperiop2"}"`,
-            {
-              id: producto.IdProducto
-            }
-          )
+          .post(this.API + `productos/delete?id_empresa=${this.empresa}"`, {
+            id: producto.IdProducto
+          })
           .then(res => {
             if (res.data.updated) {
               this.$toasted.success(
@@ -641,6 +661,16 @@ export default {
       // this.$refs.inputBotapie.setValue('')
       this.$refs.inputProductoDesc.$el.value = "";
       this.initForm();
+      setTimeout(async () => {
+        let res = await this.axios(
+          `${this.API}mediciones?id_empresa=${this.empresa}`
+        );
+        if (res.data.length > 0) {
+          this.producto.medicion = res.data.filter(
+            v => v.ProductoMedicion == "UNIDAD"
+          )[0];
+        }
+      }, 100);
     },
     initForm() {
       this.producto = {
@@ -708,16 +738,13 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+
       this.axios
-        .post(
-          this.API +
-            `productos?id_empresa=${sessionStorage.getItem("empresa") ||
-              "imperiop2"}`,
-          {
-            ...this.producto,
-            PreciosPorProducto: this.producto.precios
-          }
-        )
+        .post(this.API + `productos?id_empresa=${this.empresa}`, {
+          ...this.producto,
+          PreciosPorProducto: this.producto.precios,
+          id_empresa: this.empresa
+        })
         .then(response => {
           if (this.cbGuardar) {
             this.cbGuardar(
@@ -742,6 +769,7 @@ export default {
           //INSERTANDO IMAGEN
           let formData = new FormData();
           formData.append("imagen", this.file);
+          formData.append("empresa", this.empresa);
 
           this.axios({
             method: "post",
@@ -769,12 +797,7 @@ export default {
         categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase();
 
         this.axios
-          .post(
-            this.API +
-              `categorias&id_empresa=${sessionStorage.getItem("empresa") ||
-                "imperiop2"}`,
-            categoria
-          )
+          .post(this.API + `categorias?id_empresa=${this.empresa}`, categoria)
           .then(response => {
             this.$toasted.show("Categoría guardada correctamente");
             this.setCategoria({
@@ -794,12 +817,7 @@ export default {
         marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase();
 
         this.axios
-          .post(
-            this.API +
-              `marcas&id_empresa=${sessionStorage.getItem("empresa") ||
-                "imperiop2"}`,
-            marca
-          )
+          .post(this.API + `marcas?id_empresa=${this.empresa}`, marca)
           .then(response => {
             this.$toasted.show("Marca guardada correctamente");
             this.setMarca({
@@ -819,12 +837,7 @@ export default {
         talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase();
 
         this.axios
-          .post(
-            this.API +
-              `tallas&id_empresa=${sessionStorage.getItem("empresa") ||
-                "imperiop2"}`,
-            talla
-          )
+          .post(this.API + `tallas&id_empresa=${this.empresa}`, talla)
           .then(response => {
             this.$toasted.show("Talla guardada correctamente");
             this.setTalla({
@@ -843,7 +856,8 @@ export default {
         this.axios
           .get(this.API + "productos/eshijo", {
             params: {
-              idProducto: this.producto.IdProducto
+              idProducto: this.producto.IdProducto,
+              id_empresa: this.empresa
             }
           })
           .then(res => {
