@@ -3,8 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2 ocularMovil" v-if="$store.state.MostrarBotonMultipleEmpresa">
-            Agregar Productos
+          <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
           </b-button>
           <autocomplete
             ref="autocompleteProducto"
@@ -540,7 +539,7 @@
             <b-form-input
               v-model="searchProducto"
               placeholder="Buscar..."
-              class="form-control"
+              class="form-control inputResponsive"
             ></b-form-input>
             <b-input-group-append>
               <b-button @click="startRecognition()">
@@ -551,7 +550,7 @@
               v-model="IdProducto"
               @keydown.enter.prevent="buscarProductosCodigoBarrasModal"
               type="text"
-              class="form-control ml-2"
+              class="form-control ml-2  inputResponsive"
               placeholder="Codigo de Barra"
             />
             <b-input-group-append>
@@ -563,6 +562,26 @@
               ></b-button>
             </b-input-group-append>
           </b-input-group>
+        </b-col>
+        <b-col cols="12" slot="modal-footer">
+          <div class="w-100 px-2 my-2 derecha">
+              <b-button
+                variant="primary"
+                size="sm"
+                class="float-right mx-1"
+                @click="anadirarProductos()"
+              >
+                Aceptar
+              </b-button>
+              <b-button
+                variant="danger"
+                size="sm"
+                class="float-right mx-1"
+                @click="modalNuevoProductos = false"
+              >
+                Cancelar
+              </b-button>
+          </div>
         </b-col>
         <b-col cols="12" class="mt-3">
           <table class="table tblProductosModal">
@@ -646,26 +665,7 @@
           ></b-pagination>-->
         </b-col>
       </b-row>
-      <div slot="modal-footer">
-        <div class="w-100">
-          <b-button
-            variant="primary"
-            size="sm"
-            class="float-right mx-1"
-            @click="anadirarProductos()"
-          >
-            Aceptar
-          </b-button>
-          <b-button
-            variant="danger"
-            size="sm"
-            class="float-right mx-1"
-            @click="modalNuevoProductos = false"
-          >
-            Cancelar
-          </b-button>
-        </div>
-      </div>
+      
     </b-modal>
   </b-row>
 </template>
@@ -1640,15 +1640,39 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 60%; /* Ajusta el porcentaje según lo necesites */
+  max-width: 60%;
 }
+
 .optionSelect {
   background: #e8f5e9 !important;
+}
+.derecha {
+  align-items: right;
+  text-align: right !important;
+  align-content: right;
+}
+.w-100 {
+  width: 100% !important;
 }
 @media only screen and (max-width: 700px) {
   /* For desktop: */
   .ocularMovil {
     display: none;
+  }
+  .modalSelectProduct.modal-xl .modal-dialog {
+    background: red !important;
+    max-width: 100%;
+    font-size: 0.6rem;
+  }
+  .btnResponsive {
+    max-width: 25%;
+    white-space: pre-line;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .inputResponsive {
+    width: 82% !important;
+    margin: 5px 0;
   }
 }
 </style>

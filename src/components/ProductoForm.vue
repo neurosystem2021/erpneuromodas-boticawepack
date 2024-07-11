@@ -422,7 +422,6 @@ export default {
         )[0];
       }
     }, 100);
-    console.log(this.producto);
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {

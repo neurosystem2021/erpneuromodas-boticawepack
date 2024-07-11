@@ -502,7 +502,7 @@ export default {
       }
 
       this.axios
-        .post(this.API + "movimientos", {
+        .post(this.API + "movimientos?id_empresa=" + this.empresa, {
           movimiento: this.movimiento,
           productos: this.productos,
           id_empresa: this.empresa
