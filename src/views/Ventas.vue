@@ -558,10 +558,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -1029,7 +1029,7 @@ export default {
                     this.getVendedor()
                     this.getNumeroVenta()
                     this.loadClienteVarios()
-                    this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                     this.$refs.inputAlmacen.setValue('PRINCIPAL')
                     this.$refs.inputPuntoVenta.setValue('CAJA1')
                     this.$refs.inputCliente.setValue('')
