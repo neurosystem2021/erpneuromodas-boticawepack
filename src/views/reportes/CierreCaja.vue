@@ -519,8 +519,10 @@ export default {
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id)
       this.loadData()
+      this.getVendedor()
     } else {
         this.getVendedor()
+        this.loadData()
     }
   },
   data () {
@@ -664,13 +666,16 @@ export default {
         let usuario = sessionStorage.getItem('User')
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
-            this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
-
-            if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+          this.setVendedor(response.data);
+          this.$nextTick(() => {
+            if (this.$refs.inputVendedor) {
+              this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+              this.$refs.inputVendedor.$refs.input.disabled = true;
+              if (response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputVendedor.$refs.input.disabled = true;
+              }
             }
+          });
         })
         .catch((error) => {
             console.log(error)
@@ -698,8 +703,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          //user: sessionStorage.getItem("User")
-          user:         this.vendedor.Usuario,
+          user: sessionStorage.getItem("User"),
+          //user:         this.vendedor.Usuario,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -756,7 +761,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -778,7 +783,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -795,7 +800,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        //params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
