@@ -32,6 +32,7 @@
                   <autocomplete
                       required="required"
                       ref="inputAlmacen"
+                      :debounce="900"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
                       initValue="KM6"
@@ -92,6 +93,7 @@
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
+                    :debounce="900"
                     ref="inputCategoria"
                     anchor="ProductoCategoria"
                     label="writer"
@@ -106,6 +108,7 @@
                   <label>Producto:</label>
                   <autocomplete
                     :url="API + 'productos'"
+                    :debounce="900"
                     ref="inputProducto"
                     anchor="Producto"
                     label="writer"
@@ -120,6 +123,7 @@
                   <label>Marca:</label>
                   <autocomplete
                     :url="API + 'marcas'"
+                    :debounce="900"
                     ref="inputMarca"
                     anchor="ProductoMarca"
                     label="writer"
