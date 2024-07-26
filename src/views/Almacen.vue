@@ -91,6 +91,7 @@
                 <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
+                    :debounce="1000"
                     :url="API + 'categorias'"
                     ref="inputCategoria"
                     anchor="ProductoCategoria"
@@ -105,6 +106,7 @@
                 <b-form-group>
                   <label>Producto:</label>
                   <autocomplete
+                    :debounce="1000"
                     :url="API + 'productos'"
                     ref="inputProducto"
                     anchor="Producto"
@@ -119,6 +121,7 @@
                 <b-form-group>
                   <label>Marca:</label>
                   <autocomplete
+                    :debounce="1000"
                     :url="API + 'marcas'"
                     ref="inputMarca"
                     anchor="ProductoMarca"
