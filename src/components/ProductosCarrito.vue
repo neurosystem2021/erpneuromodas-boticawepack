@@ -768,7 +768,7 @@ export default {
       }
     },
     mostrarTablaProductos() {
-      console.log("llego");
+      
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
     }
@@ -1127,15 +1127,18 @@ export default {
       }
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
       obj.precio = 0;
       obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj);
-      if (!index) {
+
+      if (index !== null && index !== undefined) {
+        this.$store.state.cart.productos[index] = obj;
+        this.$refs["modalCant"].hide();
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      } else {
         this.add([
           obj,
           () => {
@@ -1146,19 +1149,14 @@ export default {
           false,
           this.cliente.EsVIP
         ]);
-        // Vue.set(this.productos, obj.IdProducto, obj)
         this.$refs["modalCant"].hide();
         obj.cantidadPres = obj.cantidad;
         this.actualizarProd(obj);
-      } else {
-        this.$store.state.cart.productos[index] = obj;
-        this.$refs["modalCant"].hide();
-        this.mostrarTablaProductos = !this.mostrarTablaProductos;
-        this.mostrarTablaProductos = !this.mostrarTablaProductos;
       }
-      this.index = null;
+
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
+      this.index = null;
     },
     setProductoCant(prod, index = null) {
       this.objProd.cantxPrecio = 1;
@@ -1167,6 +1165,7 @@ export default {
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
+
       if (!obj.Empresa) {
         let datoEmpresa = this.$store.state.empresas.filter(
           v => v.value == empresa
@@ -1176,18 +1175,20 @@ export default {
       }
 
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
-      // this.objProd.precio = 0
-      // this.objProd.cantidad = 0
       obj.precio = 0;
       obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
-      console.log(obj);
-      if (!index) {
+
+      if (index !== null && index !== undefined) {
+        
+        this.$store.state.cart.productos[index] = obj;
+        this.$refs["modalCant"].hide();
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      } else {
+        
         this.add([
           obj,
           () => {
@@ -1201,15 +1202,11 @@ export default {
         this.$refs["modalCant"].hide();
         obj.cantidadPres = this.cant;
         this.actualizarProd(obj);
-      } else {
-        this.$store.state.cart.productos[index] = obj;
-        this.$refs["modalCant"].hide();
-        this.mostrarTablaProductos = !this.mostrarTablaProductos;
-        this.mostrarTablaProductos = !this.mostrarTablaProductos;
       }
-      this.index = null;
+
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
+        this.index = null;
     },
     recalcularTotalPorItem(item, index) {
       let produc = { ...item };

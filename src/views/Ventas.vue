@@ -890,7 +890,7 @@ export default {
       }, 100);
     },
     recalcularTotalPorEmpresaFlag() {
-      console.log("llego");
+      
       setTimeout(() => {
         this.recalcularTotalesPorEmpresa();
       }, 100);
@@ -926,7 +926,7 @@ export default {
       add: "agregarProducto"
     }),
     async recalcularTotalesPorEmpresa() {
-      console.log("s");
+      
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
         if (this.productos.some(p => p.Empresa == empresa.value)) {
@@ -1161,7 +1161,7 @@ export default {
           this.venta.Numero = response.data.numero;
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
       //Cargar producto del documento afectado nota credito
@@ -1192,7 +1192,7 @@ export default {
               }
             })
             .catch(error => {
-              console.log(error);
+              console.error(error);
             });
           this.limpiarCart();
           response.data.map(item => {
@@ -1265,7 +1265,7 @@ export default {
           this.getTipoDoc(response.data.IdTipoDoc);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
@@ -1348,7 +1348,7 @@ export default {
             }
           })
           .catch(error => {
-            console.log(error);
+            console.error(error);
           });
       }
 
@@ -1407,7 +1407,7 @@ export default {
           this.aplicarDescuento(response.data.descuento);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
@@ -1429,7 +1429,7 @@ export default {
           this.venta.Numero = response.data.numero;
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
@@ -1502,7 +1502,7 @@ export default {
           );
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
