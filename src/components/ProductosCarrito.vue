@@ -6,6 +6,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :debounce="100"
             :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"

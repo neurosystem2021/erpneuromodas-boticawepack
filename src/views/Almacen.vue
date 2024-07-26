@@ -92,6 +92,7 @@
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
+                    :debounce="1000"
                     ref="inputCategoria"
                     anchor="ProductoCategoria"
                     label="writer"
@@ -106,6 +107,7 @@
                   <label>Producto:</label>
                   <autocomplete
                     :url="API + 'productos'"
+                    :debounce="1000"
                     ref="inputProducto"
                     anchor="Producto"
                     label="writer"
@@ -120,6 +122,7 @@
                   <label>Marca:</label>
                   <autocomplete
                     :url="API + 'marcas'"
+                    :debounce="1000"
                     ref="inputMarca"
                     anchor="ProductoMarca"
                     label="writer"
