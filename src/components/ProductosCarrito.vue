@@ -60,7 +60,7 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="setProductoUni(objProd)"
+              @click="setProductoUni(objProd,index)"
             >
               <b-row>
                 <b-col md="6" class="nomCart">
@@ -84,7 +84,7 @@
               @click="
                 () => {
                   if (parseFloat(d.cantidad)) {
-                    setProductoCant(d);
+                    setProductoCant(d,index);
                   }
                 }
               "
@@ -142,7 +142,7 @@
             v-if="productos[data.index].estadoPxP == false"
             :disabled="bloquearInput ? true : false"
             variant="info"
-            @click="showPresentacion(productos[data.index])"
+            @click="showPresentacion(productos[data.index],data.index)"
             >
             <i class="fas fa-list"></i>
             </b-button>
@@ -714,6 +714,7 @@ export default {
   },
   data() {
     return {
+      index: null,
       mostrarTablaProductos: true,
       empresa: "",
       IdProducto: "",
@@ -765,6 +766,11 @@ export default {
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
+    },
+    mostrarTablaProductos() {
+      console.log("llego");
+      this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+        .recalcularTotalPorEmpresaFlag;
     }
   },
   props: {
@@ -848,7 +854,6 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        console.log(value.total);
         sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento);
       });
 
@@ -1105,7 +1110,7 @@ export default {
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj;
     },
-    setProductoUni(obj) {
+    setProductoUni(obj, index = null) {
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
@@ -1116,7 +1121,7 @@ export default {
         obj.Empresa = datoEmpresa[0].value;
         obj.NombreEmpresa = datoEmpresa[0].text;
       }
-      console.log(obj);
+
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
       }
@@ -1130,26 +1135,46 @@ export default {
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj);
-
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        { setPrecioCosto: this.tipo == "mov" ? true : false },
-        false,
-        this.cliente.EsVIP
-      ]);
-      // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs["modalCant"].hide();
-      obj.cantidadPres = obj.cantidad;
-      this.actualizarProd(obj);
+      if (!index) {
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+          },
+          { setPrecioCosto: this.tipo == "mov" ? true : false },
+          false,
+          this.cliente.EsVIP
+        ]);
+        // Vue.set(this.productos, obj.IdProducto, obj)
+        this.$refs["modalCant"].hide();
+        obj.cantidadPres = obj.cantidad;
+        this.actualizarProd(obj);
+      } else {
+        this.$store.state.cart.productos[index] = obj;
+        this.$refs["modalCant"].hide();
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      }
+      this.index = null;
+      this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+        .recalcularTotalPorEmpresaFlag;
     },
-    setProductoCant(prod) {
+    setProductoCant(prod, index = null) {
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "imperiop2";
+      if (!obj.Empresa) {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        obj.Empresa = datoEmpresa[0].value;
+        obj.NombreEmpresa = datoEmpresa[0].text;
+      }
+
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
       // this.objProd.precio = 0
@@ -1161,19 +1186,30 @@ export default {
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        false,
-        false,
-        this.cliente.EsVIP
-      ]);
-      this.$refs["modalCant"].hide();
-      obj.cantidadPres = this.cant;
-      this.actualizarProd(obj);
+      console.log(obj);
+      if (!index) {
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+          },
+          false,
+          false,
+          this.cliente.EsVIP
+        ]);
+        this.$refs["modalCant"].hide();
+        obj.cantidadPres = this.cant;
+        this.actualizarProd(obj);
+      } else {
+        this.$store.state.cart.productos[index] = obj;
+        this.$refs["modalCant"].hide();
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+        this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      }
+      this.index = null;
+      this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+        .recalcularTotalPorEmpresaFlag;
     },
     recalcularTotalPorItem(item, index) {
       let produc = { ...item };
@@ -1188,7 +1224,19 @@ export default {
 
       // this.sumatoriaTotal();
     },
-    showPresentacion(obj) {
+    showPresentacion(obj, index) {
+      if (!obj.Empresa) {
+        let empresa = this.$store.state.empresa.filter(
+          v =>
+            v.value ==
+            (sessionStorage.getItem("empresa")
+              ? sessionStorage.getItem("empresa")
+              : "imperiop2")
+        );
+        obj.Empresa = empresa[0].value;
+        obj.NombreEmpresa = empresa[0].text;
+      }
+      this.index = index;
       if (!obj.PreciosPorProducto !== "") {
         this.precioCont = obj.PrecioContado;
         obj.estadoPxP = false;

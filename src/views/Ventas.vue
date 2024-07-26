@@ -885,10 +885,15 @@ export default {
       ).toFixed(2);
     },
     productos() {
-      this.recalcularTotalesPorEmpresa();
+      setTimeout(() => {
+        this.recalcularTotalesPorEmpresa();
+      }, 100);
     },
     recalcularTotalPorEmpresaFlag() {
-      this.recalcularTotalesPorEmpresa();
+      console.log("llego");
+      setTimeout(() => {
+        this.recalcularTotalesPorEmpresa();
+      }, 100);
     }
   },
   computed: {
@@ -921,6 +926,7 @@ export default {
       add: "agregarProducto"
     }),
     async recalcularTotalesPorEmpresa() {
+      console.log("s");
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
         if (this.productos.some(p => p.Empresa == empresa.value)) {
