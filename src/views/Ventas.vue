@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'fondo-empresa': this.empresa === 'imperiop1' }">
+  <div :class="{ 'fondo-empresa': this.empresa === 'modasm' }">
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
     <Menu v-if="false"></Menu>
@@ -12,19 +12,10 @@
               v-model="empresa"
               :options="$store.state.empresas"
               size="lg"
-              style="font-weight: bold; width: 350px"
               class="form-control my-2"
               @change="cambiarEmpresa"
             ></b-form-select>
-            <!-- <select
-              class="form-control"
-              v-model="empresa"
-              @change="cambiarEmpresa"
-              style="font-weight: bold; width: 350px"
-            >
-              <option value="imperiop1">EMP. FERRETERIA GOMEZ S.A.C</option>
-              <option value="imperiop2">EMP. ROLLING GOMEZ</option>
-            </select> -->
+           
           </b-button-group>
         </div>
         <div class="float-right">
@@ -778,7 +769,7 @@ export default {
 
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "imperiop2"
+        sessionStorage.getItem("empresa") || "modasm"
       );
 
       url = newUrl.toString();
@@ -870,7 +861,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      empresa: "imperiop2",
+      empresa: "modasm",
       ventaSinStock: 0,
       idPerfil: sessionStorage.getItem("IdPerfil") || 0
     };
@@ -888,6 +879,7 @@ export default {
       this.recalcularTotalesPorEmpresa();
     },
     recalcularTotalPorEmpresaFlag() {
+      console.log("ddd");
       this.recalcularTotalesPorEmpresa();
     }
   },
@@ -931,7 +923,7 @@ export default {
             }, 0);
           this.lstTotalPorEmpresa.push({
             nombre: empresa.text,
-            total: total
+            total: parseFloat(total).toFixed(2)
           });
         } else {
           this.lstTotalPorEmpresa.push({
@@ -1560,7 +1552,8 @@ export default {
         this.inProgress = false;
         return;
       }
-
+      console.log(this.totalCart);
+      console.log(totalPagos);
       if (!this.venta.EsCredito) {
         if (
           parseFloat(this.totalCart).toFixed(2) !=

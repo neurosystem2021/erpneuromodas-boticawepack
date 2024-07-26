@@ -128,7 +128,7 @@ import LineChart from "@/components/LineChart";
 import config from "@/store/config.js";
 export default {
   mounted() {
-    this.empresa = sessionStorage.getItem("empresa") || "imperiop2";
+    this.empresa = sessionStorage.getItem("empresa") || "modasm";
     this.initDia(0);
     this.getAlmacenes();
   },

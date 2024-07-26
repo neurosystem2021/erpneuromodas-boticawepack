@@ -2,9 +2,12 @@ export default {
     proveedoresFiltrados: [],
     almacenesFiltrados: [],
     empresas: [
-        { value: "imperiop2", text: "INVERSIONES CRISTAL EIRL" }, /// imperiop2 es la que se coge por defecto
-        { value: "imperiop1", text: "MUNDO DE LAS FLORES" },
-
+        { value: "modasm", text: "EMP. MARIOS SPORT F. (PRENDAS DE VESTIR)"},
+        { value: "modasgio", text: "EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)"},
+        { value: "modasjes", text: "EMP. MARIO JESUS (PLASTIQUERIA)"},
+        { value: "modasjun", text: "EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)"},
+        { value: "modaspau", text: "EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)"},     
+        
     ],
     consideraAppendEmpresa:true,
     MostrarBotonMultipleEmpresa:false,

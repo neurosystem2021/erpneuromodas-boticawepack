@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'fondo-empresa': (this.empresa === 'imperiop1')}">
+  <div :class="{'fondo-empresa': (this.empresa === 'modasm')}">
     <br>
     <b-container class="bv-example-row">
       <div>
@@ -545,7 +545,7 @@ export default {
   beforeMount() {
     let empresa = sessionStorage.getItem("empresa");
     if (!empresa) {
-      this.empresa = "imperiop2";
+      this.empresa = "modasm";
       sessionStorage.setItem("empresa", this.empresa);
     } else {
       this.empresa = empresa;
@@ -602,7 +602,7 @@ export default {
       ],
       cierre: {},
       vendedor: {}
-      // empresa: "imperiop2"
+      // empresa: "modasm"
     };
   },
   computed: {

@@ -149,7 +149,7 @@
 import { API } from "@/store/config.js";
 export default {
   beforeMount() {
-    if (this.$route.query.empresa === "imperiop1") {
+    if (this.$route.query.empresa === "modasm") {
       // Interceptos XMLHttpRequest
       let oldXHROpen = window.XMLHttpRequest.prototype.open;
       window.XMLHttpRequest.prototype.open = function(
@@ -165,7 +165,7 @@ export default {
             ? url
             : location.protocol + "//" + location.host + url;
         newUrl = new URL(newUrl);
-        newUrl.searchParams.append("empresa", "imperiop1");
+        newUrl.searchParams.append("empresa", "modasm");
         url = newUrl.toString();
         arguments[1] = url;
         return oldXHROpen.apply(this, arguments);

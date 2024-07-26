@@ -417,7 +417,7 @@ export default {
     if (sessionStorage.getItem("empresa")) {
       this.empresa = sessionStorage.getItem("empresa");
     } else {
-      this.empresa = "imperiop2";
+      this.empresa = "modasm";
     }
   },
   mounted() {

@@ -81,7 +81,7 @@ export default {
   async beforeMount() {
     let empresa = sessionStorage.getItem("empresa");
     if (!empresa) {
-      this.empresa = "imperiop2";
+      this.empresa = "modasm";
       sessionStorage.setItem("empresa", this.empresa);
     } else {
       this.empresa = empresa;

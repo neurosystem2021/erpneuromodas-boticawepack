@@ -234,6 +234,7 @@ const actions = {
     commit('APLICAR_DESCUENTO', descuento)
   },
   actualizarTotalCart({ commit }, total) {
+    console.log(total);
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {

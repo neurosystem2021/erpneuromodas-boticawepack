@@ -408,7 +408,7 @@ export default {
     };
   },
   async beforeMount() {
-    this.empresa = sessionStorage.getItem("empresa") || "imperiop2";
+    this.empresa = sessionStorage.getItem("empresa") || "modasm";
 
     await this.initForm();
 
