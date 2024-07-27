@@ -149,7 +149,7 @@ export default {
   font-size: 2.7rem;
 }
 .producto {
-  color: blue;
+  color: #1A237E;
   font-weight: bold;
 }
 .presentacion {

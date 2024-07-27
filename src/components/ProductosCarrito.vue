@@ -709,7 +709,7 @@
       v-if="modalPresentaciones">
       <b-row class="px-4">
         <b-col cols="6">
-          <b-card  @click="guardarItemPorUnidad()">
+          <b-card  @click="guardarItemPorUnidad()" class="cardPresentacion">
               <b-row>
                 <b-col cols="6"> UNIDAD </b-col>
                 <b-col cols="6" class="borderIzquierdo">
@@ -760,7 +760,7 @@
       <b-row class="px-4">
         <b-col cols="6">
 
-<b-card  @click="guardarItemPorUnidadEditar()">
+<b-card  @click="guardarItemPorUnidadEditar()" class="cardPresentacion">
               <b-row>
                 <b-col cols="6"> UNIDAD </b-col>
                 <b-col cols="6" class="borderIzquierdo">
