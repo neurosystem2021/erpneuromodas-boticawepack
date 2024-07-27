@@ -203,7 +203,7 @@
         <template
           slot="cantxPrecio"
           slot-scope="data"
-          v-if="productos[data.index].estadoPxP == false"
+          v-if="productos[data.index].tipo == 'PRESENTACION'"
         >
           <input
             v-model="productos[data.index].cantxPrecio"
@@ -224,7 +224,7 @@
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            disabled
+            :disabled="productos[data.index].tipo == 'PRESENTACION'"
             type="number"
             style="width: 95px"
             class="form-control"
@@ -709,6 +709,19 @@
       v-if="modalPresentaciones">
       <b-row class="px-4">
         <b-col cols="6">
+          <b-card  @click="guardarItemPorUnidad()">
+              <b-row>
+                <b-col cols="6"> UNIDAD </b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{itemProducto.PrecioContado}}
+                  </b>
+
+                  </b-col>
+              </b-row>
+          </b-card>
+          
           <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItem(item)">
               <b-row>
                 <b-col cols="6">{{item.nombre}}</b-col>
@@ -746,6 +759,20 @@
     <b-modal id="modal-1" :title="`${itemProducto.Producto}`" hide-footer v-model="modalPresentacionesEditar" v-if="modalPresentacionesEditar">
       <b-row class="px-4">
         <b-col cols="6">
+
+<b-card  @click="guardarItemPorUnidadEditar()">
+              <b-row>
+                <b-col cols="6"> UNIDAD </b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{itemProducto.PrecioContado}}
+                  </b>
+
+                  </b-col>
+              </b-row>
+          </b-card>
+
           <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItemEditar(item)">
               <b-row>
                 <b-col cols="6">{{item.nombre}}</b-col>
@@ -798,7 +825,6 @@ export default {
     } else {
       this.empresa = empresa;
     }
-    console.log(this.empresa);
   },
   async mounted() {
     let vm = this;
@@ -914,7 +940,7 @@ export default {
   },
   watch: {
     totalCart() {
-      this.pagocon = this.totalCart;
+      this.pagocon = parseFloat(this.totalCart).toFixed(2);
     },
     sumatoriaTotal(sum) {
       this.asignarVuelto();
@@ -1144,7 +1170,7 @@ export default {
     },
 
     asignarVuelto() {
-      this.vuelto = this.pagocon - this.sumatoriaTotal;
+      this.vuelto = parseFloat(this.pagocon - this.sumatoriaTotal).toFixed(2);
     },
 
     loadBarcode(e) {
@@ -1209,7 +1235,6 @@ export default {
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
-      console.log(empresa);
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
@@ -1221,8 +1246,8 @@ export default {
         let datoEmpresa = this.$store.state.empresas.filter(
           v => v.value == empresa
         );
-        obj.Empresa = datoEmpresa.value;
-        obj.NombreEmpresa = datoEmpresa.text;
+        obj.Empresa = datoEmpresa[0].value;
+        obj.NombreEmpresa = datoEmpresa[0].text;
       }
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
@@ -1244,7 +1269,6 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log("ssDDDDs");
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1550,8 +1574,9 @@ export default {
       this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
       this.itemProducto = { ...item };
+      this.itemProducto.tipo = "PRESENTACION";
       this.itemProducto.PreciosPorProducto = PreciosPorProducto;
-      if (PreciosPorProducto.filter(v => v.precio > 0).length > 0) {
+      if (PreciosPorProducto.filter(v => v.cantidad > 0).length > 0) {
         this.monto = 0;
         setTimeout(() => {
           document.getElementById("montoPresentacion").focus();
@@ -1565,9 +1590,9 @@ export default {
           this.itemProducto.Empresa = empresa.value;
           this.itemProducto.NombreEmpresa = empresa.text;
         }
-
+        this.itemProducto.tipo = "UNIDAD";
         this.itemProducto.estadoPxP = true;
-        this.itemProducto.precio = 0;
+        this.itemProducto.precio = this.itemProducto.PrecioContado;
         this.itemProducto.total = 0;
         this.itemProducto.cantxPrecio = 0;
         this.itemProducto.cantidad = 0;
@@ -1581,24 +1606,28 @@ export default {
     },
 
     guardarItem(presentacion) {
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "modasm";
       this.errorMontoPresentacion = "";
+
       if (this.monto == 0) {
         this.errorMontoPresentacion = "Ingrese una Cantidad";
         return false;
       }
       let prod = this.itemProducto;
-
+      this.itemProducto.tipo = "PRESENTACION";
       prod.estadoPxP = true;
       prod.cantxPrecio = this.monto;
       prod.cantidad = this.monto;
       prod.descuento = 0;
       prod.disabled = true;
-      if (!prod.Empresa) {
-        let empresa = this.$store.state.empresas.filter(
-          v => v.value == this.empresa
-        )[0];
-        prod.Empresa = empresa.value;
-        prod.NombreEmpresa = empresa.text;
+      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        prod.Empresa = datoEmpresa[0].value;
+        prod.NombreEmpresa = datoEmpresa[0].text;
       }
 
       if (this.itemProducto.PreciosPorProducto.length > 0) {
@@ -1612,66 +1641,34 @@ export default {
       this.modalPresentaciones = false;
       this.modalNuevoProductos = this.abrirModal;
     },
-    // async anadirarProductosSeleccionado(item) {
-    //   this.modalNuevoProductos = false;
-    //   let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
-    //   this.itemProducto = { ...item };
-    //   this.itemProducto.PreciosPorProducto = PreciosPorProducto;
-    //   if (PreciosPorProducto.filter(v => v.precio > 0).length > 0) {
-    //     this.monto = 0;
-    //     setTimeout(() => {
-    //       document.getElementById("montoPresentacion").focus();
-    //     }, 100);
-    //     this.modalPresentaciones = true;
-    //   } else {
-    //     if (!this.itemProducto.Empresa) {
-    //       let empresa = this.$store.state.empresas.filter(
-    //         v => v.value == this.empresa
-    //       )[0];
-    //       this.itemProducto.Empresa = empresa.value;
-    //       this.itemProducto.NombreEmpresa = empresa.text;
-    //     }
-
-    //     this.itemProducto.estadoPxP = true;
-    //     this.itemProducto.precio = 0;
-    //     this.itemProducto.total = 0;
-    //     this.itemProducto.cantxPrecio = 0;
-    //     this.itemProducto.cantidad = 0;
-    //     this.itemProducto.descuento = 0;
-    //     delete this.itemProducto._rowVariant;
-    //     this.$store.state.cart.productos.push(this.itemProducto);
-    //     setTimeout(() => {
-    //       this.modalNuevoProductos = this.abrirModal;
-    //     }, 500);
-    //   }
-    // },
-
-    guardarItem(presentacion) {
-      console.log(this.abrirModal);
+    guardarItemPorUnidad() {
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "modasm";
       this.errorMontoPresentacion = "";
       if (this.monto == 0) {
         this.errorMontoPresentacion = "Ingrese una Cantidad";
         return false;
       }
       let prod = this.itemProducto;
-
+      prod.tipo = "UNIDAD";
       prod.estadoPxP = true;
-      prod.cantxPrecio = this.monto;
-      prod.cantidad = this.monto;
+      prod.cantxPrecio = 0;
+      prod.cantidad = 0;
       prod.descuento = 0;
-      prod.disabled = true;
-      if (!prod.Empresa) {
-        let empresa = this.$store.state.empresas.filter(
-          v => v.value == this.empresa
-        )[0];
-        prod.Empresa = empresa.value;
-        prod.NombreEmpresa = empresa.text;
+      prod.disabled = false;
+      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        prod.Empresa = datoEmpresa[0].value;
+        prod.NombreEmpresa = datoEmpresa[0].text;
       }
-
+      prod.total = 0;
+      prod.precio = prod.PrecioContado;
+      prod.cantidadPres = 0;
+      prod.bloquearInput = false;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * presentacion.precio;
-        prod.precio = presentacion.precio;
-        prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
       }
       delete prod._rowVariant;
@@ -1679,6 +1676,7 @@ export default {
       this.modalPresentaciones = false;
       this.modalNuevoProductos = this.abrirModal;
     },
+
     showPresentacion(obj, index) {
       this.itemProducto = { ...obj };
       this.monto = this.itemProducto.cantidad;
@@ -1692,7 +1690,7 @@ export default {
         return false;
       }
       let prod = this.itemProducto;
-
+      prod.tipo = "PRESENTACION";
       prod.estadoPxP = true;
       prod.cantxPrecio = this.monto;
       prod.cantidad = this.monto;
@@ -1702,6 +1700,35 @@ export default {
         prod.precio = presentacion.precio;
         prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
+      }
+
+      this.$store.state.cart.productos[this.index] = prod;
+      setTimeout(() => {
+        this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+          .recalcularTotalPorEmpresaFlag;
+        this.modalPresentacionesEditar = false;
+      }, 100);
+      let total = this.$store.state.cart.productos.reduce((total, item) => {
+        return parseFloat(total) + parseFloat(item.total);
+      }, 0);
+    },
+    guardarItemPorUnidadEditar() {
+      this.errorMontoPresentacion = "";
+      if (this.monto == 0) {
+        this.errorMontoPresentacion = "Ingrese una Cantidad";
+        return false;
+      }
+      let prod = this.itemProducto;
+      prod.tipo = "UNIDAD";
+      prod.precio = prod.PrecioContado;
+      // prod.cantidadPres = 0;
+      // prod.bloquearInput = false;
+      prod.cantxPrecio = this.monto;
+      prod.cantidad = this.monto;
+      if (this.itemProducto.PreciosPorProducto.length > 0) {
+        prod.total = this.monto * prod.PrecioContado;
+
+        // prod.estadoPxP = false;
       }
 
       this.$store.state.cart.productos[this.index] = prod;

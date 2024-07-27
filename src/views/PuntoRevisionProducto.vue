@@ -22,26 +22,40 @@
         </b-row>
     </b-col>
     <b-col cols="8" class="detalle">
-        <h2>Datos del producto</h2>
+        <h2> <b>DATOS DEL PRODUCTO: </b></h2>
         <b-row>
             <b-col cols="12"> <hr class="division"></b-col>
             <b-col cols="3" ><b>Categoría:</b></b-col>
-            <b-col cols="9" >{{producto.ProductoCategoria}}</b-col>
+            <b-col cols="9" class="producto">{{producto.ProductoCategoria}}</b-col>
             <b-col cols="12"> <hr class="division"></b-col>
             <b-col cols="3" ><b>Nombre:</b></b-col>
-            <b-col cols="9" >{{producto.Producto}}</b-col>
+            <b-col cols="9" class="producto">{{producto.Producto}}</b-col>
             <b-col cols="12"> <hr class="division"></b-col>
-            <b-col cols="12" v-if="producto.PreciosPorProducto  ? producto.PreciosPorProducto.length > 0 : false"  class="m-2">
+            <b-col cols="12" class="m-2">
                 <b>Presentación(es)</b>
                 <b-row class="my-3">
-                    <b-col cols="4" v-for="(pr , index) in producto.PreciosPorProducto" :key="index">
-                        <b-card title="" sub-title="" class="mt-3">
+                    <b-col cols="4">
+                        <b-card title="" sub-title="" class="mt-3 presentacion">
                              <b-row>
-                                <b-col cols="6">{{pr.nombre}}</b-col>
-                                <b-col cols="6" class="borderIzquierdo">
+                                <b-col cols="6"> UNIDAD </b-col>
+                                <b-col cols="6" class="borderIzquierdo precio">
                                 <b>
                                     Precio: <br>
-                                    {{pr.precio}}
+                                    {{producto.PrecioContado}}
+                                </b>
+
+                                </b-col>
+                            </b-row>
+                        </b-card>
+                    </b-col>
+                    <b-col cols="4" v-for="(pr , index) in producto.PreciosPorProducto.filter((v)=>v.cantidad>0)" :key="index" >
+                        <b-card title="" sub-title="" class="mt-3 presentacion">
+                             <b-row>
+                                <b-col cols="6">{{pr.nombre}}</b-col>
+                                <b-col cols="6" class="borderIzquierdo precio">
+                                <b>
+                                    Precio: <br>
+                                    {{parseFloat(pr.precio).toFixed(2)}}
                                 </b>
 
                                 </b-col>
@@ -64,7 +78,7 @@ export default {
       codigoBarra: "",
       empresa: "",
       API: config.API,
-      producto: {}
+      producto: { PrecioContado: "", PreciosPorProducto: [] }
     };
   },
   async beforeMount() {
@@ -100,9 +114,8 @@ export default {
               this.$toasted.show("No se encontró ningun producto");
             }
           });
-        setInterval(() => {
-          this.codigoBarra = "";
-          this.producto = {};
+        setTimeout(() => {
+          window.location.reload();
         }, 30 * 1000);
       }
     }
@@ -129,5 +142,17 @@ export default {
 }
 .division {
   border: 1px dashed #000 !important;
+}
+.precio {
+  /* color: blue; */
+  font-weight: bold;
+  font-size: 2.7rem;
+}
+.producto {
+  color: blue;
+  font-weight: bold;
+}
+.presentacion {
+  background: #e1f5fe;
 }
 </style>

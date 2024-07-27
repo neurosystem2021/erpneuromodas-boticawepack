@@ -1673,7 +1673,7 @@ export default {
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
-      this.venta.PagoCon = this.$refs.carrito.pagocon;
+      this.venta.PagoCon = parseFloat(this.$refs.carrito.pagocon).toFixed(2);
       this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
         .trim()
         .toUpperCase();
@@ -1773,7 +1773,7 @@ export default {
             })
             .catch(error => {
               console.error(error);
-              // this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+              this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
               this.inProgress = false;
             });
 
@@ -1793,7 +1793,7 @@ export default {
       setTimeout(() => {
         this.inProgress = false;
         window.location.reload();
-      }, 3000);
+      }, 1000 * 2 * this.$store.state.empresas.length);
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios
@@ -1826,7 +1826,9 @@ export default {
       if (this.$route.query.idPedido) {
         this.infoDelivery = obj;
         this.venta.EsDelivery = true;
-        this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
+        this.$refs.carrito.pagocon = parseFloat(
+          parseFloat(obj.Cambio).toFixed(2)
+        ).toFixed(2);
         //cargar costo de delivery
         let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
         if (costoDelivery > 0) {

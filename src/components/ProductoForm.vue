@@ -219,6 +219,16 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <label>Activar Presentación(es):</label>
+            <b-form-checkbox
+                     v-model="tienePresentacionFlag"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+                    Seleccione esta opción si el producto contiene presentaciones.
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -301,7 +311,8 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="tienePresentacionFlag ==1">
+        
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
@@ -394,6 +405,7 @@ import ProductoFormDet from "@/components/ProductoFormDet";
 export default {
   data() {
     return {
+      tienePresentacionFlag: 0,
       showProductoDet: true,
       cantidadCodigoBarra: 1,
       title: "Nuevo Producto",
