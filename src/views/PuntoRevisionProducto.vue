@@ -89,6 +89,7 @@ export default {
     } else {
       this.empresa = empresa;
     }
+    this.setScreen();
   },
   methods: {
     loadBarcode() {
@@ -118,6 +119,10 @@ export default {
           window.location.reload();
         }, 30 * 1000);
       }
+    },
+    setScreen() {
+      window.parent.document.getElementById("NavegadorParent").style.display =
+        "none";
     }
   },
   watch: {
@@ -133,9 +138,12 @@ export default {
   border-left: 1px solid #000 !important;
 }
 .revisionProducto {
-  z-index: 1;
-  min-width: 100wh;
-  min-height: 100vh;
+  /* z-index: 1; */
+  max-width: 95%;
+  align-content: center;
+  /* align-items: center; */
+  /* min-width: 100wh; */
+  /* min-height: 100vh; */
 }
 .detalle {
   font-size: 2rem;
@@ -149,7 +157,7 @@ export default {
   font-size: 2.7rem;
 }
 .producto {
-  color: #1A237E;
+  color: #1a237e;
   font-weight: bold;
 }
 .presentacion {

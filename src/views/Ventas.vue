@@ -778,6 +778,7 @@ export default {
       return oldXHROpen.apply(this, arguments);
     };
     this.initForm();
+    this.setScreen();
   },
   async mounted() {
     this.$store.state.MostrarBotonMultipleEmpresa = true;
@@ -912,6 +913,10 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    setScreen() {
+      window.parent.document.getElementById("NavegadorParent").style.display =
+        "block";
+    },
     async recalcularTotalesPorEmpresa() {
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {

@@ -12,5 +12,6 @@ export default {
     consideraAppendEmpresa:true,
     MostrarBotonMultipleEmpresa:false,
     recalcularTotalPorEmpresaFlag:true,
+    navDisabled :false,
     listadoProductos:[]
 } 
