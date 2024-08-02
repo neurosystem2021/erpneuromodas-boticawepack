@@ -1,4 +1,9 @@
 export default {
     proveedoresFiltrados : [],
-    almacenesFiltrados: []
+    almacenesFiltrados: [],
+    modalNuevoProducto:false,
+    producto:{
+        PreciosPorProducto :[]
+    },
+    esOrdenCompra:false
 } 

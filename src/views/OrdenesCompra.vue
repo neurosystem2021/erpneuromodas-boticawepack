@@ -154,38 +154,41 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
+  beforeMount() {
+    this.$store.state.esOrdenCompra = true;
+  },
   mounted() {
-    this.axios.get(this.API + 'ordencompra/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "ordencompra/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'IdOrdenCompra',
+      sortBy: "IdOrdenCompra",
       sortDesc: true,
       items: [],
       isBusy: false,
       fields: [
-            { key: 'IdOrdenCompra', label: 'ID', sortable: true },
-            { key: 'Correlativo', sortable: true },
-            { key: 'FechaOrdenCompra', label:'Fecha', sortable: true },
-            { key: 'Ruc', sortable: true },
-            { key: 'Proveedor', sortable: true },
-            { key: 'Total', sortable: true },
-            { key: 'Ver', label: 'Ver', class:'text-center' },
-            { key: 'Reimprimir', label: 'Reporte', class:'text-center' }
+        { key: "IdOrdenCompra", label: "ID", sortable: true },
+        { key: "Correlativo", sortable: true },
+        { key: "FechaOrdenCompra", label: "Fecha", sortable: true },
+        { key: "Ruc", sortable: true },
+        { key: "Proveedor", sortable: true },
+        { key: "Total", sortable: true },
+        { key: "Ver", label: "Ver", class: "text-center" },
+        { key: "Reimprimir", label: "Reporte", class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
       detalle: {},
-      infoOrden:{
+      infoOrden: {
         Anio: null,
         Correlativo: null,
         Direccion: null,
@@ -200,65 +203,77 @@ export default {
         Proveedor: null,
         Ruc: null,
         Telefono: null,
-        UsuarioReg: null,
+        UsuarioReg: null
       }
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.infoOrden = item
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaVentas.refresh()
-      },
-      nuevoProducto () {
-          this.infoOrden = {}
-          this.$refs.productoForm.show = true
-      },
-      mostrarDetalles(data){
-        this.axios.get(this.API + 'ordencompra/detalle', {
+    rowClick(item, index) {
+      this.infoOrden = item;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    actualizarTabla() {
+      this.$refs.tablaVentas.refresh();
+    },
+    nuevoProducto() {
+      this.infoOrden = {};
+      this.$refs.productoForm.show = true;
+    },
+    mostrarDetalles(data) {
+      this.axios
+        .get(this.API + "ordencompra/detalle", {
           params: {
             IdOrdenCompra: data.IdOrdenCompra
           }
-        }).then((response) => {
-             this.detalle = response.data
-             this.infoOrden = data
-             this.$refs['modalDetalle'].show()
         })
-        .catch((error) => {
-          console.log(error)
+        .then(response => {
+          this.detalle = response.data;
+          this.infoOrden = data;
+          this.$refs["modalDetalle"].show();
         })
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'ordencompra?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "ordencompra?noFecha=1&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    }
   },
-  components: {
-  }
-}
+  components: {}
+};
 </script>
 
 <style>
-#modalDetalle .modal-dialog{
-    max-width: 65% !important;
+#modalDetalle .modal-dialog {
+  max-width: 65% !important;
 }
 </style>

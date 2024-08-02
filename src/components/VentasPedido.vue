@@ -87,118 +87,166 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import { mapActions } from 'vuex'
+import config from "@/store/config.js";
+import { mapActions } from "vuex";
 
-    export default {
-        mounted () {
-            this.$emit('mounted', this.$refs.formProformaModal)
-        },
-        watch: {
-          items () {
-            this.axios.get(this.API + 'ventapedido/count').then((response) => {
-                this.totalRows = response.data.total
-            })
-          }
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                filter: '',
-                sortBy: 'idDocVenta',
-                sortDesc: true,
-                items: [],
-                isBusy: false,
-                fields: [ 
-                    { key: 'idDocVenta', label: 'Id' }, 'Almacen',
-                    'Serie', 'Numero', 'Cliente', 
-                    { key: 'DniRuc', label: 'Documento' }, 'FechaDoc', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'total', label: 'Total' }, { key: 'aplicado', label: 'Adelantos' },{ key: 'pendiente', label: 'Pendiente' }, 'facturar', 'verTicket', { key: 'Anular', label: 'Estado' } ],
-                totalRows: 50,
-                perPage: 5,
-                currentPage: 1
-            }
-        },
-        props: ['idAlmacen'],
-        methods: {
-            ...mapActions({
-                add         : 'agregarProducto',
-                obtenerStok : 'obtenerStock',
-                limpiarCarrito: 'limpiarCarrito',
-            }),
-            selectVentaPedido (proforma) {
-                this.axios.get(this.API + 'venta/pedido/detalle', {
-                    params: {
-                        idDocVenta: proforma.idDocVenta
-                    }
-                }).then((response) => {
-                    this.limpiarCarrito()
-                    response.data.map((item) => {
-                        this.add([item, () => {
-                        }, {setPreOr: item.Precio, cantidad: item.Cantidad } ])
-                        this.filter = ''
-                        this.show = false
-                    })
-                    setTimeout(() => {
-                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })        
-                    }, 300);
-                    proforma.productos = response.data
-                    // console.log(proforma);
-
-                    // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
-                    this.$emit('onSelectProforma', proforma)
-                    this.$emit('onFacturar', proforma)
-                })
-            },
-            myProvider (ctx) {
-                // Here we don't set isBusy prop, so busy state will be handled by table itself
-                // this.isBusy = true
-                let promise = this.axios.get(this.API + 'ventas/pedido?idAlmacen='+this.idAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter+'&sortBy='+ctx.sortBy+'&sortDesc='+(ctx.sortDesc ? 1 : 0 ))
-
-                return promise.then((result) => {
-                this.items = result.data
-                //this.totalRows = this.items.length
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                return(this.items)
-                }).catch(error => {
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                // Returning an empty array, allows table to correctly handle busy state in case of error
-                return []
-                })
-            },
-            anularVentaPedido(data){
-                this.$swal({
-                target: document.getElementById('conten'),
-                title: 'Se anulara la venta a pedido: <strong>'+data.Serie+' - '+data.Numero+'</strong> del  cliente <strong>'+data.Cliente+'</strong>',
-                text:'¿Está seguro?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, anular',
-                cancelButtonText: 'No, atrás'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.axios.put(this.API + 'venta/pedido/anular/'+data.idDocVenta).then(res => {
-                            if(res.data){
-                               this.$toasted.info('¡VENTA A PEDIDO ANULADA!')
-                                this.$refs.tableVentaPedido.refresh()
-                            }
-                        }).catch(err => {
-                            console.log(err)
-                        this.$toasted.error('Ha ocurrido un error')
-                        })        
-                    }
-                })
-            }
-        }
+export default {
+  mounted() {
+    this.$emit("mounted", this.$refs.formProformaModal);
+    
+  },
+  watch: {
+    items() {
+      this.axios.get(this.API + "ventapedido/count").then(response => {
+        this.totalRows = response.data.total;
+      });
     }
+  },
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      filter: "",
+      sortBy: "idDocVenta",
+      sortDesc: true,
+      items: [],
+      isBusy: false,
+      fields: [
+        { key: "idDocVenta", label: "Id" },
+        "Almacen",
+        "Serie",
+        "Numero",
+        "Cliente",
+        { key: "DniRuc", label: "Documento" },
+        "FechaDoc",
+        { key: "UsuarioReg", label: "Empleado" },
+        { key: "total", label: "Total" },
+        { key: "aplicado", label: "Adelantos" },
+        { key: "pendiente", label: "Pendiente" },
+        "facturar",
+        "verTicket",
+        { key: "Anular", label: "Estado" }
+      ],
+      totalRows: 50,
+      perPage: 5,
+      currentPage: 1
+    };
+  },
+  props: ["idAlmacen"],
+  methods: {
+    ...mapActions({
+      add: "agregarProducto",
+      obtenerStok: "obtenerStock",
+      limpiarCarrito: "limpiarCarrito"
+    }),
+    selectVentaPedido(proforma) {
+      this.axios
+        .get(this.API + "venta/pedido/detalle", {
+          params: {
+            idDocVenta: proforma.idDocVenta
+          }
+        })
+        .then(response => {
+          this.limpiarCarrito();
+          response.data.forEach(element => {
+            element.subtotal = element.cantidad * element.PrecioContado;
+            element.total = element.cantidad * element.PrecioContado;
+            element.tipo = "UNIDAD";
+            this.$store.state.cart.productos.push(element);
+          });
+          this.filter = "";
+          this.show = false;
+          // response.data.map((item) => {
+          //     this.add([item, () => {
+          //     }, {setPreOr: item.Precio, cantidad: item.Cantidad } ])
+          //     this.filter = ''
+          //     this.show = false
+          // })
+          setTimeout(() => {
+            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+          }, 300);
+          proforma.productos = response.data;
+          // console.log(proforma);
+
+          // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+          this.$emit("onSelectProforma", proforma);
+          this.$emit("onFacturar", proforma);
+        });
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let promise = this.axios.get(
+        this.API +
+          "ventas/pedido?idAlmacen=" +
+          this.idAlmacen +
+          "&limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          ctx.filter +
+          "&sortBy=" +
+          ctx.sortBy +
+          "&sortDesc=" +
+          (ctx.sortDesc ? 1 : 0)
+      );
+
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
+    },
+    anularVentaPedido(data) {
+      this.$swal({
+        target: document.getElementById("conten"),
+        title:
+          "Se anulara la venta a pedido: <strong>" +
+          data.Serie +
+          " - " +
+          data.Numero +
+          "</strong> del  cliente <strong>" +
+          data.Cliente +
+          "</strong>",
+        text: "¿Está seguro?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, anular",
+        cancelButtonText: "No, atrás"
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.axios
+            .put(this.API + "venta/pedido/anular/" + data.idDocVenta)
+            .then(res => {
+              if (res.data) {
+                this.$toasted.info("¡VENTA A PEDIDO ANULADA!");
+                this.$refs.tableVentaPedido.refresh();
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              this.$toasted.error("Ha ocurrido un error");
+            });
+        }
+      });
+    }
+  }
+};
 </script>
 <style>
 #modalVentaPedido .modal-dialog {
-    max-width: 95% !important;
+  max-width: 95% !important;
 }
 </style>

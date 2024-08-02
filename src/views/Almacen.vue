@@ -290,7 +290,14 @@
                     </div>
                   </b-popover>
                 </template>
-
+                 <template slot="presentacion" slot-scope="data">
+                       <b-button size="sm" v-if="data.item.PreciosPorProducto"
+                          variant="info"
+                          @click="abrirPresentacion(data.item)">
+                          <i class="fas fa-list"></i>
+                        </b-button>
+                      <!-- {{data.item.PreciosPorProducto}} -->
+                 </template>
               </b-table>
           </b-col>
           <b-row>
@@ -394,37 +401,64 @@
           </b-col>
         </b-row>
       </b-modal>
+
+      <b-modal v-model="modalPresentacion" size="md" :title="`${producto.Producto}`" class="" hide-footer>
+        <b-row>
+          <b-col cols="12">
+            <b-row class="presentacion">
+              <b-col cols="6">
+                <b-card  align="center" class="mb-3 contentCard">
+                  <h5 class="text-uppercase">UNIDAD</h5>
+                        <b>Stock: </b><span class="stock"> {{ getStock(producto.IdProducto) }}</span>
+                </b-card> 
+              </b-col>
+              
+              <b-col cols="6" v-for="(precio,index) in producto.PreciosPorProducto.filter(v=>v.cantidad>0)" :key="index">
+                <b-card  align="center" class="mb-3 contentCard">
+                  <h5 class="text-uppercase">{{precio.nombre}}</h5>
+                  <b>Stock: </b><span class="stock"> {{ parseFloat(getStock(producto.IdProducto) / precio.cantidad).toFixed(2) }}</span>
+                  
+                </b-card>
+              </b-col>
+            </b-row>
+          </b-col> 
+        </b-row>
+      </b-modal>
   </div>
 </template>
 
 <script>
-import config from '@/store/config.js'
-import ProductoKardex from '@/components/ProductoKardex'
+import config from "@/store/config.js";
+import ProductoKardex from "@/components/ProductoKardex";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
-      this.totalRows = response.data.total
-    })
-    this.getPrimerAlmacen()
+    this.axios.get(this.API + "productos/count").then(response => {
+      this.totalRows = response.data.total;
+    });
+    this.getPrimerAlmacen();
   },
   data() {
     return {
+      modalPresentacion: false,
+      producto: {
+        PreciosPorProducto: []
+      },
       API: config.API,
-      sumaStock: '...',
-      sumaValorizado: '...',
-      sumaValorizadoSin: '...',
-      APISTOCK: 'productos',
-      tipoStock: '',
+      sumaStock: "...",
+      sumaValorizado: "...",
+      sumaValorizadoSin: "...",
+      APISTOCK: "productos",
+      tipoStock: "",
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
-        Almacen: ''
+        Almacen: ""
       },
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filters: {},
-      filter: '',
-      sortBy: 'IdProducto',
+      filter: "",
+      sortBy: "IdProducto",
       sortDesc: false,
       productoSelect: {},
       kardexSelect: [],
@@ -432,17 +466,24 @@ export default {
       itemsStock: [],
       isBusy: false,
       fields: [
-            { key: 'CodigoBarra', label: 'Código', sortable: true },
-            { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ImagenProducto', label:'Img.'},
-            { key: 'Producto', sortable: true },
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'stock', sortable: false, variant: '', class:'text-center'}
+        { key: "CodigoBarra", label: "Código", sortable: true },
+        { key: "ProductoCategoria", label: "Categoría", sortable: true },
+        { key: "ImagenProducto", label: "Img." },
+        { key: "Producto", sortable: true },
+        { key: "ProductoMarca", label: "Marca", sortable: true },
+        { key: "stock", sortable: false, variant: "", class: "text-center" },
+        {
+          key: "presentacion",
+          label: "Presentación",
+          sortable: false,
+          variant: "",
+          class: "text-center"
+        }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
-      idPerfil: sessionStorage.getItem('IdPerfil'),
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       verValorizado: false,
       exportar: {
         fechaDesde: this.$moment().format("YYYY-01-01"),
@@ -452,33 +493,35 @@ export default {
         fechaDesde: this.$moment().format("YYYY-MM-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
-      productoNombre:'',
-      productoUrl:''
-    }
+      productoNombre: "",
+      productoUrl: ""
+    };
   },
   watch: {
-    items (items) {
+    items(items) {
       //Vue.set(this.$refs.tablaProductos, 'localItems', [])
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
+      this.axios
+        .get(this.API + "productos/stock", {
           params: {
-            idProductos: items.map((item) => item.IdProducto),
+            idProductos: items.map(item => item.IdProducto),
             idAlmacen: this.almacen.IdAlmacen,
             limit: items.length
           }
-        }).then((response) => {
-             this.itemsStock = response.data
         })
-        .catch((error) => {
-          console.log(error)
+        .then(response => {
+          this.itemsStock = response.data;
         })
+        .catch(error => {
+          console.log(error);
+        });
 
-        // Cargar la sumatoria
-        this.getSumaStock()
-        this.getSumaValorizado()
-        this.getSumaValorizadoSin()
+      // Cargar la sumatoria
+      this.getSumaStock();
+      this.getSumaValorizado();
+      this.getSumaValorizadoSin();
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -500,192 +543,313 @@ export default {
     }
   },
   computed: {
-    titleKardex () {
-      return 'KARDEX - / ' + this.productoSelect.CodigoBarra + ' / ' + this.productoSelect.Producto + ' / ' + 
-      this.productoSelect.ProductoMarca + ' / ' + this.productoSelect.ProductoFormaFarmaceutica
+    titleKardex() {
+      return (
+        "KARDEX - / " +
+        this.productoSelect.CodigoBarra +
+        " / " +
+        this.productoSelect.Producto +
+        " / " +
+        this.productoSelect.ProductoMarca +
+        " / " +
+        this.productoSelect.ProductoFormaFarmaceutica
+      );
     },
-    hrefXlsFechas () {
-      return ('/api/index.php/reporte/mercaderia?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.exportar.fechaDesde+'&fechaHasta='+this.exportar.fechaHasta+'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + this.filter).replace('#','');
+    hrefXlsFechas() {
+      return (
+        "/api/index.php/reporte/mercaderia?controlaStock=1&idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&fechaDesde=" +
+        this.exportar.fechaDesde +
+        "&fechaHasta=" +
+        this.exportar.fechaHasta +
+        "&sortBy=" +
+        this.sortBy +
+        "&sortDesc=" +
+        (this.sortDesc ? 1 : 0) +
+        this.filter
+      ).replace("#", "");
     },
-    hrefXlsProducto () {
-      return ('/api/index.php/reporte/producto/kardex?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.productoSelect.IdProducto+'&productoFF='+this.productoSelect.ProductoFormaFarmaceutica+'&productoMarca='+this.productoSelect.ProductoMarca+'&producto='+this.productoSelect.Producto+'&codigoBarra='+this.productoSelect.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta).replace('#','');
-    },
+    hrefXlsProducto() {
+      return (
+        "/api/index.php/reporte/producto/kardex?idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&idProducto=" +
+        this.productoSelect.IdProducto +
+        "&productoFF=" +
+        this.productoSelect.ProductoFormaFarmaceutica +
+        "&productoMarca=" +
+        this.productoSelect.ProductoMarca +
+        "&producto=" +
+        this.productoSelect.Producto +
+        "&codigoBarra=" +
+        this.productoSelect.CodigoBarra +
+        "&fechaDesde=" +
+        this.kardex.fechaDesde +
+        "&fechaHasta=" +
+        this.kardex.fechaHasta
+      ).replace("#", "");
+    }
   },
   methods: {
-    abrirImagen(producto,url){
-      this.productoNombre = producto
-      this.productoUrl = url
-      this.$refs['modalImagen'].show()
+    abrirImagen(producto, url) {
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
     },
-    opcionesExportar(){
-      this.$refs['modalExportar'].show()
+    opcionesExportar() {
+      this.$refs["modalExportar"].show();
     },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     },
     clickVerValorizado() {
-      let pass = window.prompt('Escriba su contraseña')
+      let pass = window.prompt("Escriba su contraseña");
       if (pass) {
-        this.axios.post(this.API + 'login', {
-          user: sessionStorage.getItem('User'),
-          password: pass
-        }).then(r => {
-          if (r.data) {
-            this.verValorizado = true;
-          }
-        })
+        this.axios
+          .post(this.API + "login", {
+            user: sessionStorage.getItem("User"),
+            password: pass
+          })
+          .then(r => {
+            if (r.data) {
+              this.verValorizado = true;
+            }
+          });
       }
     },
-    getPrimerAlmacen(){
-        this.axios.get(this.API + '/almacenes/id/1').then(r => {
-          if (r.data) {
-            this.setAlmacen(r.data)
-            this.$refs.inputAlmacen.setValue(r.data.Almacen)
-          }
-        })
+    abrirPresentacion(item) {
+      let producto = { ...item };
+      console.log(producto);
+      if (
+        this.$store.state.cart.productos.some(
+          v => v.IdProducto == producto.IdProducto
+        )
+      ) {
+        this.$toasted.error(
+          `El producto ${producto.Producto} ya se encuentra en la lista`
+        );
+        return false;
+      }
+
+      if (producto.PreciosPorProducto) {
+        producto.PreciosPorProducto = JSON.parse(producto.PreciosPorProducto);
+        producto.estadoPxP = false;
+        producto.tienepresentacionflag = true;
+      } else {
+        producto.estadoPxP = true;
+        producto.PreciosPorProducto = [];
+        producto.tienepresentacionflag = false;
+      }
+      this.producto = producto;
+
+      this.modalPresentacion = true;
     },
-    getSumaValorizado () {
-      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
-        .then( response => {
-          this.sumaValorizado = (response.data[0].sumaValorizado);
-        })
-    },
-    getSumaValorizadoSin () {
-      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizadoSin=1')
-        .then( response => {
-          this.sumaValorizadoSin = (response.data[0].sumaValorizadoSin);
-        })
-    },
-    getSumaStock () {
-      this.axios.get(this.API + 'productos/stock' + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
-        .then( response => {
-          this.sumaStock = response.data[0].sumaStock
-        })
-    },
-    getStock (idProducto) {
-      let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
-    },
-    focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },
-    limpiarClassRows () {
-      let rows = this.$refs.tablaProductos.$el.rows
-      Object.keys(rows).forEach(function (key) {
-        rows[key].classList.remove('table-info')
+    getPrimerAlmacen() {
+      this.axios.get(this.API + "/almacenes/id/1").then(r => {
+        if (r.data) {
+          this.setAlmacen(r.data);
+          this.$refs.inputAlmacen.setValue(r.data.Almacen);
+        }
       });
     },
-    setAlmacen (obj) {
-      console.log(obj)
-      this.almacen = obj
-      this.limpiarFiltros()
-      console.log(this.filter)
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    getSumaValorizado() {
+      this.axios
+        .get(
+          this.API +
+            "productos/stock" +
+            "?controlaStock=1&idAlmacen=" +
+            this.almacen.IdAlmacen +
+            "&filter=" +
+            (this.filter || "") +
+            "&filter[stock]=mayor&sumaValorizado=1"
+        )
+        .then(response => {
+          this.sumaValorizado = response.data[0].sumaValorizado;
+        });
     },
-    rowClick (item, index, e) {
-      this.limpiarClassRows()
-      e.target.parentNode.classList.add('table-info')
-
-      this.productoSelect = item
+    getSumaValorizadoSin() {
+      this.axios
+        .get(
+          this.API +
+            "productos/stock" +
+            "?controlaStock=1&idAlmacen=" +
+            this.almacen.IdAlmacen +
+            "&filter=" +
+            (this.filter || "") +
+            "&filter[stock]=mayor&sumaValorizadoSin=1"
+        )
+        .then(response => {
+          this.sumaValorizadoSin = response.data[0].sumaValorizadoSin;
+        });
     },
-    rowDblClick (item) {
-      this.productoSelect = item
-      this.showKardex = true
-      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01")
-      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD") 
+    getSumaStock() {
+      this.axios
+        .get(
+          this.API +
+            "productos/stock" +
+            "?controlaStock=1&idAlmacen=" +
+            this.almacen.IdAlmacen +
+            "&filter=" +
+            (this.filter || "") +
+            "&filter[stock]=mayor&sumaStock=1"
+        )
+        .then(response => {
+          this.sumaStock = response.data[0].sumaStock;
+        });
+    },
+    getStock(idProducto) {
+      let index = this.itemsStock.findIndex(
+        item => item.IdProducto == idProducto
+      );
+      return this.itemsStock[index] && this.itemsStock[index].stock;
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    limpiarClassRows() {
+      let rows = this.$refs.tablaProductos.$el.rows;
+      Object.keys(rows).forEach(function(key) {
+        rows[key].classList.remove("table-info");
+      });
+    },
+    setAlmacen(obj) {
+      console.log(obj);
+      this.almacen = obj;
+      this.limpiarFiltros();
+      console.log(this.filter);
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
+    },
+    rowClick(item, index, e) {
+      this.limpiarClassRows();
+      e.target.parentNode.classList.add("table-info");
 
-      this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
-          params: {
+      this.productoSelect = item;
+    },
+    rowDblClick(item) {
+      this.productoSelect = item;
+      this.showKardex = true;
+      this.kardex.fechaDesde = this.$moment().format("YYYY-MM-01");
+      this.kardex.fechaHasta = this.$moment().format("YYYY-MM-DD");
+
+      this.axios
+        .get(
+          this.API +
+            "productos/kardex/" +
+            this.productoSelect.IdProducto +
+            "?limit=0",
+          {
+            params: {
               idAlmacen: this.almacen.IdAlmacen,
               fechaHasta: this.kardex.fechaHasta,
               fechaDesde: this.kardex.fechaDesde
+            }
           }
-      }).then((response) => {
-          this.kardexSelect = response.data
-      })
+        )
+        .then(response => {
+          this.kardexSelect = response.data;
+        });
     },
-    kardexFechaRango(){
-      if(this.kardex.fechaDesde !='' && this.kardex.fechaHasta != ''){
-          this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
-          params: {
-              idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.kardex.fechaHasta,
-              fechaDesde: this.kardex.fechaDesde
-          }
-          }).then((response) => {
-              this.kardexSelect = response.data
-          })
+    kardexFechaRango() {
+      if (this.kardex.fechaDesde != "" && this.kardex.fechaHasta != "") {
+        this.axios
+          .get(
+            this.API +
+              "productos/kardex/" +
+              this.productoSelect.IdProducto +
+              "?limit=0",
+            {
+              params: {
+                idAlmacen: this.almacen.IdAlmacen,
+                fechaHasta: this.kardex.fechaHasta,
+                fechaDesde: this.kardex.fechaDesde
+              }
+            }
+          )
+          .then(response => {
+            this.kardexSelect = response.data;
+          });
       }
-     
     },
     actualizarTabla() {
-      this.$refs.tablaProductos.refresh()
+      this.$refs.tablaProductos.refresh();
     },
-    myProvider (ctx) {
+    myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = this.API + this.APISTOCK + '?controlaStock=1&idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      console.log(url)
-      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( url )
+      let url =
+        this.API +
+        this.APISTOCK +
+        "?controlaStock=1&idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      console.log(url);
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      return promise.then((result) => {
-        this.items = result.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
     },
-    limpiarFiltros () {
-      this.APISTOCK = 'productos'
-      this.tipoStock = ''
-      this.filters = {}
-      this.filter = ''
-      this.$refs.inputCategoria.setValue('')
-      this.$refs.inputProducto.setValue('')
-      this.$refs.inputMarca.setValue('')
-      this.$refs.inputCodigoBarra.value='';
+    limpiarFiltros() {
+      this.APISTOCK = "productos";
+      this.tipoStock = "";
+      this.filters = {};
+      this.filter = "";
+      this.$refs.inputCategoria.setValue("");
+      this.$refs.inputProducto.setValue("");
+      this.$refs.inputMarca.setValue("");
+      this.$refs.inputCodigoBarra.value = "";
       // this.$refs.inputModelo.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputTalla.setValue('')
       // this.$refs.inputGenero.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
-      this.productoSelect = {}
-      this.limpiarClassRows()
-      console.log(this.filter)
+      this.productoSelect = {};
+      this.limpiarClassRows();
+      console.log(this.filter);
     },
-    generateFilter (key, value) {
-      this.filters[key] = value
-      
-      let filter = ''
+    generateFilter(key, value) {
+      this.filters[key] = value;
+
+      let filter = "";
       for (var key in this.filters) {
-        filter += '&filter[' + key + ']=' + this.filters[key]
-        
-        if(key == 'stock' || key == 'minimo') {
+        filter += "&filter[" + key + "]=" + this.filters[key];
+
+        if (key == "stock" || key == "minimo") {
           // si la consulta se hace al stock jalar de otro endpoint
-          this.APISTOCK = 'productos/stock'
+          this.APISTOCK = "productos/stock";
         }
       }
 
-      
-      this.filter = filter
+      this.filter = filter;
     },
-    exportarProductos () {
-
-    }
+    exportarProductos() {}
   },
   components: {
     ProductoKardex
   }
-}
+};
 </script>
 
 <style scope>
@@ -697,7 +861,7 @@ export default {
 }
 .table-detalle th {
   color: #fff;
-  background-color: #6c757d; 
+  background-color: #6c757d;
 }
 .table-detalle tbody td {
   font-size: 18px;
@@ -709,38 +873,44 @@ export default {
 }
 .suma-stock {
   background: #a6ccd2;
-    color: #fff;
+  color: #fff;
 }
 .suma-stock div {
   font-size: 32px;
   font-weight: bold;
 }
 @media (min-width: 992px) {
-    .modal-xl .modal-dialog {
-        max-width: 1200px;
-    }
+  .modal-xl .modal-dialog {
+    max-width: 1200px;
+  }
 }
 </style>
 <style>
-  .popover{
-    max-width: 420px !important;
-  }
-  .centrarClase {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-  }
-  .centrarClaseIzq {
-    display: flex;
-    justify-content: start;
-    align-content: center;
-    align-items: center;
-  }
-  #modalImagen .modal-dialog {
-    max-width: 75% !important;
-  }
-  .imagenGrande{
-    width: 100%;
-  }
+.popover {
+  max-width: 420px !important;
+}
+.centrarClase {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.centrarClaseIzq {
+  display: flex;
+  justify-content: start;
+  align-content: center;
+  align-items: center;
+}
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+.stock {
+  background: green;
+  color: white;
+  font-weight: bold;
+  padding: 5px 10px;
+}
 </style>
