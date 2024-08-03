@@ -249,6 +249,24 @@ export default {
                         this.infoOrden.MovimientoMetodoPago
                       }</td>
                     </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
+                      <td class="celda" style="text-transform: uppercase">: ${
+                        this.infoOrden.FechaOrdenCompra
+                      }</td>
+                    </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Fecha a Recoger</td>
+                      <td class="celda" style="text-transform: uppercase">: ${
+                        this.infoOrden.FechaRecojo
+                      }</td>
+                    </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Registrado Por</td>
+                      <td class="celda" style="text-transform: uppercase">: ${
+                        this.infoOrden.UsuarioRegOrden
+                      }</td>
+                    </tr>
                   </tbody>
                 </table>
                     
@@ -298,9 +316,6 @@ export default {
         <html>
           <head>
             <style>
-              @page {
-                size: landscape;
-              }
               body { 
                 font-family: Arial, sans-serif; 
                 padding: 20px 20px;
@@ -325,6 +340,7 @@ export default {
             <img id="printImage" src="${
               this.urlImg
             }" onload="window.print(); window.close();" class="imgPrint">
+            <h1>Registro de Ordenes de Compra</h1>
             ${html}
           </body>
         </html>
@@ -337,10 +353,10 @@ export default {
         <table class="table b-table table-striped table-hover table-sm" width="100%" >
           <thead>
             <tr>
-              <th style="width: 5% !important">Id</th>
+              
               <th>Correlativo</th>
+              <th>Usuario</th>
               <th>Fecha</th>
-              <th>Ruc</th>
               <th>Proveedor</th>
               <th>Total</th>             
             </tr>
@@ -349,18 +365,11 @@ export default {
       this.productos.forEach(prod => {
         html += `
             <tr v-for="(prod, i) in productos" :key="i">
-              <td class="${
-                prod.AnuladoOrden == 1 ? "table-danger" : ""
-              }" style="width: 5% !important">${prod.IdOrdenCompra}</td>
               <td class="${prod.AnuladoOrden == 1 ? "table-danger" : ""}">${
           prod.Correlativo
-        }</td>
-              <td class="${prod.AnuladoOrden == 1 ? "table-danger" : ""}">${
-          prod.FechaOrdenCompra
-        }</td>
-              <td class="${prod.AnuladoOrden == 1 ? "table-danger" : ""}">${
-          prod.Ruc
-        }</td>
+        }</td><td>${prod.UsuarioRegOrden}</td><td class="${
+          prod.AnuladoOrden == 1 ? "table-danger" : ""
+        }">${prod.FechaOrdenCompra}</td>
               <td class="${prod.AnuladoOrden == 1 ? "table-danger" : ""}">${
           prod.Proveedor
         }</td>
@@ -383,14 +392,16 @@ export default {
         );
         return;
       }
-
+      /*
+  @page {
+                  size: landscape;
+                }
+*/
       printWindow.document.write(`
           <html>
             <head>
               <style>
-                @page {
-                  size: landscape;
-                }
+              
                 @media print {
                   body { 
                     font-family: Arial, sans-serif; 
@@ -420,6 +431,9 @@ export default {
               <img id="printImage" src="${
                 this.urlImg
               }" onload="window.print(); window.close();" class="imgPrint">
+
+              <h1>Registro de Ordenes de Compra</h1>
+
               ${html}
             </body>
           </html>
