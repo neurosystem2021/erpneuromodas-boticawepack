@@ -21,6 +21,8 @@
                         :on-select="setTipoMovimiento"
                         :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
                         :classes="{input: 'form-control'}">
+                        :customParams="{ id_perfil: idPerfil}"
+                        >
                       </autocomplete>
                     </b-form-group>
                   </b-col>
@@ -232,7 +234,8 @@ export default {
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
       isTraslado: true,
-      isSalida: false
+      isSalida: false,
+      idPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   computed: {

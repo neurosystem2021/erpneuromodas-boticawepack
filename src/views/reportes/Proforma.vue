@@ -70,28 +70,27 @@
           </table>
         </div>
       </div>
-      <table border="0" cellspacing="0" cellpadding="0">
+      <table border="0" cellspacing="0" cellpadding="0" min-width="100%" class="tblProductos">
         <thead>
           <tr>
-            <th class="no">#</th>
-            <th></th>
-            <th class="desc">DESCRIPCIÓN</th>
+            <th class="total">#</th>
             <th class="qty">CANT.</th>
+            <th colspan="2" class="desc">DESCRIPCIÓN</th>
             <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
+            <td class="total">{{ index+1 }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
+            <td colspan="2"  class="desc" style="font-size:0.75rem">
+              <h3 style="color:#000; font-size:1rem">{{ prod.Producto }} <p v-if="presentacionProducto(prod)">({{ presentacionProducto(prod)}})</p> </h3><p v-if='prod.ProductoDesc'>{{ prod.ProductoDesc }}</p><p v-if="prod.ProductoDesc2"> {{prod.ProductoDesc2}}</p><p v-if="prod.ProductoDesc3">{{ prod.ProductoDesc3 }}</p>
+            </td>
             <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:1.1rem">
               <div v-if="prod.DisabledTotal === 0">
-                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
-                <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br><span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
           </tr>
@@ -109,8 +108,8 @@
           </tr>-->
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style="background:#010067 ; color:#fff">TOTAL</td>
+            <td style="background:#010067 ; color:#fff">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -146,63 +145,96 @@
 </template>
 
 <script>
-import {API} from '@/store/config.js'
+import { API } from "@/store/config.js";
 export default {
-	mounted () {
-		this.getProforma()
-    this.getEmpresa()
-	},
-	data () {
-		return {
-			API: API,
-			idProforma: this.$route.params.id,
-			proforma: { productos: [] },
+  mounted() {
+    this.getProforma();
+    this.getEmpresa();
+  },
+  data() {
+    return {
+      API: API,
+      idProforma: this.$route.params.id,
+      proforma: { productos: [] },
       empresa: {},
-      fechaHasta:'',
-		}
-	},
-	computed: {
-		subTotal () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
-			})
-      return sumatoria
-		}
-	},
+      fechaHasta: ""
+    };
+  },
+  computed: {
+    subTotal() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+      });
+      return sumatoria;
+    }
+  },
   methods: {
-    getProforma () {
-      this.axios.get(API + 'proformas/id/' + this.idProforma)
-			.then(res => {
-				this.proforma = res.data
-        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
-			})
+    getProforma() {
+      this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
+        this.proforma = res.data;
+        this.fechaHasta = this.calcularFechaHasta(
+          this.proforma.FechaReg.substring(0, 10),
+          this.proforma.DiasValidos
+        )
+          .toISOString()
+          .substring(0, 10);
+      });
     },
-    calcularFechaHasta(actual,dias){
-    var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
-    return date;
+    presentacionProducto(item) {
+      if (item.presentacion) {
+        let presentacion = JSON.parse(item.presentacion);
+        return `${presentacion.nombre} de ${presentacion.cantidad} uds`;
+      }
+
+      return "";
     },
-    getEmpresa () {
-      this.axios.get(API + 'empresa/id/' + 1)
-			.then(res => {
-				this.empresa = res.data
-			})
+
+    calcularFechaHasta(actual, dias) {
+      var date = new Date(actual);
+      date.setDate(date.getDate() + (dias - 1));
+      return date;
     },
-    imprimir(){
-    window.print();
+    getEmpresa() {
+      this.axios.get(API + "empresa/id/" + 1).then(res => {
+        this.empresa = res.data;
+      });
+    },
+    imprimir() {
+      window.print();
     }
   }
-}
+};
 </script>
 
 <style scoped>
-@import '../../assets/css/invoice.css';
-.celda{
-  text-align:left;
-  border: none !important;
-  background: white !important
+@import "../../assets/css/invoice.css";
+
+.total {
+  background: #010067 !important;
+  color: #fff !important;
 }
+
+.tblProductos {
+  background: red !important;
+}
+
+.celda {
+  text-align: left !important;
+  border: none !important;
+  background: white !important;
+}
+
+table.tblProductos tr {
+  background: red !important;
+}
+
+table.tblProductos td.celda {
+  text-align: left !important;
+  border: none !important;
+  background: white !important;
+}
+
 @media print {
   #printBtn {
     display: none;

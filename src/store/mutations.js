@@ -4,5 +4,11 @@ export default {
     },
     LLENAR_ALMACENES_FILTRADOS (state, items) {
         state.almacenesFiltrados = items
+    },
+    AGREGAR_PRODUCTO(state,item){
+      state.cart.productos.push(item);  
+    },
+    ELIMINAR_PRODUCTO(state,item){
+      state.cart.productos.slice(item,1);  
     }
 }

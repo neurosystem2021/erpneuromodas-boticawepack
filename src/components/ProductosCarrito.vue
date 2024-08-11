@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-           <b-button variant="success" class="ml-1 btn-anadir" @click="abrirModalListProducto()"> Añadir </b-button>
+           <!-- <b-button variant="success" class="ml-1 btn-anadir" @click="abrirModalListProducto()"> Añadir </b-button> -->
               <BusquedaProducto v-on:monto="cantProductos=$event" v-on:modal="abrirModal=$event"/>
               
                <!-- <b-input-group-text><strong class="text-danger">!</strong></b-input-group-text> -->
@@ -407,12 +407,16 @@
           </table>
     </b-col>
     <br><br>
-    <b-modal v-model="$store.state.modalNuevoProducto" size="md" title="Añadir Producto" class="" hide-footer>
+    <!-- <b-modal v-model="$store.state.modalNuevoProducto" size="md" title="Añadir Producto" class="" hide-footer>
       <b-row>
         <b-col cols="6">
          <b-row class="presentacion">
             <b-col cols="12">
-              <b-card  align="center" class="mb-3 contentCard" @click="anadirProductosListado({item:null})" tabindex="2">
+              <b-card  align="center" class="mb-3 contentCard"
+               @click="anadirProductosListado({item:null})" 
+              @keyup.enter="anadirProductosListado({item:null})" 
+              @keyup.space="anadirProductosListado({item:null})" 
+              tabindex="2">
                 <b-row>
                 <b-col md="6" class="nomCart">
                   <h5 class="text-uppercase">UNIDAD</h5>
@@ -427,7 +431,13 @@
             </b-col>
             <div v-if=" $store.state.producto.PreciosPorProducto.length>0">
               <b-col cols="12" v-for="(precio,index) in $store.state.producto.PreciosPorProducto.filter((v)=>v.cantidad >0 )" :key="index" >
-                <b-card  align="center" class="mb-3 contentCard" @click="anadirProductosListado({item:precio, tipo:'PRESENTACION'})" :tabindex="index+3">
+                <b-card  align="center" class="mb-3 contentCard" 
+                @click="anadirProductosListado({item:precio, tipo:'PRESENTACION'})" 
+                @keyup.enter="anadirProductosListado({item:precio, tipo:'PRESENTACION'})" 
+                @keyup.space="anadirProductosListado({item:precio, tipo:'PRESENTACION'})" 
+                :tabindex="index+3"
+              
+                >
                   <b-row>
                   <b-col md="6" class="nomCart">
                     <h5 class="text-uppercase">{{precio.nombre}}</h5>
@@ -442,7 +452,7 @@
               </b-col>
             </div>
           </b-row>
-        <!-- <b-col class="calculadora">-->
+        <b-col class="calculadora">
 
         </b-col> 
         <b-col cols="6" class="calculadora">
@@ -476,13 +486,18 @@
         </b-col>
         
       </b-row>
-    </b-modal>
+    </b-modal> -->
     <b-modal v-model="modalEditarProducto" size="md" title="Añadir Producto" class="" hide-footer>
       <b-row>
         <b-col cols="6">
          <b-row class="presentacion">
             <b-col cols="12">
-              <b-card  align="center" class="mb-3 contentCard" @click="actualizarProductosListado({item:null})">
+              <b-card  align="center" class="mb-3 contentCard" 
+              @click="actualizarProductosListado({item:null})"
+              @keyup.enter="actualizarProductosListado({item:null})"
+              @keyup.space="actualizarProductosListado({item:null})"
+              tabindex="2"
+              >
                 <b-row>
                 <b-col md="6" class="nomCart">
                   <h5 class="text-uppercase">UNIDAD</h5>
@@ -497,7 +512,12 @@
             </b-col>
             <div v-if=" $store.state.producto.PreciosPorProducto.length>0">
               <b-col cols="12" v-for="(precio,index) in $store.state.producto.PreciosPorProducto.filter((v)=>v.cantidad >0 )" :key="index">
-                <b-card  align="center" class="mb-3 contentCard" @click="actualizarProductosListado({item:precio, tipo:'PRESENTACION'})">
+                <b-card  align="center" class="mb-3 contentCard"
+                 @click="actualizarProductosListado({item:precio, tipo:'PRESENTACION'})"
+                 @keyup.enter="actualizarProductosListado({item:precio, tipo:'PRESENTACION'})"
+                 @keyup.space="actualizarProductosListado({item:precio, tipo:'PRESENTACION'})"
+                 :tabindex="index+3"
+                 >
                   <b-row>
                   <b-col md="6" class="nomCart">
                     <h5 class="text-uppercase">{{precio.nombre}}</h5>
@@ -519,7 +539,7 @@
               <b-row>
                 <b-col cols="12">
                   <b-input placeholder="Cantidad" class="my-2" v-model="cantProductos" type="number"
-                     :state="validarCantidad" trim
+                     :state="validarCantidad" trim  tabindex="1"
                      />
                   <b-form-invalid-feedback id="input-live-feedback">
                       {{ errorCantidad }}
@@ -547,7 +567,7 @@
         
       </b-row>
     </b-modal>
-     <b-modal
+     <!-- <b-modal
           v-model="modalListadoProductos"
           title="Listado de Productos" hide-footer 
           striped
@@ -604,10 +624,10 @@
             <span class="mt-1">
                 Item por Page:
             </span>
-            <!-- <b-input-group-text> </b-input-group-text> -->
+            <b-input-group-text> </b-input-group-text> 
             <b-form-select v-model="perPage" :options="itemPerPage"></b-form-select>
           </b-input-group>
-      </b-modal>
+      </b-modal> -->
   </b-row>
 </template>
 
@@ -620,7 +640,7 @@ import config from "@/store/config.js";
 export default {
   mounted() {
     this.obtenerListadoProductos();
-    console.log("esOrdenCompra", this.esOrdenCompra);
+    console.log("esOrdenCompra", this.$store.state.esOrdenCompra);
     // this.alterarBuscadorProductos()
   },
   data() {
@@ -874,15 +894,15 @@ export default {
         // alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
-    async abrirModalListProducto() {
-      await this.obtenerListadoProductos();
-      this.modalListadoProductos = !this.modalListadoProductos;
-      this.abrirModal = true;
-    },
+    // async abrirModalListProducto() {
+    //   await this.obtenerListadoProductos();
+    //   this.modalListadoProductos = !this.modalListadoProductos;
+    //   this.abrirModal = true;
+    // },
 
     abrirModalSelect(item) {
       // this.lstProductos = [];
-      this.cantProductos = 0;
+      this.cantProductos = "";
       let producto = { ...item };
       if (
         this.$store.state.cart.productos.some(
@@ -901,12 +921,22 @@ export default {
         producto.tienepresentacionflag = true;
       } else {
         producto.estadoPxP = true;
-        producto.tienepresentacionflag = false;
         producto.PreciosPorProducto = [];
+        producto.tienepresentacionflag = false;
       }
-      this.$store.state.producto = producto;
-
-      this.$store.state.modalNuevoProducto = true;
+      let precio = this.$store.state.esOrdenCompra
+        ? producto.PrecioCosto
+        : producto.PrecioContado;
+      producto.cantidad = 1;
+      producto.cantxPrecio = 1;
+      producto.subtotal = precio * 1;
+      producto.total = precio * 1;
+      producto.precio = precio;
+      producto.tipo = "UNIDAD";
+      producto.descuento = 0;
+      this.$store.state.cart.productos.push(producto);
+      this.search = "";
+      // this.$store.state.modalNuevoProducto = true;
     },
     filteredItems() {
       if (this.codigoBarra) {
@@ -955,72 +985,74 @@ export default {
       }
     },
 
-    anadirProductosListado({ item = null, tipo = "UNIDAD" }) {
-      this.validarCantidad = true;
-      this.errorCantidad = "";
-      if (!this.cantProductos || this.cantProductos <= 0) {
-        this.validarCantidad = false;
-        this.errorCantidad = "Seleccione una cantidad";
-        return false;
-      }
-      let producto = this.$store.state.producto;
-      if (tipo == "PRESENTACION") {
-        let precio = this.esOrdenCompra ? item.precioc : item.precio;
+    // anadirProductosListado({ item = null, tipo = "UNIDAD" }) {
+    //   this.validarCantidad = true;
+    //   this.errorCantidad = "";
+    //   if (!this.cantProductos || this.cantProductos <= 0) {
+    //     this.validarCantidad = false;
+    //     this.errorCantidad = "Seleccione una cantidad";
+    //     this.$refs.frmCantidad.focus();
+    //     return false;
+    //   }
+    //   let producto = this.$store.state.producto;
+    //   if (tipo == "PRESENTACION") {
+    //     let precio = this.$store.state.esOrdenCompra ? item.precioc : item.precio;
 
-        producto.cantidad = this.cantProductos;
-        producto.cantxPrecio = this.cantProductos;
-        producto.cantidadPres = item.cantidad;
-        producto.precio = precio ? precio : 0;
-        producto.subtotal =
-          (precio ? precio : 0) * item.cantidad * this.cantProductos;
-        producto.total =
-          (precio ? precio : 0) * item.cantidad * this.cantProductos;
-        producto.disabled = true;
-        producto.tipo = "PRESENTACION";
-      }
-      if (tipo == "UNIDAD") {
-        let precio = this.esOrdenCompra
-          ? producto.PrecioCosto
-          : producto.PrecioContado;
-        producto.cantidad = this.cantProductos;
-        producto.cantxPrecio = this.cantProductos;
+    //     producto.cantidad = this.cantProductos;
+    //     producto.cantxPrecio = this.cantProductos;
+    //     producto.cantidadPres = item.cantidad;
+    //     producto.precio = precio ? precio : 0;
+    //     producto.subtotal = (precio ? precio : 0) * this.cantProductos;
+    //     producto.total = (precio ? precio : 0) * this.cantProductos;
+    //     producto.disabled = true;
+    //     producto.tipo = "PRESENTACION";
+    //   }
+    //   if (tipo == "UNIDAD") {
+    //     let precio = this.$store.state.esOrdenCompra
+    //       ? producto.PrecioCosto
+    //       : producto.PrecioContado;
+    //     producto.cantidad = this.cantProductos;
+    //     producto.cantxPrecio = this.cantProductos;
 
-        producto.subtotal = precio * this.cantProductos;
-        producto.total = precio * this.cantProductos;
-        producto.precio = precio;
-        producto.tipo = "UNIDAD";
-      }
-      // actualizarProd
-      // this.actualizarProd(producto);
-      producto.descuento = 0;
-      this.$store.state.cart.productos.push(producto);
-      this.$store.state.modalNuevoProducto = false;
-      this.modalListadoProductos = this.abrirModal;
-    },
+    //     producto.subtotal = precio * this.cantProductos;
+    //     producto.total = precio * this.cantProductos;
+    //     producto.precio = precio;
+    //     producto.tipo = "UNIDAD";
+    //   }
+    //   // actualizarProd
+    //   // this.actualizarProd(producto);
+    //   producto.descuento = 0;
+    //   this.$store.state.cart.productos.push(producto);
+    //   this.$store.state.modalNuevoProducto = false;
+    //   this.modalListadoProductos = this.abrirModal;
+    // },
     actualizarProductosListado({ item = null, tipo = "UNIDAD" }) {
       this.validarCantidad = true;
       this.errorCantidad = "";
       if (!this.cantProductos || this.cantProductos <= 0) {
         this.validarCantidad = false;
         this.errorCantidad = "Seleccione una cantidad";
+        this.$refs.frmCantidad.focus();
         return false;
       }
       let producto = this.$store.state.producto;
       if (tipo == "PRESENTACION") {
-        let precio = this.esOrdenCompra ? item.precioc : item.precio;
+        let precio = this.$store.state.esOrdenCompra
+          ? item.precioc
+          : item.precio;
+        producto.presentacion = JSON.stringify(item);
         producto.cantidad = this.cantProductos;
         producto.cantxPrecio = this.cantProductos;
         producto.cantidadPres = item.cantidad;
         producto.precio = precio ? precio : 0;
-        producto.subtotal =
-          (precio ? precio : 0) * item.cantidad * this.cantProductos;
-        producto.total =
-          (precio ? precio : 0) * item.cantidad * this.cantProductos;
+        producto.subtotal = (precio ? precio : 0) * this.cantProductos;
+        producto.total = (precio ? precio : 0) * this.cantProductos;
         producto.disabled = true;
         producto.tipo = "PRESENTACION";
       }
       if (tipo == "UNIDAD") {
-        let precio = this.esOrdenCompra
+        producto.presentacion = "";
+        let precio = this.$store.state.esOrdenCompra
           ? producto.PrecioCosto
           : producto.PrecioContado;
         producto.cantidad = this.cantProductos;
@@ -1033,7 +1065,7 @@ export default {
       }
       // actualizarProd
       // this.actualizarProd(producto);
-
+      console.log(producto);
       this.$store.state.cart.productos[this.index] = producto;
       this.modalEditarProducto = false;
     },
@@ -1124,16 +1156,16 @@ export default {
     cambiarCantidadPresentacion(producto, index, tipo = "UNIDAD") {
       let prod = { ...producto };
       if (tipo == "PRESENTACION") {
-        let precio = this.esOrdenCompra ? item.precioc : item.precio;
+        let precio = this.$store.state.esOrdenCompra
+          ? prod.precioc
+          : prod.precio;
         prod.cantidad = prod.cantxPrecio;
-        prod.subtotal =
-          prod.cantxPrecio * prod.cantidadPres * (precio ? precio : 0);
+        prod.subtotal = prod.cantxPrecio * (precio ? precio : 0);
 
-        prod.total =
-          prod.cantxPrecio * prod.cantidadPres * (precio ? precio : 0);
+        prod.total = prod.cantxPrecio * (precio ? precio : 0);
       }
       if (tipo == "UNIDAD") {
-        let precio = this.esOrdenCompra
+        let precio = this.$store.state.esOrdenCompra
           ? producto.PrecioCosto
           : producto.PrecioContado;
         prod.subtotal = prod.cantidad * precio;
@@ -1303,10 +1335,8 @@ export default {
                 if (prod.tipo == "PRESENTACION") {
                   prod.cantidad++;
                   prod.cantxPrecio++;
-                  prod.subtotal =
-                    prod.cantxPrecio * prod.precio * prod.cantidadPres;
-                  prod.total =
-                    prod.cantxPrecio * prod.precio * prod.cantidadPres;
+                  prod.subtotal = prod.cantxPrecio * prod.precio;
+                  prod.total = prod.cantxPrecio * prod.precio;
                   this.productos.filter(
                     v => v.IdProducto == response.data.IdProducto
                   )[0] = prod;
@@ -1682,8 +1712,9 @@ export default {
       this.buscar(value);
     },
     quitarProducto(index) {
-      this.eliminar(index);
-      this.$emit("onRemoveProducto", index);
+      this.$store.commit("ELIMINAR_PRODUCTO", index);
+      // this.eliminar(index);
+      // this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
     },
 
@@ -1758,6 +1789,6 @@ export default {
   border-left: dashed 1px !important;
 }
 .modalLstProductos .modal-dialog {
-  max-width: 80%;
+  max-width: 70%;
 }
 </style>

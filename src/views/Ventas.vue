@@ -41,7 +41,7 @@
             </b-row>
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
                 <b-row style="margin-bottom:-10px">
-                    <b-col md="7">
+                    <b-col md="8">
                         <b-row>
                             <b-col md="12">
                                 <b-form-group>
@@ -176,7 +176,19 @@
                                                 style="text-transform:uppercase;"
                                                 class="form-control"
                                                 required
-                                                placeholder="Digite su Guía" v-if="venta.EsGuia" />
+                                                placeholder="Guía" v-if="venta.EsGuia" />
+                                        <input v-model="venta.OrdenGuia"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control mx-1"
+                                                required
+                                                placeholder="O. C." v-if="venta.EsGuia" />
+                                        <b-form-textarea v-model="venta.ObservacionGuia"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control mx-1"
+                                                required
+                                                placeholder="Observación(es)" v-if="venta.EsGuia" />
                                     </b-input-group>
 
                                     <b-row v-if="this.$route.query.idPedido">
@@ -197,7 +209,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="2">
                         <!--<b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -322,10 +334,15 @@
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
+                                                
+                                                <b-form-input type="number" placeholder="Cantidad Días" v-model="cantidaDias" v-if="venta.EsCredito"/>
+
+
                                                 <b-form-input 
                                                     :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
+                                                    readonly
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
@@ -498,6 +515,7 @@ import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
 import VentasPedido from "@/components/VentasPedido.vue";
 import Swal from "sweetalert2";
+import moment from "moment";
 export default {
   beforeMount() {
     this.$store.state.esOrdenCompra = false;
@@ -514,6 +532,7 @@ export default {
   },
   data() {
     return {
+      cantidaDias: "",
       isNota: false,
       isVentaPedido: false,
       dni: "",
@@ -529,7 +548,7 @@ export default {
       tieneIgv: false,
       venta: {},
       bloquearInput: false,
-      diasValidosProf: 0,
+      diasValidosProf: 1,
       adelantosPreOrden: [],
       adelantosVentaPedido: [],
       itemsMotivoNota: [
@@ -594,6 +613,11 @@ export default {
     };
   },
   watch: {
+    cantidaDias() {
+      let nuevaFecha = moment().add(this.cantidaDias, "days");
+      let fechaFormateada = nuevaFecha.format("YYYY-MM-DD");
+      this.venta.FechaCredito = fechaFormateada;
+    },
     totalCart(newVal) {
       this.venta.pago.efectivo.monto = parseFloat(
         newVal -
@@ -762,7 +786,7 @@ export default {
         EsDelivery: false,
         nombreLlevar: "",
         DireccionEntrega: "",
-        diasValidosProf: 0,
+        diasValidosProf: 1,
         idVentaPedido: null,
         correlativoVentaPedido: null
       };
@@ -1146,7 +1170,7 @@ export default {
           this.$toasted.info("Proforma Guardada con exito");
           this.limpiarDespuesVenta();
           this.loadClienteVarios();
-          this.diasValidosProf = 0;
+          this.diasValidosProf = 1;
           this.inProgress = false;
           window.open(
             "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
@@ -1383,7 +1407,7 @@ export default {
       prods.forEach(element => {
         if (element.tipo == "PRESENTACION") {
           // element.precio = element.precio * element.cantidadPres *element.cantxPrecio;
-          element.cantidad = element.cantxPrecio * element.cantidadPres;
+          element.cantidad = element.cantxPrecio;
         }
       });
 
@@ -1532,7 +1556,7 @@ export default {
                 ]);
                 //Cargar Productos Delivery
                 let productos = JSON.parse(obj.Productos);
-                console.log(productos);
+
                 productos.map(item => {
                   this.add([
                     item.IdProducto,

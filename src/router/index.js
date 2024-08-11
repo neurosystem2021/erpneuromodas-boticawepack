@@ -36,11 +36,13 @@ import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Remision from '@/views/Remision.vue'
+import RemisionVer from '@/views/RemisionVer.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 import Ordenes from '@/views/reportes/Ordenes.vue'
 import Confrontacion from '@/views/reportes/Confrontacion.vue'
+import RemisionListado from '@/views/reportes/RemisionListado.vue'
 
 Vue.use(Router)
 
@@ -163,6 +165,11 @@ export default new Router({
       component: Remision
     },
     {
+      path: '/remision/ver/:idDocVenta/:Serie/:Numero',
+      name: 'RemisionVer',
+      component: RemisionVer
+    },
+    {
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
@@ -241,6 +248,11 @@ export default new Router({
       path: '/config/operacion',
       name: 'ConfigOperacion',
       component: ConfigOperacion
+    },
+    {
+      path: '/remision/listado',
+      name: 'RemisionListado',
+      component: RemisionListado
     }
   ]
 })

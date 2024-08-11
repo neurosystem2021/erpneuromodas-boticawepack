@@ -81,18 +81,31 @@
                       </autocomplete>
                     </b-form-group>
                   </b-col>
-                  <b-col md="3">
+                  <b-col md="12">
                     <b-form-group label="Credito: ">
-                      <b-form-checkbox 
+                      <b-row>
+                        <b-col cols="4"> <b-form-checkbox 
                         v-model="movimiento.EsCredito"
                         :value="1"
                         :unchecked-value="0">
                         Pago pendiente
-                      </b-form-checkbox>
-                      <b-form-input v-model="movimiento.FechaVenCredito"
+                      </b-form-checkbox> 
+                      </b-col>
+                        <b-col cols="4">
+                            <b-form-input type="number" placeholder="Cantidad Días" v-model="cantidaDias" v-if="movimiento.EsCredito"/>
+                        </b-col>
+                        <b-col cols="4">
+                           <b-form-input v-model="movimiento.FechaVenCredito"
                         v-if="movimiento.EsCredito"
                         type="date"
-                        placeholder="Fecha Vencimiento"></b-form-input>
+                        readonly
+                        placeholder="Fecha Vencimiento" />
+                        </b-col>
+                      </b-row>
+                     
+
+                    
+                     
                     </b-form-group>
                   </b-col>
                 </b-row>
@@ -216,7 +229,7 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
-
+import moment from "moment";
 export default {
   beforeMount() {
     this.$store.state.esOrdenCompra = true;
@@ -231,6 +244,7 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
+      cantidaDias: "",
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
@@ -271,6 +285,13 @@ export default {
       almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
     })
+  },
+  watch: {
+    cantidaDias() {
+      let nuevaFecha = moment().add(this.cantidaDias, "days");
+      let fechaFormateada = nuevaFecha.format("YYYY-MM-DD");
+      this.movimiento.FechaVenCredito = fechaFormateada;
+    }
   },
   methods: {
     ...mapActions({

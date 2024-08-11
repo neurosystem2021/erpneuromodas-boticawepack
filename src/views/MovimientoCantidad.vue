@@ -20,7 +20,9 @@
                         placeholder=""
                         :on-select="setTipoMovimiento"
                         :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
-                        :classes="{input: 'form-control'}">
+                        :classes="{input: 'form-control'}"
+                        :customParams="{ id_perfil: idPerfil}"
+                        > 
                       </autocomplete>
                     </b-form-group>
                   </b-col>
@@ -248,15 +250,16 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-          // {
-          //   key: "stock",
-          //   label: "Stock",
-          //   variant: "info",
-          //   class: "text-center"
-          // },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
           { key: "Producto" },
           { key: "ProductoPresentacion", label: "Rack" },
           { key: "Descripcion", label: "Descripción" },

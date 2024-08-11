@@ -782,7 +782,7 @@ export default {
         // modelo: {},
         //talla: {},
         medicion: {
-          IdProductoMedicion: 6,
+          IdProductoMedicion: 1,
           ProductoMedicion: "UNIDAD"
         },
         Imagen: null,
