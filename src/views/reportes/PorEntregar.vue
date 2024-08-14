@@ -97,6 +97,13 @@
               :per-page="perPage"
               :current-page="currentPage">
 
+              <template slot="Anulado" slot-scope="data">
+                <a 
+                  :class="['btn', 'text-white', data.item.Anulado === 0 ? 'btn-success' : 'btn-danger']" 
+                >
+                {{ data.item.Anulado === 0 ? 'ACTIVO' : 'ANULADO' }}
+              </a>
+              </template>
                 <template slot="stock" slot-scope="data">
                   <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
                     {{ getStock(data.item.IdProducto) }}
