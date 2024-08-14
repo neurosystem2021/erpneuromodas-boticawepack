@@ -2,31 +2,68 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
+          <b-col md="3" class="my-1">
+            <b-form-group class="mb-0">
               <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
+                <b-form-input 
+                    v-model="searchFilter" 
+                    placeholder="Buscar Producto" 
+                    @input="updateFilters"
+                  />                
+                  <b-input-group-append>
+                    <b-btn 
+                      :disabled="!searchFilter" 
+                      @click="clearSearchFilter">
+                      Limpiar
+                    </b-btn>                
+                  </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <br />
+          </b-col>
+          <b-col md="3" class="my-1">
+            <b-form-group>
+              <div class="d-flex align-items-center">
+                <b-form-input
+                  ref="inputCodigoBarra"
+                  placeholder="Buscar Código de Barra"
+                  class="form-control"
+                  :debounce="4000"
+                  v-model="codigoBarraFilter"
+                  @input="updateFilters"
+                />
+                <b-btn
+                  :disabled="!codigoBarraFilter"
+                  @click="clearCodigoBarraFilter"
+                  class="ml-2"
+                >
+                  Limpiar
+                </b-btn>
+              </div>
+            </b-form-group>
           </b-col>
           <b-col md="6" class="my-1">
             <b-row>
             <b-col md="8">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                <b-form-select 
+                  :options="pageOptions" 
+                  v-model="perPage" 
+                  @input="resetPage"
+                />
               </b-form-group>
             </b-col>
             <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
+              <p style="margin-top: 6px;">
+                de <b class="text-success">{{ totalRows }}</b> Artículos
+              </p>
             </b-col>
             </b-row>
           </b-col>
 
+          <b-col>
+            <b-row class="my-1"></b-row>
+          </b-col>
           <b-table small
             ref="tablaProductos"
             :filter="filter"
@@ -50,15 +87,30 @@
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+                  <b-pagination 
+                    :total-rows="totalRows" 
+                    :per-page="perPage" 
+                    v-model="currentPage" 
+                    class="my-0" 
+                  />
                 </b-col>
             </b-row>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+        <producto-form 
+          ref="productoForm" 
+          :producto-update="productoSelect" 
+          :cbGuardar="actualizarTabla"
+        ></producto-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
+              <b-button 
+              variant="success" 
+              size="lg" 
+              @click="nuevoProducto"
+              >
+              Nuevo
+              </b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -72,15 +124,22 @@ import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.fetchTotalRows();
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: null,
+      APISTOCK: 'productos',
+      tipoStock: '',
+      showKardex: false,
+      almacen: {
+        IdAlmacen: 1,
+        Almacen: ''
+      },
+      pageOptions: [5, 10, 15, 50, 100],
+      searchFilter: '',
+      codigoBarraFilter: '',
+      filter: '',
       sortBy: 'IdProducto',
       sortDesc: false,
       productoSelect: {},
@@ -102,6 +161,11 @@ export default {
     }
   },
   methods: {
+    fetchTotalRows() {
+      this.axios.get(`${this.API}productos/count`).then((response) => {
+        this.totalRows = response.data.total;
+      });
+    },
       rowClick (item, index) {
         this.productoSelect = item
         this.$refs.productoForm.show = true;
@@ -119,22 +183,46 @@ export default {
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+        let url = `${this.API}productos?limit=${ctx.perPage}&page=${ctx.currentPage}&sortBy=${ctx.sortBy}&sortDesc=${ctx.sortDesc ? 1 : 0}`;
 
-        return promise.then((result) => {
-          this.items = result.data
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
+        if (this.filter) {
+          url += this.filter;
+        }
+        this.isBusy = true;
+        return this.axios.get(url)
+
+          .then(result => {
+            this.items = result.data;
+            this.isBusy = false;
+            return this.items;
+          })
+          .catch(error => {
+            this.isBusy = false;
+            return [];
+          });
+      },
+      updateFilters() {
+        let filters = [];
+        if (this.searchFilter) {
+          filters.push(`filter[producto]=${encodeURIComponent(this.searchFilter)}`);
+        }
+      if (this.codigoBarraFilter) {
+        filters.push(`filter[codigo]=${encodeURIComponent(this.codigoBarraFilter)}`);
+      }
+      this.filter = filters.length ? `&${filters.join('&')}` : '';
+      this.currentPage = 1; // Reset page number when applying filters
+      this.$refs.tablaProductos.refresh(); // Refresh table to apply new filters
+    },
+    clearSearchFilter() {
+      this.searchFilter = '';
+      this.updateFilters();
+    },
+    clearCodigoBarraFilter() {
+      this.codigoBarraFilter = '';
+      this.updateFilters();
+    },
+    resetPage() {
+      this.currentPage = 1;
       }
   },
   components: {
@@ -145,4 +233,7 @@ export default {
 
 <style>
 
+.b-form-group {
+    margin-bottom: 0;
+  }
 </style>
