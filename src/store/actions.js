@@ -11,5 +11,10 @@ export default {
         axios.get(API + 'almacenes?q=' + search).then((response) => {
             commit('LLENAR_ALMACENES_FILTRADOS', response.data)
         })
+    },
+    GetUbigeo ({ commit }, search) {
+        axios.get(API + '/ubigeo/listado').then((response) => {
+            commit('LISTAR_UBIGEO', response.data)
+        })
     }
 }

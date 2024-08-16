@@ -196,7 +196,9 @@
               <productos-carrito 
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
+                :fields="carrito.fields"
                 :tipoCambio="movimiento.TipoCambio"
+                :bloquearInput="false"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
@@ -235,7 +237,43 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      carrito: {
+        fields: [
+          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "Producto" },
+          // { key: "ProductoPresentacion", label: "Rack" },
+          { key: "Descripcion", label: "Descripción" },
+           { key: "eventPres", label: "" },
+           { key: "cantxPrecio", variant: "warning" },
+          // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+          // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+          { key: "cantidad" },
+          { key: "precioc", label: "Precio Compra" },
+          { key: "precio", label: "Precio Venta" },
+          //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center"
+          },
+          // { key: "descuento", label: "% Desc." },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center"
+          },
+          { key: "acciones", label: "" }
+        ]
+      }
     };
   },
   computed: {

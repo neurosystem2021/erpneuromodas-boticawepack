@@ -175,19 +175,16 @@
                                                 type="text"
                                                 style="text-transform:uppercase;"
                                                 class="form-control"
-                                                required
                                                 placeholder="Guía" v-if="venta.EsGuia" />
                                         <input v-model="venta.OrdenGuia"
                                                 type="text"
                                                 style="text-transform:uppercase;"
                                                 class="form-control mx-1"
-                                                required
                                                 placeholder="O. C." v-if="venta.EsGuia" />
                                         <b-form-textarea v-model="venta.ObservacionGuia"
                                                 type="text"
                                                 style="text-transform:uppercase;"
                                                 class="form-control mx-1"
-                                                required
                                                 placeholder="Observación(es)" v-if="venta.EsGuia" />
                                     </b-input-group>
 
@@ -577,10 +574,12 @@ export default {
           { key: "ProductoPresentacion", label: "Rack" },
           { key: "Descripcion", label: "Descripción" },
           { key: "eventPres", label: "" },
+          // { key: "obsequio" },
           { key: "cantxPrecio", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
           // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
           { key: "cantidad" },
+          // { key: "igv" },
           { key: "precio", label: "Precio" },
           //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
           {
@@ -653,6 +652,7 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+
     facturarVentaPedido(data) {
       //this.venta.IdPreOrden.push(orden)
       // obtener total adelantos
@@ -1161,8 +1161,16 @@ export default {
         this.inProgress = false;
         return;
       }
+      let prods = [...this.productos];
 
-      this.venta.productos = this.productos;
+      // prods.forEach(element => {
+      //   if (element.tipo == "PRESENTACION") {
+      //     element.precio =
+      //       element.precio * element.cantidadPres * element.cantxPrecio;
+      //     // element.cantidad = element.cantxPrecio;
+      //   }
+      // });
+      this.venta.productos = prods;
       this.venta.diasValidosProf = this.diasValidosProf;
       this.axios
         .post(this.API + "proformas", this.venta)
@@ -1183,7 +1191,8 @@ export default {
           this.inProgress = false;
         });
     },
-    guardarVenta(evt) {
+
+    async guardarVenta(evt) {
       evt.preventDefault();
 
       this.inProgress = true;
@@ -1358,20 +1367,20 @@ export default {
         return;
       }
       // cantidadPres
-      let val = true;
-      if (this.productos.some(v => v.tipo == "PRESENTACION")) {
-        this.productos
-          .filter(v => v.tipo == "PRESENTACION")
-          .forEach(element => {
-            val = element.cantidadPres * element.cantidad <= element.stock;
-          });
-      }
+      // let val = true;
+      // if (this.productos.some(v => v.tipo == "PRESENTACION")) {
+      //   this.productos
+      //     .filter(v => v.tipo == "PRESENTACION")
+      //     .forEach(element => {
+      //       val = element.cantidadPres * element.cantidad <= element.stock;
+      //     });
+      // }
 
-      if (!val) {
-        this.$toasted.error("No se puede vender un producto sin stock");
-        this.inProgress = false;
-        return;
-      }
+      // if (!val) {
+      //   this.$toasted.error("No se puede vender un producto sin stock");
+      //   this.inProgress = false;
+      //   return;
+      // }
       if (totalCero >= 1) {
         this.$toasted.error("No se puede enviar un producto en S/. 0.00");
         this.inProgress = false;
@@ -1404,13 +1413,6 @@ export default {
       }
       let prods = [...this.productos];
 
-      prods.forEach(element => {
-        if (element.tipo == "PRESENTACION") {
-          // element.precio = element.precio * element.cantidadPres *element.cantxPrecio;
-          element.cantidad = element.cantxPrecio;
-        }
-      });
-
       // console.log(prods);
       // this.inProgress = false;
       // return true;
@@ -1431,7 +1433,7 @@ export default {
       this.venta.TipoVenta = this.selectedtv;
       this.inProgress = false;
       // return false;
-      this.axios
+      await this.axios
         .post(this.API + "ventas", this.venta)
         .then(response => {
           if (response.data.errorUser) {

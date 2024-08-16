@@ -32,7 +32,7 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
              <b-button variant="primary" @click="loadBarcode" class="btn-anadir"><i class="fas fa-search"></i></b-button>
-            <producto-form v-if="tipo!='mov'" :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -131,12 +131,13 @@
         </template>
 
         <template slot="obsequio" slot-scope="data">
-          <div class="obsequio" v-if="tipoMov==0">
+          <!-- <div class="obsequio" v-if="tipoMov==0"> -->
+          <div class="obsequio">
             <b-form-checkbox
               button-variant="primary"
               v-model="productos[data.index].EsObsequio"
               :value="1"
-              @input="setObsequio(data.index)"
+              @input="esObsequio(data.index)"
               :unchecked-value="0">
             </b-form-checkbox>
           </div>
@@ -157,15 +158,16 @@
         </template>
 
         <template slot="cantidad" slot-scope="data">
-              <!-- cambiarCantidadPresentacion(productos[data.index],data.index) -->
+          <!-- cambiarCantidadPresentacion(productos[data.index],data.index) -->
           <input
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].disabled ||bloquearInput?true:false || esDelivery"
             type="number"
             style="width: 95px"
             class="form-control"
-            step="1"
+            step="0.01"
             min="0"
+            
             @input="(val) => {
               recalcularTotal(data.index)
               $emit('onInputCantidad', val.target.value)
@@ -195,9 +197,21 @@
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
+            <!-- :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false) || (isVentas && idPerfil!=1 && tipoDocSunat!='99')" -->
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false) || (isVentas && idPerfil!=1 && tipoDocSunat!='99')"
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.01"
+            class="form-control"
+            placeholder="Precio"
+            @input="recalcularTotal(data.index)"
+            />
+        </template>
+        <template slot="precioc" slot-scope="data">
+          <input
+            v-model="productos[data.index].precioc"
             type="number"
             style="width: 95px"
             min="0"
@@ -208,6 +222,17 @@
             />
         </template>
         <template slot="subtotal" slot-scope="data">
+          <input
+            v-model="productos[data.index].subtotal"
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.01"
+            class="form-control"
+            placeholder="Subtotal"
+            v-if="$store.state.esOrdenCompra==1"
+            @input="recalcularPrecioCompra(data.index)"
+            />
           {{ parseFloat(productos[data.index].subtotal).toFixed(2) }}
         </template>
         <template slot="igv" slot-scope="data">
@@ -400,7 +425,7 @@
                     v-model="pagocon"
                     @input="asignarVuelto"></b-form-input><br>
                   <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
+                  <b>S/ {{ calcVuelto() }}</b>
                 </td>
               </tr>
             </tbody>
@@ -633,14 +658,14 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import ProductoForm from "./ProductoForm";
+import ProductoForm from "@/components/ProductoForm";
 import BusquedaProducto from "./comun/BusquedaProducto";
 import config from "@/store/config.js";
 
 export default {
   mounted() {
     this.obtenerListadoProductos();
-    console.log("esOrdenCompra", this.$store.state.esOrdenCompra);
+
     // this.alterarBuscadorProductos()
   },
   data() {
@@ -850,6 +875,58 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    calcVuelto() {
+      let vuelto = 0;
+      if (this.pagocon) {
+        vuelto = parseFloat(this.pagocon) - this.sumatoriaTotal();
+      }
+      return vuelto;
+    },
+    esObsequio(index) {
+      let newProducto = { ...this.$store.state.cart.productos[index] };
+
+      if (newProducto.EsObsequio == 1) {
+        newProducto.precio = 0;
+        newProducto.precioc = 0;
+        newProducto.subtotal = 0;
+        newProducto.total = 0;
+      }
+      if (newProducto.EsObsequio == 0) {
+        if (newProducto.tipo == "PRESENTACION") {
+          let presentacion = JSON.parse(newProducto.presentacion);
+
+          newProducto.precio = presentacion.precio;
+          newProducto.precioc = presentacion.precioc;
+
+          newProducto.cantxPrecio = newProducto.cantxPrecio;
+          newProducto.cantidad =
+            newProducto.cantxPrecio * presentacion.cantidad;
+          newProducto.subtotal =
+            (this.$store.state.esOrdenCompra
+              ? presentacion.precioc
+              : presentacion.precio) * newProducto.cantxPrecio;
+          newProducto.total =
+            (this.$store.state.esOrdenCompra
+              ? presentacion.precioc
+              : presentacion.precio) * newProducto.cantxPrecio;
+        }
+        if (newProducto.tipo == "UNIDAD") {
+          newProducto.cantxPrecio = 0;
+          newProducto.precio = newProducto.PrecioContado;
+
+          newProducto.precioc = newProducto.PrecioCosto;
+          newProducto.subtotal =
+            newProducto.cantidad * newProducto.PrecioContado;
+          newProducto.total = newProducto.cantidad * newProducto.PrecioContado;
+        }
+      }
+
+      this.$store.state.cart.productos[index] = newProducto;
+      this.tableProductos = false;
+      setTimeout(() => {
+        this.tableProductos = true;
+      }, 1);
+    },
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
@@ -904,6 +981,7 @@ export default {
       // this.lstProductos = [];
       this.cantProductos = "";
       let producto = { ...item };
+      console.log(producto);
       if (
         this.$store.state.cart.productos.some(
           v => v.IdProducto == producto.IdProducto
@@ -924,17 +1002,23 @@ export default {
         producto.PreciosPorProducto = [];
         producto.tienepresentacionflag = false;
       }
-      let precio = this.$store.state.esOrdenCompra
-        ? producto.PrecioCosto
-        : producto.PrecioContado;
-      producto.cantidad = 1;
+
+      producto.cantidad = 0;
       producto.cantxPrecio = 1;
-      producto.subtotal = precio * 1;
-      producto.total = precio * 1;
-      producto.precio = precio;
+      producto.subtotal =
+        (this.$store.state.esOrdenCompra
+          ? producto.PrecioCosto
+          : producto.PrecioContado) * 1;
+      producto.total =
+        (this.$store.state.esOrdenCompra
+          ? producto.PrecioCosto
+          : producto.PrecioContado) * 1;
+      producto.precio = producto.PrecioContado;
+      producto.precioc = producto.PrecioCosto;
       producto.tipo = "UNIDAD";
       producto.descuento = 0;
-      this.$store.state.cart.productos.push(producto);
+      this.$store.commit("AGREGAR_PRODUCTO", producto);
+      //this.$store.state.cart.productos.unshift(producto);
       this.search = "";
       // this.$store.state.modalNuevoProducto = true;
     },
@@ -1036,38 +1120,48 @@ export default {
         return false;
       }
       let producto = this.$store.state.producto;
+      // console.log(producto);
       if (tipo == "PRESENTACION") {
-        let precio = this.$store.state.esOrdenCompra
-          ? item.precioc
-          : item.precio;
-        producto.presentacion = JSON.stringify(item);
-        producto.cantidad = this.cantProductos;
+        let presentacion = JSON.stringify(item);
+        producto.presentacion = presentacion;
+        producto.cantidad = this.cantProductos * item.cantidad;
         producto.cantxPrecio = this.cantProductos;
         producto.cantidadPres = item.cantidad;
-        producto.precio = precio ? precio : 0;
-        producto.subtotal = (precio ? precio : 0) * this.cantProductos;
-        producto.total = (precio ? precio : 0) * this.cantProductos;
+        producto.precio = item.precio ? item.precio : 0;
+        producto.precioc = item.precioc ? item.precioc : 0;
+        producto.subtotal = this.$store.state.esOrdenCompra
+          ? (item.precioc ? item.precioc : 0) * this.cantProductos
+          : (item.precio ? item.precio : 0) * this.cantProductos;
+        producto.total = this.$store.state.esOrdenCompra
+          ? (item.precioc ? item.precioc : 0) * this.cantProductos
+          : (item.precio ? item.precio : 0) * this.cantProductos;
         producto.disabled = true;
         producto.tipo = "PRESENTACION";
       }
       if (tipo == "UNIDAD") {
         producto.presentacion = "";
-        let precio = this.$store.state.esOrdenCompra
-          ? producto.PrecioCosto
-          : producto.PrecioContado;
+
         producto.cantidad = this.cantProductos;
-        producto.cantxPrecio = this.cantProductos;
+        producto.cantxPrecio = 0;
         producto.disabled = false;
-        producto.subtotal = precio * this.cantProductos;
-        producto.total = precio * this.cantProductos;
-        producto.precio = precio;
+        producto.subtotal =
+          (this.$store.state.esOrdenCompra
+            ? producto.precioc
+            : producto.precio) * this.cantProductos;
+        producto.total =
+          (this.$store.state.esOrdenCompra
+            ? producto.precioc
+            : producto.precio) * this.cantProductos;
+        producto.precio = producto.PrecioContado;
+        producto.precioc = producto.PrecioCosto;
         producto.tipo = "UNIDAD";
       }
       // actualizarProd
       // this.actualizarProd(producto);
-      console.log(producto);
       this.$store.state.cart.productos[this.index] = producto;
       this.modalEditarProducto = false;
+      this.tableProductos = false;
+      this.tableProductos = true;
     },
 
     abrirCalcularM2(obj) {
@@ -1156,21 +1250,38 @@ export default {
     cambiarCantidadPresentacion(producto, index, tipo = "UNIDAD") {
       let prod = { ...producto };
       if (tipo == "PRESENTACION") {
-        let precio = this.$store.state.esOrdenCompra
-          ? prod.precioc
-          : prod.precio;
-        prod.cantidad = prod.cantxPrecio;
-        prod.subtotal = prod.cantxPrecio * (precio ? precio : 0);
+        let precio = prod.precio;
+        let precioc = prod.precioc;
+        let presentacion = JSON.parse(producto.presentacion);
+        // console.log(presentacion);
+        // newProducto.cantxPrecio * presentacion.cantidad
+        prod.cantidad = prod.cantxPrecio * presentacion.cantidad;
+        prod.subtotal =
+          prod.cantxPrecio *
+          (this.$store.state.esOrdenCompra
+            ? presentacion.precioc
+            : presentacion.precio);
 
-        prod.total = prod.cantxPrecio * (precio ? precio : 0);
+        prod.total =
+          prod.cantxPrecio *
+          (this.$store.state.esOrdenCompra
+            ? presentacion.precioc
+            : presentacion.precio);
       }
       if (tipo == "UNIDAD") {
-        let precio = this.$store.state.esOrdenCompra
-          ? producto.PrecioCosto
-          : producto.PrecioContado;
-        prod.subtotal = prod.cantidad * precio;
+        prod.cantxPrecio = 0;
+        // let precio = producto.PrecioContado;
+        prod.subtotal =
+          prod.cantidad *
+          (this.$store.state.esOrdenCompra
+            ? producto.PrecioCosto
+            : producto.PrecioContado);
 
-        prod.total = prod.cantidad * precio;
+        prod.total =
+          prod.cantidad *
+          (this.$store.state.esOrdenCompra
+            ? prod.PrecioCosto
+            : prod.PrecioContado);
       }
       this.productos[index] = prod;
 
@@ -1183,7 +1294,7 @@ export default {
     cambiarPresentacion(prod, index) {
       this.$store.state.producto = prod;
       this.index = index;
-      this.cantProductos = prod.cantidad;
+      this.cantProductos = "1";
       this.modalEditarProducto = true;
     },
     sumatoriaSubTotal() {
@@ -1325,6 +1436,7 @@ export default {
                   v => v.IdProducto == response.data.IdProducto
                 )[0];
                 if (prod.tipo == "UNIDAD") {
+                  prod.cantxPrecio = 0;
                   prod.cantidad++;
                   prod.subtotal = prod.cantidad * prod.precio;
                   prod.total = prod.cantidad * prod.precio;
@@ -1397,25 +1509,60 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.add([id, false, false, false, false, true, this.isVentas]);
-      setTimeout(() => {
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-      }, 200);
+      const index = this.$store.state.cart.productos
+        .map((producto, index) => ({ producto, index }))
+        .filter(v => v.producto.IdProducto == id)
+        .map(v => v.index)[0];
 
-      if (this.isVentas) {
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
-        if (fPP.length != 4) {
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion;
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
-          obj.IdProductoMarca = obj.marca.IdProductoMarca;
-          obj.ProductoMarca = obj.marca.ProductoMarca;
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria;
-          this.productoSelect = obj;
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
-          this.showPresentacion(this.productoSelect);
-        }
-      }
+      console.log(obj);
+
+      let prod = this.$store.state.cart.productos[index];
+      prod.tienepresentacionflag = !pxp.some(v => v.cantidad > 0);
+      prod.estadoPxP = !pxp.some(v => v.cantidad > 0);
+      prod.PrecioContado = obj.PrecioContado;
+      prod.precio = obj.PrecioContado;
+      prod.cantxPrecio = 0;
+      prod.PrecioCosto = obj.PrecioCosto;
+      prod.precioc = obj.PrecioCosto;
+      prod.Producto = obj.Producto;
+      prod.ProductoPresentacion = obj.ProductoPresentacion;
+      prod.PreciosPorProducto = pxp;
+      prod.ProductoMedicion = obj.medicion.ProductoMedicion;
+      prod.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+      prod.IdProductoMarca = obj.marca.IdProductoMarca;
+      prod.ProductoMarca = obj.marca.ProductoMarca;
+      prod.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+      prod.ProductoCategoria = obj.categoria.ProductoCategoria;
+      prod.disabled = false;
+      prod.tipo = "UNIDAD";
+      prod.subtotal =
+        prod.cantidad *
+        (this.$store.state.esOrdenCompra ? obj.PrecioCosto : obj.PrecioContado);
+      prod.total =
+        prod.cantidad *
+        (this.$store.state.esOrdenCompra ? obj.PrecioCosto : obj.PrecioContado);
+      this.$store.state.cart.productos[index] = prod;
+      this.tableProductos = false;
+      this.tableProductos = true;
+      // this.add([id, false, false, false, false, true, this.isVentas]);
+      // setTimeout(() => {
+      //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      // }, 200);
+
+      // if (this.isVentas) {
+      //   let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+      //   if (fPP.length != 4) {
+      //     obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+      //     obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+      //     obj.IdProductoMarca = obj.marca.IdProductoMarca;
+      //     obj.ProductoMarca = obj.marca.ProductoMarca;
+      //     obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+      //     obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+      //     this.productoSelect = obj;
+      //     this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+      //     this.showPresentacion(this.productoSelect);
+      //   }
+      // }
     },
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
@@ -1612,11 +1759,45 @@ export default {
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
-    recalcularTotal(index) {
-      console.log(this.$store.state.cart.productos[index]);
+    recalcularPrecioCompra(index) {
       let prod = this.$store.state.cart.productos[index];
-      prod.subtotal = prod.cantidad * prod.precio;
-      prod.total = prod.cantidad * prod.precio;
+      if (prod.tipo == "UNIDAD") {
+        prod.cantxPrecio = 0;
+        prod.precioc = parseFloat(prod.subtotal / prod.cantidad).toFixed(2);
+        prod.total = prod.subtotal;
+      }
+      if (prod.tipo == "PRESENTACION") {
+        let presentacion = JSON.parse(prod.presentacion);
+        prod.precioc = parseFloat(
+          prod.subtotal / presentacion.cantidad
+        ).toFixed(2);
+        prod.total = prod.subtotal;
+      }
+      this.$store.state.cart.productos[index] = prod;
+      this.tableProductos = false;
+      this.tableProductos = true;
+    },
+    recalcularTotal(index) {
+      let prod = this.$store.state.cart.productos[index];
+      if (prod.tipo == "UNIDAD") {
+        prod.cantxPrecio = 0;
+        prod.subtotal =
+          prod.cantidad *
+          (this.$store.state.esOrdenCompra ? prod.precioc : prod.precio);
+        prod.total =
+          prod.cantidad *
+          (this.$store.state.esOrdenCompra ? prod.precioc : prod.precio);
+      }
+      if (prod.tipo == "PRESENTACION") {
+        let presentacion = JSON.parse(prod.presentacion);
+
+        prod.subtotal =
+          prod.cantxPrecio *
+          (this.$store.state.esOrdenCompra ? prod.precioc : prod.precio);
+        prod.total =
+          prod.cantxPrecio *
+          (this.$store.state.esOrdenCompra ? prod.precioc : prod.precio);
+      }
       this.$store.state.cart.productos[index] = prod;
       this.tableProductos = false;
       this.tableProductos = true;

@@ -55,6 +55,7 @@ export default {
       currentPage: 1,
       lstRemnision: [],
       headerTable: [
+        { key: "creted_at", text: "Fecha. Reg." },
         { key: "DocumentoReferencia", text: "DocumentoReferencia" },
         { key: "Serie", text: "Serie" },
         { key: "Numero", text: "Numero" },

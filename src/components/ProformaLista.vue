@@ -115,10 +115,11 @@ export default {
         .then(response => {
           this.limpiarCarrito();
           response.data.forEach(element => {
-            element.subtotal = element.cantidad * element.PrecioContado;
-            element.total = element.cantidad * element.PrecioContado;
-            element.tipo = "UNIDAD";
-            this.$store.state.cart.productos.push(element);
+            this.anadirProduct(element);
+            // element.subtotal = element.cantidad * element.PrecioContado;
+            // element.total = element.cantidad * element.PrecioContado;
+            // element.tipo = "UNIDAD";
+            // this.$store.state.cart.productos.push(element);
           });
           this.filter = "";
           this.show = false;
@@ -200,6 +201,42 @@ export default {
             });
         }
       });
+    },
+    anadirProduct(item) {
+      item.PreciosPorProducto = item.PreciosPorProducto
+        ? JSON.parse(item.PreciosPorProducto)
+        : [];
+
+      item.estadoPxP = !item.PreciosPorProducto.some(v => v.cantidad > 0);
+      item.tienepresentacionflag = !item.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
+
+      item.cantidadPres > 0
+        ? (item.tipo = "PRESENTACION")
+        : (item.tipo = "UNIDAD");
+      if (item.tipo == "UNIDAD") {
+        item.subtotal =
+          item.cantidad *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.total =
+          item.cantidad *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+      }
+      if (item.tipo == "PRESENTACION") {
+        let presentacion = JSON.parse(item.presentacion);
+        item.disabled = true;
+        item.cantxPrecio = item.cantidadPres;
+        item.subtotal =
+          item.cantidadPres *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.total =
+          item.cantidadPres *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.cantidadPres = presentacion.cantidad;
+      }
+      
+      this.$store.commit("AGREGAR_PRODUCTO", item);
     }
   }
 };

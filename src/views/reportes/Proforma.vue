@@ -15,7 +15,7 @@
       <div id="details" class="clearfix">
         <div id="client">
           <br>
-          <h5 class="to" style="color:black">PROFORMA A:</h5>
+          <h5 class="to" style=":black">PROFORMA A:</h5>
           <table>
             <tbody>
               <tr>
@@ -76,17 +76,21 @@
             <th class="total">#</th>
             <th class="qty">CANT.</th>
             <th colspan="2" class="desc">DESCRIPCIÓN</th>
+            <th class="unit">U.M.</th>
             <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
+           
             <td class="total">{{ index+1 }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
             <td colspan="2"  class="desc" style="font-size:0.75rem">
               <h3 style="color:#000; font-size:1rem">{{ prod.Producto }} <p v-if="presentacionProducto(prod)">({{ presentacionProducto(prod)}})</p> </h3><p v-if='prod.ProductoDesc'>{{ prod.ProductoDesc }}</p><p v-if="prod.ProductoDesc2"> {{prod.ProductoDesc2}}</p><p v-if="prod.ProductoDesc3">{{ prod.ProductoDesc3 }}</p>
             </td>
+             <td class="unit" style="font-size:1.1rem">
+              {{ getPresentacion(prod)}}</td>
             <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:1.1rem">
               <div v-if="prod.DisabledTotal === 0">
@@ -128,9 +132,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>
@@ -195,6 +199,14 @@ export default {
       date.setDate(date.getDate() + (dias - 1));
       return date;
     },
+    getPresentacion(prod) {
+      if (prod.presentacion) {
+        let presentacion = JSON.parse(prod.presentacion);
+        return presentacion.nombre;
+      } else {
+        return prod.ProductoMedicion;
+      }
+    },
     getEmpresa() {
       this.axios.get(API + "empresa/id/" + 1).then(res => {
         this.empresa = res.data;
@@ -216,7 +228,7 @@ export default {
 }
 
 .tblProductos {
-  background: red !important;
+  background: #FD8100 !important;
 }
 
 .celda {
@@ -226,7 +238,7 @@ export default {
 }
 
 table.tblProductos tr {
-  background: red !important;
+  background: #FD8100 !important;
 }
 
 table.tblProductos td.celda {

@@ -22,7 +22,7 @@
             @click="abrirModalSelect(producto)"
           >
             <td :class="obtenerClaseStock(producto)">
-              {{ producto.stock }}
+              {{ parseFloat(producto.stock).toFixed(2) }}
             </td>
             <td class="tdproducto">{{ producto.Producto }}</td>
             <td class="tdcategoria">{{ producto.ProductoCategoria }}</td>
@@ -66,12 +66,12 @@ export default {
       search: "",
       API: config.API,
       lstProductos: [],
-      producto: []
+      producto: [],
+      textSearch: ""
     };
   },
   mounted() {
     document.addEventListener("click", this.handleClickOutside);
-    console.log(this.productos);
   },
   destroyed() {
     document.removeEventListener("click", this.handleClickOutside);
@@ -80,7 +80,7 @@ export default {
     buscarProductos() {
       const config = {
         url: `${this.API}/productos/puntoventa/stock/1?q=${
-          this.search
+          this.textSearch
         }&sortBy=stock&sortDesc=1&limit=50`,
         method: "get"
       };
@@ -102,31 +102,29 @@ export default {
         this.$toasted.error("El producto ya se encuentra en la lista");
         return false;
       }
-      const precio = this.$store.state.esOrdenCompra
-        ? prod.PrecioCosto
-          ? prod.PrecioCosto
-          : 0
-        : prod.PrecioContado
-          ? prod.PrecioContado
-          : 0;
+      const precioc = prod.PrecioCosto;
+      const precio = prod.PrecioContado;
       prod.PreciosPorProducto = prod.PreciosPorProducto
         ? JSON.parse(prod.PreciosPorProducto)
         : [];
 
-      console.log(prod.PreciosPorProducto.length);
-      prod.estadoPxP = prod.PreciosPorProducto.length == 0;
-      prod.tienepresentacionflag = prod.PreciosPorProducto.length > 0;
+      prod.estadoPxP = !prod.PreciosPorProducto.some(v => v.cantidad > 0);
+      prod.tienepresentacionflag = !prod.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
       prod.cantidad = 1;
       prod.cantxPrecio = 1;
-      prod.subtotal = precio;
-      prod.total = precio;
+      prod.subtotal = this.$store.state.esOrdenCompra ? precioc : precio;
+      prod.total = this.$store.state.esOrdenCompra ? precioc : precio;
       prod.precio = precio;
+      prod.precioc = precioc;
       prod.tipo = "UNIDAD";
       prod.descuento = 0;
       this.$store.commit("AGREGAR_PRODUCTO", prod);
       this.$nextTick(() => {
         this.lstProductos = [];
       });
+      this.search = "";
     },
     obtenerClaseStock(producto) {
       const classStock = "tdstock ";
@@ -172,7 +170,10 @@ export default {
   },
   watch: {
     search() {
-      this.buscarProductos();
+      if (this.search) {
+        this.textSearch = this.search;
+        this.buscarProductos();
+      }
     }
   },
   computed: {

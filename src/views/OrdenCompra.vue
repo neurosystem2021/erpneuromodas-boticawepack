@@ -263,7 +263,7 @@ export default {
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
           // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
           { key: "cantidad" },
-          { key: "precio", label: "Precio" },
+          { key: "precioc", label: "Precio Compra" },
           //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
           //{ key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
           //{ key: 'igv', label: 'IGV' },

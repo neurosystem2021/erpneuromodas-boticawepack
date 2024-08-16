@@ -5,5 +5,6 @@ export default {
     producto:{
         PreciosPorProducto :[]
     },
+    listUbigeo:[],
     esOrdenCompra:false
 } 

@@ -20,6 +20,19 @@
               </b-form-text>
           </b-form-group>
           <b-form-group>
+            <label>Código:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.Codigo"
+              @input="(val) => producto.Codigo = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+              <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -582,6 +595,7 @@ export default {
             this.producto.ControlaStockMinimo = newVal.ControlaStockMinimo;
             this.producto.StockMinimo = newVal.StockMinimo;
             this.producto.CodigoBarra = newVal.CodigoBarra;
+            this.producto.Codigo = newVal.Codigo;
             this.producto.ProductoModelo = newVal.ProductoModelo;
             this.producto.ProductoDesc = newVal.ProductoDesc;
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
@@ -811,6 +825,7 @@ export default {
         this.producto.Rendimiento = 0;
       }
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.producto.Codigo = ("" + this.producto.Codigo).trim();
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.axios
         .post(this.API + "productos", {

@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid>
           <b-row>
               <b-col md="8">
 
@@ -115,7 +115,9 @@
                   </b-col>
                 </b-row>
 
-                <b-row v-if="!isTraslado && false">
+                <!-- <b-row v-if="!isTraslado && false"> -->
+
+                <b-row>
                   <b-col md="6">
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
@@ -229,12 +231,22 @@
 </template>
 
 <script>
-import Menu from "@/components/Menu";
-import ProductosCarrito from "@/components/ProductosCarrito";
-//import ProveedoresTabla from 'components/ProveedoresTabla'
-import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
+import ProductosCarrito from "@/components/ProductosCarrito";
+import ClientesForm from "@/components/ClientesForm";
+import ConfigVenta from "@/components/ConfigVenta";
+import PagoDeuda from "@/components/PagoDeuda";
+import PreOrdenLista from "@/components/PreOrdenLista.vue";
+import Proformas from "@/components/ProformaLista.vue";
+import DeliveryModal from "@/components/DeliveryModal.vue";
+import VentasPedido from "@/components/VentasPedido.vue";
+
+import Menu from "@/components/Menu";
+//import ProveedoresTabla from 'components/ProveedoresTabla'
+import ProveedoresForm from "@/components/ProveedoresForm";
+
+
 
 export default {
   mounted() {},
@@ -263,17 +275,28 @@ export default {
           { key: "Producto" },
           { key: "ProductoPresentacion", label: "Rack" },
           { key: "Descripcion", label: "Descripción" },
-          // { key: "eventPres", label: "" },
-          // { key: "cantxPrecio", variant: "warning" },
+          { key: "eventPres", label: "" },
+          { key: "obsequio" },
+          { key: "cantxPrecio", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
           // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
           { key: "cantidad" },
-          { key: "precio", label: "Precio" },
-          //{ key: 'precio', label: 'Precio' },
+          { key: "precioc", label: "Precio Compra" },
+          { key: "precio", label: "Precio Venta" },
           //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
-          //{ key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center"
+          },
           //{ key: 'descuento', label: '% Desc.'},
-          //{ key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center"
+          },
           { key: "acciones", label: "" }
         ]
       }
@@ -342,7 +365,7 @@ export default {
       currentMonth = currentMonth < 10 ? "0" + currentMonth : currentMonth;
       return {
         EsCredito: 0,
-        alterarProductos: 1,
+        alterarProductos: 0,
         FechaVenCredito: "",
         Moneda: "PEN",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
@@ -577,7 +600,14 @@ export default {
   components: {
     Menu,
     ProductosCarrito,
-    ProveedoresForm
+    ProveedoresForm,
+    ClientesForm,
+    ConfigVenta,
+    PagoDeuda,
+    PreOrdenLista,
+    Proformas,
+    DeliveryModal,
+    VentasPedido
   }
 };
 </script>

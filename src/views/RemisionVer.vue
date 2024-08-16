@@ -172,6 +172,7 @@
                 <div class="row">
                   <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
                   <div class="input-group input-group-sm col-sm-8">
+                    <!-- <UbigoComponent /> -->
                     <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required>
                     <div class="input-group-append">
                       <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
@@ -284,12 +285,12 @@
 <script>
 import Menu from "@/components/Menu";
 import ProductosCarrito from "@/components/ProductosCarrito";
+import UbigoComponent from "@/components/comun/UbigoComponent";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
 export default {
   beforeMount() {
     let params = this.$route.params;
-    console.log(params);
     this.NroComprobante = `${params.Serie}-${params.Numero}`;
     this.setDocRef({
       NroComprobante: this.NroComprobante,
@@ -298,6 +299,7 @@ export default {
   },
   mounted() {
     this.limpiarCamposRefs();
+    this.GetUbigeo();
   },
   data() {
     return {
@@ -328,6 +330,7 @@ export default {
         fields: [
           { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
+          { key: "cantxPrecio", variant: "warning" },
           { key: "cantidad" },
           { key: "acciones", label: "" }
         ]
@@ -342,7 +345,8 @@ export default {
   methods: {
     ...mapActions({
       limpiarCart: "limpiarCarrito",
-      add: "agregarProducto"
+      add: "agregarProducto",
+      GetUbigeo: "GetUbigeo"
     }),
     afe(e) {
       return false;
@@ -468,11 +472,11 @@ export default {
         });
     },
     limpiarCamposRefs() {
-      this.$refs.inputplacaVehiculo.disabled = true;
-      this.$refs.inputnroDocChofer.disabled = true;
-      this.$refs.inputapellidosChofer.disabled = true;
-      this.$refs.inputnombresChofer.disabled = true;
-      this.$refs.inputlicenciaChofer.disabled = true;
+      this.$refs.inputplacaVehiculo.disabled = false;
+      this.$refs.inputnroDocChofer.disabled = false;
+      this.$refs.inputapellidosChofer.disabled = false;
+      this.$refs.inputnombresChofer.disabled = false;
+      this.$refs.inputlicenciaChofer.disabled = false;
       this.$refs.inputplacaVehiculo.required = false;
       this.$refs.inputnroDocChofer.required = false;
       this.$refs.inputapellidosChofer.required = false;
@@ -504,8 +508,8 @@ export default {
         this.$refs.inputnombresChofer.required = true;
         this.$refs.inputlicenciaChofer.required = true;
 
-        this.$refs.inputnroDocumentoTransportista.disabled = true;
-        this.$refs.inputrazonSocialTransportista.disabled = true;
+        this.$refs.inputnroDocumentoTransportista.disabled = false;
+        this.$refs.inputrazonSocialTransportista.disabled = false;
         this.$refs.inputnroDocumentoTransportista.required = false;
         this.$refs.inputrazonSocialTransportista.required = false;
 
@@ -719,24 +723,64 @@ export default {
             });
           // this.limpiarCart();
 
-          response.data.map(item => {
-            item.estadoPxP = false;
-            let preciosProd = [];
-            item.precioCont = item.PrecioContado;
-            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
-            let fPP = preciosProd.filter(p => p.cantidad === 0);
+          response.data.forEach(item => {
+            this.AnadirProductosListado(item);
+            // item.estadoPxP = false;
+            // let preciosProd = [];
+            // console.log(item.CantidadPres);
+            // item.precioCont = item.PrecioContado;
+            // preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+            // let fPP = preciosProd.filter(p => p.cantidad === 0);
 
-            if (!item.PreciosPorProducto || fPP.length === 4) {
-              item.estadoPxP = true;
-            }
-            this.add([item, () => {}, false]);
+            // if (item.CantidadPres > 0) {
+            //   item.estadoPxP = true;
+            // }
+            // this.add([item, () => {}, false]);
           });
         });
+    },
+    AnadirProductosListado(item) {
+      item.PreciosPorProducto = item.PreciosPorProducto
+        ? JSON.parse(item.PreciosPorProducto)
+        : [];
+
+      item.estadoPxP = !item.PreciosPorProducto.some(v => v.cantidad > 0);
+      item.tienepresentacionflag = !item.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
+      item.CantidadPres > 0
+        ? (item.tipo = "PRESENTACION")
+        : (item.tipo = "UNIDAD");
+
+      if (item.tipo == "UNIDAD") {
+        item.subtotal =
+          item.cantidad *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.total =
+          item.cantidad *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+      }
+      if (item.tipo == "PRESENTACION") {
+        let presentacion = JSON.parse(item.Presentacion);
+        item.disabled = true;
+        item.presentacion = item.Presentacion;
+        item.cantxPrecio = item.CantidadPres;
+        item.subtotal =
+          item.CantidadPres *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.total =
+          item.CantidadPres *
+          (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
+        item.cantidadPres = presentacion.cantidad;
+      }
+
+      this.$store.commit("AGREGAR_PRODUCTO", item);
     }
   },
   components: {
     Menu,
-    ProductosCarrito
+    ProductosCarrito,
+    UbigoComponent
   }
 };
 </script>
