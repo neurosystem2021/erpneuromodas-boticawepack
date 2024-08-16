@@ -41,7 +41,7 @@
       <table border="0" cellspacing="0" cellpadding="0">
         <thead>
           <tr>
-            <th class="no">#</th>
+            <th class="no">N°</th>
             <th class="desc">DESCRIPCIÓN</th>
             <th class="unit">PRECIO U.</th>
             <th class="ca">CORTE ANCHO</th>
@@ -65,6 +65,8 @@
               <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
             </td>
           </tr>
+          <td colspan="5">TOTAL CANT.</td>
+          <td>{{ totalCantidad }}</td>
         </tbody>
         <tfoot>
           <tr>
@@ -117,6 +119,9 @@ export default {
 		}
 	},
 	computed: {
+    totalCantidad() {
+      return this.proforma.productos.reduce((sum, prod) => sum + prod.Cantidad, 0);
+    },
 		subTotal () {
 			let sumatoria = 0
 			this.proforma.productos.forEach(prod => {
