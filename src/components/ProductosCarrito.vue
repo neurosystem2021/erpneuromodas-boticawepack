@@ -1003,8 +1003,8 @@ export default {
         producto.tienepresentacionflag = false;
       }
 
-      producto.cantidad = 0;
-      producto.cantxPrecio = 1;
+      producto.cantidad = 1;
+      producto.cantxPrecio = 0;
       producto.subtotal =
         (this.$store.state.esOrdenCompra
           ? producto.PrecioCosto
@@ -1417,23 +1417,28 @@ export default {
     //   }
     // },
 
-    loadBarcode(e) {
+    async loadBarcode(e) {
       e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
         let params = { codigoBarra: idProducto };
-        this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
+        await this.axios
+          .get(
+            `${this.API}/productos/puntoventa/stock/1?q=${
+              this.loadCode
+            }&sortBy=stock&sortDesc=1&limit=1`
+          )
           .then(response => {
-            if (response.data.IdProducto) {
+            let prod = response.data[0]
+            if (prod.IdProducto) {
               if (
                 this.productos.some(
-                  v => v.IdProducto == response.data.IdProducto
+                  v => v.IdProducto == prod.IdProducto
                 )
               ) {
                 let prod = this.productos.filter(
-                  v => v.IdProducto == response.data.IdProducto
+                  v => v.IdProducto == prod.IdProducto
                 )[0];
                 if (prod.tipo == "UNIDAD") {
                   prod.cantxPrecio = 0;
@@ -1441,7 +1446,7 @@ export default {
                   prod.subtotal = prod.cantidad * prod.precio;
                   prod.total = prod.cantidad * prod.precio;
                   this.productos.filter(
-                    v => v.IdProducto == response.data.IdProducto
+                    v => v.IdProducto == prod.IdProducto
                   )[0] = prod;
                 }
                 if (prod.tipo == "PRESENTACION") {
@@ -1450,13 +1455,13 @@ export default {
                   prod.subtotal = prod.cantxPrecio * prod.precio;
                   prod.total = prod.cantxPrecio * prod.precio;
                   this.productos.filter(
-                    v => v.IdProducto == response.data.IdProducto
+                    v => v.IdProducto == prod.IdProducto
                   )[0] = prod;
                 }
                 this.tableProductos = false;
                 this.tableProductos = true;
               } else {
-                this.abrirModalSelect(response.data);
+                this.abrirModalSelect(prod);
               }
             } else {
               this.loadCode = "";
@@ -1614,7 +1619,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj, precio) {
-      this.objProd.cantxPrecio = 1;
+      this.objProd.cantxPrecio = 0;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
       obj.precio = 0;
@@ -1640,7 +1645,7 @@ export default {
       this.actualizarProd(obj);
     },
     setProductoCant(prod) {
-      this.objProd.cantxPrecio = 1;
+      this.objProd.cantxPrecio = 0;
       this.cant = prod.cantidad;
       let obj = this.objProd;
       this.$refs.autocompleteProducto.setValue("");

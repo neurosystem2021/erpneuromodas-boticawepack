@@ -21,7 +21,11 @@
               <div class="container">
                 <div class="row">
                   <label for="observacion" class="col-sm-4">Observación</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Observación" v-model="remision.observacion">
+                   <b-form-textarea
+                    id="textarea"
+                    v-model="remision.observacion"
+                    class="textArea col-sm-8"
+                   ></b-form-textarea>
                 </div>
               </div>
               <div class="container">
@@ -133,8 +137,7 @@
               </div>
             </fieldset>
           </b-col>
-
-
+          
           <b-col md="6">
             <fieldset class="scheduler-border">
               <legend class="scheduler-border">
@@ -806,5 +809,11 @@ export default {
 #remision-form fieldset > h5 {
   border-bottom: 1px solid #cacaca;
   padding-bottom: 4px;
+}
+
+.textArea {
+  resize: none;
+  field-sizing: content;
+  min-height: 1lh;
 }
 </style>

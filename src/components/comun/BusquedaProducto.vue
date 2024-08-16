@@ -112,14 +112,15 @@ export default {
       prod.tienepresentacionflag = !prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
-      prod.cantidad = 1;
-      prod.cantxPrecio = 1;
+      prod.cantxPrecio = 0;
       prod.subtotal = this.$store.state.esOrdenCompra ? precioc : precio;
       prod.total = this.$store.state.esOrdenCompra ? precioc : precio;
       prod.precio = precio;
       prod.precioc = precioc;
       prod.tipo = "UNIDAD";
       prod.descuento = 0;
+      prod.cantidad = 1;
+      console.log(prod);
       this.$store.commit("AGREGAR_PRODUCTO", prod);
       this.$nextTick(() => {
         this.lstProductos = [];

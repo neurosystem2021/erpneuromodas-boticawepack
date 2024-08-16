@@ -340,8 +340,17 @@
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     readonly
+                                                    class="mt-2"
                                                     type="date">
                                                 </b-form-input>
+                                                <b-form-textarea v-model="venta.Observacion"
+                                                  type="text"
+                                                    class="form-control mt-2 textArea"
+                                                    placeholder="Observación(es)" 
+                                                    v-if="venta.EsCredito"
+                                                  />
+                                                
+
                                                 <b-form-checkbox 
                                                     :disabled="bloquearInput?true:false || venta.EsDelivery"
                                                     v-model="venta.PorEntregar"
@@ -1172,6 +1181,7 @@ export default {
       // });
       this.venta.productos = prods;
       this.venta.diasValidosProf = this.diasValidosProf;
+      console.log(this.venta);
       this.axios
         .post(this.API + "proformas", this.venta)
         .then(response => {
@@ -1179,6 +1189,7 @@ export default {
           this.limpiarDespuesVenta();
           this.loadClienteVarios();
           this.diasValidosProf = 1;
+          this.cantidaDias = 0;
           this.inProgress = false;
           window.open(
             "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
@@ -1693,6 +1704,11 @@ export default {
 }
 .big-text {
   font-size: 30px;
+}
+.textArea {
+  resize: none;
+  field-sizing: content;
+  min-height: 1lh;
 }
 @media only screen and (max-width: 700px) {
   /* For desktop: */

@@ -56,11 +56,19 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CREDITO' : 'CONTADO'}}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.PorEntregar == 1 ? 'PENDIENTE' : 'INMEDIATO'}}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;"> Fecha Crédito</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCredito}}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;"> Días de Crédito</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DiasCredito}}</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -125,6 +133,7 @@
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
         <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div class="notice">Observación(es): {{proforma.Observacion}}</div>
       </div>
       <div>
         <br>
@@ -150,6 +159,7 @@
 
 <script>
 import { API } from "@/store/config.js";
+import moment from "moment";
 export default {
   mounted() {
     this.getProforma();
@@ -180,9 +190,7 @@ export default {
         this.fechaHasta = this.calcularFechaHasta(
           this.proforma.FechaReg.substring(0, 10),
           this.proforma.DiasValidos
-        )
-          .toISOString()
-          .substring(0, 10);
+        );
       });
     },
     presentacionProducto(item) {
@@ -195,9 +203,10 @@ export default {
     },
 
     calcularFechaHasta(actual, dias) {
-      var date = new Date(actual);
-      date.setDate(date.getDate() + (dias - 1));
-      return date;
+      console.log(actual);
+      console.log(dias);
+      var new_date = moment(actual).add(dias, "days");
+      return new_date.format("YYYY-MM-DD");
     },
     getPresentacion(prod) {
       if (prod.presentacion) {
@@ -228,7 +237,7 @@ export default {
 }
 
 .tblProductos {
-  background: #FD8100 !important;
+  background: #fd8100 !important;
 }
 
 .celda {
@@ -238,7 +247,7 @@ export default {
 }
 
 table.tblProductos tr {
-  background: #FD8100 !important;
+  background: #fd8100 !important;
 }
 
 table.tblProductos td.celda {
