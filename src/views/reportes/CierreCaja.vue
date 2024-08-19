@@ -743,7 +743,7 @@ export default {
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
       this.axios
-        .get(this.API + "usuarios/" + usuario + `&id_empresa=${this.empresa}`)
+        .get(this.API + "usuarios/" + usuario + `&id_empresa=${ sessionStorage.getItem("empresa")}`)
         .then(response => {
           this.setVendedor(response.data);
           //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
@@ -786,7 +786,7 @@ export default {
             salidas: this.totalSalidas,
             total: this.granTotal,
             totalVentas: this.totalVentas,
-            id_empresa: this.empresa
+            id_empresa: sessionStorage.getItem("empresa")
           })
           .then(res => {
             this.loadData();
@@ -811,7 +811,7 @@ export default {
         .get(this.API + "ventas/detalle", {
           params: {
             idDocVentas: this.ventas.map(item => item.idDocVenta),
-            id_empresa: this.empresa
+            id_empresa:  sessionStorage.getItem("empresa")
           }
         })
         .then(response => {
@@ -828,7 +828,7 @@ export default {
     getVentas() {
       let params = {
         idCierre: this.$route.params.id,
-        id_empresa: this.empresa
+        id_empresa:  sessionStorage.getItem("empresa")
       };
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -850,7 +850,7 @@ export default {
     getIngresos() {
       let params = {
         idCierre: this.$route.params.id,
-        id_empresa: this.empresa
+        id_empresa:  sessionStorage.getItem("empresa")
       };
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -870,7 +870,7 @@ export default {
     getSalidas() {
       let params = {
         idCierre: this.$route.params.id,
-        id_empresa: this.empresa
+        id_empresa:  sessionStorage.getItem("empresa")
       };
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -889,7 +889,7 @@ export default {
     getAdelantos() {
       let params = {
         idDocVentas: this.ventas.map(v => v.idDocVenta),
-        id_empresa: this.empresa
+        id_empresa:  sessionStorage.getItem("empresa")
       };
       this.axios
         .get(this.API + "cierrecaja/ingresos/adelantos", {
