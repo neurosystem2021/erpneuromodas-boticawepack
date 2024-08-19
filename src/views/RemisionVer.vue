@@ -174,12 +174,15 @@
               <div class="container">
                 <div class="row">
                   <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
-                  <div class="input-group input-group-sm col-sm-8">
+                  <div class="input-group input-group-sm col-sm-8" v-if="$store.state.listUbigeo.length>0">
+                    <UbigoComponent :datos="$store.state.listUbigeo" />
+                    <!-- <b-tree-view :data="$store.state.listUbigeo" /> -->
                     <!-- <UbigoComponent /> -->
-                    <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required>
+                    <!-- {{ $store.state.listUbigeo}} -->
+                   <!-- <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required> 
                     <div class="input-group-append">
                       <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -216,12 +219,12 @@
 
               <h5>Unidad de transporte</h5>
 
-              <!--<div class="container">
+               <!-- <div class="container">
                 <div class="row">
                   <label for="placaCarreta" class="col-sm-4">N° de Placa Carreta</label>
                   <input type="text" class="form-control form-control-sm col-sm-8" id="placaCarreta" placeholder="N° de Placa" v-model="remision.placaCarreta">
                 </div>
-              </div>-->
+              </div> -->
 
               <div class="container mt-2">
                 <div class="row">
@@ -291,6 +294,8 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import UbigoComponent from "@/components/comun/UbigoComponent";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
+import { bTreeView } from "bootstrap-vue-treeview";
+
 export default {
   beforeMount() {
     let params = this.$route.params;
@@ -354,6 +359,17 @@ export default {
     afe(e) {
       return false;
     },
+
+    handleSelectDestino(node) {
+      console.log("Selected node:", node);
+      if (!node.children) {
+        this.remision.codUbigeoDestino = node.id;
+        console.log("Selected ID:", this.remision.codUbigeoDestino);
+        // Cierra el dropdown después de seleccionar
+        this.$refs.dropdown.hide();
+      }
+    },
+
     motivoTrasladoChange(e) {
       let descripcionMotivoTraslado =
         e.target.options[e.target.selectedIndex].text;
@@ -783,7 +799,8 @@ export default {
   components: {
     Menu,
     ProductosCarrito,
-    UbigoComponent
+    UbigoComponent,
+    bTreeView
   }
 };
 </script>
@@ -815,5 +832,8 @@ export default {
   resize: none;
   field-sizing: content;
   min-height: 1lh;
+}
+.b-dropdown-menu {
+  position: absolute;
 }
 </style>

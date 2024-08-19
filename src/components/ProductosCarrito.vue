@@ -1430,13 +1430,9 @@ export default {
             }&sortBy=stock&sortDesc=1&limit=1`
           )
           .then(response => {
-            let prod = response.data[0]
+            let prod = response.data[0];
             if (prod.IdProducto) {
-              if (
-                this.productos.some(
-                  v => v.IdProducto == prod.IdProducto
-                )
-              ) {
+              if (this.productos.some(v => v.IdProducto == prod.IdProducto)) {
                 let prod = this.productos.filter(
                   v => v.IdProducto == prod.IdProducto
                 )[0];

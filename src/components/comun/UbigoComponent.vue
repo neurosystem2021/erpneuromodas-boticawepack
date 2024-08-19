@@ -1,49 +1,75 @@
 <template>
-  <section v-if="departamentos.length && provincias.length && distritos.length">
-    <ul class="departamento" v-for="departamento in departamentos" :key="departamento.id">
-        <li> 
-            <details>
-                <summary> {{ departamento.nombre }}  </summary>
+  <input v-if="cboClose" type="text" class="form-control form-control-sm" id="direccionDestino" placeholder="Dirección de Llegada" v-model="Ubigeo" @blur="cboClose=false">
+  <section v-else>
 
-        <ul class="provincia" v-for="provincia in provincias.filter(v => v.id_padre == departamento.id)" :key="provincia.id">
-            <li> {{ provincia.nombre }} </li>
-            <ul class="distrito" v-for="distrito in distritos.filter(v => v.id_padre == provincia.id)" :key="distrito.id">
-                {{ distrito.nombre }}
-            </ul>
-        </ul>
-            </details>
+      <ul class="classDepartamento" v-for="departamento in datos" :key="departamento.id" 
+          >
+        <li @click="obtenerSelect(departamento)" > 
+          <span>
+           <i class="fa fa-chevron-right" v-if="!departamento.selected" aria-hidden="true"></i> 
+           <i class="fa fa-chevron-down" v-else aria-hidden="true"></i> 
+           {{departamento.name}}
+          </span>
+          <ul class="classProvincia" v-for="provincia in departamento.children" :key="provincia.id" >
+
+            <li @click="obtenerSelect(provincia); $event.stopPropagation()"  v-if="departamento.selected">
+              <span>
+             <i class="fa fa-chevron-right" v-if="!provincia.selected" aria-hidden="true"></i> 
+             <i class="fa fa-chevron-down" v-else aria-hidden="true"></i> 
+             {{provincia.name}}
+
+              </span>
+                <ul class="classDistrito" v-for="distrito in provincia.children" :key="distrito.id" >
+                  <li @click="guardarIdUbigeo(distrito.id,distrito.name,provincia.name,departamento.name); $event.stopPropagation()" v-if="provincia.selected">
+                    <span>
+                    {{distrito.name}}
+
+                    </span>
+                  </li>
+                </ul>
+              
+            </li>
+
+          </ul>
         </li>
-    </ul>    
+
+      </ul>
   </section>
-  <p v-else>Cargando datos...</p>
+
 </template>
 
 <script>
 import { mapState } from "vuex";
 export default {
+  props: ["datos"],
   data() {
     return {
+      cboClose: false,
+      Ubigeo: "",
       departamentos: [],
       provincias: [],
       distritos: []
     };
   },
   mounted() {
-    this.getListadoUbigeo();
+    // this.getListadoUbigeo();
   },
   watch: {
-    listUbigeo() {
-      this.getListadoUbigeo();
-    }
+    // listUbigeo() {
+    //   this.getListadoUbigeo();
+    // }
   },
   methods: {
-    async getListadoUbigeo() {
-      this.departamentos = this.listUbigeo.filter(v => v.nivel == 1);
-      this.provincias = this.listUbigeo.filter(v => v.nivel == 2);
-      this.distritos = this.listUbigeo.filter(v => v.nivel == 3);
+    obtenerSelect(item) {
+      item.selected = !item.selected;
+      this.$forceUpdate();
+      console.log(item);
     },
-    toggleProvincia(provincia) {
-      provincia.expanded = !provincia.expanded;
+    guardarIdUbigeo(id, distrito, provincia, departamento) {
+      let nameDepartamento = departamento.replace(/^DEPARTAMENTO\s*/, "");
+      this.Ubigeo = `${nameDepartamento} > ${provincia} > ${distrito}`;
+      this.$emit("idUbigeo", id);
+      this.cboClose = true;
     }
   },
   computed: {
@@ -53,16 +79,30 @@ export default {
 </script>
 
 <style scoped>
+section {
+  padding: 5px 0 px;
+}
 ul {
   list-style: none;
-}
-.tree summary {
   cursor: pointer;
+  margin: 0;
 }
-.tree summary ::marker {
-  display: none;
+li {
+  width: 100%;
 }
-.tree summary::-webkit-details-marker {
-  display: none;
+.classDepartamento {
+  padding: 0px;
+}
+
+.classProvincia .classDistrito {
+  padding: 0 0 0 50px;
+}
+span {
+  display: block;
+  border: 1px solid black;
+  padding: 10px 10px;
+  width: 100%;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 </style>
