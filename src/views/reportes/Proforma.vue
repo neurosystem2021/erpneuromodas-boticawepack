@@ -30,13 +30,18 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
                 <td class="celda" style="text-transform: uppercase">: Soles</td>
-              </tr>
+              </tr> -->
               <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">T. Pago:</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CRÉDITO' :'CONTADO' }}</td>
+                
               </tr>
             </tbody>
           </table>
@@ -47,29 +52,29 @@
           <table>
             <tbody>
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Válido Desde</td>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha de emisión</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>
-                <td class="celda" style="text-transform: uppercase">: {{fechaHasta}}</td>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo Validez</td>
+                <td class="celda" style="text-transform: uppercase">: {{proforma.DiasValidos}} d</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CREDITO' : 'CONTADO'}}</td>
-              </tr>
+              </tr> -->
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.PorEntregar == 1 ? 'PENDIENTE' : 'INMEDIATO'}}</td>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.PorEntregar == 1 ? proforma.PorEntregarDias +' D' : 'INMEDIATO'}}</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;"> Fecha Crédito</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCredito}}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;"> Días de Crédito</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.DiasCredito}}</td>
-              </tr>
+              </tr> -->
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
@@ -132,7 +137,8 @@
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <!-- <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div> -->
+        <div class="notice">PAGOS: - Factura a {{DiasCredito}} días - S/. {{ subTotal | redondear }}</div>
         <div class="notice">Observación(es): {{proforma.Observacion}}</div>
       </div>
       <div>
@@ -171,7 +177,8 @@ export default {
       idProforma: this.$route.params.id,
       proforma: { productos: [] },
       empresa: {},
-      fechaHasta: ""
+      fechaHasta: "",
+      DiasCredito: 0
     };
   },
   computed: {
@@ -191,6 +198,10 @@ export default {
           this.proforma.FechaReg.substring(0, 10),
           this.proforma.DiasValidos
         );
+        this.DiasCredito = this.calcularDiasCredito(
+          this.proforma.FechaReg,
+          this.proforma.FechaCredito
+        );
       });
     },
     presentacionProducto(item) {
@@ -201,10 +212,12 @@ export default {
 
       return "";
     },
-
+    calcularDiasCredito(FechaReg, FechaCredito) {
+      let FechaRegFormat = moment(FechaReg, "YYYY-MM-DD");
+      let FechaCreditoFormat = moment(FechaCredito, "YYYY-MM-DD");
+      return FechaCreditoFormat.diff(FechaRegFormat, "days");
+    },
     calcularFechaHasta(actual, dias) {
-      console.log(actual);
-      console.log(dias);
       var new_date = moment(actual).add(dias, "days");
       return new_date.format("YYYY-MM-DD");
     },

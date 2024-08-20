@@ -358,6 +358,9 @@
                                                     :unchecked-value="0">
                                                     Por entregar
                                                 </b-form-checkbox>
+
+                                                <b-form-input type="number" placeholder="Cantidad Días" v-model="PorEntregarDias" 
+                                                v-if="venta.PorEntregar==1"/>
                                             </td>
                                         </tr>
                                         <tr>
@@ -538,7 +541,8 @@ export default {
   },
   data() {
     return {
-      cantidaDias: "",
+      cantidaDias: 0,
+      PorEntregarDias: 0,
       isNota: false,
       isVentaPedido: false,
       dni: "",
@@ -1181,7 +1185,7 @@ export default {
       // });
       this.venta.productos = prods;
       this.venta.diasValidosProf = this.diasValidosProf;
-      console.log(this.venta);
+      this.venta.PorEntregarDias = this.PorEntregarDias;
       this.axios
         .post(this.API + "proformas", this.venta)
         .then(response => {
@@ -1428,6 +1432,7 @@ export default {
       // this.inProgress = false;
       // return true;
       this.venta.productos = prods;
+      this.venta.PorEntregarDias = this.PorEntregarDias;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
       this.venta.PagoCon = this.$refs.carrito.pagocon;

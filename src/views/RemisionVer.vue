@@ -83,10 +83,11 @@
                 <div class="row">
                   <label for="codUbigeoOrigen" class="col-sm-4">Ubigeo de Partida</label>
                   <div class="input-group input-group-sm col-sm-8">
-                    <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required>
+                    <UbigoComponent  :key="'ubigeoOrigen'" :datos="$store.state.listUbigeo" @idUbigeo="obtenerIdUbigeoOrigen"/>
+                    <!-- <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required>
                     <div class="input-group-append">
                       <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -175,7 +176,8 @@
                 <div class="row">
                   <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
                   <div class="input-group input-group-sm col-sm-8" v-if="$store.state.listUbigeo.length>0">
-                    <UbigoComponent :datos="$store.state.listUbigeo" />
+                    <UbigoComponent :key="'ubigeoDestino'" :datos="$store.state.listUbigeo" @idUbigeo="obtenerIdUbigeoDestino"/>
+                    <!-- <UbigoComponent :datos="$store.state.listUbigeo" @idUbigeo="remision.codUbigeoDestino =$emit"/> -->
                     <!-- <b-tree-view :data="$store.state.listUbigeo" /> -->
                     <!-- <UbigoComponent /> -->
                     <!-- {{ $store.state.listUbigeo}} -->
@@ -304,6 +306,28 @@ export default {
       NroComprobante: this.NroComprobante,
       IdDocVenta: params.idDocVenta
     });
+    // inputrazonSocialTransportista
+    setTimeout(() => {
+      this.$refs.inputplacaVehiculo.disabled = false;
+      this.$refs.inputnroDocChofer.disabled = false;
+      this.$refs.inputapellidosChofer.disabled = false;
+      this.$refs.inputnombresChofer.disabled = false;
+      this.$refs.inputlicenciaChofer.disabled = false;
+
+      this.$refs.inputplacaVehiculo.required = true;
+      this.$refs.inputnroDocChofer.required = true;
+      this.$refs.inputapellidosChofer.required = true;
+      this.$refs.inputnombresChofer.required = true;
+      this.$refs.inputlicenciaChofer.required = true;
+
+      this.$refs.inputnroDocumentoTransportista.disabled = false;
+      this.$refs.inputrazonSocialTransportista.disabled = false;
+      this.$refs.inputnroDocumentoTransportista.required = false;
+      this.$refs.inputrazonSocialTransportista.required = false;
+
+      this.remision.nroDocumentoTransportista = "";
+      this.remision.razonSocialTransportista = "";
+    }, 10);
   },
   mounted() {
     this.limpiarCamposRefs();
@@ -356,6 +380,12 @@ export default {
       add: "agregarProducto",
       GetUbigeo: "GetUbigeo"
     }),
+    obtenerIdUbigeoOrigen(id) {
+      this.remision.codUbigeoOrigen = id;
+    },
+    obtenerIdUbigeoDestino(id) {
+      this.remision.codUbigeoDestino = id;
+    },
     afe(e) {
       return false;
     },
@@ -379,6 +409,7 @@ export default {
       evt.preventDefault();
     },
     guardarRemision(evt) {
+      console.log(this.remision);
       evt.preventDefault();
       this.inProgress = true;
 
@@ -413,6 +444,19 @@ export default {
       this.remision.placaVehiculo = (
         "" + this.remision.placaVehiculo
       ).toUpperCase();
+
+      if (!this.remision.codUbigeoOrigen) {
+        this.$toasted.show("No ha seleccionado Ubigeo de Partida");
+        this.inProgress = false;
+        return false;
+      }
+      if (!this.remision.codUbigeoDestino) {
+        this.$toasted.show("No ha seleccionado Ubigeo de Destino");
+        this.inProgress = false;
+
+        return false;
+      }
+
       this.axios
         .post(this.API + "remision", {
           remision: this.remision,
