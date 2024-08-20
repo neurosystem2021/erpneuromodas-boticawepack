@@ -19,7 +19,7 @@
         </thead>
         <tbody>
             <tr v-for="(prod, i) in kardexSaldo" :key="i">
-                <td>{{ prod.Fecha }}</td>
+                <td class="fecha-column">{{ prod.Fecha }}</td>
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
                 <td>{{ prod.Nombres }}</td>
                 <td :class="{'table-warning': prod.IngresoCantidad > 0}">{{ prod.IngresoCantidad }}</td>
@@ -73,6 +73,10 @@ table thead th {
 }
 .table-danger {
     text-align: center;
+}
+
+.fecha-column {
+    width: 100px;
 }
 
 </style>
