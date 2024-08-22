@@ -10,7 +10,6 @@
             <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
               type="text"
@@ -117,9 +116,8 @@
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <input 
-              required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
               min="0"
               step="0.0001"
@@ -209,14 +207,14 @@
       </b-row>
 
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
+              @input="actualizarPorcentajeUtilidad"
               type="number"
               class="form-control"
               step="0.0001"
@@ -228,7 +226,7 @@
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
               type="number"
-              @input.native="actualizarPorcentajeUtilidad"
+              @input="actualizarPorcentajeUtilidad"
               class="form-control"
               step="0.0001"
               />
@@ -312,7 +310,11 @@ export default {
   watch: {
     show (val) {
       let newVal = this.productoUpdate  || {}
-      if (newVal.IdProducto) {
+      if (newVal.IdProducto && !this.nuevo) {
+          this.axios.get(this.API + 'productos/id/'+newVal.IdProducto
+          ).then((response) => {
+          newVal = response.data 
+          this.initForm()
         this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
@@ -380,13 +382,18 @@ export default {
         this.producto.Imagen = newVal.Imagen
         this.$refs.file.value=null
         this.file = ''
+        }).catch((error) => {
+            console.log(error)
+            this.initForm()
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
       } else {
         this.$refs.file.value=null
         this.file = ''
         this.title = 'Nuevo Producto'
         this.clearForm()
 
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        //this.$refs.inputCodigoBarra.$el.disabled = false
       }
     }
   },
@@ -491,7 +498,7 @@ export default {
       var precioContado = this.producto.PrecioContado
       var precioCosto = this.producto.PrecioCosto
 
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(((precioContado - precioCosto)/precioCosto) * 100)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
