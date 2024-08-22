@@ -267,6 +267,13 @@
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
           />
+            <b-form-checkbox 
+                v-model=productos[data.index].editarPrecio
+                :value="1"                                  
+                :unchecked-value="0"
+                @change="actualizarEditarPrecio(data.index)">
+                <b style="color:#17a2b8; font-size:0.8rem">Editar precio</b>
+            </b-form-checkbox> 
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -714,6 +721,7 @@ export default {
   },
   data() {
     return {
+      editarPrecio: 0,
       index: null,
       mostrarTablaProductos: true,
       empresa: "",
@@ -890,6 +898,76 @@ export default {
       actualizarProd: "actualizarProducto"
       // obtenerStok: "obtenerStock",
     }),
+    actualizarEditarPrecio(index) {
+            // Cambio de estado del checkbox
+            //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
+            let producto = this.productos[index];
+
+            if (producto.editarPrecio === 1) {
+                  producto.editarPrecio = 0;
+                  return;
+                }
+
+            this.$swal({
+                title: 'Escriba la contraseña del administrador',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Atrás',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+                preConfirm: () => {
+                    return new Promise((resolve) => {
+                        resolve({
+                            password: document.getElementById('password').value
+                        });
+                    });
+                }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let password = result.value.password;
+                        this.axios.post(this.API + 'login', {
+                            user: 'admin',
+                            password: password
+                        }).then(response => {
+                            // Respuesta de la API
+                            if (response.data) {
+                              producto.editarPrecio = 1;
+                            } else {
+                                this.$swal({
+                                    title: 'Error',
+                                    text: 'Contraseña incorrecta',
+                                    icon: 'error',
+                                }).then(() => {
+                                          // Si la contraseña es incorrecta, desmarca el checkbox
+                                          //this.checkboxValue = 0;
+                                          producto.editarPrecio = 0;
+                                      });
+                            }
+                        }).catch(error => {
+                            // Error en la solicitud
+                            this.$swal({
+                                title: 'Error',
+                                text: 'Hubo un problema con la solicitud',
+                                icon: 'error',
+                            });
+                        });
+                    }else {
+                            // Si el modal se cierra sin confirmar
+                            //this.checkboxValue = 0;
+                            producto.editarPrecio = 0;
+                     }
+                }).catch(error => {
+                          if (error) {
+                              this.$swal({
+                                  title: 'Advertencia',
+                                  text: error,
+                                  icon: 'warning',
+                              });
+                          }
+                      });
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;

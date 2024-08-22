@@ -63,6 +63,15 @@
       </div>
       <br /><br />
       <b-row>
+        <b-col>
+          <b-row class="my-1"></b-row>
+        </b-col>
+        <b-col>
+          <b-row class="my-2"></b-row>
+        </b-col>
+        <b-col>
+          <b-row class="my-3"></b-row>
+        </b-col>
         <b-col md="12" v-if="this.$route.query.idPedido">
           <div class="form-inline">
             <h4>
@@ -95,6 +104,15 @@
                     </autocomplete>
                   </b-input-group>
                 </b-form-group>
+                  <b-form-checkbox
+                    v-model="venta.EsSeparado"
+                    :value="1"
+                    :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1" :style="{ whiteSpace: 'nowrap' }">
+                    <b>VENTA CON SEPARACION</b>
+                    <b-col>
+                    <b-row class="my-3"></b-row>
+                    </b-col>
+                  </b-form-checkbox> 
                 <b-form-group v-if="isNota">
                   <label>Doc. Referencia:</label>
                   <autocomplete
@@ -1098,6 +1116,8 @@ export default {
         EsOrganizacion: 0,
         NombreOrganizacion: "",
         NroComprobanteModifica: "",
+        EsSeparado: 0,
+        Separado: 0,
         CodSunatModifica: "",
         NotaIdMotivo: "",
         NotaDescMotivo: "",
@@ -1110,6 +1130,8 @@ export default {
       };
       this.isNota = false;
       this.bloquearInput = false;
+      this.MontoConsumido = 0;
+      this.MontoTotal = 0;
       this.adelantosPreOrden = [];
       this.adelanto = 0;
       this.infoDelivery = {};
@@ -1122,6 +1144,11 @@ export default {
       this.venta.CodSunatModifica = "";
       this.venta.NotaIdMotivo = "";
       this.venta.NotaDescMotivo = "";
+      this.venta.EsSeparado = 0;
+      this.venta.Separado = 0;
+      this.venta.SeparadoId = 0;
+      this.MontoConsumido = 0;
+      this.MontoTotal = 0;
       this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
@@ -1138,6 +1165,7 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
+      this.venta.EsSeparado = obj.EsSeparado
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -1212,6 +1240,44 @@ export default {
           this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
+    setDocRefConsumo (obj) {
+            this.venta.SeparadoId = obj.IdDocVenta
+            this.MontoConsumido = obj.SubTotalSeparado
+            this.MontoTotal = obj.SubtotalIni
+            this.axios.get(this.API + 'venta/detalle/comprobante', {
+                params: {
+                    NroComprobante: obj.NroComprobante,
+                    idDocVenta: obj.IdDocVenta,
+                    IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+                }
+            }).then((response) => {
+                this.venta.Placa = ''
+                this.venta.Km = ''
+                this.venta.DescripcionEmbarcacion = ''
+                this.axios.get(this.API + 'cliente', {
+                    params: {
+                        idCliente: response.data[0].IdCliente
+                }})
+                .then((response) => {
+                    if (response.data) {
+                        this.$refs.inputCliente.setValue(response.data.Cliente)
+                        this.venta.cliente = response.data
+                        this.venta.CampoDireccion = this.venta.cliente.Direccion
+                    } else {
+                        this.$toasted.show('No se encontro al cliente')
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+                this.limpiarCart()
+                response.data.map((item) => {
+                    this.add([item, () => {
+                    }, false ])
+                })
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+            })
+        },
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
         this.bloquearInput = true;
@@ -1227,7 +1293,9 @@ export default {
     setAlmacen(obj) {
       this.venta.almacen = obj;
       this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      if(this.productos.length>0){
+                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
+            }
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -1511,6 +1579,14 @@ export default {
       evt.preventDefault();
 
       this.inProgress = true;
+      if(this.venta.Separado == 1 && this.venta.ConsumoId == 0){
+                this.$toasted.show('Debe seleccionar una venta consumo...')
+                this.inProgress = false
+                return 
+            }
+            if(this.venta.Separado == 0){
+                this.venta.ConsumoId = 0
+            }
       let totalPagos = 0;
       totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
         ? 0

@@ -357,6 +357,33 @@
         </table>
       </b-row>
 
+      <b-row>
+        <h5>Ventas Vale</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasVale" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>{{ item.EfectivoDesc }} - {{ item.VisaDesc }} - {{ item.MastercardDesc }} - {{ item.TransferenciaDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Vale</b></td>
+              <td class="total"><b>S/. {{ totalVentasVale | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
       <b-row class="credito no-print">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
@@ -686,6 +713,18 @@ export default {
       return this.ventas.filter(venta => {
         return venta.Visa > 0 && !venta.EsCredito;
       });
+    },
+    totalVentasVale() {
+      let total = 0
+      this.ventasVale.forEach(venta => {
+        if (!venta.Anulado) total += (venta.Transferencia + venta.Mastercard + venta.Efectivo + venta.Visa)
+      });
+      return total
+    },
+    ventasVale () {
+      return this.ventas.filter(venta => {
+        return venta.EsVale == 1
+      })
     },
     totalVentasMastercard() {
       let total = 0;
