@@ -392,6 +392,45 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
+    <b-col md="3" v-show="tipo == 'mov' || !opcionCarrito">
+ <table class="table b-table border table-footer">
+            <tbody>
+              <tr v-if="sumatoriaDescuento > 0">
+                <td class="table-success">SubTotal</td>
+                <td class="table-success">{{ parseFloat(sumatoriaSubTotal()) + parseFloat(sumatoriaDescuento) | redondear }}</td>
+              </tr>
+              <tr v-if="sumatoriaDescuento > 0">
+                <td class="table-danger">Descuento</td>
+                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
+              </tr>
+              <tr>
+                <td><b>SubTotal</b></td>
+                <td class="table-danger">{{ sumatoriaSubTotal()  }}</td>
+              </tr>
+              <tr v-if="sumatoriaIgv > 0">
+                <td><b>IGV</b></td>
+                <td class="table-danger">{{ sumatoriaIgv }}</td>
+              </tr>
+              <tr>
+                <td><b>TOTAL</b></td>
+                <td class="table-danger">{{ sumatoriaTotal() }}</td>
+              </tr>
+              <tr>
+                <td  colspan="2">
+                  <label>pagó con:</label>
+                  <b-form-input
+                    type="text"
+                    :disabled="bloquearInput?true:false"
+                    placeholder="Pagó con"
+                    v-model="pagocon"
+                    @input="asignarVuelto"></b-form-input><br>
+                  <label>Vuelto:</label>
+                  <b>S/ {{ calcVuelto() }}</b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </b-col>
     <b-col md="3" v-show="tipo != 'mov' || opcionCarrito">
           <table class="table b-table border table-footer">
             <tbody>
@@ -1430,29 +1469,31 @@ export default {
             }&sortBy=stock&sortDesc=1&limit=1`
           )
           .then(response => {
-            let prod = response.data[0];
+            const prod = response.data[0];
+            // console.log(prod);
             if (prod.IdProducto) {
               if (this.productos.some(v => v.IdProducto == prod.IdProducto)) {
-                let prod = this.productos.filter(
+                console.log(prod);
+                let prodNew = this.productos.filter(
                   v => v.IdProducto == prod.IdProducto
                 )[0];
-                if (prod.tipo == "UNIDAD") {
-                  prod.cantxPrecio = 0;
-                  prod.cantidad++;
-                  prod.subtotal = prod.cantidad * prod.precio;
-                  prod.total = prod.cantidad * prod.precio;
+                if (prodNew.tipo == "UNIDAD") {
+                  prodNew.cantxPrecio = 0;
+                  prodNew.cantidad++;
+                  prodNew.subtotal = prodNew.cantidad * prodNew.precio;
+                  prodNew.total = prodNew.cantidad * prodNew.precio;
                   this.productos.filter(
-                    v => v.IdProducto == prod.IdProducto
-                  )[0] = prod;
+                    v => v.IdProducto == prodNew.IdProducto
+                  )[0] = prodNew;
                 }
-                if (prod.tipo == "PRESENTACION") {
-                  prod.cantidad++;
-                  prod.cantxPrecio++;
-                  prod.subtotal = prod.cantxPrecio * prod.precio;
-                  prod.total = prod.cantxPrecio * prod.precio;
+                if (prodNew.tipo == "PRESENTACION") {
+                  prodNew.cantidad++;
+                  prodNew.cantxPrecio++;
+                  prodNew.subtotal = prodNew.cantxPrecio * prodNew.precio;
+                  prodNew.total = prodNew.cantxPrecio * prodNew.precio;
                   this.productos.filter(
-                    v => v.IdProducto == prod.IdProducto
-                  )[0] = prod;
+                    v => v.IdProducto == prodNew.IdProducto
+                  )[0] = prodNew;
                 }
                 this.tableProductos = false;
                 this.tableProductos = true;
