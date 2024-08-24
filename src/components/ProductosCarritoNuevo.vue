@@ -457,48 +457,48 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
 export default {
   mounted() {
-  console.log('FROM PRODUCOS')
+    console.log("FROM PRODUCOS");
     // this.alterarBuscadorProductos()
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
       handleKeyDown: false,
       vuelto: 0,
-      pagocon: '',
+      pagocon: "",
       cliente: {},
       preciosProd: [],
       objProd: {},
-      PresentacionesProd:[],
-      medicionPro:'UNIDAD',
+      PresentacionesProd: [],
+      medicionPro: "UNIDAD",
       cant: 0,
       precioCont: 0,
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil'),
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       accionBoton: 1,
-      productoChange:null,
-      cantidadInput:'',
+      productoChange: null,
+      cantidadInput: "",
       capturaIndex: 0,
-      indexPos: null,
-    }
+      indexPos: null
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     },
-    productos (prods) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+    productos(prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi >= 0 && !this.productos[pi].precioBruta) {
-        this.productos[pi].precioBruta = this.productos[pi].precio
+        this.productos[pi].precioBruta = this.productos[pi].precio;
       }
     }
   },
@@ -511,14 +511,14 @@ export default {
     tipoCambio: Number,
     igvTotal: Boolean,
     idAlmacen: Number,
-    bloquearInput:Boolean,
+    bloquearInput: Boolean,
     idMetodoPago: Number,
-    esDelivery:Boolean,
-    touchHab:Boolean,
+    esDelivery: Boolean,
+    touchHab: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -526,28 +526,47 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-            //{ key: 'presentaciones', label: '', sortable: false, class:'text-center stocksize'},
-            { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
-            { key: 'Producto', class:'fontsize thsize' },
-            //{ key: 'Indicaciones', label: 'Indicaciones' , class:'thsize'},
-            //{ key: 'eventPres', label: '', class:'thsize' },
-            // { key: 'cantxPrecio', variant: 'warning' },
-            // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-            // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-            /*{ key: 'ProductoMedicion', label: 'Medición' },*/
-            //{ key: 'cantxPrecio', variant: 'warning', class:'text-center thsize' },
-            { key: 'eventPresent', label: '', class:'fontsize thsize' },
-            { key: 'Presentacion', label: 'Presentación', class:'text-center stocksize' },
-            { key: 'cantidad', class:'text-center thsize' },
-            { key: 'precio', label: 'Precio' , class:'thsize' },
-            //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
-            { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center thsize' }, 
-            { key: 'descuento', label: 'Descuento', class:'thsize'},
-            { key: 'total', label: 'Total', variant: 'danger', class:'text-center thsize' },
-            { key: 'acciones', label: '', class:'thsize'}
-        ]
+          //{ key: 'presentaciones', label: '', sortable: false, class:'text-center stocksize'},
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center stocksize"
+          },
+          { key: "Producto", class: "fontsize thsize" },
+          //{ key: 'Indicaciones', label: 'Indicaciones' , class:'thsize'},
+          //{ key: 'eventPres', label: '', class:'thsize' },
+          // { key: 'cantxPrecio', variant: 'warning' },
+          // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+          // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+          /*{ key: 'ProductoMedicion', label: 'Medición' },*/
+          //{ key: 'cantxPrecio', variant: 'warning', class:'text-center thsize' },
+          { key: "eventPresent", label: "", class: "fontsize thsize" },
+          {
+            key: "Presentacion",
+            label: "Presentación",
+            class: "text-center stocksize"
+          },
+          { key: "cantidad", class: "text-center thsize" },
+          { key: "precio", label: "Precio", class: "thsize" },
+          //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center thsize"
+          },
+          { key: "descuento", label: "Descuento", class: "thsize" },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center thsize"
+          },
+          { key: "acciones", label: "", class: "thsize" }
+        ];
       },
       type: Array
     }
@@ -557,554 +576,594 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    apiInidicaciones () {
-        return this.API + 'indicaciones'
+    apiInidicaciones() {
+      return this.API + "indicaciones";
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
-      obtenerStok: 'obtenerStock',
-      limpiarCart: 'limpiarCarrito',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock",
+      limpiarCart: "limpiarCarrito"
     }),
-    actualizaDesc(index,prod){
+    actualizaDesc(index, prod) {
       //Vue.delete(this.productos[index], 'descuento');
-      Vue.set(this.productos[index],'descuento',parseFloat(prod.descuento))
-      this.actualizarProd({Producto:prod,Pos:index})
+      Vue.set(this.productos[index], "descuento", parseFloat(prod.descuento));
+      this.actualizarProd({ Producto: prod, Pos: index });
     },
-    changeCant (val, prod, index) {
+    changeCant(val, prod, index) {
       if (val) {
-        prod.cantidad = val
+        prod.cantidad = val;
         //prod.cantidad = Number(val)
       }
       this.$nextTick(() => {
-        this.actualizarProd({Producto:prod,Pos:index})
-      })
+        this.actualizarProd({ Producto: prod, Pos: index });
+      });
     },
-    abrirPop1(index){
+    abrirPop1(index) {
       if (!this.touchHab) {
-        return
+        return;
       }
-      this.capturaIndex = index
-      this.objProd=this.productos[index];
-      this.$refs['modalIngCant'].show()
-      this.$refs['modalIngPre'].hide()
-      this.$refs['modalIngDesc'].hide()
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngCant"].show();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
     },
-    abrirPop2(index){
+    abrirPop2(index) {
       if (!this.touchHab) {
-        return
+        return;
       }
-      this.capturaIndex = index
-      this.objProd=this.productos[index];
-      this.$refs['modalIngPre'].show()
-      this.$refs['modalIngCant'].hide()
-      this.$refs['modalIngDesc'].hide()
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngPre"].show();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngDesc"].hide();
     },
-    abrirPop3(index){
+    abrirPop3(index) {
       if (!this.touchHab) {
-        return
+        return;
       }
-      this.capturaIndex = index
-      this.objProd=this.productos[index];
-      this.$refs['modalIngDesc'].show()
-      this.$refs['modalIngCant'].hide()
-      this.$refs['modalIngPre'].hide()
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngDesc"].show();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
     },
-    addNumber(number){
-       this.cantidadInput = this.cantidadInput + number
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
     },
-    addPoint(){
-     if (!(''+this.cantidadInput).includes('.')){
-          this.$nextTick(()=>{
-            this.cantidadInput = this.cantidadInput + '.'
-          })
-     }
-    },
-    deleteNumber(){
-      this.cantidadInput = this.cantidadInput.toString().slice(0,-1)
-    },
-    verificar(e){
-      if((e.key=='.' && (''+this.cantidadInput).includes('.')) || e.key==' '){
-        e.preventDefault()
+    addPoint() {
+      if (!("" + this.cantidadInput).includes(".")) {
+        this.$nextTick(() => {
+          this.cantidadInput = this.cantidadInput + ".";
+        });
       }
     },
-    ingresaNum(index){
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    verificar(e) {
+      if (
+        (e.key == "." && ("" + this.cantidadInput).includes(".")) ||
+        e.key == " "
+      ) {
+        e.preventDefault();
+      }
+    },
+    ingresaNum(index) {
       index = this.capturaIndex;
-      this.cantidadInput==''?this.cantidadInput=1:this.cantidadInput
+      this.cantidadInput == "" ? (this.cantidadInput = 1) : this.cantidadInput;
 
-      if (this.$refs['modalIngCant'].is_show) {
-        this.productos[index].cantidad= this.cantidadInput;
-        this.actualizaDesc(index,this.productos[index])
+      if (this.$refs["modalIngCant"].is_show) {
+        this.productos[index].cantidad = this.cantidadInput;
+        this.actualizaDesc(index, this.productos[index]);
       }
-      if (this.$refs['modalIngPre'].is_show) {
+      if (this.$refs["modalIngPre"].is_show) {
         this.productos[index].precio = this.cantidadInput;
-        this.setNuevoPrecioContado(index)
+        this.setNuevoPrecioContado(index);
       }
-      if (this.$refs['modalIngDesc'].is_show) {
+      if (this.$refs["modalIngDesc"].is_show) {
         this.productos[index].descuento = this.cantidadInput;
-        this.ActualizarDesc(index,this.cantidadInput)
+        this.ActualizarDesc(index, this.cantidadInput);
       }
-      
-      this.cantidadInput = ''
-      this.$refs['modalIngCant'].hide()
-      this.$refs['modalIngPre'].hide()
-      this.$refs['modalIngDesc'].hide()
+
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
     },
-    cerrrarNum(){
-      this.cantidadInput = ''
-      this.$refs['modalIngCant'].hide()
-      this.$refs['modalIngPre'].hide()
-      this.$refs['modalIngDesc'].hide()
+    cerrrarNum() {
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
     },
-    showPresentacion (obj, index = null) {
-      if (obj.PreciosPorProducto !== '' && obj.PreciosPorProducto !== null ) {
-          this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
-          this.objProd = obj
-          this.$refs['modalCant'].show()
-          this.indexPos = index
-          return
+    showPresentacion(obj, index = null) {
+      if (obj.PreciosPorProducto !== "" && obj.PreciosPorProducto !== null) {
+        this.preciosProd = obj.PreciosPorProducto
+          ? JSON.parse(obj.PreciosPorProducto)
+          : [];
+        this.objProd = obj;
+        this.$refs["modalCant"].show();
+        this.indexPos = index;
+        return;
       }
     },
-    setIndicacion(obj){
-      this.$nextTick(()=>{
-        if(this.productoSelect.indicacion==null || this.productoSelect.indicacion == undefined){
-          this.productoSelect.indicacion = ''
+    setIndicacion(obj) {
+      this.$nextTick(() => {
+        if (
+          this.productoSelect.indicacion == null ||
+          this.productoSelect.indicacion == undefined
+        ) {
+          this.productoSelect.indicacion = "";
         }
-        this.productoSelect.indicacion = this.productoSelect.indicacion +" -"+ obj.Indicacion
+        this.productoSelect.indicacion =
+          this.productoSelect.indicacion + " -" + obj.Indicacion;
         //this.actualizarProd(this.productoSelect)
-      })
-      
+      });
     },
-    limpiar(){
-        this.limpiarCart()
+    limpiar() {
+      this.limpiarCart();
     },
-    cambiarPrecio (index, prod) {
-      var utilidad =   (1-(this.productos[index].PorcentajeUtilidad / 100))
-      this.productos[index].precio = Math.round((this.productos[index].PrecioCosto / utilidad)*10)/10
+    cambiarPrecio(index, prod) {
+      var utilidad = 1 - this.productos[index].PorcentajeUtilidad / 100;
+      this.productos[index].precio =
+        Math.round((this.productos[index].PrecioCosto / utilidad) * 10) / 10;
     },
-    
-    addManoDeObra (index, e) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-      if ( pi < 0 ) {
-        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
-        
-        this.productos[index].EsManoDeObra = 0
-        return ;
+
+    addManoDeObra(index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+      if (pi < 0) {
+        this.$toasted.error("Primero seleccione el producto MANODEOBRA");
+
+        this.productos[index].EsManoDeObra = 0;
+        return;
       }
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = true
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) -
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = true;
       } else {
-        e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].precio = 0
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = false
+        e.target.parentNode.parentNode.removeAttribute("style");
+        this.productos[pi].precio = 0;
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) +
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = false;
       }
     },
-    updateManoDeObraNeta (index) {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    updateManoDeObraNeta(index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
-      })
-      
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
+
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi >= 0 && index !== pi) {
-        this.productos[pi].precio = precio
+        this.productos[pi].precio = precio;
       }
     },
-    asignarDisabledProf (index, e) {
+    asignarDisabledProf(index, e) {
       if (e.target.checked === true) {
-        this.productos[index].disabledProf = 1
-        return
+        this.productos[index].disabledProf = 1;
+        return;
       }
-      this.productos[index].disabledProf = 0
+      this.productos[index].disabledProf = 0;
     },
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
-    editarProducto(Pro){
-      this.indexPos = index
-      this.productoSelect = Pro
+    editarProducto(Pro) {
+      this.indexPos = index;
+      this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    agregarGuardar(id,obj){
-      this.add([id,false,false,false,false,true,this.isVentas]);
+    agregarGuardar(id, obj) {
+      this.add([id, false, false, false, false, true, this.isVentas]);
       setTimeout(() => {
-              //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, 200); 
-      
-      if(this.isVentas){
-          obj.estadoPxP = false
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-          obj.IdProductoMarca= obj.marca.IdProductoMarca
-          obj.ProductoMarca= obj.marca.ProductoMarca
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria
-          this.productoSelect = obj
-          this.showPresentacion(this.productoSelect)
+        //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      }, 200);
+
+      if (this.isVentas) {
+        obj.estadoPxP = false;
+        obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+        obj.IdProductoMarca = obj.marca.IdProductoMarca;
+        obj.ProductoMarca = obj.marca.ProductoMarca;
+        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+        obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+        this.productoSelect = obj;
+        this.showPresentacion(this.productoSelect);
       }
     },
-    setProducto (obj) {
-      this.precioCont = obj.PrecioContado
-      this.medicionPro = obj.ProductoMedicion
-      this.preciosProd = []
-      this.objProd = {}
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
+    setProducto(obj) {
+      this.precioCont = obj.PrecioContado;
+      this.medicionPro = obj.ProductoMedicion;
+      this.preciosProd = [];
+      this.objProd = {};
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
 
-      let fpp = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0' || p.cantidad === '')
+      let fpp = this.preciosProd.filter(
+        p => p.cantidad === 0 || p.cantidad === "0" || p.cantidad === ""
+      );
 
-      if (fpp.length==4) {
-        this.setProductoUni(obj)
-        return
+      if (fpp.length == 4) {
+        this.setProductoUni(obj);
+        return;
       }
 
-      this.$refs['modalCant'].show()
-      this.objProd = obj
-    },  
-    setProductoUni (obj) {
-      obj.precio = obj.PrecioContado
-      obj.cantidad = 1
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj.indicacion = ''
-      obj.Presentacion = obj.ProductoMedicion
-      obj.CantidadPresentacion = 1
-      obj.EsPresentacion = 0
-      obj.EsVentaNew = false
-      obj.precioc = obj.PrecioCosto
-      obj = this.onSetProducto(obj)
-      if(this.indexPos != null){
-        this.actualizarProd({Producto:obj,Pos:this.indexPos})
-        this.indexPos = null
-        this.$refs['modalCant'].hide()
-        return
-      }
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-      }, { setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
-      this.$refs['modalCant'].hide()
+      this.$refs["modalCant"].show();
+      this.objProd = obj;
     },
-    setProductoCant (prod) {
-      let obj = {...this.objProd}
-      obj.Presentacion = prod.nombre
-      obj.CantidadPresentacion = prod.cantidad
-      obj.precioc = prod.precioc 
-      obj.precio = prod.precio
-      obj.cantidad = 1
-      obj.EsPresentacion = 1
-      obj.subt = ''
-      obj.Descripcion = prod.nombre
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj.EsVentaNew = false
-      obj = this.onSetProducto(obj, prod.precio, prod.precioc)
-      if(this.indexPos != null){
-        this.actualizarProd({Producto:obj,Pos:this.indexPos})
-        this.indexPos = null
-        this.$refs['modalCant'].hide()
-        return
+    setProductoUni(obj) {
+      obj.precio = obj.PrecioContado;
+      obj.cantidad = 1;
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.indicacion = "";
+      obj.Presentacion = obj.ProductoMedicion;
+      obj.CantidadPresentacion = 1;
+      obj.EsPresentacion = 0;
+      obj.EsVentaNew = false;
+      obj.precioc = obj.PrecioCosto;
+      obj = this.onSetProducto(obj);
+      if (this.indexPos != null) {
+        this.actualizarProd({ Producto: obj, Pos: this.indexPos });
+        this.indexPos = null;
+        this.$refs["modalCant"].hide();
+        return;
       }
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-      }, { setSuma: false, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
-      this.$refs['modalCant'].hide()
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto añadido correctamente");
+          this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+        },
+        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
+        false,
+        this.cliente.EsVIP
+      ]);
+      this.$refs["modalCant"].hide();
+    },
+    setProductoCant(prod) {
+      let obj = { ...this.objProd };
+      obj.Presentacion = prod.nombre;
+      obj.CantidadPresentacion = prod.cantidad;
+      obj.precioc = prod.precioc;
+      obj.precio = prod.precio;
+      obj.cantidad = 1;
+      obj.EsPresentacion = 1;
+      obj.subt = "";
+      obj.Descripcion = prod.nombre;
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.EsVentaNew = false;
+      obj = this.onSetProducto(obj, prod.precio, prod.precioc);
+      if (this.indexPos != null) {
+        this.actualizarProd({ Producto: obj, Pos: this.indexPos });
+        this.indexPos = null;
+        this.$refs["modalCant"].hide();
+        return;
+      }
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto añadido correctamente");
+          this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+        },
+        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
+        false,
+        this.cliente.EsVIP
+      ]);
+      this.$refs["modalCant"].hide();
     },
     showIndicaciones(obj) {
-      this.productoSelect = obj
-      this.$refs['modalIndi'].show()
+      this.productoSelect = obj;
+      this.$refs["modalIndi"].show();
     },
     renderChild(data) {
-        return `
+      return `
           <div>
             <b>${data.Indicacion}</b>
           </div>  
-          `
+          `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
-    setNuevoPrecioContado (index) {
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
-      if(this.isVentas){
-        precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-      }else{
-        precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      if (this.isVentas) {
+        precio += precio * (this.productos[index].PorcentajeUtilidad / 100);
+      } else {
+        precio = precio / (1 - this.productos[index].PorcentajeUtilidad / 100);
       }
-      let normalPrecio = this.$options.filters.redondear(precio)
+      let normalPrecio = this.$options.filters.redondear(precio);
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precio, 1)
-      
+      let nuevoPrecio = this.$options.filters.redondear(precio, 1);
+
       if (this.tipoCambio > 0) {
-        normalPrecio *= this.tipoCambio
-        nuevoPrecio *= this.tipoCambio
+        normalPrecio *= this.tipoCambio;
+        nuevoPrecio *= this.tipoCambio;
       }
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
-      this.getSubtotal(index)
+      Vue.set(
+        this.productos[index],
+        "normalPrecioContado",
+        parseFloat(normalPrecio).toFixed(2)
+      );
+      Vue.set(
+        this.productos[index],
+        "nuevoPrecioContado",
+        Math.ceil(nuevoPrecio)
+      );
+      this.getSubtotal(index);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
       //this.updateManoDeObraNeta(index)
     },
-    ActualizarDesc(index,val){
-      Vue.delete(this.productos[index], 'descuento');
-      Vue.set(this.productos[index],'descuento',parseFloat(val))
+    ActualizarDesc(index, val) {
+      Vue.delete(this.productos[index], "descuento");
+      Vue.set(this.productos[index], "descuento", parseFloat(val));
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     },
     formatFecha(fecha) {
       if (fecha) {
-			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+        return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
       } else {
-        return ''
+        return "";
       }
-		}
+    }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style scoped>
-  .contentCard {
-    cursor: pointer;
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid black;
+}
+.nomCart2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers td {
+  min-width: 40px;
+  min-height: 40px;
+  border: 0.5px solid #a3a3a3;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  padding: 1.8% 1.8%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  font-family: Arial;
+  color: black;
+  background-color: #fff;
+}
+.calc__numbers td:last-child {
+  background-color: #eaeaea;
+}
+.calc__numbers2 td:last-child {
+  background-color: white;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+}
+.calc__numbers .accionActiva {
+  color: #fff !important;
+  background: #65ba9b !important;
+}
+.pagocon .input-group-text {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.fontsize {
+  font-size: 50px !important;
+}
+.new {
+  animation: blink 0.3s ease;
+}
+@keyframes blink {
+  0% {
+    background-color: yellow;
   }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
-  }
-  .nomCart {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-right: 2px solid black;
-  }
-  .nomCart2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
- 
-    .calc__numbers {
-        width:  15vw;
-        height: 15vw;
-    }
-    .calc__numbers2 {
-        width:  100%;
-        height: 20vh;
-    }
-    .calc__numbers td {
-    min-width: 40px;
-    min-height: 40px;
-    border: 0.5px solid #A3A3A3;
-    cursor: pointer;
-    text-align: center;
-    vertical-align: middle;
-    padding:1.8% 1.8%;
-    font-size: 0.8rem;
-    font-weight: bold;
-    font-family: Arial;
-    color: black;
-    background-color: #fff;
-    }
-    .calc__numbers td:last-child {
-    background-color: #EAEAEA;
-    }
-    .calc__numbers2 td:last-child {
+  100% {
     background-color: white;
-    }
-    .calc__numbers .botones:hover {
-    color: #fff;
-    background: #65BA9B;
-    }
-    .calc__numbers .accionActiva{
-        color: #fff !important;
-        background: #65BA9B !important;
-    }
-    .pagocon .input-group-text{
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-    .fontsize{
-      font-size: 50px !important;
-    }
-    .new {
-      animation: blink 0.3s ease;
-    }
-    @keyframes blink {
-      0% {
-        background-color: yellow;
-      }
-      100% {
-        background-color: white;
-      }
-    }
+  }
+}
 </style>
 
 <style>
-    .ingCant .modal-backdrop{
-      background: transparent;
-    }
-    .ingPre .modal-backdrop{
-      background: transparent;
-    }
-    .ingDesc .modal-backdrop{
-      background: transparent;
-    }
-    #ingCant {
-      height: unset !important;
-      right: unset !important;
-      bottom: unset !important;
-      margin-left: 25vw;
-    }
-    #ingPre {
-      height: unset !important;
-      right: unset !important;
-      bottom: unset !important;
-      margin-left: 10vw;
-    }
-    #ingDesc {
-      height: unset !important;
-      right: unset !important;
-      bottom: unset !important;
-      margin-left: 20vw;
-    }
-    td.fontsize{
-      font-size: 0.75rem !important;
-      font-weight: bold;
-      text-align: center; 
-      vertical-align: middle !important;
-    }
-    td.stocksize{
-      text-align: center !important; 
-      vertical-align: middle !important;
-    }
-    th.stocksize{
-      font-size: 0.8rem !important;
-      text-align: center;
-    }
-    th.thsize{
-      font-size: 0.85rem !important;
-      text-align: center;
-    }
-    td.thsize{
-      vertical-align: middle !important;
-    }
-    .popover-body{
-      background-color: #C1C1C1;
-    }
-    .bs-popover-bottom{
-      max-width: 370px !important;
-    }
+.ingCant .modal-backdrop {
+  background: transparent;
+}
+.ingPre .modal-backdrop {
+  background: transparent;
+}
+.ingDesc .modal-backdrop {
+  background: transparent;
+}
+#ingCant {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 25vw;
+}
+#ingPre {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 10vw;
+}
+#ingDesc {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 20vw;
+}
+td.fontsize {
+  font-size: 0.75rem !important;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle !important;
+}
+td.stocksize {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+th.stocksize {
+  font-size: 0.8rem !important;
+  text-align: center;
+}
+th.thsize {
+  font-size: 0.85rem !important;
+  text-align: center;
+}
+td.thsize {
+  vertical-align: middle !important;
+}
+.popover-body {
+  background-color: #c1c1c1;
+}
+.bs-popover-bottom {
+  max-width: 370px !important;
+}
 
-    #carrito td {
-    margin: 0 0.3rem !important;
-    padding: 0 0.3rem !important;
+#carrito td {
+  margin: 0 0.3rem !important;
+  padding: 0 0.3rem !important;
 }
 </style>
