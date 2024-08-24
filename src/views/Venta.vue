@@ -562,6 +562,7 @@ export default {
       //setInterval(this.updateTime, 1000)
       //this.escucharPedidos()
       this.getVendedorInfo()
+      this.configStock()
       //this.getCategorias()
       //this.getImpresoraCocina()
       //if(this.$route.query.idProyecto)
@@ -630,7 +631,8 @@ export default {
                     { key: 'descuento', label: 'Descuento'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
-                ]
+                ],
+                ventaSinStock:0
             },
             infoDelivery:{},
             //Nuevos datos
@@ -1189,6 +1191,15 @@ export default {
             this.loadClienteVarios()
             this.$router.replace('/venta')
             //this.$refs.inputNombreCliente.$refs.input.required = true 
+        },
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+                .then(res => {
+                    this.ventaSinStock = res.data
+                })
+                .catch((err)=>{
+                    this.ventaSinStock = 0
+                })
         },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
@@ -1901,11 +1912,11 @@ export default {
                 pro.Descripcion = (''+pro.Presentacion).trim()
 
             });
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
-                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con uniades para la presentacion.',{duration: 3000});
+            /*if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
+                this.$toasted.error('No se puede vender un producto sin stock, con cuenta con unidades para la presentacion.',{duration: 3000});
                 this.inProgress = false            
                 return;
-            }
+            }*/
             if(totalCero >= 1) {
                 //this.$toasted.error('No se puede enviar un producto en S/. 0.00');
                 this.$swal({
