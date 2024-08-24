@@ -174,6 +174,24 @@
                                 </b-form-group>
                             </b-col>
 
+                            <b-col md="6" class="mb-1">
+                                <b-input-group>
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsObservacion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Es observacion
+                                        </b-form-checkbox>
+                                        <input v-model="venta.NombreObservacion"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                required
+                                                placeholder="OBSERVACION" v-if="venta.EsObservacion" />
+                                    </b-input-group>
+                            </b-col>
+
                         </b-row>
                     </b-col>
                     <b-col md="3">
@@ -662,6 +680,8 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
+                EsObservacion: 0,
+                NombreObservacion: '',
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
@@ -1114,6 +1134,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.NombreObservacion = (''+this.venta.NombreObservacion).trim().toUpperCase()
             this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.IdPedido = this.$route.query.idPedido || null
