@@ -164,7 +164,7 @@ export default {
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       showLetras: false,
-      urlImg: "http://boticav1.local/resources/images/logo-ticket.png"
+      urlImg: "/resources/images/logo.png"
     };
   },
   methods: {
@@ -180,7 +180,7 @@ export default {
     },
     imprimir() {
       let html = `
-      <table>
+      <table width="100%">
         <thead>
           <tr>
              <th>DNI/RUC</th>
@@ -226,9 +226,13 @@ export default {
         <html>
           <head>
             <style>
+            *{
+            font-size: 0.8rem !important;
+            }
               body { 
                 font-family: Arial, sans-serif; 
                 padding: 20px 20px;
+                
               }
               .table-success {
                 background: #c3e6cb !important;
@@ -242,6 +246,10 @@ export default {
               }
               .mt-2{
                 margin: 4% 0 !important;
+              }
+              table,tr,td,th {
+                border-collapse: collapse;
+                border: 1px solid black; 
               }
             </style>
           </head>

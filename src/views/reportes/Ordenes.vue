@@ -195,7 +195,7 @@ export default {
         Telefono: null,
         UsuarioReg: null
       },
-      urlImg: "http://boticav1.local/resources/images/logo-ticket.png"
+      urlImg: "/resources/images/logo.png"
     };
   },
   computed: {
