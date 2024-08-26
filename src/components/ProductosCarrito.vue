@@ -776,7 +776,6 @@ export default {
       }
     },
     mostrarTablaProductos() {
-      
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
     }
@@ -899,74 +898,80 @@ export default {
       // obtenerStok: "obtenerStock",
     }),
     actualizarEditarPrecio(index) {
-            // Cambio de estado del checkbox
-            //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
-            let producto = this.productos[index];
+      // Cambio de estado del checkbox
+      //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
+      let producto = this.productos[index];
 
-            if (producto.editarPrecio === 1) {
-                  producto.editarPrecio = 0;
-                  return;
+      if (producto.editarPrecio === 1) {
+        producto.editarPrecio = 0;
+        return;
+      }
+
+      this.$swal({
+        title: "Escriba la contraseña del administrador",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Atrás",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        html:
+          '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+        preConfirm: () => {
+          return new Promise(resolve => {
+            resolve({
+              password: document.getElementById("password").value
+            });
+          });
+        }
+      })
+        .then(result => {
+          if (result.isConfirmed) {
+            let password = result.value.password;
+            this.axios
+              .post(this.API + "login", {
+                user: "admin",
+                password: password
+              })
+              .then(response => {
+                // Respuesta de la API
+                if (response.data) {
+                  producto.editarPrecio = 1;
+                } else {
+                  this.$swal({
+                    title: "Error",
+                    text: "Contraseña incorrecta",
+                    icon: "error"
+                  }).then(() => {
+                    // Si la contraseña es incorrecta, desmarca el checkbox
+                    //this.checkboxValue = 0;
+                    producto.editarPrecio = 0;
+                  });
                 }
-
+              })
+              .catch(error => {
+                // Error en la solicitud
+                this.$swal({
+                  title: "Error",
+                  text: "Hubo un problema con la solicitud",
+                  icon: "error"
+                });
+              });
+          } else {
+            // Si el modal se cierra sin confirmar
+            //this.checkboxValue = 0;
+            producto.editarPrecio = 0;
+          }
+        })
+        .catch(error => {
+          if (error) {
             this.$swal({
-                title: 'Escriba la contraseña del administrador',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Atrás',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
-                preConfirm: () => {
-                    return new Promise((resolve) => {
-                        resolve({
-                            password: document.getElementById('password').value
-                        });
-                    });
-                }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let password = result.value.password;
-                        this.axios.post(this.API + 'login', {
-                            user: 'admin',
-                            password: password
-                        }).then(response => {
-                            // Respuesta de la API
-                            if (response.data) {
-                              producto.editarPrecio = 1;
-                            } else {
-                                this.$swal({
-                                    title: 'Error',
-                                    text: 'Contraseña incorrecta',
-                                    icon: 'error',
-                                }).then(() => {
-                                          // Si la contraseña es incorrecta, desmarca el checkbox
-                                          //this.checkboxValue = 0;
-                                          producto.editarPrecio = 0;
-                                      });
-                            }
-                        }).catch(error => {
-                            // Error en la solicitud
-                            this.$swal({
-                                title: 'Error',
-                                text: 'Hubo un problema con la solicitud',
-                                icon: 'error',
-                            });
-                        });
-                    }else {
-                            // Si el modal se cierra sin confirmar
-                            //this.checkboxValue = 0;
-                            producto.editarPrecio = 0;
-                     }
-                }).catch(error => {
-                          if (error) {
-                              this.$swal({
-                                  title: 'Advertencia',
-                                  text: error,
-                                  icon: 'warning',
-                              });
-                          }
-                      });
+              title: "Advertencia",
+              text: error,
+              icon: "warning"
+            });
+          }
+        });
     },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
@@ -1151,7 +1156,10 @@ export default {
         }
       }
     },
-    setProducto(obj) {
+    setProducto(prod) {
+      let obj = { ...prod };
+      obj.PrecioVenta = prod.PrecioContado;
+      obj.PrecioContado = 0;
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
@@ -1260,13 +1268,11 @@ export default {
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
       if (index !== null && index !== undefined) {
-        
         this.$store.state.cart.productos[index] = obj;
         this.$refs["modalCant"].hide();
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
       } else {
-        
         this.add([
           obj,
           () => {
@@ -1284,7 +1290,7 @@ export default {
 
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
-        this.index = null;
+      this.index = null;
     },
     recalcularTotalPorItem(item, index) {
       let produc = { ...item };
@@ -1376,9 +1382,7 @@ export default {
         }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
+                
                 <td style="width: 5%">
                   <img src="${
                     data.Imagen == null || data.Imagen == ""

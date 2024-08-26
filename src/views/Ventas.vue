@@ -908,7 +908,6 @@ export default {
       }, 100);
     },
     recalcularTotalPorEmpresaFlag() {
-      
       setTimeout(() => {
         this.recalcularTotalesPorEmpresa();
       }, 100);
@@ -944,7 +943,6 @@ export default {
       add: "agregarProducto"
     }),
     async recalcularTotalesPorEmpresa() {
-      
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
         if (this.productos.some(p => p.Empresa == empresa.value)) {
@@ -1165,7 +1163,7 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      this.venta.EsSeparado = obj.EsSeparado
+      this.venta.EsSeparado = obj.EsSeparado;
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -1240,44 +1238,47 @@ export default {
           this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
-    setDocRefConsumo (obj) {
-            this.venta.SeparadoId = obj.IdDocVenta
-            this.MontoConsumido = obj.SubTotalSeparado
-            this.MontoTotal = obj.SubtotalIni
-            this.axios.get(this.API + 'venta/detalle/comprobante', {
-                params: {
-                    NroComprobante: obj.NroComprobante,
-                    idDocVenta: obj.IdDocVenta,
-                    IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
-                }
-            }).then((response) => {
-                this.venta.Placa = ''
-                this.venta.Km = ''
-                this.venta.DescripcionEmbarcacion = ''
-                this.axios.get(this.API + 'cliente', {
-                    params: {
-                        idCliente: response.data[0].IdCliente
-                }})
-                .then((response) => {
-                    if (response.data) {
-                        this.$refs.inputCliente.setValue(response.data.Cliente)
-                        this.venta.cliente = response.data
-                        this.venta.CampoDireccion = this.venta.cliente.Direccion
-                    } else {
-                        this.$toasted.show('No se encontro al cliente')
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-                this.limpiarCart()
-                response.data.map((item) => {
-                    this.add([item, () => {
-                    }, false ])
-                })
-                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })              
+    setDocRefConsumo(obj) {
+      this.venta.SeparadoId = obj.IdDocVenta;
+      this.MontoConsumido = obj.SubTotalSeparado;
+      this.MontoTotal = obj.SubtotalIni;
+      this.axios
+        .get(this.API + "venta/detalle/comprobante", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta,
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+          }
+        })
+        .then(response => {
+          this.venta.Placa = "";
+          this.venta.Km = "";
+          this.venta.DescripcionEmbarcacion = "";
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
+                idCliente: response.data[0].IdCliente
+              }
             })
-        },
+            .then(response => {
+              if (response.data) {
+                this.$refs.inputCliente.setValue(response.data.Cliente);
+                this.venta.cliente = response.data;
+                this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          this.limpiarCart();
+          response.data.map(item => {
+            this.add([item, () => {}, false]);
+          });
+          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+        });
+    },
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
         this.bloquearInput = true;
@@ -1293,9 +1294,9 @@ export default {
     setAlmacen(obj) {
       this.venta.almacen = obj;
       this.$refs.inputAlmacen.setValue(obj.Almacen);
-      if(this.productos.length>0){
-                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
-            }
+      if (this.productos.length > 0) {
+        this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      }
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -1579,14 +1580,14 @@ export default {
       evt.preventDefault();
 
       this.inProgress = true;
-      if(this.venta.Separado == 1 && this.venta.ConsumoId == 0){
-                this.$toasted.show('Debe seleccionar una venta consumo...')
-                this.inProgress = false
-                return 
-            }
-            if(this.venta.Separado == 0){
-                this.venta.ConsumoId = 0
-            }
+      if (this.venta.Separado == 1 && this.venta.ConsumoId == 0) {
+        this.$toasted.show("Debe seleccionar una venta consumo...");
+        this.inProgress = false;
+        return;
+      }
+      if (this.venta.Separado == 0) {
+        this.venta.ConsumoId = 0;
+      }
       let totalPagos = 0;
       totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
         ? 0
@@ -1723,7 +1724,17 @@ export default {
           totalCero += 1;
         }
       });
-
+      let previoMenorFlag = this.productos.some(
+        prod => prod.precio < prod.PrecioVenta
+      );
+      
+      if (previoMenorFlag) {
+        this.$toasted.show(
+          "Existen Productos, con monto, menor al precio de venta. Verifique"
+        );
+        this.inProgress = false;
+        return;
+      }
       if (
         sinStock >= 1 &&
         this.venta.tipoVenta.CodSunat != "07" &&
