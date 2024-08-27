@@ -3,8 +3,8 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
-          </b-button>
+          <!--<b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
+          </b-button>-->
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
@@ -267,13 +267,6 @@
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
           />
-            <b-form-checkbox 
-                v-model=productos[data.index].editarPrecio
-                :value="1"                                  
-                :unchecked-value="0"
-                @change="actualizarEditarPrecio(data.index)">
-                <b style="color:#17a2b8; font-size:0.8rem">Editar precio</b>
-            </b-form-checkbox> 
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
