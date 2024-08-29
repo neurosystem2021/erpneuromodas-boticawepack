@@ -1862,6 +1862,7 @@ export default {
             .then(async response => {
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
+              window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&preview=1&id_empresa=imperiop2', '_blank', 'noopener');
               // -------------------------
               await fetch("http://localhost:5000/imprimir/getcmdped.php", {
                 method: "POST",
