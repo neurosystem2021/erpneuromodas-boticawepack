@@ -998,6 +998,7 @@ export default {
       this.axios
         .get(this.API + "config/stock?id_emprea=" + this.empresa)
         .then(res => {
+          console.log(res.data);
           this.ventaSinStock = res.data;
         })
         .catch(err => {
@@ -1711,6 +1712,7 @@ export default {
       let totalCero = 0;
       this.productos.forEach(pro => {
         if (
+          pro.ControlaStock == "1" &&
           pro.CodigoBarra !== "COSTODELIVERY" &&
           pro.CodigoBarra !== "MANODEOBRA" &&
           (pro.stock <= 0 ||
@@ -1727,7 +1729,7 @@ export default {
       let previoMenorFlag = this.productos.some(
         prod => prod.precio < prod.PrecioVenta
       );
-      
+
       if (previoMenorFlag) {
         this.$toasted.show(
           "Existen Productos, con monto, menor al precio de venta. Verifique"

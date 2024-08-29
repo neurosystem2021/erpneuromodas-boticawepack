@@ -458,7 +458,7 @@
             <img src="static/moto-delivery.png" style="width: 24px" />
           </div>
           <div v-else>
-            <div>{{ data.item.stock }}</div>
+            <div  v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
             <img
               v-if="data.item.EsPadre"
               src="static/box.png"
