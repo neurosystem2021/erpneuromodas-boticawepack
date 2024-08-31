@@ -104,7 +104,7 @@
                     </autocomplete>
                   </b-input-group>
                 </b-form-group>
-                  <b-form-checkbox
+                  <!--<b-form-checkbox
                     v-model="venta.EsSeparado"
                     :value="1"
                     :unchecked-value="0" v-if="venta.tipoVenta.CodSunat=='12'" class="mt-1" :style="{ whiteSpace: 'nowrap' }">
@@ -112,7 +112,7 @@
                     <b-col>
                     <b-row class="my-3"></b-row>
                     </b-col>
-                  </b-form-checkbox> 
+                  </b-form-checkbox> -->
                 <b-form-group v-if="isNota">
                   <label>Doc. Referencia:</label>
                   <autocomplete

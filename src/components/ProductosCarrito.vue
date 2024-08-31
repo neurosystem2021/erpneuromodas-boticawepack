@@ -1149,10 +1149,7 @@ export default {
         }
       }
     },
-    setProducto(prod) {
-      let obj = { ...prod };
-      obj.PrecioVenta = prod.PrecioContado;
-      obj.PrecioContado = 0;
+    setProducto(obj) {
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
