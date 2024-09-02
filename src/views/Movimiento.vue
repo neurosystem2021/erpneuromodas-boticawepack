@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <b-container fluid>
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid>
           <b-row>
             <b-col cols="12">
                <b-form-select
@@ -207,8 +207,10 @@
           <b-row>
             <b-col>
               <productos-carrito 
+                :fields="carrito.fields"
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
+                :idAlmacen="movimiento.almacenOrigen.IdAlmacen"
                 :tipoCambio="movimiento.TipoCambio"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
@@ -223,7 +225,7 @@
         <br><br>
     </b-form>
 
-  </div>
+  </b-container>
 </template>
 
 <script>
@@ -256,7 +258,58 @@ export default {
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
       isTraslado: true,
-      isSalida: false
+      isSalida: false,
+      carrito: {
+        fields: [
+          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "CodigoBarra", label: "Código", sortable: true },
+          { key: "Producto", label: "Artículo" },
+          // { key: "NombreEmpresa", label: "Empresa" },
+          { key: "Descripcion", label: "Descripción" },
+          { key: "ProductoMarca", label: "Marca", sortable: true },
+          { key: "ProductoPresentacion", label: "Anaquel" },
+          { key: "obsequio", label: "Obsequio", class: "thcenter" },
+          { key: "eventPres", label: "" },
+          { key: "cantxPrecio", variant: "warning" },
+          // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+          // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          // { key: "subtotal", label: "SubTotal", variant: "success" },
+          {
+            key: "subtotales",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center"
+          },
+          { key: "igv", label: "IGV" },
+          { key: "precioVenta", label: "Precio venta (S/)" },
+          { key: "total", label: "Total", variant: "danger" },
+          // { key: "precio", label: "Precio" },
+          //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+          // {
+          //   key: "subtotal",
+          //   label: "SubTotal",
+          //   variant: "success",
+          //   class: "text-center"
+          // },
+
+          { key: "descuento", label: "Desc." },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center"
+          },
+          { key: "acciones", label: "" }
+        ]
+      }
     };
   },
   computed: {
@@ -343,7 +396,7 @@ export default {
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
-        almacenOrigen: { IdAlmacen: -1 },
+        almacenOrigen: { IdAlmacen: 1 },
         almacenDestino: { IdAlmacen: -1 },
         user: sessionStorage.getItem("User")
       };
@@ -361,7 +414,7 @@ export default {
     },
     setTipoMovimiento(obj) {
       if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
+        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
         this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.isTraslado = false;
         this.isSalida = false;

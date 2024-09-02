@@ -1737,6 +1737,7 @@ export default {
         this.inProgress = false;
         return;
       }
+
       if (
         sinStock >= 1 &&
         this.venta.tipoVenta.CodSunat != "07" &&
@@ -1758,21 +1759,27 @@ export default {
         this.inProgress = false;
         return;
       }
-
-      let count = 0;
-      for (const k in this.venta.pago) {
-        if (this.venta.pago[k].monto > 0) {
-          count = count + 1;
-        }
+      let productos = this.productos;
+      if (this.venta.tipoVenta.CodSunat == "07") {
+        productos = this.productos.map(item => {
+          item.Empresa = this.empresa;
+          return item;
+        });
       }
+      // let count = 0;
+      // for (const k in this.venta.pago) {
+      //   if (this.venta.pago[k].monto > 0) {
+      //     count = count + 1;
+      //   }
+      // }
 
-      if (count > 1) {
-        this.$toasted.show("Solo se permite un tipo de pago.");
-        this.inProgress = false;
-        return;
-      }
+      // if (count > 1) {
+      //   this.$toasted.show("Solo se permite un tipo de pago.");
+      //   this.inProgress = false;
+      //   return;
+      // }
 
-      this.venta.productos = this.productos;
+      this.venta.productos = productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
       this.venta.PagoCon = this.$refs.carrito.pagocon;
@@ -1855,14 +1862,20 @@ export default {
           //   }
           // });
           let comandaJson = JSON.stringify(dataImprimir);
-          // console.log(comandaJson);
+          console.log("dddd");
 
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
-              window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId + '&preview=1&id_empresa=imperiop2', '_blank', 'noopener');
+              window.open(
+                "/imprimir/index.php?IdDocVenta=" +
+                  response.data.insertId +
+                  "&preview=1&id_empresa=imperiop2",
+                "_blank",
+                "noopener"
+              );
               // -------------------------
               await fetch("http://localhost:5000/imprimir/getcmdped.php", {
                 method: "POST",

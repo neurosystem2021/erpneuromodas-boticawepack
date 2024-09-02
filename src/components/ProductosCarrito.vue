@@ -12,7 +12,8 @@
               sortBy: isVentas ? 'stock' : 'IdProducto',
               sortDesc: 1,
               limit: '25',
-              id_empresa: empresa 
+              id_empresa: empresa ,
+              fechaHasta:getFecha()
             }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
@@ -269,6 +270,17 @@
           />
         </template>
         <template slot="subtotal" slot-scope="data">
+          
+          {{ getSubtotal(data.index) }}
+        </template>
+        <template slot="subtotales" slot-scope="data">
+         <input v-model="productos[data.index].subtotal" type="number"
+            @input="reCalcularPrecioUnitario(data.index)" 
+            @change="reCalcularPrecioUnitario(data.index)"
+            min="0"
+            step="0.01"
+            style="width: 95px"
+          />
           {{ getSubtotal(data.index) }}
         </template>
         <template slot="igv" slot-scope="data">
@@ -860,6 +872,7 @@ export default {
       this.actualizarTotal(sumatoria);
       return this.$options.filters.redondear(sumatoria);
     },
+
     sumatoriaIgv() {
       let sumatoria = 0;
       if (this.igvTotal) {
@@ -890,6 +903,13 @@ export default {
       actualizarProd: "actualizarProducto"
       // obtenerStok: "obtenerStock",
     }),
+    reCalcularPrecioUnitario(index) {
+      let prod = { ...this.productos[index] };
+      prod.precio = parseFloat(prod.subtotal / prod.cantidad).toFixed(2);
+      this.productos[index] = prod;
+      this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      this.mostrarTablaProductos = !this.mostrarTablaProductos;
+    },
     actualizarEditarPrecio(index) {
       // Cambio de estado del checkbox
       //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
@@ -1160,6 +1180,7 @@ export default {
       this.objProd = {};
       obj.EsObsequio = 0;
       obj.EsVenta = this.isVentas;
+
       if (!obj.Empresa) {
         let datoEmpresa = this.$store.state.empresas.filter(
           v => v.value == empresa
@@ -1167,15 +1188,16 @@ export default {
         obj.Empresa = datoEmpresa.value;
         obj.NombreEmpresa = datoEmpresa.text;
       }
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = "";
-      }
+      // if (!this.isVentas) {
+      //   obj.PreciosPorProducto = "";
+      // }
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(
         p => p.cantidad === 0 || p.cantidad === "0"
       );
-
+      // console.log(obj);
+      // return null;
       if (!obj.PreciosPorProducto || fPP.length === 5) {
         obj.estadoPxP = true;
         this.setProductoUni(obj);
@@ -1255,6 +1277,7 @@ export default {
       obj.cantidad = 0;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
       if (index !== null && index !== undefined) {
@@ -1331,7 +1354,6 @@ export default {
         if (data.EsPadre == 1) {
           styleStock = "";
         }
-
         return `
         <style>
           #table-render {
@@ -1372,6 +1394,7 @@ export default {
         }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 100px">${data.PrecioContado}</td>
                 
                 <td style="width: 5%">
                   <img src="${
@@ -1674,6 +1697,9 @@ export default {
     buscarProductosCodigoBarrasModal(e) {
       e.preventDefault();
       // this.IdProducto = this.IdProducto;
+    },
+    getFecha() {
+      return this.$moment().format("YYYY-MM-DD");
     }
   },
   components: {
