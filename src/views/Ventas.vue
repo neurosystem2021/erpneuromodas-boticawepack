@@ -636,7 +636,7 @@ export default {
                 },
                 vendedor: {},
                 adelantosPreOrden:[],
-                FechaCredito: this.$moment().format("YYYY-MM-DD"),
+                FechaCredito: this.$moment().add(1, 'days').format("YYYY-MM-DD"),
                 FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
