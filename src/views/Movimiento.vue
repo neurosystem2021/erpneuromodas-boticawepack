@@ -396,7 +396,7 @@ export default {
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
-        almacenOrigen: { IdAlmacen: 1 },
+        almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
         user: sessionStorage.getItem("User")
       };
@@ -414,7 +414,7 @@ export default {
     },
     setTipoMovimiento(obj) {
       if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
+        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
         this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.isTraslado = false;
         this.isSalida = false;
