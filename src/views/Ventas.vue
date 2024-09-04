@@ -890,7 +890,6 @@ export default {
       }, 100);
     },
     recalcularTotalPorEmpresaFlag() {
-      
       setTimeout(() => {
         this.recalcularTotalesPorEmpresa();
       }, 100);
@@ -926,7 +925,6 @@ export default {
       add: "agregarProducto"
     }),
     async recalcularTotalesPorEmpresa() {
-      
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
         if (this.productos.some(p => p.Empresa == empresa.value)) {
@@ -1194,8 +1192,14 @@ export default {
             .catch(error => {
               console.error(error);
             });
+          let empresa = this.$store.state.empresas.filter(
+            v => v.value == this.empresa
+          )[0];
+          // console.log(empresa);
           this.limpiarCart();
           response.data.map(item => {
+            item.id_empresa = empresa.value;
+            item.NombreEmpresa = empresa.text;
             item.estadoPxP = false;
             let preciosProd = [];
             item.precioCont = item.PrecioContado;

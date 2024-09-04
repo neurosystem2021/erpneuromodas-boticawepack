@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div >
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="bv-example-row">
           <b-row>
             <b-col cols="12">
                <b-form-select
