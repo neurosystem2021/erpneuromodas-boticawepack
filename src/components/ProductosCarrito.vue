@@ -996,6 +996,7 @@ export default {
       this.$refs.autocompleteProducto.setValue("");
       obj.precio = 0;
       obj.cantidad = 0;
+      obj.estadoPxP = true;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj);
