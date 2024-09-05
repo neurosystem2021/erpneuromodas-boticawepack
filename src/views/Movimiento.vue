@@ -210,7 +210,7 @@
                 :fields="carrito.fields"
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
-                :idAlmacen="movimiento.almacenOrigen.IdAlmacen"
+                :idAlmacen="movimiento.almacenDestino.IdAlmacen"
                 :tipoCambio="movimiento.TipoCambio"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
