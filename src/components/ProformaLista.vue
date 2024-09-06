@@ -125,6 +125,10 @@ export default {
       }, 50);
     },
     selectProformas(proforma) {
+      let empresa = this.$store.state.empresas.filter(
+        v => v.value == this.empresa
+      )[0];
+
       this.axios
         .get(this.API + "proformas/detalle/nuevo", {
           params: {
@@ -135,6 +139,11 @@ export default {
         })
         .then(response => {
           this.limpiarCarrito();
+          response.data.map(item => {
+            item.Empresa = empresa.value;
+            item.NombreEmpresa = empresa.text;
+            // item.IdEm
+          });
           response.data.map(item => {
             this.add([
               item,

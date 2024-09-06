@@ -1131,6 +1131,7 @@ export default {
     setDocRef(obj) {
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
+
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
         this.venta.tipoVenta.CodSunat == "08"
@@ -1186,6 +1187,20 @@ export default {
               console.log(error);
             });
           this.limpiarCart();
+          let empresa = this.$store.state.empresas.filter(
+            v => v.value == this.empresa
+          )[0];
+
+          if (
+            this.venta.tipoVenta.CodSunat == "07" ||
+            this.venta.tipoVenta.CodSunat == "08"
+          ) {
+            response.data.map(item => {
+              item.Empresa = empresa.value;
+              item.NombreEmpresa = empresa.text;
+              // item.IdEm
+            });
+          }
           response.data.map(item => {
             item.estadoPxP = false;
             let preciosProd = [];

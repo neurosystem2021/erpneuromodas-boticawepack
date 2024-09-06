@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
           <b-row>
             <b-col cols="12">
                <b-form-select
@@ -210,6 +210,8 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
+                :idAlmacen="movimiento.almacenDestino.IdAlmacen"
+                :fields="carrito.fields"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
@@ -256,7 +258,37 @@ export default {
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
       isTraslado: true,
-      isSalida: false
+      isSalida: false,
+      carrito: {
+        fields: [
+          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "CodigoBarra", label: "Código" },
+          // { key: 'ProductoCategoria', label: 'Categoria'},
+          { key: "Producto", label: "Artículo" },
+          { key: "Descripcion", label: "Descripción" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoPresentacion", label: "Anaquel" },
+          // { key: 'ProductoMedicion', label: 'Medición' },
+          { key: "obsequio", label: "Obsequio", class: "thcenter" },
+          { key: "eventPres", label: "" },
+          { key: "cantxPrecio", variant: "warning" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotalE", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
+          // { key: 'flete', label: 'FLETE' },
+          // { key: 'lote', label: 'Lote' },
+          { key: "precioVenta", label: "Precio venta (S/)" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ]
+      }
     };
   },
   computed: {

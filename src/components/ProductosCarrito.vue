@@ -259,6 +259,16 @@
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
         </template>
+        <template slot="subtotalE" slot-scope="data">
+          <b-input v-model="productos[data.index].subtotal"
+          type="number"
+           @blur="recalcularPUxSubTotal(data.index)"
+           @input="recalcularPUxSubTotal(data.index)"
+           />
+          <!-- {{data.item.subtotal}} -->
+          
+          {{ getSubtotal(data.index) }}
+        </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -706,7 +716,7 @@
 
     <b-modal id="modal-1" :title="`${itemProducto.Producto}`"
      hide-footer v-model="modalPresentaciones"
-      v-if="modalPresentaciones">
+      v-if="modalPresentaciones" >
       <b-row class="px-4">
         <b-col cols="6">
           <b-card  @click="guardarItemPorUnidad()" class="cardPresentacion">
@@ -739,7 +749,9 @@
         <b-col cols="6" class="borderIzquierdoPunteado pr-4 pl-5" >
           <b-row>
             <b-col cols="12" class="px-0 montoPresenacion">
-              <b-form-input class="my-2 " type="number" id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
+              <b-form-input class="my-2 " type="number"
+              ref="montoPresentacion"
+               id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
               @input="monto == 0 ? errorMontoPresentacion='Ingrese una cantidad' : errorMontoPresentacion =''"/>
                   <span class="text-red">{{errorMontoPresentacion}}</span>
 
@@ -935,7 +947,8 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
       productoUrl: "",
-      itemProducto: {}
+      itemProducto: {},
+      primerMonto: true
     };
   },
   watch: {
@@ -1017,6 +1030,7 @@ export default {
         return this.API + "productos";
       }
     },
+
     sumatoriaSubTotal() {
       let sumatoria = 0;
       if (this.igvTotal) {
@@ -1035,7 +1049,7 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento);
+        sumatoria += parseFloat(value.total) - parseFloat(value.descuento);
       });
       this.actualizarTotal(sumatoria);
       return this.$options.filters.redondear(sumatoria);
@@ -1062,26 +1076,38 @@ export default {
     }
   },
   methods: {
+    recalcularPUxSubTotal(index) {
+      let prod = { ...this.productos[index] };
+      prod.precio = parseFloat(prod.subtotal / prod.cantidad);
+      this.productos[index] = prod;
+      this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      this.mostrarTablaProductos = !this.mostrarTablaProductos;
+    },
     aumentarMontoPresentacion(item) {
-      switch (item.tipo) {
-        case "number":
-          this.monto = parseFloat(this.monto.toString() + item.valor);
-          break;
-        case "limpiar":
-          this.monto = 0;
-          break;
-        case "backspace":
-          if (this.monto.toString().length > 1) {
-            this.monto = parseFloat(
-              this.monto.toString().slice(0, this.monto.toString().length - 1)
-            );
-          } else {
+      if (this.primerMonto) {
+        this.monto = item.valor;
+        this.primerMonto = false;
+      } else {
+        switch (item.tipo) {
+          case "number":
+            this.monto = parseFloat(this.monto.toString() + item.valor);
+            break;
+          case "limpiar":
             this.monto = 0;
-          }
-          break;
+            break;
+          case "backspace":
+            if (this.monto.toString().length > 1) {
+              this.monto = parseFloat(
+                this.monto.toString().slice(0, this.monto.toString().length - 1)
+              );
+            } else {
+              this.monto = 0;
+            }
+            break;
 
-        default:
-          break;
+          default:
+            break;
+        }
       }
     },
     ...mapActions({
@@ -1577,11 +1603,13 @@ export default {
       this.itemProducto.tipo = "PRESENTACION";
       this.itemProducto.PreciosPorProducto = PreciosPorProducto;
       if (PreciosPorProducto.filter(v => v.cantidad > 0).length > 0) {
-        this.monto = 0;
+        this.monto = 1;
         setTimeout(() => {
           document.getElementById("montoPresentacion").focus();
+          document.getElementById("montoPresentacion").select();
         }, 100);
         this.modalPresentaciones = true;
+        this.primerMonto = true;
       } else {
         if (!this.itemProducto.Empresa) {
           let empresa = this.$store.state.empresas.filter(

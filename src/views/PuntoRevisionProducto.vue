@@ -92,29 +92,39 @@ export default {
     this.setScreen();
   },
   methods: {
-    loadBarcode() {
+    async loadBarcode() {
+      let val = false;
       if (this.codigoBarra) {
-        let params = {
-          codigoBarra: this.codigoBarra,
-          id_empresa: this.empresa
-        };
-        this.axios
-          .get(this.API + "productos/id/" + this.codigoBarra, {
-            params: params
-          })
-          .then(response => {
-            if (response.data.IdProducto) {
-              let PreciosPorProducto = JSON.parse(
-                response.data.PreciosPorProducto
-              );
-              this.producto = response.data;
-              this.producto.PreciosPorProducto = PreciosPorProducto;
-              this.codigoBarra = "";
-            } else {
-              this.loadCode = "";
-              this.$toasted.show("No se encontró ningun producto");
-            }
-          });
+        await this.$store.state.empresas.forEach(async element => {
+          if (!val) {
+            let params = {
+              codigoBarra: this.codigoBarra,
+              id_empresa: element.value
+            };
+            await this.axios
+              .get(this.API + "productos/id/" + this.codigoBarra, {
+                params: params
+              })
+              .then(response => {
+                if (!!response) {
+                  val = true;
+
+                  if (response.data.IdProducto) {
+                    let PreciosPorProducto = JSON.parse(
+                      response.data.PreciosPorProducto
+                    );
+                    this.producto = response.data;
+                    this.producto.PreciosPorProducto = PreciosPorProducto;
+                    this.codigoBarra = "";
+                  }
+                }
+              });
+          }
+        });
+        // if (!val) {
+        //   this.loadCode = "";
+        //   this.$toasted.show("No se encontró ningun producto");
+        // }
         setTimeout(() => {
           window.location.reload();
         }, 30 * 1000);
