@@ -1656,7 +1656,8 @@ export default {
   height: 40px !important;
 }
 .imagen:hover {
-  transform: scale(2.5);
+  width: 120px !important;
+  height: 120px !important;
 }
 
 .table.tblProductosModal {

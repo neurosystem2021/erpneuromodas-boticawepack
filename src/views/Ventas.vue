@@ -1136,6 +1136,7 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
+      console.log('dddddddddd')
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
