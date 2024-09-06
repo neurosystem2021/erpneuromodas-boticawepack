@@ -1164,6 +1164,9 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
+      let empresa = this.$store.state.empresas.filter(
+        v => v.value == this.empresa
+      )[0];
       this.venta.EsSeparado = obj.EsSeparado;
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
@@ -1223,6 +1226,8 @@ export default {
             });
           this.limpiarCart();
           response.data.map(item => {
+            item.Empresa = empresa.value;
+            item.NombreEmpresa = empresa.text;
             item.estadoPxP = false;
             let preciosProd = [];
             item.precioCont = item.PrecioContado;

@@ -129,7 +129,8 @@
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <input v-model="productos[data.index].cantidad" :disabled="productos[data.index].estadoPxP == false || bloquearInput
+          <input v-model="productos[data.index].cantidad" 
+          :disabled="productos[data.index].EsPresentacion  || bloquearInput
             ? true
             : false || esDelivery
             " type="number" style="width: 95px" class="form-control" step="any" min="0" @input="(val) => {
@@ -471,9 +472,11 @@ export default {
     let vm = this;
     vm.lstProductos = [];
     await vm.$store.state.empresas.forEach(async empresa => {
-      let url = `${vm.API
-        }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${empresa.value
-        }&limit=`;
+      let url = `${
+        vm.API
+      }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
+        empresa.value
+      }&limit=`;
       // url = new URL(url);
       let res = await vm.axios(url);
       await res.data.forEach(element => {
@@ -634,7 +637,6 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        
         sumatoria += parseFloat(value.total) - parseFloat(value.descuento);
       });
 
@@ -796,7 +798,7 @@ export default {
         this.productos[pi].precio =
           parseFloat(this.productos[pi].precio) -
           parseFloat(this.productos[index].precio) *
-          parseFloat(this.productos[index].cantidad);
+            parseFloat(this.productos[index].cantidad);
         this.productos[index].disabled = true;
       } else {
         e.target.parentNode.parentNode.removeAttribute("style");
@@ -804,7 +806,7 @@ export default {
         this.productos[pi].precio =
           parseFloat(this.productos[pi].precio) +
           parseFloat(this.productos[index].precio) *
-          parseFloat(this.productos[index].cantidad);
+            parseFloat(this.productos[index].cantidad);
         this.productos[index].disabled = false;
       }
     },
@@ -978,6 +980,10 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj, index = null) {
+      console.log(obj);
+      let press = obj.PreciosPorProducto
+        ? JSON.parse(obj.PreciosPorProducto)
+        : [];
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
@@ -996,9 +1002,10 @@ export default {
       this.$refs.autocompleteProducto.setValue("");
       obj.precio = 0;
       obj.cantidad = 0;
-      obj.estadoPxP = true;
+      obj.estadoPxP = !press.some(v => v.precio > 0);
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+      obj.EsPresentacion = false;
       obj = this.onSetProducto(obj);
 
       if (index !== null && index !== undefined) {
@@ -1047,7 +1054,7 @@ export default {
       obj.cantidad = 0;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-
+      obj.EsPresentacion = true;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
       if (index !== null && index !== undefined) {
@@ -1150,30 +1157,34 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre == 1
+                <td style="width: 60px" class="${styleStock}"><b>${
+          data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
               ? Number.isInteger(data.stock)
                 ? data.stock
                 : data.stock.toFixed(2)
               : data.stock
-          }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra
-          }</b></td>
+        }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 100px">${data.PrecioContado}</td>
                 
                 <td style="width: 5%">
-                  <img src="${data.Imagen == null || data.Imagen == ""
-            ? "static/no-photo.png"
-            : "/resources/images/productos/" + data.Imagen
-          }" class="imagen">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica == 1
-            ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
-            : ""
-          }</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
               </tr>
             </tbody>
           </table>   
@@ -1181,8 +1192,9 @@ export default {
         `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca
-        } / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
       `;
     },
     // setCantidad (index, val) {
@@ -1579,7 +1591,6 @@ export default {
 }
 
 @media only screen and (max-width: 700px) {
-
   /* For desktop: */
   .ocularMovil {
     display: none;
