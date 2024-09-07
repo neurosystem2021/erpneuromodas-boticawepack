@@ -121,7 +121,7 @@
           </div>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].EsPresentacion">
           <input v-model="productos[data.index].cantxPrecio" type="number" style="width: 80px" step="0.001" min="0"
             :disabled="bloquearInput ? true : false" @input="(val) => changeCant(val.target.value, productos[data.index])
               " placeholder="Cantidad" class="form-control" />
