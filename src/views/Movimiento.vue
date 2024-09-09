@@ -414,7 +414,7 @@ export default {
     },
     setTipoMovimiento(obj) {
       if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
+        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
         this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.isTraslado = false;
         this.isSalida = false;
@@ -422,7 +422,7 @@ export default {
           this.$refs.inputAlmacenDestino.setValue("");
         }
       } else if (obj.Tipo == 1) {
-        this.movimiento.almacenDestino = { IdAlmacen: -1 };
+        this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.movimiento.almacenOrigen = { IdAlmacen: 1 };
         if (this.$refs.inputAlmacenOrigen) {
           this.$refs.inputAlmacenOrigen.setValue("");

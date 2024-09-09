@@ -1540,7 +1540,8 @@ export default {
 }
 
 .imagen:hover {
-  transform: scale(2.5);
+  width: 100px !important;
+  height: 100px !important;
 }
 
 .table.tblProductosModal {
