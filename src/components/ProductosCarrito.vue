@@ -431,7 +431,7 @@
             </tbody>
           </table>
     </b-col>
-    <b-col md="3" v-show="tipo != 'mov' || opcionCarrito">
+    <!-- <b-col md="3" v-show="tipo != 'mov' || opcionCarrito">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -469,7 +469,7 @@
               </tr>
             </tbody>
           </table>
-    </b-col>
+    </b-col> -->
     <br><br>
     <!-- <b-modal v-model="$store.state.modalNuevoProducto" size="md" title="Añadir Producto" class="" hide-footer>
       <b-row>

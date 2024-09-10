@@ -932,10 +932,14 @@ export default {
               console.log(error);
             });
           this.limpiarCart();
+          console.log(response.data);
           response.data.map(item => {
+            item.subtotal = item.cantidad * item.precio;
+            item.total = item.cantidad * item.precio;
             item.estadoPxP = false;
             let preciosProd = [];
             item.precioCont = item.PrecioContado;
+
             preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
             let fPP = preciosProd.filter(p => p.cantidad === 0);
 
