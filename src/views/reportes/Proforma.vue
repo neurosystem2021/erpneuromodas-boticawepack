@@ -73,25 +73,29 @@
       <table border="0" cellspacing="0" cellpadding="0">
         <thead>
           <tr>
-            <th class="no">#</th>
+            <th width="3%" class="no">#</th>
             <!--<th></th>-->
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="qty">CANT.</th>
-            <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
+            <th width="40%" class="desc">DESCRIPCIÓN</th>
+            <th width="20%" class="de">PRESENTACIÓN</th>
+            <th width="8%" class="um">U.M.</th>
+            <th width="10%" class="qty">CANT.</th>
+            <th width="10%" class="unit">PRECIO U.</th>
+            <th width="10%"class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
+            <td width="3%" class="no">{{ index+1 }}</td>
             <!--<td></td>-->
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
-            <td class="desc"><h3 style="color:black !important;">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td width="40%" class="desc"><h3 style="color:black !important;">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td width="20%" class="de" style="text-align:center">{{ prod.Descripcion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td width="8%" class="um" style="text-align:center">{{ prod.ProductoMedicion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
              <!--<td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>-->
-            <td class="qty">{{ prod.Cantidad }}</td>
-            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total">
+            <td width="10%" class="qty">{{ prod.Cantidad }}</td>
+            <td width="10%" class="unit">S/. {{ prod.Precio | moneda }}</td>
+            <td width="10%" class="total">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -102,7 +106,7 @@
         <tfoot>
           <tr>
             <td colspan="2"></td>
-            <td colspan="2">SUBTOTAL</td>
+            <td colspan="4">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
           <!--<tr>
@@ -112,7 +116,7 @@
           </tr>-->
           <tr>
             <td colspan="2"></td>
-            <td colspan="2" style="background:#E7BC2F">TOTAL</td>
+            <td colspan="4" style="background:#E7BC2F">TOTAL</td>
             <td style="background:#E7BC2F">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
