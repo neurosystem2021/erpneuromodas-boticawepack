@@ -144,6 +144,7 @@
               " placeholder="Cantidad" />
         </template>
         <template slot="precio" slot-scope="data">
+          
           <input v-model="productos[data.index].precio" :disabled="productos[data.index].disabled || bloquearInput
             ? true
             : false ||
@@ -1036,7 +1037,9 @@ export default {
     setProductoCant(prod, index = null) {
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
-      let obj = this.objProd;
+
+      let obj = { ...this.objProd };
+
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "imperiop2";
@@ -1055,8 +1058,9 @@ export default {
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj.EsPresentacion = true;
+      obj.cantidadPres = prod.cantidad;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
-
+      console.log("prod", obj);
       if (index !== null && index !== undefined) {
         this.$store.state.cart.productos[index] = obj;
         this.$refs["modalCant"].hide();
@@ -1211,8 +1215,9 @@ export default {
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precioFinal =
       // }else{
-      precioFinal =
-        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
+      // precioFinal =
+      //   (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
+      precioFinal = precio;
       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
 

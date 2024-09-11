@@ -106,7 +106,7 @@
         </b-col>
       </b-row>
 
-      <b-row class="no-print">
+      <b-row class="">
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>

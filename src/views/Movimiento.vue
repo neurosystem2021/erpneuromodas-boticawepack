@@ -206,11 +206,12 @@
           </b-row>
           <b-row>
             <b-col>
+              
               <productos-carrito 
                 :fields="carrito.fields"
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
-                :idAlmacen="movimiento.almacenDestino.IdAlmacen"
+                :idAlmacen="movimiento.movimientoTipo.Tipo ==1 ? movimiento.almacenOrigen.IdAlmacen : movimiento.almacenDestino.IdAlmacen"
                 :tipoCambio="movimiento.TipoCambio"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
