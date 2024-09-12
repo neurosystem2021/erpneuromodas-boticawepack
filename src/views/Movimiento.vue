@@ -132,7 +132,7 @@
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
                         v-model="movimiento.alterarProductos"
-                        :value="1"
+                        :value="0"
                         :unchecked-value="0">
                         Alterar precio productos
                       </b-form-checkbox>

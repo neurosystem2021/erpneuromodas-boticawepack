@@ -169,7 +169,7 @@
       </b-row>
 
 
-      <b-row class="no-print">
+      <b-row>
         <h5>Ventas Visa</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -233,7 +233,7 @@
 
       
 
-      <b-row class="no-print">
+      <b-row>
         <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -295,7 +295,7 @@
         </table>
       </b-row>
   
-      <b-row class="no-print">
+      <b-row>
         <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -384,7 +384,7 @@
           </tfoot>
         </table>
       </b-row>
-      <b-row class="credito no-print">
+      <b-row class="credito">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -447,7 +447,7 @@
       </b-row>
 
 
-      <b-row class="no-print">
+      <b-row>
         <b-col v-if="totalIngresos">
           <h5>Ingresos Caja Principal</h5><br>
           <table class="table b-table table-sm">
@@ -501,7 +501,7 @@
       </b-row>
       
 
-      <b-row class="no-print">
+      <b-row>
         <b-col v-if="totalIngresosTarjeta">
           <h5>Ingresos de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
@@ -530,7 +530,7 @@
         </b-col>
       </b-row>
 
-      <b-row class="no-print">
+      <b-row>
           <b-col v-if="totalAdelantos">
             <h5>Descontar Adelantos</h5><br>
             <table class="table b-table table-sm adelantos">
@@ -560,7 +560,7 @@
 
       <br>
 
-      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
