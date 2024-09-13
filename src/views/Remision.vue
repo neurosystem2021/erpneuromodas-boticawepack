@@ -289,6 +289,7 @@ import config from '@/store/config.js'
 export default {
   mounted () {
     this.limpiarCamposRefs();
+    this.$store.state.bloquearCarrito = false;
   },
   data () {
     return {

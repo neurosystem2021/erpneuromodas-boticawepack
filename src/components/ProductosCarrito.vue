@@ -131,43 +131,20 @@
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
-
+        <!-- :disabled="bloquearInput?true:false || esDelivery || true"-->
         <template slot="cantidad" slot-scope="data">
           <input
-            v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || esDelivery || true"
+            v-model.number="productos[data.index].cantidad"
+            :disabled="$store.state.bloquearCarrito"
             type="number"
             autocomplete="off"
-            style="width: 90px; font-weight:bold"
+            style="width: 90px; font-weight: bold"
             class="form-control"
             step="1"
             min="0"
-            @input="(val) => {
-              changeCant(val.target.value,productos[data.index])
-              $emit('onInputCantidad', val.target.value)
-                if(!productos[data.index].PreciosPorProducto) {
-                return
-                }
-              if(!precioHabilitado){
-              let arr = JSON.parse(productos[data.index].PreciosPorProducto || '[]');
-              arr.map((r)=>{
-                r.cantidad = Number(r.cantidad || 0)
-                r.precio = Number(r.precio || 0)
-              })
-              let arreglado = arr.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
-              let cambio = false
-              arreglado.map(r=>{
-              if(r.cantidad>0 && r.precio>0 && val.target.value >=r.cantidad){
-                productos[data.index].precio = r.precio
-                cambio = true
-              }
-              })
-                if(!cambio){
-                  productos[data.index].precio = productos[data.index].PrecioContado
-                }
-              } 
-            }"
-            placeholder="Cantidad"/>
+            @input="handleInput(data.index)"
+            placeholder="Cantidad"
+          />
         </template>
         <template slot="precio" slot-scope="data">
           <input
@@ -553,6 +530,42 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    handleInput(index) {
+      const cantidad = this.productos[index].cantidad;
+      // Emitir el valor de cantidad
+      this.$emit('onInputCantidad', cantidad);
+      
+      // Validar si PreciosPorProducto está disponible
+      if (!this.productos[index].PreciosPorProducto) {
+        return;
+      }
+
+      if (!this.precioHabilitado) {
+        // Obtener los precios por producto como array y convertir a números
+        let preciosPorProducto = JSON.parse(this.productos[index].PreciosPorProducto || '[]');
+        preciosPorProducto.forEach((precio) => {
+          precio.cantidad = Number(precio.cantidad || 0);
+          precio.precio = Number(precio.precio || 0);
+        });
+
+        // Ordenar los precios por cantidad
+        let preciosOrdenados = preciosPorProducto.sort((a, b) => a.cantidad - b.cantidad);
+        let cambio = false;
+
+        // Determinar el precio correcto basado en la cantidad
+        preciosOrdenados.forEach((precio) => {
+          if (precio.cantidad > 0 && precio.precio > 0 && cantidad >= precio.cantidad) {
+            this.productos[index].precio = precio.precio;
+            cambio = true;
+          }
+        });
+
+        // Si no hubo cambio, asignar el precio de contado
+        if (!cambio) {
+          this.productos[index].precio = this.productos[index].PrecioContado;
+        }
+      }
+    },
     setSubtotal(index, val, prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
       Vue.set(this.productos[index], 'precio', precio)
