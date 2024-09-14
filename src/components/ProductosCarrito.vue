@@ -672,8 +672,8 @@ export default {
       buscar: "buscarProductos",
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
-      actualizarProd: "actualizarProducto"
-      // obtenerStok: "obtenerStock",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock",
     }),
     reCalcularPrecioUnitario(index) {
       let prod = { ...this.productos[index] };

@@ -574,6 +574,7 @@
                               $options.filters.redondear(
                                 totalCart -
                                   venta.pago.mastercard.monto -
+                                  venta.pago.transferencia.monto -
                                   $event.target.value
                               )
                           "
@@ -613,6 +614,7 @@
                               $options.filters.redondear(
                                 totalCart -
                                   venta.pago.visa.monto -
+                                  venta.pago.transferencia.monto -
                                   $event.target.value
                               )
                           "
@@ -651,6 +653,7 @@
                             venta.pago.efectivo.monto =
                               $options.filters.redondear(
                                 totalCart -
+                                  venta.pago.visa.monto -
                                   venta.pago.mastercard.monto -
                                   $event.target.value
                               )
