@@ -3,32 +3,25 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <autocomplete
-            ref="autocompleteProducto"
-            :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40', nopadre:(isVentas?0:1) }"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+          <autocomplete ref="autocompleteProducto" :url="APIProductos"
+            :customParams="{ 'sortBy': isVentas ? 'stock' : 'IdProducto', 'sortDesc': 1, limit: '40', nopadre: (isVentas ? 0 : 1) }"
+            :onShouldRenderChild="renderChild" anchor="Producto" label="writer" placeholder="Agregar Producto"
+            :on-select="setProducto" :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :classes="{ input: 'form-control' }">
           </autocomplete>
-          <input v-model="loadCode"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  ref="barcodeInput"
-                  class="form-control"
-                  placeholder="Codigo de Barra" />
+          <input v-model="loadCode" @keydown.enter.prevent="loadBarcode" type="text" ref="barcodeInput"
+            class="form-control" placeholder="Codigo de Barra" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
-             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            <producto-form v-model="showButton" :cbGuardar="(id, pxp, obj) => { agregarGuardar(id, pxp, obj) }"
+              ref="productoFormEdit" :producto-update="productoSelect"
+              :precio_venta="$store.state.cart.precio_venta"></producto-form>
           </b-input-group-append>
         </b-input-group>
-        <b-form-text id="input-live-help" style="color: black !important;"><b>Busqueda avanzada (Producto, Modelo, Categoria, Marca) - Anteponer * para buscar por Palabra Clave</b></b-form-text>
+        <b-form-text id="input-live-help" style="color: black !important;"><b>Busqueda avanzada (Producto, Modelo,
+            Categoria, Marca) - Anteponer * para buscar por Palabra Clave</b></b-form-text>
       </b-form-group>
 
       <!--<b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
@@ -83,17 +76,13 @@
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
+          <h3 style="text-decoration: underline;">{{ objProd.Producto }}</h3>
           <h5>Precios Disponibles</h5>
         </div>
         <hr>
         <b-row>
           <b-col cols="6" v-if="false">
-            <b-card
-              align="center"
-              class="mb-3 contentCard"
-              @click="setProductoUni(objProd, precioCont)"
-            >
+            <b-card align="center" class="mb-3 contentCard" @click="setProductoUni(objProd, precioCont)">
               <b-row>
                 <b-col md="4" class="nomCart">
                   <h5 class="text-uppercase">UNI</h5>
@@ -108,17 +97,12 @@
           </b-col>
 
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
-            <b-card
-              v-if="d.cantidad != 0"
-              align="center"
-              class="mb-3 contentCard"
-              :class="{'disabledMouse': !parseFloat(d.cantidad)}"
-              @click="() => {
-                if ( parseFloat(d.cantidad) ) {
+            <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
+              :class="{ 'disabledMouse': !parseFloat(d.cantidad) }" @click="() => {
+                if (parseFloat(d.cantidad)) {
                   setProductoUni(objProd, d.precio)
                 }
-              }"
-            >
+              }">
               <b-row>
                 <b-col md="4" class="nomCart">
                   <h5 class="text-uppercase">{{ d.nombre }}</h5>
@@ -134,9 +118,9 @@
         </b-row>
       </b-modal>
 
-      <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+      <b-modal id="modalImagen" size="lg" ref="moverTableCarritodalImagen" hide-footer hide-header>
         <div class="d-block text-center">
-          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+          <h3 style="text-decoration: underline;">{{ productoNombre }}</h3>
         </div>
         <b-row style="display:flex; justify-content:center; align-items:center">
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
@@ -146,142 +130,116 @@
       <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
         <div class="d-block text-center">
           <div id="codigoBarraStyle">
-            <v-quagga
-              :onDetected="onBarcodeScanned"
-              :readerSize="readerSize"
-              :readerTypes="detecteds"
-              :patchSize="'medium'"
-              class="cameraBarra"
-            ></v-quagga>
+            <v-quagga :onDetected="onBarcodeScanned" :readerSize="readerSize" :readerTypes="detecteds"
+              :patchSize="'medium'" class="cameraBarra"></v-quagga>
           </div>
         </div>
       </b-modal>
-
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small responsive striped hover :items="productos" :fields="fields" ref="tablaCarrito"
+        v-if="verTableCarrito">
         <template slot="eventPres" slot-scope="data">
           <div style="width: 75px;">
-            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index],data.index)"><i class="fas fa-list"></i></b-button>
-            <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
-            <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput ? true : false" variant="info"
+              @click="showPresentacion(productos[data.index], data.index)"><i class="fas fa-list"></i></b-button>
+            <b-button
+              @click="abrirImagen(productos[data.index].Producto, productos[data.index].Imagen == null || productos[data.index].Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + productos[data.index].Imagen)"
+              style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success"
+              size="sm"><i class="fas fa-image"></i></b-button>
+            <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto"
+              :title="productos[data.index].Producto" triggers="hover">
               <div style="text-align:center">
-                <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
+                <b-img style="border-radius: 10px; width:200px" fluid
+                  :src="productos[data.index].Imagen == null || productos[data.index].Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + productos[data.index].Imagen"
+                  alt="" @error="setAltImg"></b-img>
               </div>
             </b-popover>
           </div>
         </template>
 
         <template slot="obsequio" slot-scope="data">
-          <div class="obsequio" v-if="tipoMov==0">
-            <b-form-checkbox
-              button-variant="primary"
-              v-model="productos[data.index].EsObsequio"
-              :value="1"
-              @input="setObsequio(data.index)"
-              :unchecked-value="0">
+          <div class="obsequio" v-if="tipoMov == 0">
+            <b-form-checkbox button-variant="primary" v-model="productos[data.index].EsObsequio" :value="1"
+              @input="setObsequio(data.index)" :unchecked-value="0">
             </b-form-checkbox>
           </div>
         </template>
 
         <template slot="VentaEstrategica" slot-scope="data">
-          <div v-if="data.item.VentaEstrategica==1">
+          <div v-if="data.item.VentaEstrategica == 1">
             <i class="fas fa-star" style="color:yellow !important"></i>
           </div>
         </template>
 
         <template slot="itemNum" slot-scope="data">
           <div>
-          {{  (data.index+1) }}
+            {{ (data.index + 1) }}
           </div>
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <input
-            v-model="productos[data.index].cantxPrecio"
-            type="number"
-            style="width: 100px"
-            step="0.001"
-            min="0"
-            :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
-            placeholder="Cantidad"
+          <input v-model="productos[data.index].cantxPrecio" type="number" style="width: 100px" step="0.001" min="0"
+            :disabled="bloquearInput ? true : false"
+            @input="(val) => changeCant(val.target.value, productos[data.index], data.index)" placeholder="Cantidad"
             class="form-control" />
-          <span>x{{productos[data.index].cantidadPres}}</span>
+          <span>x{{ productos[data.index].cantidadPres }}</span>
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <input
-            v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false"
-            type="number"
-            autocomplete="off"
-            style="width: 100px; font-weight:bold"
-            class="form-control"
-            step="0.1"
-            min="0"
-            @input="(val) => {
-              changeCant(val.target.value,productos[data.index],data.index)
+          <input v-model="productos[data.index].cantidad" :disabled="bloquearInput ? true : false" type="number"
+            autocomplete="off" style="width: 100px; font-weight:bold" class="form-control" step="0.1" min="0" @input="(val) => {
+              changeCant(val.target.value, productos[data.index], data.index)
               $emit('onInputCantidad', val.target.value)
-                /*if(!productos[data.index].PreciosPorProducto) {
-                return
-                }
-              if(!precioHabilitado){
-              let arr = JSON.parse(productos[data.index].PreciosPorProducto || '[]');
-              arr.map((r)=>{
-                r.cantidad = Number(r.cantidad || 0)
-                r.precio = Number(r.precio || 0)
-              })
-              let arreglado = arr.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
-              let cambio = false
-              arreglado.map(r=>{
-              if(r.cantidad>0 && r.precio>0 && val.target.value >=r.cantidad){
-                productos[data.index].precio = r.precio
-                cambio = true
+              /*if(!productos[data.index].PreciosPorProducto) {
+              return
               }
-              })
-                if(!cambio){
-                  productos[data.index].precio = productos[data.index].PrecioContado
-                }
-              } */
-            }"
-            placeholder="Cantidad"/>
+            if(!precioHabilitado){
+            let arr = JSON.parse(productos[data.index].PreciosPorProducto || '[]');
+            arr.map((r)=>{
+              r.cantidad = Number(r.cantidad || 0)
+              r.precio = Number(r.precio || 0)
+            })
+            let arreglado = arr.sort((a,b) => Number(a.cantidad) - Number(b.cantidad))
+            let cambio = false
+            arreglado.map(r=>{
+            if(r.cantidad>0 && r.precio>0 && val.target.value >=r.cantidad){
+              productos[data.index].precio = r.precio
+              cambio = true
+            }
+            })
+              if(!cambio){
+                productos[data.index].precio = productos[data.index].PrecioContado
+              }
+            } */
+            }" placeholder="Cantidad" />
         </template>
         <template slot="precio" slot-scope="data">
-          <input
-            v-model="productos[data.index].precio"
-            type="number"
-            style="width: 100px"
-            min="0"
-            step="0.00001"
-            class="form-control"
-            placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
-            />
-            <div v-if="isVentas" class="text-center" style="font-size:0.8rem"><b>{{productos[data.index].PrecioCosto | moneda}}</b></div>
+          <input :disabled="productos[data.index].editarPrecio !== 1 && editarPrecioBloque !== 1"
+            v-model="productos[data.index].precio" type="number" style="width: 100px" min="0" step="0.00001"
+            class="form-control" placeholder="Precio" @input="setNuevoPrecioContado(data.index)" />
+          <div v-if="isVentas" class="text-center" style="font-size:0.8rem"><b>{{ productos[data.index].PrecioCosto |
+            moneda }}</b></div>
+          <b-form-checkbox v-model=productos[data.index].editarPrecio :value="1" :unchecked-value="0"
+            @change="actualizarEditarPrecio(data.index)">
+            <b style="color:#17a2b8; font-size:0.6rem" class="text-left">Editar precio</b>
+          </b-form-checkbox>
         </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
+            <!-- <b-form-input v-model="productos[data.index].subtotal" @blur="recalcularPU(data.index)"></b-form-input> -->
             {{ getSubtotal(data.index) }}
+
           </div>
           <div v-else>
-            <input
-            type="number"
-            style="width: 105px"
-            min="0"
-            step="0.00001"
-            placeholder="Subtotal"
-            class="form-control"
-            v-model="productos[data.index].subt"
-            @input="val => setSubtotal(data.index, val.target.value, productos[data.index])"/>
+            <input type="number" style="width: 105px" min="0" step="0.00001" placeholder="Subtotal" class="form-control"
+              v-model="productos[data.index].subt"
+              @input="val => setSubtotal(data.index, val.target.value, productos[data.index])" />
             <b>{{ getSubtotal(data.index) }}</b>
           </div>
         </template>
         <template slot="igv" slot-scope="data">
-          <b-form-checkbox
-            v-model="productos[data.index].TieneIgv"
-            :value="1"
-            :disabled="bloquearInput?true:false || (productos[data.index].EsObsequio==1 && tipoMov==0 ?true:false)"
-            @input="setNuevoPrecioContado(data.index)"
-            :unchecked-value="0">
+          <b-form-checkbox v-model="productos[data.index].TieneIgv" :value="1"
+            :disabled="bloquearInput ? true : false || (productos[data.index].EsObsequio == 1 && tipoMov == 0 ? true : false)"
+            @input="setNuevoPrecioContado(data.index)" :unchecked-value="0">
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
@@ -292,7 +250,7 @@
             min="0"
             placeholder="Flete"></b-form-input>
         </template>-->
-        
+
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
@@ -300,89 +258,64 @@
             min="0"
             placeholder="Lote"></b-form-input>
         </template>-->
-        
+
         <template slot="manoobra" slot-scope="data">
-          <input 
-            @change="(e) => addManoDeObra(data.index, e)"
-            v-if="productos[data.index].CodigoBarra != 'MANODEOBRA' " 
-            :disabled="bloquearInput?true:false"
-            v-model="productos[data.index].EsManoDeObra"
+          <input @change="(e) => addManoDeObra(data.index, e)" v-if="productos[data.index].CodigoBarra != 'MANODEOBRA'"
+            :disabled="bloquearInput ? true : false" v-model="productos[data.index].EsManoDeObra"
             class="form-check-input" type="checkbox" />
+
         </template>
 
         <template slot="precioVenta" slot-scope="data">
-          <input
-            :disabled="bloquearInput?true:false"
-            style="width:105px"
-            v-model="productos[data.index].nuevoPrecioContado"
-            type="number"
-            min="0"
-            step="0.01"
-            class="form-control"
-            placeholder="Precio Venta"/>
-            <b-form-text>
+          <!-- {{ productos[data.index] }} -->
+          <!-- <input :disabled="bloquearInput ? true : false" style="width:105px" -->
+          <input disabled style="width:105px" v-model="productos[data.index].nuevoPrecioContado" type="number" min="0"
+            step="0.01" class="form-control" placeholder="Precio Venta" />
+
+          <!-- <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
-            </b-form-text>
+            </b-form-text> -->
         </template>
 
         <template slot="utilidad" slot-scope="data">
-          <input 
-            :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
-            class="form-control"
-            v-model="productos[data.index].PorcentajeUtilidad"
-            style="width: 80px"
-            type="number" 
-            step="0.01"
-            @input="cambiarPrecio(data.index, productos[data.index])" 
-            @mouseup="cambiarPrecio(data.index, productos[data.index])" 
-            />
-            <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+          <input :disabled="bloquearInput ? true : false || (idPerfil == 1) ? false : true || esDelivery"
+            class="form-control" v-model="productos[data.index].PorcentajeUtilidad" style="width: 80px" type="number"
+            step="0.01" @input="cambiarPrecio(data.index, productos[data.index])"
+            @mouseup="cambiarPrecio(data.index, productos[data.index])" />
+          <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <input
-            :disabled="bloquearInput?true:false  || esDelivery"
-            v-model="productos[data.index].descuento"
-            style="width:90px"
-            type="number"
-            min="0"
-            step="0.01"
-            class="form-control"
-            value="0"
-            @input="actualizarDescu(data.index)"/>
-            <b-form-text>
-            </b-form-text>
+          <input :disabled="bloquearInput ? false : true || esDelivery" v-model="productos[data.index].PorcentajeDesc"
+            style="width:90px" type="number" min="0" step="0.01" :max="productos[data.index].PorcentajeDescMax"
+            class="form-control" value="0"
+            @input="val => { productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10; actualizarDescu(data.index); }" />
+          <b-form-text class="text-center">
+            <b style="color:#dc3545">% Max:
+              {{ productos[data.index].PorcentajeDescMax }}</b>
+            <br>
+            <b>Desc: S/{{ productos[data.index].descuento }}</b>
+          </b-form-text>
         </template>
 
         <template slot="FechaAlquiler" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FechaAlquiler"
-            type="date"
-            placeholder="Fecha Fin"
+          <b-form-input v-model="productos[data.index].FechaAlquiler" type="date" placeholder="Fecha Fin"
             :value="formatFecha(data.item.FechaAlquiler)"></b-form-input>
         </template>
 
         <template slot="FechaAlquilerFin" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FechaAlquilerFin"
-            type="date"
-            placeholder="Fecha Fin"
+          <b-form-input v-model="productos[data.index].FechaAlquilerFin" type="date" placeholder="Fecha Fin"
             :value="formatFecha(data.item.FechaAlquilerFin)"></b-form-input>
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <textarea 
-            :disabled="bloquearInput?true:false"
-            class="form-control"
-            placeholder="Descripción"
-            cols="9" rows="1"
-            style="width: 150px"
-            v-model="productos[data.index].Descripcion"></textarea>
+          <textarea :disabled="bloquearInput ? true : false" class="form-control" placeholder="Descripción" cols="9"
+            rows="1" style="width: 150px" v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
             placeholder="Descripción"></b-form-input>-->
-        </template>        
+        </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
@@ -399,12 +332,16 @@
           />-->
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button :disabled="bloquearInput ? true : false" variant="danger" size="sm"
+            @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          <b-button style="margin-top:5px" :disabled="bloquearInput ? true : false"
+            v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm"
+            @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
+          <b-button :disabled="bloquearInput ? true : false" size="sm" variant="info"
+            @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
 
@@ -415,17 +352,17 @@
         </template>
 
         <template slot="stock" slot-scope="data">
-          <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
-              <img src="static/moto-delivery.png" style="width: 24px" />
+          <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
+            <img src="static/moto-delivery.png" style="width: 24px" />
           </div>
           <div v-else>
-            <div v-if="data.item.ControlaStock==1">
-            <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-            <div v-if="!data.item.EsPadre" style="font-weight:bold">{{data.item.stock }}</div>
-          </div>
-          <div v-else style="font-weight:bold">
-            ---
-          </div>
+            <div v-if="data.item.ControlaStock == 1">
+              <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+              <div v-if="!data.item.EsPadre" style="font-weight:bold">{{ data.item.stock }}</div>
+            </div>
+            <div v-else style="font-weight:bold">
+              ---
+            </div>
           </div>
         </template>
       </b-table>
@@ -440,43 +377,40 @@
       <slot name="adicional"></slot>
     </b-col>
     <b-col md="3">
-          <table class="table b-table border table-footer">
-            <tbody>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-success">SubTotal</td>
-                <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
-              </tr>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-danger">Descuento</td>
-                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
-              </tr>
-              <tr>
-                <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
-              </tr>
-              <tr v-if="sumatoriaIgv > 0">
-                <td><b>IGV</b></td>
-                <td class="table-danger">{{ sumatoriaIgv }}</td>
-              </tr>
-              <tr>
-                <td><b>TOTAL</b></td>
-                <td class="table-danger">{{ sumatoriaTotal }}</td>
-              </tr>
-              <tr>
-                <td  colspan="2">
-                  <label>pagó con:</label>
-                  <b-form-input
-                    type="text"
-                    :disabled="bloquearInput?true:false"
-                    placeholder="Pagó con"
-                    v-model="pagocon"
-                    @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <table class="table b-table border table-footer">
+        <tbody>
+          <tr v-if="sumatoriaDescuento > 0">
+            <td class="table-success">SubTotal</td>
+            <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}
+            </td>
+          </tr>
+          <tr v-if="sumatoriaDescuento > 0">
+            <td class="table-danger">Descuento</td>
+            <td class="table-danger">- {{ sumatoriaDescuento }}</td>
+          </tr>
+          <tr>
+            <td><b>SubTotal</b></td>
+            <td class="table-danger">{{ sumatoriaSubTotal }}</td>
+          </tr>
+          <tr v-if="sumatoriaIgv > 0">
+            <td><b>IGV</b></td>
+            <td class="table-danger">{{ sumatoriaIgv }}</td>
+          </tr>
+          <tr>
+            <td><b>TOTAL</b></td>
+            <td class="table-danger">{{ sumatoriaTotal }}</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label>pagó con:</label>
+              <b-form-input type="text" :disabled="bloquearInput ? true : false" placeholder="Pagó con"
+                v-model="pagocon" @input="asignarVuelto"></b-form-input><br>
+              <label>Vuelto:</label>
+              <b>S/ {{ vuelto | redondear }}</b>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </b-col>
     <br><br>
   </b-row>
@@ -496,12 +430,15 @@ export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
-  data () {
+  data() {
     return {
+
+      verTableCarrito: true,
       readerSize: {
         width: 1600,
         height: 1080,
       },
+
       detecteds: [
         "code_128_reader",
         "ean_reader",
@@ -530,12 +467,13 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
-      medicionPro:'UNIDAD',
+      medicionPro: 'UNIDAD',
       productoSelect: {},
       idPerfil: sessionStorage.getItem('IdPerfil'),
-      productoNombre:'',
-      productoUrl:'',
-      modalAbiertCode: false
+      productoNombre: '',
+      productoUrl: '',
+      modalAbiertCode: false,
+      editarPrecio: 0
     }
   },
   created() {
@@ -547,18 +485,26 @@ export default {
     this.$barcodeScanner.destroy();
   },
   watch: {
-    sumatoriaTotal (sum) {
+    tipoUtilidad() {
+      this.changeTipoUtilidad()
+    },
+    sumatoriaTotal(sum) {
       this.asignarVuelto()
     },
-    productos (prods) {
+    productos(prods) {
+
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio
       }
+      // this.changeTipoUtilidad()
     }
   },
   props: {
+    tipoVenta: Number,
+    editarPrecioBloque: Number,
+    tipoUtilidad: String,
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -566,11 +512,11 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
-    bloquearInput:Boolean,
-    esDelivery:Boolean,
+    bloquearInput: Boolean,
+    esDelivery: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
+      default(obj) {
         return obj
       }
     },
@@ -579,17 +525,17 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'itemNum', label: '#', class:'text-center thclass' },
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'CodigoBarra', label: 'Código'},
+          { key: 'itemNum', label: '#', class: 'text-center thclass' },
+          { key: 'stock', label: 'Stock', variant: 'info', class: 'text-center' },
+          { key: 'CodigoBarra', label: 'Código' },
           // { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
+          { key: 'Producto', label: 'Artículo' },
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: 'ProductoMarca', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' },
-          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
+          { key: 'obsequio', label: 'Obsequio', class: 'thcenter' },
           { key: 'eventPres', label: '' },
           //{ key: 'cantxPrecio', variant: 'warning' },
           // { key: 'ProductoMedicion', label: 'Medición' },
@@ -601,7 +547,7 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: 'precioVenta', label: 'Precio venta (S/)' },
           { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
+          { key: 'acciones', label: '' }
         ]
       },
       type: Array
@@ -612,14 +558,14 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen) {
         return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
       } else {
         return this.API + 'productos'
       }
     },
-    sumatoriaSubTotal () {
+    sumatoriaSubTotal() {
       let sumatoria = 0
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
@@ -634,21 +580,21 @@ export default {
       }
       return this.$options.filters.redondear(sumatoria)
     },
-    sumatoriaTotal () {
+    sumatoriaTotal() {
       let sumatoria = 0
       this.productos.map((value) => {
         sumatoria += parseFloat(value.total)
       })
-      
+
       this.actualizarTotal(sumatoria)
       return this.$options.filters.redondear(sumatoria)
     },
-    sumatoriaIgv () {
+    sumatoriaIgv() {
       let sumatoria = 0
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
         //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - (sumatoria / 1.18)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)
@@ -656,7 +602,7 @@ export default {
       }
       return this.$options.filters.redondear(sumatoria)
     },
-    sumatoriaDescuento () {
+    sumatoriaDescuento() {
       let sumatoria = 0
       this.productos.map((value) => {
         sumatoria += parseFloat(value.descuento || 0)
@@ -670,14 +616,14 @@ export default {
       buscar: 'buscarProductos',
       eliminar: 'eliminarProducto',
       actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
+      actualizarProd: 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
-    obtenerAnaquel(data){
-      if(data.Anaqueles && data.Anaqueles!='null' && this.idAlmacen>0){
+    obtenerAnaquel(data) {
+      if (data.Anaqueles && data.Anaqueles != 'null' && this.idAlmacen > 0) {
         let obj = JSON.parse(data.Anaqueles)
-        let anaquel = obj.find((d)=>d.id==this.idAlmacen)
-        return anaquel?anaquel.nombre:''
+        let anaquel = obj.find((d) => d.id == this.idAlmacen)
+        return anaquel ? anaquel.nombre : ''
       }
       return ''
 
@@ -685,17 +631,17 @@ export default {
     setSubtotal(index, val, prod) {
       let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
       Vue.set(this.productos[index], 'precio', precio)
-      this.actualizarProd({Producto:prod,Pos:index})
+      this.actualizarProd({ Producto: prod, Pos: index })
     },
-    abrirImagen(producto,url){
+    abrirImagen(producto, url) {
       this.productoNombre = producto
       this.productoUrl = url
       this.$refs['modalImagen'].show()
     },
-    abrirCodigoBarra(){
+    abrirCodigoBarra() {
       this.$refs['modalCodigoBarra'].show()
-      this.modalAbiertCode=true;
-      this.result="";
+      this.modalAbiertCode = true;
+      this.result = "";
     },
     onBarcodeScanned(barcode) {
       if (this.modalAbiertCode) {
@@ -703,43 +649,43 @@ export default {
         this.format = barcode.codeResult.format;
         const audio = new Audio(sound)
         audio.play()
-        if (this.result.length>0) {
+        if (this.result.length > 0) {
           this.loadCode = this.result;
           this.loadBarcode();
           this.$refs['modalCodigoBarra'].hide()
-          this.modalAbiertCode=false;
+          this.modalAbiertCode = false;
         }
       }
-      
+
       // do something...
     },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png"
     },
-    changeCant (val, prod, index) {
-      if (val>0) {
+    changeCant(val, prod, index) {
+      if (val > 0) {
         //prod.cantidad *= Number(prod.cantidad)
         //prod.cantidad = Number(prod.cantidadPres)
         //prod.cantidad = Number(val)
       }
       prod.subt = ''
       this.$nextTick(() => {
-        this.actualizarProd({Producto:prod,Pos:index})
+        this.actualizarProd({ Producto: prod, Pos: index })
       })
     },
 
-    cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
+    cambiarPrecio(index, prod) {
+      var utilidad = this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
       this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
     },
-    
-    addManoDeObra (index, e) {
+
+    addManoDeObra(index, e) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-      if ( pi < 0 ) {
+      if (pi < 0) {
         this.$toasted.error('Primero seleccione el producto MANODEOBRA')
-        
+
         this.productos[index].EsManoDeObra = 0
-        return ;
+        return;
       }
 
       if (this.productos[index].EsManoDeObra) {
@@ -754,14 +700,14 @@ export default {
       }
     },
 
-    updateManoDeObraNeta (index) {
+    updateManoDeObraNeta(index) {
       let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
+        precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
       })
-      
+
       let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
 
       if (pi >= 0 && index !== pi) {
@@ -769,7 +715,7 @@ export default {
       }
     },
 
-    asignarDisabledProf (index, e) {
+    asignarDisabledProf(index, e) {
       if (e.target.checked === true) {
         this.productos[index].disabledProf = 1
         return
@@ -777,7 +723,7 @@ export default {
       this.productos[index].disabledProf = 0
     },
 
-    asignarVuelto () {
+    asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
     // loadBarcode (e) {
@@ -797,23 +743,23 @@ export default {
     //   }
     // },
 
-    loadBarcode (e) {
+    loadBarcode(e) {
       if (e) {
         e.preventDefault()
       }
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = {codigoBarra: idProducto}
-        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
-        .then((response) => {
-          if (response.data.IdProducto) {
-            this.setProducto(response.data)
-          } else {
-            this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
-          }
-        })
+        let params = { codigoBarra: idProducto }
+        this.axios.get(this.API + 'productos/id/' + idProducto, { params: params })
+          .then((response) => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data)
+            } else {
+              this.loadCode = ''
+              this.$toasted.show('No se encontró ningun producto')
+            }
+          })
       }
     },
 
@@ -845,40 +791,56 @@ export default {
         this.pasteCode = false
       }
     },*/
-    setObsequio(index){
+    setObsequio(index) {
       this.productos[index].precio = 0
       this.productos[index].nuevoPrecioContado = 0
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
-    editarProducto(Pro){
+    editarProducto(Pro) {
+      // console.log(Pro)
+      //this.$store.state.cart.precio_venta = 55
       this.productoSelect = Pro
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
+      this.$store.state.cart.precio_venta =
+        this.isVentas ? Pro.precio : Pro.nuevoPrecioContado;
     },
-    agregarGuardar(id,pxp,obj){
-      this.add([id,false,false,false,false,true,this.isVentas]);
-      setTimeout(() => {
-              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, 200); 
-      
+    async agregarGuardar(id, pxp, obj) {
 
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
-        if(fPP.length!=4){
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-          obj.IdProductoMarca= obj.marca.IdProductoMarca
-          obj.ProductoMarca= obj.marca.ProductoMarca
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria
-          this.productoSelect = obj
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-          this.showPresentacion(this.productoSelect)
-        }
+      this.add([id, false, false, false, false, true, this.isVentas]);
+      await setTimeout(() => {
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      }, 200);
+
+
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
+      if (fPP.length != 4) {
+        obj.ProductoMedicion = obj.medicion.ProductoMedicion
+        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
+        obj.IdProductoMarca = obj.marca.IdProductoMarca
+        obj.ProductoMarca = obj.marca.ProductoMarca
+        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
+        obj.ProductoCategoria = obj.categoria.ProductoCategoria
+        this.productoSelect = obj
+        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
+        this.showPresentacion(this.productoSelect)
+      }
+      setTimeout(() => {
+        this.changeTipoUtilidad()
+      }, 100);
     },
-    setProducto (obj) {
+    async setProducto(obj) {
+      let val = this.productos.some(prod =>
+        prod.IdProducto === obj.IdProducto
+      )
+      if (val) {
+        this.$toasted.show('Producto ya se encuentra en el listado')
+        return;
+      }
+
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
       this.loadCode = ''
@@ -887,6 +849,29 @@ export default {
       obj.EsObsequio = 0
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = true;
+      obj.OldPrecioCosto = obj.PrecioCosto
+
+
+      switch (this.tipoUtilidad) {
+        case 'Corporativo':
+          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(2)
+          break;
+        case 'Publico':
+          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(2)
+          break;
+        case 'Taller':
+
+          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(2)
+          break;
+
+        default:
+          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto).toFixed(2) : '';
+          // console.log(obj.precio)
+          break;
+      }
 
       /*this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
@@ -908,22 +893,65 @@ export default {
         this.setProductoUni(obj)
         return
       }
-      this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-      if(obj.precioConvenio){
-        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+      this.preciosProd.push({ nombre: "P. Pub.", cantidad: 1, precio: obj.PrecioContado })
+      if (obj.precioConvenio) {
+        this.preciosProd.push({ nombre: "P. Dis.", cantidad: 1, precio: obj.precioConvenio })
       }
-      if(obj.PrecioEspecial){
-       this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+      if (obj.PrecioEspecial) {
+        this.preciosProd.push({ nombre: "P. Esp.", cantidad: 1, precio: obj.PrecioEspecial })
       }
       this.objProd = {}
       this.objProd = obj
-      if(this.preciosProd.length == 1){
-        this.setProductoUni(obj,obj.PrecioContado)
-      }else{
+      if (this.preciosProd.length == 1) {
+        this.setProductoUni(obj, obj.PrecioContado)
+      } else {
         this.$refs['modalCant'].show()
       }
-    },  
-    setProductoUni (obj, precio = false) {
+      if (this.isVentas) {
+        this.changeTipoUtilidad()
+      }
+    },
+    changeTipoUtilidad() {
+      this.verTableCarrito = !this.verTableCarrito
+      let productos = [...this.$store.state.cart.productos]
+      // console.log('tipoUtilidad',this.tipoUtilidad)
+      productos.forEach(prod => {
+        switch (this.tipoUtilidad) {
+          case 'Corporativo':
+
+            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(2)
+
+            break;
+          case 'Publico':
+
+            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(2)
+
+            break;
+          case 'Taller':
+
+            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(2)
+
+            break;
+
+          default:
+            prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2)
+            prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(2)
+            break;
+        }
+
+      });
+      // console.log('PrecioContado ', productos)
+      this.$store.state.cart.productos = productos
+      setTimeout(() => {
+
+        this.verTableCarrito = !this.verTableCarrito
+      }, 10);
+    },
+    recalcularPU(index) {
+      console.log(index)
+    },
+    setProductoUni(obj, precio = false) {
+
       this.objProd.cantxPrecio = 1
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
@@ -934,21 +962,34 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj,false,precio)
+
+      // obj.nuevoPrecioContado = 0
+
+      obj = this.onSetProducto(obj, false, precio)
+
       obj.cantidadPres = obj.cantidad
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-        //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
-      this.loadCode=''
+
+      this.$store.state.cart.productos.push(obj)
+      this.$toasted.success('Producto añadido correctamente')
+      this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      // this.add([obj, () => {
+      //   console.log('objq', obj.nuevoPrecioContado)
+      //   this.$emit('onAddProducto', obj)
+      //   this.$toasted.success('Producto añadido correctamente')
+      //   //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+      // }, {
+      //     setPrecioCosto: (this.tipo == 'mov' ? true : false)
+      //   },
+      //   false, false])
+
+      this.loadCode = ''
+
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
-    setProductoCant (prod) {
+    setProductoCant(prod) {
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
@@ -965,24 +1006,24 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj.cantidadPres = this.cant
-      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
 
-      if(this.indexProdSelect == null){
+      if (this.indexProdSelect == null) {
         this.add([obj, () => {
           this.$emit('onAddProducto', obj)
           this.$toasted.success('Producto añadido correctamente')
           //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
         }, false, false])
-      }else{
-        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
+      } else {
+        this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
         this.indexProdSelect = null
       }
-      
+
       this.$refs['modalCant'].hide()
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
-    showPresentacion (obj, index) {
+    showPresentacion(obj, index) {
       /*if (!obj.PreciosPorProducto !== '') {
         this.precioCont = obj.PrecioContado
         obj.estadoPxP = false
@@ -991,14 +1032,14 @@ export default {
         this.$refs['modalCant'].show()
         return
       }*/
-      if(this.isVentas){
+      if (this.isVentas) {
         this.preciosProd = []
-        this.preciosProd.push({nombre:"P. Pub.", cantidad: 1, precio:obj.PrecioContado})
-        if(obj.precioConvenio){
-        this.preciosProd.push({nombre:"P. Dis.", cantidad: 1, precio:obj.precioConvenio})
+        this.preciosProd.push({ nombre: "P. Pub.", cantidad: 1, precio: obj.PrecioContado })
+        if (obj.precioConvenio) {
+          this.preciosProd.push({ nombre: "P. Dis.", cantidad: 1, precio: obj.precioConvenio })
         }
-        if(obj.PrecioEspecial){
-        this.preciosProd.push({nombre:"P. Esp.", cantidad: 1,  precio:obj.PrecioEspecial})
+        if (obj.PrecioEspecial) {
+          this.preciosProd.push({ nombre: "P. Esp.", cantidad: 1, precio: obj.PrecioEspecial })
         }
         obj.EsVentaNew = true;
         this.objProd = obj
@@ -1010,9 +1051,9 @@ export default {
     renderChild(data) {
       if (this.idAlmacen) {
         let styleStock = ''
-        if(data.stock <= 0){
+        if (data.stock <= 0) {
           styleStock = 'table-danger'
-        }else{
+        } else {
           styleStock = 'table-success'
         }
 
@@ -1046,15 +1087,15 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre == 1 ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />' : (data.stock ? Number.isInteger(data.stock) ? data.stock : data.stock.toFixed(2) : data.stock)}</b></td>
                 <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
                 <td style="width: 5%">
-                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                  <img src="${data.Imagen == null || data.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.Imagen}" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica == 1 ? '<i class="fas fa-star" style="color:yellow !important" ></i>' : ''}</b></td>-->
               </tr>
             </tbody>
           </table>   
@@ -1068,23 +1109,24 @@ export default {
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
-    setNuevoPrecioContado (index) {
-
+    setNuevoPrecioContado(index) {
+      console.log(this.productos[index])
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
+      if (this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
+        console.log(precio)
       }
-      let precioFinal=0
+      let precioFinal = 0
       //if(this.isVentas){
-        //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-       // let precioFinal = 
+      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
+      // let precioFinal = 
       // }else{
-      precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
-      if(this.isVentas){
+      precioFinal = precio * this.productos[index].PorcentajeUtilidad / 100 + precio
+      if (this.isVentas) {
         Vue.set(this.productos[index], 'subt', '')
       }
-       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
@@ -1095,32 +1137,32 @@ export default {
       let normalPrecio = this.$options.filters.redondear(precioFinal)
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
       let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1)
-      
+
       if (this.tipoCambio > 0) {
         normalPrecio *= this.tipoCambio
         nuevoPrecio *= this.tipoCambio
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      // Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
+      // Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio 
       this.updateManoDeObraNeta(index)
     },
-    actualizarDescu(index){
+    actualizarDescu(index) {
       let obj = this.productos[index];
-      this.actualizarProd({Producto:obj,Pos:index})
+      this.actualizarProd({ Producto: obj, Pos: index })
     },
     getSubtotal(index) {
-      
+
       let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
       return subtotal
     },
-    getIgv (index) {
+    getIgv(index) {
       let igv = 0
       if (this.productos[index].TieneIgv) {
         igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
@@ -1130,7 +1172,7 @@ export default {
       // this.productos[index].igv = igv
       return igv
     },
-    getTotal (index) {
+    getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal)
 
       if (this.productos[index].FLETE) {
@@ -1143,15 +1185,15 @@ export default {
         total -= parseFloat(this.productos[index].descuento)
       }
 
-      total =  this.$options.filters.redondear(total)
+      total = this.$options.filters.redondear(total)
       Vue.set(this.productos[index], 'total', total)
       // this.productos[index].total = total
       return total
     },
-    getData (value) {
+    getData(value) {
       this.buscar(value)
     },
-    quitarProducto (index) {
+    quitarProducto(index) {
       this.eliminar(index)
       this.$emit('onRemoveProducto', index)
       this.$toasted.show('Producto quitado del listado')
@@ -1159,11 +1201,82 @@ export default {
 
     formatFecha(fecha) {
       if (fecha) {
-			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+        return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
       } else {
         return ''
       }
-		}
+    },
+
+    actualizarEditarPrecio(index) {
+      // Cambio de estado del checkbox
+      //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
+      let producto = this.productos[index];
+
+      if (producto.editarPrecio === 1) {
+        producto.editarPrecio = 0;
+        return;
+      }
+
+      this.$swal({
+        title: 'Escriba la contraseña del administrador',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Atrás',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+        preConfirm: () => {
+          return new Promise((resolve) => {
+            resolve({
+              password: document.getElementById('password').value
+            });
+          });
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let password = result.value.password;
+          this.axios.post(this.API + 'login', {
+            user: 'admin',
+            password: password
+          }).then(response => {
+            // Respuesta de la API
+            if (response.data) {
+              producto.editarPrecio = 1;
+            } else {
+              this.$swal({
+                title: 'Error',
+                text: 'Contraseña incorrecta',
+                icon: 'error',
+              }).then(() => {
+                // Si la contraseña es incorrecta, desmarca el checkbox
+                //this.checkboxValue = 0;
+                producto.editarPrecio = 0;
+              });
+            }
+          }).catch(error => {
+            // Error en la solicitud
+            this.$swal({
+              title: 'Error',
+              text: 'Hubo un problema con la solicitud',
+              icon: 'error',
+            });
+          });
+        } else {
+          // Si el modal se cierra sin confirmar
+          //this.checkboxValue = 0;
+          producto.editarPrecio = 0;
+        }
+      }).catch(error => {
+        if (error) {
+          this.$swal({
+            title: 'Advertencia',
+            text: error,
+            icon: 'warning',
+          });
+        }
+      });
+    }
   },
   components: {
     ProductoForm
@@ -1172,100 +1285,122 @@ export default {
 </script>
 
 <style scoped>
-  .contentCard {
-    cursor: pointer;
-  }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
-  .oferta{
-     border: 4px solid #dc3545;
-  }
-  .ofertanom{
-    color: #dc3545;
-    border-right: 2px solid #dc3545;
-  }
+.contentCard {
+  cursor: pointer;
+}
+
+.disabledMouse {
+  background: #CECECE;
+  cursor: inherit;
+}
+
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+
+.oferta {
+  border: 4px solid #dc3545;
+}
+
+.ofertanom {
+  color: #dc3545;
+  border-right: 2px solid #dc3545;
+}
 </style>
 <style>
-  .popover{
-    max-width: 420px !important;
-  }
-  .nomCart {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    border-right: 2px solid black;
-  }
-  #modalImagen .modal-dialog {
-    max-width: 75% !important;
-  }
-  .imagenGrande{
-    width: 100%;
-  }
-  #modalCodigoBarra {
-    padding: 0!important;
-  }
+.popover {
+  max-width: 420px !important;
+}
+
+.nomCart {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  border-right: 2px solid black;
+}
+
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+
+.imagenGrande {
+  width: 100%;
+}
+
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+
+.obsequio {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
+
+@media only screen and (max-width: 1440px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
     max-height: 50vh !important;
   }
-  #modalCodigoBarra .modal-body {
-    padding-bottom: 1px !important;
-    margin-bottom: 1px !important;
-  }
-  #codigoBarraStyle video, canvas{
-    width: 100%;
-    height: 100%;
-  }
+
   .cameraBarra {
     height: 50vh;
     width: auto;
-    margin: 0 auto;
   }
-  .obsequio{
-    display: flex;
-    justify-content: center;
-    justify-items: center;
+}
+
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
   }
-  @media only screen and (max-width: 1440px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 50vw !important;
-      max-height: 50vh !important;
-    }
-    .cameraBarra {
-      height: 50vh;
-      width: auto;
-    }
+
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
   }
-  @media only screen and (max-width: 750px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 100vw !important;
-      max-height: 80vh !important;
-    }
-    .cameraBarra {
-      height: 80vh;
-      width: auto;
-    }
+}
+
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
   }
-  @media only screen and (max-width: 375px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 100vw !important;
-      max-height: 80vh !important;
-    }
-    .cameraBarra {
-      height: 80vh;
-      width: auto;
-    }
+
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
   }
-  #modalCantidad .modal-dialog {
-      max-width: 40% !important;
-  }
-  .tdcenter {
-    vertical-align: middle !important;
-  }
+}
+
+#modalCantidad .modal-dialog {
+  max-width: 40% !important;
+}
+
+.tdcenter {
+  vertical-align: middle !important;
+}
 </style>

@@ -5,7 +5,8 @@ import axios from 'axios'
 const state = {
   productos: [],
   productosFiltrados: [],
-  totalCart: 0
+  totalCart: 0,
+  precio_venta: 0,
 }
 
 const mutations = {
@@ -46,6 +47,7 @@ const mutations = {
     })
   },
   ACTUALIZAR_PRODUCTO ({ productos }, obj) {
+    // console.log(obj)
     //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
     productos.splice(obj.Pos, 1, obj.Producto)
   },

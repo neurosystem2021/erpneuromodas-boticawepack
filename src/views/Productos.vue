@@ -93,7 +93,7 @@ export default {
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'PalabraClave', label: 'Palabra Clave', sortable: true },
-            { key: 'PorcentajeUtilidad', label: 'Porcentaje Utilidad', sortable: true },
+            { key: 'UPublico', label: '% Util. Publico', sortable: true },
             { key: 'PrecioCosto', label: 'Precio Compra', sortable: true },
             { key: 'PrecioContado', label: 'Precio Venta', sortable: true },
             //{ key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },

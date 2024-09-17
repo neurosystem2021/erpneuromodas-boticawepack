@@ -163,7 +163,7 @@ import { mapActions } from 'vuex'
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'No, atrás'
+                cancelButtonText: 'No, atrás',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.axios.delete(this.API + 'proforma/eliminar/'+data.IdProforma).then(res => {
@@ -205,7 +205,7 @@ import { mapActions } from 'vuex'
                 confirmButtonText: 'Sí, cambiar',
                 cancelButtonText: 'No, atrás',
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
+                cancelButtonColor: '#d33',
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.updateVendido(item);

@@ -537,7 +537,8 @@ export default {
         event.target.src = "static/no-photo.png" 
     },
     clickVerValorizado() {
-      let pass = window.prompt('Escriba su contraseña')
+     /* let pass = window.prompt('Escriba su contraseña')
+
       if (pass) {
         this.axios.post(this.API + 'login', {
           user: sessionStorage.getItem('User'),
@@ -547,7 +548,51 @@ export default {
             this.verValorizado = true;
           }
         })
-      }
+      }*/
+
+    this.$swal({
+    title: 'Escriba su contraseña',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Aceptar',
+    cancelButtonText: 'Atrás',
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+    preConfirm: () => {
+        return new Promise((resolve) => {
+            resolve({
+                password: document.getElementById('password').value
+            });
+        });
+    }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let password = result.value.password;
+            this.axios.post(this.API + 'login', {
+                user: sessionStorage.getItem('User'),
+                password: password
+            }).then(response => {
+                // Respuesta de la API
+                if (response.data) {
+                    this.verValorizado = true;
+                } else {
+                    this.$swal({
+                        title: 'Error',
+                        text: 'Contraseña incorrecta',
+                        icon: 'error',
+                    });
+                }
+            }).catch(error => {
+                // Error en la solicitud
+                this.$swal({
+                    title: 'Error',
+                    text: 'Hubo un problema con la solicitud',
+                    icon: 'error',
+                });
+            });
+        }
+    });
     },
     getPrimerAlmacen(){
         this.axios.get(this.API + '/almacenes/id/1').then(r => {

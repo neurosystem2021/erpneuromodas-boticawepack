@@ -54,6 +54,55 @@
             Es Oferta
           </b-form-checkbox>
         </b-col>
+
+        <b-col md="12" style="margin-top:10px">
+          <b-form-group>
+            <label>% Desc. MAX:</label>
+            <b-form-input
+              v-model="categoria.PorcentajeDescMax"
+              type="number"
+              value="0"
+              required="required"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="12" style="margin-top:10px">
+          <b-form-group>
+            <label>% Utilidad Corporativo:</label>
+            <b-form-input
+              v-model="categoria.UCorporativo"
+              type="number"
+              value="0"
+              required="required"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="12" style="margin-top:10px">
+          <b-form-group>
+            <label>% Utilidad Público:</label>
+            <b-form-input
+              v-model="categoria.UPublico"
+              type="number"
+              value="0"
+              required="required"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="12" style="margin-top:10px">
+          <b-form-group>
+            <label>% Utilidad Taller</label>
+            <b-form-input
+              v-model="categoria.UTaller"
+              type="number"
+              value="0"
+              required="required"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+
         <div slot="modal-footer">
         <b-btn variant="primary" type="submit">
            Guardar
@@ -104,6 +153,10 @@ export default {
         this.categoria.MostrarPuntoVenta = newVal.MostrarPuntoVenta
         this.categoria.Orden = newVal.Orden
         this.categoria.EsOferta = newVal.EsOferta
+        this.categoria.PorcentajeDescMax = newVal.PorcentajeDescMax
+        this.categoria.UCorporativo = newVal.UCorporativo
+        this.categoria.UPublico = newVal.UPublico
+        this.categoria.UTaller = newVal.UTaller
       } else {
         this.title='Nueva Categoria'
         this.initForm();
@@ -119,6 +172,10 @@ export default {
           MostrarPuntoVenta:0,
           Orden:0,
           EsOferta:0,
+          PorcentajeDescMax: 0,
+          UCorporativo: 0,
+          UPublico: 0,
+          UTaller: 0
       }
     },
     guardarCategoriaImpresora(e) {
