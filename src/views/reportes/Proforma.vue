@@ -118,11 +118,6 @@
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
-          <!--<tr>
-            <td colspan="2"></td>
-            <td colspan="2">TAX 25%</td>
-            <td>$1,300.00</td>
-          </tr>-->
           <tr>
             <td colspan="3"></td>
             <td colspan="2" style="background:#010067 ; color:#fff">TOTAL</td>
@@ -234,8 +229,445 @@ export default {
         this.empresa = res.data;
       });
     },
+    // window.print();
     imprimir() {
-      window.print();
+      let baseURL = window.location.origin;
+      let html = `
+      <html>
+        <head>
+            <title>Impresión Proforma. </title>
+            	<div id="logo">
+                <img src="${baseURL}/resources/images/banner-proforma.jpg">
+              </div>
+        </head>
+        <style>
+        @media print{
+          .total {
+           /* background: #010067 !important;*/
+           /* color: #fff !important;*/
+          }
+
+          .tblProductos {
+            background: #fd8100 !important;
+          }
+
+          .celda {
+            text-align: left !important;
+            border: none !important;
+            background: white !important;
+          }
+
+          table.tblProductos tr {
+            background: #fd8100 !important;
+          }
+
+          table.tblProductos td.celda {
+            text-align: left !important;
+            border: none !important;
+            background: white !important;
+          }
+      
+         .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
+          }
+          a {
+          color: #0087C3;
+          text-decoration: none;
+        }
+        
+        #invoice-container {
+          position: relative;
+          width: 21cm;  
+          margin: 0 auto; 
+          color: #555555;
+          background: #FFFFFF; 
+          font-family: Arial, sans-serif; 
+          font-size: 14px; 
+        }
+        
+        header {
+          padding: 10px 0;
+          margin-bottom: 20px;
+          border-bottom: 1px solid #AAAAAA;
+        }
+        
+        #logo {
+          float: left;
+          margin-top: 8px;
+          text-align: center;
+          width: 100%;
+        }
+        
+        #logo img {
+          max-width: 100%;
+          height: auto;
+        }
+        
+        #company {
+          float: right;
+          text-align: right;
+        }
+        
+        
+        #details {
+          margin-bottom: 9px;
+        }
+        
+        #client {
+          padding-left: 6px;
+          border-left: 6px solid #FD8100;
+          float: left;
+          width: 12cm;
+        }
+
+        #client .to {
+    color: #777777;
+  }
+  
+        h2.name {
+    font-size: 1.2em;
+    font-weight: normal;
+    margin: 0;
+  }
+  
+  
+  /* #invoice {
+    float: right;
+    text-align: right;
+    width: 5cm;
+  }*/
+   #invoice h1 {
+    color: #0087C3;
+    font-size: 1.6em;
+    line-height: 1em;
+    font-weight: normal;
+    margin: 0  0 10px 0;
+  }
+    /*
+     #invoice .date {
+    font-size: 1.1em;
+    color: #777777;
+  }
+*/
+   
+  /*table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 7px;
+  }*/
+  
+    table th,
+  table td {
+    /* padding: 10px; */
+    padding: 3px;
+    background: #EEEEEE;
+    text-align: center;
+    border-bottom: 1px solid #FFFFFF;
+  }
+    table th {
+    white-space: nowrap;        
+    font-weight: bold;
+  }
+  
+  table td {
+    text-align: right;
+  }
+  
+  table td h3{
+    color: #FD8100;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0 0 0.2em 0;
+  }
+    table .no {
+    color: #FFFFFF;
+    font-size: 1em;
+    /* background: #FD8100;*/
+  }
+  
+  table .desc {
+    text-align: left;
+ /*   white-space: pre-wrap;*/
+/*      white-space: pre-line;*/
+    color:black;
+  }
+  
+  table .unit {
+    color:black;
+    font-size: 1em;
+    background: #DDDDDD;
+    text-align: center;
+  }
+  
+  table .qty {
+    color: black;
+    text-align: center;
+  }
+    table .total {
+    /* background: #FD8100;*/
+    color: black;
+    text-align: right;
+  }
+  table .total .dsct {
+    font-size: .7em;
+    font-style: italic;
+  }
+  table td.unit,
+  table td.qty,
+  table td.total {
+    font-size: .9em;
+    color: black;
+  }
+  
+  table tbody tr:last-child td {
+    border: none;
+  }
+  
+  table tfoot td {
+    padding: 7px 20px;
+    background: #FFFFFF;
+    border-bottom: none;
+    font-size: 1.2em;
+    white-space: nowrap; 
+    border-top: 1px solid #AAAAAA; 
+  }
+    
+  table tfoot tr:first-child td {
+    border-top: none; 
+  }
+  
+  table tfoot tr:last-child td {
+    color: black;
+    font-size: 1.4em;
+    border-top: 1px solid #FD8100; 
+  
+  }
+  
+  table tfoot tr td:first-child {
+    border: none;
+  }
+  #accounts{
+    font-size: .9em;
+    margin-bottom: 12px;
+    margin-top: 12px;
+  }
+
+  #thanks{
+    font-size: 2em;
+    margin-bottom: 9px;
+  }
+  
+  #notices{
+    padding-left: 6px;
+    border-left: 6px solid #FD8100;
+  }
+  
+  #notices .notice {
+    font-size: 1em;
+  }
+  
+  footer {
+    color: #777777;
+    width: 100%;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #AAAAAA;
+    padding: 8px 0;
+    text-align: center;
+  }
+    }   
+      </style>
+      <body>
+      <div id="details" class="clearfix">
+        <div id="client">
+          <br>
+          <h5 class="to" style=":black">PROFORMA A:</h5>
+          <table>
+            <tbody>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.Cliente
+                }</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Documento</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.Documento
+                }<td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.ClienteDireccion
+                }</td>
+              </tr>
+
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.UsuarioReg
+                }</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">T. Pago:</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.EsCredito == 1 ? "CRÉDITO" : "CONTADO"
+                }</td>
+                
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="invoice">
+          <h1>PROFORMA ${this.proforma.Anio}-${this.proforma.Numero}</h1>
+          <div style="height:15px"></div>
+          <table>
+            <tbody>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha de emisión</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.FechaReg
+                    ? this.proforma.FechaReg.substring(0, 10)
+                    : this.proforma.FechaReg
+                }</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo Validez</td>
+                <td class="celda" style="text-transform: uppercase"> ${
+                  this.proforma.DiasValidos
+                } D </td>
+              </tr>
+             
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega</td>
+                <td class="celda" style="text-transform: uppercase">: ${
+                  this.proforma.PorEntregar == 1
+                    ? this.proforma.PorEntregarDias + " D"
+                    : "INMEDIATO"
+                }</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <table border="0" cellspacing="0" cellpadding="0" min-width="100%" class="tblProductos">
+        <thead>
+          <tr>
+            <th width="2%" class="total">#</th>
+            <th width="5%" class="qty">CANT.</th>
+            <th width="48%" class="desc">DESCRIPCIÓN</th>
+            <th width="12%" class="unit">U.M.</th>
+            <th width="11%" class="unit">PRECIO U.</th>
+            <th width="12%" class="total">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+      this.proforma.productos.forEach((prod, index) => {
+        html += `
+          <tr>
+           
+            <td class="total">${index + 1}</td>
+            <td class="qty" style="font-size:1.1rem">${prod.Cantidad}</td>
+            <td class="desc" style="font-size:0.75rem">
+              <h3 style="color:#000; font-size:1rem"> ${prod.Producto} `;
+        if (this.presentacionProducto(prod)) {
+          html += ` <p>(${this.presentacionProducto(prod)})</p> `;
+        }
+        if (prod.ProductoDesc) {
+          html += ` </h3><p>${prod.ProductoDesc}</p>`;
+        }
+        if (prod.ProductoDesc2) {
+          html += ` </h3><p>${prod.ProductoDesc2}</p>`;
+        }
+        if (prod.ProductoDesc3) {
+          html += ` </h3><p>${prod.ProductoDesc3}</p>`;
+        }
+        html += `
+            </td>
+             <td class="unit" style="font-size:1.1rem">
+              ${this.getPresentacion(prod)}</td>
+            <td class="unit" style="font-size:1.1rem">S/. ${parseFloat(
+              prod.Precio
+            ).toFixed(2)}</td>
+            <td class="total" style="font-size:1.1rem">
+              <div v-if="prod.DisabledTotal === 0">
+                S/. ${parseFloat(
+                  prod.Precio * prod.Cantidad - prod.Descuento
+                ).toFixed(2)}<br>
+                `;
+        if (prod.Descuento) {
+          html += `<span class="dsct">Dsct: ${prod.Descuento |
+            this.moneda("S/. ")} </span> `;
+        }
+        html += `
+              </div>
+            </td>
+          </tr>
+       
+      `;
+      });
+      html += ` 
+        
+            <tr>
+              <td colspan="3"></td>
+              <td colspan="2">SUBTOTAL</td>
+              <td>S/. ${parseFloat(this.subTotal).toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colspan="3"></td>
+              <td colspan="2">TOTAL</td>
+              <td >S/. ${parseFloat(
+                this.subTotal
+              ).toFixed(2)}</td>
+            </tr>
+          
+          </tbody>
+        </table>
+        <div id="accounts" style="font-weight:bold;">
+          <img style="max-width: 100%" src="${baseURL}/resources/images/cuentas.png" />
+        </div>
+        <br>
+        <div id="notices">
+          <div>NOTA:</div>
+          <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
+          <div class="notice">PAGOS: - Factura a ${parseFloat(
+            this.DiasCredito ? this.DiasCredito : 0
+          ).toFixed(2)} días - S/. ${this.subTotal}</div>
+          <div class="notice">Observación(es): ${
+            this.proforma.Observacion ? this.proforma.Observacion : ""
+          }</div>
+        </div>
+        <div>
+          <br>
+          <br>
+          <br>
+          <table>
+            <tbody>
+              <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:50%"></td>
+              <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
+              <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:10%"></td>
+            </tbody>
+          </table>
+        </div>
+        
+        </body>
+        </html>
+      `;
+      // let ventana = window.open("", "", "height=600,width=800");
+      let ventana = window.open("", "", " width=793,height=1122");
+      ventana.document.write(html);
+      ventana.document.close();
+      ventana.focus();
+
+      ventana.print();
+      ventana.close();
     }
   }
 };
