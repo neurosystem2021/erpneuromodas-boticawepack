@@ -286,7 +286,7 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <input :disabled="bloquearInput ? false : true || esDelivery" v-model="productos[data.index].PorcentajeDesc"
+          <input :disabled="bloquearInput ? true : false || esDelivery" v-model="productos[data.index].PorcentajeDesc"
             style="width:90px" type="number" min="0" step="0.01" :max="productos[data.index].PorcentajeDescMax"
             class="form-control" value="0"
             @input="val => { productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10; actualizarDescu(data.index); }" />
@@ -1185,7 +1185,7 @@ export default {
         total -= parseFloat(this.productos[index].descuento)
       }
 
-      total = this.$options.filters.redondear(total)
+      total = parseFloat(parseFloat(total).toFixed(1)).toFixed(2)
       Vue.set(this.productos[index], 'total', total)
       // this.productos[index].total = total
       return total
