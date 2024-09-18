@@ -717,7 +717,7 @@ export default {
         //prod.cantidad *= Number(prod.cantidad)
         //prod.cantidad = Number(prod.cantidadPres)
         //prod.cantidad = Number(val)
-      } 
+      }
       prod.subt = ''
       this.$nextTick(() => {
         this.actualizarProd({ Producto: prod, Pos: index })
@@ -909,21 +909,21 @@ export default {
       }
       switch (this.tipoUtilidad) {
         case 'Corporativo':
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(1)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(1)).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(0)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(0)).toFixed(2)
           break;
         case 'Publico':
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2)
           break;
         case 'Taller':
 
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(1)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(1)).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(0)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(0)).toFixed(2)
           break;
 
         default:
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto).toFixed(1)).toFixed(2) : '';
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto).toFixed(0)).toFixed(2) : '';
           // console.log(obj.precio)
           break;
       }
@@ -975,17 +975,17 @@ export default {
         switch (this.tipoUtilidad) {
           case 'Corporativo':
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
 
             break;
           case 'Publico':
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
 
             break;
           case 'Taller':
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
 
             break;
 
@@ -1015,17 +1015,17 @@ export default {
       switch (this.tipoUtilidad) {
         case 'Corporativo':
 
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2)
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
 
           break;
         case 'Publico':
 
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
 
           break;
         case 'Taller':
 
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2)
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
 
           break;
 
@@ -1285,7 +1285,7 @@ export default {
         total -= parseFloat(this.productos[index].descuento)
       }
 
-      total = parseFloat(parseFloat(total).toFixed(1)).toFixed(2)
+      total = parseFloat(parseFloat(total).toFixed(0)).toFixed(2)
       Vue.set(this.productos[index], 'total', total)
       // this.productos[index].total = total
       return total

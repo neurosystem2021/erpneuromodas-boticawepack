@@ -259,7 +259,7 @@
         </b-col> -->
         </b-row>
 
-        <b-form-group v-if="producto.TienePresentacion">
+        <b-form-group v-if="producto.TienePresentacion && mostrarPresentacionFlag">
           <hr>
           <b-row>
             <b-col md="3" v-for="i in 4" :key="i.id">
@@ -279,11 +279,13 @@
                 </b-form-group>
 
                 <b-form-group>
-                  <label>Precio:</label>
+                  <label>Precio Unitario:</label>
                   <input v-model="producto.precios[i - 1].precioUnit" :disabled="(idPerfil == 1) ? false : true"
-                    type="number" class="form-control" step="0.00001" @input="recalcularPrecioPresentacion(i)" />
+                    type="number" class="form-control" step="0.00001" @input="recalcularPrecioPresentacion(i)"
+                    @change="recalcularPrecioPresentacion(i)" @blur="recalcularPrecioPresentacion(i)" />
                 </b-form-group>
                 <b-form-group>
+                  <label>Precio:</label>
                   <input v-model="producto.precios[i - 1].precio" :disabled="(idPerfil == 1) ? false : true" readonly
                     type="number" class="form-control" step="0.00001" />
                   <!-- <label>Total: {{ (producto.precios[i - 1].precio * producto.precios[i - 1].cantidad) | redondear
@@ -355,6 +357,7 @@ export default {
       activaSubProducto: true,
       hideQuitarX: true,
       almacenes: [{ value: null, text: '-- SELECCIONE ALMACEN --' }],
+      mostrarPresentacionFlag: true
     }
   },
   beforeMount() {
@@ -527,10 +530,12 @@ export default {
     },*/
     recalcularPrecioPresentacion(i) {
       let prod = { ...this.producto.precios[i - 1] }
-      console.log(prod)
+      // console.log(prod)
       prod.precio = prod.precioUnit * prod.cantidad
       // console.log(prod.precio)
       this.producto.precios[i - 1] = prod
+      this.mostrarPresentacionFlag = !this.mostrarPresentacionFlag
+      this.mostrarPresentacionFlag = !this.mostrarPresentacionFlag
     },
     recalcularMontos() {
       let prod = { ...this.producto }
