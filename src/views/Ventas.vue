@@ -7,12 +7,9 @@
         <b-container fluid class="ancho mt-2" id="conten">
             <b-row>
                 <b-col md="6">
-                    <b-form-group label="Tipo de Utilidad" >
-                        <b-form-radio-group
-                         id="radio-group-2"
-                         v-model="tipoUtilidad"
-                         name="radio-sub-component"
-                         @change="cambioTipoVenta">
+                    <b-form-group label="Tipo de Utilidad">
+                        <b-form-radio-group id="radio-group-2" v-model="tipoUtilidad" name="radio-sub-component"
+                            @change="cambioTipoVenta">
                             <b-form-radio value="Corporativo">Corporativo</b-form-radio>
                             <b-form-radio value="Publico">Público</b-form-radio>
                             <b-form-radio value="Taller">Taller</b-form-radio>
@@ -487,8 +484,8 @@ export default {
         totalCart(newVal) {
             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))).toFixed(2);
         },
-       // selectedtv(newVal, oldVal) {
-         //   this.cambioTipoVenta(newVal, oldVal);
+        // selectedtv(newVal, oldVal) {
+        //   this.cambioTipoVenta(newVal, oldVal);
         //}
     },
     computed: {
@@ -761,62 +758,70 @@ export default {
             this.getNumeroVenta()
         },
         cambioTipoVenta() {
-        this.$nextTick(() => {
-            // Verificar si estamos cambiando a Corporativo o Taller
-            if (this.tipoUtilidad === 'Corporativo' || this.tipoUtilidad === 'Taller') {
-                // Mostrar SweetAlert2 para pedir la contraseña
-                this.$swal({
-                    title: 'Escriba la contraseña del administrador',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Aceptar',
-                    cancelButtonText: 'Atrás',
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
-                    preConfirm: () => {
-                        return {
-                            password: document.getElementById('password').value
-                        };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let password = result.value.password;
+            this.$nextTick(() => {
+                // Verificar si estamos cambiando a Corporativo o Taller
+                if (this.tipoUtilidad === 'Corporativo' || this.tipoUtilidad === 'Taller') {
+                    // Mostrar SweetAlert2 para pedir la contraseña
+                    this.$swal({
+                        title: 'Escriba la contraseña del administrador',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Atrás',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        
+                        html: `
+                    <input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
+                    <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>
+                    `,
+                        preConfirm: () => {
+                            return {
+                                usuario: document.getElementById('usuario').value,
+                                password: document.getElementById('password').value
+                            };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let password = result.value.password;
+                            let usuario = result.value.usuario;
 
-                        // Enviar la contraseña a la API para validación
-                        this.axios.post(this.API + 'login', {
-                            user: 'admin',
-                            password: password
-                        }).then(response => {
-                            if (response.data) {
-                                // Contraseña correcta, actualizar tipo de utilidad
-                                this.show = true; // Acceso autorizado
-                                this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior
-                            } else {
-                                // Contraseña incorrecta, revertir al valor anterior
+                            // Enviar la contraseña a la API para validación
+                            this.axios.post(this.API + 'login', {
+                                user: usuario,
+                                password: password
+                            }).then(response => {
+                                if (response.data && response.data.IdUsuarioPerfil == 1) {
+                                    // Contraseña correcta, actualizar tipo de utilidad
+                                    this.show = true; // Acceso autorizado
+                                    this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior
+                                } else {
+                                    // Contraseña incorrecta, revertir al valor anterior
+                                    this.$swal({
+                                        title: 'Error',
+                                        text: 'No autorizado.',
+                                        icon: 'error'
+                                    }).then(() => {
+                                        this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
+                                    });
+                                }
+                            }).catch(error => {
+                                // Error en la solicitud
+                                console.error('Error en la solicitud:', error);
                                 this.$swal({
                                     title: 'Error',
-                                    text: 'Contraseña incorrecta, no autorizado.',
+                                    text: 'Ha ocurrido un error, vuelva a intentarlo.',
                                     icon: 'error'
                                 }).then(() => {
                                     this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
                                 });
-                            }
-                        }).catch(error => {
-                            // Error en la solicitud
-                            console.error('Error en la solicitud:', error);
-                            this.$swal({
-                                title: 'Error',
-                                text: 'Ha ocurrido un error, vuelva a intentarlo.',
-                                icon: 'error'
-                            }).then(() => {
-                                this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
                             });
-                        });
-                    } else {
-                        // Si el modal se cierra sin confirmar
-                        this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
-                    }
+                        } else {
+                            // Si el modal se cierra sin confirmar
+                            this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
+                        }
                     }).catch(error => {
                         // Manejo de cualquier otro error
                         if (error) {

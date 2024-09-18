@@ -74,11 +74,16 @@
         </b-row>
       </b-modal>-->
 
-      <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
+      <b-modal ref="modalCant" size="xl" id="modalCantidad" v-model="modalCantFlag" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{ objProd.Producto }}</h3>
           <h5>Precios Disponibles</h5>
         </div>
+        <div class="d-block text-center" v-for="(pres, index) in presentacion" :key="index">
+          <h3 style="text-decoration: underline;">{{ objProd.Producto }}</h3>
+          <h5>Precios Disponibles</h5>
+        </div>
+
         <hr>
         <b-row>
           <b-col cols="6" v-if="false">
@@ -96,6 +101,25 @@
             </b-card>
           </b-col>
 
+          <!-- <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+            <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
+              :class="{ 'disabledMouse': !parseFloat(d.cantidad) }" @click="() => {
+                if (parseFloat(d.cantidad)) {
+                  setProductoUni(objProd, d.precio)
+                }
+              }">
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>{{ d.cantidad }}
+                  <br>
+                  <b>Precio: </b>S/ {{ d.precio }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col> -->
           <b-col cols="6" v-for="d in preciosProd" :key="d.id">
             <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
               :class="{ 'disabledMouse': !parseFloat(d.cantidad) }" @click="() => {
@@ -139,7 +163,8 @@
         v-if="verTableCarrito">
         <template slot="eventPres" slot-scope="data">
           <div style="width: 75px;">
-            <b-button size="sm" v-if="isVentas" :disabled="bloquearInput ? true : false" variant="info"
+            <b-button size="sm" v-if="isVentas && !productos[data.index].estadoPxP"
+              :disabled="bloquearInput ? true : false" variant="info"
               @click="showPresentacion(productos[data.index], data.index)"><i class="fas fa-list"></i></b-button>
             <b-button
               @click="abrirImagen(productos[data.index].Producto, productos[data.index].Imagen == null || productos[data.index].Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + productos[data.index].Imagen)"
@@ -432,7 +457,7 @@ export default {
   },
   data() {
     return {
-
+      modalCantFlag: false,
       verTableCarrito: true,
       readerSize: {
         width: 1600,
@@ -842,7 +867,7 @@ export default {
       }
 
       this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
+      obj.estadoPxP = obj.TienePresentacion == 1 ? false : true;
       this.loadCode = ''
       this.preciosProd = []
       this.objProd = {}
@@ -851,7 +876,11 @@ export default {
       obj.EsVentaNew = true;
       obj.OldPrecioCosto = obj.PrecioCosto
 
+      if (obj.TienePresentacion == 1) {
+        let presentacion = JSON.parse(obj.PreciosPorProducto)
+        obj.presentacion == presentacion.filter(v => v.cantidad > 0)
 
+      }
       switch (this.tipoUtilidad) {
         case 'Corporativo':
           this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(2) : '';
@@ -905,11 +934,12 @@ export default {
       if (this.preciosProd.length == 1) {
         this.setProductoUni(obj, obj.PrecioContado)
       } else {
-        this.$refs['modalCant'].show()
+        this.modalCantFlag = true
       }
       if (this.isVentas) {
         this.changeTipoUtilidad()
       }
+      console.log(obj)
     },
     changeTipoUtilidad() {
       this.verTableCarrito = !this.verTableCarrito
@@ -985,7 +1015,7 @@ export default {
       this.loadCode = ''
 
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
+      this.modalCantFlag = false
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
@@ -1019,7 +1049,7 @@ export default {
         this.indexProdSelect = null
       }
 
-      this.$refs['modalCant'].hide()
+      this.modalCantFlag = false
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
@@ -1044,7 +1074,7 @@ export default {
         obj.EsVentaNew = true;
         this.objProd = obj
         this.indexProdSelect = index
-        this.$refs['modalCant'].show()
+        this.modalCantFlag = true
         return
       }
     },
@@ -1225,10 +1255,15 @@ export default {
         cancelButtonText: 'Atrás',
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        html: `<input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
+               <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>
+        `,
         preConfirm: () => {
           return new Promise((resolve) => {
             resolve({
+              usuario: document.getElementById('usuario').value,
               password: document.getElementById('password').value
             });
           });
@@ -1236,12 +1271,13 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           let password = result.value.password;
+          let usuario = result.value.usuario;
           this.axios.post(this.API + 'login', {
-            user: 'admin',
+            user: usuario,
             password: password
           }).then(response => {
             // Respuesta de la API
-            if (response.data) {
+            if (response.data && response.data.IdUsuarioPerfil == 1) {
               producto.editarPrecio = 1;
             } else {
               this.$swal({

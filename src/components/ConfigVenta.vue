@@ -1,26 +1,17 @@
 <template>
     <div>
         <b-button @click="MostrarConfiguracion" variant="outline-primary">Configurar</b-button>
-        
-        <b-form @submit="guardarConfigVenta">    
-            <b-modal id="modalConfigVenta" 
-                title="Configurar Venta" 
-                size="md" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">
+
+        <b-form @submit="guardarConfigVenta">
+            <b-modal id="modalConfigVenta" title="Configurar Venta" size="md" v-model="show" header-bg-variant="dark"
+                headerTextVariant="light" body-bg-variant="light" body-text-variant="dark">
 
                 <b-row class="mb-1">
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="porCada"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            placeholder=""></b-form-input>
+                            <b-form-input v-model="porCada" id="input-porcada" type="number" min="0" step="0.1"
+                                placeholder=""></b-form-input>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -28,12 +19,8 @@
                     <b-col><label for="input-porcada">El cliente gana:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" append="punto(s)">
-                        <b-form-input v-model="puntos"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="1"
-                            placeholder=""></b-form-input>
+                            <b-form-input v-model="puntos" id="input-porcada" type="number" min="0" step="1"
+                                placeholder=""></b-form-input>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -41,12 +28,8 @@
                     <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="valorPunto"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            placeholder=""></b-form-input>
+                            <b-form-input v-model="valorPunto" id="input-porcada" type="number" min="0" step="0.1"
+                                placeholder=""></b-form-input>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -54,14 +37,10 @@
                     <b-col><label for="input-porcada">% Pago de comision:</label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="% ">
-                        <input v-model="valorComision"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            class="form-control"
-                            placeholder=""/>
-                            <b-button size="sm" text="Button" variant="success" @click="guardarConfigComision">Ok</b-button>
+                            <input v-model="valorComision" id="input-porcada" type="number" min="0" step="0.01"
+                                class="form-control" placeholder="" />
+                            <b-button size="sm" text="Button" variant="success"
+                                @click="guardarConfigComision">Ok</b-button>
                         </b-input-group>
                     </b-col>
                 </b-row>
@@ -94,7 +73,7 @@
                         </b-input-group>
                     </b-col>
                 </b-row> -->
-               <!-- <b-row class="mb-1">
+                <!-- <b-row class="mb-1">
                     <b-col><label for="input-porcada">Descuento Sala: </label></b-col>
                     <b-col>
                         <b-input-group size="sm" prepend="% ">
@@ -107,15 +86,15 @@
                         </b-input-group>
                     </b-col>
                 </b-row> -->
-                <div slot="modal-footer" >
+                <div slot="modal-footer">
                     <b-btn size="sm" variant="success" type="submit">
                         Guardar
                     </b-btn>
-                    <b-btn size="sm" variant="secondary" @click="show=false">
+                    <b-btn size="sm" variant="secondary" @click="show = false">
                         Cerrar
                     </b-btn>
                 </div>
-            
+
             </b-modal>
         </b-form>
     </div>
@@ -123,43 +102,43 @@
 <script>
 import config from '@/store/config.js'
 
-    export default {
-        mounted () {
-            this.obtenerDescuento()
-            this.obtenerComision()
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                porCada: 20,
-                puntos: 1,
-                valorPunto: 1,
-                valorComision: 1,
-                descCorporativo: 0,
-                descInstitucional: 0,
-                //descSala:0
-            }
-        },
-        methods: {
-            obtenerDescuento () {
-                this.axios.get(this.API + 'ventas/descuento')
+export default {
+    mounted() {
+        this.obtenerDescuento()
+        this.obtenerComision()
+    },
+    data() {
+        return {
+            API: config.API,
+            show: false,
+            porCada: 20,
+            puntos: 1,
+            valorPunto: 1,
+            valorComision: 1,
+            descCorporativo: 0,
+            descInstitucional: 0,
+            //descSala:0
+        }
+    },
+    methods: {
+        obtenerDescuento() {
+            this.axios.get(this.API + 'ventas/descuento')
                 .then((response) => {
                     this.porCada = response.data.PorCada,
-                    this.puntos = response.data.Puntos,
-                    this.valorPunto = response.data.ValorPunto,
-                    this.descCorporativo = response.data.DescCorporativo,
-                    this.descInstitucional = response.data.DescInstitucional
+                        this.puntos = response.data.Puntos,
+                        this.valorPunto = response.data.ValorPunto,
+                        this.descCorporativo = response.data.DescCorporativo,
+                        this.descInstitucional = response.data.DescInstitucional
                     //this.descSala = response.data.DescSala
                 })
                 .catch((error) => {
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
-            },
-            obtenerComision () {
-                // Para obtener el ValorComision
-                this.axios.get(this.API + 'ventas/comision')
+        },
+        obtenerComision() {
+            // Para obtener el ValorComision
+            this.axios.get(this.API + 'ventas/comision')
                 .then((response) => {
                     this.valorComision = response.data.valorComision
                 })
@@ -167,25 +146,25 @@ import config from '@/store/config.js'
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
-            },
-            MostrarConfiguracion(){
-                /*let pass = window.prompt('Escriba su contraseña de administrador')
-                if (pass) {
-                    this.axios.post(this.API + 'login', {
-                    user: 'admin',
-                    password: pass
-                    }).then(r => {
-                        if (r.data) {
-                            this.show = true;
-                        }else{
-                            this.$toasted.show('Contraseña incorrecta, no autorizado.')
-                        }
-                    }).catch((error) => {
-                        console.log(error)
-                        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                    })
-                }*/
-                this.$swal({
+        },
+        MostrarConfiguracion() {
+            /*let pass = window.prompt('Escriba su contraseña de administrador')
+            if (pass) {
+                this.axios.post(this.API + 'login', {
+                user: 'admin',
+                password: pass
+                }).then(r => {
+                    if (r.data) {
+                        this.show = true;
+                    }else{
+                        this.$toasted.show('Contraseña incorrecta, no autorizado.')
+                    }
+                }).catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            }*/
+            this.$swal({
                 title: 'Escriba la contraseña del administrador',
                 icon: 'question',
                 showCancelButton: true,
@@ -193,53 +172,61 @@ import config from '@/store/config.js'
                 cancelButtonText: 'Atrás',
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                html:
+                    ` <input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
+                <input type="password" id="password" class="swal2-input" placeholder="Contraseña">
+                `,
+
                 preConfirm: () => {
                     return new Promise((resolve) => {
                         resolve({
+                            usuario: document.getElementById('usuario').value,
                             password: document.getElementById('password').value
                         });
                     });
                 }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let password = result.value.password;
-                        this.axios.post(this.API + 'login', {
-                            user: 'admin',
-                            password: password
-                        }).then(response => {
-                            // Respuesta de la API
-                            if (response.data) {
-                                this.show = true;
-                            } else {
-                                this.$swal({
-                                    title: 'Error',
-                                    text: 'Contraseña incorrecta',
-                                    icon: 'error',
-                                });
-                            }
-                        }).catch(error => {
-                            // Error en la solicitud
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let password = result.value.password;
+                    let usuario = result.value.usuario;
+                    this.axios.post(this.API + 'login', {
+                        user: usuario,
+                        password: password
+                    }).then(response => {
+                        // Respuesta de la API
+                        if (response.data && response.data.IdUsuarioPerfil == 1) {
+                            this.show = true;
+                        } else {
                             this.$swal({
                                 title: 'Error',
-                                text: 'Hubo un problema con la solicitud',
+                                text: 'Contraseña incorrecta',
                                 icon: 'error',
                             });
+                        }
+                    }).catch(error => {
+                        // Error en la solicitud
+                        this.$swal({
+                            title: 'Error',
+                            text: 'Hubo un problema con la solicitud',
+                            icon: 'error',
                         });
-                    }
-                });
-            },
-            guardarConfigVenta (evt) {
-                evt.preventDefault()
+                    });
+                }
+            });
+        },
+        guardarConfigVenta(evt) {
+            evt.preventDefault()
 
-                this.axios.post(this.API + 'ventas/descuento', {
-                    porCada: this.porCada,
-                    puntos: this.puntos,
-                    valorPunto: this.valorPunto,
-                    descCorporativo: this.descCorporativo,
-                    descInstitucional: this.descInstitucional,
-                    //descSala: this.descSala
-                })
+            this.axios.post(this.API + 'ventas/descuento', {
+                porCada: this.porCada,
+                puntos: this.puntos,
+                valorPunto: this.valorPunto,
+                descCorporativo: this.descCorporativo,
+                descInstitucional: this.descInstitucional,
+                //descSala: this.descSala
+            })
                 .then((response) => {
                     this.$emit('onUpdateConfig', response.data)
                     this.obtenerDescuento()
@@ -250,26 +237,24 @@ import config from '@/store/config.js'
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
-            },
-            guardarConfigComision() {
-                // Comision
-                this.axios.post(this.API + 'ventas/comision', {
-                    valorComision: this.valorComision
-                }).then((response) => {
-                    this.$emit('onUpdateConfigComision', response.data)
-                    this.obtenerComision()
-                    this.$toasted.show('Se actualizó la configuración')
-                    this.show = false
-                })
+        },
+        guardarConfigComision() {
+            // Comision
+            this.axios.post(this.API + 'ventas/comision', {
+                valorComision: this.valorComision
+            }).then((response) => {
+                this.$emit('onUpdateConfigComision', response.data)
+                this.obtenerComision()
+                this.$toasted.show('Se actualizó la configuración')
+                this.show = false
+            })
                 .catch((error) => {
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
 
-            }
         }
     }
+}
 </script>
-<style>
-
-</style>
+<style></style>

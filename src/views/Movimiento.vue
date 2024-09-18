@@ -86,10 +86,7 @@
 
               <b-col md="6">
                 <b-form-group>
-                  <b-form-checkbox 
-                    v-model="editarPrecioBloque"
-                    :value="1"
-                    :unchecked-value="0"
+                  <b-form-checkbox v-model="editarPrecioBloque" :value="1" :unchecked-value="0"
                     @change="actualizarEditarPrecioBloque()">
                     Editar todos los precios
                   </b-form-checkbox>
@@ -151,10 +148,8 @@
         </b-row>
         <b-row>
           <b-col>
-            <productos-carrito
-              :editarPrecioBloque="editarPrecioBloque"
-              tipoUtilidad="Publico" ref="carrito" @onAddProducto="onAddProducto"
-              :tipoCambio="movimiento.TipoCambio" :fields="carrito.fields" tipo="mov"
+            <productos-carrito :editarPrecioBloque="editarPrecioBloque" tipoUtilidad="Publico" ref="carrito"
+              @onAddProducto="onAddProducto" :tipoCambio="movimiento.TipoCambio" :fields="carrito.fields" tipo="mov"
               :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
           </b-col>
         </b-row>
@@ -185,7 +180,7 @@ export default {
   },
   data() {
     return {
-      editarPrecioBloque:0,
+      editarPrecioBloque: 0,
       inProgress: false,
       newRuc: '',
       API: config.API,
@@ -464,85 +459,92 @@ export default {
       this.$refs[ref].handleDoubleClick()
     },
     actualizarEditarPrecioBloque() {
-     // Cambio de estado del checkbox
-            //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
-            if (this.isVerified && this.editarPrecioBloque === 1 && !this.checkboxValue) {
-                // Si está marcado y se está desmarcando, cambia el estado sin mostrar el modal
-                this.editarPrecioBloque = 0;
-                return;
-            }
+      // Cambio de estado del checkbox
+      //this.editarPrecio = this.editarPrecio === 1 ? 0 : 1;
+      if (this.isVerified && this.editarPrecioBloque === 1 && !this.checkboxValue) {
+        // Si está marcado y se está desmarcando, cambia el estado sin mostrar el modal
+        this.editarPrecioBloque = 0;
+        return;
+      }
 
-            if (!this.isVerified) {
-                if (this.editarPrecioBloque === 0) {
-                    this.$swal({
-                        title: 'Escriba la contraseña del administrador',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Aceptar',
-                        cancelButtonText: 'Atrás',
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        html: '<input type="password" id="password" class="swal2-input" placeholder="Contraseña">',
-                        preConfirm: () => {
-                            return new Promise((resolve) => {
-                                resolve({
-                                    password: document.getElementById('password').value
-                                });
-                            });
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let password = result.value.password;
-                            this.axios.post(this.API + 'login', {
-                                user: 'admin',
-                                password: password
-                            }).then(response => {
-                                // Respuesta de la API
-                                if (response.data) {
-                                    this.editarPrecioBloque = 1;
-                                } else {
-                                    this.$swal({
-                                        title: 'Error',
-                                        text: 'Contraseña incorrecta',
-                                        icon: 'error',
-                                    }).then(() => {
-                                        // Si la contraseña es incorrecta, desmarca el checkbox
-                                        this.checkboxValue = 0;
-                                        this.editarPrecioBloque = 0;
-                                    });
-                                }
-                            }).catch(error => {
-                                // Error en la solicitud
-                                console.error('Error en la solicitud:', error);
-                                this.$swal({
-                                    title: 'Error',
-                                    text: 'Hubo un problema con la solicitud',
-                                    icon: 'error',
-                                });
-                            });
-                        } else {
-                            // Si el modal se cierra sin confirmar
-                            this.checkboxValue = 0;
-                            this.editarPrecioBloque = 0;
-                        }
-                    }).catch(error => {
-                        if (error) {
-                            this.$swal({
-                                title: 'Advertencia',
-                                text: error,
-                                icon: 'warning',
-                            });
-                        }
-                    });
-                } else {
-                    // Si ya está verificado simplemente cambia el estado del checkbox
-                    this.editarPrecioBloque = this.editarPrecioBloque === 0 ? 1 : 0;
-                }
-            } else {
-                // Si la contraseña ya ha sido verificada simplemente cambia el estado del checkbox
-                this.editarPrecioBloque = this.editarPrecioBloque === 0 ? 1 : 0;
+      if (!this.isVerified) {
+        if (this.editarPrecioBloque === 0) {
+          this.$swal({
+            title: 'Escriba la contraseña del administrador',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Atrás',
+            confirmButtonColor: '#3085d6',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            cancelButtonColor: '#d33',
+            html: `
+                    <input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
+                    <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>
+                    `,
+            preConfirm: () => {
+              return new Promise((resolve) => {
+                resolve({
+                  usuario: document.getElementById('usuario').value,
+                  password: document.getElementById('password').value
+                });
+              });
             }
-  }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              let password = result.value.password;
+              let usuario = result.value.usuario;
+              this.axios.post(this.API + 'login', {
+                user: usuario,
+                password: password
+              }).then(response => {
+                // Respuesta de la API
+                if (response.data && response.data.IdUsuarioPerfil == 1) {
+                  this.editarPrecioBloque = 1;
+                } else {
+                  this.$swal({
+                    title: 'Error',
+                    text: 'Contraseña incorrecta',
+                    icon: 'error',
+                  }).then(() => {
+                    // Si la contraseña es incorrecta, desmarca el checkbox
+                    this.checkboxValue = 0;
+                    this.editarPrecioBloque = 0;
+                  });
+                }
+              }).catch(error => {
+                // Error en la solicitud
+                console.error('Error en la solicitud:', error);
+                this.$swal({
+                  title: 'Error',
+                  text: 'Hubo un problema con la solicitud',
+                  icon: 'error',
+                });
+              });
+            } else {
+              // Si el modal se cierra sin confirmar
+              this.checkboxValue = 0;
+              this.editarPrecioBloque = 0;
+            }
+          }).catch(error => {
+            if (error) {
+              this.$swal({
+                title: 'Advertencia',
+                text: error,
+                icon: 'warning',
+              });
+            }
+          });
+        } else {
+          // Si ya está verificado simplemente cambia el estado del checkbox
+          this.editarPrecioBloque = this.editarPrecioBloque === 0 ? 1 : 0;
+        }
+      } else {
+        // Si la contraseña ya ha sido verificada simplemente cambia el estado del checkbox
+        this.editarPrecioBloque = this.editarPrecioBloque === 0 ? 1 : 0;
+      }
+    }
   },
   components: {
     Menu,
