@@ -74,15 +74,15 @@
         </b-row>
       </b-modal>-->
 
-      <b-modal ref="modalCant" size="xl" id="modalCantidad" v-model="modalCantFlag" hide-footer hide-header>
+      <b-modal ref="modalCant" size="lg" id="modalCantidad" v-model="modalCantFlag" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{ objProd.Producto }}</h3>
           <h5>Precios Disponibles</h5>
         </div>
-        <div class="d-block text-center" v-for="(pres, index) in presentacion" :key="index">
+        <!-- <div class="d-block text-center" v-for="(pres, index) in presentacion" :key="index">
           <h3 style="text-decoration: underline;">{{ objProd.Producto }}</h3>
           <h5>Precios Disponibles</h5>
-        </div>
+        </div> -->
 
         <hr>
         <b-row>
@@ -124,7 +124,26 @@
             <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
               :class="{ 'disabledMouse': !parseFloat(d.cantidad) }" @click="() => {
                 if (parseFloat(d.cantidad)) {
-                  setProductoUni(objProd, d.precio)
+                  setProductoUnd(objProd, d.precio)
+                }
+              }">
+              <b-row>
+                <b-col md="4" class="nomCart">
+                  <h5 class="text-uppercase">{{ d.nombre }}</h5>
+                </b-col>
+                <b-col md="8" class="text-left">
+                  <b>Cant: </b>{{ d.cantidad }}
+                  <br>
+                  <b>Precio: </b>S/ {{ d.precio }}
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-col>
+          <b-col cols="6" v-for="d in productoPresentacion" :key="d.id">
+            <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
+              :class="{ 'disabledMouse': !parseFloat(d.cantidad) }" @click="() => {
+                if (parseFloat(d.cantidad)) {
+                  setProductoCant(d)
                 }
               }">
               <b-row>
@@ -201,7 +220,7 @@
           </div>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
+        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].EsPresentacion">
           <input v-model="productos[data.index].cantxPrecio" type="number" style="width: 100px" step="0.001" min="0"
             :disabled="bloquearInput ? true : false"
             @input="(val) => changeCant(val.target.value, productos[data.index], data.index)" placeholder="Cantidad"
@@ -210,8 +229,9 @@
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <input v-model="productos[data.index].cantidad" :disabled="bloquearInput ? true : false" type="number"
-            autocomplete="off" style="width: 100px; font-weight:bold" class="form-control" step="0.1" min="0" @input="(val) => {
+          <input v-model="productos[data.index].cantidad"
+            :disabled="bloquearInput ? true : productos[data.index].EsPresentacion" type="number" autocomplete="off"
+            style="width: 100px; font-weight:bold" class="form-control" step="0.1" min="0" @input="(val) => {
               changeCant(val.target.value, productos[data.index], data.index)
               $emit('onInputCantidad', val.target.value)
               /*if(!productos[data.index].PreciosPorProducto) {
@@ -494,6 +514,7 @@ export default {
       precioCont: 0,
       medicionPro: 'UNIDAD',
       productoSelect: {},
+      productoPresentacion: [],
       idPerfil: sessionStorage.getItem('IdPerfil'),
       productoNombre: '',
       productoUrl: '',
@@ -689,10 +710,14 @@ export default {
     },
     changeCant(val, prod, index) {
       if (val > 0) {
+        if (prod.EsPresentacion) {
+
+          prod.cantidad = prod.cantxPrecio * prod.cantidadPres
+        }
         //prod.cantidad *= Number(prod.cantidad)
         //prod.cantidad = Number(prod.cantidadPres)
         //prod.cantidad = Number(val)
-      }
+      } 
       prod.subt = ''
       this.$nextTick(() => {
         this.actualizarProd({ Producto: prod, Pos: index })
@@ -849,6 +874,7 @@ export default {
         obj.ProductoMarca = obj.marca.ProductoMarca
         obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
         obj.ProductoCategoria = obj.categoria.ProductoCategoria
+
         this.productoSelect = obj
         this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
         this.showPresentacion(this.productoSelect)
@@ -878,26 +904,26 @@ export default {
 
       if (obj.TienePresentacion == 1) {
         let presentacion = JSON.parse(obj.PreciosPorProducto)
-        obj.presentacion == presentacion.filter(v => v.cantidad > 0)
+        obj.presentacion = presentacion.filter(v => v.cantidad > 0)
 
       }
       switch (this.tipoUtilidad) {
         case 'Corporativo':
-          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(1)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(1)).toFixed(2)
           break;
         case 'Publico':
-          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2)
           break;
         case 'Taller':
 
-          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(2)
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(1)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(1)).toFixed(2)
           break;
 
         default:
-          this.isVentas ? obj.precio = parseFloat(obj.OldPrecioCosto).toFixed(2) : '';
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto).toFixed(1)).toFixed(2) : '';
           // console.log(obj.precio)
           break;
       }
@@ -949,17 +975,17 @@ export default {
         switch (this.tipoUtilidad) {
           case 'Corporativo':
 
-            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2)
 
             break;
           case 'Publico':
 
-            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
 
             break;
           case 'Taller':
 
-            prod.precio = parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(2)
+            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2)
 
             break;
 
@@ -980,6 +1006,40 @@ export default {
     recalcularPU(index) {
       console.log(index)
     },
+
+    setProductoUnd(obj, precio = false) {
+      let prod = { ...obj }
+      prod.cantxPrecio = 1
+      prod.cantidad = 1
+      prod.EsPresentacion = false
+      switch (this.tipoUtilidad) {
+        case 'Corporativo':
+
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2)
+
+          break;
+        case 'Publico':
+
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
+
+          break;
+        case 'Taller':
+
+          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2)
+
+          break;
+
+        default:
+          prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2)
+          prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(2)
+          break;
+      }
+
+      // console.log('indexProdSelect',this.indexProdSelect)
+      this.actualizarProd({ Producto: prod, Pos: this.indexProdSelect });
+      this.modalCantFlag = false
+    },
+
     setProductoUni(obj, precio = false) {
 
       this.objProd.cantxPrecio = 1
@@ -1019,16 +1079,20 @@ export default {
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
     },
+
+
     setProductoCant(prod) {
+      console.log(prod)
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
+      obj.EsPresentacion = true
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = 0
+      obj.precio = prod.precio
       obj.cantidad = 1
       obj.EsVentaNew = true;
       //obj.IdLote = 0
@@ -1045,6 +1109,7 @@ export default {
           //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
         }, false, false])
       } else {
+        console.log('ssss')
         this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
         this.indexProdSelect = null
       }
@@ -1063,6 +1128,10 @@ export default {
         return
       }*/
       if (this.isVentas) {
+        if (obj.TienePresentacion == 1) {
+          // let presentacion = JSON.parse(obj.PreciosPorProducto)
+          this.productoPresentacion = obj.presentacion
+        }
         this.preciosProd = []
         this.preciosProd.push({ nombre: "P. Pub.", cantidad: 1, precio: obj.PrecioContado })
         if (obj.precioConvenio) {
@@ -1187,7 +1256,8 @@ export default {
     },
     getSubtotal(index) {
 
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
+      let subtotal = this.$options.filters.redondear(
+        (this.productos[index].EsPresentacion ? this.productos[index].cantxPrecio : this.productos[index].cantidad) * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
       return subtotal

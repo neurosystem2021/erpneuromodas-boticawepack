@@ -280,12 +280,14 @@
 
                 <b-form-group>
                   <label>Precio:</label>
-                  <input v-model="producto.precios[i - 1].precio" :disabled="(idPerfil == 1) ? false : true"
-                    type="number" class="form-control" step="0.00001" />
+                  <input v-model="producto.precios[i - 1].precioUnit" :disabled="(idPerfil == 1) ? false : true"
+                    type="number" class="form-control" step="0.00001" @input="recalcularPrecioPresentacion(i)" />
                 </b-form-group>
                 <b-form-group>
-                  <label>Total: {{ (producto.precios[i - 1].precio * producto.precios[i - 1].cantidad) | redondear
-                    }}</label>
+                  <input v-model="producto.precios[i - 1].precio" :disabled="(idPerfil == 1) ? false : true" readonly
+                    type="number" class="form-control" step="0.00001" />
+                  <!-- <label>Total: {{ (producto.precios[i - 1].precio * producto.precios[i - 1].cantidad) | redondear
+                    }}</label> -->
                 </b-form-group>
               </b-card>
             </b-col>
@@ -523,6 +525,13 @@ export default {
         
       })
     },*/
+    recalcularPrecioPresentacion(i) {
+      let prod = { ...this.producto.precios[i - 1] }
+      console.log(prod)
+      prod.precio = prod.precioUnit * prod.cantidad
+      // console.log(prod.precio)
+      this.producto.precios[i - 1] = prod
+    },
     recalcularMontos() {
       let prod = { ...this.producto }
       prod.PrecioContado = parseFloat(prod.PrecioCosto * (1 + prod.UPublico / 100)).toFixed(2)

@@ -465,7 +465,7 @@ export default {
                     { key: 'Anaquel', label: 'Anaquel', class: 'tdcenter' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '', class: 'tdcenter' },
-                    //{ key: 'cantxPrecio', variant: 'warning' },
+                    { key: 'cantxPrecio', variant: 'warning' },
                     // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
                     // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
                     { key: 'cantidad', class: 'tdcenter' },
