@@ -150,7 +150,7 @@
           <b-col>
             <productos-carrito :editarPrecioBloque="editarPrecioBloque" tipoUtilidad="Publico" ref="carrito"
               @onAddProducto="onAddProducto" :tipoCambio="movimiento.TipoCambio" :fields="carrito.fields" tipo="mov"
-              :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
+              :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto" :recalcularTipoDeUtilidad="recalcularTipoDeUtilidadflag"></productos-carrito>
           </b-col>
         </b-row>
         <b-row align-h="center" class="text-center">

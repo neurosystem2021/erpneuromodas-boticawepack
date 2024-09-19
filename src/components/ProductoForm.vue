@@ -363,7 +363,13 @@ export default {
   beforeMount() {
     this.initForm()
   },
-  props: ['precio_venta', 'showButton', 'productoUpdate', 'cbGuardar', 'hideQuitar', 'bloquearInput'],
+  props: [
+    'precio_venta',
+    'showButton',
+    'productoUpdate',
+    'cbGuardar',
+    'hideQuitar',
+    'bloquearInput'],
   watch: {
     async show(val) {
       if (!this.show) {
@@ -719,7 +725,7 @@ export default {
         e.preventDefault();
       }
     },
-    guardarProducto(e) {
+    async guardarProducto(e) {
       e.preventDefault();
 
       if (this.$refs.productoDet.productos.length <= 0 && this.producto.EsPadre == 1) {
@@ -767,7 +773,7 @@ export default {
         PreciosPorProducto: this.producto.precios,
         Anaqueles: this.producto.anaqueles
       })
-        .then((response) => {
+        .then(async (response) => {
           if (this.cbGuardar) {
             this.cbGuardar(response.data.insertId, this.producto.precios, this.producto)
           }
@@ -787,7 +793,7 @@ export default {
           let formData = new FormData();
           formData.append('imagen', this.file);
 
-          this.axios({
+          await this.axios({
             method: 'post',
             url: this.API + 'producto/imagen/' + response.data.insertId,
             data: formData,
@@ -803,6 +809,7 @@ export default {
           console.log(error)
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         })
+      this.$refs.productoForm.hide()
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""

@@ -772,7 +772,7 @@ export default {
                         cancelButtonColor: '#d33',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
-                        
+
                         html: `
                     <input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
                     <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>

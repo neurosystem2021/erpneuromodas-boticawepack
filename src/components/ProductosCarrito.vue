@@ -336,10 +336,9 @@
         <template slot="descuento" slot-scope="data">
           <input :disabled="bloquearInput ? true : false || esDelivery" v-model="productos[data.index].PorcentajeDesc"
             style="width:90px" type="number" min="0" step="0.01" :max="productos[data.index].PorcentajeDescMax"
-            class="form-control" value="0"
-            @input="val => {
+            class="form-control" value="0" @input="val => {
               productos[data.index].descuento =
-              parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index);
+                parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index);
             }" />
           <b-form-text class="text-center">
             <b style="color:#dc3545">% Max:
@@ -537,6 +536,12 @@ export default {
     this.$barcodeScanner.destroy();
   },
   watch: {
+
+    recalcularTipoDeUtilidadFlag() {
+
+      this.changeTipoUtilidad()
+
+    },
     tipoUtilidad() {
       this.changeTipoUtilidad()
     },
@@ -554,6 +559,7 @@ export default {
     }
   },
   props: {
+
     tipoVenta: Number,
     editarPrecioBloque: Number,
     tipoUtilidad: String,
@@ -608,7 +614,8 @@ export default {
   computed: {
     ...mapState({
       productos: state => state.cart.productos,
-      filtrados: state => state.cart.productosFiltrados
+      filtrados: state => state.cart.productosFiltrados,
+      recalcularTipoDeUtilidadFlag: state => state.cart.recalcularTipoDeUtilidadFlag
     }),
     APIProductos() {
       if (this.idAlmacen) {
@@ -870,7 +877,8 @@ export default {
         this.isVentas ? Pro.precio : Pro.nuevoPrecioContado;
     },
     async agregarGuardar(id, pxp, obj) {
-
+      // console.log('obj', obj)
+      // obj.setPrecioCosto = true
       this.add([id, false, false, false, false, true, this.isVentas]);
       await setTimeout(() => {
         this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
@@ -892,7 +900,7 @@ export default {
       }
       setTimeout(() => {
         this.changeTipoUtilidad()
-      }, 100);
+      }, 1000);
     },
     async setProducto(obj) {
       let val = this.productos.some(prod =>
@@ -976,37 +984,43 @@ export default {
       if (this.isVentas) {
         this.changeTipoUtilidad()
       }
-      console.log(obj)
+
     },
     changeTipoUtilidad() {
+      console.log('aqui')
       this.verTableCarrito = !this.verTableCarrito
-      let productos = [...this.$store.state.cart.productos]
-      // console.log('tipoUtilidad',this.tipoUtilidad)
+      let productos = [...this.productos]
       productos.forEach(prod => {
+        prod.OldPrecioCosto = prod.PrecioCosto
         switch (this.tipoUtilidad) {
           case 'Corporativo':
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
-
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2) : '';
+            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2);
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Publico':
+            console.log('PrecioCosto', prod)
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
+            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
-
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Taller':
 
-            prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
-
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2) : '';
+            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2);
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
             break;
 
           default:
-            prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2)
+            this.isVentas ? prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2) : '';
             prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(2)
             break;
         }
 
       });
+
       // console.log('PrecioContado ', productos)
       this.$store.state.cart.productos = productos
       setTimeout(() => {
@@ -1093,7 +1107,6 @@ export default {
 
 
     setProductoCant(prod) {
-      console.log(prod)
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
@@ -1120,7 +1133,7 @@ export default {
           //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
         }, false, false])
       } else {
-        console.log('ssss')
+
         this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
         this.indexProdSelect = null
       }
@@ -1220,12 +1233,12 @@ export default {
     //   this.$emit('onInputCantidad', val)
     // },
     setNuevoPrecioContado(index) {
-      console.log(this.productos[index])
+
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio)
       if (this.productos[index].TieneIgv) {
         precio += (precio * 0.18)
-        console.log(precio)
+
       }
       let precioFinal = 0
       //if(this.isVentas){
@@ -1266,7 +1279,7 @@ export default {
       this.actualizarProd({ Producto: obj, Pos: index })
     },
     getSubtotal(index) {
-
+      console.log('productos[index]', this.productos[index])
       let subtotal = this.$options.filters.redondear(
         (this.productos[index].EsPresentacion ? this.productos[index].cantxPrecio : this.productos[index].cantidad) * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
