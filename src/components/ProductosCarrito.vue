@@ -18,7 +18,7 @@
             <producto-form v-model="showButton" :cbGuardar="(id, pxp, obj) => { agregarGuardar(id, pxp, obj) }"
               ref="productoFormEdit" :producto-update="productoSelect"
               :precio_venta="$store.state.cart.precio_venta"></producto-form>
-            <b-button variant="warning" @click="abrirFormularioNuevoProducto">
+            <b-button variant="warning" @click="abrirFormularioNuevoProducto" v-if="!isVentas">
               Nuevo Producto
             </b-button>
           </b-input-group-append>
@@ -337,8 +337,10 @@
           <input :disabled="bloquearInput ? true : false || esDelivery" v-model="productos[data.index].PorcentajeDesc"
             style="width:90px" type="number" min="0" step="0.01" :max="productos[data.index].PorcentajeDescMax"
             class="form-control" value="0"
-            @input="val => { productos[data.index].descuento =
-               parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index); }" />
+            @input="val => {
+              productos[data.index].descuento =
+              parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index);
+            }" />
           <b-form-text class="text-center">
             <b style="color:#dc3545">% Max:
               {{ productos[data.index].PorcentajeDescMax }}</b>
