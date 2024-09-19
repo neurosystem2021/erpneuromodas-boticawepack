@@ -315,7 +315,7 @@
               </b-input-group-append>
             </b-input-group>
           </div>
-          <b-btn variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+          <b-btn variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto && idPerfil == 1">
             Anular
           </b-btn>
           <b-btn variant="warning" @click="clearForm" v-if="!producto.IdProducto">
@@ -504,6 +504,9 @@ export default {
       this.cargarAlmacenes()
       this.recalcularMontos()
     },
+    // producto() {
+    //   this.recalcularMontos()
+    // }
     // precio_venta(val) {
 
     //   setTimeout(() => {
@@ -612,8 +615,14 @@ export default {
       this.recalcularMontos()
     },
     setCategoria(obj) {
+      console.log(obj)
       this.producto.categoria = obj
+      this.producto.UCorporativo = obj.UCorporativo
+      this.producto.UPublico = obj.UPublico
+      this.producto.UTaller = obj.UTaller
       this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
+      // console.log(this.producto)
+      this.recalcularMontos()
     },
     setMedicion(obj) {
       this.producto.medicion = obj

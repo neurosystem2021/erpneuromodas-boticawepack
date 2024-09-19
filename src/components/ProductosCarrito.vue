@@ -18,6 +18,9 @@
             <producto-form v-model="showButton" :cbGuardar="(id, pxp, obj) => { agregarGuardar(id, pxp, obj) }"
               ref="productoFormEdit" :producto-update="productoSelect"
               :precio_venta="$store.state.cart.precio_venta"></producto-form>
+            <b-button variant="warning" @click="abrirFormularioNuevoProducto">
+              Nuevo Producto
+            </b-button>
           </b-input-group-append>
         </b-input-group>
         <b-form-text id="input-live-help" style="color: black !important;"><b>Busqueda avanzada (Producto, Modelo,
@@ -334,7 +337,8 @@
           <input :disabled="bloquearInput ? true : false || esDelivery" v-model="productos[data.index].PorcentajeDesc"
             style="width:90px" type="number" min="0" step="0.01" :max="productos[data.index].PorcentajeDescMax"
             class="form-control" value="0"
-            @input="val => { productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10; actualizarDescu(data.index); }" />
+            @input="val => { productos[data.index].descuento =
+               parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index); }" />
           <b-form-text class="text-center">
             <b style="color:#dc3545">% Max:
               {{ productos[data.index].PorcentajeDescMax }}</b>
@@ -431,11 +435,11 @@
           </tr>
           <tr v-if="sumatoriaDescuento > 0">
             <td class="table-danger">Descuento</td>
-            <td class="table-danger">- {{ sumatoriaDescuento }}</td>
+            <td class="table-danger">- {{ parseFloat(parseFloat(sumatoriaDescuento).toFixed(0)).toFixed(2) }}</td>
           </tr>
           <tr>
             <td><b>SubTotal</b></td>
-            <td class="table-danger">{{ sumatoriaSubTotal }}</td>
+            <td class="table-danger">{{ parseFloat(parseFloat(sumatoriaSubTotal).toFixed(0)).toFixed(2) }}</td>
           </tr>
           <tr v-if="sumatoriaIgv > 0">
             <td><b>IGV</b></td>
@@ -665,6 +669,11 @@ export default {
       actualizarProd: 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    abrirFormularioNuevoProducto() {
+
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = true;
+    },
     obtenerAnaquel(data) {
       if (data.Anaqueles && data.Anaqueles != 'null' && this.idAlmacen > 0) {
         let obj = JSON.parse(data.Anaqueles)
