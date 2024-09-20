@@ -230,7 +230,9 @@ export default {
       ultimoMovimiento: '',
       movimiento: this.initMovimiento(),
       isTraslado:true,
-      isSalida:false
+      isSalida:false,
+      movimiento: this.initMovimiento(),
+      idPerfil:sessionStorage.getItem('IdPerfil')
     }
   },
   computed: {
@@ -441,6 +443,12 @@ return false
 
       if(this.isTraslado==true || this.isSalida==true){
         this.movimiento.alterarProductos = 0
+      }
+
+      if (this.idPerfil!=1 && this.movimiento.movimientoTipo.CodSunat==99) {
+        this.$toasted.error('Solo el administrador puede realizar salidas')
+        this.inProgress = false
+        return;
       }
 
       this.axios.post(this.API + 'movimientos', {
