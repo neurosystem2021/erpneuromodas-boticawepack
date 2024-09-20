@@ -10,8 +10,11 @@
                     <b-button-group size="sm" class="ocularMovil">
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                            <movimiento></movimiento>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
@@ -471,6 +474,7 @@ import config from '@/store/config.js'
 import ProductosCarrito from '@/components/ProductosCarrito'
 import ClientesForm from '@/components/ClientesForm'
 import ConfigVenta from '@/components/ConfigVenta'
+import Movimiento from '@/components/Movimiento'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
@@ -1294,6 +1298,7 @@ export default {
         ClientesForm,
         ConfigVenta,
         PagoDeuda,
+        Movimiento,
         PreOrdenLista,
         Proformas,
         DeliveryModal,
