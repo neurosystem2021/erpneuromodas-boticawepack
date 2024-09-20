@@ -5,7 +5,11 @@
         <b-row>
             <b-col cols="12">
                 <b-form-input
-                ref="barcodeInput" readonly v-model="codigoBarra" placeholder="Código de Barra"  id="codigoBarra" class="form-control"/>
+                ref="barcodeInput" 
+                v-model="codigoBarra"
+                 placeholder="Código de Barra"
+                  id="codigoBarra"
+                   class="form-control"/>
             </b-col>
             <b-col cols="12">
                <b-card
@@ -73,14 +77,14 @@
 
 <script>
 import config from "@/store/config.js";
-window.addEventListener("keydown", event => {
-  if (this.isBarcode(event)) {
-    this.barcode += event.key;
-    if (this.isEndOfBarcode(event)) {
-      this.handleSearch();
-    }
-  }
-});
+// window.addEventListener("keydown", event => {
+//   if (this.isBarcode(event)) {
+//     this.barcode += event.key;
+//     if (this.isEndOfBarcode(event)) {
+//       this.handleSearch();
+//     }
+//   }
+// });
 export default {
   data() {
     return {
@@ -128,8 +132,8 @@ export default {
                     );
                     this.producto = response.data;
                     this.producto.PreciosPorProducto = PreciosPorProducto;
-                    this.codigoBarra = "";
                   }
+                  this.codigoBarra = "";
                 }
               });
           }
