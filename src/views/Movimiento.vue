@@ -19,6 +19,7 @@
                         label="writer"
                         placeholder=""
                         :on-select="setTipoMovimiento"
+                         :customParams="{ IdPerfil: idPerfil }"
                         :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
