@@ -704,9 +704,12 @@ export default {
                     })
                 this.limpiarCart()
                 response.data.map((item) => {
+                    //console.log(item)
                     item.estadoPxP = false
                     let preciosProd = []
                     item.precioCont = item.PrecioContado
+                    item.precio = item.PrecioCosto
+                    item.nuevoPrecioContado = item.PrecioCosto
                     preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
                     let fPP = preciosProd.filter(p => p.cantidad === 0)
 

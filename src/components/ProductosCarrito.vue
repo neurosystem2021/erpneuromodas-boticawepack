@@ -987,7 +987,7 @@ export default {
 
     },
     changeTipoUtilidad() {
-      console.log('aqui')
+      
       this.verTableCarrito = !this.verTableCarrito
       let productos = [...this.productos]
       productos.forEach(prod => {
@@ -1000,7 +1000,7 @@ export default {
             prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Publico':
-            console.log('PrecioCosto', prod)
+            
             this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
 
@@ -1279,7 +1279,6 @@ export default {
       this.actualizarProd({ Producto: obj, Pos: index })
     },
     getSubtotal(index) {
-      console.log('productos[index]', this.productos[index])
       let subtotal = this.$options.filters.redondear(
         (this.productos[index].EsPresentacion ? this.productos[index].cantxPrecio : this.productos[index].cantidad) * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
