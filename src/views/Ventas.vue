@@ -600,6 +600,18 @@ export default {
 
         // Vue.set(this.productos, obj.IdProducto, obj)
         },
+        limpiarPuntoVenta(){
+            this.ultimaVentaCliente=''
+            this.$toasted.info('Se limpio el punto de venta',{duration:3000})
+            this.limpiarDespuesVenta()
+            this.$refs.carrito.pagocon = 0
+        },
+        estadoVale(vale){
+            this.venta.EsVale = 0
+            this.venta.ConsumoId = 0
+            this.MontoConsumido = 0
+            this.MontoTotal = 0
+        },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -661,6 +673,7 @@ export default {
                 },
                 CampoDireccion: 'Direccion',
                 DescripcionEmbarcacion: '',
+                idcomprobantemodifica: 0 ,
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
@@ -673,29 +686,90 @@ export default {
             //this.loadFirstAlmacen()
         },
         setTipoVenta (obj) {
-            this.isNota = false
-            this.bloquearInput=false
-            this.venta.NroComprobanteModifica = ''
-            this.venta.CodSunatModifica = ''
-            this.venta.NotaIdMotivo = ''
-            this.venta.NotaDescMotivo = ''
-            this.TieneIgvComprobante = false
-
-            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
-
-            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
-                this.isNota = true
-                this.limpiarCart()
-                this.venta.Placa = ''
+            if(obj.TieneIgv==1){
+                let pass = window.prompt('Escriba su contraseña')
+                if ((''+pass).trim()!='') {
+                    this.axios.post(this.API + 'login', {
+                    user: 'admin',
+                    password: pass
+                    }).then(r => {
+                        if (r.data) {
+                            this.isNota = false
+                            this.bloquearInput=false
+                            this.venta.NroComprobanteModifica = ''
+                            this.venta.IdComprobanteModifica = 0
+                            this.venta.CodSunatModifica = ''
+                            this.venta.NotaIdMotivo = ''
+                            this.venta.NotaDescMotivo = ''
+                            this.TieneIgvComprobante = false
+                            this.venta.EsConsumoVale = 0
+                            this.venta.EsVale = 0
+                            this.venta.ConsumoId = 0
+                            this.MontoConsumido = 0
+                            this.MontoTotal = 0
+                            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
+                            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                                this.isNota = true
+                                this.limpiarCart()
+                                this.venta.Placa = ''
+                            }
+                            if (obj.TieneIgv) {
+                                this.tieneIgv = true
+                            } else {
+                                this.tieneIgv = false
+                            }
+                            this.venta.tipoVenta = obj
+                            this.getNumeroVenta()
+                        }else{
+                            this.noAutorizado()
+                        }
+                    }).catch((error)=>{
+                        this.noAutorizado()
+                    })
+                }else{
+                    this.noAutorizado()
+                }
+            } else{
+                this.isNota = false
+                this.bloquearInput=false
+                this.venta.NroComprobanteModifica = ''
+                this.venta.IdComprobanteModifica = 0
+                this.venta.CodSunatModifica = ''
+                this.venta.NotaIdMotivo = ''
+                this.venta.NotaDescMotivo = ''
+                this.TieneIgvComprobante = false
+                this.venta.EsConsumoVale = 0
+                this.venta.EsVale = 0
+                this.venta.ConsumoId = 0
+                this.MontoConsumido = 0
+                this.MontoTotal = 0
+                this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
+                if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+                    this.isNota = true
+                    this.limpiarCart()
+                    this.venta.Placa = ''
+                }
+                if (obj.TieneIgv) {
+                    this.tieneIgv = true
+                } else {
+                    this.tieneIgv = false
+                }
+                this.venta.tipoVenta = obj
+                this.getNumeroVenta()
             }
-            
-            if (obj.TieneIgv) {
-                this.tieneIgv = true
-            } else {
-                this.tieneIgv = false
+ 
+        },
+        noAutorizado(){
+            this.venta.tipoVenta= {
+                IdTipoDoc: 7,
+                TipoDoc: 'BOLETA ELEC.',
+                LimitItems: 0,
+                CodSunat: '03',
             }
-            this.venta.tipoVenta = obj
-            this.getNumeroVenta()
+            this.tieneIgv = false
+            this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+            this.getVendedor()
+            this.$toasted.error('No autorizado')
         },
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
