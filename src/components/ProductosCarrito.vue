@@ -987,7 +987,7 @@ export default {
 
     },
     changeTipoUtilidad() {
-      
+
       this.verTableCarrito = !this.verTableCarrito
       let productos = [...this.productos]
       productos.forEach(prod => {
@@ -1000,7 +1000,7 @@ export default {
             prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Publico':
-            
+
             this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
 
@@ -1037,6 +1037,7 @@ export default {
       prod.cantxPrecio = 1
       prod.cantidad = 1
       prod.EsPresentacion = false
+      prod.descripcionPresentacion = null;
       switch (this.tipoUtilidad) {
         case 'Corporativo':
 
@@ -1119,6 +1120,7 @@ export default {
       obj.precio = prod.precio
       obj.cantidad = 1
       obj.EsVentaNew = true;
+      obj.descripcionPresentacion = JSON.stringify(prod);
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
@@ -1141,6 +1143,7 @@ export default {
       this.modalCantFlag = false
       this.$refs.barcodeInput.focus()
       //this.actualizarProd(obj)
+      console.log(obj)
     },
     showPresentacion(obj, index) {
       /*if (!obj.PreciosPorProducto !== '') {

@@ -106,6 +106,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                       <th>Medición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -118,6 +119,10 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>
+                        <!-- Verificar si prod.presentacion existe, si es un string JSON lo parsea -->
+                        {{ parsePresentacion(prod.presentacion).nombre || 'UNIDAD' }}
+                      </td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -169,6 +174,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Medición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -181,6 +187,10 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>
+                        <!-- Verificar si prod.presentacion existe, si es un string JSON lo parsea -->
+                        {{ parsePresentacion(prod.presentacion).nombre || 'UNIDAD' }}
+                      </td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -233,6 +243,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Medición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -245,6 +256,10 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>
+                        <!-- Verificar si prod.presentacion existe, si es un string JSON lo parsea -->
+                        {{ parsePresentacion(prod.presentacion).nombre || 'UNIDAD' }}
+                      </td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -295,6 +310,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Medición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -307,6 +323,10 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>
+                        <!-- Verificar si prod.presentacion existe, si es un string JSON lo parsea -->
+                        {{ parsePresentacion(prod.presentacion).nombre || 'UNIDAD' }}
+                      </td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -357,6 +377,7 @@
                     <tr>
                       <th>Codigo</th>
                       <th>Producto</th>
+                      <th>Medición</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -369,6 +390,10 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
+                       <td>
+                        <!-- Verificar si prod.presentacion existe, si es un string JSON lo parsea -->
+                        {{ parsePresentacion(prod.presentacion).nombre || 'UNIDAD' }}
+                      </td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -756,12 +781,22 @@ export default {
         let total = 0
         this.productosVendidos.map(pv=>{
           total += pv.MontoVendido;
-        })
+          })
         this.productosVendidosTotal = total
       }).catch(err => {
         console.log(err)
       })
     },
+    // Método para parsear la columna de presentacion
+    parsePresentacion(presentacion) {
+      try {
+        // Verifica si presentacion es un objeto o una cadena y luego lo parsea
+        return typeof presentacion === 'string' ? JSON.parse(presentacion) : presentacion || {};
+      } catch (error) {
+        console.error('Error al parsear presentacion:', error);
+        return {}; // Retorna un objeto vacío en caso de error
+      }
+      },
     loadDetalles () {
       this.axios.get(this.API + 'ventas/detalle', {
           params: {

@@ -1,17 +1,17 @@
 <template>
-	<div id="invoice-container">
-		<header class="clearfix">
-			<div id="logo">
-				<img src="/resources/images/logop.png" style="height: 70px;">
-			</div>
-			<div id="company">
-				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
-				<div>{{ empresa.DIRECCION }}</div>
-				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>
-		</header>
-		<main>
+  <div id="invoice-container">
+    <header class="clearfix">
+      <div id="logo">
+        <img src="/resources/images/logop.png" style="height: 70px;">
+      </div>
+      <div id="company">
+        <h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
+        <div>{{ empresa.DIRECCION }}</div>
+        <div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
+        <div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
+      </div>
+    </header>
+    <main>
       <div id="details" class="clearfix">
         <div id="client">
           <br>
@@ -28,7 +28,7 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
@@ -48,11 +48,12 @@
             <tbody>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Desde</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
+                <td class="celda" style="text-transform: uppercase">: {{
+                  proforma.FechaReg ? proforma.FechaReg.substring(0, 10) : proforma.FechaReg }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>
-                <td class="celda" style="text-transform: uppercase">: {{fechaHasta}}</td>
+                <td class="celda" style="text-transform: uppercase">: {{ fechaHasta }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
@@ -84,16 +85,28 @@
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:0.95rem">{{ prod.Producto }}</h3></td>
-            <td class="desc" style="font-size:0.95rem"><h3 style="color:#57B223; font-size:0.95rem">{{ prod.ProductoMarca }}</h3></td>
+            <td class="no">{{ index + 1 }}</td>
+            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" />
+            </td>
+            <td class="desc" style="font-size:0.95rem;color:#327c07">
+              {{ prod.Producto }}
+              {{ prod.presentacion ? `Presentación: ${JSON.parse(prod.presentacion).nombre}` : '' }}
+              {{ prod.presentacion ? `CPP: ${JSON.parse(prod.presentacion).cantidad}` : '' }}
+              <!-- <p style="color:#57B223; font-size:0.95rem">{{ prod.Producto }}
+              </p>
+
+              <p style="color:#57B223;  font-size:0.95rem"> </p> -->
+
+            </td>
+            <td class="desc" style="font-size:0.95rem">
+              <h3 style="color:#57B223; font-size:0.95rem">{{ prod.ProductoMarca }}</h3>
+            </td>
             <td class="qty" style="font-size:0.95rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:0.95rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:0.95rem">
               <div v-if="prod.DisabledTotal === 0">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
-                <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+                <span class="dsct" v-if="prod.Descuento">Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
           </tr>
@@ -123,7 +136,8 @@
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{ proforma.DiasValidos
+            }}</span> DIAS.</div>
       </div>
       <div>
         <br>
@@ -131,9 +145,13 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:50%"></td>
-            <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:50%">
+            </td>
+            <td
+              style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">
+              FIRMA/SELLO DE AUTORIZACION</td>
+            <td style="border: none !important; border-top:3px solid #57B223; background: white !important; width:10%">
+            </td>
           </tbody>
         </table>
       </div>
@@ -144,55 +162,55 @@
     <!--<footer>
       Invoice was created on a computer and is valid without the signature and seal.
     </footer>-->
-	</div>
+  </div>
 </template>
 
 <script>
-import {API} from '@/store/config.js'
+import { API } from '@/store/config.js'
 export default {
-	mounted () {
-		this.getProforma()
+  mounted() {
+    this.getProforma()
     this.getEmpresa()
-	},
-	data () {
-		return {
-			API: API,
-			idProforma: this.$route.params.id,
-			proforma: { productos: [] },
+  },
+  data() {
+    return {
+      API: API,
+      idProforma: this.$route.params.id,
+      proforma: { productos: [] },
       empresa: {},
-      fechaHasta:'',
-		}
-	},
-	computed: {
-		subTotal () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
-			})
+      fechaHasta: '',
+    }
+  },
+  computed: {
+    subTotal() {
+      let sumatoria = 0
+      this.proforma.productos.forEach(prod => {
+        sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
+      })
       return sumatoria
-		}
-	},
+    }
+  },
   methods: {
-    getProforma () {
+    getProforma() {
       this.axios.get(API + 'proformas/id/' + this.idProforma)
-			.then(res => {
-				this.proforma = res.data
-        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
-			})
+        .then(res => {
+          this.proforma = res.data
+          this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0, 10), this.proforma.DiasValidos).toISOString().substring(0, 10);
+        })
     },
-    calcularFechaHasta(actual,dias){
-    var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
-    return date;
+    calcularFechaHasta(actual, dias) {
+      var date = new Date(actual);
+      date.setDate(date.getDate() + (dias - 1));
+      return date;
     },
-    getEmpresa () {
+    getEmpresa() {
       this.axios.get(API + 'empresa/id/' + 1)
-			.then(res => {
-				this.empresa = res.data
-			})
+        .then(res => {
+          this.empresa = res.data
+        })
     },
-    imprimir(){
-    window.print();
+    imprimir() {
+      window.print();
     }
   }
 }
@@ -200,11 +218,13 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
-.celda{
-  text-align:left;
+
+.celda {
+  text-align: left;
   border: none !important;
   background: white !important
 }
+
 @media print {
   #printBtn {
     display: none;

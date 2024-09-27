@@ -215,6 +215,7 @@
             <autocomplete :url="API + 'productos/presentacionesdet'" :ref="'inputPresentaciondet' + index"
               anchor="Anaquel" label="writer" :placeholder.sync="an.nombre"
               :on-select="val => an.nombre = val.Anaquel && val.Anaquel.toUpperCase()"
+              :customParams="{ 'limit':15 }"
               :onInput="val => an.nombre = val && val.toUpperCase()" :classes="{ input: 'form-control upper' }">
             </autocomplete>
           </b-col>

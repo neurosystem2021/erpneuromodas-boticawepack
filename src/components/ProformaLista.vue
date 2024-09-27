@@ -120,8 +120,14 @@ import { mapActions } from 'vuex'
                 }).then((response) => {
                     this.limpiarCarrito()
                     response.data.map((item) => {
+                         //console.log('carrito',item)
+                        const descripcionPresentacion = JSON.stringify(item.presentacion);
                         this.add([item, () => {
-                        }, {setPreOr: item.Precio, cantidad: item.Cantidad } ])
+                        }, {setPreOr: item.Precio,
+                            descripcionPresentacion: descripcionPresentacion,
+                            cantidad: item.Cantidad,
+                            //cantidadPres : item.Cantidad
+                         } ])
                         this.filter = ''
                         this.show = false
                     })
