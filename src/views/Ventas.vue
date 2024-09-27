@@ -1855,15 +1855,15 @@ export default {
           data.productos = productos;
           data.totalCart = totalCarr;
 
-          if (data.pago.efectivo.monto != 0) {
-            data.pago.efectivo.monto = totalCarr;
-          } else if (data.pago.mastercard.monto != 0) {
-            data.pago.mastercard.monto = totalCarr;
-          } else if (data.pago.transferencia.monto != 0) {
-            data.pago.transferencia.monto = totalCarr;
-          } else if (data.pago.visa.monto != 0) {
-            data.pago.visa.monto = totalCarr;
-          }
+          //if (data.pago.efectivo.monto != 0) {
+          //  data.pago.efectivo.monto = totalCarr;
+          //} else if (data.pago.mastercard.monto != 0) {
+          //  data.pago.mastercard.monto = totalCarr;
+          //} else if (data.pago.transferencia.monto != 0) {
+          //  data.pago.transferencia.monto = totalCarr;
+          //} else if (data.pago.visa.monto != 0) {
+          //  data.pago.visa.monto = totalCarr;
+          //}
           // data.pago.forEach((element) => {
           //   if (element.monto != 0) {
           //     element.monto = totalCarr;
