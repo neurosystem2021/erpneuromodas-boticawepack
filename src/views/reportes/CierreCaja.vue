@@ -642,8 +642,8 @@ export default {
         this.totalVentasVisa +
         this.totalVentasMastercard +
         this.totalVentasEfectivo +
-        this.totalIngresos -
-        this.totalSalidas -
+      //this.totalIngresos -
+      //this.totalSalidas -
         this.totalAdelantosActivos
       );
     },
