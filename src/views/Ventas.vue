@@ -1012,6 +1012,15 @@ export default {
         },
         guardarProforma() {
             this.inProgress = true
+            //console.log('prueba',this.productos)
+
+            for (let producto of this.productos) {
+                    if (producto.PorcentajeDesc > producto.PorcentajeDescMax) {
+                        this.$toasted.show(`El descuento del producto no puede exceder ${producto.PorcentajeDescMax}%`);
+                        this.inProgress = false;
+                        return;
+                    }
+                }
 
             if (!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
