@@ -302,7 +302,12 @@
             class="form-control"
             step="0.001"
             min="0"
-            @input="
+           @input="recalcularSubTotal(productos[data.index])"
+            placeholder="Cantidad"
+          />
+        </template>
+        /*
+        @input="
               (val) => {
                 $emit('onInputCantidad', val.target.value);
                 /*if(isVentas){
@@ -332,9 +337,7 @@
                 }
               }
             "
-            placeholder="Cantidad"
-          />
-        </template>
+        */
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
@@ -833,7 +836,11 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
-
+    recalcularSubTotal(item) {
+      item.subtotal = item.PrecioContado * item.cantidad;
+      // $emit("onInputCantidad", item.cantidad);
+      this.$forceUpdate();
+    },
     BusquedaProductos(busqueda) {
       if (busqueda) {
         return this.API + "productos/puntoventa/stock/" + busqueda;
@@ -1077,6 +1084,7 @@ export default {
     },
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
+      obj.subtotal = obj.PrecioContado;
       let variantStock = "";
       switch (true) {
         case obj.stock <= 0:
@@ -1337,6 +1345,7 @@ export default {
       return igv;
     },
     getTotal(index) {
+      console.log("productos", this.productos[index]);
       let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
@@ -1352,6 +1361,7 @@ export default {
       total = this.$options.filters.redondear(total);
       Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
+
       return total;
     },
     getData(value) {
@@ -1491,7 +1501,6 @@ canvas {
   }
 }
 @media only screen and (max-width: 700px) {
-  /* For desktop: */
   .ocularMovil {
     display: none;
   }
