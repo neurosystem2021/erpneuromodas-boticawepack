@@ -704,8 +704,19 @@ export default {
                     })
                 this.limpiarCart()
                 response.data.map((item) => {
-                    //console.log(item)
+                    console.log(item)
                     item.estadoPxP = false
+                    let prod = { ...item }
+                    if (prod.presentacion) {
+                        item.EsPresentacion = true
+                        item.cantidad = prod.CantidadPres
+                        item.cantxPrecio = prod.cantidad
+                        item.cantidadPres = JSON.parse(prod.presentacion).cantidad
+                        item.TienePresentacion = 1
+                        item.descripcionPresentacion = prod.presentacion
+                        item.presentacion = JSON.parse(prod.PreciosPorProducto || '[]')
+                    }
+                    
                     let preciosProd = []
                     item.precioCont = item.PrecioContado
                     item.precio = item.PrecioCosto

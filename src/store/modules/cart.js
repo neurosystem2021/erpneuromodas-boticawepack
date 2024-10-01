@@ -111,7 +111,7 @@ const actions = {
     }
 
     if (typeof producto === 'object') {
-      console.log('aqui')
+      
       /*let preciosProd = JSON.parse(producto.PreciosPorProducto || '[]')
       let fPP = preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
 
