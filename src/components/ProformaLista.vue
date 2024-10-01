@@ -191,7 +191,7 @@ export default {
             .delete(this.API + "proforma/eliminar/" + data.IdProforma)
             .then(res => {
               if (res.data) {
-                this.$toasted.info("¡PROFORMA ELIMINADA!");
+                this.$toasted.info("COTIZACION ELIMINADA!");
                 this.$refs.tableProformas.refresh();
               }
             })

@@ -15,7 +15,7 @@
       <div id="details" class="clearfix">
         <div id="client">
           <br>
-          <h5 class="to" style=":black">PROFORMA A:</h5>
+          <h5 class="to" style=":black">COTIZACION A:</h5>
           <table>
             <tbody>
               <tr>
@@ -47,7 +47,7 @@
           </table>
         </div>
         <div id="invoice">
-          <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
+          <h1>COTIZACION {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
           <div style="height:15px"></div>
           <table>
             <tbody>
@@ -132,7 +132,7 @@
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <!-- <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div> -->
+        <!-- <div class="notice">ESTA COTIZACION SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div> -->
         <div class="notice">PAGOS: - Factura a {{DiasCredito}} días - S/. {{ subTotal | redondear }}</div>
         <div class="notice">Observación(es): {{proforma.Observacion}}</div>
       </div>
@@ -340,7 +340,7 @@ export default {
   }*/
    #invoice h1 {
     color: #0087C3;
-    font-size: 1.6em;
+    font-size: 1em;
     line-height: 1em;
     font-weight: normal;
     margin: 0  0 10px 0;
@@ -484,8 +484,6 @@ export default {
       <body>
       <div id="details" class="clearfix">
         <div id="client">
-          <br>
-          <h5 class="to" style=":black">PROFORMA A:</h5>
           <table>
             <tbody>
               <tr>
@@ -524,8 +522,7 @@ export default {
           </table>
         </div>
         <div id="invoice">
-          <h1>PROFORMA ${this.proforma.Anio}-${this.proforma.Numero}</h1>
-          <div style="height:15px"></div>
+          <h1>COTIZACION ${this.proforma.Anio}-${this.proforma.Numero}</h1>
           <table>
             <tbody>
               <tr>
@@ -563,7 +560,7 @@ export default {
             <th width="5%" class="qty">CANT.</th>
             <th width="48%" class="desc">DESCRIPCIÓN</th>
             <th width="12%" class="unit">U.M.</th>
-            <th width="11%" class="unit">PRECIO U.</th>
+            <th width="11%" class="unit">P.U.</th>
             <th width="12%" class="total">TOTAL</th>
           </tr>
         </thead>

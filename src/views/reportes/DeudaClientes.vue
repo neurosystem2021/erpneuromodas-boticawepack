@@ -172,100 +172,25 @@ export default {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
     },
-    calcularTotal() {
+    calcularTotal() { 
       let sum = this.items.reduce((sum, item) => {
         return sum + parseFloat(item.Saldo);
       }, 0);
       return parseFloat(sum).toFixed(2);
     },
-    imprimir() {
-      let html = `
-      <table width="100%">
-        <thead>
-          <tr>
-             <th>DNI/RUC</th>
-             <th>Cliente</th>
-             <th>Serie</th>
-             <th>Total</th>
-             <th>Aplicado</th>
-             <th>Apli. Nota Cred</th>
-             <th>Saldo</th>
-             <th>Emision</th>
-             <th>Vencimiento</th>
-             <th>Letras</th>
-          </tr>
-        </thead>
-        <tbody>
-        `;
-
-      this.items.forEach(element => {
-        html += `<tr>
-          <td>${element.DniRuc}</td>
-          <td>${element.Cliente}</td>
-          <td>${element.Correlativo}</td>
-          <td>${element.Total}</td>
-          <td>${element.Aplicado}</td>
-          <td>${element.NotaCreApli}</td>
-          <td>${element.Saldo}</td>
-          <td>${element.FechaDoc}</td>
-          <td>${element.FechaCredito}</td>
-          <td>${element.Letras}</td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-
-      const printWindow = window.open("", "_blank");
-      if (!printWindow) {
-        alert(
-          "No se pudo abrir la ventana de impresión. Por favor, habilita las ventanas emergentes."
-        );
-        return;
+    async imprimir() {
+      // http://localhost/api/index.php/cliente/imprimir/deudas_cliente?idalmacen=1&q=&limit=50&page=1&fechaDesde=2024-01-01&fechaHasta=2024-09-20
+      let res = await this.axios(
+        `${this.API}cliente/imprimir/deudas_cliente?idalmacen=${
+          this.almacen.IdAlmacen
+        }&limit=perPage&fechaDesde=${this.rango.fechaDesde}&fechaHasta=${
+          this.rango.fechaHasta
+        }"&q=${this.filter}`
+      ).catch(e => console.log(e));
+      if (res.data) {
+        console.log(res.data.url);
+        window.open(res.data.url, "_blank");
       }
-
-      printWindow.document.write(`
-        <html>
-          <head>
-            <style>
-            *{
-            font-size: 0.8rem !important;
-            }
-              body { 
-                font-family: Arial, sans-serif; 
-                padding: 20px 20px;
-                
-              }
-              .table-success {
-                background: #c3e6cb !important;
-              }
-              .text-center {
-                text-align: center;
-              }
-              .imgPrint{
-                max-height: 100px;
-                margin: 10px 10px;
-              }
-              .mt-2{
-                margin: 4% 0 !important;
-              }
-              table,tr,td,th {
-                border-collapse: collapse;
-                border: 1px solid black; 
-              }
-            </style>
-          </head>
-          <body>
-          
-            <img id="printImage" src="${
-              this.urlImg
-            }" onload="window.print(); window.close();" class="imgPrint">
-            <h1>Reporte Deuda de Clientes</h1>
-            <h2> Deuda Total: ${this.calcularTotal()} </h2>
-            ${html}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
     },
     setAlmacen(obj) {
       this.almacen = obj;

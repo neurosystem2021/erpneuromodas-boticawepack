@@ -127,7 +127,7 @@
 							<div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
 							<div class="text-left" v-if="proformaTotal">
 								<b style="padding: 4px; background: #ebf0ff;">
-									<b>PROFORMA:</b> {{ codProforma }} <br> S/ {{ proformaTotal }}
+									<b>COTIZACION:</b> {{ codProforma }} <br> S/ {{ proformaTotal }}
 								</b>
 							</div>
 							<br>
