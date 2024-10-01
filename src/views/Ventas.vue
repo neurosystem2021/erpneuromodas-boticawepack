@@ -384,7 +384,7 @@
                         <b-button type="button" v-if="!this.$route.query.idPedido" :disabled="inProgress"
                             variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress"
-                            v-if="venta.vendedor.IdUsuarioPerfil == 1 || venta.vendedor.IdUsuarioPerfil == 28"
+                            v-if="venta.vendedor.IdUsuarioPerfil == 1 || venta.vendedor.IdUsuarioPerfil == 28 || venta.vendedor.IdUsuarioPerfil == 39 || venta.vendedor.IdUsuarioPerfil == 40"
                             variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
