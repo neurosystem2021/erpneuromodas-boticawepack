@@ -638,12 +638,12 @@ export default {
     },
     granTotal() {
       return (
-        this.totalVentasTransferencia +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
+        //this.totalVentasTransferencia +
+        //this.totalVentasVisa +
+        //this.totalVentasMastercard +
         this.totalVentasEfectivo +
-      //this.totalIngresos -
-      //this.totalSalidas -
+        this.totalIngresos -
+        this.totalSalidas -
         this.totalAdelantosActivos
       );
     },
