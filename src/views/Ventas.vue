@@ -934,9 +934,17 @@ export default {
           this.limpiarCart();
           console.log(response.data);
           response.data.map(item => {
-            item.subtotal = item.cantidad * item.precio;
-            item.total = item.cantidad * item.precio;
-            item.estadoPxP = false;
+            let prod = { ...item };
+            if (item.presentacion) {
+              item.cantidad = prod.cantidadPres;
+              item.cantidadPres = parseFloat(
+                JSON.parse(prod.presentacion).cantidad
+              );
+              item.tipo = "PRESENTACION";
+              item.cantxPrecio = prod.cantidad;
+            }
+            item.subtotal = prod.cantidad * item.precio;
+            item.total = prod.cantidad * item.precio;
             let preciosProd = [];
             item.precioCont = item.PrecioContado;
 
