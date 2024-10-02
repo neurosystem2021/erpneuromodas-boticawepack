@@ -10,8 +10,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 330px; margin: 0 5 !importante">
-                            <option value="imperiop1">EMP. EL IMPERIO DE LOS COLCHONES S.A.C</option>
-                            <option value="imperiop2">EMP. HUILCA AGUILAR LEYDI SUSAN</option>
+                            <option value="imperiop1">FGOMEZ</option>
+                            <option value="imperiop2">FGOMEZ</option>
                         </select>
                     </b-button-group>
                 </div>
