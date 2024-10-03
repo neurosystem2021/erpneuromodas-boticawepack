@@ -1136,7 +1136,7 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      console.log('dddddddddd')
+      console.log("dddddddddd");
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -1705,10 +1705,12 @@ export default {
       this.loading = true;
       await this.$store.state.empresas.forEach(async element => {
         let data = { ...this.venta };
-        let serie = await this.obtenerSerie(element.value);
+        console.log(data);
+        let dataReponseSerie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
         let empresa = await this.obtenerDatosEmpresa(element.value);
         let impresora = await this.obtenerDatosImpresora(element.value);
+        console.log(serie);
         let total = data.productos
           .filter(v => v.Empresa == element.value)
           .reduce((total, prod) => {
@@ -1724,8 +1726,8 @@ export default {
           NombreOrganizacion: this.venta.NombreOrganizacion,
           vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
-          numero: this.venta.Numero,
-          serie: this.venta.Serie,
+          numero: dataReponseSerie.Numero,
+          serie: dataReponseSerie.Serie,
           CodSunat: this.venta.tipoVenta.CodSunat,
           IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
           LimitItems: this.venta.tipoVenta.LimitItems,
@@ -1806,7 +1808,7 @@ export default {
         }
       });
 
-      // this.$toasted.success("Venta realizada con exito");
+      this.$toasted.success("Venta realizada con exito");
 
       setTimeout(() => {
         this.inProgress = false;
