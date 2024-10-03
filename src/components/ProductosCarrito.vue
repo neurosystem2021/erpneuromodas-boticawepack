@@ -449,7 +449,7 @@
           ></b-pagination>-->
         </b-col>
       </b-row>
-
+      
     </b-modal>
   </b-row>
 </template>
@@ -638,7 +638,7 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.total) - parseFloat(value.descuento);
+        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento);
       });
 
       this.actualizarTotal(sumatoria);
