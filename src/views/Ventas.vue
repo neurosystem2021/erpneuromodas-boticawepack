@@ -1136,7 +1136,7 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      console.log("dddddddddd");
+      console.log('dddddddddd')
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -1710,7 +1710,6 @@ export default {
         let almacen = await this.obtenerAlmacen(element.value);
         let empresa = await this.obtenerDatosEmpresa(element.value);
         let impresora = await this.obtenerDatosImpresora(element.value);
-        console.log(serie);
         let total = data.productos
           .filter(v => v.Empresa == element.value)
           .reduce((total, prod) => {
@@ -1744,8 +1743,8 @@ export default {
           productos: data.productos.filter(v => v.Empresa == element.value)
         };
         data.almacen = almacen;
-        data.Numero = serie.numero;
-        data.Serie = serie.serie;
+        data.Numero = dataReponseSerie.numero;
+        data.Serie = dataReponseSerie.serie;
 
         if (data.productos.some(v => v.Empresa == element.value)) {
           let productos = data.productos.filter(
