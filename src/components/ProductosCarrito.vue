@@ -768,7 +768,6 @@ export default {
       }
     },
     mostrarTablaProductos() {
-      
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
     }
@@ -887,8 +886,8 @@ export default {
       buscar: "buscarProductos",
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
-      actualizarProd: "actualizarProducto"
-      // obtenerStok: "obtenerStock",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock"
     }),
     abrirImagen(producto, url) {
       this.productoNombre = producto;
@@ -1182,13 +1181,11 @@ export default {
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
       if (index !== null && index !== undefined) {
-        
         this.$store.state.cart.productos[index] = obj;
         this.$refs["modalCant"].hide();
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
       } else {
-        
         this.add([
           obj,
           () => {
@@ -1206,7 +1203,7 @@ export default {
 
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
-        this.index = null;
+      this.index = null;
     },
     recalcularTotalPorItem(item, index) {
       let produc = { ...item };

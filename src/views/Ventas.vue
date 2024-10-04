@@ -1136,7 +1136,6 @@ export default {
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      console.log("dddddddddd");
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -1199,7 +1198,7 @@ export default {
           // console.log(empresa);
           this.limpiarCart();
           response.data.map(item => {
-            item.id_empresa = empresa.value;
+            item.Empresa = this.empresa;
             item.NombreEmpresa = empresa.text;
             item.estadoPxP = false;
             let preciosProd = [];
@@ -1705,12 +1704,11 @@ export default {
       this.loading = true;
       await this.$store.state.empresas.forEach(async element => {
         let data = { ...this.venta };
-        console.log(data);
         let dataReponseSerie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
         let empresa = await this.obtenerDatosEmpresa(element.value);
         let impresora = await this.obtenerDatosImpresora(element.value);
-        console.log(serie);
+
         let total = data.productos
           .filter(v => v.Empresa == element.value)
           .reduce((total, prod) => {
@@ -1726,8 +1724,8 @@ export default {
           NombreOrganizacion: this.venta.NombreOrganizacion,
           vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
-          numero: dataReponseSerie.Numero,
-          serie: dataReponseSerie.Serie,
+          numero: dataReponseSerie.numero,
+          serie: dataReponseSerie.serie,
           CodSunat: this.venta.tipoVenta.CodSunat,
           IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
           LimitItems: this.venta.tipoVenta.LimitItems,
@@ -1744,9 +1742,8 @@ export default {
           productos: data.productos.filter(v => v.Empresa == element.value)
         };
         data.almacen = almacen;
-        data.Numero = serie.numero;
-        data.Serie = serie.serie;
-
+        data.Numero = dataReponseSerie.numero;
+        data.Serie = dataReponseSerie.serie;
         if (data.productos.some(v => v.Empresa == element.value)) {
           let productos = data.productos.filter(
             v => v.Empresa == element.value
@@ -1773,7 +1770,6 @@ export default {
           //   }
           // });
           let comandaJson = JSON.stringify(dataImprimir);
-          // console.log(comandaJson);
 
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
