@@ -11,6 +11,7 @@ import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
+import Traslado from '@/views/Traslado.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -175,6 +176,11 @@ export default new Router({
       path: '/reportes/articulosresumen',
       name: 'ArticulosResumen',
       component: ArticulosResumen
+    },
+    {
+      path: '/traslado',
+      name: 'Traslado',
+      component: Traslado
     },
   ]
 })
