@@ -301,6 +301,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
+              :disabled="true"
               step="0.0001"
               type="number"
               @input="actualizarPorcentajeUtilidad"
