@@ -127,7 +127,22 @@
                             <b-badge variant="info" style="font-size:1.2rem">Adelanto de: S/ {{ adelanto }} </b-badge>
                             <b-badge variant="success" style="font-size:1.2rem">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                         </b-col>
-                    </b-row>
+                    </b-row>                        
+                    <b-form-row>
+                        <b-col md="2" class="d-flex align-items-center">
+                            <label>OBSERVACIÓN:</label>
+                        </b-col>
+                        <b-col md="6">
+                            <b-form-group>
+                            <input
+                                v-model="venta.Observacion"
+                                type="text"
+                                class="form-control"
+                                placeholder="Observación"
+                            />
+                            </b-form-group>
+                        </b-col>
+                    </b-form-row>
                     <b-row>
                         <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab" :idMetodoPago="venta.IdMetodoPago">
                             <template slot="metodopago" v-if="!venta.EsCredito">
@@ -1240,6 +1255,7 @@ export default {
                 EsCredito: 0,
                 Serie: '',
                 Numero: '',
+                Observacion:'',
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
@@ -1957,6 +1973,7 @@ export default {
                 this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             } 
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.Observacion = (this.venta.Observacion+'').toUpperCase()
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             if(this.venta.cliente.DniRuc != '00000000'){
                 this.venta.EsOrganizacion = 0

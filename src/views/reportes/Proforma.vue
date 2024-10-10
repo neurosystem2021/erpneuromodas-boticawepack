@@ -22,6 +22,10 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
               </tr>
+              <tr v-if="proforma.Telefono">
+                <td class="celda" style="font-weight:bold; width:25% !important;">Telefono</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Telefono }}</td>
+              </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Documento</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.Documento }}</td>
