@@ -841,7 +841,7 @@ export default {
             let sinStock = 0
             let totalCero = 0
             this.productos.forEach(pro => {
-                if(pro.stock <= 0) {
+                if((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock)) {
                     sinStock += 1
                 }
                 if(parseFloat(pro.total) <= 0) {
@@ -855,7 +855,7 @@ export default {
                 return;
             }
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
