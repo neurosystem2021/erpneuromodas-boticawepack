@@ -1505,10 +1505,18 @@ export default {
       this.actualizarProd(obj);
     },
     getSubtotal(index) {
-      let subtotal = this.$options.filters.redondear(
-        this.productos[index].cantidad * this.productos[index].precio
+      let subtotal =
+        (this.productos[index].tipo == "PRESENTACION"
+          ? this.productos[index].cantxPrecio
+          : this.productos[index].cantidad) * this.productos[index].precio;
+      // let subtotal = this.$options.filters.redondear(
+      //   this.productos[index].cantidad * this.productos[index].precio
+      // );
+      Vue.set(
+        this.productos[index],
+        "subtotal",
+        parseFloat(subtotal).toFixed(2)
       );
-      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
       return subtotal;
     },
@@ -1623,7 +1631,7 @@ export default {
         this.itemProducto.precio = this.itemProducto.PrecioContado;
         this.itemProducto.total = 0;
         this.itemProducto.cantxPrecio = 0;
-        this.itemProducto.cantidad = 0;
+        this.itemProducto.cantidad = 1;
         this.itemProducto.descuento = 0;
         delete this.itemProducto._rowVariant;
         this.$store.state.cart.productos.push(this.itemProducto);
@@ -1643,13 +1651,15 @@ export default {
         this.errorMontoPresentacion = "Ingrese una Cantidad";
         return false;
       }
+      // console.log(prod);
       let prod = this.itemProducto;
       this.itemProducto.tipo = "PRESENTACION";
       prod.estadoPxP = true;
       prod.cantxPrecio = this.monto;
-      prod.cantidad = this.monto;
+      prod.cantidad = presentacion.cantidad * this.monto;
       prod.descuento = 0;
       prod.disabled = true;
+      prod.Presentacion = JSON.stringify(presentacion);
       if (!prod.Empresa || typeof prod.Empresa == "undefined") {
         let datoEmpresa = this.$store.state.empresas.filter(
           v => v.value == empresa

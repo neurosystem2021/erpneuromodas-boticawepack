@@ -145,6 +145,8 @@ export default {
             // item.IdEm
           });
           response.data.map(item => {
+            item.estadoPxP = !!item.estadoPxP;
+            console.log(item);
             this.add([
               item,
               () => {},
@@ -156,6 +158,7 @@ export default {
           setTimeout(() => {
             this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
           }, 300);
+
           proforma.productos = response.data;
           // console.log(proforma);
 

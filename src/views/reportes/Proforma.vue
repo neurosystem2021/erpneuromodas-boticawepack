@@ -84,9 +84,16 @@
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
+            <!-- <td class="no">{{ prod }}</td> -->
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3></td>
-            <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}
+              <br>
+            <span v-if="prod.tipo=='PRESENTACION'">
+                Nombre: {{ JSON.parse(prod.Presentacion).nombre }} : CPP: {{ JSON.parse(prod.Presentacion).cantidad }}
+            </span>
+          </h3>
+            </td>
+            <td class="qty" style="font-size:1.1rem">{{ prod.tipo=='PRESENTACION' ? prod.cantxPrecio : prod.Cantidad }}</td>
             <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:1.1rem">
               <div v-if="prod.DisabledTotal === 0">
