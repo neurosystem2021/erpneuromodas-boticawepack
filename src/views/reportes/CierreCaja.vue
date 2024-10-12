@@ -7,8 +7,8 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                          <option value="imperiop1">FGOMEZ</option>
-                          <option value="imperiop2">FGOMEZ</option>
+                          <option value="imperiop1">DISTLUIS</option>
+                          <!--<option value="imperiop2">FGOMEZ</option>-->
                       </select>
                   </b-button-group>
               </div>
