@@ -999,14 +999,22 @@ export default {
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    loadBarcode(e) {
+    async loadBarcode(e) {
       if (e) {
         e.preventDefault();
       }
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([
+        //this.setProducto(obj);
+        let res = await this.axios.get(this.API + "productos/id/" + idProducto);
+        if (res.data) {
+          this.setProducto(res.data);
+        } else {
+          this.$toasted.show("No se encontró ningun producto");
+        }
+
+        /* this.add([
           idProducto,
           obj => {
             if (obj) {
@@ -1018,7 +1026,7 @@ export default {
             this.loadCode = "";
           },
           { setPrecio: this.setPrecio, setSuma: true }
-        ]);
+        ]);*/
       }
     },
 
@@ -1347,7 +1355,6 @@ export default {
       return igv;
     },
     getTotal(index) {
-      console.log("productos", this.productos[index]);
       let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {

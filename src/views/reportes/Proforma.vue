@@ -76,6 +76,7 @@
             <th class="no">#</th>
             <th></th>
             <th class="desc">DESCRIPCIÓN</th>
+            <th class="desc">U.M.</th>
             <th class="qty">CANT.</th>
             <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
@@ -86,10 +87,16 @@
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}
-            <br v-if="prod.Presentacion">Presentación:{{ prod.Presentacion ? JSON.parse(prod.Presentacion).nombre :'' }}
-            <br v-if="prod.Presentacion">CPP: {{ prod.Presentacion ? JSON.parse(prod.Presentacion).cantidad :'' }}
-
             </h3></td>
+            <td v-if="prod.Presentacion">
+              {{ prod.Presentacion ? JSON.parse(prod.Presentacion).nombre :'' }}
+              <br v-if="prod.Presentacion">CPP: {{ prod.Presentacion ? JSON.parse(prod.Presentacion).cantidad :'' }}
+            </td>
+            <td class="qty" v-else>
+              {{ prod.DescripcionProductoMedicion }}
+            </td>
+
+            
             <td class="qty" style="font-size:1.1rem">{{  prod.Presentacion ? prod.CantidadxPresentacion : prod.Cantidad }} </td>
             <td class="unit" style="font-size:1.1rem">S/. {{
             prod.Presentacion ?  prod.Cantidad * prod.Precio /prod.CantidadxPresentacion  :  prod.Precio 
