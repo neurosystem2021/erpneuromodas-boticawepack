@@ -1145,6 +1145,7 @@ export default {
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
       obj.cantidadPres = obj.cantidad;
+      obj.Presentacion = "";
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
@@ -1153,6 +1154,7 @@ export default {
       let obj = this.objProd;
       this.$refs.autocompleteProducto.setValue("");
       obj.subt = "";
+      obj.Presentacion = JSON.stringify(prod);
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
