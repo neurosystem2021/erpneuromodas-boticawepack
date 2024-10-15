@@ -764,7 +764,8 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center  ">
             <thead>
               <tr style>
-                <th class="table-info" style="width: 60px">Stock</th>
+                <th class="table-info" style="width: 50px">Stock</th>
+                <th style="width: 70px">Còdigo</th>
                 <th style="width: 200px">Producto</th>
                 <th style="width: 100px">Categoría</th>
                 <th style="width: 100px">Marca</th>
@@ -774,7 +775,8 @@ export default {
             <tbody>
               <tr>
                 <td class="${styleStock}"><b>${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b></td>
-                <td><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td><b>${data.CodigoBarra}</b></td>
+                <td><b>${data.Producto}</b></td>
                 <td>${data.ProductoCategoria}</td>
                 <td>${data.ProductoMarca}</td>
                 <td class="table-primary"><b>${data.PrecioContado}</b></td>
@@ -921,4 +923,17 @@ export default {
     align-items: center;
     border-right: 2px solid black;
   }
+</style>
+<style>
+.danger {
+  background-color:#ff7675;
+  color: #ffffff;
+}
+.ambar {
+  background-color: #feca57;
+  color: #ffffff;
+}
+.tabla-carrito .table-sm td  {
+  font-size: .8rem!important;
+}
 </style>
