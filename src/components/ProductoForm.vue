@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="mostrarForm">
     <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
@@ -497,6 +497,7 @@ import ProductoFormDet from "@/components/ProductoFormDet";
 export default {
   data() {
     return {
+      mostrarForm: true,
       showPresentacion: false,
       showProductoDet: true,
       cantidadCodigoBarra: 1,
@@ -520,7 +521,9 @@ export default {
       if (val) {
         //this.cargarCatOferta()
       }
-
+      this.mostrarForm = false;
+      this.mostrarForm = true;
+      this.$refs.file.value = "";
       let newVal = this.productoUpdate || {};
       if (newVal.IdProducto && !this.nuevo) {
         this.axios
@@ -813,7 +816,7 @@ export default {
         e.preventDefault();
       }
     },
-    guardarProducto(e) {
+    async guardarProducto(e) {
       e.preventDefault();
 
       // Agregar producto DET
@@ -827,12 +830,12 @@ export default {
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
       this.producto.Codigo = ("" + this.producto.Codigo).trim();
       this.producto.Producto = ("" + this.producto.Producto).trim();
-      this.axios
+      await this.axios
         .post(this.API + "productos", {
           ...this.producto,
           PreciosPorProducto: this.producto.precios
         })
-        .then(response => {
+        .then(async response => {
           if (this.cbGuardar) {
             this.cbGuardar(
               response.data.insertId,
@@ -857,7 +860,7 @@ export default {
           let formData = new FormData();
           formData.append("imagen", this.file);
 
-          this.axios({
+          await this.axios({
             method: "post",
             url: this.API + "producto/imagen/" + response.data.insertId,
             data: formData,
@@ -867,6 +870,8 @@ export default {
           });
 
           this.$refs.productoForm.hide();
+          this.producto = {};
+          this.file = "";
         })
         .catch(error => {
           console.log(error);
@@ -981,7 +986,7 @@ export default {
   background-color: #e1f7d5;
   padding: 5px;
 }
-.cardarPresendacion{
+.cardarPresendacion {
   border: 1px solid rgba(0, 0, 0, 0.125) !important;
 }
 </style>
