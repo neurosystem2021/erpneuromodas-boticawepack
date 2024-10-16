@@ -155,7 +155,7 @@
               autocomplete="off"
               style="width: 90px; font-weight:bold"
               class="form-control"
-              step="1"
+              step="0.01"
               min="0"
               @input="handleInputCantidad(data.index)"
               placeholder="Cantidad"
