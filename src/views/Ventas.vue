@@ -11,7 +11,7 @@
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 330px; margin: 0 5 !importante">
                             <option value="imperiop1">FGOMEZ</option>
-                            <option value="imperiop2">FGOMEZ</option>
+                            <option value="imperiop2">RGOMEZ</option>
                         </select>
                     </b-button-group>
                 </div>

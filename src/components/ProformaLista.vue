@@ -13,7 +13,7 @@
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
                             <option value="imperiop1">FGOMEZ</option>
-                            <option value="imperiop2">FGOMEZ</option>
+                            <option value="imperiop2">RGOMEZ</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
