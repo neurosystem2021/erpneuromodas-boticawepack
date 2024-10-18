@@ -84,7 +84,7 @@
               <b-col md="3">
                 <b-form-group>
                   <label>Código de barra:</label>
-                  <input ref="inputCodigoBarra" class="form-control" v-on:input="(val) => generateFilter('codigo', val.target.value, true)"/>
+                  <input ref="inputCodigoBarra" class="form-control" @input="debouncedInput($event)" />
                 </b-form-group>
               </b-col>
               <b-col md="3">
@@ -93,6 +93,7 @@
                   <autocomplete
                     :url="API + 'categorias'"
                     ref="inputCategoria"
+                    :debounce="600"
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
@@ -107,6 +108,7 @@
                   <autocomplete
                     :url="API + 'productos'"
                     ref="inputProducto"
+                    :debounce="600"
                     anchor="Producto"
                     label="writer"
                     :on-select="val => generateFilter('producto', val.Producto)"                    
@@ -121,6 +123,7 @@
                   <autocomplete
                     :url="API + 'marcas'"
                     ref="inputMarca"
+                    :debounce="600"
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
@@ -415,6 +418,7 @@ export default {
       sumaValorizadoSin: '...',
       APISTOCK: 'productos',
       tipoStock: '',
+      debounceTimeout: null,
       showKardex: false,
       almacen: {
         IdAlmacen: 1,
@@ -511,6 +515,14 @@ export default {
     },
   },
   methods: {
+    debouncedInput(event) {
+      clearTimeout(this.debounceTimeout);
+      const value = event.target.value;
+      
+      this.debounceTimeout = setTimeout(() => {
+        this.generateFilter('codigo', value, true);
+      }, 1000);
+    },
     abrirImagen(producto,url){
       this.productoNombre = producto
       this.productoUrl = url

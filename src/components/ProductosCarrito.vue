@@ -7,6 +7,7 @@
             ref="autocompleteProducto"
             :url="APIProductos"
             :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '40', nopadre:(isVentas?0:1) }"
+            :debounce="600"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
