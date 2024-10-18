@@ -47,7 +47,7 @@
             </b-row>
             <b-row align-h="center" class="text-center">
               <b-col cols="6">
-                <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar a FZ</b-button>
+                <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar a INNOVA</b-button>
                 <!--<b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>-->
                   <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?hashMovimiento=' + ultimoMovimiento">Imprimir Último traslado</b-button>
               </b-col>
@@ -128,7 +128,7 @@ export default {
         this.axios
           .get(this.API + "destino/producto/verificar", {
             params: {
-              producto: obj.Producto
+              CodigoBarra: obj.CodigoBarra
             }
           })
           .then(res => {
