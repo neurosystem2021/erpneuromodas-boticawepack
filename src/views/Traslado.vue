@@ -128,7 +128,7 @@ export default {
         this.axios
           .get(this.API + "destino/producto/verificar", {
             params: {
-              producto: obj.Producto
+              CodigoBarra: obj.CodigoBarra
             }
           })
           .then(res => {
