@@ -12,8 +12,30 @@
                 <b-col md="4">
                   <label>Gasto:</label>
                   <b-form-group>
-                    <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                    <b-form-select v-model="selectProducto.IdProducto" 
+                    :options="lstProducto"
+                    value-field="IdProducto"
+                    text-field="Producto"
+                    required
+                    @change="ObtenerCosto"
+                    ></b-form-select>
                   </b-form-group>
+                  <b-form-group>
+                    Cantidad:
+                    <input v-model="selectProducto.Cantidad"
+                    @input="recalcularTotal"
+                    
+                    required type="number" class="form-control" step="1" />
+                  </b-form-group>
+                  <b-form-group>
+                    Costo:
+                    <input v-model="selectProducto.Gasto"  @input="recalcularTotal" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <b-form-group>
+                    Total Costo:
+                    <input v-model="selectProducto.TotalGasto" readonly required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                 
                   <label>Descripción:</label>
                   <b-form-group>
                     <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
@@ -118,15 +140,19 @@ export default {
       API: config.API,
       showMovimientoModal: false,
       selectProducto: {
-        Gasto: "",
+        Gasto: 0,
         GastoDesc: "",
         Ingreso: "",
         IngresoDesc: "",
         Salida: "",
         SalidaDesc: "",
         Deposito: "",
-        DepositoDesc: ""
-      }
+        DepositoDesc: "",
+        TotalGasto: 0,
+        IdProducto: "",
+        Cantidad: 1
+      },
+      lstProducto: []
       // Otros datos...
     };
   },
@@ -167,23 +193,26 @@ export default {
           }
         }); */
 
-      await this.$swal.fire({
-        icon: "info",
-        title: "Escriba la contraseña del administrador",
-        html:
-          '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
-          '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
-        focusConfirm: false,
-        showCloseButton: true,
-        preConfirm: () => {
-          const input1 = document.getElementById("swal-input1").value;
-          const input2 = document.getElementById("swal-input2").value;
-          if (!input1 || !input2) {
-            this.$swal.showValidationMessage("Por favor, complete ambos campos");
+      await this.$swal
+        .fire({
+          icon: "info",
+          title: "Escriba la contraseña del administrador",
+          html:
+            '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
+            '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
+          focusConfirm: false,
+          showCloseButton: true,
+          preConfirm: () => {
+            const input1 = document.getElementById("swal-input1").value;
+            const input2 = document.getElementById("swal-input2").value;
+            if (!input1 || !input2) {
+              this.$swal.showValidationMessage(
+                "Por favor, complete ambos campos"
+              );
+            }
+            return { usuario: input1, clave: input2 };
           }
-          return { usuario: input1, clave: input2 };
-        }
-      })
+        })
         .then(async result => {
           try {
             const response = await this.axios.post(this.API + "login", {
@@ -191,9 +220,9 @@ export default {
               password: result.value.clave
             });
             if (response.data) {
-              console.log(response.data);
               if (response.data.IdUsuarioPerfil == 1) {
                 this.showMovimientoModal = true;
+                this.obtenerProductosTipoChatarra();
               } else {
                 this.$swal.fire({
                   icon: "error",
@@ -228,7 +257,14 @@ export default {
           console.log(e);
         });
     },
-    insertarGasto() {
+    ObtenerCosto(item) {
+      let valor = this.lstProducto.filter(v => v.IdProducto == item)[0];
+      // console.log(valor.PrecioContado);
+      this.selectProducto.Gasto = valor.PrecioContado;
+      this.selectProducto.TotalGasto = valor.PrecioContado;
+      this.recalcularTotal();
+    },
+    async insertarGasto() {
       let usuario = sessionStorage.getItem("User");
 
       if (this.selectProducto.Gasto <= 0) {
@@ -238,7 +274,13 @@ export default {
       let r = confirm("¿Desea Insertar un gasto?");
 
       if (r) {
-        this.axios
+        let data = {
+          producto: this.selectProducto,
+          concepto:
+            "Compra de chatarra " + " - " + this.selectProducto.GastoDesc
+        };
+
+        await this.axios
           .post(this.API + "cajaybanco/gasto", {
             producto: this.selectProducto,
             concepto:
@@ -246,16 +288,28 @@ export default {
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdHabitacion: this.selectProducto.IdProducto,
             Gasto: this.selectProducto.Gasto,
+            TotalGasto: this.selectProducto.TotalGasto,
             Usuario: usuario
           })
           .then(res => {
             // this.adelantos.push(res.data)
-            this.cargarGastos();
-            this.selectProducto.Gasto = "";
-            this.selectProducto.Producto = "";
-            this.selectProducto.GastoDesc = "";
+            // this.cargarGastos();
+            this.selectProducto = {
+              Gasto: 0,
+              GastoDesc: "",
+              Ingreso: "",
+              IngresoDesc: "",
+              Salida: "",
+              SalidaDesc: "",
+              Deposito: "",
+              DepositoDesc: "",
+              TotalGasto: 0,
+              IdProducto: "",
+              Cantidad: 1
+            };
           });
       }
+      this.showMovimientoModal = false;
     },
 
     insertarIngreso() {
@@ -355,11 +409,35 @@ export default {
         })
         .then(() => {
           this.$toasted.success("Guardado correctamente");
-          this.getHabitaciones();
+          // this.getHabitaciones();
           this.show = false;
         });
+    },
+    async obtenerProductosTipoChatarra() {
+      await this.axios
+        .get(this.API + "/productos/cargar_producto_charrata")
+        .then(response => {
+          let res = response.data;
+          if (res.data) {
+            this.lstProducto = res.data;
+          }
+          if (res.error) {
+            this.$toasted.error(res.error);
+          }
+          // console.log(res);
+        });
+    },
+    recalcularTotal() {
+      if (this.selectProducto.IdProducto) {
+        let valor = this.lstProducto.filter(
+          v => v.IdProducto == this.selectProducto.IdProducto
+        )[0];
+
+        this.selectProducto.TotalGasto = parseFloat(
+          this.selectProducto.Cantidad * valor.PrecioContado
+        ).toFixed(2);
+      }
     }
-    // Otros métodos...
   },
   components: {
     PreOrdenFormDet,

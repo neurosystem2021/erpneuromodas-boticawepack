@@ -428,13 +428,14 @@
           <table class="table b-table table-sm">
             <thead>
               <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>ID</th><th>Fecha</th><th>Producto</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Producto }}</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
@@ -443,7 +444,7 @@
               <tr>
                 <td colspan="2"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+                <td colspan="2" class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>

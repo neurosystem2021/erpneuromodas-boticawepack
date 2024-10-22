@@ -245,6 +245,14 @@
               Tiene Presentacion
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.EsChatarra"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Chatarra
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group v-show="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
@@ -523,6 +531,7 @@ export default {
         this.producto.IdOfertaCategoria     = newVal.IdOfertaCategoria
         this.producto.VentaEstrategica      = newVal.VentaEstrategica
         this.producto.TienePresentacion     = newVal.TienePresentacion
+        this.producto.EsChatarra     = newVal.EsChatarra
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
@@ -681,6 +690,7 @@ export default {
         marca: {},
         IdOfertaCategoria: null,
         VentaEstrategica: 0,
+        EsChatarra:0,
         // modelo: {},
         //talla: {},
         medicion: {
