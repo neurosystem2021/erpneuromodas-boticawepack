@@ -6,7 +6,7 @@
 
     <b-container fluid class="ancho" id="conten">
       <div>
-        <div class="float-left">
+        <div>
           <b-button-group size="sm">
             <b-form-select
               v-model="empresa"
@@ -17,7 +17,7 @@
             ></b-form-select>
            
           </b-button-group>
-        </div>
+        </div>  
         <div class="float-right">
           <b-button-group size="sm" class="ocularMovil">
             <delivery-modal
