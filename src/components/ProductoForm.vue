@@ -301,7 +301,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              :disabled="true"
+              :disabled="(idPerfil == 1) ? false : true"
               step="0.0001"
               type="number"
               @input="actualizarPorcentajeUtilidad"
