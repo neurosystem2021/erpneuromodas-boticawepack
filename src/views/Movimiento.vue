@@ -443,6 +443,8 @@ return false
         this.movimiento.alterarProductos = 0
       }
 
+      let r = confirm('¿Desea Guardar el Movimiento?')
+      if (r == true) {
       this.axios.post(this.API + 'movimientos', {
         movimiento: this.movimiento,
         productos: this.productos
@@ -464,6 +466,9 @@ return false
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         this.inProgress = false
       })
+      }else {
+          this.inProgress = false
+      }
     },
     focusAutocomplete (ref) {
       //this.$refs[ref].type = ""
