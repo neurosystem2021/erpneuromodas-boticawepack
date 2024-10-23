@@ -1000,25 +1000,21 @@ export default {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     loadBarcode(e) {
-      if (e) {
-        e.preventDefault();
-      }
+      e.preventDefault();
       let idProducto = this.loadCode;
-
+      let id_empresa = this.empresa;
       if (idProducto) {
-        this.add([
-          idProducto,
-          obj => {
-            if (obj) {
-              this.$emit("onAddProducto");
-              this.$toasted.show("Producto añadido correctamente");
+        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data);
             } else {
+              this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
-            this.loadCode = "";
-          },
-          { setPrecio: this.setPrecio, setSuma: true }
-        ]);
+          });
       }
     },
 
