@@ -30,11 +30,13 @@
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
-            placeholder="Agregar Producto"
+            placeholder="Buscar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
              id="autocompleteProducto"
+             class="txtBuscarProducto"
+
           >
           </autocomplete>
           <b-button @click="abrirMicrofono()">
@@ -291,6 +293,7 @@
 
         <template slot="cantidad" slot-scope="data">
           <input
+            :ref="'cantidad-' + data.index"
             v-model="productos[data.index].cantidad"
             :disabled="
               productos[data.index].estadoPxP == false || bloquearInput
@@ -298,7 +301,7 @@
                 : false || esDelivery
             "
             type="number"
-            style="width: 95px"
+           style="width: 105px"
             class="form-control"
             step="0.001"
             min="0"
@@ -402,13 +405,17 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
+        <template slot="flete" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
+             style="width: 105px"
             placeholder="Flete"></b-form-input>
-        </template>-->
+            <strong>
+              {{ (productos[data.index].FLETE ?  productos[data.index].FLETE :0)/productos[data.index].cantidad }} x Unidad
+            </strong>
+        </template>
 
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
@@ -610,9 +617,11 @@
             <td><b>SubTotal</b></td>
             <td class="table-danger">{{ sumatoriaSubTotal }}</td>
           </tr>
-          <tr v-if="sumatoriaIgv > 0">
+          <!-- <tr v-if="sumatoriaIgv > 0"> -->
+          <tr v-if=" obtenerSumatoriaIgv()  > 0">
             <td><b>IGV</b></td>
-            <td class="table-danger">{{ sumatoriaIgv }}</td>
+           
+            <td class="table-danger">{{ obtenerSumatoriaIgv() }}</td>
           </tr>
           <tr>
             <td><b>TOTAL</b></td>
@@ -718,6 +727,7 @@ export default {
     }
   },
   props: {
+    gravada: 0,
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -1154,6 +1164,14 @@ export default {
       this.$refs["modalCant"].hide();
       obj.cantidadPres = obj.cantidad;
       obj.Presentacion = "";
+
+      this.$forceUpdate();
+      this.$nextTick(() => {
+        const inputRef = this.$refs[`cantidad-0`];
+        // console.log(inputRef);
+        inputRef.focus();
+        inputRef.select();
+      });
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
@@ -1186,6 +1204,8 @@ export default {
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
       //this.actualizarProd(obj)
+
+      this.$forceUpdate();
     },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
@@ -1358,7 +1378,7 @@ export default {
       let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE);
+        // total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
@@ -1380,6 +1400,8 @@ export default {
       this.eliminar(index);
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
+
+      this.$forceUpdate();
     },
 
     formatFecha(fecha) {
@@ -1411,6 +1433,25 @@ export default {
       }
 
       // do something...
+    },
+    obtenerSumatoriaIgv() {
+      let igv = 0;
+
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            let x = prod.total / 1.18;
+
+            return totalIGV + parseFloat(prod.total) - parseFloat(x).toFixed(2);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            return totalIGV + parseFloat(prod.igv ? prod.igv : 0);
+          }, 0);
+        }
+      }
+
+      return parseFloat(igv).toFixed(2);
     }
   },
 
@@ -1483,6 +1524,10 @@ canvas {
   width: auto;
   margin: 0 auto;
 }
+.txtBuscarProducto {
+  border: 2px solid blue;
+}
+
 @media only screen and (max-width: 750px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 100vw !important;

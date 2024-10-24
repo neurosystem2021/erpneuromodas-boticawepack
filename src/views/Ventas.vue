@@ -9,7 +9,7 @@
             <div>
                 <div class="float-left">
                     <b-button-group size="sm">
-                        <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 330px; margin: 0 5 !importante">
+                        <select class="form-control" v-model="empresaSelect" @change="cambiarEmpresa" style="font-weight: bold; width: 330px; margin: 0 5 !importante">
                             <option value="imperiop1">FGOMEZ</option>
                             <option value="imperiop2">RGOMEZ</option>
                         </select>
@@ -69,6 +69,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
+                                        :customParams="{  id_empresa: empresa }"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -83,6 +84,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
+                                        :customParams="{  id_empresa: empresa }"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -99,6 +101,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setDocRef"
+                                        :customParams="{  id_empresa: empresa }"
                                         :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -116,6 +119,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setAlmacen" 
+                                        :customParams="{  id_empresa: empresa }"
                                         :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -138,6 +142,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setPuntoVenta" 
+                                        :customParams="{  id_empresa: empresa }"
                                         :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -158,6 +163,7 @@
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
+                                            :customParams="{  id_empresa: empresa }"
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
@@ -187,6 +193,7 @@
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
+                                            :customParams="{  id_empresa: empresa }"
                                             :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
@@ -281,7 +288,7 @@
                                 required="required"
                                 ref="inputVendedor"
                                 :url="API + 'usuarios'"
-                                :customParams="{idPerfil: idPerfil}"
+                                :customParams="{idPerfil: idPerfil,id_empresa: empresa }"
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedorManual" 
@@ -301,6 +308,7 @@
                                 :onInput="(val) => newDniRuc = val"
                                 :on-select="setComisionista" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
+                                :customParams="{  id_empresa: empresa }"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
@@ -561,7 +569,7 @@ export default {
       newUrl = new URL(newUrl);
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "imperiop1"
+        sessionStorage.getItem("empresa") || "imperiop2"
       );
       url = newUrl.toString();
       arguments[1] = url;
@@ -574,12 +582,21 @@ export default {
     // this.getNumeroVenta()
     await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
-      this.empresa = sessionStorage.getItem("empresa");
+      this.empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "imperiop2";
+      this.empresaSelect = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "imperiop2";
+    } else {
+      this.empresa = "imperiop2";
+      this.empresaSelect = "imperiop2";
     }
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
     this.escucharPedidos();
     this.configStock();
+    console.log("empresa", this.empresa);
   },
   data() {
     return {
@@ -647,7 +664,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      empresa: "imperiop1",
+      empresaSelect: "",
       ventaSinStock: 0,
       idPerfil: sessionStorage.getItem("IdPerfil") || 0
     };
@@ -699,7 +716,7 @@ export default {
       headerCarritos.push({ key: "Producto" });
       headerCarritos.push({ key: "ProductoPresentacion", label: "Anaquel" });
       if (this.mostrarResponsive()) {
-          headerCarritos.push({ key: "Descripcion", label: "Descripción" });
+        headerCarritos.push({ key: "Descripcion", label: "Descripción" });
       }
       headerCarritos.push({ key: "eventPres", label: "" });
       headerCarritos.push({ key: "cantxPrecio", variant: "warning" });
@@ -771,7 +788,11 @@ export default {
     },
     configStock() {
       this.axios
-        .get(this.API + "config/stock")
+        .get(this.API + "config/stock", {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
         .then(res => {
           this.ventaSinStock = res.data;
         })
@@ -780,16 +801,24 @@ export default {
         });
     },
     cambiarEmpresa() {
-      sessionStorage.setItem("empresa", this.empresa);
-      window.location.reload();
-      return false;
+      sessionStorage.setItem("empresa", this.empresaSelect);
+      setTimeout(() => {
+        window.location.reload();
+        return false;
+      }, 100);
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/00000000").then(res => {
-        if (res.data.IdCliente) {
-          this.setCliente(res.data);
-        }
-      });
+      this.axios
+        .get(this.API + "clientes/00000000", {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(res => {
+          if (res.data.IdCliente) {
+            this.setCliente(res.data);
+          }
+        });
     },
     prevent(evt) {
       if (evt.target.tagName !== "TEXTAREA") {
@@ -808,7 +837,8 @@ export default {
         .get(this.API + "preorden/cajaybanco", {
           params: {
             IdPreOrden: orden.IdPreOrden,
-            TipoCajaBanco: 0
+            TipoCajaBanco: 0,
+            id_empresa: this.empresa
           }
         })
         .then(res => {
@@ -823,16 +853,28 @@ export default {
         });
     },
     loadFirstAlmacen() {
-      return this.axios.get(this.API + "almacenes/primero").then(res => {
-        this.$refs.inputAlmacen.setValue(res.data.Almacen);
-        this.venta.almacen = res.data;
-      });
+      return this.axios
+        .get(this.API + "almacenes/primero", {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(res => {
+          this.$refs.inputAlmacen.setValue(res.data.Almacen);
+          this.venta.almacen = res.data;
+        });
     },
     loadFirstPuntoVenta() {
-      return this.axios.get(this.API + "puntoventa/primero").then(res => {
-        this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta);
-        this.setPuntoVenta(res.data);
-      });
+      return this.axios
+        .get(this.API + "puntoventa/primero", {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(res => {
+          this.$refs.inputPuntoVenta.setValue(res.data.PuntoVenta);
+          this.setPuntoVenta(res.data);
+        });
     },
     loadClienteBarcode(e) {
       e.preventDefault();
@@ -937,7 +979,8 @@ export default {
         .get(this.API + "ventas/solonumero", {
           params: {
             serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+            id_empresa: this.empresa
           }
         })
         .then(response => {
@@ -953,14 +996,16 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+            id_empresa: this.empresa
           }
         })
         .then(response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
-                idCliente: response.data[0].IdCliente
+                idCliente: response.data[0].IdCliente,
+                id_empresa: this.empresa
               }
             })
             .then(response => {
@@ -1001,9 +1046,15 @@ export default {
       }
     },
     loadAlmacen(id) {
-      this.axios.get(this.API + "almacenes/id/" + id).then(res => {
-        this.setAlmacen(res.data);
-      });
+      this.axios
+        .get(this.API + "almacenes/id/" + id, {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(res => {
+          this.setAlmacen(res.data);
+        });
     },
     setAlmacen(obj) {
       this.venta.almacen = obj;
@@ -1011,15 +1062,27 @@ export default {
       this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
     },
     loadPuntoVenta(id) {
-      this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
-        this.setPuntoVenta(res.data);
-        this.getNumeroVenta();
-      });
+      this.axios
+        .get(this.API + "puntoventa/id/" + id, {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(res => {
+          this.setPuntoVenta(res.data);
+          this.getNumeroVenta();
+        });
     },
     getTipoDoc(id) {
-      this.axios.get(this.API + "tipodoc/" + id).then(response => {
-        if (response.data) this.setTipoVenta(response.data);
-      });
+      this.axios
+        .get(this.API + "tipodoc/" + id, {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
+        .then(response => {
+          if (response.data) this.setTipoVenta(response.data);
+        });
     },
     setPuntoVenta(obj) {
       this.venta.puntoVenta = obj;
@@ -1032,7 +1095,11 @@ export default {
         usuario = user;
       }
       this.axios
-        .get(this.API + "usuarios/" + usuario)
+        .get(this.API + "usuarios/" + usuario, {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
         .then(response => {
           this.setVendedor(response.data);
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
@@ -1072,11 +1139,13 @@ export default {
       let params = {};
       if (dni) {
         params = {
-          dni: dni
+          dni: dni,
+          id_empresa: this.empresa
         };
       } else {
         params = {
-          idCliente: obj.IdCliente || obj
+          idCliente: obj.IdCliente || obj,
+          id_empresa: this.empresa
         };
       }
 
@@ -1087,7 +1156,10 @@ export default {
           this.getVendedor(obj.UsuarioReg);
           delete obj.productos;
           this.axios
-            .post(this.API + "verificar/crear/cliente", { data: obj })
+            .post(
+              this.API + "verificar/crear/cliente?id_empresa=" + this.empresa,
+              { data: obj }
+            )
             .then(response => {
               //console.log(response.data);
               this.$refs.inputCliente.setValue(response.data.Cliente);
@@ -1178,7 +1250,11 @@ export default {
       }
 
       this.axios
-        .get(this.API + "ventas/descuento/" + this.puntosAplicados)
+        .get(this.API + "ventas/descuento/" + this.puntosAplicados, {
+          params: {
+            id_empresa: this.empresa
+          }
+        })
         .then(response => {
           this.descuentoPuntos = response.data;
           this.aplicarDescuento(response.data.descuento);
@@ -1197,7 +1273,8 @@ export default {
         .get(this.API + "ventas/numero", {
           params: {
             idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+            id_empresa: this.empresa
           }
         })
         .then(response => {
@@ -1255,7 +1332,7 @@ export default {
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
       this.axios
-        .post(this.API + "proformas", this.venta)
+        .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
           this.$toasted.info("Proforma Guardada con exito");
           //this.limpiarDespuesVenta()
@@ -1460,7 +1537,7 @@ export default {
         ? this.infoDelivery.Direccion || ""
         : "";
       this.axios
-        .post(this.API + "ventas", this.venta)
+        .post(this.API + "ventas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
@@ -1499,7 +1576,9 @@ export default {
     },
     emitirauto(idDocVenta) {
       this.axios
-        .post(this.API + "emitirauto", { IdDocVenta: idDocVenta })
+        .post(this.API + "emitirauto?id_empresa=" + this.empresa, {
+          IdDocVenta: idDocVenta
+        })
         .then(response => {
           if (response.data.success) {
             if (response.data.Estado == 1) {
@@ -1531,7 +1610,11 @@ export default {
         let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
         if (costoDelivery > 0) {
           this.axios
-            .get(this.API + "costo/delivery")
+            .get(this.API + "costo/delivery", {
+              params: {
+                id_empresa: this.empresa
+              }
+            })
             .then(response => {
               if (response.data) {
                 let costoDeliverObj = response.data;
