@@ -35,6 +35,7 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
              id="autocompleteProducto"
+             class="cboAgregar"
           >
           </autocomplete>
           <b-button @click="abrirMicrofono()">
@@ -291,6 +292,7 @@
 
         <template slot="cantidad" slot-scope="data">
           <input
+            :ref="'cantidad-' + data.index"
             v-model="productos[data.index].cantidad"
             :disabled="
               productos[data.index].estadoPxP == false || bloquearInput
@@ -402,13 +404,17 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
+        <template slot="flete" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
+             style="width: 120px"
             placeholder="Flete"></b-form-input>
-        </template>-->
+            <strong>
+                {{ (productos[data.index].FLETE? productos[data.index].FLETE :0)/productos[data.index].cantidad }}
+            </strong>
+        </template>
 
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
@@ -610,9 +616,9 @@
             <td><b>SubTotal</b></td>
             <td class="table-danger">{{ sumatoriaSubTotal }}</td>
           </tr>
-          <tr v-if="sumatoriaIgv > 0">
+          <tr v-if="calcularIGV() > 0">
             <td><b>IGV</b></td>
-            <td class="table-danger">{{ sumatoriaIgv }}</td>
+            <td class="table-danger">{{ calcularIGV() }}</td>
           </tr>
           <tr>
             <td><b>TOTAL</b></td>
@@ -718,6 +724,7 @@ export default {
     }
   },
   props: {
+    gravada: 0,
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -840,6 +847,22 @@ export default {
       item.subtotal = item.PrecioContado * item.cantidad;
       // $emit("onInputCantidad", item.cantidad);
       this.$forceUpdate();
+    },
+    calcularIGV() {
+      let igv = 0;
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((total, item) => {
+            let x = item.precio / 1.18;
+            return total + parseFloat(item.precio) - parseFloat(x);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((total, item) => {
+            return total + parseFloat(item.igv);
+          }, 0);
+        }
+      }
+      return parseFloat(igv).toFixed(2);
     },
     BusquedaProductos(busqueda) {
       if (busqueda) {
@@ -1155,6 +1178,13 @@ export default {
       obj.cantidadPres = obj.cantidad;
       obj.Presentacion = "";
       //this.actualizarProd(obj)
+      this.$forceUpdate();
+      this.$nextTick(() => {
+        const inputRef = this.$refs[`cantidad-0`];
+
+        inputRef.focus();
+        inputRef.select();
+      });
     },
     setProductoCant(prod) {
       this.objProd.cantxPrecio = 1;
@@ -1358,7 +1388,7 @@ export default {
       let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE);
+        // total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
@@ -1482,6 +1512,9 @@ canvas {
   height: 20em;
   width: auto;
   margin: 0 auto;
+}
+.cboAgregar {
+  border: 1px solid blue;
 }
 @media only screen and (max-width: 750px) {
   #modalCodigoBarra .modal-dialog {
