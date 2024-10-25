@@ -3,8 +3,11 @@
     <b-button-group size="sm">
       <b-button @click="promptPassword" variant="outline-primary">Movimiento</b-button>
     </b-button-group>
-    <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
-      <b-tabs content-class="mt-3">
+    <b-modal 
+    v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito"
+
+    >
+      <b-tabs content-class="mt-3" @click.stop>
         <b-tab title="Compra de chatarra">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
@@ -18,6 +21,7 @@
                     text-field="Producto"
                     required
                     @change="ObtenerCosto"
+                    ref="cboProductos"
                     ></b-form-select>
                   </b-form-group>
                   <b-form-group>
@@ -221,8 +225,8 @@ export default {
             });
             if (response.data) {
               if (response.data.IdUsuarioPerfil == 1) {
+                await this.obtenerProductosTipoChatarra();
                 this.showMovimientoModal = true;
-                this.obtenerProductosTipoChatarra();
               } else {
                 this.$swal.fire({
                   icon: "error",
@@ -259,9 +263,10 @@ export default {
     },
     ObtenerCosto(item) {
       let valor = this.lstProducto.filter(v => v.IdProducto == item)[0];
-      // console.log(valor.PrecioContado);
-      this.selectProducto.Gasto = valor.PrecioContado;
-      this.selectProducto.TotalGasto = valor.PrecioContado;
+
+      this.selectProducto.Cantidad = 1;
+      this.selectProducto.Gasto = valor.PrecioCosto;
+      this.selectProducto.TotalGasto = valor.PrecioCosto;
       this.recalcularTotal();
     },
     async insertarGasto() {
@@ -309,7 +314,6 @@ export default {
             };
           });
       }
-      this.showMovimientoModal = false;
     },
 
     insertarIngreso() {
