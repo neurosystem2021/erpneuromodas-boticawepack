@@ -11,6 +11,8 @@ import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
+import ConversionConfig from '@/views/ConversionConfig.vue'
+import ConverionUnidades from '@/views/ConverionUnidades.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -70,6 +72,16 @@ export default new Router({
       path: '/ventas',
       name: 'Ventas',
       component: Ventas
+    },
+    {
+      path: '/conversion_configuracion',
+      name: 'Ventas',
+      component: ConversionConfig
+    },
+    {
+      path: '/conversion_unidades',
+      name: 'Ventas',
+      component: ConverionUnidades
     },
     {
       path: '/reportes/ventas',
