@@ -1525,7 +1525,7 @@ canvas {
   margin: 0 auto;
 }
 .txtBuscarProducto {
-  border: 2px solid blue;
+  border: 2px solid #1a237e;
 }
 
 @media only screen and (max-width: 750px) {

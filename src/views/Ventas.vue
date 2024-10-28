@@ -372,20 +372,27 @@
                                                     :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
-                                                    :unchecked-value="0">
+                                                    :unchecked-value="0"
+                                                    :style=" !venta.EsCredito ? 'background: #1A237E; color:white;font-size:1.3rem' : ''"
+                                                    class="my-1"
+                                                    >
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
                                                     :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
+                                                    
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
                                                     :disabled="bloquearInput?true:false || venta.EsDelivery"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
-                                                    :unchecked-value="0">
+                                                    :unchecked-value="0"
+                                                    :style=" !venta.PorEntregar ? 'background: #1A237E; color:white;font-size:1.3rem' : ''"
+                                                    class="my-1"
+                                                    >
                                                     Por entregar
                                                 </b-form-checkbox>
                                             </td>

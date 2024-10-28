@@ -197,7 +197,7 @@
                   :unchecked-value="0"
                  
                 >
-                  No Gravada
+                  Gravada
                  
                 </b-form-checkbox>
               </b-col>
@@ -272,7 +272,7 @@ export default {
         { key: "precio", label: "P/U" },
         { key: "subtotal", label: "SubTotal", variant: "success" },
         { key: "igv", label: "IGV" },
-        { key: 'flete', label: 'FLETE' },
+        { key: "flete", label: "FLETE" },
         // { key: 'lote', label: 'Lote' },
         { key: "precioVenta", label: "Precio venta (S/)" },
         { key: "total", label: "Total", variant: "danger" },
@@ -502,6 +502,24 @@ export default {
     },
     guardarMovimiento(evt) {
       evt.preventDefault();
+      this.$swal
+        .fire({
+          icon: "question",
+          title: "Guardar",
+          text: "Desea guardar el movimiento",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          confirmButtonText: `Si, Guardar`,
+          denyButtonText: `No Guardar`,
+          showDenyButton: true
+        })
+        .then(action => {
+          if (action.isConfirmed) {
+            this.guardar();
+          }
+        });
+    },
+    guardar() {
       this.inProgress = true;
 
       if (!this.movimiento.proveedor.IdProveedor) {
@@ -558,8 +576,7 @@ export default {
       if (this.isTraslado == true || this.isSalida == true) {
         this.movimiento.alterarProductos = 0;
       }
-      let r = confirm('¿Desea Guardar el Movimiento?')
-      if (r == true) {
+
       this.axios
         .post(this.API + "movimientos", {
           movimiento: this.movimiento,
@@ -582,9 +599,6 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-      }else {
-        this.inProgress = false
-      }
     },
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
