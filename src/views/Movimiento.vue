@@ -463,6 +463,24 @@ export default {
     },
     guardarMovimiento(evt) {
       evt.preventDefault();
+      this.$swal
+        .fire({
+          icon: "question",
+          title: "Guardar",
+          text: "Desea guardar el movimiento",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          confirmButtonText: `Si, Guardar`,
+          denyButtonText: `No Guardar`,
+          showDenyButton: true
+        })
+        .then(action => {
+          if (action.isConfirmed) {
+            this.guardar();
+          }
+        });
+    },
+    guardar() {
       this.inProgress = true;
 
       if (!this.movimiento.proveedor.IdProveedor) {
@@ -520,33 +538,28 @@ export default {
         this.movimiento.alterarProductos = 0;
       }
 
-      let r = confirm("¿Desea Guardar el Movimiento?");
-      if (r == true) {
-        this.axios
-          .post(this.API + "movimientos", {
-            movimiento: this.movimiento,
-            productos: this.productos
-          })
-          .then(response => {
-            if (response.data.error) {
-              this.$toasted.show(response.data.error);
-            } else {
-              this.ultimoMovimiento = response.data.hash;
-              this.movimiento = this.initMovimiento();
-              this.limpiar();
-              this.$refs.inputMovimiento.setValue("");
-              this.$refs.inputProveedor.setValue("");
-              this.$toasted.success("Movimiento guardado correctamente ");
-            }
-            this.inProgress = false;
-          })
-          .catch(error => {
-            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-            this.inProgress = false;
-          });
-      } else {
-        this.inProgress = false;
-      }
+      this.axios
+        .post(this.API + "movimientos", {
+          movimiento: this.movimiento,
+          productos: this.productos
+        })
+        .then(response => {
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.ultimoMovimiento = response.data.hash;
+            this.movimiento = this.initMovimiento();
+            this.limpiar();
+            this.$refs.inputMovimiento.setValue("");
+            this.$refs.inputProveedor.setValue("");
+            this.$toasted.success("Movimiento guardado correctamente ");
+          }
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""

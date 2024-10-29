@@ -371,13 +371,17 @@
                                                     :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
+                                                     :style=" !venta.EsCredito ? 'background: #1A237E; color:white;font-size:1.3rem' : ''"
+                                                     
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox 
                                                     :disabled="bloquearInput?true:false || venta.EsDelivery"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
-                                                    :unchecked-value="0">
+                                                    :unchecked-value="0"
+                                                     :style=" !venta.EsCredito ? 'background: #1A237E; color:white;font-size:1.3rem' : ''"
+                                                     >
                                                     Por entregar
                                                 </b-form-checkbox>
                                             </td>
@@ -699,7 +703,7 @@ export default {
       headerCarritos.push({ key: "Producto" });
       headerCarritos.push({ key: "ProductoPresentacion", label: "Anaquel" });
       if (this.mostrarResponsive()) {
-          headerCarritos.push({ key: "Descripcion", label: "Descripción" });
+        headerCarritos.push({ key: "Descripcion", label: "Descripción" });
       }
       headerCarritos.push({ key: "eventPres", label: "" });
       headerCarritos.push({ key: "cantxPrecio", variant: "warning" });
