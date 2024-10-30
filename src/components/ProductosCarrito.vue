@@ -853,8 +853,8 @@ export default {
       if (this.productos.length > 0) {
         if (this.gravada == 1) {
           igv = this.productos.reduce((total, item) => {
-            let x = item.precio / 1.18;
-            return total + parseFloat(item.precio) - parseFloat(x);
+            let x = item.total / 1.18;
+            return total + parseFloat(item.total) - parseFloat(x);
           }, 0);
         } else {
           igv = this.productos.reduce((total, item) => {
@@ -862,6 +862,25 @@ export default {
           }, 0);
         }
       }
+      return parseFloat(igv).toFixed(2);
+    },
+    obtenerSumatoriaIgv() {
+      let igv = 0;
+
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            let x = prod.total / 1.18;
+
+            return totalIGV + parseFloat(prod.total) - parseFloat(x).toFixed(2);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            return totalIGV + parseFloat(prod.igv ? prod.igv : 0);
+          }, 0);
+        }
+      }
+
       return parseFloat(igv).toFixed(2);
     },
     BusquedaProductos(busqueda) {
