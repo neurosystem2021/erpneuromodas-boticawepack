@@ -1003,22 +1003,34 @@ export default {
       if (e) {
         e.preventDefault();
       }
+
       let idProducto = this.loadCode;
+      let id_empresa = this.empresa;
 
       if (idProducto) {
-        this.add([
-          idProducto,
-          obj => {
-            if (obj) {
-              this.$emit("onAddProducto");
-              this.$toasted.show("Producto añadido correctamente");
+        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
+
+        // Uso de axios para obtener el producto
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              let obj = response.data;
+
+              // Usamos la lógica adaptada de la segunda función
+              this.add([
+                obj,
+                () => {
+                  this.$emit("onAddProducto", obj); // Emitimos el evento
+                  this.$toasted.show("Producto añadido correctamente");
+                },
+                { setPrecio: this.setPrecio, setSuma: true }
+              ]);
             } else {
-              this.$toasted.show("No se encontró ningun producto");
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningún producto");
             }
-            this.loadCode = "";
-          },
-          { setPrecio: this.setPrecio, setSuma: true }
-        ]);
+          });
       }
     },
 
