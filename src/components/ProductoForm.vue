@@ -222,7 +222,9 @@
             <b-form-checkbox
                    v-model="producto.esMercadero"
                    :value="1"
-                   :unchecked-value="0">
+                   :unchecked-value="0"
+                   @change="changeTerminado(1)"
+                   >
               Es Mercadería
             </b-form-checkbox>
           </b-form-group>
@@ -230,7 +232,9 @@
             <b-form-checkbox
                    v-model="producto.esProductoTerminado"
                    :value="1"
-                   :unchecked-value="0">
+                   :unchecked-value="0"
+                   @change="changeTerminado(2)"
+                   >
               Es Producto Terminado
             </b-form-checkbox>
           </b-form-group>
@@ -745,6 +749,22 @@ export default {
     keyDownInput(e) {
       if (e.target.tagName != "TEXTAREA") {
         e.preventDefault();
+      }
+    },
+    changeTerminado(tipo) {
+      if (tipo == 1) {
+        this.$nextTick(() => {
+          if (this.producto.esMercadero == 1) {
+            this.producto.esProductoTerminado = 0;
+          }
+        });
+      }
+      if (tipo == 2) {
+        this.$nextTick(() => {
+          if (this.producto.esProductoTerminado == 1) {
+            this.producto.esMercadero = 0;
+          }
+        });
       }
     },
     guardarProducto(e) {
