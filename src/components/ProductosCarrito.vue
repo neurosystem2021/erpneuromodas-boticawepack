@@ -187,7 +187,7 @@
             type="number"
             style="width: 95px"
             min="0"
-            step="0.000001"
+            step="0.0000001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
