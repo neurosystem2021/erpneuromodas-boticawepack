@@ -739,7 +739,7 @@
             <b-button
               type="submit"
               :disabled="inProgress"
-              v-if="idPerfil == 1 || idPerfil == 14 || idPerfil == 3"
+              v-if="idPerfil == 1 || idPerfil == 14 || idPerfil == 6"
               variant="success"
               size="lg"
               >Efectuar Venta</b-button
