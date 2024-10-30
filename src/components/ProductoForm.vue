@@ -219,6 +219,22 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.esMercadero"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Mercadería
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.esProductoTerminado"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Producto Terminado
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -519,6 +535,8 @@ export default {
             this.producto.EsHabitacion = newVal.EsHabitacion;
             this.producto.Piso = newVal.Piso;
             this.producto.ControlaStock = newVal.ControlaStock;
+            this.producto.esMercadero = newVal.esMercadero;
+            this.producto.esProductoTerminado = newVal.esProductoTerminado;
             this.producto.Imagen = newVal.Imagen;
             this.producto.IdOfertaCategoria = newVal.IdOfertaCategoria;
             if (newVal.PreciosPorProducto) {
@@ -695,6 +713,8 @@ export default {
         // Color: '',
         PorcentajeUtilidad: 0,
         ControlaStock: 1,
+        esMercadero: 1,
+        esProductoTerminado: 0,
         ControlaStockMinimo: 0,
         StockMinimo: 0,
         PrecioCosto: 0,
