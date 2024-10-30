@@ -14,8 +14,8 @@
           <table width="100%" class="lstProdConfig">
             <thead>
               <tr>
-                <th style="padding: 5px">Categoría</th>
                 <th style="padding: 5px">Código</th>
+                <th style="padding: 5px">Categoría</th>
                 <th style="padding: 5px">Producto</th>
                 <th style="padding: 5px">Estado</th>
                 <th style="padding: 5px">Ac</th>
@@ -23,12 +23,16 @@
             </thead>
             <tbody>
               <!-- <template> -->
-              <tr v-for="(prod,index) in $store.state.ConfProdPres.lstConfiguracionProductoPresentacion" :key="index">
+              <tr
+              :class="prod.Estado ==0 ? 'styleEliminado':''"
+                            v-for="(prod,index) in $store.state.ConfProdPres.lstConfiguracionProductoPresentacion" :key="index">
                 <td width="10%">{{prod.Code}}  </td>
                 <td width="20%">{{prod.ProductoCategoria}} </td>
                 <td width="50%">{{prod.Producto}}  </td>
                 <td width="15%">{{prod.Estado ==1 ? 'Activo':'Inactivo'}}  </td>
-                <td width="25%">  <b-button size="sm" variant="danger"><i class="fas fa-trash fa-sm"></i></b-button> </td>
+                <td width="25%">  <b-button size="sm" variant="danger" v-if="prod.Estado==1"
+                  @click="eliminarConfiguracionProductoPresentacion(prod)"
+                  ><i class="fas fa-trash fa-sm"></i></b-button> </td>
 
                 <!-- <template>
                  
@@ -53,6 +57,7 @@
                 <b-col cols="12" class="my-1">
                   <strong>Producto Presentación:</strong>
                     <autocomplete 
+                        anchor="Producto"
                         ref="autocompleteProducto" 
                         :url="APIProductos" 
                         :customParams="{
@@ -70,11 +75,15 @@
                         v-model="Producto"
                     >
                     </autocomplete>   
-                    {{ Producto.Producto }}
+                    <span :style="ErrorProducto ? 'color:red' : ''">
+                      {{ ErrorProducto }}
+
+                    </span>
                 </b-col>
                 <b-col cols="12" class="my-2">
                   <strong>Producto Añadir:</strong>
                     <autocomplete 
+                        anchor="Producto"
                         id="autocompleteProductoDetalle"
                         ref="autocompleteProductoDetalle" :url="APIProductos"
                         :customParams="{
@@ -86,7 +95,7 @@
                         label="writer" 
                         placeholder="Añadir Producto Detalle"
                         :on-select="setProductoDetalle" 
-                        :onFocus="focusAutocompleteDet.bind(null, 'autocompleteProductoDetalle')"
+                        :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoDetalle')"
                         :classes="{ input: 'form-control' }"
                         :onShouldRenderChild="renderChildDet">
                     </autocomplete>   
@@ -98,10 +107,13 @@
                      :items="lstProdutos" 
                     :fields="fields">
                         <template slot="cantidad" slot-scope="data">
-                           <b-form-input
+                           <input
                             v-model="lstProdutos[data.index].cantidad" 
                            :ref="'cantidad-'+data.index"
-                           type="number" style="width: 95px"
+                           :id="'cantidad-'+data.index"
+                           type="number" 
+                           style="width: 95px"
+                           class="form-control"
                            />
                         </template>
                         <template slot="action" slot-scope="data">
@@ -141,6 +153,7 @@ import { mapActions, mapState } from "vuex";
 export default {
   data() {
     return {
+      ErrorProducto: "",
       mConversion: false,
       isVentas: true,
       API: config.API,
@@ -208,18 +221,19 @@ export default {
       }
     },
 
-    guardarData() {
-      console.log(this.Producto);
+    async guardarData() {
       if (this.valRegistro()) {
         let data = {
           producto: this.Producto,
           productoDetalle: this.lstProdutos
         };
-        this.GuardarConfiguracionProductoPresentacion(data);
+        await this.GuardarConfiguracionProductoPresentacion(data);
+        this.mConversion = false;
       }
+      await this.ObtenerListadoConfiguracion();
     },
     valRegistro() {
-      if (this.Producto) {
+      if (!this.Producto) {
         this.$toasted.info("Es necesario una presentación");
         return false;
       }
@@ -232,14 +246,20 @@ export default {
       return true;
     },
     setProductoDetalle(obj) {
+      // console.log(this.validarProducto(obj));
       if (this.validarProducto(obj)) {
         obj.cantidad = 1;
         this.lstProdutos.unshift(obj);
         this.$nextTick(() => {
-          // const inputRef = this.$refs[`cantidad-0`];
-          const inputRef = this.$refs[`cantidad-0`].$el; // Acceder al elemento HTML real
-          inputRef.focus();
-          inputRef.select();
+          setTimeout(() => {
+            let inputRef = document.getElementById("cantidad-0");
+            if (inputRef) {
+              inputRef.focus();
+              inputRef.select();
+            } else {
+              console.warn("Referencia cantidad-0 no encontrada");
+            }
+          }, 50);
         });
       }
     },
@@ -247,11 +267,7 @@ export default {
       this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
     },
-    focusAutocompleteDet(ref) {
-      console.log(ref);
-      this.$refs[ref].type = "";
-      this.$refs[ref].handleDoubleClick();
-    },
+
     renderChild(data) {
       if (this.idAlmacen) {
         let styleStock = "";
@@ -412,11 +428,14 @@ export default {
       this.lstProdutos.splice(index, 1);
     },
     validarProductoPresentacion(prod) {
+      this.ErrorProducto = "";
       if (
         this.$store.state.ConfProdPres.lstConfiguracionProductoPresentacion.some(
           v => v.IdProducto == prod.IdProducto
         )
       ) {
+        this.ErrorProducto =
+          "Producto ya se encuentra registrado. Seleccione otro.";
         this.$toasted.info("Producto es ya se encuentra registrado.");
         return false;
       }
@@ -431,15 +450,43 @@ export default {
         this.$toasted.info("Producto es ya se encuentra como presentación.");
         return false;
       }
-      if (
-        this.lstProdutos.some(pro => {
-          prod.IdProducto == prod.IdProducto;
-        })
-      ) {
+      if (this.Producto.IdProducto == prod.IdProducto) {
+        this.$toasted.info(
+          "Producto ya se encuentra seleccinado como presentación."
+        );
+        return false;
+      }
+      if (this.lstProdutos.some(v => v.IdProducto == prod.IdProducto)) {
         this.$toasted.info("Producto ya se encuentra en el listado.");
         return false;
       }
+
       return true;
+    },
+    async eliminarConfiguracionProductoPresentacion(obj) {
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        html: `¿Desea Eliminar <strong> ${
+          obj.Producto
+        } </strong> Del listado de configuración?`,
+        confirmButtonText: "Si, Eliminar",
+        showDenyButton: true,
+        showCancelButton: false,
+        denyButtonText: "Cancelar",
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      }).then(async res => {
+        if (res.isConfirmed) {
+          let p = { ...obj };
+          obj.Estado = obj.Estado == 1 ? 0 : 1;
+          await this.axios
+            .put(this.API + "/cambiar_estado_configuracion_producto", obj)
+            .then(res => {});
+
+          await this.ObtenerListadoConfiguracion();
+        }
+      });
     }
   },
   computed: {
@@ -460,6 +507,9 @@ export default {
 .lstProdConfig tr td {
   /* border: 1px solid black; */
   padding: 5px;
+}
+.styleEliminado {
+  color: red;
 }
 /* Style for child tables */
 </style>
