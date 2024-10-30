@@ -405,12 +405,13 @@
           </b-form-checkbox>
         </template>
         <template slot="flete" slot-scope="data">
-          <b-form-input
+          <input
+            class="form-control"
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
              style="width: 120px"
-            placeholder="Flete"></b-form-input>
+            placeholder="Flete"></input>
             <strong>
                 {{ (productos[data.index].FLETE? productos[data.index].FLETE :0)/productos[data.index].cantidad }}
             </strong>
