@@ -410,11 +410,11 @@
             class="form-control"
             v-model="productos[data.index].FLETE"
             type="number"
-            min="0"
-             style="width: 105px"
-            placeholder="Flete"></input>
+            step="0.01"
+            style="width: 105px"
+            placeholder="Flete"/>
             <strong>
-              {{ (productos[data.index].FLETE ?  productos[data.index].FLETE :0)/productos[data.index].cantidad }} x Unidad
+              {{ parseFloat((productos[data.index].FLETE ?  productos[data.index].FLETE :0)/productos[data.index].cantidad).toFixed(2) }} x Unidad
             </strong>
         </template>
 
