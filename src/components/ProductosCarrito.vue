@@ -411,9 +411,10 @@
             type="number"
             min="0"
              style="width: 120px"
-            placeholder="Flete"></input>
+             step="0.01"
+            placeholder="Flete">
             <strong>
-                {{ (productos[data.index].FLETE? productos[data.index].FLETE :0)/productos[data.index].cantidad }}
+                {{ parseFloat((productos[data.index].FLETE? productos[data.index].FLETE :0)/productos[data.index].cantidad).toFixed(2) }}
             </strong>
         </template>
 
