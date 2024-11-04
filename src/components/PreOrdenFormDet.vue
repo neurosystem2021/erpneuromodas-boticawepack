@@ -31,6 +31,7 @@
           <th>Producto</th>
           <th>Precio</th>
           <th>Cantidad</th>
+          <th>Total</th>
           <th class="text-center">Quitar</th>
         </tr>
       </thead>
@@ -53,6 +54,10 @@
             <span class="hideInModal">{{ prod.Cantidad }}</span>
             <input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
           </td>
+          <td>
+            <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2) }}</span>
+            
+          </td>
           <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -60,176 +65,188 @@
   </div>    
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
-  mounted () {
-    
-    this.getProductos()
+  mounted() {
+    this.getProductos();
   },
-  data () {
+  data() {
     return {
       API: config.API,
       productosACargar: [],
       productos: [],
-      loadCode: '',
-    }
+      loadCode: ""
+    };
   },
-  props: ['idPreorden', 'idProducto'],
+  props: ["idPreorden", "idProducto"],
   computed: {
     sumProductos() {
       var sum = 0;
       this.productos.map(prod => {
-        if(prod.EsManoDeObra==0){
-          sum += (prod.Cantidad * prod.Precio) || 0
+        if (prod.EsManoDeObra == 0) {
+          sum += prod.Cantidad * prod.Precio || 0;
         }
-      })
+      });
       return sum;
     },
-    manoDeObraBruta () {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    manoDeObraBruta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.PrecioMO : 0;
-      return precio
+      return precio;
     },
-    manoDeObraMenosMat () {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    manoDeObraMenosMat() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.PrecioMOmM : 0;
-      return precio
-    },
+      return precio;
+    }
   },
   watch: {
-    productos (prods) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+    productos(prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].Precio) {
-        this.productos[pi].Precio = this.productos[pi].Precio
+        this.productos[pi].Precio = this.productos[pi].Precio;
       }
     }
   },
   methods: {
-    emitUpdate () {
-      this.$emit('onUpdateProductos', this.productos)
+    emitUpdate() {
+      this.$emit("onUpdateProductos", this.productos);
     },
-    getProductos () {
+    getProductos() {
       if (this.idPreorden) {
-        this.axios.get(this.API + 'preorden/detalle', {
-          params: {idPreOrden: this.idPreorden}
-        }).then(res => {
-          this.productos = res.data.map(item => {
-            item.PrecioMO = item.Precio
-            item.PrecioMOmM = item.Precio
-            if (item.IdProducto === this.idProducto) {
-              item.isDisabled = true
-            }
-            return item
+        this.axios
+          .get(this.API + "preorden/detalle", {
+            params: { idPreOrden: this.idPreorden, sortDesc: "DEC" }
           })
+          .then(res => {
+            this.productos = res.data.map(item => {
+              item.PrecioMO = item.Precio;
+              item.PrecioMOmM = item.Precio;
+              if (item.IdProducto === this.idProducto) {
+                item.isDisabled = true;
+              }
+              return item;
+            });
 
-          this.productosACargar.map(pc => {
-            let producto = this.productos.find(pr => pr.IdProducto === pc.IdProducto)
-            if (!producto) {
-              this.productos.push(pc)
-            }
+            this.productosACargar.map(pc => {
+              let producto = this.productos.find(
+                pr => pr.IdProducto === pc.IdProducto
+              );
+              if (!producto) {
+                this.productos.push(pc);
+              }
+            });
+            this.emitUpdate();
           })
-          this.emitUpdate();
-        }).catch(err => {
-          console.log(err)
-        })
+          .catch(err => {
+            console.log(err);
+          });
       }
     },
     renderChild(data) {
       return `
         <b>${data.IdProducto} - ${data.Producto} - ${data.CodigoBarra}</b>
-      `
+      `;
     },
-    loadBarcode (e) {
-      e.preventDefault()
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = {codigoBarra: idProducto}
-        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
-        .then((response) => {
-          if (response.data.IdProducto) {
-            this.addProducto(response.data)
-            this.loadCode=''
-          } else {
-            this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
-          }
-        })
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.addProducto(response.data);
+              this.loadCode = "";
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
       }
     },
-    addProducto (data) {
-      let index = this.productos.findIndex(el => el.IdProducto == data.IdProducto)
+    addProducto(data) {
+      let index = this.productos.findIndex(
+        el => el.IdProducto == data.IdProducto
+      );
 
       if (index >= 0) {
-        this.$toasted.show('El producto ya está agregado')
-        return
+        this.$toasted.show("El producto ya está agregado");
+        return;
       }
 
       if (data.EsHabitacion) {
-        this.$toasted.show('No puede ingresar este producto')
-        return
+        this.$toasted.show("No puede ingresar este producto");
+        return;
       }
-      
-      data.Precio = data.PrecioContado
-      
-      this.productos.push(data)
-      this.$toasted.success('Producto agregado')
-      this.emitUpdate()
 
+      data.Precio = data.PrecioContado;
+
+      this.productos.push(data);
+      this.$toasted.success("Producto agregado");
+      this.emitUpdate();
     },
-    quitarProducto (prod) {
-      let index = this.productos.findIndex(el => el.IdProducto == prod.IdProducto)
-      this.productos.splice(index, 1)
-      this.emitUpdate()
+    quitarProducto(prod) {
+      let index = this.productos.findIndex(
+        el => el.IdProducto == prod.IdProducto
+      );
+      this.productos.splice(index, 1);
+      this.emitUpdate();
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    addManoDeObra (index, e) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-      if ( pi < 0 ) {
-        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
-        
-        this.productos[index].EsManoDeObra = 0
-        return ;
+    addManoDeObra(index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+      if (pi < 0) {
+        this.$toasted.error("Primero seleccione el producto MANODEOBRA");
+
+        this.productos[index].EsManoDeObra = 0;
+        return;
       }
 
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"  
-        this.productos[pi].PrecioMOmM -= (parseFloat(this.productos[index].Precio) * parseFloat(this.productos[index].Cantidad))
-        this.productos[index].disabled = true
-      } else {  
-        e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].PrecioMOmM += (parseFloat(this.productos[index].Precio) * parseFloat(this.productos[index].Cantidad))
-        this.productos[index].disabled = false
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].PrecioMOmM -=
+          parseFloat(this.productos[index].Precio) *
+          parseFloat(this.productos[index].Cantidad);
+        this.productos[index].disabled = true;
+      } else {
+        e.target.parentNode.parentNode.removeAttribute("style");
+        this.productos[pi].PrecioMOmM +=
+          parseFloat(this.productos[index].Precio) *
+          parseFloat(this.productos[index].Cantidad);
+        this.productos[index].disabled = false;
       }
-      this.emitUpdate()
+      this.emitUpdate();
     },
-    updateManoDeObraNeta (index) {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    updateManoDeObraNeta(index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precio : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= (parseFloat(p.precio) * parseFloat(p.Cantidad))
-      })
-      
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+        precio -= parseFloat(p.precio) * parseFloat(p.Cantidad);
+      });
+
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
-        this.productos[pi].precio = precio
+        this.productos[pi].precio = precio;
       }
-    },
+    }
   }
-}
+};
 </script>
 <style scoped>
-  .hideInModal {
-    display: none;
-  }
-  .form-check-input {
-    margin-left: 0.75rem !important;
-  }
+.hideInModal {
+  display: none;
+}
+.form-check-input {
+  margin-left: 0.75rem !important;
+}
 </style>

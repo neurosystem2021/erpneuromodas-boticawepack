@@ -6,8 +6,107 @@
 			  <br>
 			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS HUÁNUCO' : 'PROYECTOS PUCALLPA' }}</b></b-alert>
 			  <br>
+			  <b-button variant="success" size="sm" @click="abrirMdlNuevoProyecto()">
+				Agregar Proyecto
+			  </b-button>
+			  <b-modal title="Empezar Proyecto" v-model="mdlNuevoProyecto" v-if="mdlNuevoProyecto" hide-footer>
+				<label>Seleccione un cliente:</label>
+				<b-input-group>
+					<autocomplete
+						required="required"
+						:url="API + 'clientes'"
+						anchor="ClienteDniRuc"
+						label="writer"
+						placeholder=""
+						:onInput="(val) => newDniRuc = val"
+						:on-select="setCliente" 
+						:classes="{input: 'form-control'}"
+						id="cboCliente"
+						>
+					</autocomplete>
+				<b-input-group-append>
+				
+				<!-- <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form> -->
+				</b-input-group-append>
+				</b-input-group>
+				<br>
+				<label>Descripcion:</label>
+				<textarea 
+					class="form-control"
+					placeholder="Descripción"
+					cols="12" rows="3"
+					style="width: 100%"
+					v-model="selectCliente.Descripcion">
+				</textarea>
+				<br>
+				<label>Fecha Inicio:</label>
+				<b-input-group>
+				<b-form-input v-model="selectCliente.FechaAlquilerInicio"
+					type="date"
+					placeholder="Fecha Inicio" />
+				</b-input-group>
+				<br>
+				<label>Fecha Fin:</label>
+				<b-input-group>
+				<b-form-input v-model="selectCliente.FechaAlquilerFin"
+				type="date"
+				placeholder="Fecha Fin"></b-form-input>
+				</b-input-group>
+				<br>
+				<b-button variant="success" size="sm" @click="nuevoProyecto()">Empezar Proyecto</b-button>	
+								
+			  </b-modal>
+			  <!-- <b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
+								<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
+									<label>Seleccione un cliente:</label>
+									<b-input-group>
+										<autocomplete
+												required="required"
+												:ref="'inputCliente2' + index"
+												:url="API + 'clientes'"
+												anchor="ClienteDniRuc"
+												label="writer"
+												placeholder=""
+												:onInput="(val) => newDniRuc = val"
+												:on-select="setCliente" 
+												:classes="{input: 'form-control'}">
+										</autocomplete>
+										<b-input-group-append>
+											<!--<proveedores-tabla></proveedores-tabla>
+											<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
+										</b-input-group-append>
+									</b-input-group>
+									<br>
+									<label>Descripcion:</label>
+									<textarea 
+										class="form-control"
+										placeholder="Descripción"
+										cols="12" rows="3"
+										style="width: 100%"
+										v-model="selectCliente.Descripcion">
+									</textarea>
+
+									<br>
+									<label>Fecha Inicio:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.FechaAlquilerInicio"
+											type="date"
+											placeholder="Fecha Inicio"></b-form-input>
+									</b-input-group>
+									<br>
+									<label>Fecha Fin:</label>
+									<b-input-group>
+										<b-form-input v-model="selectCliente.FechaAlquilerFin"
+											type="date"
+											placeholder="Fecha Fin"></b-form-input>
+									</b-input-group>
+									<br>
+
+									<b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
+								</b-popover> -->
+			  
 			</div>
-        	<b-row>
+        	<b-row class="mt-3">
 				<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
 					<b-card :bg-variant="getVariant(hab)" :class="hab.EstadoHabitacion==3?getClaseTexto(hab):'text-center text-light'">
 									
@@ -129,8 +228,8 @@
 		  </div>
       </b-container>
 
-		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}" >
-			<b-modal v-model="show" size="lg" id="carrito"  no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
+		<b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}"  >
+			<b-modal v-model="show" class="modalProyecto" id="carrito" size="lg" no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
 
 				<div id="contentModal" >
 				  	<div class="row">
@@ -310,53 +409,54 @@
     </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
-import config from '@/store/config.js'
-import PreOrdenFormDet from '@/components/PreOrdenFormDet'
-import ClientesForm from '@/components/ClientesForm'
-import Proformas from '@/components/ProformaLista.vue'
+import { mapActions, mapState } from "vuex";
+import config from "@/store/config.js";
+import PreOrdenFormDet from "@/components/PreOrdenFormDet";
+import ClientesForm from "@/components/ClientesForm";
+import Proformas from "@/components/ProformaLista.vue";
 
 export default {
-  	mounted () {
-		this.getHabitaciones()
-	},
-	data () {
-		return {
-			API: config.API,
-			show: false,
-			showPopover: true,
-			habitaciones: [],
-			selectCliente: {},
-			selectProducto: {},
-			vuelo: '',
-			fechaReserva: this.$moment().format("YYYY-MM-DD"),
-			pisos: [1, 2, 3, 4, 5],
-			adelantos: [],
-			gastos: [],
-			montoTotal: 0,
-			IdProforma: null,
-			proformaTotal: null,
-			codProforma: null,
-			profTotHab: 0,
-			// proformaTotalCard: null,
-			// habitacionesPiso: []
+  mounted() {
+    this.getHabitaciones();
+  },
+  data() {
+    return {
+      mdlNuevoProyecto: false,
+      API: config.API,
+      show: false,
+      showPopover: true,
+      habitaciones: [],
+      selectCliente: {},
+      selectProducto: {},
+      vuelo: "",
+      fechaReserva: this.$moment().format("YYYY-MM-DD"),
+      pisos: [1, 2, 3, 4, 5],
+      adelantos: [],
+      gastos: [],
+      montoTotal: 0,
+      IdProforma: null,
+      proformaTotal: null,
+      codProforma: null,
+      profTotHab: 0,
+      // proformaTotalCard: null,
+      // habitacionesPiso: []
 
-			//nuevas funciones
-			totalManoObraBruta:0,
-			totalManoObraMenoMat:0,
-			totalManoObraNeta:0,
-			totalSumaProductos:0,
-			totalGastos:0,
-			totalAdelantos:0,
-			editarDescripcion:false,
-			newDniRuc:'',
-			}
-	},
-	computed: {
-		...mapState({
-            productos: state => state.cart.productos
-        }),
-/* 		totalAdelantos() {
+      //nuevas funciones
+      totalManoObraBruta: 0,
+      totalManoObraMenoMat: 0,
+      totalManoObraNeta: 0,
+      totalSumaProductos: 0,
+      totalGastos: 0,
+      totalAdelantos: 0,
+      editarDescripcion: false,
+      newDniRuc: ""
+    };
+  },
+  computed: {
+    ...mapState({
+      productos: state => state.cart.productos
+    })
+    /* 		totalAdelantos() {
 			let sumatoria = 0
 			this.adelantos.map(ad => {
 				if (ad.Tipo) {
@@ -376,409 +476,510 @@ export default {
 
 			return sumatoria;
 		}, */
-	},
-	methods: {
-		mountedProforma(modal) {
-			document.body.appendChild(modal)
-		},
-		selectProforma(proforma) {
-			this.show = true
-			this.$nextTick(() => {
-				proforma.productos.map(p => {
-					this.$refs.preOrdenProductos.productosACargar.push(p)
-				})
+  },
+  methods: {
+    abrirMdlNuevoProyecto() {
+      this.mdlNuevoProyecto = true;
+    },
+    mountedProforma(modal) {
+      document.body.appendChild(modal);
+    },
+    selectProforma(proforma) {
+      this.show = true;
+      this.$nextTick(() => {
+        proforma.productos.map(p => {
+          this.$refs.preOrdenProductos.productosACargar.push(p);
+        });
 
-				this.IdProforma = proforma.IdProforma
-			})
-		},
-		cargarAdelantos() {
-			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
-				IdPreOrden		: this.selectProducto.IdPreOrden,
-				TipoCajaBanco 	: 0
-			} }).then(res => {
-				this.adelantos = res.data
-				this.calculoGastosAdelantos()
-			})
-		},
-		cargarGastos() {
-			this.axios.get(this.API + 'preorden/cajaybanco', { params: {
-				IdPreOrden		: this.selectProducto.IdPreOrden,
-				TipoCajaBanco 	: 1
-			} }).then(res => {
-				this.gastos = res.data
-				this.calculoGastosAdelantos()
-			})
-		},
-		insertarAdelanto() {
-			let usuario = sessionStorage.getItem('User')
+        this.IdProforma = proforma.IdProforma;
+      });
+    },
+    cargarAdelantos() {
+      this.axios
+        .get(this.API + "preorden/cajaybanco", {
+          params: {
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            TipoCajaBanco: 0
+          }
+        })
+        .then(res => {
+          this.adelantos = res.data;
+          this.calculoGastosAdelantos();
+        });
+    },
+    cargarGastos() {
+      this.axios
+        .get(this.API + "preorden/cajaybanco", {
+          params: {
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            TipoCajaBanco: 1
+          }
+        })
+        .then(res => {
+          this.gastos = res.data;
+          this.calculoGastosAdelantos();
+        });
+    },
+    insertarAdelanto() {
+      let usuario = sessionStorage.getItem("User");
 
-			if(this.selectProducto.Adelanto <= 0) {
-				return;
-			}
+      if (this.selectProducto.Adelanto <= 0) {
+        return;
+      }
 
-			let r = confirm("¿Desea Insertar un adelanto?")
+      let r = confirm("¿Desea Insertar un adelanto?");
 
-			if (r) {
-				this.axios.post(this.API + 'preorden/cajaybanco', {
-					producto: this.selectProducto,
-                    concepto: 'Adelanto Proyecto ' + this.selectProducto.Producto + ' - ' + this.selectProducto.AdelantoDesc,
-					IdPreOrden: this.selectProducto.IdPreOrden,
-					IdHabitacion: this.selectProducto.IdProducto,
-					Adelanto: this.selectProducto.Adelanto,
-					Usuario: usuario
-				}).then(res => {
-					// this.adelantos.push(res.data)
-					this.cargarAdelantos();
-					this.selectProducto.Adelanto 		= '' 
-					this.selectProducto.Producto 		= '' 
-					this.selectProducto.AdelantoDesc	= ''
-				})
-			}
-		},
+      if (r) {
+        this.axios
+          .post(this.API + "preorden/cajaybanco", {
+            producto: this.selectProducto,
+            concepto:
+              "Adelanto Proyecto " +
+              this.selectProducto.Producto +
+              " - " +
+              this.selectProducto.AdelantoDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            Adelanto: this.selectProducto.Adelanto,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            this.cargarAdelantos();
+            this.selectProducto.Adelanto = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.AdelantoDesc = "";
+          });
+      }
+    },
 
-		insertarGasto() {
-			let usuario = sessionStorage.getItem('User')
+    insertarGasto() {
+      let usuario = sessionStorage.getItem("User");
 
-			if(this.selectProducto.Gasto <= 0) {
-				return;
-			}
+      if (this.selectProducto.Gasto <= 0) {
+        return;
+      }
 
-			let r = confirm("¿Desea Insertar un gasto?")
+      let r = confirm("¿Desea Insertar un gasto?");
 
-			if (r) {
-				this.axios.post(this.API + 'preorden/cajaybanco/gasto', {
-					producto: this.selectProducto,
-                    concepto: 'Gasto Proyecto ' + this.selectProducto.Producto + ' - ' + this.selectProducto.GastoDesc,
-					IdPreOrden: this.selectProducto.IdPreOrden,
-					IdHabitacion: this.selectProducto.IdProducto,
-					Gasto: this.selectProducto.Gasto,
-					Usuario: usuario
-				}).then(res => {
-					// this.adelantos.push(res.data)
-					this.cargarGastos();
-					this.selectProducto.Gasto 		= '' 
-					this.selectProducto.Producto 	= '' 
-					this.selectProducto.GastoDesc 	= ''
-				})
-			}
-		},
+      if (r) {
+        this.axios
+          .post(this.API + "preorden/cajaybanco/gasto", {
+            producto: this.selectProducto,
+            concepto:
+              "Gasto Proyecto " +
+              this.selectProducto.Producto +
+              " - " +
+              this.selectProducto.GastoDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            Gasto: this.selectProducto.Gasto,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            this.cargarGastos();
+            this.selectProducto.Gasto = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.GastoDesc = "";
+          });
+      }
+    },
 
-		getHabitacionesPiso (piso) {
-			return this.habitaciones.filter(hab => {
-				return hab.Piso === piso
-			})
-		},
-		guardarProductos() {
-			this.axios.post(this.API + 'preorden/detalle', {
-				IdPreOrden: this.selectProducto.IdPreOrden,
-				IdHabitacion: this.selectProducto.IdProducto,
-				productos: this.$refs.preOrdenProductos.productos,
-				IdProforma: this.IdProforma
-			}).then(res => {
-				this.$toasted.success('Guardado correctamente')
-				this.getHabitaciones()
-				this.show = false
-			})
-
-			
-		},
-		openCarrito(hab) {
-			this.proformaTotal = null
-			this.selectProducto = hab
-			this.$refs.modalCarrito.show()
-			this.cargarAdelantos()
-			this.cargarGastos()
-			this.cargarProformaTotal(this.selectProducto.IdProforma)
-		},
-		cargarProformaTotal(idProforma) {
-			if (idProforma) {
-				this.axios.get(this.API + 'preorden/proforma', {params: {idProforma: idProforma}}).then(res => {
-					this.proformaTotal = res.data.Total
-					this.codProforma = res.data.IdProforma
-					this.codProforma = res.data.Anio + ' - ' + res.data.Numero
-				})
-			}
-		},
-		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.IdProducto&pisoAlm='+this.$route.query.id).then(res => {
-				this.habitaciones = res.data
-				/* this.pisos.forEach(piso => {
+    getHabitacionesPiso(piso) {
+      return this.habitaciones.filter(hab => {
+        return hab.Piso === piso;
+      });
+    },
+    guardarProductos() {
+      this.axios
+        .post(this.API + "preorden/detalle", {
+          IdPreOrden: this.selectProducto.IdPreOrden,
+          IdHabitacion: this.selectProducto.IdProducto,
+          productos: this.$refs.preOrdenProductos.productos,
+          IdProforma: this.IdProforma
+        })
+        .then(res => {
+          this.$toasted.success("Guardado correctamente");
+          this.getHabitaciones();
+          this.show = false;
+        });
+    },
+    openCarrito(hab) {
+      this.proformaTotal = null;
+      this.selectProducto = hab;
+      this.$refs.modalCarrito.show();
+      this.cargarAdelantos();
+      this.cargarGastos();
+      this.cargarProformaTotal(this.selectProducto.IdProforma);
+    },
+    cargarProformaTotal(idProforma) {
+      if (idProforma) {
+        this.axios
+          .get(this.API + "preorden/proforma", {
+            params: { idProforma: idProforma }
+          })
+          .then(res => {
+            this.proformaTotal = res.data.Total;
+            this.codProforma = res.data.IdProforma;
+            this.codProforma = res.data.Anio + " - " + res.data.Numero;
+          });
+      }
+    },
+    getHabitaciones() {
+      this.axios
+        .get(
+          this.API +
+            "habitaciones?sortBy=Gen_Producto.IdProducto&sortDesc=DESC&pisoAlm=" +
+            this.$route.query.id
+        )
+        .then(res => {
+          this.habitaciones = res.data;
+          /* this.pisos.forEach(piso => {
 					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
 				}) */
-			})
-		},
-		getClaseTexto(hab) {
-			if (hab.FechaAlquilerFin<this.$moment().format('YYYY-MM-DD')) {
-				return 'text-center text-light'
-			}
-			return 'text-center text-dark'
-		},
-		getVariant(hab) {
-			if (hab.EstadoHabitacion == 3) {
-				if (hab.FechaAlquilerFin<this.$moment().format("YYYY-MM-DD")) return 'danger'
-				return 'warning'
-			}
-			if (hab.EstadoHabitacion == 2) return 'warning'
-			//if (hab.EstadoHabitacion == 3) return 'danger'
-            if (hab.EstadoHabitacion == 1 && hab.EstaSucio == 1) return 'secondary'
-			return 'success'
-		},
-		reservarHab(hab) {
-			if (!this.selectCliente.Cliente) {
-				this.$toasted.error('Seleccione un cliente.');
-			}
-			
-			this.axios.post(this.API + 'habitaciones/reservar', {
-				IdProducto: hab.IdProducto,
-				IdCliente: this.selectCliente.IdCliente,
-				FechaReserva: this.fechaReserva,
-				Vuelo: this.vuelo
-			}).then(res => {
-				this.getHabitaciones()
-				this.limpiarPopover()
-				this.limpiarDespues()
-				this.$toasted.success('La Habitación: ' + hab.Producto + ' ha sido reservada');
-				this.showPopover = false
-				this.$nextTick(() => {
-					this.showPopover = true
-				})		
-			})
-		},
-		liberarHab(hab) {
-			let r = confirm('¿Está seguro que desea liberar el proyecto? Asegurese de haber realizado la venta')
+        });
+    },
+    getClaseTexto(hab) {
+      if (hab.FechaAlquilerFin < this.$moment().format("YYYY-MM-DD")) {
+        return "text-center text-light";
+      }
+      return "text-center text-dark";
+    },
+    getVariant(hab) {
+      if (hab.EstadoHabitacion == 3) {
+        if (hab.FechaAlquilerFin < this.$moment().format("YYYY-MM-DD"))
+          return "danger";
+        return "warning";
+      }
+      if (hab.EstadoHabitacion == 2) return "warning";
+      //if (hab.EstadoHabitacion == 3) return 'danger'
+      if (hab.EstadoHabitacion == 1 && hab.EstaSucio == 1) return "secondary";
+      return "success";
+    },
+    reservarHab(hab) {
+      if (!this.selectCliente.Cliente) {
+        this.$toasted.error("Seleccione un cliente.");
+      }
 
-			if (r) {
-				this.axios.post(this.API + 'habitaciones/liberar', {
-					IdProducto: hab.IdProducto
-				}).then(res => {
-					this.getHabitaciones()
-					this.limpiarPopover()
-					this.$toasted.success('El proyecto: ' + hab.Producto + ' está ahora disponible');
-					this.showPopover = false
-					this.$nextTick(() => {
-						this.showPopover = true
-					})
-				})
-			}
-		},
-		alquilarHab(hab) {
-			if (!this.selectCliente.Cliente) {
-				this.$toasted.error('Seleccione un cliente.');
-			}
+      this.axios
+        .post(this.API + "habitaciones/reservar", {
+          IdProducto: hab.IdProducto,
+          IdCliente: this.selectCliente.IdCliente,
+          FechaReserva: this.fechaReserva,
+          Vuelo: this.vuelo
+        })
+        .then(res => {
+          this.getHabitaciones();
+          this.limpiarPopover();
+          this.limpiarDespues();
+          this.$toasted.success(
+            "La Habitación: " + hab.Producto + " ha sido reservada"
+          );
+          this.showPopover = false;
+          this.$nextTick(() => {
+            this.showPopover = true;
+          });
+        });
+    },
+    liberarHab(hab) {
+      let r = confirm(
+        "¿Está seguro que desea liberar el proyecto? Asegurese de haber realizado la venta"
+      );
 
-			let r = confirm('¿Está seguro que desea empezar el proyecto?')
+      if (r) {
+        this.axios
+          .post(this.API + "habitaciones/liberar", {
+            IdProducto: hab.IdProducto
+          })
+          .then(res => {
+            this.getHabitaciones();
+            this.limpiarPopover();
+            this.$toasted.success(
+              "El proyecto: " + hab.Producto + " ha sido liberado"
+            );
+            this.showPopover = false;
+            this.$nextTick(() => {
+              this.showPopover = true;
+            });
+          });
+      }
+    },
+    async nuevoProyecto() {
+      let data = {
+        // IdProducto: hab.IdProducto,
+        IdCliente: this.selectCliente.IdCliente,
+        FechaReserva: this.fechaReserva,
+        Vuelo: this.vuelo,
+        Descripcion: this.selectCliente.Descripcion,
+        FechaAlquilerInicio: this.selectCliente.FechaAlquilerInicio,
+        FechaAlquilerFin: this.selectCliente.FechaAlquilerFin
+      };
+      await this.axios
+        .post(this.API + "producto/registro_proyecto", data)
+        .then(res => {
+          this.getHabitaciones();
+          this.limpiarPopover();
+          this.limpiarDespues();
+          this.$toasted.success("La Habitación: ha sido reservada");
+          this.showPopover = false;
+          this.selectCliente = {};
+          this.mdlNuevoProyecto = false;
+        });
 
-			if (r) {
-				this.axios.post(this.API + 'habitaciones/alquilar', {
-					IdProducto: hab.IdProducto,
-					IdCliente: this.selectCliente.IdCliente,
-					cliente: this.selectCliente,
-					usuario: sessionStorage.getItem('User'),
-				}).then(res => {
-					this.getHabitaciones()
-					this.limpiarPopover()
-					this.limpiarDespues()
-					this.$toasted.success('El proyecto: ' + hab.Producto + ' ha sido iniciado.')
-					this.showPopover = false
-					this.$nextTick(() => {
-						this.showPopover = true
-					})
-				})
-			}
-		},
-		setCliente(obj, index) {
-			if (index >= 0) {
-				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
-				this.newDniRuc=''
-			}
-			this.selectCliente = obj
-		},
-		/*focusAutocomplete (ref) {
+      this.getHabitaciones();
+    },
+    alquilarHab(hab) {
+      if (!this.selectCliente.Cliente) {
+        this.$toasted.error("Seleccione un cliente.");
+      }
+
+      let r = confirm("¿Está seguro que desea empezar el proyecto?");
+
+      if (r) {
+        this.axios
+          .post(this.API + "habitaciones/alquilar", {
+            IdProducto: hab.IdProducto,
+            IdCliente: this.selectCliente.IdCliente,
+            cliente: this.selectCliente,
+            usuario: sessionStorage.getItem("User")
+          })
+          .then(res => {
+            this.getHabitaciones();
+            this.limpiarPopover();
+            this.limpiarDespues();
+            this.$toasted.success(
+              "El proyecto: " + hab.Producto + " ha sido iniciado."
+            );
+            this.showPopover = false;
+            this.$nextTick(() => {
+              this.showPopover = true;
+            });
+          });
+      }
+    },
+    setCliente(obj, index) {
+      if (index >= 0) {
+        this.$refs["inputCliente2" + index][0].setValue(obj.Cliente);
+        this.newDniRuc = "";
+      }
+      this.selectCliente = obj;
+    },
+    /*focusAutocomplete (ref) {
 			this.$refs[ref][0].handleDoubleClick()
 		},*/
-		limpiarPopover() {
-			//this.cliente = {}
-			//this.$refs.inputCliente.setValue('')
-		},
-		limpiarDespues() {
-			this.selectCliente = {}
-			this.selectProducto = {}
-		},
-		formatFecha(fecha) {
-			return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
-		},
-		imprimir() {
-			document.getElementById("fechaHoraImp").innerHTML = this.$moment().format("YYYY-MM-DD HH:mm:ss");
-			var elem = "contentModal";
-			var cssHead = '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>';
+    limpiarPopover() {
+      //this.cliente = {}
+      //this.$refs.inputCliente.setValue('')
+    },
+    limpiarDespues() {
+      this.selectCliente = {};
+      this.selectProducto = {};
+    },
+    formatFecha(fecha) {
+      return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
+    },
+    imprimir() {
+      document.getElementById("fechaHoraImp").innerHTML = this.$moment().format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      var elem = "contentModal";
+      var cssHead =
+        '<head><link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></head>';
 
-			var mywindow = window.open('', 'PRINT', 'height=600,width=1000');
-			mywindow.document.write(cssHead);
-			mywindow.document.write('<h5 style="text-align:center">' + document.querySelector('#carrito .modal-title').textContent  + '</h5> <hr>');
-			mywindow.document.write(document.getElementById(elem).innerHTML);
-			
-			for (var i = 0; i < mywindow.document.querySelectorAll('input, button, a').length; ++i) {
-				mywindow.document.querySelectorAll('input, button, a')[i].style.display = "none";
-			}
+      var mywindow = window.open("", "PRINT", "height=600,width=1000");
+      mywindow.document.write(cssHead);
+      mywindow.document.write(
+        '<h5 style="text-align:center">' +
+          document.querySelector("#carrito .modal-title").textContent +
+          "</h5> <hr>"
+      );
+      mywindow.document.write(document.getElementById(elem).innerHTML);
 
-			mywindow.document.getElementById('headerCamiones').className = "col-md-12";
-			mywindow.document.getElementById('productosProduccion').className = "col-md-8";
+      for (
+        var i = 0;
+        i < mywindow.document.querySelectorAll("input, button, a").length;
+        ++i
+      ) {
+        mywindow.document.querySelectorAll("input, button, a")[
+          i
+        ].style.display =
+          "none";
+      }
 
-			mywindow.document.close(); // necessary for IE >= 10
-			mywindow.focus(); // necessary for IE >= 10*/
+      mywindow.document.getElementById("headerCamiones").className =
+        "col-md-12";
+      mywindow.document.getElementById("productosProduccion").className =
+        "col-md-8";
 
-			mywindow.onload = function() {
-				setTimeout(function(){
-					mywindow.print();
-					// mywindow.close();
-				}, 500);
-			}
+      mywindow.document.close(); // necessary for IE >= 10
+      mywindow.focus(); // necessary for IE >= 10*/
 
-			return true;
-		},
-		sumProductos() {
-			let total = 0
-			if (this.$refs.preOrdenProductos) {
-				total = this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos
-			}
-			return Math.abs(total).toFixed(2)
-		},
-/* 		totManoObraBruta() {
+      mywindow.onload = function() {
+        setTimeout(function() {
+          mywindow.print();
+          // mywindow.close();
+        }, 500);
+      };
+
+      return true;
+    },
+    sumProductos() {
+      let total = 0;
+      if (this.$refs.preOrdenProductos) {
+        total = this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos;
+      }
+      return Math.abs(total).toFixed(2);
+    },
+    /* 		totManoObraBruta() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraBruta
 			}
 			return total?total.toFixed(2):0
 		}, */
-/* 		totManoObraMenoMat() {
+    /* 		totManoObraMenoMat() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraMenosMat
 			}
 			return total?total.toFixed(2):0
 		}, */
-/* 		totManoObraNeta() {
+    /* 		totManoObraNeta() {
 			let total = 0
 			if (this.$refs.preOrdenProductos) {
 				total = this.$refs.preOrdenProductos.manoDeObraMenosMat - this.totalGastos
 			}
 			return total?total.toFixed(2):0
 		}, */
-		calcularManoObra(e){
-			let pManoObra = e.find(p => p.CodigoBarra === 'MANODEOBRA');
-      		let precio = pManoObra ? pManoObra.Precio : 0;
-			let cantidad = pManoObra ? (pManoObra.Cantidad==undefined?0:pManoObra.Cantidad) :0;
-			this.totalManoObraBruta = Number(precio*cantidad)
-			this.totalManoObraMenoMat = Number(precio*cantidad)
-			e.map((preorden=>{
-				if(preorden.EsManoDeObra==1){
-					this.totalManoObraMenoMat = this.totalManoObraMenoMat - (preorden.Precio*preorden.Cantidad)
-				}
-			}))
-			this.calculoGastosAdelantos()
-		},
-		calculoGastosAdelantos(){
-			let sumatoriaGas = 0
-			this.gastos.map(ad => {
-				sumatoriaGas += parseFloat(ad.Importe)
-			})
-			this.totalGastos = sumatoriaGas
-			this.totalManoObraNeta = this.totalManoObraMenoMat - this.totalGastos
-			
+    calcularManoObra(e) {
+      let pManoObra = e.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.Precio : 0;
+      let cantidad = pManoObra
+        ? pManoObra.Cantidad == undefined
+          ? 0
+          : pManoObra.Cantidad
+        : 0;
+      this.totalManoObraBruta = Number(precio * cantidad);
+      this.totalManoObraMenoMat = Number(precio * cantidad);
+      e.map(preorden => {
+        if (preorden.EsManoDeObra == 1) {
+          this.totalManoObraMenoMat =
+            this.totalManoObraMenoMat - preorden.Precio * preorden.Cantidad;
+        }
+      });
+      this.calculoGastosAdelantos();
+    },
+    calculoGastosAdelantos() {
+      let sumatoriaGas = 0;
+      this.gastos.map(ad => {
+        sumatoriaGas += parseFloat(ad.Importe);
+      });
+      this.totalGastos = sumatoriaGas;
+      this.totalManoObraNeta = this.totalManoObraMenoMat - this.totalGastos;
 
-			let sumatoriaAde = 0
-			this.adelantos.map(ad => {
-				if (ad.Tipo) {
-					sumatoriaAde -= parseFloat(ad.Importe)
-				} else {
-					sumatoriaAde += parseFloat(ad.Importe)
-				}
-			})
-			this.totalAdelantos = sumatoriaAde
+      let sumatoriaAde = 0;
+      this.adelantos.map(ad => {
+        if (ad.Tipo) {
+          sumatoriaAde -= parseFloat(ad.Importe);
+        } else {
+          sumatoriaAde += parseFloat(ad.Importe);
+        }
+      });
+      this.totalAdelantos = sumatoriaAde;
 
-			if (this.$refs.preOrdenProductos) {
-			  this.totalSumaProductos =Math.abs(this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos).toFixed(2)  
-			  if(this.$refs.preOrdenProductos.productos){
-				this.$refs.preOrdenProductos.productos.map((pro)=>{
-					if(pro.CodigoBarra == "GASTOS"){
-						this.totalManoObraNeta += ((pro.Cantidad * pro.Precio) || 0)
-					}
-				})
-			  }
-			}
-			
-		},
-		editarDescripcionFun(){
-			this.editarDescripcion = !this.editarDescripcion
-		},
-		guardarDescripcion(){
-			this.axios.post(this.API + 'proyecto/descripcion', {
-				IdPreOrden: this.selectProducto.IdPreOrden,
-				Descripcion: this.selectProducto.Descripcion
-			}).then(res => {
-				this.editarDescripcion = false
-				this.$toasted.info('Descripcion guardada correctamente')
-			}).catch(error=>{
-				this.$toasted.show('No se guardo la descripcion, hubo un error')
-			})
-		}
-	},
-	components: {
-		PreOrdenFormDet,
-		ClientesForm,
-		Proformas,
-	}
-}
+      if (this.$refs.preOrdenProductos) {
+        this.totalSumaProductos = Math.abs(
+          this.$refs.preOrdenProductos.sumProductos - this.totalAdelantos
+        ).toFixed(2);
+        if (this.$refs.preOrdenProductos.productos) {
+          this.$refs.preOrdenProductos.productos.map(pro => {
+            if (pro.CodigoBarra == "GASTOS") {
+              this.totalManoObraNeta += pro.Cantidad * pro.Precio || 0;
+            }
+          });
+        }
+      }
+    },
+    editarDescripcionFun() {
+      this.editarDescripcion = !this.editarDescripcion;
+    },
+    guardarDescripcion() {
+      this.axios
+        .post(this.API + "proyecto/descripcion", {
+          IdPreOrden: this.selectProducto.IdPreOrden,
+          Descripcion: this.selectProducto.Descripcion
+        })
+        .then(res => {
+          this.editarDescripcion = false;
+          this.$toasted.info("Descripcion guardada correctamente");
+        })
+        .catch(error => {
+          this.$toasted.show("No se guardo la descripcion, hubo un error");
+        });
+    }
+  },
+  components: {
+    PreOrdenFormDet,
+    ClientesForm,
+    Proformas
+  }
+};
 </script>
 <style>
+.modalProyecto .modal-dialog {
+  width: 90% !important; /* Cambia el 80% al ancho que necesitas */
+  max-width: 90% !important;
+}
 @media print {
-	body .printable, body .modal {
-		display:block;
-	}
-	#pisos {
-		visibility: hidden;
-	}
-	.modal {
-		/**Remove scrollbar for printing.**/
-		overflow: visible !important;
-		position: absolute;
-	}
-	.modal-dialog {
-		visibility: visible !important;
-		/**Remove scrollbar for printing.**/
-		overflow: visible !important;
-	}
-	.modal-footer {
-		visibility: hidden;
-	}
-	.horaFechaImpreso{
- 		display: block;
-	}
-}
-</style>
-<style scoped>
-h5 {
-	font-size: 1.2rem;
-}
-h6 {
-	font-size: 1rem;
-}
-.card-footer {
-	padding-left: 0;
-	padding-right: 0;
-}
-.habitacion {
-	margin-bottom: 10px;
-}
-.detalle {
-	list-style: none;
-    padding: 0;
-	margin-bottom: 0px;
-	text-align: left;
-	font-size: 1rem;
-}
-.horaFechaImpreso{
- 	display: none;
+  body .printable,
+  body .modal {
+    display: block;
+  }
+  #pisos {
+    visibility: hidden;
+  }
+  .modal {
+    /**Remove scrollbar for printing.**/
+    overflow: visible !important;
+    position: absolute;
+  }
+  .modal-dialog {
+    visibility: visible !important;
+    /**Remove scrollbar for printing.**/
+    overflow: visible !important;
+  }
+  .modal-footer {
+    visibility: hidden;
+  }
+  .horaFechaImpreso {
+    display: block;
+  }
 }
 </style>
 
+<style scoped>
+h5 {
+  font-size: 1.2rem;
+}
+h6 {
+  font-size: 1rem;
+}
+.card-footer {
+  padding-left: 0;
+  padding-right: 0;
+}
+.habitacion {
+  margin-bottom: 10px;
+}
+.detalle {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0px;
+  text-align: left;
+  font-size: 1rem;
+}
+.horaFechaImpreso {
+  display: none;
+}
+</style>
