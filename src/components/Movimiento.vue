@@ -5,16 +5,30 @@
     </b-button-group>
     <b-modal 
     v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito"
-
+    hide-footer
     >
       <b-tabs content-class="mt-3" @click.stop>
         <b-tab title="Compra de chatarra">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
-                <b-col md="4">
-                  <label>Gasto:</label>
+                <b-col md="6">
                   <b-form-group>
+                  <label>Almacen:</label>
+                  <autocomplete
+                      required="required"
+                      ref="inputAlmacen"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+                  <b-form-group>
+                    <label>Gasto:</label>
                     <b-form-select v-model="selectProducto.IdProducto" 
                     :options="lstProducto"
                     value-field="IdProducto"
@@ -156,7 +170,8 @@ export default {
         IdProducto: "",
         Cantidad: 1
       },
-      lstProducto: []
+      lstProducto: [],
+      almacen: {}
       // Otros datos...
     };
   },
@@ -284,9 +299,10 @@ export default {
           concepto:
             "Compra de chatarra " + " - " + this.selectProducto.GastoDesc
         };
-
+        // console.log(this.almacen.IdAlmacen);
         await this.axios
           .post(this.API + "cajaybanco/gasto", {
+            idAlmacen: this.almacen.IdAlmacen,
             producto: this.selectProducto,
             concepto:
               "Compra de chatarra " + " - " + this.selectProducto.GastoDesc,
@@ -403,7 +419,13 @@ export default {
           });
       }
     },
-
+    setAlmacen(obj) {
+      this.almacen = obj;
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
     guardarProductos() {
       this.axios
         .post(this.API + "preorden/detalle", {
@@ -438,7 +460,7 @@ export default {
         )[0];
 
         this.selectProducto.TotalGasto = parseFloat(
-          this.selectProducto.Cantidad * valor.PrecioContado
+          this.selectProducto.Cantidad * valor.PrecioCosto
         ).toFixed(2);
       }
     }
