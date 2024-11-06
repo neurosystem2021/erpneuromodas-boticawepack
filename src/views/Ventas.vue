@@ -475,6 +475,7 @@ export default {
         this.loadClienteVarios()
         this.escucharPedidos()
         this.getRubro()
+        this.configStock()
     },
     data () {
         return {
@@ -527,6 +528,7 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
+            ventaSinStock:0,
             empresa: 'modasm',
             rubroTexto: '---'
         }
@@ -608,6 +610,15 @@ export default {
             sessionStorage.setItem('empresa', this.empresa)
             window.location.reload();
             return false;
+        },
+        configStock () {
+            this.axios.get(this.API + 'config/stock')
+                .then(res => {
+                    this.ventaSinStock = res.data
+                })
+                .catch((err)=>{
+                    this.ventaSinStock = 0
+                })
         },
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
@@ -1167,11 +1178,11 @@ export default {
                 }
             });
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
+            /*if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
                 return;
-            }
+            }*/
 
             if(totalCero >= 1) {
                 this.$toasted.error('No se puede enviar un producto en S/. 0.00');
