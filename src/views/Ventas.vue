@@ -10,10 +10,10 @@
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 400px">
                             <option value="modasm">EMP. MARIOS SPORT F. (PRENDAS DE VESTIR)</option>
-                            <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
+                            <!-- <option value="modasgio">EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)</option>
                             <option value="modasjes">EMP. MARIO JESUS (PLASTIQUERIA)</option>
                             <option value="modasjun">EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)</option>
-                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option>
+                            <option value="modaspau">EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)</option> -->
                         </select>
 
                     </b-button-group>
