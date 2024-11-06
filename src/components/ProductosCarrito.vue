@@ -637,7 +637,14 @@ export default {
         this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
         .then((response) => {
           if (response.data.IdProducto) {
-            this.setProducto(response.data)
+            if(this.productos.some(v=>v.IdProducto ==response.data.IdProducto)){
+              let producto = this.productos.filter(v=>v.IdProducto ==response.data.IdProducto)[0]
+              producto.cantidad=producto.cantidad+ 1;
+              this.productos.filter(v=>v.IdProducto ==response.data.IdProducto)[0] = producto
+            }else{
+
+              this.setProducto(response.data)
+            }
           } else {
             this.loadCode = ''
             this.$toasted.show('No se encontró ningun producto')    
@@ -755,12 +762,12 @@ export default {
         return
       }
 
-      let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      /*let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       if(existe){
         this.$toasted.show('El producto '+obj.Producto+' ya se agrego anteriormente a la lista',{ duration: 7000 })
         this.$refs['modalCant'].hide()
         return
-      }
+      }*/
 
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
@@ -796,12 +803,12 @@ export default {
         return
       }
 
-      let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
+      /*let existe = this.productos.some((producto)=>producto.IdProducto===obj.IdProducto)
       if(existe){
         this.$toasted.show('El producto '+obj.Producto+' ya se agrego anteriormente a la lista',{ duration: 7000 })
         this.$refs['modalCant'].hide()
         return
-      }
+      }*/
 
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
