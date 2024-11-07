@@ -480,7 +480,7 @@ export default {
             ultimaVenta: '',
             inProgress: false,
             API: config.API,
-            APINODE: "https://pedi2.pe:5000",
+            APIADMIN: "http://204.48.21.196:5000",
             puntosAplicados: 0,
             descuentoPuntos: {},
             descuentoGeneral: 0,
