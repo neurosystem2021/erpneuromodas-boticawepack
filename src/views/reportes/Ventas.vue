@@ -165,7 +165,7 @@ export default {
       this.totalRows = response.data.total
     })
 
-    this.getVentasAcumuladas()
+    this.getPrimerAlmacen()
   },
   data() {
     return {
@@ -182,7 +182,7 @@ export default {
       ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1,
-        Almacen: 'VENTA'
+        Almacen: ''
       },
       tipoDoc: {
       },
@@ -211,6 +211,15 @@ export default {
   computed: {
   },
   methods: {
+    getPrimerAlmacen(){
+        this.axios.get(this.API + '/almacenes/id/1').then(r => {
+          if (r.data) {
+            this.setAlmacen(r.data)
+            this.$refs.inputAlmacen.setValue(r.data.Almacen)
+            this.getVentasAcumuladas()
+          }
+        })
+    },
     setTipoVenta (obj) {
         this.tipoDoc = obj || {}
         this.getVentasAcumuladas()
@@ -300,7 +309,7 @@ console.log(url)
       this.filters = {}
       this.filter = ''
       this.$refs.inputVendedor.setValue('')
-      document.location.reload()
+      //document.location.reload()
      //  this.getVentasAcumuladas()
     },
     generateFilter (key, value) {
