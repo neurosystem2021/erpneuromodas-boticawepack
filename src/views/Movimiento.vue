@@ -572,15 +572,26 @@ export default {
         this.inProgress = false;
         return;
       }
-
       if (this.isTraslado == true || this.isSalida == true) {
         this.movimiento.alterarProductos = 0;
       }
-
+      let productos = [];
+      if (this.gravada == 1) {
+        this.productos.forEach(element => {
+          let pro = { ...element };
+          element.precio = parseFloat(pro.precio / 1.18).toFixed(2);
+          element.TieneIgv = 1;
+          productos.push(element);
+        });
+      } else {
+        productos = this.productos;
+      }
+      console.log(productos);
       this.axios
         .post(this.API + "movimientos", {
+          gravada: this.gravada,
           movimiento: this.movimiento,
-          productos: this.productos
+          productos: productos
         })
         .then(response => {
           if (response.data.error) {
