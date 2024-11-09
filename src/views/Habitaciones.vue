@@ -4,7 +4,7 @@
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>
-			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS HUÁNUCO' : 'PROYECTOS PUCALLPA' }}</b></b-alert>
+			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS AGUILAR' : 'PROYECTOS 2 DE MAYO' }}</b></b-alert>
 			  <br>
 			  <b-button variant="success" size="sm" @click="abrirMdlNuevoProyecto()">
 				Agregar Proyecto

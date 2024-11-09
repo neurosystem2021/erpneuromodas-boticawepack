@@ -202,6 +202,7 @@
                         </b-form-group>
                         <b-form-group>
                             <label>Vendedor:</label>
+                            
                             <autocomplete
                                 required="required"
                                 ref="inputVendedor"
@@ -447,903 +448,1037 @@
     </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
-import config from '@/store/config.js'
-import ProductosCarrito from '@/components/ProductosCarrito'
-import ClientesForm from '@/components/ClientesForm'
-import ConfigVenta from '@/components/ConfigVenta'
-import PagoDeuda from '@/components/PagoDeuda'
-import PreOrdenLista from '@/components/PreOrdenLista.vue'
-import Proformas from '@/components/ProformaLista.vue'
-import DeliveryModal from '@/components/DeliveryModal.vue'
-import Swal from 'sweetalert2'
+import { mapActions, mapState } from "vuex";
+import config from "@/store/config.js";
+import ProductosCarrito from "@/components/ProductosCarrito";
+import ClientesForm from "@/components/ClientesForm";
+import ConfigVenta from "@/components/ConfigVenta";
+import PagoDeuda from "@/components/PagoDeuda";
+import PreOrdenLista from "@/components/PreOrdenLista.vue";
+import Proformas from "@/components/ProformaLista.vue";
+import DeliveryModal from "@/components/DeliveryModal.vue";
+import Swal from "sweetalert2";
 export default {
-    beforeMount () {
-        this.initForm()
+  beforeMount() {
+    this.initForm();
+  },
+  mounted() {
+    // this.getNumeroVenta()
+    this.getVendedor();
+    //setInterval(this.updateTime, 1000)
+    this.loadClienteVarios();
+    this.loadComisionista();
+    this.escucharPedidos();
+    this.getEstadoSistema();
+    // console.log(this.vendedor);
+  },
+  data() {
+    return {
+      isNota: false,
+      dni: "",
+      adelanto: 0,
+      gasto: 0,
+      newDniRuc: "",
+      ultimaVenta: "",
+      inProgress: false,
+      API: config.API,
+      APIADMIN: "http://204.48.21.196:5000",
+      puntosAplicados: 0,
+      descuentoPuntos: {},
+      descuentoGeneral: 0,
+      tieneIgv: false,
+      venta: {},
+      bloquearInput: false,
+      diasValidosProf: 1,
+      adelantosPreOrden: [],
+      itemsMotivoNota: [
+        { value: null, text: "-- SELECCIONE EL MOTIVO --" },
+        { value: "01", text: "ANULACION DE LA OPERACION" },
+        { value: "02", text: "ANULACION POR ERROR EN EL RUC" },
+        { value: "03", text: "CORRECION POR ERROR EN LA DESCRIPCION" },
+        { value: "04", text: "DESCUENTO GLOBAL" },
+        { value: "05", text: "DESCUENTO POR ITEM" },
+        { value: "06", text: "DEVOLUCION TOTAL" },
+        { value: "07", text: "DEVOLUCION POR ITEM" },
+        { value: "08", text: "BONIFICACION" },
+        { value: "09", text: "DISMINUCION EN EL VALOR" },
+        { value: "10", text: "OTROS CONCEPTOS" }
+      ],
+      carrito: {
+        fields: [
+          { key: "manoobra", label: "Mano de obra", class: "text-center" },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "Producto" },
+          { key: "Descripcion", label: "Descripción" },
+          { key: "eventPres", label: "" },
+          { key: "cantxPrecio", variant: "warning" },
+          // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+          // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+          /*{ key: 'ProductoMedicion', label: 'Medición' },*/
+          { key: "cantidad" },
+          { key: "precio", label: "Precio" },
+          { key: "utilidad", label: "Porcentaje Utilidad %" },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center"
+          },
+          { key: "descuento", label: "Descuento" },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center"
+          },
+          { key: "acciones", label: "" }
+        ]
+      },
+      pagosPendientes: 0,
+      fechaUltPago: ""
+    };
+  },
+  watch: {
+    vendedor() {
+      this.$refs.inputVendedor.setValue(this.vendedor);
+      //   console.log("vendedor", this.vendedor);}
     },
-    mounted () {
-        // this.getNumeroVenta()
-        this.getVendedor()
-        //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
-        this.loadComisionista()
-        this.escucharPedidos()
-        this.getEstadoSistema()
+    totalCart(newVal) {
+      this.venta.pago.efectivo.monto = parseFloat(
+        newVal -
+          (parseFloat(this.venta.pago.visa.monto) +
+            parseFloat(this.venta.pago.mastercard.monto) +
+            parseFloat(this.venta.pago.yape.monto))
+      ).toFixed(2);
+    }
+  },
+  computed: {
+    ...mapState({
+      vendedor: state => state.cart.vendedor,
+      productos: state => state.cart.productos,
+      totalCart: state => state.cart.totalCart
+    }),
+    manoDeObraBruta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+      return precio;
     },
-    data () {
-        return {
-            isNota: false,
-            dni: '',
-            adelanto: 0,
-            gasto: 0,
-            newDniRuc: '',
-            ultimaVenta: '',
-            inProgress: false,
-            API: config.API,
-            APIADMIN: "http://204.48.21.196:5000",
-            puntosAplicados: 0,
-            descuentoPuntos: {},
-            descuentoGeneral: 0,
-            tieneIgv: false,
-            venta: {},
-            bloquearInput:false,
-            diasValidosProf:1,
-            adelantosPreOrden:[],
-            itemsMotivoNota: [
-                { value: null, text: '-- SELECCIONE EL MOTIVO --' },
-                { value: '01', text: 'ANULACION DE LA OPERACION' },
-                { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
-                { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
-                { value: '04', text: 'DESCUENTO GLOBAL' },
-                { value: '05', text: 'DESCUENTO POR ITEM' },
-                { value: '06', text: 'DEVOLUCION TOTAL' },
-                { value: '07', text: 'DEVOLUCION POR ITEM' },
-                { value: '08', text: 'BONIFICACION' },
-                { value: '09', text: 'DISMINUCION EN EL VALOR' },
-                { value: '10', text: 'OTROS CONCEPTOS' }
-            ],
-            carrito: {
-                fields: [
-                    { key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-                    { key: 'Producto' },
-                    { key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '' },
-                    { key: 'cantxPrecio', variant: 'warning' },
-                    // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
-                    { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio' },
-                    { key: 'utilidad', label: 'Porcentaje Utilidad %' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Descuento'},
-                    { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
-                    { key: 'acciones', label: ''}
-                ]
-            },
-            pagosPendientes:0,
-            fechaUltPago:''
-        }
-    },
-    watch: {
-        totalCart (newVal) {
-            this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.yape.monto))).toFixed(2)
-        }
-    },
-    computed: {
-        ...mapState({
-            productos: state => state.cart.productos,
-            totalCart: state => state.cart.totalCart
-        }),
-        manoDeObraBruta () {
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precioBruta : 0;
+    manoDeObraNeta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precio : 0;
 
-            return precio
-        },
-        manoDeObraNeta () {
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precio : 0;
-
-            return precio
-        }
-    },
-    methods: {
-        ...mapActions({
-            aplicarDescuento: 'aplicarDescuentoGeneral',
-            limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock',
-            actualizarPrecioConvenio: 'actualizarPrecioConvenio',
-            add:'agregarProducto'
-        }),
-        getEstadoSistema(){
-            let hostUrl = sessionStorage.getItem('HostUrl')
-            if(hostUrl != null){
-                this.axios.get(this.APIADMIN + '/api/sistema', {params: { Url:hostUrl}
-                }).then(res => {
-                    if(res.data.success==true){
-                        let info = res.data.data
-                        this.pagosPendientes = info.length
-                        this.fechaUltPago = info.slice(-1)[0].FechaVencimientoFormat || ''
-                    }else{
-                        this.pagosPendientes = 0
-                        console.log(res.data.msg);
-                    }
-                }).catch(err => {
-                    this.pagosPendientes = 0
-                    console.log("Error de conexión al admin");
-                })   
-       
-            }else{
-                this.pagosPendientes = 0
-            }
-        },
-        loadClienteVarios () {
-            this.axios.get(this.API + 'clientes/00000000')
-                .then(res => {
-                    if (res.data.IdCliente) {
-                        this.setCliente(res.data)
-                    }
-                })
-        },
-        loadComisionista () {
-            this.axios.get(this.API + 'comisionista/0000')
-                .then(res => {
-                    if (res.data.IdCliente) {
-                        this.setComisionista(res.data)
-                    }
-                })
-        },
-        prevent (evt) {
-            if (evt.target.tagName !== 'TEXTAREA') {
-                evt.preventDefault();
-            }
-        },
-        selectPreOrden (orden) {
-            // console.log(orden)
-           // this.venta.IdPreOrden = this.venta.IdPreOrden || []
-           // if (Array.isArray(this.venta.IdPreOrden) ) {
-            this.venta.IdPreOrden.push(orden)
-            //}
-
-            // obtener total adelantos
-            this.axios.get(this.API + 'preorden/cajaybanco', { 
-                params: { 
-                    IdPreOrden      : orden.IdPreOrden,
-                    TipoCajaBanco 	: 0
-                } 
-            })
-            .then(res => {
-                this.adelantosPreOrden = res.data
-                let suma = 0
-                res.data.map(ad => {
-                    if (ad.Tipo == 0) {
-                        suma += ad.Importe
-                    }
-                })
-                this.adelanto = suma
-            })
-        },
-        loadFirstAlmacen () {
-            this.axios.get(this.API + 'almacenes/primero')
-                .then(res => {
-                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
-                    this.venta.almacen = res.data
-                })
-        },
-        loadClienteBarcode (e) {
-            e.preventDefault()
-            let dni = this.dni;
-
-            if (dni) {
-                this.setCliente(false, dni)
-            }
-        },
-        focusAutocomplete (ref) {
-            // this.$refs[ref].type = ""
-            this.$refs[ref].handleDoubleClick()
-        },
-        initForm () {
-            this.venta = {
-                EsCredito: 0,
-                Serie: '',
-                Numero: '',
-                cliente: {},
-                comisionista: {},
-                tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
-                    LimitItems: 0,
-                    CodSunat: '03'
-                },
-                almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'HUANUCO'
-                },
-                puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'HUANUCO'
-                },
-                vendedor: {},
-                adelantosPreOrden:[],
-                FechaCredito: this.$moment().format("YYYY-MM-DD"),
-                FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
-                pago: {
-                    efectivo: { IdMetodoPago: 1, monto: 0 },
-                    visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 },
-                    yape: { IdMetodoPago: 4, monto:0 }
-                },
-                IdPreOrden: [],
-                CampoDireccion: 'Direccion',
-                NroComprobanteModifica: '',
-                CodSunatModifica: '',
-                NotaIdMotivo: '',
-                NotaDescMotivo: '',
-                EsDelivery: false,
-                nombreLlevar: '',
-                DireccionEntrega: '',
-                diasValidosProf: 1,
-                ProformaSinPrecio: 0,
-            }
-            this.isNota = false
-            this.bloquearInput=false
-            this.adelantosPreOrden=[]
-            this.adelanto = 0
-            this.infoDelivery = {}
-        },
-        setTipoVenta (obj) {
-            this.isNota = false
-            this.bloquearInput=false,
-            this.venta.NroComprobanteModifica = ''
-            this.venta.CodSunatModifica = ''
-            this.venta.NotaIdMotivo = ''
-            this.venta.NotaDescMotivo = ''
-            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
-            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
-                this.isNota = true
-            }
-
-            if (obj.TieneIgv) {
-                this.tieneIgv = true
+      return precio;
+    }
+  },
+  methods: {
+    ...mapActions({
+      aplicarDescuento: "aplicarDescuentoGeneral",
+      limpiarCart: "limpiarCarrito",
+      obtenerStok: "obtenerStock",
+      actualizarPrecioConvenio: "actualizarPrecioConvenio",
+      add: "agregarProducto"
+    }),
+    getEstadoSistema() {
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      if (hostUrl != null) {
+        this.axios
+          .get(this.APIADMIN + "/api/sistema", {
+            params: { Url: hostUrl }
+          })
+          .then(res => {
+            if (res.data.success == true) {
+              let info = res.data.data;
+              this.pagosPendientes = info.length;
+              this.fechaUltPago =
+                info.slice(-1)[0].FechaVencimientoFormat || "";
             } else {
-                this.tieneIgv = false
+              this.pagosPendientes = 0;
+              console.log(res.data.msg);
             }
-            this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
-            this.venta.tipoVenta = obj
-            this.getNumeroVenta()
-        },
-        setDocRef (obj) {
-            this.venta.CodSunatModifica = obj.CodSunat
-            this.venta.NroComprobanteModifica = obj.NroComprobante
-            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
-                this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
-            }
-            this.axios.get(this.API + 'ventas/solonumero', {
-                params: {
-                    serie: this.venta.Serie,
-                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
-                }
-            })
-            .then((response) => {
-                this.venta.Numero = response.data.numero
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-            })
-             //Cargar producto del documento afectado nota credito
-             this.axios.get(this.API + 'venta/detalle/comprobante', {
-                    params: {
-                        NroComprobante: obj.NroComprobante,
-                        idDocVenta: obj.IdDocVenta,
-                        IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
-                    }
-                }).then((response) => {
-                this.axios.get(this.API + 'cliente', {
-                    params: {
-                        idCliente: response.data[0].IdCliente
-                    }})
-                    .then((response) => {
-                        if (response.data) {
-                            this.$refs.inputCliente.setValue(response.data.Cliente)
-                            this.venta.cliente = response.data
-                        } else {
-                            this.$toasted.show('No se encontro al cliente')
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    })
-                     this.limpiarCart()
-                     response.data.map((item) => {
-                            item.estadoPxP = false
-                            let preciosProd = []
-                            item.precioCont = item.PrecioContado
-                            preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                            let fPP = preciosProd.filter(p => p.cantidad === 0)
-                            
-                            if (!item.PreciosPorProducto || fPP.length === 4) {
-                                item.estadoPxP = true
-                            }
-                        this.add([item, () => {
-                        }, false ])
-                    })     
-                    this.venta.NotaIdMotivo=null
-                    this.bloquearInput=true
-                    this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen})                 
-                })
-        },
-        setMotivo(ev){
-            if(ev == '01' || ev == '02' || ev == '06' || ev == null){
-                this.bloquearInput=true;
-            }else{
-                this.bloquearInput=false;
-            }
-        },
-        loadAlmacen(id) {
-            this.axios.get(this.API + 'almacenes/id/' + id)
-            .then(res => {
-                this.setAlmacen(res.data)
-            })
-        },
-        setAlmacen (obj) {
-            this.venta.almacen = obj
-            this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
-        },
-        loadPuntoVenta (id) {
-            this.axios.get(this.API + 'puntoventa/id/' + id)
-            .then(res => {
-                this.setPuntoVenta(res.data)
-                this.getNumeroVenta()
-            })
-        },
-        getTipoDoc (id) {
-            this.axios.get(this.API + 'tipodoc/' + id)
-                .then(response => {
-                    if (response.data) this.setTipoVenta(response.data)
-                })
-        },
-        setPuntoVenta (obj) {
-            this.venta.puntoVenta = obj
-            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
-            this.getNumeroVenta()
-        },
-        getVendedor () {
-            let usuario = sessionStorage.getItem('User')
-            this.axios.get(this.API + 'usuarios/' + usuario)
-            .then((response) => {
-                this.setVendedor(response.data)
-                this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                this.$refs.inputVendedor.$refs.input.disabled = true
-                this.loadAlmacen(response.data.IdAlmacen)
-                this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-                // bloquear ambos inputs
-                this.$refs.inputAlmacen.$refs.input.disabled = true
-                this.$refs.inputPuntoVenta.$refs.input.disabled = true
-                //this.getNumeroVenta()
-                this.getTipoDoc(response.data.IdTipoDoc)
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-            })
-        },
-        setVendedor (obj) {
-            // console.log(obj)
-            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+          })
+          .catch(err => {
+            this.pagosPendientes = 0;
+            console.log("Error de conexión al admin");
+          });
+      } else {
+        this.pagosPendientes = 0;
+      }
+    },
+    loadClienteVarios() {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
+        if (res.data.IdCliente) {
+          this.setCliente(res.data);
+        }
+      });
+    },
+    loadComisionista() {
+      this.axios.get(this.API + "comisionista/0000").then(res => {
+        if (res.data.IdCliente) {
+          this.setComisionista(res.data);
+        }
+      });
+    },
+    prevent(evt) {
+      if (evt.target.tagName !== "TEXTAREA") {
+        evt.preventDefault();
+      }
+    },
+    selectPreOrden(orden) {
+      // console.log(orden)
+      // this.venta.IdPreOrden = this.venta.IdPreOrden || []
+      // if (Array.isArray(this.venta.IdPreOrden) ) {
+      this.venta.IdPreOrden.push(orden);
+      //}
 
-            this.venta.vendedor = obj
+      // obtener total adelantos
+      this.axios
+        .get(this.API + "preorden/cajaybanco", {
+          params: {
+            IdPreOrden: orden.IdPreOrden,
+            TipoCajaBanco: 0
+          }
+        })
+        .then(res => {
+          this.adelantosPreOrden = res.data;
+          let suma = 0;
+          res.data.map(ad => {
+            if (ad.Tipo == 0) {
+              suma += ad.Importe;
+            }
+          });
+          this.adelanto = suma;
+        });
+    },
+    loadFirstAlmacen() {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.venta.almacen = res.data;
+      });
+    },
+    loadClienteBarcode(e) {
+      e.preventDefault();
+      let dni = this.dni;
+
+      if (dni) {
+        this.setCliente(false, dni);
+      }
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    initForm() {
+      this.venta = {
+        EsCredito: 0,
+        Serie: "",
+        Numero: "",
+        cliente: {},
+        comisionista: {},
+        tipoVenta: {
+          IdTipoDoc: 7,
+          TipoDoc: "BOLETA ELEC.",
+          LimitItems: 0,
+          CodSunat: "03"
         },
-        setComisionista (obj) {
-            if (typeof obj === 'object') {
-                this.$refs.inputComisionista.setValue(obj.Cliente)
-                this.venta.comisionista = obj
+        almacen: {
+          IdAlmacen: 1,
+          Almacen: "HUANUCO"
+        },
+        puntoVenta: {
+          IdDocVentaPuntoVenta: 1,
+          PuntoVenta: "HUANUCO"
+        },
+        vendedor: {},
+        adelantosPreOrden: [],
+        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+        pago: {
+          efectivo: { IdMetodoPago: 1, monto: 0 },
+          visa: { IdMetodoPago: 2, monto: 0 },
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          yape: { IdMetodoPago: 4, monto: 0 }
+        },
+        IdPreOrden: [],
+        CampoDireccion: "Direccion",
+        NroComprobanteModifica: "",
+        CodSunatModifica: "",
+        NotaIdMotivo: "",
+        NotaDescMotivo: "",
+        EsDelivery: false,
+        nombreLlevar: "",
+        DireccionEntrega: "",
+        diasValidosProf: 1,
+        ProformaSinPrecio: 0
+      };
+      this.isNota = false;
+      this.bloquearInput = false;
+      this.adelantosPreOrden = [];
+      this.adelanto = 0;
+      this.infoDelivery = {};
+    },
+    setTipoVenta(obj) {
+      this.isNota = false;
+      (this.bloquearInput = false), (this.venta.NroComprobanteModifica = "");
+      this.venta.CodSunatModifica = "";
+      this.venta.NotaIdMotivo = "";
+      this.venta.NotaDescMotivo = "";
+      this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
+      if (obj.CodSunat == "07" || obj.CodSunat == "08") {
+        // 07 - nota de credito, 08 - Nota de debito
+        this.isNota = true;
+      }
+
+      if (obj.TieneIgv) {
+        this.tieneIgv = true;
+      } else {
+        this.tieneIgv = false;
+      }
+      this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
+      this.venta.tipoVenta = obj;
+      this.getNumeroVenta();
+    },
+    setDocRef(obj) {
+      this.venta.CodSunatModifica = obj.CodSunat;
+      this.venta.NroComprobanteModifica = obj.NroComprobante;
+      if (
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
+      ) {
+        this.venta.Serie = this.venta.Serie.replace(
+          /^./,
+          obj.NroComprobante[0]
+        );
+      }
+      this.axios
+        .get(this.API + "ventas/solonumero", {
+          params: {
+            serie: this.venta.Serie,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.venta.Numero = response.data.numero;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+      //Cargar producto del documento afectado nota credito
+      this.axios
+        .get(this.API + "venta/detalle/comprobante", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta,
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+          }
+        })
+        .then(response => {
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
+                idCliente: response.data[0].IdCliente
+              }
+            })
+            .then(response => {
+              if (response.data) {
+                this.$refs.inputCliente.setValue(response.data.Cliente);
+                this.venta.cliente = response.data;
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          this.limpiarCart();
+          response.data.map(item => {
+            item.estadoPxP = false;
+            let preciosProd = [];
+            item.precioCont = item.PrecioContado;
+            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+            let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+            if (!item.PreciosPorProducto || fPP.length === 4) {
+              item.estadoPxP = true;
+            }
+            this.add([item, () => {}, false]);
+          });
+          this.venta.NotaIdMotivo = null;
+          this.bloquearInput = true;
+          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+        });
+    },
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
+    },
+    loadAlmacen(id) {
+      this.axios.get(this.API + "almacenes/id/" + id).then(res => {
+        this.setAlmacen(res.data);
+      });
+    },
+    setAlmacen(obj) {
+      this.venta.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+    },
+    loadPuntoVenta(id) {
+      this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
+        this.setPuntoVenta(res.data);
+        this.getNumeroVenta();
+      });
+    },
+    getTipoDoc(id) {
+      this.axios.get(this.API + "tipodoc/" + id).then(response => {
+        if (response.data) this.setTipoVenta(response.data);
+      });
+    },
+    setPuntoVenta(obj) {
+      this.venta.puntoVenta = obj;
+      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
+      this.getNumeroVenta();
+    },
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          this.$refs.inputVendedor.$refs.input.disabled = true;
+          this.loadAlmacen(response.data.IdAlmacen);
+          this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
+          // bloquear ambos inputs
+          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          //this.getNumeroVenta()
+          this.getTipoDoc(response.data.IdTipoDoc);
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    setVendedor(obj) {
+      // console.log(obj)
+      if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+
+      this.venta.vendedor = obj;
+    },
+    setComisionista(obj) {
+      if (typeof obj === "object") {
+        this.$refs.inputComisionista.setValue(obj.Cliente);
+        this.venta.comisionista = obj;
+      } else {
+        this.venta.comisionista = {};
+      }
+    },
+    setCliente(obj, dni = false) {
+      let params = {};
+      if (dni) {
+        params = {
+          dni: dni
+        };
+      } else {
+        params = {
+          idCliente: obj.IdCliente || obj
+        };
+      }
+
+      if (typeof obj === "object") {
+        this.$refs.inputCliente.setValue(obj.Cliente);
+        this.venta.cliente = obj;
+        this.venta.CampoDireccion = this.venta.cliente.Direccion;
+      } else {
+        this.axios
+          .get(this.API + "cliente", {
+            params: params
+          })
+          .then(response => {
+            if (response.data) {
+              this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = this.venta.cliente.Direccion;
             } else {
-                this.venta.comisionista = {}
+              this.$toasted.show("No se encontro al cliente");
             }
-        },
-        setCliente (obj, dni = false) {
-            let params = {}
-            if (dni) {
-                params = {
-                    dni: dni
-                }
-            }else {
-                params = {
-                    idCliente: obj.IdCliente || obj
-                }
-            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
 
-            if (typeof obj === 'object') {
-                this.$refs.inputCliente.setValue(obj.Cliente)
-                this.venta.cliente = obj
-                this.venta.CampoDireccion = this.venta.cliente.Direccion
-            } else {
-                this.axios.get(this.API + 'cliente', {
-                    params: params
-                })
-                .then((response) => {
-                    if (response.data) {
-                        this.$refs.inputCliente.setValue(response.data.Cliente)
-                        this.venta.cliente = response.data
-                        this.venta.CampoDireccion = this.venta.cliente.Direccion
-                    } else {
-                        this.$toasted.show('No se encontro al cliente')
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-            }
-            
-            //this.actualizarPrecioConvenio(obj)
-            // Actualizar DisabledTotal
-        },
-        onSetProducto (obj, cant, precio) {
-            if (cant && precio) {
-                obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant && e.precio===precio)
-                obj.precio = preciosPorProducto.precio || 0
-                return obj
-            }
-            obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
-            return obj
-        },
-        onAddProducto (obj) {
-            this.actualizarDescuento()
-            this.obtenerStok({
-                IdAlmacen: this.venta.almacen.IdAlmacen
-            })
-        },
-        actualizarDescuento () {
-            if (this.puntosAplicados > 0) {
-                this.aplicarPuntos(this.puntosAplicados)
-            }
+      //this.actualizarPrecioConvenio(obj)
+      // Actualizar DisabledTotal
+    },
+    onSetProducto(obj, cant, precio) {
+      if (cant && precio) {
+        obj.cantidad = cant;
+        let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find(
+          e => e.cantidad === cant && e.precio === precio
+        );
+        obj.precio = preciosPorProducto.precio || 0;
+        return obj;
+      }
+      obj.cantidad = 1;
+      obj.precio = obj.PrecioContado || 0;
+      return obj;
+    },
+    onAddProducto(obj) {
+      this.actualizarDescuento();
+      this.obtenerStok({
+        IdAlmacen: this.venta.almacen.IdAlmacen
+      });
+    },
+    actualizarDescuento() {
+      if (this.puntosAplicados > 0) {
+        this.aplicarPuntos(this.puntosAplicados);
+      }
 
-            if(this.descuentoGeneral > 0) {
-                this.aplicarDescuentoGeneral(this.descuentoGeneral)
-            }
-        },
-        aplicarPuntos (val) {
-            if (parseFloat(val) > this.venta.cliente.Puntos) { 
-                this.puntosAplicados = this.venta.cliente.Puntos
-            }
+      if (this.descuentoGeneral > 0) {
+        this.aplicarDescuentoGeneral(this.descuentoGeneral);
+      }
+    },
+    aplicarPuntos(val) {
+      if (parseFloat(val) > this.venta.cliente.Puntos) {
+        this.puntosAplicados = this.venta.cliente.Puntos;
+      }
 
-            this.axios.get(this.API + 'ventas/descuento/' + this.puntosAplicados)
-            .then((response) => {
-                this.descuentoPuntos = response.data
-                this.aplicarDescuento(response.data.descuento)
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-            })
-        },
-        aplicarDescuentoGeneral (val) {
-            this.puntosAplicados = 0
-            this.aplicarDescuento(val)
-        },
-        getNumeroVenta () {
-            this.axios.get(this.API + 'ventas/numero', {
-                params: {
-                    idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
-                }
-            })
-            .then((response) => {
-                this.venta.Serie = response.data.serie
-                this.venta.Numero = response.data.numero
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-            })
-        },
-        updateTime () {
-            this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
-        },
-        limpiarDespuesVenta () {
-            this.inProgress = false
-            this.tieneIgv = false
-            this.initForm()
-            this.limpiarCart()
-            this.getVendedor()
-            this.$refs.inputCliente.setValue('')
-            // this.getNumeroVenta()
-            // this.$refs.inputTipoVenta.setValue('TICKET')
-            // this.$refs.inputAlmacen.setValue('VENTA')
-            // this.$refs.inputPuntoVenta.setValue('CAJA1')
-            // this.$refs.inputVendedor.setValue('')
-        },
-        guardarProforma () {
-            this.inProgress = true
+      this.axios
+        .get(this.API + "ventas/descuento/" + this.puntosAplicados)
+        .then(response => {
+          this.descuentoPuntos = response.data;
+          this.aplicarDescuento(response.data.descuento);
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    aplicarDescuentoGeneral(val) {
+      this.puntosAplicados = 0;
+      this.aplicarDescuento(val);
+    },
+    getNumeroVenta() {
+      this.axios
+        .get(this.API + "ventas/numero", {
+          params: {
+            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.venta.Serie = response.data.serie;
+          this.venta.Numero = response.data.numero;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    updateTime() {
+      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
+    },
+    limpiarDespuesVenta() {
+      this.inProgress = false;
+      this.tieneIgv = false;
+      this.initForm();
+      this.limpiarCart();
+      this.getVendedor();
+      this.$refs.inputCliente.setValue("");
+      // this.getNumeroVenta()
+      // this.$refs.inputTipoVenta.setValue('TICKET')
+      // this.$refs.inputAlmacen.setValue('VENTA')
+      // this.$refs.inputPuntoVenta.setValue('CAJA1')
+      // this.$refs.inputVendedor.setValue('')
+    },
+    guardarProforma() {
+      this.inProgress = true;
 
-            if(!this.productos.length) {
-                this.$toasted.show('No hay productos para crear la proforma')
-                this.inProgress = false            
-                return          
-            }
+      if (!this.productos.length) {
+        this.$toasted.show("No hay productos para crear la proforma");
+        this.inProgress = false;
+        return;
+      }
 
-            if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
-                this.$toasted.show('Debe ingresar los días de validez de la proforma')
-                this.inProgress = false
-                return
-            }
+      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
+        this.$toasted.show("Debe ingresar los días de validez de la proforma");
+        this.inProgress = false;
+        return;
+      }
 
-            if(!this.venta.cliente.IdCliente) {
-                this.$toasted.show('Debe seleccionar un cliente')
-                this.inProgress = false
-                return
-            }
+      if (!this.venta.cliente.IdCliente) {
+        this.$toasted.show("Debe seleccionar un cliente");
+        this.inProgress = false;
+        return;
+      }
 
-            if(!this.venta.vendedor.Usuario) {
-                this.$toasted.show('Debe seleccionar un vendedor')
-                this.inProgress = false
-                return
-            }
-            if(this.venta.ProformaSinPrecio == 1){
-                this.productos.map((p)=>{
-                    p.disabledProf = 1
-                })
-            }
+      if (!this.venta.vendedor.Usuario) {
+        this.$toasted.show("Debe seleccionar un vendedor");
+        this.inProgress = false;
+        return;
+      }
+      if (this.venta.ProformaSinPrecio == 1) {
+        this.productos.map(p => {
+          p.disabledProf = 1;
+        });
+      }
 
-            this.venta.productos = this.productos
-            this.venta.diasValidosProf = this.diasValidosProf
-            this.axios.post(this.API + 'proformas', this.venta)
-            .then((response) => {
-                this.$toasted.success('Proforma Guardada con exito')
-                this.limpiarDespuesVenta()
-                this.loadClienteVarios()
-                this.loadComisionista()
-                this.diasValidosProf=1;
-                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                this.inProgress = false
-            })
-        },
-        guardarVenta (evt) {
-            evt.preventDefault();
+      this.venta.productos = this.productos;
+      this.venta.diasValidosProf = this.diasValidosProf;
+      this.axios
+        .post(this.API + "proformas", this.venta)
+        .then(response => {
+          this.$toasted.success("Proforma Guardada con exito");
+          this.limpiarDespuesVenta();
+          this.loadClienteVarios();
+          this.loadComisionista();
+          this.diasValidosProf = 1;
+          window.open(
+            "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
+            "_blank"
+          );
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
+    },
+    guardarVenta(evt) {
+      evt.preventDefault();
 
-            this.inProgress = true
-            let totalPagos = 0
-            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))?0:parseFloat(this.venta.pago.yape.monto)
+      this.inProgress = true;
+      let totalPagos = 0;
+      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+        ? 0
+        : parseFloat(this.venta.pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+        ? 0
+        : parseFloat(this.venta.pago.visa.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        ? 0
+        : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))
+        ? 0
+        : parseFloat(this.venta.pago.yape.monto);
 
-            if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
-                this.inProgress = false            
-                return  
-            }
-            if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
-                this.inProgress = false            
-                return  
-            }
-            if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
-                this.inProgress = false            
-                return  
-            }
-            if((isNaN(parseFloat(this.venta.pago.yape.monto))?0:parseFloat(this.venta.pago.yape.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago YAPE / PLIN no puede ser negativo')
-                this.inProgress = false            
-                return  
-            }
+      if (
+        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+          ? 0
+          : parseFloat(this.venta.pago.efectivo.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.visa.monto))
+          ? 0
+          : parseFloat(this.venta.pago.visa.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+          ? 0
+          : parseFloat(this.venta.pago.mastercard.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago Transferencia no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.yape.monto))
+          ? 0
+          : parseFloat(this.venta.pago.yape.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago YAPE / PLIN no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            if (!this.venta.EsCredito) {
-                if (this.totalCart != totalPagos) {
-                    this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false            
-                    return                
-                }
-            }
+      if (!this.venta.EsCredito) {
+        if (this.totalCart != totalPagos) {
+          this.$toasted.show("Los pagos no coinciden con la venta");
+          this.inProgress = false;
+          return;
+        }
+      }
 
-            if (!this.venta.cliente.DniRuc) {
-                this.$toasted.show('Debe seleccionar un cliente.')
-                this.inProgress = false
-                return
-            }
+      if (!this.venta.cliente.DniRuc) {
+        this.$toasted.show("Debe seleccionar un cliente.");
+        this.inProgress = false;
+        return;
+      }
 
-            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
-            if (!esNumerico) {
-                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-                this.inProgress = false
-                return
-            }
+      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
+      if (!esNumerico) {
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+        this.inProgress = false;
+        return;
+      }
 
-            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
-            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
-                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-                this.inProgress = false
-                return
-            }
+      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            //Nota de Creadito
-            if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
-                if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
-                    this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-                    this.inProgress = false
-                    return 
-                }
-                if(!this.venta.NotaIdMotivo) {
-                    this.$toasted.show('Debe seleccionar un Motivo')
-                    this.inProgress = false
-                    return 
-                }
-                this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
-            }
+      //Nota de Creadito
+      if (
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
+      ) {
+        if (
+          !this.venta.CodSunatModifica ||
+          !this.venta.NroComprobanteModifica
+        ) {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+          this.inProgress = false;
+          return;
+        }
+        if (!this.venta.NotaIdMotivo) {
+          this.$toasted.show("Debe seleccionar un Motivo");
+          this.inProgress = false;
+          return;
+        }
+        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.venta.NotaIdMotivo
+        )[0].text;
+      }
 
-            if(!this.productos.length) {
-                this.$toasted.show('No hay productos para vender')
-                this.inProgress = false            
-                return          
-            }
+      if (!this.productos.length) {
+        this.$toasted.show("No hay productos para vender");
+        this.inProgress = false;
+        return;
+      }
 
-            // NO PERMITE CANTIDAD Y PRECIOS 0
-            let sinStock = 0
-            let totalCero = 0 
-            let menosUtilidad = 0
-            this.productos.forEach(pro => {
-                if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
-                    sinStock += 1
-                }
+      // NO PERMITE CANTIDAD Y PRECIOS 0
+      let sinStock = 0;
+      let totalCero = 0;
+      let menosUtilidad = 0;
+      this.productos.forEach(pro => {
+        if (
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA" &&
+          (pro.stock <= 0 || parseFloat(pro.cantidad) > pro.stock)
+        ) {
+          sinStock += 1;
+        }
 
-                if(parseFloat(pro.total) <= 0) {
-                    totalCero += 1
-                }
+        if (parseFloat(pro.total) <= 0) {
+          totalCero += 1;
+        }
 
-                /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
+        /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
                     menosUtilidad += 1
                 }*/
 
-                if((parseFloat(pro.precio)-pro.PrecioCosto < 0) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')){
-                    menosUtilidad += 1
-                }
-            });
+        if (
+          parseFloat(pro.precio) - pro.PrecioCosto < 0 &&
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA"
+        ) {
+          menosUtilidad += 1;
+        }
+      });
 
-            if (menosUtilidad>=1 && this.venta.tipoVenta.CodSunat != '07') {
-                this.$toasted.error('No se puede vender un producto con ganancia negativa');
-                this.inProgress = false            
-                return;
-            }
-            
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
-                this.$toasted.error('No se puede vender un producto sin stock');
-                this.inProgress = false            
-                return;
-            }
+      if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+        this.$toasted.error(
+          "No se puede vender un producto con ganancia negativa"
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            if(totalCero >= 1) {
-                this.$toasted.error('No se puede enviar un producto en S/. 0.00');
-                this.inProgress = false
-                return;
-            }
+      if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+        this.$toasted.error("No se puede vender un producto sin stock");
+        this.inProgress = false;
+        return;
+      }
 
-            if (this.totalCart <= 0) {
-                this.$toasted.show('La venta en S/. 0.00 no está permitido')
-                this.inProgress = false            
-                return 
-            }
+      if (totalCero >= 1) {
+        this.$toasted.error("No se puede enviar un producto en S/. 0.00");
+        this.inProgress = false;
+        return;
+      }
 
-            this.venta.productos = this.productos
-            this.venta.puntosAplicados = this.puntosAplicados || 0
-            this.venta.totalCart = this.totalCart || 0
-            this.venta.PagoCon = this.$refs.carrito.pagocon
-            this.venta.adelantosPreOrden = this.adelantosPreOrden
-            this.venta.IdPedido = this.$route.query.idPedido || null
-            this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
-            this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
-            this.axios.post(this.API + 'ventas', this.venta)
-            .then((response) => {
+      if (this.totalCart <= 0) {
+        this.$toasted.show("La venta en S/. 0.00 no está permitido");
+        this.inProgress = false;
+        return;
+      }
 
-                // limpiar preorden seleccionado
-                this.$router.replace('/ventas')
-                this.$toasted.success('Venta realizada con exito')
-                this.inProgress = false
-                this.tieneIgv = false
-                this.ultimaVenta = response.data.insertId
-                this.initForm()
-                this.limpiarCart()
-                this.getVendedor()
-                this.getNumeroVenta()
-                this.loadClienteVarios()
-                this.loadComisionista()
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
-                this.$refs.inputAlmacen.setValue('VENTA')
-                this.$refs.inputPuntoVenta.setValue('CAJA1')
-                this.$refs.inputCliente.setValue('')
-                this.$refs.inputVendedor.setValue('')
-                this.$refs.inputComisionista.setValue('')
-                this.$refs.carrito.pagocon = 0
-                window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
-            })
-            .catch((error) => {
-                console.log(error)
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                this.inProgress = false
-            })
-        },
-        eliminarCliente () {
-            this.$refs.inputCliente.setValue('')
-            this.venta.cliente = {}
-        },
-        eliminarComisionista () {
-            this.$refs.inputComisionista.setValue('')
-            this.venta.comisionista = {}
-        },
-        onPagarDelivery(obj){
-            this.$route.query.idPedido = obj.IdPedido
-            if(this.$route.query.idPedido){
-                console.log(obj);
-                this.infoDelivery = obj
-                this.venta.EsDelivery = true
-                this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
-                //cargar costo de delivery
-                let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2)
-                if (costoDelivery>0) {
-                    this.axios.get(this.API +'costo/delivery')
-                    .then((response) => {
-                        if(response.data){
-                            let costoDeliverObj = response.data
-                                costoDeliverObj.precio = costoDelivery
-                                costoDeliverObj.cantidad = 1
-                                costoDeliverObj.EsCostoDelivery = 1
-                                costoDeliverObj.IdImpresora = 0
-                                costoDeliverObj.descuento = 0
-                                costoDeliverObj.indicacion = ''
-                                this.add([response.data, () => {
-                                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                                }, { setPrecioCosto: false }, false ,false ])
-                                //Cargar Productos Delivery
-                                let productos = JSON.parse(obj.Productos)
-                                console.log(productos);
-                                productos.map((item) => {
-                                    this.add([item.IdProducto, () => {
-                                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                                    }, { cantidad: item.Cantidad, precio:item.Precio, indicacion: item.Indicacion  }, false ])
-                                })
-                                this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
-                                this.venta.DireccionEntrega = obj.Direccion
-                                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')
-                        }else{
-                            this.$toasted.show("PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'")   
-                            this.anularPagoDelivery()
-                        }
-                    }).catch(error=>{
-                        this.$toasted.show('HUBO UN ERROR')
-                    })
-                } else {
-                    //Cargar Productos Delivery
-                    let productos = JSON.parse(obj.Productos)
-                    productos.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                        }, { cantidad: item.Cantidad, precio:item.Precio, indicacion: item.Indicacion, isDelivery:true  }, false ])
-                    })
-                    this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
-                    this.venta.DireccionEntrega = obj.Direccion
-                }
-                 
-            }
-        },
-        anularPagoDelivery(){
-            this.limpiarCart()
-            this.venta.EsDelivery = false
-            this.infoDelivery = {}
-            this.$refs.carrito.pagocon = ''
-            this.loadClienteVarios()
-            this.loadComisionista()
-            this.venta.nombreLlevar = ''
-            this.venta.selectOpcionVenta = 0
-            this.venta.nombreLlevar = ''
-            this.venta.DireccionEntrega = ''
-            this.$router.replace('/ventas')
-        },
-        //Sockets
-        escucharPedidos(){
-            this.sockets.subscribe('nuevo-pedido', (data) => {
-            if(this.$refs.deliveryModal.show){
-                this.$toasted.success('Nuevo Pedido de' + "<strong>"+data.nombre+"</strong>");  
-                this.$refs.deliveryModal.getPedidos();  
-            }else{
-                this.$refs.deliveryModal.getPedidos();
-                this.$swal({
-                    position: 'top-end',
-                    icon: 'info',
-                    target: document.getElementById('conten'),
-                    title: 'Pedido de Delivery de: <br> ' + "<strong>"+data.nombre+"</strong>",
-                    showConfirmButton: true,
-                    confirmButtonText: 'Mostrar Pedidos',
-                    confirmButtonColor:'#3880ff'
-                }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                this.$refs.deliveryModal.show=true;
-                } else if (result.isDenied) {
-                    console.log("Denegado");
-                }
-                })
-            }
-            });
-        },
-        //Fin Sockets
+      this.venta.productos = this.productos;
+      this.venta.puntosAplicados = this.puntosAplicados || 0;
+      this.venta.totalCart = this.totalCart || 0;
+      this.venta.PagoCon = this.$refs.carrito.pagocon;
+      this.venta.adelantosPreOrden = this.adelantosPreOrden;
+      this.venta.IdPedido = this.$route.query.idPedido || null;
+      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
+      this.venta.DireccionEntrega = this.venta.EsDelivery
+        ? this.infoDelivery.Direccion || ""
+        : "";
+      this.axios
+        .post(this.API + "ventas", this.venta)
+        .then(response => {
+          // limpiar preorden seleccionado
+          this.$router.replace("/ventas");
+          this.$toasted.success("Venta realizada con exito");
+          this.inProgress = false;
+          this.tieneIgv = false;
+          this.ultimaVenta = response.data.insertId;
+          this.initForm();
+          this.limpiarCart();
+          this.getVendedor();
+          this.getNumeroVenta();
+          this.loadClienteVarios();
+          this.loadComisionista();
+          this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
+          this.$refs.inputAlmacen.setValue("VENTA");
+          this.$refs.inputPuntoVenta.setValue("CAJA1");
+          this.$refs.inputCliente.setValue("");
+          this.$refs.inputVendedor.setValue("");
+          this.$refs.inputComisionista.setValue("");
+          this.$refs.carrito.pagocon = 0;
+          window.open(
+            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+            "_blank"
+          );
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    components: {
-        ProductosCarrito,
-        ClientesForm,
-        ConfigVenta,
-        PagoDeuda,
-        PreOrdenLista,
-        Proformas,
-        DeliveryModal,
+    eliminarCliente() {
+      this.$refs.inputCliente.setValue("");
+      this.venta.cliente = {};
+    },
+    eliminarComisionista() {
+      this.$refs.inputComisionista.setValue("");
+      this.venta.comisionista = {};
+    },
+    onPagarDelivery(obj) {
+      this.$route.query.idPedido = obj.IdPedido;
+      if (this.$route.query.idPedido) {
+        console.log(obj);
+        this.infoDelivery = obj;
+        this.venta.EsDelivery = true;
+        this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
+        //cargar costo de delivery
+        let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
+        if (costoDelivery > 0) {
+          this.axios
+            .get(this.API + "costo/delivery")
+            .then(response => {
+              if (response.data) {
+                let costoDeliverObj = response.data;
+                costoDeliverObj.precio = costoDelivery;
+                costoDeliverObj.cantidad = 1;
+                costoDeliverObj.EsCostoDelivery = 1;
+                costoDeliverObj.IdImpresora = 0;
+                costoDeliverObj.descuento = 0;
+                costoDeliverObj.indicacion = "";
+                this.add([
+                  response.data,
+                  () => {
+                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+                  },
+                  { setPrecioCosto: false },
+                  false,
+                  false
+                ]);
+                //Cargar Productos Delivery
+                let productos = JSON.parse(obj.Productos);
+                console.log(productos);
+                productos.map(item => {
+                  this.add([
+                    item.IdProducto,
+                    () => {
+                      this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+                    },
+                    {
+                      cantidad: item.Cantidad,
+                      precio: item.Precio,
+                      indicacion: item.Indicacion
+                    },
+                    false
+                  ]);
+                });
+                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                this.venta.DireccionEntrega = obj.Direccion;
+                this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
+              } else {
+                this.$toasted.show(
+                  "PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'"
+                );
+                this.anularPagoDelivery();
+              }
+            })
+            .catch(error => {
+              this.$toasted.show("HUBO UN ERROR");
+            });
+        } else {
+          //Cargar Productos Delivery
+          let productos = JSON.parse(obj.Productos);
+          productos.map(item => {
+            this.add([
+              item.IdProducto,
+              () => {
+                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+              },
+              {
+                cantidad: item.Cantidad,
+                precio: item.Precio,
+                indicacion: item.Indicacion,
+                isDelivery: true
+              },
+              false
+            ]);
+          });
+          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.venta.DireccionEntrega = obj.Direccion;
+        }
+      }
+    },
+    anularPagoDelivery() {
+      this.limpiarCart();
+      this.venta.EsDelivery = false;
+      this.infoDelivery = {};
+      this.$refs.carrito.pagocon = "";
+      this.loadClienteVarios();
+      this.loadComisionista();
+      this.venta.nombreLlevar = "";
+      this.venta.selectOpcionVenta = 0;
+      this.venta.nombreLlevar = "";
+      this.venta.DireccionEntrega = "";
+      this.$router.replace("/ventas");
+    },
+    //Sockets
+    escucharPedidos() {
+      this.sockets.subscribe("nuevo-pedido", data => {
+        if (this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          this.$refs.deliveryModal.getPedidos();
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              this.$refs.deliveryModal.show = true;
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      });
     }
-}
+    //Fin Sockets
+  },
+  components: {
+    ProductosCarrito,
+    ClientesForm,
+    ConfigVenta,
+    PagoDeuda,
+    PreOrdenLista,
+    Proformas,
+    DeliveryModal
+  }
+};
 </script>
 <style scoped>
 .alert {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 .puntos {
-    font-size: 52px;
+  font-size: 52px;
 }
 .big-text {
-    font-size: 30px;
+  font-size: 30px;
 }
-
 </style>
 <style>
 .holder {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    clear: both;
-    display: inline-block;
-    overflow: hidden;
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  clear: both;
+  display: inline-block;
+  overflow: hidden;
 }
 .news {
-    animation : slide 20s linear infinite;
-    white-space: pre;
+  animation: slide 20s linear infinite;
+  white-space: pre;
 }
 
 @keyframes slide {
-    0% {
-        transform: translatex(100vw)
-       
-    }
+  0% {
+    transform: translatex(100vw);
+  }
 
-    100% {
-         transform: translatex(-120vw)
-    }
+  100% {
+    transform: translatex(-120vw);
+  }
 }
 
 @media only screen and (max-width: 700px) {
   /* For desktop: */
-    .ocularMovil{
-        display: none !important;
-    }
+  .ocularMovil {
+    display: none !important;
+  }
 }
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
-    .ancho{
-        width: calc(100% - 300px)
-    }
+  .ancho {
+    width: calc(100% - 300px);
+  }
 }
 @media only screen and (max-width: 750px) {
   /* For desktop: */
-    .ocularMovil2{
-        display: none !important;
-    }
-    .mostrarSerie{
-      display: inline !important;
-    }
+  .ocularMovil2 {
+    display: none !important;
+  }
+  .mostrarSerie {
+    display: inline !important;
+  }
 }
 </style>

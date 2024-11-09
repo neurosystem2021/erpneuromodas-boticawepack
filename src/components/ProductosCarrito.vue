@@ -687,6 +687,7 @@ export default {
         let params = {codigoBarra: idProducto}
         this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
         .then((response) => {
+          console.log('sss')
           if (response.data.IdProducto) {
             this.setProducto(response.data)
           } else {
