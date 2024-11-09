@@ -233,7 +233,8 @@
                             :isNota="isNota"
                             :bloquearInput="bloquearInput"
                             :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto" style="margin-top:-20px">
+                            :onSetProducto="onSetProducto" style="margin-top:-20px"
+                            :esDelivery="venta.EsDelivery">
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -608,7 +609,10 @@ export default {
                 CampoDireccion: '',
                 diasValidosProf: 0,
                 EsOrganizacion: 0,
-                NombreOrganizacion: ''
+                NombreOrganizacion: '',
+                EsDelivery: false,
+                nombreLlevar: '',
+                DireccionEntrega: ''
             }
             this.isNota = false
             this.bloquearInput=false
@@ -1072,6 +1076,9 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
+            this.venta.IdPedido = this.$route.query.idPedido || null
+            this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
+            this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 

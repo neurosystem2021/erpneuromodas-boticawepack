@@ -488,6 +488,7 @@ export default {
     almacenDestino:Number,
     almacenOrigen:Number,
     bloquearInput:Boolean,
+    esDelivery:Boolean,
     onSetProducto: {
       type: Function,
       default (obj) {
