@@ -28,7 +28,7 @@
                   ref="inputCodigoBarra"
                   placeholder="Buscar Código de Barra"
                   class="form-control"
-                  :debounce="4000"
+                  :debounce="2000"
                   v-model="codigoBarraFilter"
                   @input="updateFilters"
                 />
