@@ -490,7 +490,7 @@ export default {
           this.axios
             .get(this.API + "productos/id/" + newVal.IdProducto)
             .then(response => {
-              console.log('aaaa')
+              console.log("aaaa");
               newVal = response.data;
               this.initForm();
               this.title = "Editar Producto << " + newVal.CodigoBarra + " >>";

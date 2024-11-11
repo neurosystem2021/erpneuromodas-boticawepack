@@ -122,6 +122,7 @@ export default {
           let Vendedor = response.data[0].UsuarioReg;
           this.$store.state.cart.vendedor = Vendedor;
           response.data.map(item => {
+            item.descuento = item.Descuento;
             this.add([
               item.IdProducto,
               () => {
@@ -130,18 +131,21 @@ export default {
               {
                 setPrecio: true,
                 setPreOr: item.Precio,
-                cantidad: item.Cantidad
+                descuento: item.Descuento,
+                cantidad: item.Cantidad,
+                Descripcion: item.Descripcion,
               }
             ]);
 
             this.filter = "";
             this.show = false;
           });
+          // console.log(response.data);
           proforma.productos = response.data;
-          // console.log(proforma);
 
           // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
           this.$emit("onSelectProforma", proforma);
+          this.$emit("vendedorProforma", Vendedor);
           this.limpiarCarrito();
         });
     },

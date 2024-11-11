@@ -19,7 +19,10 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                        <proformas 
+                        :idAlmacen="venta.almacen.IdAlmacen" 
+                        @onSelectProforma="setCliente"
+                        @vendedorProforma="guardarVendedor" />
                     </b-button-group>
                     <b-button-group size="sm" class="ocularMovil2">
                         <pre-orden-lista 
@@ -214,7 +217,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group>
+                        <!-- <b-form-group>
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -228,7 +231,7 @@
                                 :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
-                        </b-form-group>
+                        </b-form-group> -->
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
@@ -330,6 +333,15 @@
                                         <tr>
                                             <td>Efectivo</td>
                                             <td>
+                                              <b-form-checkbox size="sm" 
+                                              v-model="venta.pago.efectivo.select"
+                                              @change="cambiarTipoPago('efectivo')"
+                                                value="1"
+                                                unchecked-value="0"
+                                              />
+                                              
+                                            </td>
+                                            <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
                                                     type="text"
@@ -351,6 +363,14 @@
                                         </tr>
                                         <tr>
                                             <td>Tarjeta</td>
+                                            <td>
+                                               <b-form-checkbox size="sm" 
+                                              v-model="venta.pago.visa.select"
+                                              @change="cambiarTipoPago('visa')"
+                                              value="1"
+                                              unchecked-value="0"
+                                              />
+                                            </td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -375,6 +395,14 @@
                                         <tr>
                                             <td>Transferencia</td>
                                             <td>
+                                              <b-form-checkbox size="sm" 
+                                              v-model="venta.pago.mastercard.select"
+                                              @change="cambiarTipoPago('mastercard')"
+                                              value="1"
+                                              unchecked-value="0"
+                                              />
+                                            </td>
+                                            <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
                                                     :disabled="bloquearInput?true:false"
@@ -397,6 +425,14 @@
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: middle !important;">YAPE / PLIN</td>
+                                            <td>
+                                              <b-form-checkbox size="sm" 
+                                              v-model="venta.pago.yape.select"
+                                              @change="cambiarTipoPago('yape')"
+                                              value="1"
+                                              unchecked-value="0"
+                                              />
+                                            </td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.yape.descripcion"
@@ -546,15 +582,27 @@ export default {
   watch: {
     vendedor() {
       this.$refs.inputVendedor.setValue(this.vendedor);
-      //   console.log("vendedor", this.vendedor);}
+      // }
     },
     totalCart(newVal) {
-      this.venta.pago.efectivo.monto = parseFloat(
-        newVal -
-          (parseFloat(this.venta.pago.visa.monto) +
-            parseFloat(this.venta.pago.mastercard.monto) +
-            parseFloat(this.venta.pago.yape.monto))
-      ).toFixed(2);
+      // if (this.venta.pago.efectivo.select) {
+      //   this.venta.pago.efectivo.monto = parseFloat(
+      //     newVal -
+      //       (parseFloat(this.venta.pago.visa.monto) +
+      //         parseFloat(this.venta.pago.mastercard.monto) +
+      //         parseFloat(this.venta.pago.yape.monto))
+      //   ).toFixed(2);
+      // }
+      if (this.venta.pago.visa.select) {
+        this.venta.pago.visa.monto = this.totalCart;
+      } else if (this.venta.pago.mastercard.select) {
+        this.venta.pago.mastercard.monto = this.totalCart;
+      } else if (this.venta.pago.yape.select) {
+        this.venta.pago.yape.monto = this.totalCart;
+      } else {
+        this.venta.pago.efectivo.select = 1;
+        this.venta.pago.efectivo.monto = this.totalCart;
+      }
     }
   },
   computed: {
@@ -584,6 +632,58 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    cambiarTipoPago(tipo) {
+      console.log(tipo);
+      this.$nextTick(() => {
+        if (tipo == "efectivo") {
+          this.venta.pago.efectivo.select = 1;
+          this.venta.pago.visa.select = 0;
+          this.venta.pago.mastercard.select = 0;
+          this.venta.pago.yape.select = 0;
+          this.venta.pago.efectivo.monto = this.totalCart;
+          this.venta.pago.yape.monto = 0;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.mastercard.monto = 0;
+        }
+        if (tipo == "visa") {
+          this.venta.pago.visa.select = 1;
+          this.venta.pago.efectivo.select = 0;
+          this.venta.pago.mastercard.select = 0;
+          this.venta.pago.yape.select = 0;
+          this.venta.pago.visa.monto = this.totalCart;
+
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.yape.monto = 0;
+        }
+        if (tipo == "mastercard") {
+          this.venta.pago.mastercard.select = 1;
+          this.venta.pago.efectivo.select = 0;
+          this.venta.pago.visa.select = 0;
+          this.venta.pago.yape.select = 0;
+          this.venta.pago.mastercard.monto = this.totalCart;
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.yape.monto = 0;
+        }
+        if (tipo == "yape") {
+          this.venta.pago.yape.select = 1;
+          this.venta.pago.mastercard.select = 0;
+          this.venta.pago.efectivo.select = 0;
+          this.venta.pago.visa.select = 0;
+          this.venta.pago.yape.monto = this.totalCart;
+          this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.visa.monto = 0;
+        }
+      });
+    },
+    guardarVendedor(event) {
+      this.$refs.inputVendedor.setValue(event);
+      this.venta.vendedor = {
+        Usuario: event
+      };
+    },
     getEstadoSistema() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       if (hostUrl != null) {
@@ -876,7 +976,7 @@ export default {
     },
     setComisionista(obj) {
       if (typeof obj === "object") {
-        this.$refs.inputComisionista.setValue(obj.Cliente);
+        // this.$refs.inputComisionista.setValue(obj.Cliente);
         this.venta.comisionista = obj;
       } else {
         this.venta.comisionista = {};
@@ -1231,7 +1331,15 @@ export default {
         this.inProgress = false;
         return;
       }
-
+      this.venta.TipoPago = this.venta.pago.efectivo.select
+        ? "Efectivo"
+        : this.venta.pago.visa.select
+          ? "Tarjeta"
+          : this.venta.pago.mastercard.select
+            ? "Transferencia"
+            : this.venta.pago.yape.select
+              ? "Yape/ Plin"
+              : "Contado";
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
@@ -1262,7 +1370,7 @@ export default {
           this.$refs.inputPuntoVenta.setValue("CAJA1");
           this.$refs.inputCliente.setValue("");
           this.$refs.inputVendedor.setValue("");
-          this.$refs.inputComisionista.setValue("");
+          // this.$refs.inputComisionista.setValue("");
           this.$refs.carrito.pagocon = 0;
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
@@ -1280,7 +1388,7 @@ export default {
       this.venta.cliente = {};
     },
     eliminarComisionista() {
-      this.$refs.inputComisionista.setValue("");
+      // this.$refs.inputComisionista.setValue("");
       this.venta.comisionista = {};
     },
     onPagarDelivery(obj) {

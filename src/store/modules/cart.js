@@ -96,6 +96,9 @@ const actions = {
     let setPrecioCosto = false;
     let setPreOr = false;
     let isDelivery = false;
+    let descuento = 0;
+    let descripcion = "";
+
     if (obje) {
       setPrecio = obje.setPrecio;
       cantidad = obje.cantidad;
@@ -104,6 +107,8 @@ const actions = {
       setPrecioCosto = obje.setPrecioCosto;
       setPreOr = obje.setPreOr;
       isDelivery = obje.isDelivery;
+      descuento = obje.descuento ? obje.descuento : 0;
+      descripcion = obje.Descripcion;
     }
 
     if (typeof producto === "object") {
@@ -192,9 +197,10 @@ const actions = {
               obj.nuevoPrecioContado = 0;
             }
 
-            obj.descuento = 0;
-            //obj.nuevoPrecioContado = 0
+            obj.descuento = descuento;
 
+            //obj.nuevoPrecioContado = 0
+            obj.Descripcion = descripcion;
             let arr2 = [
               { desc: obj.ProductoDesc },
               { desc: obj.ProductoDesc2 },
@@ -207,7 +213,16 @@ const actions = {
               obj.Descripcion =
                 arr2[0].desc + "\n" + arr2[1].desc + "\n" + arr2[2].desc;
             }
-
+            if (descripcion) {
+              if (descripcion != '"\\n\\n"') {
+                if (descripcion.startsWith('"') && descripcion.endsWith('"')) {
+                  descripcion = descripcion.slice(1, -1);
+                }
+                obj.Descripcion = descripcion.replace(/\\n/g, "\n");
+              } else {
+                obj.Descripcion = null;
+              }
+            }
             commit("AGREGAR_PRODUCTO", obj);
             if (cb) cb(obj);
           } else {

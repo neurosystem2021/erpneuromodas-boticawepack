@@ -249,6 +249,7 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
+          <!-- {{ productos[data.index] }} -->
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
@@ -957,9 +958,9 @@ export default {
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv)
       }
-      if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
-      }
+      // if (this.productos[index].descuento) {
+      //   total -= parseFloat(this.productos[index].descuento)
+      // }
 
       total =  this.$options.filters.redondear(total)
       Vue.set(this.productos[index], 'total', total)
