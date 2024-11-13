@@ -85,7 +85,13 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
+            <td class="desc" style="font-size:0.75rem">
+              <h3 style="color:black; font-size:1rem">{{ prod.Producto }}</h3>
+              <h4 style="color:black; font-size:0.9rem" v-if="prod.ProductoDesc">{{ prod.ProductoDesc }} </h4>
+              <h4 style="color:black; font-size:0.9rem" v-if="prod.ProductoDesc2">{{ prod.ProductoDesc2 }} </h4>
+              <h4 style="color:black; font-size:0.9rem" v-if="prod.ProductoDesc3">{{ prod.ProductoDesc3 }} </h4>
+              <h4 style="color:black; font-size:0.9rem">{{ formatearDescripcion(prod.Descripcion) }} </h4>
+            </td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:1.1rem"><span v-if="prod.DisabledTotal === 0">S/. {{ prod.Precio | moneda }}</span></td>
             <td class="total" style="font-size:1.1rem">
@@ -146,76 +152,93 @@
 </template>
 
 <script>
-import {API} from '@/store/config.js'
+import { API } from "@/store/config.js";
 export default {
-	mounted () {
-		this.getProforma()
-    this.getEmpresa()
-	},
-	data () {
-		return {
-			API: API,
-			idProforma: this.$route.params.id,
-			proforma: { productos: [] },
+  mounted() {
+    this.getProforma();
+    this.getEmpresa();
+  },
+  data() {
+    return {
+      API: API,
+      idProforma: this.$route.params.id,
+      proforma: { productos: [] },
       empresa: {},
-      fechaHasta:'',
-		}
-	},
-	computed: {
-		subTotal () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio)
-			})
-      return sumatoria
-		},
-    descuento () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += prod.Descuento
-			})
-      return sumatoria
-		},
-    total () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
-			})
-      return sumatoria
-		}
-	},
+      fechaHasta: ""
+    };
+  },
+  computed: {
+    subTotal() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Cantidad * prod.Precio;
+      });
+      return sumatoria;
+    },
+    descuento() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Descuento;
+      });
+      return sumatoria;
+    },
+    total() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+      });
+      return sumatoria;
+    }
+  },
   methods: {
-    getProforma () {
-      this.axios.get(API + 'proformas/id/' + this.idProforma)
-			.then(res => {
-				this.proforma = res.data
-        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
-			})
+    getProforma() {
+      this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
+        this.proforma = res.data;
+        this.fechaHasta = this.calcularFechaHasta(
+          this.proforma.FechaReg.substring(0, 10),
+          this.proforma.DiasValidos
+        )
+          .toISOString()
+          .substring(0, 10);
+      });
     },
-    calcularFechaHasta(actual,dias){
-    var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
-    return date;
+    calcularFechaHasta(actual, dias) {
+      var date = new Date(actual);
+      date.setDate(date.getDate() + (dias - 1));
+      return date;
     },
-    getEmpresa () {
-      this.axios.get(API + 'empresa/id/' + 1)
-			.then(res => {
-				this.empresa = res.data
-			})
+    getEmpresa() {
+      this.axios.get(API + "empresa/id/" + 1).then(res => {
+        this.empresa = res.data;
+      });
     },
-    imprimir(){
-    window.print();
+    imprimir() {
+      window.print();
+    },
+    formatearDescripcion(Desc) {
+      let descripcion = Desc;
+      if (descripcion) {
+        if (descripcion != '"\\n\\n"') {
+          if (descripcion.startsWith('"') && descripcion.endsWith('"')) {
+            descripcion = descripcion.slice(1, -1);
+          }
+          descripcion = descripcion.replace(/\\n/g, "\n");
+        } else {
+          descripcion = null;
+        }
+      }
+      return descripcion;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-@import '../../assets/css/invoice.css';
-.celda{
-  text-align:left;
+@import "../../assets/css/invoice.css";
+.celda {
+  text-align: left;
   border: none !important;
-  background: white !important
+  background: white !important;
 }
 @media print {
   #printBtn {

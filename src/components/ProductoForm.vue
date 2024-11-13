@@ -490,7 +490,6 @@ export default {
           this.axios
             .get(this.API + "productos/id/" + newVal.IdProducto)
             .then(response => {
-              console.log("aaaa");
               newVal = response.data;
               this.initForm();
               this.title = "Editar Producto << " + newVal.CodigoBarra + " >>";
@@ -528,7 +527,7 @@ export default {
 
               // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
               // this.$refs.inputProducto.$el.disabled = true
-              this.$refs.inputCodigoBarra.$el.disabled = true;
+              this.$refs.inputCodigoBarra.$el.disabled = false;
 
               // this.$refs.inputColor.setValue(newVal.Color)
               // this.$refs.inputBotapie.setValue(newVal.Botapie)

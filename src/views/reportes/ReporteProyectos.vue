@@ -189,6 +189,42 @@
                 </table>
               </b-col>
             </b-row>
+            <h6>Gastos:</h6>
+            <b-row>
+              <b-col md="12">
+                <table class="table b-table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Id Caja</th>
+                            <th class="text-center">Fecha</th>
+                            <th class="text-center">Concepto</th>
+                            <th class="text-center">Importe</th>
+                            <th class="text-center">Doc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(ade, i) in gastos" :key="i">
+                            <td class="text-center">{{ ade.IdCajaBanco }}</td>
+                            <td class="text-center">{{ ade.FechaDoc }}</td>
+                            <td class="text-center">{{ ade.Concepto }}</td>
+                            <td class="text-center">{{ ade.Importe | moneda }}</td>
+                            <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + ade.IdCajaBanco" target="_blank"><i class="fas fa-print"></i></b-btn></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td class="text-center"><b>TOTAL ADELANTOS</b></td>
+                      <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                          gastos.reduce((total,gasto)=>{
+                            return total + parseFloat(gasto.Importe)
+                          },0)
+                        }} </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </b-col>
+            </b-row>
             <hr>
             <h6>Productos:</h6>
             <b-row>
@@ -239,152 +275,194 @@
   </template>
   
   <script>
-  import config from '@/store/config.js'
-  
-  export default {
-    mounted() {
-      this.axios.get(this.API + 'proyectos/count').then((response) => {
-        this.totalRows = response.data.total
-      })
-      this.getAlmacenes();
-    },
-    data() {
-      return {
-        API: config.API,
-        pageOptions: [ 5, 10, 20, 50, 100,200 ],
-        filter: null,
-        sortBy: 'IdPreOrden',
-        sortDesc: true,
-        productoSelect: {},
-        items: [],
-        isBusy: false,
-        gastos: [],
-        adelantos: [],
-        productos: [],
-        fields: [
-              { key: 'IdPreOrden', label: 'ID', sortable: true },
-              { key: 'Nombre', sortable: true },
-              { key: 'Cliente', sortable: true },
-              { key: 'DniRuc', sortable: true },
-              { key: 'FechaReg', label: 'Fecha Registro', sortable: true },
-              { key: 'FechaAlquilerInicioF', label: 'Fecha Inicio', sortable: true },
-              { key: 'FechaAlquilerFinF', label: 'Fecha Fin', sortable: true },
-              { key: 'Cliente', sortable: true },
-              { key: 'Adelantos',label: 'Adelantos', sortable: true },
-              { key: 'TotalDetalle',label: 'Total', sortable: true },
-              { key: 'Estado',label: 'Estado', sortable: true, class:'text-center' },
-              { key: 'Visualizar', class:'text-center' },
-        ],
-        totalRows: 50,
-        perPage: 20,
-        currentPage: 1,
-        idAlmacen: (sessionStorage.getItem('IdPerfil')==1?0:sessionStorage.getItem('IdAlmacen')) || 0,
-        almacenes: [
-          { value: 0, text: 'TODOS' },
-        ],
-        fechaIni: '',
-		fechaFin: '',
-        nombreProyecto: '',
-      }
-    },
-    methods: {
-        limpiarBusquador(){
-          this.fechaFin = ''
-          this.fechaIni = ''
-          this.actualizarTabla()
-        },
-        setAltImg(event) { 
-            event.target.src = "static/no-photo.png" 
-        },
-        rowClick (item, index) {
-          this.productoSelect = item
-        },
-        verDetalle(id, item){
-          this.productoSelect = item
-          this.cargarCajaBanco(id)
-          this.getProductos(id)
-          this.$refs['modalDetalle'].show()
-        },
-        getProductos (id) {
-          this.productos=[]
-          this.axios.get(this.API + 'proyecto/detalle', {
-            params: {IdPreOrden: id}
-          }).then(res => {
-            this.nombreProyecto = res.data[0].Producto
-            res.data.map(pc => {
-                this.productos.push(pc)
-            })
+import config from "@/store/config.js";
 
-          }).catch(err => {
-            console.log(err)
-          })
+export default {
+  mounted() {
+    this.axios.get(this.API + "proyectos/count").then(response => {
+      this.totalRows = response.data.total;
+    });
+    this.getAlmacenes();
+  },
+  data() {
+    return {
+      API: config.API,
+      pageOptions: [5, 10, 20, 50, 100, 200],
+      filter: null,
+      sortBy: "IdPreOrden",
+      sortDesc: true,
+      productoSelect: {},
+      items: [],
+      isBusy: false,
+      gastos: [],
+      adelantos: [],
+      productos: [],
+      gastos: [],
+      fields: [
+        { key: "IdPreOrden", label: "ID", sortable: true },
+        { key: "Nombre", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "DniRuc", sortable: true },
+        { key: "FechaReg", label: "Fecha Registro", sortable: true },
+        { key: "FechaAlquilerInicioF", label: "Fecha Inicio", sortable: true },
+        { key: "FechaAlquilerFinF", label: "Fecha Fin", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Adelantos", label: "Adelantos", sortable: true },
+        { key: "TotalDetalle", label: "Total", sortable: true },
+        {
+          key: "Estado",
+          label: "Estado",
+          sortable: true,
+          class: "text-center"
         },
-        cargarCajaBanco(id){
-          this.gastos=[];
-          this.adelantos=[];
-          this.axios.get(this.API + 'proyecto/cajaybanco/todo', { params: {
-            IdPreOrden: id
-          } }).then(res => {
-            this.cajaBanco = res.data
-            this.cajaBanco.map(cb=>{
-              if(cb.Tipo==0){
-                this.adelantos.push(cb)
-              }
-              if(cb.Tipo==1){
-                this.gastos.push(cb)
-              }
-            })
-          })
-        },
-        actualizarTabla() {
-          setTimeout(() => {
-            this.$refs.tablaVentas.refresh()
-          }, 300);
-          
-        },
-        setAlmacen(){
-          this.actualizarTabla()
-        },
-        myProvider (ctx) {
-          // Here we don't set isBusy prop, so busy state will be handled by table itself
-          // this.isBusy = true
-          let url = this.API + 'reporte/proyectos?&FechaIni='+this.fechaFin+'&FechaFin='+this.fechaIni+'&idAlmacen='+this.idAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-          url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-          let promise = this.axios.get( url )
-  
-          return promise.then((result) => {
-            this.items = result.data
-            //this.totalRows = this.items.length
-            // Here we could override the busy state, setting isBusy to false
-            // this.isBusy = false
-            return(this.items)
-          }).catch(error => {
-            // Here we could override the busy state, setting isBusy to false
-            // this.isBusy = false
-            // Returning an empty array, allows table to correctly handle busy state in case of error
-            return []
-          })
-        },
-        getAlmacenes(){
-          this.almacenes = []
-          this.almacenes.push({ value: 0, text: 'TODOS' })
-          this.axios.get(this.API + '/almacenes').then(r => {
-            if (r.data) {
-              r.data.map(al=>{
-                this.almacenes.push({ value: al.IdAlmacen, text: al.Almacen })
-              })
-            }
-          })
-        },
+        { key: "Visualizar", class: "text-center" }
+      ],
+      totalRows: 50,
+      perPage: 20,
+      currentPage: 1,
+      idAlmacen:
+        (sessionStorage.getItem("IdPerfil") == 1
+          ? 0
+          : sessionStorage.getItem("IdAlmacen")) || 0,
+      almacenes: [{ value: 0, text: "TODOS" }],
+      fechaIni: "",
+      fechaFin: "",
+      nombreProyecto: ""
+    };
+  },
+  methods: {
+    limpiarBusquador() {
+      this.fechaFin = "";
+      this.fechaIni = "";
+      this.actualizarTabla();
     },
-    components: {
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
+    rowClick(item, index) {
+      this.productoSelect = item;
+    },
+    verDetalle(id, item) {
+      this.productoSelect = item;
+      this.cargarCajaBanco(id);
+      this.getProductos(id);
+      this.cargarGastos(id);
+      this.$refs["modalDetalle"].show();
+    },
+    async cargarGastos(id) {
+      this.gastos = [];
+      await this.axios
+        .get(this.API + "preorden/cajaybanco", {
+          params: {
+            IdPreOrden: id,
+            TipoCajaBanco: 1
+          }
+        })
+        .then(res => {
+          this.gastos = res.data;
+          this.calculoGastosAdelantos();
+        });
+    },
+    getProductos(id) {
+      this.productos = [];
+      this.axios
+        .get(this.API + "proyecto/detalle", {
+          params: { IdPreOrden: id }
+        })
+        .then(res => {
+          this.nombreProyecto = res.data[0].Producto;
+          res.data.map(pc => {
+            this.productos.push(pc);
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    cargarCajaBanco(id) {
+      this.gastos = [];
+      this.adelantos = [];
+      this.axios
+        .get(this.API + "proyecto/cajaybanco/todo", {
+          params: {
+            IdPreOrden: id
+          }
+        })
+        .then(res => {
+          this.cajaBanco = res.data;
+          this.cajaBanco.map(cb => {
+            if (cb.Tipo == 0) {
+              this.adelantos.push(cb);
+            }
+            if (cb.Tipo == 1) {
+              this.gastos.push(cb);
+            }
+          });
+        });
+    },
+    actualizarTabla() {
+      setTimeout(() => {
+        this.$refs.tablaVentas.refresh();
+      }, 300);
+    },
+    setAlmacen() {
+      this.actualizarTabla();
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "reporte/proyectos?&FechaIni=" +
+        this.fechaFin +
+        "&FechaFin=" +
+        this.fechaIni +
+        "&idAlmacen=" +
+        this.idAlmacen +
+        "&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
+
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
+    },
+    getAlmacenes() {
+      this.almacenes = [];
+      this.almacenes.push({ value: 0, text: "TODOS" });
+      this.axios.get(this.API + "/almacenes").then(r => {
+        if (r.data) {
+          r.data.map(al => {
+            this.almacenes.push({ value: al.IdAlmacen, text: al.Almacen });
+          });
+        }
+      });
     }
-    }
-  </script>
+  },
+  components: {}
+};
+</script>
   
   <style>
-    #modalDetalle .modal-dialog{
-      max-width: 65% !important;
-    }
-  </style>
-  
+#modalDetalle .modal-dialog {
+  max-width: 65% !important;
+}
+</style>

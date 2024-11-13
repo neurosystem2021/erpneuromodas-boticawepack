@@ -13,6 +13,7 @@
           placeholder="Seleccionar Producto"
           :on-select="addProducto"
           :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
+           :customParams="{ esProyecto: esProyecto ? esProyecto : false }"
           :classes="{input: 'form-control upper'}">
         </autocomplete>
         <input v-model="loadCode"
@@ -79,7 +80,7 @@ export default {
       loadCode: ""
     };
   },
-  props: ["idPreorden", "idProducto"],
+  props: ["idPreorden", "idProducto", "esProyecto"],
   computed: {
     sumProductos() {
       var sum = 0;
@@ -158,7 +159,8 @@ export default {
         let params = { codigoBarra: idProducto };
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then(response => {console.log('qqqq')
+          .then(response => {
+            console.log("qqqq");
             if (response.data.IdProducto) {
               this.addProducto(response.data);
               this.loadCode = "";

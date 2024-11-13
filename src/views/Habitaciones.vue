@@ -1,15 +1,21 @@
 <template>
     <div>
+      
       <b-container class="bv-example-row">
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
-			<div v-if="getHabitacionesPiso(pi).length">
+			<div v-if="getMostrarPiso(pi)">
 			  <br>
 			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS AGUILAR' : 'PROYECTOS 2 DE MAYO' }}</b></b-alert>
 			  <br>
-			  <b-button variant="success" size="sm" @click="abrirMdlNuevoProyecto()">
+			  <b-button variant="success" size="sm"
+          id="nuevoProyecto"
+          >
+          <!-- @click="showNuevoProyecto=!showNuevoProyecto" -->
 				Agregar Proyecto
 			  </b-button>
-			  <b-modal title="Empezar Proyecto" v-model="mdlNuevoProyecto" v-if="mdlNuevoProyecto" hide-footer>
+			  <!-- <b-modal title="Empezar Proyecto" v-model="mdlNuevoProyecto" v-if="mdlNuevoProyecto" hide-footer
+        no-close-on-backdrop> -->
+        <b-popover  v-if="showNuevoProyecto" target="nuevoProyecto" title="Empezar Proyecto">
 				<label>Seleccione un cliente:</label>
 				<b-input-group>
 					<autocomplete
@@ -24,13 +30,17 @@
 						id="cboCliente"
 						>
 					</autocomplete>
-				<b-input-group-append>
+          <b-input-group-append>
+            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+				
 				
 				<!-- <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form> -->
-				</b-input-group-append>
+                                        
+				<!-- <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form> -->
+          </b-input-group-append>
 				</b-input-group>
 				<br>
-				<label>Descripcion:</label>
+			<label>Descripcion:</label>
 				<textarea 
 					class="form-control"
 					placeholder="Descripción"
@@ -38,7 +48,7 @@
 					style="width: 100%"
 					v-model="selectCliente.Descripcion">
 				</textarea>
-				<br>
+					<br>
 				<label>Fecha Inicio:</label>
 				<b-input-group>
 				<b-form-input v-model="selectCliente.FechaAlquilerInicio"
@@ -54,8 +64,8 @@
 				</b-input-group>
 				<br>
 				<b-button variant="success" size="sm" @click="nuevoProyecto()">Empezar Proyecto</b-button>	
-								
-			  </b-modal>
+      </b-popover>				
+			  <!-- </b-modal> -->
 			  <!-- <b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
 								<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
 									<label>Seleccione un cliente:</label>
@@ -234,6 +244,11 @@
 				<div id="contentModal" >
 				  	<div class="row">
 						<div id="headerCamiones" class="col-md-12">
+              <div class="text-left">
+                <h4>
+                  Código : {{ selectProducto.IdProducto }}
+                </h4>
+              </div>
 							<div class="text-right horaFechaImpreso"> Fecha y Hora del impreso: <span id="fechaHoraImp" style="font-weight:bold"></span></div>
 							<div class="text-left" style="margin-bottom: 20px;">Fecha del Proyecto: <b> Inicio: {{ selectProducto.FechaAlquiler }} - Fin: {{ selectProducto.FechaAlquilerFin }}</b></div>
 							<div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
@@ -247,13 +262,24 @@
 										placeholder="Descripción"
 										cols="12" rows="3"
 										style="width: 100%"
-										v-model="selectProducto.Descripcion">
-								</textarea>
+										v-model="selectProducto.Descripcion"/>								
 									</b-col>
 									<b-col md="3">
 										<b-button v-if="!editarDescripcion" style="margin-top:5px" variant="primary" size="sm" @click="editarDescripcionFun()"><i class="fas fa-pencil-alt fa-sm"></i> Editar Descripcion</b-button>
 										<b-button v-if="editarDescripcion" style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
 									</b-col>
+                  <b-col md="3"  class="mt-2">
+                    <b-input-group>
+                      <b-form-input
+                        v-model="cantidadCodigoBarra"
+                        type="number"
+                        style="width:80px;"
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + selectProducto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-col>
 								</b-row>
 							</div>
 							<div class="text-left" v-if="proformaTotal">
@@ -268,6 +294,7 @@
 									<pre-orden-form-det v-if="show"
 									:id-preorden="selectProducto.IdPreOrden"
 									:id-producto="selectProducto.IdProducto"
+                  :esProyecto="true"
 									ref="preOrdenProductos"
 									 @onUpdateProductos="calcularManoObra"
 									></pre-orden-form-det>
@@ -425,12 +452,13 @@ export default {
       API: config.API,
       show: false,
       showPopover: true,
+      showNuevoProyecto: true,
       habitaciones: [],
       selectCliente: {},
       selectProducto: {},
       vuelo: "",
       fechaReserva: this.$moment().format("YYYY-MM-DD"),
-      pisos: [1, 2, 3, 4, 5],
+      pisos: [1, 2],
       adelantos: [],
       gastos: [],
       montoTotal: 0,
@@ -449,7 +477,8 @@ export default {
       totalGastos: 0,
       totalAdelantos: 0,
       editarDescripcion: false,
-      newDniRuc: ""
+      newDniRuc: "",
+      cantidadCodigoBarra: 1
     };
   },
   computed: {
@@ -586,6 +615,10 @@ export default {
       }
     },
 
+    getMostrarPiso(piso) {
+      let id = this.$route.query.id ? this.$route.query.id : 1;
+      return piso == id;
+    },
     getHabitacionesPiso(piso) {
       return this.habitaciones.filter(hab => {
         return hab.Piso === piso;
@@ -606,6 +639,7 @@ export default {
         });
     },
     openCarrito(hab) {
+      console.log(hab);
       this.proformaTotal = null;
       this.selectProducto = hab;
       this.$refs.modalCarrito.show();
@@ -627,11 +661,12 @@ export default {
       }
     },
     getHabitaciones() {
+      let id = this.$route.query.id ? this.$route.query.id : 1;
       this.axios
         .get(
           this.API +
             "habitaciones?sortBy=Gen_Producto.IdProducto&sortDesc=DESC&pisoAlm=" +
-            this.$route.query.id
+            id
         )
         .then(res => {
           this.habitaciones = res.data;
@@ -667,7 +702,8 @@ export default {
           IdProducto: hab.IdProducto,
           IdCliente: this.selectCliente.IdCliente,
           FechaReserva: this.fechaReserva,
-          Vuelo: this.vuelo
+          Vuelo: this.vuelo,
+          pisoAlm: this.$route.query.id
         })
         .then(res => {
           this.getHabitaciones();
@@ -713,7 +749,8 @@ export default {
         Vuelo: this.vuelo,
         Descripcion: this.selectCliente.Descripcion,
         FechaAlquilerInicio: this.selectCliente.FechaAlquilerInicio,
-        FechaAlquilerFin: this.selectCliente.FechaAlquilerFin
+        FechaAlquilerFin: this.selectCliente.FechaAlquilerFin,
+        pisoAlm: this.$route.query.id
       };
       await this.axios
         .post(this.API + "producto/registro_proyecto", data)
