@@ -716,7 +716,7 @@ export default {
                         item.descripcionPresentacion = prod.presentacion
                         item.presentacion = JSON.parse(prod.PreciosPorProducto || '[]')
                     }
-                    
+
                     let preciosProd = []
                     item.precioCont = item.PrecioContado
                     item.precio = item.PrecioCosto
@@ -1015,12 +1015,12 @@ export default {
             //console.log('prueba',this.productos)
 
             for (let producto of this.productos) {
-                    if (producto.PorcentajeDesc > producto.PorcentajeDescMax) {
-                        this.$toasted.show(`El descuento del producto no puede exceder ${producto.PorcentajeDescMax}%`);
-                        this.inProgress = false;
-                        return;
-                    }
+                if (producto.PorcentajeDesc > producto.PorcentajeDescMax) {
+                    this.$toasted.show(`El descuento del producto no puede exceder ${producto.PorcentajeDescMax}%`);
+                    this.inProgress = false;
+                    return;
                 }
+            }
 
             if (!this.productos.length) {
                 this.$toasted.show('No hay productos para crear la proforma')
@@ -1046,7 +1046,15 @@ export default {
                 return
             }
 
-            this.venta.productos = this.productos
+            let productos = [];
+            this.productos.forEach(prod => {
+                let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
+
+                prod.descuento = parseFloat((cantidad * prod.precio * prod.PorcentajeDesc) / 100).toFixed(0);
+                productos.push(prod);
+            });
+
+            this.venta.productos = productos
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
                 .then((response) => {
@@ -1210,7 +1218,15 @@ export default {
                 return
             }
 
-            this.venta.productos = this.productos
+            let productos = [];
+            this.productos.forEach(prod => {
+                let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
+
+                prod.descuento = parseFloat((cantidad * prod.precio * prod.PorcentajeDesc) / 100).toFixed(0);
+                productos.push(prod);
+            });
+            //console.log("prod", productos)
+            this.venta.productos = productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
@@ -1224,7 +1240,8 @@ export default {
                 .then((response) => {
 
                     // limpiar preorden seleccionado
-                    this.$router.replace('/ventas')
+                    // this.$router.replace('/ventas')
+                    // window.location.reload()
                     this.$toasted.success('Venta realizada con exito')
                     this.inProgress = false
                     this.tieneIgv = false

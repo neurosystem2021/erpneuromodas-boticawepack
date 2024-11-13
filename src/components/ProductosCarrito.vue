@@ -237,6 +237,7 @@
             style="width: 100px; font-weight:bold" class="form-control" step="0.1" min="0" @input="(val) => {
               changeCant(val.target.value, productos[data.index], data.index)
               $emit('onInputCantidad', val.target.value)
+              actualizarDescu(data.index)
               /*if(!productos[data.index].PreciosPorProducto) {
               return
               }
@@ -341,12 +342,12 @@
                 parseFloat(parseFloat(Math.round(getSubtotal(data.index) * val.target.value / 100 * 10) / 10).toFixed(0)).toFixed(2); actualizarDescu(data.index);
             }" />
           <b-form-text class="text-center">
-            <b style="color:#dc3545">% Max:
-              {{ productos[data.index].PorcentajeDescMax }}</b>
-            <br>
-            <b>Desc: S/{{ productos[data.index].descuento }}</b>
+            <b style="color:#dc3545">% Max: {{ productos[data.index].PorcentajeDescMax }}</b>
+            <br />
+            <b>Desc: S/{{ calcularDescuento(data.index) }}</b>
           </b-form-text>
         </template>
+
 
         <template slot="FechaAlquiler" slot-scope="data">
           <b-form-input v-model="productos[data.index].FechaAlquiler" type="date" placeholder="Fecha Fin"
@@ -366,7 +367,7 @@
             type="text"
             placeholder="Descripción"></b-form-input>-->
         </template>
-
+        <!-- {{ recalcularTotal(data.index) }} -->
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
@@ -429,18 +430,21 @@
     <b-col md="3">
       <table class="table b-table border table-footer">
         <tbody>
-          <tr v-if="sumatoriaDescuento > 0">
+          <tr v-if="recalcularDescuento() > 0">
             <td class="table-success">SubTotal</td>
             <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}
             </td>
           </tr>
-          <tr v-if="sumatoriaDescuento > 0">
+          <tr v-if="recalcularDescuento() > 0">
             <td class="table-danger">Descuento</td>
-            <td class="table-danger">- {{ parseFloat(parseFloat(sumatoriaDescuento).toFixed(0)).toFixed(2) }}</td>
+            <td class="table-danger">- {{ recalcularDescuento() }}
+            </td>
           </tr>
           <tr>
             <td><b>SubTotal</b></td>
-            <td class="table-danger">{{ parseFloat(parseFloat(sumatoriaSubTotal).toFixed(0)).toFixed(2) }}</td>
+            <td class="table-danger">{{
+              recalcularSubTotal()
+              }}</td>
           </tr>
           <tr v-if="sumatoriaIgv > 0">
             <td><b>IGV</b></td>
@@ -448,7 +452,7 @@
           </tr>
           <tr>
             <td><b>TOTAL</b></td>
-            <td class="table-danger">{{ sumatoriaTotal }}</td>
+            <td class="table-danger">{{ recalcularTotal() }}</td>
           </tr>
           <tr>
             <td colspan="2">
@@ -617,6 +621,15 @@ export default {
       filtrados: state => state.cart.productosFiltrados,
       recalcularTipoDeUtilidadFlag: state => state.cart.recalcularTipoDeUtilidadFlag
     }),
+    calcularDescuento() {
+      return (index) => {
+        let porcentajeDesc = parseFloat(this.productos[index].PorcentajeDesc) || 0;
+        let subtotal = this.getSubtotal(index);
+        let descuento = parseFloat((subtotal * porcentajeDesc / 100).toFixed(0));
+        return descuento;
+      };
+    },
+
     APIProductos() {
       if (this.idAlmacen) {
         return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
@@ -678,6 +691,9 @@ export default {
       actualizarProd: 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    actualizarDescuento(index) {
+      this.productos[index].descuento = this.calcularDescuento(index);
+    },
     abrirFormularioNuevoProducto() {
 
       this.$refs.productoFormEdit.show = true;
@@ -920,7 +936,7 @@ export default {
       obj.EsVenta = this.isVentas
       obj.EsVentaNew = true;
       obj.OldPrecioCosto = obj.PrecioCosto
-
+      obj.PorcentajeDesc = 0
       if (obj.TienePresentacion == 1) {
         let presentacion = JSON.parse(obj.PreciosPorProducto)
         obj.presentacion = presentacion.filter(v => v.cantidad > 0)
@@ -984,7 +1000,7 @@ export default {
       if (this.isVentas) {
         this.changeTipoUtilidad()
       }
-
+      this.$forceUpdate();
     },
     changeTipoUtilidad() {
 
@@ -1278,17 +1294,23 @@ export default {
       this.updateManoDeObraNeta(index)
     },
     actualizarDescu(index) {
-      let obj = this.productos[index];
-      this.actualizarProd({ Producto: obj, Pos: index })
+      this.$nextTick(() => {
+        //console.log('holi')
+        let obj = this.productos[index];
+        this.actualizarProd({ Producto: obj, Pos: index })
+      })
     },
     getSubtotal(index) {
+
       let subtotal = this.$options.filters.redondear(
         (this.productos[index].EsPresentacion ? this.productos[index].cantxPrecio : this.productos[index].cantidad) * this.productos[index].precio)
       Vue.set(this.productos[index], 'subtotal', subtotal)
       // this.productos[index].subtotal = subtotal
       return subtotal
+
     },
     getIgv(index) {
+
       let igv = 0
       if (this.productos[index].TieneIgv) {
         igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
@@ -1297,27 +1319,63 @@ export default {
       Vue.set(this.productos[index], 'igv', igv)
       // this.productos[index].igv = igv
       return igv
+
     },
     getTotal(index) {
-      let total = parseFloat(this.productos[index].subtotal)
+      let subtotal = parseFloat(this.productos[index].subtotal) || 0;
+      //subtotal = subtotal.toFixed(0);
+      let flete = parseFloat(this.productos[index].FLETE) || 0;
+      let igv = parseFloat(this.productos[index].igv) || 0;
+      let descuento = parseFloat(this.productos[index].PorcentajeDesc) || 0;
+      // descuento = descuento.toFixed(0);
+      let total = subtotal;
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += flete;
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += igv;
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat((subtotal * descuento) / 100).toFixed(0);
       }
 
-      total = parseFloat(parseFloat(total).toFixed(0)).toFixed(2)
-      Vue.set(this.productos[index], 'total', total)
-      // this.productos[index].total = total
-      return total
+      total = parseFloat(total.toFixed(0));
+
+      // Establece el valor en el objeto y asegura el formato de dos decimales
+      Vue.set(this.productos[index], 'total', total.toFixed(0));
+
+      return total.toFixed(2);
     },
+
     getData(value) {
       this.buscar(value)
+    },
+    recalcularDescuento() {
+      //this.$nextTick(() => {
+       // console.log('dddd')
+        let des = this.productos.reduce((total, prod) => {
+          return parseFloat((total + prod.subtotal * prod.PorcentajeDesc / 100).toFixed(0));
+        }, 0)
+
+        return parseFloat(des).toFixed(2)
+      //})
+    },
+    recalcularSubTotal() {
+      let des = this.productos.reduce((total, prod) => {
+        return total + parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0) / 100).toFixed(0)
+        // return parseFloat((total + parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc || 0) / 100)).toFixed(2));
+      }, 0)
+
+      return parseFloat(des).toFixed(2)
+    },
+    recalcularTotal() {
+      let des = this.productos.reduce((total, prod) => {
+        return total + parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0) / 100).toFixed(0)
+        //return parseFloat((total + parseFloat(prod.subtotal) * (1 - (prod.PorcentajeDesc || 0) / 100)).toFixed(2));
+      }, 0)
+
+      return parseFloat(des).toFixed(2)
     },
     quitarProducto(index) {
       this.eliminar(index)

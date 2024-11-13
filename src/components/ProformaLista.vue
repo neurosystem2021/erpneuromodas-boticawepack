@@ -112,8 +112,10 @@ export default {
                 this.limpiarCarrito()
                 response.data.map((item) => {
                     //console.log('carrito',item)
-                    
+
                     let prod = { ...item }
+                    //item.descuento = item.Descuento
+                    //console.log('proforma: ', item.descuento);
                     if (prod.presentacion) {
                         item.EsPresentacion = true
                         item.cantidad = prod.CantidadPres
@@ -126,12 +128,17 @@ export default {
                         item.presentacion = JSON.parse(prod.PreciosPorProducto || '[]')
                     }
 
+
+
                     this.add([item, () => {
-                    }, {
+                    },
+                        {
                             setPreOr: item.Precio,
                             // descripcionPresentacion: descripcionPresentacion,
                             // cantidad: prod.presentacion ? prod.CantidadPres : item.Cantidad,
-                            //cantidadPres : item.Cantidad
+                            //cantidadPres : item.Cantidad,
+                            //descuento: item.descuento,
+                           // PorcentajeDesc: item.PorcentajeDesc
                         }])
                     this.filter = ''
                     this.show = false
