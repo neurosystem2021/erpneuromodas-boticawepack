@@ -12,6 +12,7 @@ import Habitaciones from '@/views/Habitaciones.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Venta from '@/views/Venta.vue'
+import Venta2 from '@/views/Venta2.vue'
 import CategoriasNuevo from '@/views/CategoriasNuevo.vue'
 import Proveedores from '@/views/Proveedores.vue'
 
@@ -165,6 +166,11 @@ export default new Router({
       path: '/venta',
       name: 'Venta',
       component: Venta
+    },
+    {
+      path: '/venta2',
+      name: 'Venta2',
+      component: Venta2
     },
     {
       path: '/categoriasnuevo',
