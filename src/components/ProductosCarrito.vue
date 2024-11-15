@@ -638,7 +638,7 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento);
+        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento) + parseFloat(value.igv);
       });
 
       this.actualizarTotal(sumatoria);
