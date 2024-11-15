@@ -683,20 +683,15 @@
           </b-row>
 
           <b-row style="background: #f4f4f4" class="buscador">
-            <b-col md="8">
-              <b-input-group prepend="Buscar Producto" class="mt-2 mb-2">
+            <b-col md="4">
+              <b-input-group prepend="" class="mt-2 mb-2">
                 <b-form-input
                   placeholder="INGRESE UN PRODUCTO"
                   ref="inputSearchProducto"
                   autocomplete="off"
-                  @input="
-                    (val) => {
-                      debounceInput(val);
-                      cargandoProductos = true;
-                      productosCategoria = [];
-                    }
-                  "
+                  @input="buscarProducto"
                   v-model="busqueda"
+                  @focus.native="limpiarFiltro"
                 ></b-form-input>
                 <b-input-group-append>
                   <b-button variant="secondary" @click="limpiarFiltro"
@@ -705,6 +700,24 @@
                 </b-input-group-append>
               </b-input-group>
             </b-col>
+            <b-col md="4">
+              <b-input-group prepend="" class="mt-2 mb-2">
+                <b-form-input
+                  placeholder="Búsqueda por Voz"
+                  ref="inputSearchVoiceProducto"
+                  autocomplete="off"
+                  v-model="busquedaVoz"
+                  
+                  readonly
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button variant="secondary" @click="startRecognition">
+                    <i class="fa fa-microphone" aria-hidden="true"></i>
+                  </b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-col>
+
             <b-col md="4">
               <b-input-group class="mt-2 mb-2">
                 <input
@@ -939,6 +952,8 @@ export default {
   },
   data() {
     return {
+      query: "",
+      busquedaVoz: "",
       dni: "",
       isNota: false,
       adelanto: 0,
@@ -974,7 +989,7 @@ export default {
         { value: "07", text: "DEVOLUCION POR ITEM" },
         { value: "08", text: "BONIFICACION" },
         { value: "09", text: "DISMINUCION EN EL VALOR" },
-        { value: "10", text: "OTROS CONCEPTOS" },
+        { value: "10", text: "OTROS CONCEPTOS" }
       ],
       carrito: {
         fields: [
@@ -994,17 +1009,17 @@ export default {
             key: "subtotal",
             label: "SubTotal",
             variant: "success",
-            class: "text-center",
+            class: "text-center"
           },
           { key: "descuento", label: "Descuento" },
           {
             key: "total",
             label: "Total",
             variant: "danger",
-            class: "text-center",
+            class: "text-center"
           },
-          { key: "acciones", label: "" },
-        ],
+          { key: "acciones", label: "" }
+        ]
       },
       infoDelivery: {},
       //Nuevos datos
@@ -1018,11 +1033,11 @@ export default {
       ultimaComanda: {},
       opcionesVenta: [
         { text: "Normal", value: 0 },
-        { text: "Delivery", value: 2 },
+        { text: "Delivery", value: 2 }
       ],
       navDisabled: false,
       APPTOKEN: "",
-      precioHabilitado: false,
+      precioHabilitado: false
     };
   },
   watch: {
@@ -1033,26 +1048,30 @@ export default {
           parseFloat(this.venta.pago.mastercard.monto) +
           parseFloat(this.venta.pago.delivery.monto));
     },
+    busquedaVoz() {
+      if (this.busquedaVoz) {
+        console.log(this.busquedaVoz);
+        this.buscarProducto(this.busquedaVoz);
+      } else {
+        this.limpiarFiltro();
+      }
+    }
   },
   computed: {
     ...mapState({
-      productos: (state) => state.cart.productos,
-      totalCart: (state) => state.cart.totalCart,
+      productos: state => state.cart.productos,
+      totalCart: state => state.cart.totalCart
     }),
     manoDeObraBruta() {
-      let pManoObra = this.productos.find(
-        (p) => p.CodigoBarra === "MANODEOBRA"
-      );
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
       return precio;
     },
     manoDeObraNeta() {
-      let pManoObra = this.productos.find(
-        (p) => p.CodigoBarra === "MANODEOBRA"
-      );
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precio : 0;
       return precio;
-    },
+    }
   },
   methods: {
     ...mapActions({
@@ -1061,8 +1080,58 @@ export default {
       obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto",
-      actualizarProd: "actualizarProducto",
+      actualizarProd: "actualizarProducto"
     }),
+    startRecognition() {
+      this.busquedaVoz = "";
+      this.limpiarFiltro();
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (this.query) {
+          this.busquedaVoz = this.query;
+        } else {
+          this.busquedaVoz = "";
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      this.busquedaVoz = this.query;
+      console.log("Búsqueda:", this.query);
+      this.buscarProducto(this.query);
+    },
     changeOrganizacion(val) {
       if (val) {
         this.$refs.inputCliente.$refs.input.disabled = true;
@@ -1098,24 +1167,23 @@ export default {
           target: document.getElementById("conten"),
           focusConfirm: false,
           preConfirm: () => {
-            const password = this.$swal
-              .getPopup()
-              .querySelector("#password").value;
+            const password = this.$swal.getPopup().querySelector("#password")
+              .value;
             if (!password) {
               this.$swal.showValidationMessage(
                 "Ingrese la contraseña de administrador"
               );
             }
             return { password: password };
-          },
-        }).then((result) => {
+          }
+        }).then(result => {
           if (result.value.password) {
             this.axios
               .post(this.API + "login", {
                 user: "admin",
-                password: result.value.password,
+                password: result.value.password
               })
-              .then((r) => {
+              .then(r => {
                 if (r.data) {
                   this.precioHabilitado = true;
                 } else {
@@ -1134,10 +1202,10 @@ export default {
       this.axios
         .get(this.API + "proyecto", {
           params: {
-            IdProyecto: this.$route.query.idProyecto,
-          },
+            IdProyecto: this.$route.query.idProyecto
+          }
         })
-        .then((res) => {
+        .then(res => {
           if (res.data) {
             this.adelanto = res.data.Adelantos;
             this.adelantosPreOrden = res.data.AdelantosArreglo;
@@ -1148,11 +1216,11 @@ export default {
             this.venta.cliente.Direccion = res.data.Direccion;
             this.venta.cliente.DniRuc = res.data.DniRuc;
             console.log(this.venta.cliente.IdCliente);
-            res.data.Detalle.map((item) => {
+            res.data.Detalle.map(item => {
               this.add([
                 item,
                 () => {},
-                { cantidad: item.Cantidad, precio: item.Precio },
+                { cantidad: item.Cantidad, precio: item.Precio }
               ]);
             });
           }
@@ -1162,16 +1230,16 @@ export default {
       let usuario = sessionStorage.getItem("User");
       this.axios
         .get(this.API + "usuarios/info/" + usuario)
-        .then((response) => {
+        .then(response => {
           this.setVendedor(response.data);
           let almacen = {
             IdAlmacen: response.data.IdAlmacen,
             Almacen: response.data.Almacen,
-            DescuentoActivo: response.data.DescuentoActivo,
+            DescuentoActivo: response.data.DescuentoActivo
           };
           let puntoVenta = {
             IdDocVentaPuntoVenta: response.data.IdDocVentaPuntoVenta,
-            PuntoVenta: response.data.PuntoVenta,
+            PuntoVenta: response.data.PuntoVenta
           };
           this.APPTOKEN = response.data.APPTOKEN;
           this.setAlmacen(almacen);
@@ -1182,7 +1250,7 @@ export default {
           this.$refs.inputPuntoVenta.$refs.input.disabled = true;
           this.$refs.inputVendedor.$refs.input.disabled = true;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -1190,12 +1258,12 @@ export default {
     getCategorias() {
       this.axios
         .get(this.API + "categorias/puntoventa")
-        .then((response) => {
+        .then(response => {
           this.categorias = response.data;
           if (this.categorias.length > 0) {
             let masMov = {
               ProductoCategoria: "MÁS MOVIDOS",
-              IdProductoCategoria: 0,
+              IdProductoCategoria: 0
             };
             this.categorias.unshift(masMov);
             setTimeout(() => {
@@ -1205,7 +1273,7 @@ export default {
             }, 300);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toasted.show("Hubo un error, no hay conexion");
         });
     },
@@ -1219,15 +1287,15 @@ export default {
             params: {
               IdProductoCategoria: idProductoCategoria,
               idAlmacen: this.venta.almacen.IdAlmacen,
-              MasMovido: idProductoCategoria == 0 ? 1 : 0,
-            },
+              MasMovido: idProductoCategoria == 0 ? 1 : 0
+            }
           })
-          .then((response) => {
+          .then(response => {
             this.cargandoProductos = false;
             this.productosCategoria = response.data;
             //console.log(this.productosCategoria,"izi");
           })
-          .catch((error) => {
+          .catch(error => {
             this.cargandoProductos = true;
             this.productosCategoria = [];
             this.$toasted.show("Hubo un error, no hay conexion");
@@ -1237,20 +1305,19 @@ export default {
     getImpresoraCocina() {
       this.axios
         .get(this.API + "impresora/cocina")
-        .then((response) => {
+        .then(response => {
           if (response.data) {
             this.impresoraCocina = response.data;
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toasted.show("Hubo un error, no hay conexion");
         });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
-    debounceInput: _.debounce(function (e) {
-      console.log("entra");
+    debounceInput: _.debounce(function(e) {
       if (e.trim() == "") {
         return;
       }
@@ -1262,16 +1329,18 @@ export default {
       this.axios
         .get(this.API + "productos/categoria", {
           params: {
-            q: val,
-          },
+            q: val.trim(),
+            idAlmacen: this.venta.almacen.IdAlmacen,
+            MasMovido: val ? 0 : 1
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.cargandoProductos = false;
           this.productosCategoria = response.data;
-          this.$refs.barcodeInput.focus();
-          this.$refs.inputSearchProducto.focus();
+          // this.$refs.barcodeInput.focus();
+          // this.$refs.inputSearchProducto.focus();
         })
-        .catch((error) => {
+        .catch(error => {
           this.cargandoProductos = true;
           this.productosCategoria = [];
           this.$toasted.show("Hubo un error, no hay conexion");
@@ -1285,20 +1354,20 @@ export default {
       axios
         .get(API + "productos/puntoventa/stock", {
           params: {
-            idProductos: this.productosCategoria.map((prod) => prod.IdProducto),
-            idAlmacen: this.venta.almacen.IdAlmacen,
-          },
+            idProductos: this.productosCategoria.map(prod => prod.IdProducto),
+            idAlmacen: this.venta.almacen.IdAlmacen
+          }
         })
-        .then((response) => {
-          this.productosCategoria = this.productosCategoria.map((prod) => {
+        .then(response => {
+          this.productosCategoria = this.productosCategoria.map(prod => {
             let index = response.data.findIndex(
-              (item) => item.IdProducto == prod.IdProducto
+              item => item.IdProducto == prod.IdProducto
             );
             prod.stock = items[index] && items[index].stock;
             return prod;
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -1321,7 +1390,7 @@ export default {
       this.objProd = {};
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fpp = this.preciosProd.filter(
-        (p) => p.cantidad === 0 || p.cantidad === "0" || p.cantidad === ""
+        p => p.cantidad === 0 || p.cantidad === "0" || p.cantidad === ""
       );
 
       this.setProductoUni({ ...obj });
@@ -1355,7 +1424,7 @@ export default {
         },
         { setPrecioCosto: false, setSuma: true },
         false,
-        false,
+        false
       ]);
       this.loadCode = "";
 
@@ -1385,7 +1454,7 @@ export default {
           this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen || 1 });
         },
         false,
-        false,
+        false
       ]);
 
       this.$refs["modalCant"].hide();
@@ -1460,11 +1529,10 @@ export default {
     changeMovimiento(hash, idProducto, index) {
       if (hash) {
         // Stock
-        let stock = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
-        ).Stock;
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Stock;
         let serieNumero = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
+          m => m.value === hash
         ).SerieNumero;
         if (stock) {
           // this.productos[index].stockMovimiento = stock
@@ -1480,11 +1548,13 @@ export default {
         }
         // Fecha de vencimiento
         var fechaVen = this.movimientoLotes[idProducto].find(
-          (m) => m.value === hash
+          m => m.value === hash
         ).FechaVen;
         let hoy = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
-        let en5dias = this.$moment().add(5, "days").unix();
+        let en5dias = this.$moment()
+          .add(5, "days")
+          .unix();
         let style = "bg-success";
         if (fechaVenUnix && fechaVenUnix < hoy) {
           style = "bg-danger";
@@ -1494,13 +1564,14 @@ export default {
         }
         if (fechaVen) {
           this.$nextTick(() => {
-            this.productos[index].FechaVen =
-              this.$moment(fechaVen).format("YYYY-MM-DD");
+            this.productos[index].FechaVen = this.$moment(fechaVen).format(
+              "YYYY-MM-DD"
+            );
             //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
             //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
             this.actualizarProd({
               Producto: this.productos[index],
-              Pos: index,
+              Pos: index
             });
 
             Vue.set(
@@ -1529,9 +1600,9 @@ export default {
             "/" +
             this.venta.almacen.IdAlmacen
         )
-        .then((response) => {
+        .then(response => {
           let indexProducto = this.productos.findIndex(
-            (p) => p.IdProducto === $idProducto
+            p => p.IdProducto === $idProducto
           );
           // Cargar por defecto lote próximo a vencer.
           let primeroVencer = response.data.reduce((a, b) => {
@@ -1553,15 +1624,15 @@ export default {
             );
           });
           //
-          this.movimientoLotes[$idProducto] = response.data.map((l) => ({
+          this.movimientoLotes[$idProducto] = response.data.map(l => ({
             value: l.hashMovimiento,
             text: l.hashMovimiento,
             Stock: l.Stock,
             FechaVen: l.FechaVen,
-            SerieNumero: l.Serie + "-" + l.Numero,
+            SerieNumero: l.Serie + "-" + l.Numero
           }));
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -1573,12 +1644,12 @@ export default {
       if (idProducto) {
         this.add([
           idProducto,
-          (obj) => {
+          obj => {
             if (obj) {
               this.$emit("onAddProducto");
               this.$toasted.show("Producto añadido correctamente");
               this.obtenerStok({
-                IdAlmacen: this.venta.almacen.IdAlmacen || 1,
+                IdAlmacen: this.venta.almacen.IdAlmacen || 1
               });
             } else {
               this.$toasted.show("No se encontró ningun producto");
@@ -1586,7 +1657,7 @@ export default {
             this.loadCode = "";
           },
           { setPrecio: true, setSuma: true },
-          { isBarCode: true },
+          { isBarCode: true }
         ]);
       }
     },
@@ -1623,31 +1694,31 @@ export default {
       this.axios
         .get(this.API + "/preorden/estado", {
           params: {
-            idPreOrden: this.$route.query.idPreOrden,
-          },
+            idPreOrden: this.$route.query.idPreOrden
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.mesa = response.data.Mesa;
           this.mesero = response.data.UsuarioReg;
           this.cargarVendedorPreOrden(response.data.UsuarioReg);
           this.axios
             .get(this.API + "preorden/detalle/agrupado", {
               params: {
-                idPreOrden: this.$route.query.idPreOrden,
-              },
+                idPreOrden: this.$route.query.idPreOrden
+              }
             })
-            .then((response) => {
+            .then(response => {
               this.limpiarCart();
-              response.data.map((item) => {
+              response.data.map(item => {
                 this.add([item, () => {}, false]);
               });
               //this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
             })
-            .catch((error) => {
+            .catch(error => {
               this.$toasted.show("Hubo un error, no hay conexion");
             });
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toasted.show("Hubo un error, no hay conexion");
         });
     },
@@ -1655,12 +1726,12 @@ export default {
       let usuario = user || sessionStorage.getItem("User");
       this.axios
         .get(this.API + "usuarios/" + usuario)
-        .then((response) => {
+        .then(response => {
           //this.setVendedor(response.data)
           this.venta.vendedor.Usuario = response.data.Usuario;
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -1678,7 +1749,7 @@ export default {
       //this.$refs.inputNombreCliente.$refs.input.required = true
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/00000000").then((res) => {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
         if (res.data.IdCliente) {
           this.setCliente(res.data);
         }
@@ -1693,7 +1764,7 @@ export default {
       this.venta.IdPreOrden = orden;
     },
     loadFirstAlmacen() {
-      this.axios.get(this.API + "almacenes/primero").then((res) => {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
         //this.$refs.inputAlmacen.setValue(res.data.Almacen)
         this.venta.almacen = res.data;
       });
@@ -1720,16 +1791,16 @@ export default {
           IdTipoDoc: 7,
           TipoDoc: "BOLETA ELEC.",
           LimitItems: 0,
-          CodSunat: "03",
+          CodSunat: "03"
         },
         almacen: {
           IdAlmacen: 1,
           Almacen: "PRINCIPAL",
-          DescuentoActivo: 0,
+          DescuentoActivo: 0
         },
         puntoVenta: {
           IdDocVentaPuntoVenta: 1,
-          PuntoVenta: "PRINCIPAL",
+          PuntoVenta: "PRINCIPAL"
         },
         vendedor: {},
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -1738,7 +1809,7 @@ export default {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
           mastercard: { IdMetodoPago: 3, monto: 0 },
-          delivery: { IdMetodoPago: 4, monto: 0 },
+          delivery: { IdMetodoPago: 4, monto: 0 }
         },
         idProductos: [],
         NroComprobanteModifica: "",
@@ -1754,7 +1825,7 @@ export default {
         DireccionEntrega: "",
         IdMetodoPago: 1,
         EsOrganizacion: 0,
-        NombreOrganizacion: "",
+        NombreOrganizacion: ""
       };
       this.isNota = false;
       this.bloquearInput = false;
@@ -1821,13 +1892,13 @@ export default {
         .get(this.API + "ventas/solonumero", {
           params: {
             serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-          },
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.venta.Numero = response.data.numero;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -1837,17 +1908,17 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-          },
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
-                idCliente: response.data[0].IdCliente,
-              },
+                idCliente: response.data[0].IdCliente
+              }
             })
-            .then((response) => {
+            .then(response => {
               if (response.data) {
                 this.$refs.inputCliente.setValue(response.data.Cliente);
                 this.venta.CampoDireccion = response.data.Direccion;
@@ -1856,11 +1927,11 @@ export default {
                 this.$toasted.show("No se encontro al cliente");
               }
             })
-            .catch((error) => {
+            .catch(error => {
               console.log(error);
             });
           this.limpiarCart();
-          response.data.map((item) => {
+          response.data.map(item => {
             this.add([item, () => {}, false]);
           });
           this.actualizarDescuento();
@@ -1877,7 +1948,7 @@ export default {
       }
     },
     loadAlmacen(id) {
-      this.axios.get(this.API + "almacenes/id/" + id).then((res) => {
+      this.axios.get(this.API + "almacenes/id/" + id).then(res => {
         this.setAlmacen(res.data);
       });
     },
@@ -1894,13 +1965,13 @@ export default {
       }
     },
     loadPuntoVenta(id) {
-      this.axios.get(this.API + "puntoventa/id/" + id).then((res) => {
+      this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
         this.setPuntoVenta(res.data);
         this.getNumeroVenta();
       });
     },
     getTipoDoc(id) {
-      this.axios.get(this.API + "tipodoc/" + id).then((response) => {
+      this.axios.get(this.API + "tipodoc/" + id).then(response => {
         if (response.data) {
           this.setTipoVenta(response.data);
           this.$refs.inputTipoVenta.setValue(response.data.TipoDoc);
@@ -1916,7 +1987,7 @@ export default {
       let usuario = sessionStorage.getItem("User");
       this.axios
         .get(this.API + "usuarios/" + usuario)
-        .then((response) => {
+        .then(response => {
           this.setVendedor(response.data);
           //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
           // this.$refs.inputVendedor.$refs.input.disabled = true
@@ -1928,7 +1999,7 @@ export default {
           //this.getNumeroVenta()
           this.getTipoDoc(response.data.IdTipoDoc);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -1950,11 +2021,11 @@ export default {
       let params = {};
       if (dni) {
         params = {
-          dni: dni,
+          dni: dni
         };
       } else {
         params = {
-          idCliente: obj.IdCliente || obj,
+          idCliente: obj.IdCliente || obj
         };
       }
       if (typeof obj === "object") {
@@ -1970,9 +2041,9 @@ export default {
       } else {
         this.axios
           .get(this.API + "cliente", {
-            params: params,
+            params: params
           })
-          .then((response) => {
+          .then(response => {
             if (response.data) {
               this.$refs.inputCliente.setValue(response.data.Cliente);
               this.venta.cliente = response.data;
@@ -1981,7 +2052,7 @@ export default {
               this.$toasted.show("No se encontro al cliente");
             }
           })
-          .catch((error) => {
+          .catch(error => {
             console.log(error);
           });
       }
@@ -2034,7 +2105,7 @@ export default {
         if (costoDelivery > 0) {
           this.axios
             .get(this.API + "costo/delivery")
-            .then((response) => {
+            .then(response => {
               if (response.data) {
                 let costoDeliverObj = response.data;
                 costoDeliverObj.precio = costoDelivery;
@@ -2050,12 +2121,12 @@ export default {
                   },
                   { setPrecioCosto: false },
                   false,
-                  false,
+                  false
                 ]);
                 //Cargar Productos Delivery
                 let productos = JSON.parse(obj.Productos);
                 console.log(productos);
-                productos.map((item) => {
+                productos.map(item => {
                   this.add([
                     item.IdProducto,
                     () => {
@@ -2065,9 +2136,9 @@ export default {
                       cantidad: item.Cantidad,
                       precio: item.Precio,
                       indicacion: item.Indicacion,
-                      isDelivery: true,
+                      isDelivery: true
                     },
-                    false,
+                    false
                   ]);
                 });
                 this.venta.selectOpcionVenta = 2;
@@ -2081,13 +2152,13 @@ export default {
                 this.anularPagoDelivery();
               }
             })
-            .catch((error) => {
+            .catch(error => {
               this.$toasted.show("HUBO UN ERROR");
             });
         } else {
           //Cargar Productos Delivery
           let productos = JSON.parse(obj.Productos);
-          productos.map((item) => {
+          productos.map(item => {
             this.add([
               item.IdProducto,
               () => {
@@ -2097,9 +2168,9 @@ export default {
                 cantidad: item.Cantidad,
                 precio: item.Precio,
                 indicacion: item.Indicacion,
-                isDelivery: true,
+                isDelivery: true
               },
-              false,
+              false
             ]);
           });
           this.venta.selectOpcionVenta = 2;
@@ -2138,11 +2209,11 @@ export default {
       }
       this.axios
         .get(this.API + "ventas/descuento/" + this.puntosAplicados)
-        .then((response) => {
+        .then(response => {
           this.descuentoPuntos = response.data;
           this.aplicarDescuento(response.data.descuento);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -2156,14 +2227,14 @@ export default {
         .get(this.API + "ventas/numero", {
           params: {
             idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-          },
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.venta.Serie = response.data.serie;
           this.venta.Numero = response.data.numero;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
@@ -2195,7 +2266,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2209,7 +2280,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2223,7 +2294,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2231,7 +2302,7 @@ export default {
       this.venta.productos = this.productos;
       this.axios
         .post(this.API + "proformas", this.venta)
-        .then((response) => {
+        .then(response => {
           //this.$toasted.show('Proforma Guardada con exito')
           this.$swal({
             position: "center",
@@ -2240,7 +2311,7 @@ export default {
             showConfirmButton: true,
             confirmButtonText: "Aceptar",
             target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8",
+            confirmButtonColor: "#0275d8"
           });
           this.inProgress = false;
           this.limpiarDespuesVenta();
@@ -2251,7 +2322,7 @@ export default {
             "_blank"
           );
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
@@ -2341,7 +2412,7 @@ export default {
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
             target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8",
+            confirmButtonColor: "#0275d8"
           });
           this.inProgress = false;
           return;
@@ -2356,7 +2427,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2371,7 +2442,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2387,7 +2458,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         this.inProgress = false;
@@ -2403,7 +2474,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2424,7 +2495,7 @@ export default {
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
             target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8",
+            confirmButtonColor: "#0275d8"
           });
           this.inProgress = false;
           return;
@@ -2438,7 +2509,7 @@ export default {
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
             target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8",
+            confirmButtonColor: "#0275d8"
           });
           this.inProgress = false;
           return;
@@ -2450,7 +2521,7 @@ export default {
           return;
         }
         this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
-          (item) => item.value == this.venta.NotaIdMotivo
+          item => item.value == this.venta.NotaIdMotivo
         )[0].text;
       }
       if (!this.productos.length) {
@@ -2462,7 +2533,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2472,7 +2543,7 @@ export default {
       let totalCero = 0;
       let igualPro = 0;
       let sum = 0;
-      this.productos.forEach((pro) => {
+      this.productos.forEach(pro => {
         if (
           parseFloat(pro.stock) <= 0 ||
           parseFloat(pro.stock).toFixed(2) <
@@ -2489,7 +2560,7 @@ export default {
         pro.Descripcion = ("" + pro.Presentacion).trim();
 
         let pre = this.productos.filter(
-          (p) =>
+          p =>
             p.IdProducto == pro.IdProducto &&
             p.CantidadPresentacion == pro.CantidadPresentacion
         ).length;
@@ -2503,7 +2574,7 @@ export default {
           igualPro += 1;
         }
         sum = 0;
-        this.productos.map((p) => {
+        this.productos.map(p => {
           if (p.IdProducto == pro.IdProducto) {
             sum += p.cantidad * p.CantidadPresentacion;
           }
@@ -2538,7 +2609,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2552,7 +2623,7 @@ export default {
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
           target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8",
+          confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
         return;
@@ -2571,7 +2642,7 @@ export default {
           : "";
       }
       this.venta.PagoCon = this.$refs.carrito.pagocon;
-      this.venta.idProductos = this.productos.map((prod) => prod.IdProducto);
+      this.venta.idProductos = this.productos.map(prod => prod.IdProducto);
       if (this.venta.cliente.DniRuc != "00000000") {
         this.venta.EsOrganizacion = 0;
         this.venta.NombreOrganizacion = "";
@@ -2584,7 +2655,7 @@ export default {
         .trim();
       this.axios
         .post(this.API + "ventas", this.venta)
-        .then((response) => {
+        .then(response => {
           if (response.data.actualizar) {
             this.inProgress = false;
             //this.obtenerStok({IdAlmacen: this.venta.almacen.IdAlmacen})
@@ -2599,7 +2670,7 @@ export default {
               showConfirmButton: true,
               confirmButtonText: "Entiendo",
               target: document.getElementById("conten"),
-              confirmButtonColor: "#0275d8",
+              confirmButtonColor: "#0275d8"
             });
             return;
           } else if (response.data.pagado) {
@@ -2607,7 +2678,7 @@ export default {
             this.$toasted.show(response.data.error);
           } else {
             try {
-              this.venta.productos.map((pro) => {
+              this.venta.productos.map(pro => {
                 delete pro.nuevoPrecioContado;
                 delete pro.disabledProf;
                 delete pro.normalPrecioContado;
@@ -2737,7 +2808,7 @@ export default {
               let dataInfoDocVenta = {
                 Serie: response.data.serie,
                 Numero: response.data.numero,
-                Fecha: response.data.fecha,
+                Fecha: response.data.fecha
               };
               this.venta.dataInfoDocVenta = dataInfoDocVenta;
               this.venta.reps = 1;
@@ -2799,7 +2870,7 @@ export default {
             //this.emitirauto(response.data.insertId)
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
@@ -2850,7 +2921,7 @@ export default {
           NombreImpresora: this.venta.vendedor.NombreImpresora,
           NombreRed: this.venta.vendedor.NombreRed,
           Puerto: this.venta.vendedor.Puerto,
-          Tipo: this.venta.vendedor.Tipo,
+          Tipo: this.venta.vendedor.Tipo
         };
         let impresoraJson = JSON.stringify(data);
         var left = screen.width / 2 - 800 / 2;
@@ -2889,7 +2960,7 @@ export default {
     emitirauto(idDocVenta) {
       this.axios
         .post(this.API + "emitirauto", { IdDocVenta: idDocVenta })
-        .then((response) => {
+        .then(response => {
           if (response.data.success) {
             if (response.data.Estado == 1) {
               this.$toasted.error("SUNAT: " + response.data.msj_sunat);
@@ -2898,7 +2969,7 @@ export default {
             }
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toasted.show("Ha ocurrido un error, en la emision a sunat");
         });
     },
@@ -2909,8 +2980,9 @@ export default {
     eliminarComisionista() {
       // this.$refs.inputComisionista.setValue('')
       this.venta.comisionista = {};
-    },
+    }
   },
+  watch: {},
   components: {
     ClientesForm,
     ConfigVenta,
@@ -2920,8 +2992,8 @@ export default {
     //OrdenesModal,
     //DeliveryModal,
     //"vue-simple-spinner": Spinner,
-    ProductosCarritoNuevo,
-  },
+    ProductosCarritoNuevo
+  }
 };
 </script>
 <style scoped>
