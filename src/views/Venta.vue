@@ -45,7 +45,31 @@
               <b-row>
                 <b-col cols="6">
                   <b-row>
-                    <b-col cols="12">Clientes </b-col>
+                    <b-col cols="12">
+                      <b-input-group class="mt-2">
+                          <!-- <clientes-form 
+                            v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" 
+                            idModal="editCliente" @onAddCliente="setCliente" 
+                            :editCliente="venta.cliente">
+                          </clientes-form> -->
+                            <autocomplete
+                                required="required"
+                                :id="`inputCliente${index}`"
+                                :url="API + 'clientes'"
+                                anchor="ClienteDniRuc"
+                                label="writer"
+                                placeholder="Cliente"
+                                class="font-weight-bold"
+                                :onInput="(val) => newDniRuc = val"
+                                :on-select="setCliente" 
+                                :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
+                                :classes="{input: 'form-control'}">
+                            </autocomplete>
+                            <b-input-group-append>
+                                <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-col>
                     <b-col cols="12">Combo</b-col>
                   </b-row>
                 </b-col>
@@ -316,7 +340,7 @@
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import momemnt from "moment";
-// import ClientesForm from "@/components/ClientesForm";
+import ClientesForm from "@/components/ClientesForm";
 // import ConfigVenta from "@/components/ConfigVenta";
 // import PagoDeuda from "@/components/PagoDeuda";
 // import PreOrdenLista from "@/components/PreOrdenLista.vue";
@@ -328,9 +352,10 @@ import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
 // import debounce from "lodash";
 import Swal from "sweetalert2";
 export default {
-  components: { ProductosCarritoNuevo },
+  components: { ProductosCarritoNuevo, ClientesForm },
   data() {
     return {
+      newDniRuc: "",
       API: config.API,
       categorias: [],
       productosCategoria: [],
@@ -362,6 +387,7 @@ export default {
       tabActive: 0,
       ventaActiva: 0,
       venta: {
+        cliente: {},
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -411,6 +437,7 @@ export default {
       },
       ventas: [
         {
+          cliente: {},
           EsCredito: 0,
           Serie: "",
           Numero: "",
@@ -501,6 +528,7 @@ export default {
         });
     },
     focusAutocomplete(ref) {
+      console.log(ref);
       let element = document.getElementById(ref);
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
@@ -657,6 +685,49 @@ export default {
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
+    },
+    setCliente(obj, dni = false) {
+      let params = {};
+      if (dni) {
+        params = { dni };
+      } else {
+        params = { idCliente: obj.IdCliente || obj };
+      }
+
+      let ref = `inputCliente${this.ventaActiva}`;
+      let inputCliente = this.$refs[ref];
+
+      if (typeof obj === "object") {
+        if (inputCliente && typeof inputCliente.setValue === "function") {
+          // inputCliente.setValue(obj.Cliente);
+        }
+        this.ventas[this.ventaActiva].cliente = obj;
+        this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
+
+        if (obj.DniRuc !== "00000000") {
+          // inputCliente.$refs.input.disabled = false;
+          this.ventas[this.ventaActiva].EsOrganizacion = 0;
+          this.ventas[this.ventaActiva].NombreOrganizacion = "";
+        }
+      } else {
+        this.axios
+          .get(this.API + "cliente", { params })
+          .then(response => {
+            if (response.data) {
+              if (inputCliente && typeof inputCliente.setValue === "function") {
+                // inputCliente.setValue(response.data.Cliente);
+              }
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = response.data.Direccion;
+            } else {
+              this.$toasted.show("No se encontró al cliente");
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+      console.log(this.ventas[this.ventaActiva]);
     },
     async obtenerStockBuscador(IdProducto) {
       let res = {};
