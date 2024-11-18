@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col cols="6">
+      <b-col cols="7">
         <b-tabs v-model="ventaActiva" content-class="mt-3" fill class="mt-2 px-2">
           <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`">
             <b-container>
@@ -10,7 +10,7 @@
                   <b-input-group prepend="Doc. Venta" class="mt-2">
                     <autocomplete
                     required="required"
-                    :ref="`inputTipoVenta${index}`"
+                    :id="`inputTipoVenta${index}`"
                     :url="API + 'ventas/tipos'"
                     anchor="TipoDoc"
                     initValue="BOLETA ELEC."
@@ -18,10 +18,10 @@
                     label="writer"
                     placeholder=""
                     :on-select="setTipoVenta"
+                    :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
                     :classes="{input: 'form-control'}"
-                    @focus.native="focusAutocomplete(`inputTipoVenta${index}`)"
                     >
-                    </autocomplete>
+                  </autocomplete>
                   </b-input-group>
                 </b-col>
                 <b-col cols="3">
@@ -50,7 +50,9 @@
                   </b-row>
                 </b-col>
                 <b-col cols="6">
-                  <h1>Correlativo </h1>
+                  <h1> 
+                    {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
+                     </h1>
                   {{ fechaActual()}}
                 </b-col>
 
@@ -61,7 +63,52 @@
                 </b-col>
               </b-row>
               <b-row class="mt-2">
-                <b-table striped hover :fields="headerTable" :items="venta.produtos">
+                <b-table striped hover :fields="headerTable" :items="venta.productos">
+                  <template slot="presentacion" slot-scope="data">
+                    <b-form-input
+                      v-model="data.item.ProductoPresentacion"
+                      type="text"
+                      style="text-align:center; font-weight:bold; width: 120px;"
+                      autocomplete="false"
+                      disabled
+                      ></b-form-input>
+                     
+                  </template>
+                  <template slot="cantidad" slot-scope="data">
+                    <b-form-input
+                      v-model="data.item.cantidad"
+                      type="text"
+                      style="text-align:center; font-weight:bold; width: 120px;"
+                      autocomplete="false"
+                      ></b-form-input>
+                     
+                  </template>
+                  <template slot="precio" slot-scope="data">
+                    <b-form-input
+                      v-model="data.item.precio"
+                      type="text"
+                      style="text-align:center; font-weight:bold; width: 120px;"
+                      autocomplete="false"
+                      ></b-form-input>
+                     
+                  </template>
+                  <template slot="descuento" slot-scope="data">
+                    <b-form-input
+                      v-model="data.item.descuento"
+                      type="text"
+                      style="text-align:center; font-weight:bold; width: 120px;"
+                      autocomplete="false"
+                      ></b-form-input>
+                     
+                  </template>
+                  <template slot="subtotal" slot-scope="data">
+                  {{ getSubtotal(data.item) }}
+                     
+                  </template>
+                  <template slot="total" slot-scope="data">
+                  {{ getTotal(data.item) }}
+                     
+                  </template>
 
                 </b-table>
               </b-row>
@@ -85,7 +132,7 @@
         </b-row> -->
 
       </b-col>
-      <b-col md="6">
+      <b-col md="5">
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
@@ -287,10 +334,12 @@ export default {
       API: config.API,
       categorias: [],
       productosCategoria: [],
+      isNota: [],
+      tieneIgv: [],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "Producto" },
-        { key: "ProductoCategoria", label: "Categoria" },
+        { key: "presentacion", label: "Presentacion" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         {
@@ -313,11 +362,101 @@ export default {
       tabActive: 0,
       ventaActiva: 0,
       venta: {
-        EsOrganizacion: false
+        EsCredito: 0,
+        Serie: "",
+        Numero: "",
+        Observacion: "",
+        cliente: {},
+        comisionista: {},
+        tipoVenta: {
+          IdTipoDoc: 7,
+          TipoDoc: "BOLETA ELEC.",
+          LimitItems: 0,
+          CodSunat: "03"
+        },
+        almacen: {
+          IdAlmacen: 1,
+          Almacen: "PRINCIPAL",
+          DescuentoActivo: 0
+        },
+        puntoVenta: {
+          IdDocVentaPuntoVenta: 1,
+          PuntoVenta: "PRINCIPAL"
+        },
+        vendedor: {},
+        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+        pago: {
+          efectivo: { IdMetodoPago: 1, monto: 0 },
+          visa: { IdMetodoPago: 2, monto: 0 },
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          delivery: { IdMetodoPago: 4, monto: 0 }
+        },
+        idProductos: [],
+        NroComprobanteModifica: "",
+        CodSunatModifica: "",
+        NotaIdMotivo: "",
+        NotaDescMotivo: "",
+        IdPreOrden: null,
+        CampoDireccion: "",
+        EsDelivery: false,
+        EsParaLlevar: 0,
+        nombreLlevar: "",
+        selectOpcionVenta: 0,
+        DireccionEntrega: "",
+        IdMetodoPago: 1,
+        EsOrganizacion: 0,
+        NombreOrganizacion: "",
+        productos: []
       },
       ventas: [
         {
-          EsOrganizacion: false
+          EsCredito: 0,
+          Serie: "",
+          Numero: "",
+          Observacion: "",
+          cliente: {},
+          comisionista: {},
+          tipoVenta: {
+            IdTipoDoc: 7,
+            TipoDoc: "BOLETA ELEC.",
+            LimitItems: 0,
+            CodSunat: "03"
+          },
+          almacen: {
+            IdAlmacen: 1,
+            Almacen: "PRINCIPAL",
+            DescuentoActivo: 0
+          },
+          puntoVenta: {
+            IdDocVentaPuntoVenta: 1,
+            PuntoVenta: "PRINCIPAL"
+          },
+          vendedor: {},
+          FechaCredito: this.$moment().format("YYYY-MM-DD"),
+          FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+          pago: {
+            efectivo: { IdMetodoPago: 1, monto: 0 },
+            visa: { IdMetodoPago: 2, monto: 0 },
+            mastercard: { IdMetodoPago: 3, monto: 0 },
+            delivery: { IdMetodoPago: 4, monto: 0 }
+          },
+          idProductos: [],
+          NroComprobanteModifica: "",
+          CodSunatModifica: "",
+          NotaIdMotivo: "",
+          NotaDescMotivo: "",
+          IdPreOrden: null,
+          CampoDireccion: "",
+          EsDelivery: false,
+          EsParaLlevar: 0,
+          nombreLlevar: "",
+          selectOpcionVenta: 0,
+          DireccionEntrega: "",
+          IdMetodoPago: 1,
+          EsOrganizacion: 0,
+          NombreOrganizacion: "",
+          productos: []
         }
       ],
       bloquearInput: false,
@@ -325,12 +464,46 @@ export default {
       touchHab: false
     };
   },
+  mounted() {
+    this.getVendedorInfo();
+  },
   methods: {
     fechaActual() {
       return this.$moment().format("YYYY-MM-DD H:mm:ss");
     },
+    getVendedorInfo() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/info/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+          let almacen = {
+            IdAlmacen: response.data.IdAlmacen,
+            Almacen: response.data.Almacen,
+            DescuentoActivo: response.data.DescuentoActivo
+          };
+          let puntoVenta = {
+            IdDocVentaPuntoVenta: response.data.IdDocVentaPuntoVenta,
+            PuntoVenta: response.data.PuntoVenta
+          };
+          this.APPTOKEN = response.data.APPTOKEN;
+          this.setAlmacen(almacen);
+          this.setPuntoVenta(puntoVenta);
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // bloquear ambos inputs
+          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          this.$refs.inputVendedor.$refs.input.disabled = true;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
     focusAutocomplete(ref) {
-      this.$refs[ref].handleDoubleClick();
+      let element = document.getElementById(ref);
+      const event = new MouseEvent("dblclick");
+      element.dispatchEvent(event);
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
@@ -345,19 +518,59 @@ export default {
         this.setCliente(this.$route.query.idCliente);
       }
     },
+    getCategorias() {
+      this.axios
+        .get(this.API + "categorias/puntoventa")
+        .then(response => {
+          this.categorias = response.data;
+          if (this.categorias.length > 0) {
+            let masMov = {
+              ProductoCategoria: "MAS MOVIDOS",
+              IdProductoCategoria: 0
+            };
+            this.categorias.unshift(masMov);
+            setTimeout(() => {
+              this.tabActive = 0;
+              let primerCategoria = this.categorias[0].IdProductoCategoria;
+              this.getProductosCategoria(primerCategoria);
+            }, 300);
+          }
+        })
+        .catch(error => {
+          this.$toasted.show("Hubo un error, no hay conexion");
+        });
+    },
+    getProductosCategoria(idProductoCategoria) {
+      if (this.venta.almacen.IdAlmacen) {
+        this.productosCategoria = [];
+        this.cargandoProductos = true;
+        this.busqueda = "";
+        this.axios
+          .get(this.API + "productos/categoria", {
+            params: {
+              IdProductoCategoria: idProductoCategoria,
+              idAlmacen: this.venta.almacen.IdAlmacen,
+              MasMovido: idProductoCategoria == 0 ? 1 : 0
+            }
+          })
+          .then(response => {
+            this.cargandoProductos = false;
+            this.productosCategoria = response.data;
+            //console.log(this.productosCategoria,"izi");
+          })
+          .catch(error => {
+            this.cargandoProductos = true;
+            this.productosCategoria = [];
+            this.$toasted.show("Hubo un error, no hay conexion");
+          });
+      }
+    },
     setPuntoVenta(obj) {
       this.ventas[this.ventaActiva].puntoVenta = obj;
       this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
-    focusAutocomplete(refName) {
-      const inputRef = this.$refs[refName];
-      if (inputRef && typeof inputRef.handleDoubleClick === "function") {
-        inputRef.handleDoubleClick();
-      } else {
-        console.warn("handleDoubleClick no está definido o no es una función.");
-      }
-    },
+
     limpiarFiltro() {
       this.busqueda = "";
       this.tabActive = 0;
@@ -367,12 +580,104 @@ export default {
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
       });
+      this.getVendedorInfo();
     },
     eliminarVentana() {
       this.ventas.splice(this.ventaActiva, 1);
+
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventaActiva - 1;
+      });
     },
-    setTipoVenta(val) {
-      console.log(val);
+    setTipoVenta(obj) {
+      this.isNota[this.ventaActiva] = false;
+      this.bloquearInput = false;
+      this.ventas[this.ventaActiva].NroComprobanteModifica = "";
+      this.ventas[this.ventaActiva].CodSunatModifica = "";
+      this.ventas[this.ventaActiva].NotaIdMotivo = "";
+      this.ventas[this.ventaActiva].NotaDescMotivo = "";
+      // this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
+      if (obj.CodSunat == "07" || obj.CodSunat == "08") {
+        // 07 - nota de credito, 08 - Nota de debito
+        this.isNota[this.ventaActiva] = true;
+        this.limpiarCart();
+        if (this.ventas[this.ventaActiva].EsDelivery) {
+          this.anularPagoDelivery();
+        } else if (
+          this.$route.query.idPreOrden &&
+          this.$route.query.idCliente
+        ) {
+          this.anularPagoOrden();
+        }
+      }
+
+      if (obj.CodSunat == "01" || obj.CodSunat == "07") {
+        this.ventas[this.ventaActiva].EsOrganizacion = 0;
+        this.ventas[this.ventaActiva].NombreOrganizacion = "";
+        // this.$refs.inputCliente.$refs.input.disabled = false;
+      }
+
+      if (obj.TieneIgv) {
+        this.tieneIgv[this.ventaActiva] = true;
+      } else {
+        this.tieneIgv[this.ventaActiva] = false;
+      }
+      //this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
+      console.log("tipoVenta", obj);
+      this.ventas[this.ventaActiva].tipoVenta = obj;
+      this.getNumeroVenta();
+    },
+    getNumeroVenta() {
+      this.axios
+        .get(this.API + "ventas/numero", {
+          params: {
+            idPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
+              .IdDocVentaPuntoVenta,
+            idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.ventas[this.ventaActiva].Serie = response.data.serie;
+          this.ventas[this.ventaActiva].Numero =
+            response.data.numero + this.ventaActiva;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    async setProducto(producto) {
+      console.log("producto", producto);
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      // console.log("prod", prod);
+      prod.cantidad = 1;
+      prod.precio = prod.PrecioContado;
+      prod.descuento = 0;
+      this.ventas[this.ventaActiva].productos.push(prod);
+    },
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
+    async obtenerStockBuscador(IdProducto) {
+      let res = {};
+      await this.axios(this.API + "productos/puntoventa/stock", {
+        params: {
+          idProductos: [IdProducto],
+          idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
+        }
+      }).then(response => {
+        res = response.data[0];
+        // return response.data;
+      });
+      return res;
+    },
+    getSubtotal(prod) {
+      let subtotal = prod.cantidad * prod.precio;
+      return subtotal;
+    },
+    getTotal(prod) {
+      let total = prod.cantidad * prod.precio - prod.descuento;
+      return total;
     }
   }
 };
