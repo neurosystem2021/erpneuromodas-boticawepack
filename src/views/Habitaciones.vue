@@ -763,8 +763,8 @@ export default {
           this.selectCliente = {};
           this.mdlNuevoProyecto = false;
         });
-
-      this.getHabitaciones();
+      window.location.reload();
+      // this.getHabitaciones();
     },
     alquilarHab(hab) {
       if (!this.selectCliente.Cliente) {
