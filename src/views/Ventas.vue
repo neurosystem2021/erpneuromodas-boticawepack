@@ -228,6 +228,14 @@
                             $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
                 </b-row>
+                <b-row v-if="venta.idProforma > 0">
+                    <b-col md="6" class="ml-3">
+                        <b-row>
+                            <h5 class="mt-1"><b-badge variant="info" style="font-size:1.2rem">{{venta.anioNumeroProforma}}</b-badge></h5>
+                            <b-button class="ml-1 mb-2 mt-1" size="sm" variant="danger" @click="limpiarProforma"><b>Quitar</b></b-button>
+                        </b-row>
+                    </b-col>
+                </b-row>
                 <b-row>
                     <b-col>
                         <productos-carrito :tipoUtilidad="tipoUtilidad" @onInputCantidad="actualizarDescuento"
@@ -626,7 +634,9 @@ export default {
                 EsDelivery: false,
                 nombreLlevar: '',
                 DireccionEntrega: '',
-                diasValidosProf: 1
+                diasValidosProf: 1,
+                idProforma: 0,
+                anioNumeroProforma: ""
             }
             this.isNota = false
             this.bloquearInput = false
@@ -898,15 +908,29 @@ export default {
                 }
             }
 
-            if (typeof obj === 'object') {
-                this.$refs.inputCliente.setValue(obj.Cliente)
-                this.venta.cliente = obj
-                this.venta.CampoDireccion = this.venta.cliente.Direccion
-                if (this.venta.cliente.DniRuc == '00000000') {
-                    this.venta.EsOrganizacion = 0
-                    this.venta.NombreOrganizacion = ''
-                }
+            if (typeof obj === "object") {
+             if (obj.IdProforma > 0) {
+                this.venta.idProforma = obj.IdProforma;
+                //this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
+                this.venta.anioNumeroProforma ="Proforma Nro: "+obj.Numero;
+                //this.getVendedor(obj.UsuarioReg);
+                delete obj.productos;
+                
+                //console.log(response.data);
+                this.$refs.inputCliente.setValue(obj.Cliente);
+                this.venta.cliente = obj;
+                this.venta.CampoDireccion = this.venta.cliente.Direccion;
+                
             } else {
+                this.$refs.inputCliente.setValue(obj.Cliente);
+                this.venta.cliente = obj;
+                this.venta.CampoDireccion = this.venta.cliente.Direccion;
+                if (this.venta.cliente.DniRuc == "00000000") {
+                    this.venta.EsOrganizacion = 0;
+                    this.venta.NombreOrganizacion = "";
+                }
+            }
+        } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
                 })
@@ -930,6 +954,12 @@ export default {
 
             //this.actualizarPrecioConvenio(obj)
             // Actualizar DisabledTotal
+        },
+        limpiarProforma() {
+            this.venta.idProforma = 0;
+            this.venta.anioNumeroProforma = "";
+            //this.limpiarCart()
+            //this.loadClienteVarios()
         },
         onSetProducto(obj, cant, precio) {
             if (cant) {
