@@ -45,7 +45,7 @@
             @keydown.enter.prevent="loadBarcode"
             type="text"
             class="form-control"
-            placeholder="Codigo de Barra"
+            placeholder="Codigo de Barra1"
           />
           <b-input-group-append>
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
@@ -97,7 +97,7 @@
             @keydown.enter.prevent="loadBarcode"
             type="text"
             class="form-control"
-            placeholder="Codigo de Barra"
+            placeholder="Codigo de Barra2"
           />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -1001,39 +1001,24 @@ export default {
     },
     loadBarcode(e) {
       if (e) {
-        e.preventDefault();
+        e.preventDefault()
       }
-
       let idProducto = this.loadCode;
       let id_empresa = this.empresa;
-
       if (idProducto) {
         let params = { codigoBarra: idProducto, id_empresa: id_empresa };
-
-        // Uso de axios para obtener el producto
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
             if (response.data.IdProducto) {
-              let obj = response.data;
-
-              // Usamos la lógica adaptada de la segunda función
-              this.add([
-                obj,
-                () => {
-                  this.$emit("onAddProducto", obj); // Emitimos el evento
-                  this.$toasted.show("Producto añadido correctamente");
-                },
-                { setPrecio: this.setPrecio, setSuma: true }
-              ]);
+              this.setProducto(response.data);
             } else {
               this.loadCode = "";
-              this.$toasted.show("No se encontró ningún producto");
+              this.$toasted.show("No se encontró ningun producto");
             }
           });
       }
-    },
-
+    },    
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
 
@@ -1095,6 +1080,13 @@ export default {
       }
     },
     setProducto(obj) {
+      let val = this.productos.some(prod =>
+        prod.IdProducto === obj.IdProducto
+      )
+      if (val) {
+        this.$toasted.show('Producto ya se encuentra en el listado')
+        return;
+      }
       this.precioCont = obj.PrecioContado;
       obj.subtotal = obj.PrecioContado;
       let variantStock = "";
