@@ -1011,22 +1011,22 @@ export default {
         switch (this.tipoUtilidad) {
           case 'Corporativo':
 
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2) : '';
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2);
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(1)).toFixed(2)
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Publico':
 
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2) : '';
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
 
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Taller':
 
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2) : '';
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2);
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100).toFixed(1)).toFixed(2)
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
             break;
 
           default:
@@ -1233,7 +1233,7 @@ export default {
                 <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${parseFloat(data.PrecioContado).toFixed(2)}</b></td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
                 <td style="width: 5%">
                   <img src="${data.Imagen == null || data.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.Imagen}" class="imagen">
                 </td>
