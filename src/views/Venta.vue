@@ -831,16 +831,20 @@ export default {
     },
     anadirVentana() {
       this.ventas.push(this.venta);
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-      });
+      // this.$nextTick(() => {
+      //   this.ventaActiva = this.ventas.length - 1;
+      // });
       this.getVendedorInfo();
     },
     eliminarVentana() {
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
-        this.ventaActiva = this.ventaActiva - 1;
+        if (this.ventaActiva != 0) {
+          this.ventaActiva = this.ventaActiva - 1;
+        } else {
+          this.ventaActiva = 0;
+        }
       });
     },
     setTipoVenta(obj) {
