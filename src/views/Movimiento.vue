@@ -188,34 +188,28 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col md="4">
+              <b-col cols="12">
                 <b-form-checkbox
                   id="checkbox-1"
                   v-model="gravada"
                   name="checkbox-1"
-                  :value="1"
-                  :unchecked-value="0"
-                 
+                  value="1"
+                  unchecked-value="0"
                 >
-                  Gravada
-                 
+                  GRAVADA
                 </b-form-checkbox>
               </b-col>
-
           </b-row>
           <b-row>
+            
             <b-col>
               <productos-carrito 
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"
-                :onSetProducto="onSetProducto"
-                :fields='fields'
-                @recalcularPorOpGravada="recalcularMontosGravada()"
+                :fields="fields"
                 :gravada="gravada"
-                />
-
+                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -243,6 +237,7 @@ export default {
   mounted() {},
   data() {
     return {
+      gravada: 0,
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -250,7 +245,6 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
-      gravada: 0,
       fields: [
         {
           key: "stock",
@@ -294,39 +288,6 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
-    recalcularMontosGravada() {
-      if (this.productos.length > 0) {
-        this.productos.forEach(producto => {
-          producto.OldPrecioCosto = producto.PrecioCosto;
-
-          if (this.gravada == 0) {
-            this.productos.forEach(async producto => {
-              let newPrecio = await this.calcularPrecioEIGV(
-                producto.PrecioCosto
-              );
-              producto.precio = newPrecio.Precio;
-              producto.TieneIgv = 1;
-              producto.igv = newPrecio.IGV;
-            });
-          } else {
-            this.productos.forEach(producto => {
-              producto.precio = producto.PrecioCosto;
-              producto.igv = 0;
-              producto.TieneIgv = 0;
-            });
-          }
-        });
-      }
-      this.$forceUpdate();
-    },
-    calcularPrecioEIGV(PrecioCosto) {
-      let Precio = PrecioCosto / 1.18;
-      let IGV = PrecioCosto - Precio;
-      return {
-        Precio: parseFloat(Precio).toFixed(2),
-        IGV: parseFloat(IGV).toFixed(2)
-      };
-    },
     onSetProducto(obj, cant, precio) {
       if (cant) {
         obj.cantidad = cant;
@@ -572,6 +533,7 @@ export default {
         this.inProgress = false;
         return;
       }
+
       if (this.isTraslado == true || this.isSalida == true) {
         this.movimiento.alterarProductos = 0;
       }
@@ -621,11 +583,6 @@ export default {
     ProductosCarrito,
     ProveedoresForm
   }
-  // watch: {
-  //   productos() {
-  //     this.recalcularMontosGravada();
-  //   }
-  // }
 };
 </script>
 <style>

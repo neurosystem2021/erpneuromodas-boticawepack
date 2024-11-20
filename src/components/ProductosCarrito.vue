@@ -30,13 +30,12 @@
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
-            placeholder="Buscar Producto"
+            placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
              id="autocompleteProducto"
-             class="txtBuscarProducto"
-
+             class="cboAgregar"
           >
           </autocomplete>
           <b-button @click="abrirMicrofono()">
@@ -301,7 +300,7 @@
                 : false || esDelivery
             "
             type="number"
-           style="width: 105px"
+            style="width: 95px"
             class="form-control"
             step="0.001"
             min="0"
@@ -410,11 +409,12 @@
             class="form-control"
             v-model="productos[data.index].FLETE"
             type="number"
-            step="0.01"
-            style="width: 105px"
-            placeholder="Flete"/>
+            min="0"
+             style="width: 120px"
+             step="0.01"
+            placeholder="Flete">
             <strong>
-              {{ parseFloat((productos[data.index].FLETE ?  productos[data.index].FLETE :0)/productos[data.index].cantidad).toFixed(2) }} x Unidad
+                {{ parseFloat((productos[data.index].FLETE? productos[data.index].FLETE :0)/productos[data.index].cantidad).toFixed(2) }}
             </strong>
         </template>
 
@@ -618,11 +618,9 @@
             <td><b>SubTotal</b></td>
             <td class="table-danger">{{ sumatoriaSubTotal }}</td>
           </tr>
-          <!-- <tr v-if="sumatoriaIgv > 0"> -->
-          <tr v-if=" obtenerSumatoriaIgv()  > 0">
+          <tr v-if="calcularIGV() > 0">
             <td><b>IGV</b></td>
-           
-            <td class="table-danger">{{ obtenerSumatoriaIgv() }}</td>
+            <td class="table-danger">{{ calcularIGV() }}</td>
           </tr>
           <tr>
             <td><b>TOTAL</b></td>
@@ -851,6 +849,41 @@ export default {
       item.subtotal = item.PrecioContado * item.cantidad;
       // $emit("onInputCantidad", item.cantidad);
       this.$forceUpdate();
+    },
+    calcularIGV() {
+      let igv = 0;
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((total, item) => {
+            let x = item.total / 1.18;
+            return total + parseFloat(item.total) - parseFloat(x);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((total, item) => {
+            return total + parseFloat(item.igv);
+          }, 0);
+        }
+      }
+      return parseFloat(igv).toFixed(2);
+    },
+    obtenerSumatoriaIgv() {
+      let igv = 0;
+
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            let x = prod.total / 1.18;
+
+            return totalIGV + parseFloat(prod.total) - parseFloat(x).toFixed(2);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((totalIGV, prod) => {
+            return totalIGV + parseFloat(prod.igv ? prod.igv : 0);
+          }, 0);
+        }
+      }
+
+      return parseFloat(igv).toFixed(2);
     },
     BusquedaProductos(busqueda) {
       if (busqueda) {
@@ -1165,15 +1198,14 @@ export default {
       this.$refs["modalCant"].hide();
       obj.cantidadPres = obj.cantidad;
       obj.Presentacion = "";
-
+      //this.actualizarProd(obj)
       this.$forceUpdate();
       this.$nextTick(() => {
         const inputRef = this.$refs[`cantidad-0`];
-        // console.log(inputRef);
+
         inputRef.focus();
         inputRef.select();
       });
-      //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
       this.objProd.cantxPrecio = 1;
@@ -1205,8 +1237,6 @@ export default {
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
       //this.actualizarProd(obj)
-
-      this.$forceUpdate();
     },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
@@ -1401,8 +1431,6 @@ export default {
       this.eliminar(index);
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
-
-      this.$forceUpdate();
     },
 
     formatFecha(fecha) {
@@ -1434,25 +1462,6 @@ export default {
       }
 
       // do something...
-    },
-    obtenerSumatoriaIgv() {
-      let igv = 0;
-
-      if (this.productos.length > 0) {
-        if (this.gravada == 1) {
-          igv = this.productos.reduce((totalIGV, prod) => {
-            let x = prod.total / 1.18;
-
-            return totalIGV + parseFloat(prod.total) - parseFloat(x).toFixed(2);
-          }, 0);
-        } else {
-          igv = this.productos.reduce((totalIGV, prod) => {
-            return totalIGV + parseFloat(prod.igv ? prod.igv : 0);
-          }, 0);
-        }
-      }
-
-      return parseFloat(igv).toFixed(2);
     }
   },
 
@@ -1525,10 +1534,9 @@ canvas {
   width: auto;
   margin: 0 auto;
 }
-.txtBuscarProducto {
-  border: 2px solid #1a237e;
+.cboAgregar {
+  border: 1px solid blue;
 }
-
 @media only screen and (max-width: 750px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 100vw !important;
