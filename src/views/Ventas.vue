@@ -9,7 +9,7 @@
             </b-col>
         </b-row>
         <br />
-        <b-container class="bv-example-row"  id="conten">
+        <b-container class="bv-example-row"  id="conten" fluid>
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil2">
