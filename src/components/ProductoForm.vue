@@ -503,16 +503,25 @@ export default {
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
         }
+        this.$refs.file.value=null
+        this.file=''
         }).catch((error) => {
+
+            this.$refs.file.value=null
+            this.file=''
             console.log(error)
             this.initForm()
             this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+
           })
 
       } else {
 
         this.title = 'Nuevo Producto'
         this.clearForm()
+
+        this.$refs.file.value=null
+        this.file=''
 
         //this.$refs.inputCodigoBarra.$el.disabled = false
       }
