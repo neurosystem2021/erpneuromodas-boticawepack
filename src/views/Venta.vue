@@ -1,9 +1,10 @@
 <template>
   <b-container fluid>
-    <b-row>
-      <b-col cols="7">
-        <b-tabs v-model="ventaActiva" content-class="mt-3" fill class="mt-2 px-2">
-          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`">
+    <b-row id="header">
+      <b-col cols="7" >
+        <b-card no-body>
+        <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-2" >
+          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs">
             <b-container>
               <b-row>
                 <b-col cols="5">
@@ -61,6 +62,7 @@
                                 label="writer"
                                 placeholder="Cliente"
                                 class="font-weight-bold"
+                                initValue="00000000 CLIENTES VARIOS"
                                 :onInput="(val) => newDniRuc = val"
                                 :on-select="setCliente" 
                                 :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
@@ -81,11 +83,15 @@
                   </b-row>
                 </b-col>
                 <b-col cols="6">
-                  <h1> 
-                    {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
-                     </h1>
-                  {{ fechaActual()}}
-                </b-col>
+                  <center>
+
+                    <h1> 
+                      {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
+                      <p style="padding: 2px 0; border-radius: 25px;width:30% ; background: yellow; font-size: 1rem;"> Valor Referencial</p>
+                    </h1>
+                    {{ fechaActual()}}
+                  </center>
+                  </b-col>
 
               </b-row>
               <b-row>
@@ -100,16 +106,32 @@
                   </b-form-group>
                 </b-col>
               </b-row>
-              <b-row class="mt-2"  style="position: relative;height: 40vh;overflow-y: scroll;">
-                <b-table striped hover :fields="headerTable" :items="venta.productos">
+              <div style="height: 40vh;">
+              <b-row class="mt-2"  style="position: relative;max-height: 40vh;overflow-y: scroll;">
+                <b-table striped hover :fields="headerTable"  :items="venta.productos">
+                  <template slot="pres" slot-scope="data">
+                    <b-button   
+                      v-if="data.item.tienePresentacion"
+                      size="sm"
+                      variant="info"
+                      @click="showPresentacion(data.item,data.index)" 
+                      style="margin-top:2px;"
+                      >
+                      <i class="fas fa-list"></i>
+                    </b-button>
+      
+                     
+                     
+                  </template>
                   <template slot="presentacion" slot-scope="data">
                     <b-form-input
-                      v-model="data.item.ProductoPresentacion"
+                      v-model="data.item.presentacion"
                       type="text"
                       style="text-align:center; font-weight:bold; width: 120px;"
                       autocomplete="false"
                       disabled
                       ></b-form-input>
+                     
                      
                   </template>
                   <template slot="cantidad" slot-scope="data">
@@ -120,10 +142,15 @@
                       autocomplete="false"
                       :id="`input${data.index}`"
                       ></b-form-input>
-                     
+                      <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
+                      v-if="data.item.CantidadPresentacion">
+                        
+                        {{ data.item.CantidadPresentacion }} unid.
+                      </p>
                   </template>
                   <template slot="precio" slot-scope="data">
                     <b-form-input
+                      :disabled="data.item.bloquearInputPrecio"
                       v-model="data.item.precio"
                       min="0"
                       step="0.00001"
@@ -163,6 +190,7 @@
 
                 </b-table>
               </b-row>
+              </div>
               <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
                 <b-col cols="4">
                   <b-row>
@@ -170,12 +198,12 @@
                       <b-button v-if="touchHab" variant="danger" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                     </b-col>
-                    <b-col md="12" class="mt-1">
-                      <!-- <b-button type="button" block variant="primary" @click="LimpiarPuntoVenta"><i class="fas fa-redo"></i> Actualizar</b-button> -->
+                    <!-- <b-col md="12" class="mt-1">
+                   
                       <b-button type="button" block variant="primary"><i class="fas fa-redo"></i> Actualizar</b-button>
-                    </b-col>
+                    </b-col> -->
                     <b-col md="12" class="mt-1">
-                      <proformas :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                      <proformas :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen" @onSelectProforma="cargarProforma"></proformas>
                     </b-col>
                   <b-col md="12" class="mt-1">
                     <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
@@ -190,11 +218,12 @@
                 </b-col>
                 <b-col cols="4">
                   <b-col md="12" class="text-left">
-                    <b-form-radio-group id="radios1"
-                    v-model="ventas[ventaActiva].selectOpcionVenta"
+                    <b-form-radio-group 
+                      :id="`radios1${ventaActiva}`"
+                      v-model="ventas[ventaActiva].selectOpcionVenta"
                       @change="setOpcionVenta"
                       :options="opcionesVenta"
-                      name="radioOptions">
+                      :name="`radioOptions${ventaActiva}`">
                     </b-form-radio-group>
                   </b-col>
                   <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
@@ -232,8 +261,8 @@
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                          <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus">
-                          <slot name="metodopago">
+                          <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus" :style="{ minWidth: '600px' }">
+                          <slot name="metodopago" style="width: 1200px;" >
                             <table class="table b-table border table-footer table-sm">
                               <tbody>
                                 <tr>
@@ -289,7 +318,50 @@
                         <td>
                           <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
                           <b-popover target="popover-opciones" title="Opciones" triggers="focus" >
-                            <slot name="operaciones"></slot>
+                            <slot name="operaciones">
+                              <table class="table b-table border table-footer">
+                                    <tbody>
+                                        <tr v-if="ventas[ventaActiva].puntosAplicados == 0">
+                                            <td>
+                                                <b-input-group prepend="S/" append="Descuento">
+                                                    <input
+                                                        v-model="descuentoGeneral"
+                                                        min="0"
+                                                        value="0"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
+                                                        class="form-control"
+                                                    />
+                                                </b-input-group>
+                                                <b-form-text style="color:black !important; font-weight:bold">
+                                                    Descuento general a toda la venta.
+                                                </b-form-text>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b-form-checkbox
+                                                    v-model="ventas[ventaActiva].EsCredito"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Venta a credito
+                                                </b-form-checkbox>
+                                                <b-form-input 
+                                                    v-if="ventas[ventaActiva].EsCredito"
+                                                    v-model="ventas[ventaActiva].FechaCredito"
+                                                    type="date">
+                                                </b-form-input>
+                                                <!-- <b-form-checkbox v-if="false"
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox> -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </slot>
+                            
                           </b-popover>  
                         </td>
                         <td class="table-danger">Descuento</td>
@@ -360,9 +432,9 @@
 
                 </b-col>
               </b-row>
-              <b-row class="centrado d-flex justify-content-center mt-5" >
-                <b-button class="mx-1" variant="primary"> Crear Proforma</b-button>
-                <b-button class="mx-1" variant="success"> Efectuar Venta</b-button>
+              <b-row class="centrado d-flex justify-content-center my-5" >
+                <b-button class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                <b-button class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
                </b-row>
             </b-container>
           </b-tab>
@@ -371,7 +443,7 @@
         <!-- <b-row>
 
         </b-row> -->
-
+      </b-card>
       </b-col>
       <b-col md="5">
         <b-row class="headerInfo" style="background: #f4f4f4">
@@ -551,6 +623,86 @@
         </b-row>
       </b-col>
     </b-row>
+    <b-modal v-model="modalPresentacion" size="lg" hide-footer>
+      <center>
+        <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
+      </center>
+      <b-row>
+          <b-col cols="6">
+                <b-card
+                align="center"
+                class="mb-3 contentCard"
+                @click="cambiarPresentacion(
+                  producto,
+                  false
+                )"
+                >
+                <b-row>
+                    <b-col md="6" class="nomCart">
+                      <div>
+                          <b-row class="nomCart2">
+                            <center> <h6 class="text-uppercase"> {{producto.ProductoPresentacion}} </h6> </center>
+                            </b-row>
+                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ producto.stock }} </span>
+                      </div>
+                      </b-col>
+                      <b-col md="6" class="text-left">
+                      <h5>x1</h5>
+                      <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                      <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
+                    </b-col>
+                </b-row>
+                </b-card>
+            </b-col>
+
+            
+          <b-col cols="6"  v-for="(pres,index) in producto.PreciosPorProducto" :key="index">
+                <b-card
+                align="center"
+                class="mb-3 contentCard"
+                @click="cambiarPresentacion(
+                  pres,
+                  true
+                )"
+                >
+                <b-row>
+                    <b-col md="6" class="nomCart">
+                      <div>
+                          <b-row class="nomCart2">
+                            <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
+                            </b-row>
+                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff">
+                            {{  parseFloat(producto.stock/pres.cantidad).toFixed(2) }}
+                            </span>
+                      </div>
+                      </b-col>
+                      <b-col md="6" class="text-left">
+                      <h5>x{{ pres.cantidad }}</h5>
+                      <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                      <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
+                    </b-col>
+                </b-row>
+                </b-card>
+            </b-col>
+
+            <!-- <b-col md="6" v-for="(pres,index) in producto.PreciosPorProducto" :key="index" class="nomCart">
+              
+              <div>
+                <b-row class="nomCart2">
+                  <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
+                </b-row>
+                  Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ 
+                  parseFloat(producto.stock/pres.cantidad).toFixed(2)
+                  }} </span>
+              </div>
+            </b-col>
+            <b-col md="6" class="text-left">
+            <h5>x1</h5>
+            <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+            <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
+        </b-col> -->
+      </b-row>
+    </b-modal>
   </b-container>
 </template>
 <script>
@@ -582,6 +734,7 @@ export default {
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "Producto" },
+        { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
@@ -611,7 +764,6 @@ export default {
         Serie: "",
         Numero: "",
         Observacion: "",
-        cliente: {},
         comisionista: {},
         tipoVenta: {
           IdTipoDoc: 7,
@@ -714,15 +866,27 @@ export default {
       opcionesVenta: [
         { text: "Normal", value: 0 },
         { text: "Delivery", value: 2 }
-      ]
+      ],
+      modalPresentacion: false,
+      producto: {},
+      index: 0
     };
   },
   mounted() {
     this.getVendedorInfo();
+    this.getNumeroVenta();
+    this.loadClienteVarios();
   },
   methods: {
     fechaActual() {
       return this.$moment().format("YYYY-MM-DD H:mm:ss");
+    },
+    async loadClienteVarios() {
+      await this.axios.get(this.API + "clientes/00000000").then(res => {
+        if (res.data.IdCliente) {
+          this.setCliente(res.data);
+        }
+      });
     },
     getVendedorInfo() {
       let usuario = sessionStorage.getItem("User");
@@ -754,7 +918,6 @@ export default {
         });
     },
     focusAutocomplete(ref) {
-      console.log(ref);
       let element = document.getElementById(ref);
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
@@ -762,9 +925,10 @@ export default {
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
+      this.ventas[0].vendedor = obj;
     },
     setAlmacen(obj) {
-      this.venta.almacen = obj;
+      this.ventas[this.ventaActiva].almacen = obj;
       this.$refs.inputAlmacen.setValue(obj.Almacen);
       this.getCategorias();
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
@@ -821,7 +985,7 @@ export default {
     },
     setPuntoVenta(obj) {
       this.ventas[this.ventaActiva].puntoVenta = obj;
-      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
+      // this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
 
@@ -830,11 +994,21 @@ export default {
       this.tabActive = 0;
     },
     anadirVentana() {
-      this.ventas.push(this.venta);
-      // this.$nextTick(() => {
-      //   this.ventaActiva = this.ventas.length - 1;
-      // });
-      this.getVendedorInfo();
+      let venta = { ...this.venta };
+      venta.productos = [];
+      this.ventas.push(venta);
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventas.length - 1;
+        this.getNumeroVenta();
+        this.getVendedorInfo();
+        this.loadClienteVarios();
+      });
+      let header = document.getElementById("header");
+      header.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+      this.$toasted.success("Se añadió una opción más de venta");
     },
     eliminarVentana() {
       this.ventas.splice(this.ventaActiva, 1);
@@ -846,6 +1020,12 @@ export default {
           this.ventaActiva = 0;
         }
       });
+      let header = document.getElementById("header");
+      header.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+      this.$toasted.info("Opción de venta cancelada.");
     },
     setTipoVenta(obj) {
       this.isNota[this.ventaActiva] = false;
@@ -858,14 +1038,14 @@ export default {
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
         this.isNota[this.ventaActiva] = true;
-        this.limpiarCart();
+        // this.limpiarCart();
         if (this.ventas[this.ventaActiva].EsDelivery) {
-          this.anularPagoDelivery();
+          // this.anularPagoDelivery();
         } else if (
           this.$route.query.idPreOrden &&
           this.$route.query.idCliente
         ) {
-          this.anularPagoOrden();
+          // this.anularPagoOrden();
         }
       }
 
@@ -881,47 +1061,65 @@ export default {
         this.tieneIgv[this.ventaActiva] = false;
       }
       //this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
-      console.log("tipoVenta", obj);
+
       this.ventas[this.ventaActiva].tipoVenta = obj;
       this.getNumeroVenta();
     },
-    getNumeroVenta() {
-      this.axios
-        .get(this.API + "ventas/numero", {
-          params: {
-            idPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-              .IdDocVentaPuntoVenta,
-            idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
-          }
-        })
-        .then(response => {
-          this.ventas[this.ventaActiva].Serie = response.data.serie;
-          this.ventas[this.ventaActiva].Numero =
-            response.data.numero + this.ventaActiva;
-        })
-        .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-        });
+    async getNumeroVenta() {
+      // await setTimeout(() => {
+      this.$nextTick(async () => {
+        await this.axios
+          .get(this.API + "ventas/numero", {
+            params: {
+              idPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
+                .IdDocVentaPuntoVenta,
+              idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
+            }
+          })
+          .then(response => {
+            this.ventas[this.ventaActiva].Serie = response.data.serie;
+            this.ventas[this.ventaActiva].Numero =
+              response.data.numero + this.ventaActiva;
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      });
+      // }, 1000);
     },
     async setProducto(producto) {
-      if (
-        this.ventas[this.ventaActiva].productos.some(
-          v => v.IdProducto == producto.IdProducto
-        )
-      ) {
-        this.ventas[this.ventaActiva].productos.filter(
+      let productos = this.ventas[this.ventaActiva].productos;
+      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
+        productos.filter(
           v => v.IdProducto == producto.IdProducto
         )[0].cantidad += 1;
         return false;
       }
       // console.log("producto", producto);
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod);
+      // console.log("prod", prod.PreciosPorProducto);
+      let pres = [];
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+      prod.PreciosPorProducto = pres;
+      prod.presentacion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
+      prod.ProductoPresentacion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
-      this.ventas[this.ventaActiva].productos.unshift(prod);
+      prod.tienePresentacion = prod.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
+      prod.bloquearInputPrecio = false;
+      prod.CantidadPresentacion = null;
+      productos.unshift(prod);
       this.$nextTick(() => {
         let input = document.getElementById("input0");
         input.focus();
@@ -944,14 +1142,12 @@ export default {
 
       let ref = `inputCliente${this.ventaActiva}`;
       let inputCliente = this.$refs[ref];
-
       if (typeof obj === "object") {
         if (inputCliente && typeof inputCliente.setValue === "function") {
           // inputCliente.setValue(obj.Cliente);
         }
         this.ventas[this.ventaActiva].cliente = obj;
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
-
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
           this.ventas[this.ventaActiva].EsOrganizacion = 0;
@@ -965,8 +1161,9 @@ export default {
               if (inputCliente && typeof inputCliente.setValue === "function") {
                 // inputCliente.setValue(response.data.Cliente);
               }
-              this.venta.cliente = response.data;
-              this.venta.CampoDireccion = response.data.Direccion;
+              this.ventas[this.ventaActiva].cliente = response.data;
+              this.ventas[this.ventaActiva].CampoDireccion =
+                response.data.Direccion;
             } else {
               this.$toasted.show("No se encontró al cliente");
             }
@@ -1037,6 +1234,548 @@ export default {
     setOpcionVenta(opc) {
       this.ventas[this.ventaActiva].nombreLlevar = "";
       this.ventas[this.ventaActiva].DireccionEntrega = "";
+    },
+    setComisionista(obj) {
+      if (typeof obj === "object") {
+        //this.$refs.inputComisionista.setValue(obj.Cliente)
+        this.venta.comisionista = obj;
+        this.ventas[this.ventaActiva].comisionista = obj;
+      } else {
+        this.venta.comisionista = {};
+        this.ventas[this.ventaActiva].comisionista = {};
+      }
+    },
+    metodoPagoCambio(tipo = null) {
+      const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+      const ventaActual = this.ventas[this.ventaActiva].pago;
+      metodos.forEach(metodo => {
+        ventaActual[metodo].descripcion = null;
+        ventaActual[metodo].monto = 0;
+      });
+      if (tipo && metodos[tipo - 1]) {
+        ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+      }
+    },
+
+    async guardarVenta() {
+      let venta = this.ventas[this.ventaActiva];
+      let productos = venta.productos;
+      let totalPagos = 0;
+
+      totalPagos +=
+        this.obtenerMonto(venta.pago.efectivo.monto) +
+        this.obtenerMonto(venta.pago.visa.monto) +
+        this.obtenerMonto(venta.pago.mastercard.monto) +
+        this.obtenerMonto(venta.pago.delivery.monto);
+      if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
+        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago tarjeta/transferencia no puede ser negativo"
+        );
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+
+      if (!venta.cliente.DniRuc) {
+        //this.$toasted.show('Debe seleccionar un cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "Debe seleccionar un cliente",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+      var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
+      if (!esNumerico) {
+        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "El RUC debe ser numérico, editar cliente.",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
+      var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
+        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title:
+            "Una factura debe ser emitida para una empresa, no a un usuario común",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "Una boleta no debe ser emitida para una empresa",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+      if (
+        venta.tipoVenta.CodSunat == "07" ||
+        venta.tipoVenta.CodSunat == "08"
+      ) {
+        if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
+          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+          this.$swal({
+            position: "center",
+            icon: "info",
+            title: "Debe seleccionar un Documento de Referencia...",
+            showConfirmButton: true,
+            confirmButtonText: "Entiendo",
+            target: document.getElementById("conten"),
+            confirmButtonColor: "#0275d8"
+          });
+
+          return;
+        }
+        if (!venta.NotaIdMotivo) {
+          //this.$toasted.show('Debe seleccionar un Motivo')
+          this.$swal({
+            position: "center",
+            icon: "info",
+            title: "Debe seleccionar un Motivo",
+            showConfirmButton: true,
+            confirmButtonText: "Entiendo",
+            target: document.getElementById("conten"),
+            confirmButtonColor: "#0275d8"
+          });
+
+          return;
+        }
+        if (venta.NroComprobanteModifica == "") {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia");
+
+          this.$refs.inputDocRef.focus();
+          return;
+        }
+        venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == venta.NotaIdMotivo
+        )[0].text;
+      }
+      if (!productos.length) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No hay productos para vender",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+
+      if (
+        productos.some(
+          v =>
+            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+            v.stock
+        )
+      ) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No se puede vender un producto sin stock",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
+      venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
+      // venta.productos = this.productos;
+      venta.puntosAplicados = this.puntosAplicados || 0;
+      // venta.totalCart = this.totalCart || 0;
+      venta.IdPreOrden = this.$route.query.idPreOrden || null;
+      venta.IdPedido = this.$route.query.idPedido || null;
+      venta.IdProyecto = this.$route.query.idProyecto || null;
+      venta.adelantosPreOrden = this.adelantosPreOrden;
+      if (venta.selectOpcionVenta != 2) {
+        venta.DireccionEntrega = venta.EsDelivery
+          ? this.infoDelivery.Direccion || ""
+          : "";
+      }
+      venta.PagoCon = venta.pagocon;
+      venta.totalCart = this.getTotal();
+      venta.Observacion = (venta.Observacion + "").toUpperCase();
+      venta.idProductos = productos.map(prod => prod.IdProducto);
+      if (venta.cliente.DniRuc != "00000000") {
+        venta.EsOrganizacion = 0;
+        venta.NombreOrganizacion = "";
+      }
+      if (venta.EsOrganizacion) {
+        venta.cliente.Cliente = venta.NombreOrganizacion;
+      }
+      venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
+        .toUpperCase()
+        .trim();
+      await this.axios.post(this.API + "ventas", venta).then(response => {
+        console.log(response);
+        if (response.data.insertId) {
+          this.$toasted.success("Venta realizada con exito");
+          window.open(
+            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+            "_blank",
+            "noopener"
+          );
+        }
+
+        if (this.ventas.length == 1) {
+          window.location.reload();
+        } else {
+          this.eliminarVentana();
+          this.getVendedorInfo();
+        }
+
+        // if (response.data.actualizar) {
+        //   this.$toasted.show(response.data.msg);
+        //   return;
+        // }
+      });
+    },
+    async guardarProforma() {
+      let venta = this.ventas[this.ventaActiva];
+      let productos = venta.productos;
+      let totalPagos = 0;
+
+      totalPagos +=
+        this.obtenerMonto(venta.pago.efectivo.monto) +
+        this.obtenerMonto(venta.pago.visa.monto) +
+        this.obtenerMonto(venta.pago.mastercard.monto) +
+        this.obtenerMonto(venta.pago.delivery.monto);
+      if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
+        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago tarjeta/transferencia no puede ser negativo"
+        );
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+        this.$toasted.show(
+          "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+
+      if (!venta.cliente.DniRuc) {
+        //this.$toasted.show('Debe seleccionar un cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "Debe seleccionar un cliente",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+      var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
+      if (!esNumerico) {
+        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "El RUC debe ser numérico, editar cliente.",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
+      var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
+        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title:
+            "Una factura debe ser emitida para una empresa, no a un usuario común",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "Una boleta no debe ser emitida para una empresa",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+      if (
+        venta.tipoVenta.CodSunat == "07" ||
+        venta.tipoVenta.CodSunat == "08"
+      ) {
+        if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
+          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+          this.$swal({
+            position: "center",
+            icon: "info",
+            title: "Debe seleccionar un Documento de Referencia...",
+            showConfirmButton: true,
+            confirmButtonText: "Entiendo",
+            target: document.getElementById("conten"),
+            confirmButtonColor: "#0275d8"
+          });
+
+          return;
+        }
+        if (!venta.NotaIdMotivo) {
+          //this.$toasted.show('Debe seleccionar un Motivo')
+          this.$swal({
+            position: "center",
+            icon: "info",
+            title: "Debe seleccionar un Motivo",
+            showConfirmButton: true,
+            confirmButtonText: "Entiendo",
+            target: document.getElementById("conten"),
+            confirmButtonColor: "#0275d8"
+          });
+
+          return;
+        }
+        if (venta.NroComprobanteModifica == "") {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia");
+
+          this.$refs.inputDocRef.focus();
+          return;
+        }
+        venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == venta.NotaIdMotivo
+        )[0].text;
+      }
+      if (!productos.length) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No hay productos para vender",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+
+      if (
+        productos.some(
+          v =>
+            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+            v.stock
+        )
+      ) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No se puede vender un producto sin stock",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
+      venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
+      // venta.productos = this.productos;
+      venta.puntosAplicados = this.puntosAplicados || 0;
+      // venta.totalCart = this.totalCart || 0;
+      venta.IdPreOrden = this.$route.query.idPreOrden || null;
+      venta.IdPedido = this.$route.query.idPedido || null;
+      venta.IdProyecto = this.$route.query.idProyecto || null;
+      venta.adelantosPreOrden = this.adelantosPreOrden;
+      if (venta.selectOpcionVenta != 2) {
+        venta.DireccionEntrega = venta.EsDelivery
+          ? this.infoDelivery.Direccion || ""
+          : "";
+      }
+      venta.PagoCon = venta.pagocon;
+      venta.totalCart = this.getTotal();
+      venta.Observacion = (venta.Observacion + "").toUpperCase();
+      venta.idProductos = productos.map(prod => prod.IdProducto);
+      if (venta.cliente.DniRuc != "00000000") {
+        venta.EsOrganizacion = 0;
+        venta.NombreOrganizacion = "";
+      }
+      if (venta.EsOrganizacion) {
+        venta.cliente.Cliente = venta.NombreOrganizacion;
+      }
+      venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
+        .toUpperCase()
+        .trim();
+      await this.axios.post(this.API + "proformas", venta).then(response => {
+        console.log(response);
+        if (response.data.insertId) {
+          this.$toasted.success("Venta realizada con exito");
+          window.open(
+            "/imprimir/proforma.php?IdProforma=" + response.data.insertId,
+            "_blank"
+          );
+        }
+
+        // setTimeout(() => {
+        //   if (this.ventas.length == 1) {
+        //     window.location.reload();
+        //   } else {
+        //     this.eliminarVentana();
+        //     this.getVendedorInfo();
+        //   }
+        // }, 100);
+        // if (response.data.actualizar) {
+        //   this.$toasted.show(response.data.msg);
+        //   return;
+        // }
+      });
+    },
+    obtenerMonto(valor) {
+      return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
+    },
+    cargarProforma(proforma) {
+      let venta = { ...this.venta };
+      venta.cliente = proforma;
+      let productos = [];
+      proforma.productos.forEach(async element => {
+        let prod = await this.obtenerStockBuscador(element.IdProducto);
+        console.log(element);
+        productos.push({
+          ProductoPresentacion: element.Descripcion
+            ? element.Descripcion
+            : "UNIDAD",
+          presentacion: element.Descripcion ? element.Descripcion : "UNIDAD",
+          Producto: prod.Producto,
+          Producto: prod.Producto,
+          cantidad: element.Cantidad,
+          precio: element.Precio,
+          descuento: element.Descuento ? element.Descuento : 0,
+          stock: prod.stock
+          // CantidadPresentacion: element.Descripcion
+        });
+      });
+      // console.log(proforma.productos);
+      venta.productos = productos;
+      this.ventas.push(venta);
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventas.length - 1;
+        this.getNumeroVenta();
+        this.getVendedorInfo();
+        this.loadClienteVarios();
+      });
+    },
+    showPresentacion(prod, index) {
+      this.producto = { ...prod };
+      this.index = index;
+      this.modalPresentacion = true;
+    },
+    cambiarPresentacion(obj, esPresentacion) {
+      let producto = { ...this.producto };
+      if (esPresentacion) {
+        producto.presentacion = obj.nombre;
+        producto.CantidadPresentacion = obj.cantidad;
+        producto.cantidad = 1;
+        producto.bloquearInputPrecio = true;
+        producto.precio = obj.precio;
+      } else {
+        producto.presentacion = obj.ProductoPresentacion;
+        producto.CantidadPresentacion = null;
+        producto.cantidad = 1;
+        producto.bloquearInputPrecio = false;
+        producto.precio = producto.PrecioContado;
+      }
+
+      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      this.modalPresentacion = false;
+    },
+    probarImpresora() {
+      if (
+        this.venta.vendedor != false &&
+        Object.keys(this.venta.vendedor).length > 0
+      ) {
+        let data = {
+          Ip: this.venta.vendedor.Ip,
+          NombreImpresora: this.venta.vendedor.NombreImpresora,
+          NombreRed: this.venta.vendedor.NombreRed,
+          Puerto: this.venta.vendedor.Puerto,
+          Tipo: this.venta.vendedor.Tipo
+        };
+        let impresoraJson = JSON.stringify(data);
+        var left = screen.width / 2 - 800 / 2;
+        var top = screen.height / 2 - 800 / 2;
+        let params =
+          "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
+          top +
+          ", left=" +
+          left;
+        window.open(
+          "http://localhost:5000/imprimir/test.php?impresora=" +
+            encodeURIComponent(impresoraJson),
+          "Impresión",
+          params
+        );
+      }
     }
   }
 };
@@ -1102,6 +1841,7 @@ export default {
   color: #fff !important;
   background: #65ba9b !important;
 }
+
 .pagocon .input-group-text {
   font-size: 0.8rem;
   font-weight: bold;
@@ -1113,6 +1853,13 @@ export default {
   background-color: #e6e6e6;
   border-bottom: none;
 } */
+.titleTabs {
+  font-size: 1.2rem !important;
+  font-weight: bold;
+}
+.popover {
+  min-width: 400px !important; /* Estilo global para todos los popovers */
+}
 .headerInfo .input-group-text {
   font-weight: bold;
   font-size: 0.8rem;
