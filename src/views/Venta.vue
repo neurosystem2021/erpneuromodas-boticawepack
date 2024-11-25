@@ -62,7 +62,7 @@
                                 label="writer"
                                 placeholder="Cliente"
                                 class="font-weight-bold"
-                                initValue="00000000 CLIENTES VARIOS"
+                                :initValue="initValueCliente"
                                 :onInput="(val) => newDniRuc = val"
                                 :on-select="setCliente" 
                                 :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
@@ -724,6 +724,7 @@ export default {
   components: { ProductosCarritoNuevo, ClientesForm, Proformas },
   data() {
     return {
+      initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
       newDniRuc: "",
       API: config.API,
@@ -994,6 +995,8 @@ export default {
       this.tabActive = 0;
     },
     anadirVentana() {
+      this.initValueCliente = "00000000 CLIENTE VARIOS";
+
       let venta = { ...this.venta };
       venta.productos = [];
       this.ventas.push(venta);
@@ -1695,25 +1698,55 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     cargarProforma(proforma) {
+      console.log(proforma);
+      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
       let productos = [];
-      proforma.productos.forEach(async element => {
-        let prod = await this.obtenerStockBuscador(element.IdProducto);
-        console.log(element);
-        productos.push({
-          ProductoPresentacion: element.Descripcion
-            ? element.Descripcion
-            : "UNIDAD",
-          presentacion: element.Descripcion ? element.Descripcion : "UNIDAD",
-          Producto: prod.Producto,
-          Producto: prod.Producto,
-          cantidad: element.Cantidad,
-          precio: element.Precio,
-          descuento: element.Descuento ? element.Descuento : 0,
-          stock: prod.stock
-          // CantidadPresentacion: element.Descripcion
-        });
+      proforma.productos.forEach(async producto => {
+        let prod = await this.obtenerStockBuscador(producto.IdProducto);
+        let pres = [];
+        if (prod.PreciosPorProducto) {
+          let newPres = JSON.parse(prod.PreciosPorProducto);
+          pres = newPres.filter(v => v.cantidad > 0);
+        }
+        prod.PreciosPorProducto = pres;
+        prod.presentacion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
+        prod.ProductoPresentacion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
+        prod.cantidad = 1;
+        prod.precio = producto.PrecioContado;
+        prod.descuento = 0;
+        prod.tienePresentacion = prod.PreciosPorProducto.some(
+          v => v.cantidad > 0
+        );
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = null;
+        prod.ProductoPresentacion = producto.Descripcion;
+        prod.presentacion = producto.Descripcion;
+        prod.cantidad = producto.Cantidad;
+        prod.precio = producto.Precio;
+        prod.descuento = producto.Descuento ? producto.Descuento : 0;
+        prod.stock = prod.stock;
+        productos.push(prod);
+        // prod.precio = prod.Precio;
+        // productos.push({
+        //   ProductoPresentacion: element.Descripcion
+        //     ? element.Descripcion
+        //     : "UNIDAD",
+        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
+        //   Producto: prod.Producto,
+        //   Producto: prod.Producto,
+        //   cantidad: element.Cantidad,
+        //   precio: element.Precio,
+        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
+        //   descuento: element.Descuento ? element.Descuento : 0,
+        //   stock: prod.stock
+        //   // CantidadPresentacion: element.Descripcion
+        // });
       });
       // console.log(proforma.productos);
       venta.productos = productos;
@@ -1722,8 +1755,9 @@ export default {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        this.loadClienteVarios();
+        // this.loadClienteVarios();
       });
+      this.ventas[this.ventaActiva].cliente = proforma;
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };
