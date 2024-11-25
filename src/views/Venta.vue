@@ -195,6 +195,12 @@
                 <b-col cols="4">
                   <b-row>
                     <b-col md="12" class="mt-1">
+                    <b-button block variant="info" @click="anadirVentana()"> Añadir Venta</b-button>
+                  </b-col>
+                    <b-col md="12" class="mt-1">
+                      <b-button block v-if="ventas.length>1" variant="dark" @click="eliminarVentana()"> Cancelar Venta</b-button>
+                    </b-col>
+                    <b-col md="12" class="mt-1">
                       <b-button v-if="touchHab" variant="danger" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                     </b-col>
@@ -208,15 +214,17 @@
                   <b-col md="12" class="mt-1">
                     <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                   </b-col>
-                  <b-col md="12" class="mt-1">
-                    <b-button block variant="info" @click="anadirVentana()"> Añadir Venta</b-button>
-                  </b-col>
-                  <b-col md="12" class="mt-1">
-                    <b-button block v-if="ventas.length>1" variant="dark" @click="eliminarVentana()"> Cancelar Venta</b-button>
-                  </b-col>
+                 
                   </b-row>
                 </b-col>
                 <b-col cols="4">
+                  <b-col md="12" class="text-left">
+                    <b-row class="centrado d-flex justify-content-center my-1" >
+                    <b-button class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                    <b-button class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
+                  </b-row>
+                    </b-col>
+
                   <b-col md="12" class="text-left">
                     <b-form-radio-group 
                       :id="`radios1${ventaActiva}`"
@@ -432,10 +440,10 @@
 
                 </b-col>
               </b-row>
-              <b-row class="centrado d-flex justify-content-center my-5" >
+              <!-- <b-row class="centrado d-flex justify-content-center my-5" >
                 <b-button class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
                 <b-button class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
-               </b-row>
+               </b-row> -->
             </b-container>
           </b-tab>
           
@@ -1028,7 +1036,7 @@ export default {
         behavior: "smooth",
         block: "start"
       });
-      this.$toasted.info("Opción de venta cancelada.");
+      this.$toasted.info("Opción de venta cerrada.");
     },
     setTipoVenta(obj) {
       this.isNota[this.ventaActiva] = false;
@@ -1290,6 +1298,10 @@ export default {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
+        return;
+      }
+      if (totalPagos <= 0) {
+        this.$toasted.show("Debe seleccionar un método de pago");
         return;
       }
 
@@ -1624,24 +1636,24 @@ export default {
         return;
       }
 
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        )
-      ) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        return;
-      }
+      // if (
+      //   productos.some(
+      //     v =>
+      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+      //       v.stock
+      //   )
+      // ) {
+      //   this.$swal({
+      //     position: "center",
+      //     icon: "info",
+      //     title: "No se puede vender un producto sin stock",
+      //     showConfirmButton: true,
+      //     confirmButtonText: "Entiendo",
+      //     target: document.getElementById("conten"),
+      //     confirmButtonColor: "#0275d8"
+      //   });
+      //   return;
+      // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
@@ -1673,7 +1685,7 @@ export default {
       await this.axios.post(this.API + "proformas", venta).then(response => {
         console.log(response);
         if (response.data.insertId) {
-          this.$toasted.success("Venta realizada con exito");
+          this.$toasted.success("Proforma realizada con exito");
           window.open(
             "/imprimir/proforma.php?IdProforma=" + response.data.insertId,
             "_blank"
