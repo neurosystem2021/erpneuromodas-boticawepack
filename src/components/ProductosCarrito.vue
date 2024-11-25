@@ -107,7 +107,10 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
-          <b-button size="sm":disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          <b-button 
+           size="sm" 
+          :disabled="bloquearInput?true:false"  
+          variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
@@ -604,6 +607,7 @@ export default {
       if (!this.productos[index].PreciosPorProducto) return;
 
       if (!this.precioHabilitado) {
+        
         let arr = JSON.parse(this.productos[index].PreciosPorProducto || "[]");
         arr = arr.map(r => {
           r.cantidad = Number(r.cantidad || 0);
@@ -624,7 +628,7 @@ export default {
         });
 
         if (!cambio) {
-          this.productos[index].precio = this.productos[index].PrecioContado;
+          // this.productos[index].precio = this.productos[index].PrecioContado;
         }
       }
     },
@@ -855,11 +859,12 @@ export default {
       obj.EsVentaNew = this.isVentas;
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
-      let fPP = this.preciosProd.filter(
-        p => p.cantidad === 0 || p.cantidad === "0"
-      );
+      // let fPP = this.preciosProd.filter(
+      //   p => p.cantidad === 0 || p.cantidad === "0"
+      // );
+
       //  Si hay exactamente 4 presentaciones con cantidad 0, se ejecuta el bloque de código dentro del if.
-      if (fPP.length == 4 || this.preciosProd.length > 1) {
+      if (this.preciosProd.some(p => p.cantidad > 0)) {
         obj.estadoPxP = true;
         this.indexProdSelect = null;
         this.$refs["modalCant"].show();
