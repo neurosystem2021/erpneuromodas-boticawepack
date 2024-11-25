@@ -3,6 +3,13 @@
         <b-container fluid class="bv-example-row" id="conten">
             <b-row>
                 <b-col md="6" style="border-right: 3px solid #C0C0C0; background: white">
+                    <b-row>
+                        <b-col md="12" v-if="this.$route.query.idPedido">
+                            <div class="form-inline">
+                                <h4>Pago de delivery código: <b-badge variant="info">{{this.$route.query.idPedido}}</b-badge></h4>
+                            </div>
+                        </b-col>
+                    </b-row>
                     <b-form @submit="guardarVenta" @keydown.enter="prevent">
                     <b-row>
                         <b-col md="12" v-if="precioHabilitado" style="margin-bottom:-10px">
@@ -110,6 +117,20 @@
                                     <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                     <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                 </b-form-select>
+                                <b-row v-if="this.$route.query.idPedido">
+                                        <b-col>
+                                            <b-form-group>
+                                                <label style="font-weight:bold">Cliente (Delivery):</label>
+                                                <b-form-input required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese cliente" autocomplete="off" v-model="venta.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar" readonly></b-form-input>
+                                            </b-form-group>
+                                        </b-col>
+                                        <b-col>
+                                            <b-form-group>
+                                                <label style="font-weight:bold">Direccion Entrega (Delivery):</label>
+                                                <b-form-textarea required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese direccion" rows="3" autocomplete="off" v-model="venta.DireccionEntrega" ref="inputDireccionEntrega" type="text" name="DireccionEntrega" id="DireccionEntrega" readonly></b-form-textarea>
+                                            </b-form-group>
+                                        </b-col>
+                                    </b-row>
                             </b-form-group>
 
                         </b-col>
@@ -144,7 +165,7 @@
                         </b-col>
                     </b-form-row>
                     <b-row>
-                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab" :idMetodoPago="venta.IdMetodoPago">
+                        <productos-carrito-nuevo ref="carrito" :bloquearInput="bloquearInput" @onRemoveProducto="actualizarDescuento" :onSetProducto="onSetProducto" :esDelivery="venta.EsDelivery" :precioHabilitado="precioHabilitado" :descuentoActivo="venta.almacen.DescuentoActivo" :isVentas="true" :touchHab="touchHab" :idMetodoPago="venta.IdMetodoPago">
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -269,20 +290,20 @@
                                         <tr>
                                             <td>
                                                 <b-form-checkbox
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-model="venta.EsCredito"
                                                     :value="1"
                                                     :unchecked-value="0">
                                                     Venta a credito
                                                 </b-form-checkbox>
                                                 <b-form-input 
-                                                    :disabled="bloquearInput?true:false || isNota"
+                                                    :disabled="bloquearInput?true:false || isNota || venta.EsDelivery"
                                                     v-if="venta.EsCredito"
                                                     v-model="venta.FechaCredito"
                                                     type="date">
                                                 </b-form-input>
                                                 <b-form-checkbox v-if="false"
-                                                    :disabled="bloquearInput?true:false"
+                                                    :disabled="bloquearInput?true:false || venta.EsDelivery"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
                                                     :unchecked-value="0">
@@ -312,9 +333,9 @@
                                     <b-col md="12" class="mt-1">
                                         <pago-deuda></pago-deuda>
                                     </b-col>
-                                    <!--<b-col md="12" class="mt-1">
+                                    <b-col md="12" class="mt-1">
                                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                                    </b-col>-->
+                                    </b-col>
                                     <!--<b-col md="12" class="mt-1">
                                         <ordenes-modal @onPagarOrden="onPagarOrden" :vendedor="venta.vendedor" ></ordenes-modal>
                                     </b-col>-->
@@ -558,7 +579,7 @@ import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 //import OrdenesModal from '@/components/OrdenesModal.vue'
-//import DeliveryModal from '@/components/DeliveryModal.vue'
+import DeliveryModal from '@/components/DeliveryModal.vue'
 import Spinner from 'vue-simple-spinner'
 import ProductosCarritoNuevo from '@/components/ProductosCarritoNuevo'
 import debounce  from 'lodash'
@@ -575,7 +596,7 @@ export default {
         // this.getNumeroVenta()
        // this.getVendedor()
       //setInterval(this.updateTime, 1000)
-      //this.escucharPedidos()
+      this.escucharPedidos()
       this.getVendedorInfo()
       this.configStock()
       //this.getCategorias()
@@ -1129,7 +1150,7 @@ export default {
         //Fin de nuevos metodos de venta
          //Sockets
         escucharPedidos(){
-            /*this.sockets.subscribe('nuevo-pedido', (data) => {
+            this.sockets.subscribe('nuevo-pedido', (data) => {
             if(this.$refs.deliveryModal.show){
                 this.$toasted.success('Nuevo Pedido de' + "<strong>"+data.nombre+"</strong>");  
                 this.$refs.deliveryModal.getPedidos();  
@@ -1152,7 +1173,7 @@ export default {
                 }
                 })
             }
-            });*/
+            });
         },
         //Fin Sockets
         cargarPreOrden(){
@@ -2288,7 +2309,7 @@ export default {
         PreOrdenLista,
         Proformas,
         //OrdenesModal,
-        //DeliveryModal,
+        DeliveryModal,
         'vue-simple-spinner':Spinner,
         ProductosCarritoNuevo
     }
