@@ -5,6 +5,7 @@ import Movimiento from '@/views/Movimiento.vue'
 import Productos from '@/views/Productos.vue'
 import Almacen from '@/views/Almacen.vue'
 import Ventas from '@/views/Ventas.vue'
+import Ventas2 from '@/views/Ventas2.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
@@ -70,6 +71,11 @@ export default new Router({
       path: '/ventas',
       name: 'Ventas',
       component: Ventas
+    },
+    {
+      path: '/ventas2',
+      name: 'Ventas2',
+      component: Ventas2
     },
     {
       path: '/reportes/ventas',
