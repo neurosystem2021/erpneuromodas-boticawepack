@@ -58,10 +58,10 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
                 <td class="celda" style="text-transform: uppercase">: CONTADO</td>
               </tr>
-              <tr>
+              <!--<tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
-              </tr>
+              </tr>-->
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
@@ -120,6 +120,7 @@
       <br>
       <div id="notices">
         <div>NOTA:</div>
+        <div class="notice">TODA VENTA ES SIN IGV</div>
         <div class="notice">NO SE ACEPTAN DEVOLUCIONES DE DINERO, TODO CAMBIO SERA EN PRODUCTOS.</div>
         <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
