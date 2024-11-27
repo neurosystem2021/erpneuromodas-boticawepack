@@ -24,7 +24,7 @@
             </b-col>
         </b-row>
       <b-row>
-        <b-col cols="12" >
+        <b-col cols="12" class="py-0">
           <b-card no-body>
           <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2" >
             <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" class="mt-0 pt-0">
@@ -70,7 +70,7 @@
                     </b-input-group>
                     </b-col>
                     <b-col md="4">
-                        <b-input-group prepend="P.V. " class="mt-2">
+                        <b-input-group prepend="P.V. ">
                             <autocomplete
                             required="required"
                             id="inputPuntoVenta"
@@ -87,10 +87,10 @@
                             </autocomplete>
                         </b-input-group>
                         </b-col>
-                    <b-col cols="12">
+                    <b-col cols="12" class="mt-1">
                         
-                        <b-form-group>
-                          <b-input-group>
+                        <b-form-group >
+                          <b-input-group class="py-0">
                               <autocomplete
                                   required="required"
                                   :id="`inputCliente${index}`"
@@ -108,7 +108,7 @@
                               <b-input-group-append>
                                   <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                               </b-input-group-append>
-                              </b-input-group>
+                          </b-input-group>
   
                           <b-form-select v-if="ventas[ventaActiva].cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
                             <option :value="ventas[ventaActiva].cliente.Direccion">{{ venta.cliente.Direccion }}</option>
@@ -129,7 +129,7 @@
                       Es Organización
                     </b-form-checkbox>  
                   </b-col>
-                  <b-col cols="6" >
+                  <b-col cols="6" class="pt-0" >
                     <b-form-input 
                     v-model="venta.nombreOrganizacion" 
                     v-if="venta.EsOrganizacion"
@@ -868,6 +868,7 @@ export default {
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "Producto" },
+        { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
         { key: "cantidad" },
