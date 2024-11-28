@@ -130,6 +130,7 @@ import { mapActions } from 'vuex'
 
                     // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
                     this.$emit('onSelectProforma', proforma)
+                    this.$emit('cargarProforma', proforma)
                 })
             },
             myProvider (ctx) {
