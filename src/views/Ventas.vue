@@ -2,9 +2,9 @@
     <b-container fluid>
         <b-row>
             <b-col offset="8">
-                <!-- <b-button-group size="sm" class="ocularMovil">
+                <b-button-group size="sm" class="ocularMovil">
                     <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                </b-button-group> -->
+                </b-button-group> 
                 <b-button-group size="sm" class="ocularMovil">
                     <pago-deuda></pago-deuda>
                 </b-button-group>
@@ -1745,7 +1745,7 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     cargarProforma(proforma) {
-      console.log(proforma);
+    
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
@@ -1856,6 +1856,90 @@ export default {
           "Impresión",
           params
         );
+      }
+    },
+    onPagarDelivery(obj) {
+      this.$route.query.idPedido = obj.IdPedido;
+      let venta = { ...this.venta };
+      if (this.$route.query.idPedido) {
+        console.log(obj);
+        this.infoDelivery = obj;
+        this.venta.EsDelivery = true;
+        // this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
+        // //cargar costo de delivery
+        // let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
+        // if (costoDelivery > 0) {
+        //   this.axios
+        //     .get(this.API + "costo/delivery")
+        //     .then(response => {
+        //       if (response.data) {
+        //         let costoDeliverObj = response.data;
+        //         costoDeliverObj.precio = costoDelivery;
+        //         costoDeliverObj.cantidad = 1;
+        //         costoDeliverObj.EsCostoDelivery = 1;
+        //         costoDeliverObj.IdImpresora = 0;
+        //         costoDeliverObj.descuento = 0;
+        //         costoDeliverObj.indicacion = "";
+        //         this.add([
+        //           response.data,
+        //           () => {
+        //             //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+        //           },
+        //           { setPrecioCosto: false },
+        //           false,
+        //           false
+        //         ]);
+        //         //Cargar Productos Delivery
+        //         let productos = JSON.parse(obj.Productos);
+        //         console.log(productos);
+        //         productos.map(item => {
+        //           this.add([
+        //             item.IdProducto,
+        //             () => {
+        //               this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+        //             },
+        //             {
+        //               cantidad: item.Cantidad,
+        //               precio: item.Precio,
+        //               indicacion: item.Indicacion
+        //             },
+        //             false
+        //           ]);
+        //         });
+        //         this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+        //         this.venta.DireccionEntrega = obj.Direccion;
+        //         this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
+        //       } else {
+        //         this.$toasted.show(
+        //           "PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'"
+        //         );
+        //         this.anularPagoDelivery();
+        //       }
+        //     })
+        //     .catch(error => {
+        //       this.$toasted.show("HUBO UN ERROR");
+        //     });
+        } else {
+          //Cargar Productos Delivery
+          let productos = JSON.parse(obj.Productos);
+          // productos.map(item => {
+          //   this.add([
+          //     item.IdProducto,
+          //     () => {
+          //       this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+          //     },
+          //     {
+          //       cantidad: item.Cantidad,
+          //       precio: item.Precio,
+          //       indicacion: item.Indicacion,
+          //       isDelivery: true
+          //     },
+          //     false
+          //   ]);
+          // });
+          // this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          // this.venta.DireccionEntrega = obj.Direccion;
+        }
       }
     }
   },
