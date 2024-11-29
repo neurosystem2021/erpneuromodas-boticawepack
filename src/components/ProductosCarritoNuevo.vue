@@ -263,6 +263,7 @@
                   </div>
                 </template>
                 <template slot="Presentacion" slot-scope="data" >
+                  <!-- {{ data.item.Presentacion }} -->
                   <b-form-input
                     v-model="productos[data.index].Presentacion"
                     type="text"
@@ -820,10 +821,19 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj.indicacion = ''
-      obj.Presentacion = obj.ProductoMedicion
+      //obj.Presentacion = obj.ProductoMedicion
+      obj.Presentacion = obj.ProductoMedicion ? obj.ProductoMedicion : obj.Descripcion;
       obj.CantidadPresentacion = 1
       obj.EsPresentacion = 0
       obj = this.onSetProducto(obj)
+
+      // const existingProductIndex = this.productos.findIndex(p => p.IdProducto === obj.IdProducto);
+      //   if (existingProductIndex !== -1) {
+      //       // Si existe, elimina el producto anterior del carrito
+      //       this.productos.splice(existingProductIndex, 1); // Elimina el producto
+      //   }
+      //   this.productos.push(obj);
+        
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
@@ -843,6 +853,16 @@ export default {
       obj.descuento = 0
       obj.nuevoPrecioContado = 0
       obj = this.onSetProducto(obj, prod.precio, prod.precioc)
+
+      // const existingProductIndex = this.productos.findIndex(p => p.IdProducto === obj.IdProducto);
+      // if (existingProductIndex !== -1) {
+      //   // Si existe, elimina el producto anterior del carrito
+      //   this.productos.splice(existingProductIndex, 1); // Elimina el producto
+      //   }
+      // // Añade el nuevo producto al carrito
+      // this.productos.push(obj);
+     
+
       this.add([obj, () => {
         this.$emit('onAddProducto', obj)
         this.$toasted.success('Producto añadido correctamente')
