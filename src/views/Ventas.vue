@@ -1745,7 +1745,6 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     cargarProforma(proforma) {
-    
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
@@ -1919,27 +1918,26 @@ export default {
         //     .catch(error => {
         //       this.$toasted.show("HUBO UN ERROR");
         //     });
-        } else {
-          //Cargar Productos Delivery
-          let productos = JSON.parse(obj.Productos);
-          // productos.map(item => {
-          //   this.add([
-          //     item.IdProducto,
-          //     () => {
-          //       this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-          //     },
-          //     {
-          //       cantidad: item.Cantidad,
-          //       precio: item.Precio,
-          //       indicacion: item.Indicacion,
-          //       isDelivery: true
-          //     },
-          //     false
-          //   ]);
-          // });
-          // this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-          // this.venta.DireccionEntrega = obj.Direccion;
-        }
+      } else {
+        //Cargar Productos Delivery
+        let productos = JSON.parse(obj.Productos);
+        // productos.map(item => {
+        //   this.add([
+        //     item.IdProducto,
+        //     () => {
+        //       this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+        //     },
+        //     {
+        //       cantidad: item.Cantidad,
+        //       precio: item.Precio,
+        //       indicacion: item.Indicacion,
+        //       isDelivery: true
+        //     },
+        //     false
+        //   ]);
+        // });
+        // this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+        // this.venta.DireccionEntrega = obj.Direccion;
       }
     }
   },
