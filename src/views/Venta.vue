@@ -125,7 +125,7 @@
                   </template>
                   <template slot="presentacion" slot-scope="data">
                     <b-form-input
-                      v-model="data.item.presentacion"
+                      v-model="data.item.Descripcion"
                       type="text"
                       style="text-align:center; font-weight:bold; width: 120px;"
                       autocomplete="false"
@@ -1116,7 +1116,7 @@ export default {
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.presentacion = prod.ProductoPresentacion
+      prod.Descripcion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.ProductoPresentacion = prod.ProductoPresentacion
@@ -1125,6 +1125,7 @@ export default {
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
+      prod.presentacion = null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
@@ -1723,7 +1724,7 @@ export default {
           pres = newPres.filter(v => v.cantidad > 0);
         }
         prod.PreciosPorProducto = pres;
-        prod.presentacion = producto.ProductoPresentacion
+        prod.Descripcion = producto.ProductoPresentacion
           ? prod.ProductoPresentacion
           : "UNIDAD";
         prod.ProductoPresentacion = producto.ProductoPresentacion
@@ -1738,7 +1739,7 @@ export default {
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
         prod.ProductoPresentacion = producto.Descripcion;
-        prod.presentacion = producto.Descripcion;
+        prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
@@ -1779,17 +1780,19 @@ export default {
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
       if (esPresentacion) {
-        producto.presentacion = obj.nombre;
+        producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
+        producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.presentacion = obj.ProductoPresentacion;
+        producto.Descripcion = obj.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = false;
         producto.precio = producto.PrecioContado;
+        producto.presentacion = null;
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
