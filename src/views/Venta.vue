@@ -141,6 +141,7 @@
                       style="text-align:center; font-weight:bold; width: 90px;"
                       autocomplete="false"
                       :id="`input${data.index}`"
+                      @input="metodoPagoCambio(1)"
                       ></b-form-input>
                       <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
                       v-if="data.item.CantidadPresentacion">
@@ -156,7 +157,7 @@
                       step="0.00001"
                       type="text"
                       style="text-align:center; font-weight:bold; width: 105px;"
-                      autocomplete="false"
+                      autocomplete="false"  @input="metodoPagoCambio(1)"
                       ></b-form-input>
                      
                   </template>
@@ -1137,6 +1138,7 @@ export default {
         input.focus();
         input.select();
       });
+      this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
