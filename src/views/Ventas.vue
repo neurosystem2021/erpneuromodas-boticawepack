@@ -1,28 +1,13 @@
 <template>
     <b-container fluid>
-        <b-row>
-            <b-col offset="8">
-                <b-button-group size="sm" class="ocularMovil">
-                    <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                </b-button-group> 
-                <b-button-group size="sm" class="ocularMovil">
-                    <pago-deuda></pago-deuda>
-                </b-button-group>
-                <b-button-group size="sm">
-                    <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @cargarProforma="cargarProforma"></proformas>
-                </b-button-group>
-                <b-button-group size="sm" class="ocularMovil" v-if="false">
-                    <pre-orden-lista 
-                        v-show="!this.$route.query.idPreOrden"
-                        :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                        @onPreOrden="selectPreOrden"></pre-orden-lista>
-                </b-button-group>
-                <b-button-group size="sm" class="ocularMovil">
-                    
-                    <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                </b-button-group>
-            </b-col>
+      <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+        </div>
+        <b-row style="display:flex; justify-content:center; align-items:center">
+          <b-img :src="productoUrl" class="imagenGrande"></b-img>
         </b-row>
+      </b-modal>
       <b-row id="header">
         <b-col cols="12" class="py-0">
           <b-card no-body>
@@ -206,7 +191,11 @@
                         <b-input-group-append>
                             <!--<proveedores-tabla></proveedores-tabla>-->
                             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-                            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+                            <producto-form 
+                            :showButton="true" 
+                            :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"
+                            :ref="`productoFormEdit${index}`" 
+                            :producto-update="productoSelect" />
                         </b-input-group-append>
                         </b-input-group>
                     </b-form-group>
@@ -238,7 +227,14 @@
                         >
                         <i class="fas fa-list"></i>
                       </b-button>
-        
+                      
+                      <b-button @click="abrirImagen(data.item.Producto,data.index.Imagen == null ||data.index.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.index.Imagen)" style="margin-top:2px;"
+                       :id="'popover-imagen' +data.index.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                        <b-popover placement="right" :target="'popover-imagen' + data.index.IdProducto" :title="data.index.Producto" triggers="hover">
+                      <div style="text-align:center">
+                        <b-img style="border-radius: 10px; width:200px" fluid :src="data.index.Imagen == null || data.index.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.index.Imagen" alt="" @error="setAltImg" ></b-img>	
+                      </div>
+                    </b-popover>
                        
                        
                     </template>
@@ -256,13 +252,14 @@
                     <template slot="cantidad" slot-scope="data">
                       <b-form-input
                         v-model="data.item.cantidad"
-                        type="text"
+                        type="number"
                         style="text-align:center; font-weight:bold; width: 90px;"
-                        autocomplete="false"
-                        :id="`input${data.index}`"
-                        :disabled="data.item.esPresentacion"
+                      autocomplete="false"
+                      :id="`input${data.index}`"
+                      :disabled="data.item.esPresentacion"
+                      @input="metodoPagoCambio(1)"
                         ></b-form-input>
-                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
+                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
                           
                           {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
@@ -285,7 +282,8 @@
                         v-model="data.item.descuento"
                         type="text"
                         style="text-align:center; font-weight:bold; width: 100px;"
-                        autocomplete="false"
+                        autocomplete="false" 
+                        @input="metodoPagoCambio(1)"
                         ></b-form-input>
                        
                     </template>
@@ -305,7 +303,17 @@
                        <i class="fas fa-times fa-lg"></i>
                       </b-button>
             
-                       
+                      <b-button  
+                      style="margin-top:5px" 
+                      :disabled="bloquearInput?true:false"
+                       v-if="(idPerfil == 1) ? true : false"  
+                      variant="primary" 
+                      size="sm"
+                       @click="editarProducto(data.item)">
+                      <i class="fas fa-pencil-alt fa-sm">
+                      </i>
+                    </b-button>
+       
                     </template>
                     <template slot="cantxPrecio" slot-scope="data">
                       <b-form-input
@@ -314,6 +322,7 @@
                         type="text"
                         style="text-align:center; font-weight:bold; width: 100px;"
                         autocomplete="false"
+                        @input="metodoPagoCambio(1)"
                         ></b-form-input>
                       <!-- {{data.item.esPresentacion}} -->
             <!-- esPresentacion -->
@@ -327,11 +336,26 @@
                   <b-col cols="3">
                     <b-row>
                       <b-col md="12" class="mt-1">
-                      
+                        <!-- <b-button-group size="sm" class="ocularMovil">
+                          <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      </b-button-group>  -->
+                      <b-button-group size="sm" class="ocularMovil">
+                          <pago-deuda></pago-deuda>
+                      </b-button-group>
+                      <b-button-group size="sm">
+                          <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @cargarProforma="cargarProforma"></proformas>
+                      </b-button-group>
+                      <b-button-group size="sm" class="ocularMovil" v-if="false">
+                          <pre-orden-lista 
+                              v-show="!this.$route.query.idPreOrden"
+                              :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
+                              @onPreOrden="selectPreOrden"></pre-orden-lista>
+                      </b-button-group>
+                      <b-button-group size="sm" class="ocularMovil">
+                          
+                          <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
+                      </b-button-group>
                     </b-col>
-                      <b-col md="12" class="mt-1">
-                        
-                      </b-col>
                       <b-col md="12" class="mt-1">
                         <table class="table b-table border table-footer">
                                     <tbody>
@@ -464,10 +488,10 @@
                   </b-col>
                   <b-col cols="3">
                     <b-row class="centrado d-flex justify-content-center my-2" >
-                      <b-button block variant="secondary" @click="anadirVentana()"> Añadir Venta</b-button>
-                      <b-button block v-if="ventas.length>1" variant="dark" @click="eliminarVentana()"> Cancelar Venta</b-button> 
-                      <b-button block class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button block class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
+                      <b-button block class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                      <b-button block variant="warning" @click="anadirVentana()"> Añadir Venta</b-button>
+                      <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
                     </b-row>
                   </b-col>
                   <b-col cols="3">
@@ -689,6 +713,8 @@ export default {
   },
   data() {
     return {
+      productoNombre: "",
+      productoUrl: "",
       isVentas: true,
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
@@ -839,11 +865,10 @@ export default {
       modalPresentacion: false,
       producto: {},
       index: 0,
-      showButton: {
-        default: true,
-        type: Boolean
-      },
-      productoSelect: {}
+
+      productoSelect: {},
+      productoSelect: {},
+      idPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   mounted() {
@@ -861,6 +886,18 @@ export default {
           this.setCliente(res.data);
         }
       });
+    },
+    editarProducto(Pro) {
+      this.productoSelect = Pro;
+      const productoFormRef = this.$refs[`productoFormEdit${this.ventaActiva}`];
+
+      if (productoFormRef) {
+        productoFormRef.show = true;
+        productoFormRef.nuevo = false;
+      } else {
+        console.error("Referencia no encontrada");
+      }
+      console.log(productoFormRef);
     },
     getVendedorInfo() {
       let usuario = sessionStorage.getItem("User");
@@ -1170,6 +1207,7 @@ export default {
         input.focus();
         input.select();
       });
+      this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
@@ -1324,15 +1362,17 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-      const ventaActual = this.ventas[this.ventaActiva].pago;
-      metodos.forEach(metodo => {
-        ventaActual[metodo].descripcion = null;
-        ventaActual[metodo].monto = 0;
+      this.$nextTick(() => {
+        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const ventaActual = this.ventas[this.ventaActiva].pago;
+        metodos.forEach(metodo => {
+          ventaActual[metodo].descripcion = null;
+          ventaActual[metodo].monto = 0;
+        });
+        if (tipo && metodos[tipo - 1]) {
+          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        }
       });
-      if (tipo && metodos[tipo - 1]) {
-        ventaActual[metodos[tipo - 1]].monto = this.getTotal();
-      }
     },
 
     async guardarVenta() {
@@ -1512,7 +1552,7 @@ export default {
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
       venta.IdPedido = this.$route.query.idPedido || null;
       venta.IdProyecto = this.$route.query.idProyecto || null;
-      venta.adelantosPreOrden = this.adelantosPreOrden;
+      venta.adelantosPreOrden = [];
       if (venta.selectOpcionVenta != 2) {
         venta.DireccionEntrega = venta.EsDelivery
           ? this.infoDelivery.Direccion || ""
@@ -1710,7 +1750,7 @@ export default {
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
       venta.IdPedido = this.$route.query.idPedido || null;
       venta.IdProyecto = this.$route.query.idProyecto || null;
-      venta.adelantosPreOrden = this.adelantosPreOrden;
+      venta.adelantosPreOrden = [];
       if (venta.selectOpcionVenta != 2) {
         venta.DireccionEntrega = venta.EsDelivery
           ? this.infoDelivery.Direccion || ""
@@ -1805,6 +1845,7 @@ export default {
       this.producto = { ...prod };
       this.index = index;
       this.modalPresentacion = true;
+      this.metodoPagoCambio(1);
     },
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
@@ -1828,6 +1869,7 @@ export default {
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       this.modalPresentacion = false;
+      this.metodoPagoCambio(1);
     },
     probarImpresora() {
       if (
@@ -1939,6 +1981,34 @@ export default {
         // this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
         // this.venta.DireccionEntrega = obj.Direccion;
       }
+    },
+    abrirImagen(producto, url) {
+      console.log(producto);
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
+    },
+    agregarGuardar(id, pxp, obj) {
+      console.log("ddd");
+      // this.add([id, false, false, false, false, true, this.isVentas]);
+      // setTimeout(() => {
+      //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      // }, 200);
+
+      // if (this.isVentas) {
+      //   let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+      //   if (fPP.length != 4) {
+      //     obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+      //     obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+      //     obj.IdProductoMarca = obj.marca.IdProductoMarca;
+      //     obj.ProductoMarca = obj.marca.ProductoMarca;
+      //     obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+      //     obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+      //     this.productoSelect = obj;
+      //     this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+      //     this.showPresentacion(this.productoSelect);
+      //   }
+      // }
     }
   },
   computed: {
