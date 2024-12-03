@@ -50,7 +50,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput?true:false"
+            :disabled="isDisabled"
             type="number"
             style="width: 85px"
             min="0"
@@ -382,6 +382,10 @@ export default {
         })
       }
       return this.$options.filters.redondear(sumatoria)
+    },
+    isDisabled() {
+      const Perfil = sessionStorage.getItem('IdUsuarioPerfil');
+      return Number(Perfil) !== 1;
     },
     sumatoriaTotal () {
       let sumatoria = 0
