@@ -215,9 +215,9 @@
                   <b-col md="12" class="mt-1">
                     <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                   </b-col>
-                  <b-col md="12" class="mt-1">
-                    <b-button block @click="ocultarNav()"> Ocular Nav</b-button>
-                  </b-col>
+                  <!-- <b-col md="12" class="mt-1">
+                    <b-button block @click="toggleNav()"> Ocular Nav</b-button>
+                  </b-col> -->
                  
                   </b-row>
                 </b-col>
@@ -940,13 +940,9 @@ export default {
 
       this.$forceUpdate();
     },
-    ocultarNav() {
-      const nav = document.getElementById("navMenu");
-      if (nav) {
-        nav.classList.toggle("hidden");
-      } else {
-        console.error("No se encontró el elemento navMenu.");
-      }
+    toggleNav() {
+      let navMenu = document.getElementById("navMenu");
+      console.log(navMenu);
     },
     togglePopover(index) {
       if (this.mostrar[index]) {
