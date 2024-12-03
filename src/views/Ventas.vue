@@ -889,15 +889,17 @@ export default {
     },
     editarProducto(Pro) {
       this.productoSelect = Pro;
-      const productoFormRef = this.$refs[`productoFormEdit${this.ventaActiva}`];
-
-      if (productoFormRef) {
-        productoFormRef.show = true;
-        productoFormRef.nuevo = false;
-      } else {
-        console.error("Referencia no encontrada");
-      }
-      console.log(productoFormRef);
+      let modalRef = this.$refs[`productoFormEdit${this.ventaActiva}`];
+      // .$refs
+      //   .productoForm;
+      console.log(modalRef.show);
+      // modalRef.show = true;
+      // modalRef.nuevo = true;
+      // if (modalRef) {
+      //   modalRef.show();
+      // } else {
+      //   console.error("Referencia no encontrada");
+      // }
     },
     getVendedorInfo() {
       let usuario = sessionStorage.getItem("User");
