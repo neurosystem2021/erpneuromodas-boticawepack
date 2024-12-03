@@ -4,7 +4,7 @@
       <b-col cols="7" >
         <b-card no-body>
         <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-2" >
-          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs">
+          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)">
             <b-container>
               <b-row>
                 <b-col cols="5">
@@ -215,6 +215,9 @@
                   <b-col md="12" class="mt-1">
                     <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                   </b-col>
+                  <b-col md="12" class="mt-1">
+                    <b-button block @click="ocultarNav()"> Ocular Nav</b-button>
+                  </b-col>
                  
                   </b-row>
                 </b-col>
@@ -264,14 +267,28 @@
                     <tbody>
                       <tr>
                         <td>
-                          <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                          <b-button 
+                            class="p-1 ml-1 mt-1" 
+                            :id="`popover-metodopago${index}`" 
+                            tabindex="0" 
+                            variant="success" 
+                            @click="togglePopover(index)">
+                            <i class="fas fa-credit-card"></i>
+                          </b-button>
                           <br>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                           <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                          <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus" :style="{ minWidth: '600px' }">
-                          <slot name="metodopago" style="width: 1200px;" >
+                          <b-popover 
+                            :target="`popover-metodopago${index}`" 
+                            title="Método de Pago" 
+                            placement="top" 
+                            triggers="manual" 
+                            :show.sync="mostrar[index]" 
+                            :style="{ minWidth: '600px' }"
+                          >
+                          <slot :name="`metodopago${ventaActiva}`" style="width: 1200px;">
                             <table class="table b-table border table-footer table-sm">
                               <tbody>
                                 <tr>
@@ -325,9 +342,24 @@
                       </tr>
                       <tr>
                         <td>
-                          <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
-                          <b-popover target="popover-opciones" title="Opciones" triggers="focus" >
-                            <slot name="operaciones">
+                          <b-button 
+                            class="p-1 ml-1 mt-1" 
+                            :id="`popover-opciones${index}`" 
+                            tabindex="0" 
+                            @click="togglePopoverOpcion(index)" 
+                            variant="warning">
+                            <i class="fas fa-tags"></i>
+                          </b-button>
+
+                          <b-popover 
+                            :target="`popover-opciones${index}`" 
+                            title="Opciones" 
+                            triggers="manual" 
+                            placement="top" 
+                            :show.sync="mostrarOp[index]" 
+                            :style="{ minWidth: '600px' }"
+                          >
+                            <slot :name="`opciones${ventaActiva}`">
                               <table class="table b-table border table-footer">
                                     <tbody>
                                         <tr v-if="ventas[ventaActiva].puntosAplicados == 0">
@@ -733,6 +765,7 @@ export default {
   components: { ProductosCarritoNuevo, ClientesForm, Proformas },
   data() {
     return {
+      tabActiva: 0,
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
       newDniRuc: "",
@@ -879,15 +912,62 @@ export default {
       ],
       modalPresentacion: false,
       producto: {},
-      index: 0
+      index: 0,
+      mostrar: {},
+      mostrarOp: {}
     };
   },
   mounted() {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
+    this.$root.$on("bv::hide::popover", id => {
+      const metodoPagoIndex = id.replace("popover-metodopago", "");
+      const opcionesIndex = id.replace("popover-opciones", "");
+
+      if (metodoPagoIndex !== id) {
+        this.$set(this.mostrar, metodoPagoIndex, false);
+      }
+
+      if (opcionesIndex !== id) {
+        this.$set(this.mostrarOp, opcionesIndex, false);
+      }
+    });
   },
   methods: {
+    cambiarTab(index) {
+      this.tabActiva = index;
+
+      this.$forceUpdate();
+    },
+    ocultarNav() {
+      const nav = document.getElementById("navMenu");
+      if (nav) {
+        nav.classList.toggle("hidden");
+      } else {
+        console.error("No se encontró el elemento navMenu.");
+      }
+    },
+    togglePopover(index) {
+      if (this.mostrar[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+      } else {
+        this.$set(this.mostrar, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
+        });
+      }
+    },
+    togglePopoverOpcion(index) {
+      if (this.mostrarOp[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-opciones${index}`);
+      } else {
+        this.$set(this.mostrarOp, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-opciones${index}`);
+        });
+      }
+    },
     fechaActual() {
       return this.$moment().format("YYYY-MM-DD H:mm:ss");
     },
@@ -1021,6 +1101,7 @@ export default {
         block: "start"
       });
       this.$toasted.success("Se añadió una opción más de venta");
+      this.$forceUpdate();
     },
     eliminarVentana() {
       this.ventas.splice(this.ventaActiva, 1);
@@ -1948,5 +2029,8 @@ export default {
 }
 #modalCantidad .modal-dialog {
   max-width: 55% !important;
+}
+.hidden {
+  display: none;
 }
 </style>
