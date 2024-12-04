@@ -966,7 +966,7 @@ export default {
         this.$toasted.info("El producto ya se encuentra en la lista.");
         return false;
       }
-     
+
       this.precioCont = obj.PrecioContado;
       this.medicionPro = obj.ProductoMedicion;
       this.loadCode = "";
@@ -991,7 +991,7 @@ export default {
       let stock = await this.axios(`${this.API}/productos/puntoventa/stock`, {
         params: {
           idProductos: [obj.IdProducto],
-          idAlmacen: 1,
+          idAlmacen: this.venta.almacen.IdAlmacen || 1,
           noLimit: 1
         }
       });
