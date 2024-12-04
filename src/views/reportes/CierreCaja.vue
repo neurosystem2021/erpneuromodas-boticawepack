@@ -685,22 +685,24 @@ export default {
     estadoVenta (venta) {
         return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
     },
-    loadDetalles () {
-      this.axios.get(this.API + 'ventas/detalle', {
-          params: {
-            idDocVentas: this.ventas.map((item) => item.idDocVenta),
-          }
-        }).then((response) => {
-            this.itemsDetalle = response.data
-            this.ventas = this.ventas.map((item) => {
-              item.productos = this.getDetalles(item.idDocVenta)
-              return item
-            })
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
+    loadDetalles() {
+  const ids = this.ventas.map((item) => item.idDocVenta).join(',');
+  
+  this.axios.get(this.API + 'ventas/detalle', {
+      params: { idDocVentas: ids },
+    })
+    .then((response) => {
+      this.itemsDetalle = response.data;
+      this.ventas = this.ventas.map((item) => {
+        item.productos = this.getDetalles(item.idDocVenta);
+        return item;
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+},
+
     getVentas () {
       let params = {
         idCierre: this.$route.params.id
@@ -753,18 +755,19 @@ export default {
       }) 
     },
     getAdelantos() {
-        let params = {
-          idDocVentas: this.ventas.map(v => v.idDocVenta)
-        }
-        this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
-          params: params
-        })
-        .then(res => {
-          this.adelantos = res.data
-        }).catch(err => {
-          console.log(err)
-        })
-    },
+    const ids = this.ventas.map(v => v.idDocVenta).join(',');
+
+    this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
+        params: { idDocVentas: ids },
+    })
+    .then(res => {
+        this.adelantos = res.data;
+    })
+    .catch(err => {
+        console.log(err);
+    });
+},
+
     getCierre(id) {
       this.axios.get(this.API + 'cierrecaja', {
         params: {

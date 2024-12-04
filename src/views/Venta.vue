@@ -191,7 +191,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -215,7 +215,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.transferencia.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -225,7 +225,7 @@
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="venta.pago.delivery.descripcion"
+                                                    v-model="venta.pago.transferencia.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -234,12 +234,12 @@
                                                 <input
                                                     :disabled="bloquearInput?true:false"
                                                     class="form-control"
-                                                    v-model="venta.pago.delivery.monto"
+                                                    v-model="venta.pago.transferencia.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.visa.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -684,6 +684,7 @@ export default {
         newVal -
         (parseFloat(this.venta.pago.visa.monto) +
           parseFloat(this.venta.pago.mastercard.monto) +
+          parseFloat(this.venta.pago.transferencia.monto) +
           parseFloat(this.venta.pago.delivery.monto));
     }
   },
@@ -1005,6 +1006,7 @@ export default {
     setProductoUni(obj) {
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
       this.venta.pago.delivery.monto = 0;
       obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
@@ -1097,6 +1099,7 @@ export default {
         case 1:
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
           this.venta.pago.delivery.monto = 0;
           this.venta.pago.efectivo.monto = this.totalCart;
           this.venta.IdMetodoPago = 1;
@@ -1104,6 +1107,7 @@ export default {
         case 2:
           this.venta.pago.mastercard.monto = 0;
           this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
           this.venta.pago.delivery.monto = 0;
           this.venta.pago.visa.monto = this.totalCart;
           this.venta.IdMetodoPago = 2;
@@ -1111,6 +1115,7 @@ export default {
         case 3:
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
           this.venta.pago.delivery.monto = 0;
           this.venta.pago.mastercard.monto = this.totalCart;
           this.venta.IdMetodoPago = 3;
@@ -1119,7 +1124,8 @@ export default {
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
-          this.venta.pago.delivery.monto = this.totalCart;
+          this.venta.pago.delivery.monto = 0;
+          this.venta.pago.transferencia.monto = this.totalCart;
           this.venta.IdMetodoPago = 4;
           break;
 
@@ -1421,7 +1427,8 @@ export default {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
           mastercard: { IdMetodoPago: 3, monto: 0 },
-          delivery: { IdMetodoPago: 4, monto: 0 }
+          transferencia: { IdMetodoPago: 4, monto: 0 },
+          delivery: { IdMetodoPago: 5, monto: 0 }
         },
         idProductos: [],
         NroComprobanteModifica: "",
@@ -1684,6 +1691,7 @@ export default {
     onAddProducto(obj) {
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
       this.venta.pago.delivery.monto = 0;
       this.venta.IdMetodoPago = 1;
       this.actualizarDescuento();
@@ -1806,6 +1814,7 @@ export default {
     actualizarDescuento() {
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
       this.venta.pago.delivery.monto = 0;
       this.venta.IdMetodoPago = 1;
       /*             if (this.puntosAplicados > 0) {
@@ -1950,9 +1959,15 @@ export default {
       totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
         ? 0
         : parseFloat(this.venta.pago.visa.monto);
+
       totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
         ? 0
         : parseFloat(this.venta.pago.mastercard.monto);
+
+      totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
+        ? 0
+        : parseFloat(this.venta.pago.transferencia.monto);
+
       totalPagos += isNaN(parseFloat(this.venta.pago.delivery.monto))
         ? 0
         : parseFloat(this.venta.pago.delivery.monto);
