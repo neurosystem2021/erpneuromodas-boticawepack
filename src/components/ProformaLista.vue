@@ -97,10 +97,8 @@ export default {
           }
         })
         .then(response => {
+          console.log(response.data);
           response.data.map(async item => {
-            // console.log("Desc: ", item);
-            //item.Presentacion = item.Descripcion ? item.Descripcion : item.Presentacion
-            item.Presentacion = item.Descripcion || item.Presentacion;
             item.IdAlmacen = this.idAlmacen || 1;
             item.precio = item.Precio;
             item.cantidad = item.Cantidad;
@@ -108,12 +106,12 @@ export default {
             item.descuento = item.descuento ? item.descuento : 0;
             item.nuevoPrecioContado = 0;
             item.indicacion = "";
-            item.Presentacion = item.Presentacion
-              ? item.Presentacion
-              : "UNIDAD";
+            // item.Presentacion = item.Presentacion
+            //   ? item.Presentacion
+            //   : item.ProductoMedicion;
             item.CantidadPresentacion = 1;
             item.EsPresentacion = !!item.Presentacion;
-            let stock = await this.axios(
+            let res = await this.axios(
               `${this.API}/productos/puntoventa/stock`,
               {
                 params: {
@@ -123,9 +121,14 @@ export default {
                 }
               }
             );
-            item.stock = stock.data[0].stock;
-            item.Producto = stock.data[0].Producto;
-
+            let producto = res.data[0];
+            item.stock = producto.stock;
+            item.Producto = producto.Producto;
+            item.PreciosPorProducto = producto.PreciosPorProducto;
+            item.ProductoMedicion = producto.ProductoMedicion;
+            item.Presentacion = item.Descripcion
+              ? item.Descripcion
+              : producto.ProductoMedicion;
             this.$store.state.cart.productos.unshift(item);
             // this.add([item.IdProducto, () => {
             //     this.obtenerStok(item)
