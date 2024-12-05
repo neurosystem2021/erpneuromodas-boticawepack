@@ -250,7 +250,7 @@
                        
                     </template>
                     <template slot="cantidad" slot-scope="data">
-                      <b-form-input
+                      <input
                         v-model="data.item.cantidad"
                         type="number"
                         style="text-align:center; font-weight:bold; width: 90px;"
@@ -258,7 +258,8 @@
                       :id="`input${data.index}`"
                       :disabled="data.item.esPresentacion"
                       @input="metodoPagoCambio(1)"
-                        ></b-form-input>
+                       @focus="abrirModalTouch(data.index, 1)"
+                        />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
                           
@@ -266,7 +267,7 @@
                         </p>
                     </template>
                     <template slot="precio" slot-scope="data">
-                      <b-form-input
+                      <input
                         :disabled="data.item.bloquearInputPrecio"
                         v-model="data.item.precio"
                         min="0"
@@ -274,17 +275,19 @@
                         type="text"
                         style="text-align:center; font-weight:bold; width: 105px;"
                         autocomplete="false"
-                        ></b-form-input>
+                         @focus="abrirModalTouch(data.index, 2)"
+                        >
                        
                     </template>
                     <template slot="descuento" slot-scope="data">
-                      <b-form-input
+                      <input
                         v-model="data.item.descuento"
                         type="text"
                         style="text-align:center; font-weight:bold; width: 100px;"
                         autocomplete="false" 
                         @input="metodoPagoCambio(1)"
-                        ></b-form-input>
+                         @focus="abrirModalTouch(data.index, 3)"
+                        />
                        
                     </template>
                     <template slot="subtotal" slot-scope="data">
@@ -491,6 +494,8 @@
                       <b-button block class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
                       <b-button block class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button block variant="warning" @click="anadirVentana()"> Añadir Venta</b-button>
+                      <b-button v-if="touchHab" variant="danger" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                      <b-button v-else variant="success" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
                     </b-row>
                   </b-col>
@@ -682,6 +687,111 @@
           </b-col> -->
         </b-row>
       </b-modal>
+      <!-- MODALS TOUCH -->
+
+     <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngPre" id="ingPre" size="sm" hide-footer class="ingPre" title="Precio" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngDesc" id="ingDesc" size="sm" hide-footer class="ingDesc" title="Descuento" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <!-- MODALS TOUCH -->
     </b-container>
   </template>
   <script>
@@ -868,7 +978,9 @@ export default {
 
       productoSelect: {},
       productoSelect: {},
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      objProd: {},
+      cantidadInput: ""
     };
   },
   mounted() {
@@ -877,6 +989,60 @@ export default {
     this.loadClienteVarios();
   },
   methods: {
+    activarModalTouch() {
+      this.touchHab = !this.touchHab;
+    },
+    abrirModalTouch(index, tipo) {
+      this.capturaIndex = index;
+      this.cantidadInput = "";
+      this.objProd = this.ventas[this.ventaActiva].productos[index];
+      if (!this.touchHab) {
+        return;
+      }
+
+      this.$refs["modalIngDesc"].hide();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+
+      if (tipo == 1) {
+        this.$refs["modalIngCant"].show();
+      }
+      if (tipo == 2) {
+        this.$refs["modalIngPre"].show();
+      }
+      if (tipo == 3) {
+        this.$refs["modalIngDesc"].show();
+      }
+    },
+    ingresaNum() {
+      if (this.$refs["modalIngCant"].is_show) {
+        this.objProd.cantidad = this.cantidadInput;
+      }
+      if (this.$refs["modalIngPre"].is_show) {
+        this.objProd.precio = this.cantidadInput;
+      }
+      if (this.$refs["modalIngDesc"].is_show) {
+        this.objProd.descuento = this.cantidadInput;
+      }
+      // Vue.set(this.ventas[this.ventaActiva].productos, this.index, this.objProd);
+      // console.log("this.objProd");
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
+    },
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
+    },
+    cerrrarNum() {
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
+    },
     fechaActual() {
       return this.$moment().format("YYYY-MM-DD H:mm:ss");
     },
