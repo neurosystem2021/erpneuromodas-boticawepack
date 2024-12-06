@@ -3,7 +3,7 @@
     <b-container fluid class="bv-example-row" id="conten">
       <b-row>
         <b-col
-          md="7"
+          md="6"
           style="border-right: 3px solid #c0c0c0; background: white"
         >
           <b-form @submit="guardarVenta" @keydown.enter="prevent">
@@ -626,7 +626,7 @@
             </b-row>
           </b-form>
         </b-col>
-        <b-col md="5">
+        <b-col md="6">
           <b-row class="headerInfo" style="background: #f4f4f4">
             <b-col md="5">
               <b-input-group prepend="Vendedor" class="mt-2">
@@ -683,7 +683,7 @@
           </b-row>
 
           <b-row style="background: #f4f4f4" class="buscador">
-            <b-col md="4">
+            <b-col md="7">
               <b-input-group prepend="" class="mt-2 mb-2">
                 <b-form-input
                   placeholder="INGRESE UN PRODUCTO"
@@ -694,13 +694,13 @@
                   @focus.native="limpiarFiltro"
                 ></b-form-input>
                 <b-input-group-append>
-                  <b-button variant="secondary" @click="limpiarFiltro"
-                    >Limpiar</b-button
-                  >
+                  <b-button variant="secondary" @click="startRecognition">
+                    <i class="fa fa-microphone" aria-hidden="true"></i>
+                  </b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-col>
-            <b-col md="4">
+            <!-- <b-col md="4">
               <b-input-group prepend="" class="mt-2 mb-2">
                 <b-form-input
                   placeholder="Búsqueda por Voz"
@@ -716,9 +716,9 @@
                   </b-button>
                 </b-input-group-append>
               </b-input-group>
-            </b-col>
+            </b-col> -->
 
-            <b-col md="4">
+            <b-col md="5">
               <b-input-group class="mt-2 mb-2">
                 <input
                   placeholder="CODIGO DE BARRAS"
@@ -1083,7 +1083,7 @@ export default {
       actualizarProd: "actualizarProducto"
     }),
     startRecognition() {
-      this.busquedaVoz = "";
+      this.busqueda = "";
       this.limpiarFiltro();
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
@@ -1113,7 +1113,7 @@ export default {
 
       this.recognition.onend = async () => {
         if (this.query) {
-          this.busquedaVoz = this.query;
+          this.busqueda = this.query;
         } else {
           this.busquedaVoz = "";
           alert("No se pudo captar ninguna palabra");
@@ -1128,9 +1128,9 @@ export default {
       }
     },
     search() {
-      this.busquedaVoz = this.query;
-      console.log("Búsqueda:", this.query);
-      this.buscarProducto(this.query);
+      this.busqueda = this.query;
+      // console.log("Búsqueda:", this.query);
+      this.buscarProducto(this.busqueda);
     },
     changeOrganizacion(val) {
       if (val) {
