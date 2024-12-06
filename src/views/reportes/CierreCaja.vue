@@ -44,6 +44,27 @@
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
             <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
       <b-row>
+        <h5>Resumen Por Producto</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Cantidad Vendida</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+               <!-- <td> {{ produtos }} </td> -->
+               <!--  -->
+            </tr>
+          </tbody>
+        </table>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -516,7 +537,8 @@ export default {
         { value: 3, text: "Noche" }
       ],
       cierre: {},
-      vendedor: {}
+      vendedor: {},
+      reportePorProveedor: []
     };
   },
   computed: {
@@ -657,10 +679,50 @@ export default {
     imprimir() {
       window.print();
     },
-    loadData() {
-      this.getVentas();
-      this.getIngresos();
-      this.getSalidas();
+    async loadData() {
+      await this.getVentas();
+      await this.getIngresos();
+      await this.getSalidas();
+      await this.generarReporte();
+      // console.log(this.ventas);
+    },
+    generarReporte() {
+      let productos = [];
+      this.ventas.forEach(venta => {
+        venta.productos.forEach(producto => {
+          productos.push(producto);
+        });
+      });
+
+      const productosUnicos = Array.from(
+        new Set(productos.map(item => item.IdProducto))
+      ).map(producto => {
+        return { IdProducto: producto };
+      });
+
+      this.reportePorProveedor = [];
+      productosUnicos.forEach(producto => {
+        let lstProducto = productos.filter(
+          v => v.IdProducto == producto.IdProducto
+        );
+        let total = lstProducto.reduce((total, producto) => {
+          return total + parseFloat(producto.Cantidad);
+        }, 0);
+        let Precio = lstProducto.reduce((total, producto) => {
+          return (
+            total +
+            parseFloat(producto.Precio * producto.Cantidad) -
+            parseFloat(producto.Descuento)
+          );
+        }, 0);
+        this.reportePorProveedor.push({
+          IdProducto: producto.IdProducto,
+          Producto: lstProducto[0].Producto,
+          total: total,
+          Precio: Precio
+        });
+      });
+      // console.log(prod);
     },
     setVendedor(obj) {
       this.vendedor = obj;
@@ -701,8 +763,8 @@ export default {
           ? "CREDITO"
           : "APLICADO";
     },
-    loadDetalles() {
-      this.axios
+    async loadDetalles() {
+      await this.axios
         .get(this.API + "ventas/detalle", {
           params: {
             idDocVentas: this.ventas.map(item => item.idDocVenta)
@@ -719,15 +781,15 @@ export default {
           console.log(error);
         });
     },
-    getVentas() {
+    async getVentas() {
       let params = {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario;
       }
       // cierre de caja enviar el vendedor
-      this.axios
+      await this.axios
         .get(this.API + "cierrecaja/ventas", {
           params: params
         })
@@ -740,14 +802,14 @@ export default {
           console.log(err);
         });
     },
-    getIngresos() {
+    async getIngresos() {
       let params = {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario;
       }
-      this.axios
+      await this.axios
         .get(this.API + "cierrecaja/ingresos", {
           params: params
         })
@@ -758,14 +820,14 @@ export default {
           console.log(err);
         });
     },
-    getSalidas() {
+    async getSalidas() {
       let params = {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
       }
-      this.axios
+      await this.axios
         .get(this.API + "cierrecaja/salidas", {
           params: params
         })
