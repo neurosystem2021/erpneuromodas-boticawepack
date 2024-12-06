@@ -1,14 +1,14 @@
 <template>
   <b-container fluid>
     <b-row id="header">
-      <b-col cols="7" >
-        <b-card no-body>
-        <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-2" >
-          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)">
-            <b-container>
-              <b-row>
-                <b-col cols="5">
-                  <b-input-group prepend="Doc. Venta" class="mt-2">
+      <b-col cols="7" class="px-0 py-0 mx-0 ">
+        <b-card no-body >
+        <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
+          <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)" class="pt-0">
+            <b-container  class="px-0 mx-0" style="min-width: 100% !important;">
+              <b-row class="pt-0">
+                <b-col cols="5" class="pt-0">
+                  <b-input-group prepend="Doc. Venta" >
                     <autocomplete
                     required="required"
                     :id="`inputTipoVenta${index}`"
@@ -94,7 +94,7 @@
                   </b-col>
 
               </b-row>
-              <b-row>
+              <!-- <b-row>
                 <b-col cols="12">
                   <b-form-group>
                     <input
@@ -105,17 +105,29 @@
                     />
                   </b-form-group>
                 </b-col>
-              </b-row>
-              <div style="height: 40vh;">
-              <b-row class="mt-2"  style="position: relative;max-height: 40vh;overflow-y: scroll;">
-                <b-table striped hover :fields="headerTable"  :items="venta.productos">
+              </b-row> -->
+              <div style="height: 40vh;" class="px-0 mx-0">
+              <b-row style="position: relative;max-height: 40vh;overflow-y: scroll;" >
+                <b-table striped hover :fields="headerTable"  :items="venta.productos"> 
+                  <template slot="stock" slot-scope="data">
+                    <span style="font-weight: bold; font-size: 0.75rem">
+                      {{ data.item.stock }}
+
+                    </span>
+                  </template>
+                  <template slot="Producto" slot-scope="data">
+                    <span style="font-weight: bold; font-size: 0.75rem">
+                      {{ data.item.Producto }}
+
+                    </span>
+                  </template>
                   <template slot="pres" slot-scope="data">
                     <b-button   
                       v-if="data.item.tienePresentacion"
                       size="sm"
                       variant="info"
                       @click="showPresentacion(data.item,data.index)" 
-                      style="margin-top:2px;"
+                      style="margin-top:2px;font-size: 0.75rem"
                       >
                       <i class="fas fa-list"></i>
                     </b-button>
@@ -127,7 +139,7 @@
                     <b-form-input
                       v-model="data.item.Descripcion"
                       type="text"
-                      style="text-align:center; font-weight:bold; width: 120px;"
+                      style="text-align:center; font-weight:bold; width: 120px;font-size: 0.8rem"
                       autocomplete="false"
                       disabled
                       ></b-form-input>
@@ -138,7 +150,7 @@
                     <input
                       v-model="data.item.cantidad"
                       type="number"
-                      style="text-align:center; font-weight:bold; width: 90px;"
+                      style="text-align:center; font-weight:bold; width: 90px;font-size: 0.8rem"
                       autocomplete="false"
                       :id="`input${data.index}`"
                       @input="metodoPagoCambio(1)"
@@ -158,7 +170,7 @@
                       step="0.00001"
                       type="number"
                       @focus="abrirModalTouch(data.index,2)"
-                      style="text-align:center; font-weight:bold; width: 105px;"
+                      style="text-align:center; font-weight:bold; width: 105px;font-size: 0.8rem"
                       autocomplete="false"  @input="metodoPagoCambio(1)"
                       class="form-control"
                       />
@@ -168,7 +180,7 @@
                     <input
                       v-model="data.item.descuento"
                       type="number"
-                      style="text-align:center; font-weight:bold; width: 100px;"
+                      style="text-align:center; font-weight:bold; width: 100px;font-size: 0.8rem"
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
                       class="form-control"
@@ -176,11 +188,17 @@
                      
                   </template>
                   <template slot="subtotal" slot-scope="data">
-                  {{ getSubTotalDetalle(data.item) }}
+               <span style="font-size: 0.8rem">
+                 {{ getSubTotalDetalle(data.item) }}
+
+               </span>
                      
                   </template>
                   <template slot="total" slot-scope="data">
-                  {{ getTotalDetalle(data.item) }}
+                 <span style="font-size: 0.8rem">
+                   {{ getTotalDetalle(data.item) }}
+
+                 </span>
                      
                   </template>
                   <template slot="acciones" slot-scope="data">
@@ -201,7 +219,7 @@
                 <b-col cols="4">
                   <b-row>
                     <b-col md="12" class="mt-1">
-                    <b-button block variant="info" @click="anadirVentana()"> Añadir Venta</b-button>
+                    <b-button block style="background: #6D4C41; color: #fff;" @click="anadirVentana()"> Nueva Ventana</b-button>
                   </b-col>
                     <b-col md="12" class="mt-1">
                       <b-button block v-if="ventas.length>1" variant="dark" @click="eliminarVentana()"> Cancelar Venta</b-button>
@@ -220,6 +238,9 @@
                   <b-col md="12" class="mt-1">
                     <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                   </b-col>
+                  <b-col md="12" class="mt-1">
+                      <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
+                  </b-col>
                   <!-- <b-col md="12" class="mt-1">
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
                   </b-col> -->
@@ -229,8 +250,8 @@
                 <b-col cols="4">
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
-                    <b-button class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                    <b-button class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
+                    <b-button class="mx-1" block variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                    <b-button class="mx-1" block variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
                   </b-row>
                     </b-col>
 
@@ -553,12 +574,19 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
+                @input="filtrarProductos"
               ></b-form-input>
               <b-input-group-append>
+                <b-button variant="info" @click="startRecognition">
+                  <i class="fas fa-microphone"></i>
+                </b-button
+                >
+              </b-input-group-append>
+              <!-- <b-input-group-append>
                 <b-button variant="secondary" @click="limpiarFiltro"
                   >Limpiar</b-button
                 >
-              </b-input-group-append>
+              </b-input-group-append> -->
             </b-input-group>
           </b-col>
           <b-col md="4">
@@ -570,11 +598,10 @@
                 type="none"
                 inputmode="none"
                 class="form-control"
+                @keydown.enter.prevent="loadBarcode"
               />
               <b-input-group-append>
-                <b-button variant="primary"
-                  ><i class="fas fa-search"></i
-                ></b-button>
+                <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
               </b-input-group-append>
             </b-input-group>
           </b-col>
@@ -586,13 +613,17 @@
           >
             <b-tab
               no-body
-              v-for="(item, index) in categorias"
+              v-for="(item, index) in listCategoria()"
               :key="index"
               :title="item.ProductoCategoria"
               :ref="'tab' + index"
               @click="getProductosCategoria(item.IdProductoCategoria)"
             >
             </b-tab>
+            <div style=" text-align: right;">
+              <b-button class="my-1" style="background: #01579B; color:#fff;" v-if="!vermas" @click="vermas=!vermas"> Ver Mas Categoría</b-button>
+              <b-button class="my-1" style="background: #01579B; color:#fff;" v-if="vermas" @click="vermas=!vermas"> Ver Menos Categoría</b-button>
+            </div>
             <b-tab
               v-if="busqueda != ''"
               :active="busqueda != ''"
@@ -876,6 +907,8 @@ export default {
   components: { ProductosCarritoNuevo, ClientesForm, Proformas },
   data() {
     return {
+      navDisabled: false,
+      vermas: false,
       tabActiva: 0,
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
@@ -1213,6 +1246,97 @@ export default {
           this.$toasted.show("Hubo un error, no hay conexion");
         });
     },
+    listCategoria() {
+      let categorias = [...this.categorias];
+      if (this.vermas) {
+        return categorias;
+      } else {
+        return this.categorias.slice(0, 10);
+      }
+    },
+    filtrarProductos(val) {
+      this.productosCategoria = [];
+      this.cargandoProductos = true;
+      this.axios
+        .get(this.API + "productos/categoria", {
+          params: {
+            q: val
+          }
+        })
+        .then(response => {
+          this.cargandoProductos = false;
+          this.productosCategoria = response.data;
+          // this.$refs.barcodeInput.focus();
+          // this.$refs.inputSearchProducto.focus();
+        })
+        .catch(error => {
+          console.log(error);
+          this.cargandoProductos = true;
+          this.productosCategoria = [];
+          this.$toasted.show("Hubo un error, no hay conexion");
+        });
+    },
+    async loadBarcode(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      let idProducto = this.loadCode;
+
+      let prod = await this.axios.get(this.API + "productos", {
+        params: {
+          filter: this.loadCode
+        }
+      });
+      if (prod.data.length > 0) {
+        this.setProducto(prod.data[0]);
+      } else {
+        this.$toasted.show("No se encontró ningun producto");
+      }
+    },
+    startRecognition() {
+      this.busqueda = "";
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.busqueda = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.busqueda) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      this.filtrarProductos(this.busqueda);
+    },
+
     getProductosCategoria(idProductoCategoria) {
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
@@ -2072,6 +2196,16 @@ export default {
           "Impresión",
           params
         );
+      }
+    },
+    setScreen() {
+      this.navDisabled = !this.navDisabled;
+      if (this.navDisabled) {
+        window.parent.document.getElementById("NavegadorParent").style.display =
+          "none";
+      } else {
+        window.parent.document.getElementById("NavegadorParent").style.display =
+          "block";
       }
     }
   }
