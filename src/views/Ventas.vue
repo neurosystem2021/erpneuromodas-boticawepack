@@ -170,19 +170,25 @@
                   <b-col md="12">
                     <b-form-group>
                         <b-input-group>
-                        <autocomplete
-                            :ref="`autocompleteProducto${index}`"
-                            :id="`autocompleteProducto${index}`"
-                            :url="APIProductos"
-                            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
-                            :onShouldRenderChild="renderChild"
-                            anchor="Producto"
-                            label="writer"
-                            placeholder="Agregar Producto"
-                            :on-select="setProducto"
-                            :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
+                          <b-input-group-append>
+                            <autocomplete
+                                :ref="`autocompleteProducto${index}`"
+                                :id="`autocompleteProducto${index}`"
+                                :url="APIProductos"
+                                :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :onShouldRenderChild="renderChild"
+                                anchor="Producto"
+                                label="writer"
+                                placeholder="Agregar Producto"
+                                :on-select="setProducto"
+                                :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
+                                :classes="{input: 'form-control'}"
+                                style="min-width:960px ;">
+                            </autocomplete>
+                            <!-- <b-button variant="primary" @click="startRecognition">
+                              <i class="fas fa-microphone"></i>
+                            </b-button> -->
+                          </b-input-group-append>
                         <input v-model="loadCode"
                                 @keydown.enter.prevent="loadBarcode"
                                 type="text"
@@ -259,6 +265,7 @@
                       :disabled="data.item.esPresentacion"
                       @input="metodoPagoCambio(1)"
                        @focus="abrirModalTouch(data.index, 1)"
+                       class="form-control"
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -276,6 +283,7 @@
                         style="text-align:center; font-weight:bold; width: 105px;"
                         autocomplete="false"
                          @focus="abrirModalTouch(data.index, 2)"
+                         class="form-control"
                         >
                        
                     </template>
@@ -287,6 +295,7 @@
                         autocomplete="false" 
                         @input="metodoPagoCambio(1)"
                          @focus="abrirModalTouch(data.index, 3)"
+                         class="form-control"
                         />
                        
                     </template>
@@ -991,6 +1000,71 @@ export default {
   methods: {
     activarModalTouch() {
       this.touchHab = !this.touchHab;
+    },
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        console.log("Speech recognition service disconnected");
+        console.log("query", this.query);
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      let text = `autocompleteProducto${this.ventaActiva}`;
+      let buscarProducto = document.getElementById(text);
+      let autoComplete = this.$refs[text];
+
+      if (!autoComplete || !autoComplete.$el) {
+        console.error(
+          "No se encontró el componente autocomplete o su elemento DOM."
+        );
+        return;
+      }
+
+      let inputElement = autoComplete.$el.querySelector("input");
+      if (inputElement) {
+        // Establece el valor
+        
+        // Dispara el evento 'input' para notificar el cambio
+        let event = new Event("input", { bubbles: true });
+        inputElement.value = this.query;
+        inputElement.dispatchEvent(event);
+      }
+     
     },
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
