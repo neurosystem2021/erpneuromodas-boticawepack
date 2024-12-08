@@ -304,7 +304,8 @@
             class="form-control"
             step="0.001"
             min="0"
-           @input="recalcularSubTotal(productos[data.index])"
+            @keydown.enter.prevent="iraCbo()"
+            @input="recalcularSubTotal(productos[data.index])"
             placeholder="Cantidad"
           />
         </template>
@@ -362,10 +363,16 @@
           />
         </template>
         <template slot="subtotal" slot-scope="data">
-          <div v-if="isVentas">
+          <input
+          class="form-control"
+          :value="getSubtotal(data.index)"
+          disabled
+          style="width: 105px"
+          />
+          <!-- <div>
             {{ getSubtotal(data.index) }}
-          </div>
-          <div v-else>
+          </div> -->
+          <!-- <div v-else>
             <input
               type="number"
               style="width: 105px"
@@ -374,6 +381,7 @@
               placeholder="Subtotal"
               class="form-control"
               v-model="productos[data.index].subt"
+              disabled
               @input="
                 (val) =>
                   setSubtotal(
@@ -384,7 +392,7 @@
               "
             />
             <b>{{ getSubtotal(data.index) }}</b>
-          </div>
+          </div> -->
         </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
@@ -723,9 +731,19 @@ export default {
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
+    },
+    igvGeneral() {
+      // let prds = [...this.productos];
+      this.productos.forEach(element => {
+        element.TieneIgv = this.igvGeneral;
+        element.igv = 55555555;
+      });
+      this.$forceUpdate();
+      // console.log(this.igvGeneral);
     }
   },
   props: {
+    igvGeneral: false,
     gravada: 0,
     isVentas: Boolean,
     tipo: String,
@@ -1135,6 +1153,7 @@ export default {
       }
     },
     setProducto(obj) {
+      obj.TieneIgv = this.igvGeneral;
       this.precioCont = obj.PrecioContado;
       obj.subtotal = obj.PrecioContado;
       let variantStock = "";
@@ -1393,17 +1412,27 @@ export default {
       // this.productos[index].subtotal = subtotal
       return subtotal;
     },
+    iraCbo() {
+      document.getElementById("autocompleteProducto").focus();
+    },
     getIgv(index) {
+      let prod = { ...this.productos[index] };
       let igv = 0;
-      if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(
-          this.productos[index].subtotal * 0.18
-        );
+      if (prod.TieneIgv == 1) {
+        igv = prod.cantidad * prod.precio * 0.18;
       }
+      Vue.set(this.productos[index], "igv", parseFloat(igv).toFixed(4));
+      return parseFloat(igv).toFixed(4);
+      // let igv = 0;
+      // if (this.productos[index].TieneIgv) {
+      //   igv = this.$options.filters.redondear(
+      //     this.productos[index].subtotal * 0.18
+      //   );
+      // }
 
-      Vue.set(this.productos[index], "igv", igv);
+      // Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv;
+      // return igv;
     },
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);

@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit.prevent="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="8">
@@ -198,6 +198,14 @@
                 >
                   GRAVADA
                 </b-form-checkbox>
+                <b-form-checkbox
+                  id="checkbox-2"
+                  v-model="igvGeneral"
+                  value="1"
+                  unchecked-value="0"
+                >
+                  IGV
+                </b-form-checkbox>
               </b-col>
           </b-row>
           <b-row>
@@ -209,6 +217,7 @@
                 :tipoCambio="movimiento.TipoCambio"
                 :fields="fields"
                 :gravada="gravada"
+                :igvGeneral="igvGeneral"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
             </b-col>
           </b-row>
@@ -245,6 +254,7 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
+      igvGeneral: 0,
       fields: [
         {
           key: "stock",
@@ -548,7 +558,7 @@ export default {
       //   });
       // } else {
       // }
-      
+
       this.axios
         .post(this.API + "movimientos", {
           gravada: this.gravada,
