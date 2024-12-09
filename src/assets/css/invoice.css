@@ -62,7 +62,7 @@
   
   #client {
     padding-left: 6px;
-    border-left: 6px solid #57B223;
+    border-left: 6px solid #1A237E;
     float: left;
     width: 12cm;
   }
@@ -122,7 +122,7 @@
   }
   
   table td h3{
-    color: #57B223;
+    color: #1A237E;
     font-size: 1em;
     font-weight: normal;
     margin: 0 0 0.2em 0;
@@ -131,7 +131,7 @@
   table .no {
     color: #FFFFFF;
     font-size: 1em;
-    background: #57B223;
+    background: #1A237E;
   }
   
   table .desc {
@@ -153,8 +153,8 @@
   }
   
   table .total {
-    background: #57B223;
-    color: black;
+    background: #1A237E;
+    color: white !important;
     text-align: right;
   }
   table .total .dsct {
@@ -188,7 +188,7 @@
   table tfoot tr:last-child td {
     color: black;
     font-size: 1.4em;
-    border-top: 1px solid #57B223; 
+    border-top: 1px solid #1A237E; 
   
   }
   
@@ -209,7 +209,7 @@
   
   #notices{
     padding-left: 6px;
-    border-left: 6px solid #57B223;
+    border-left: 6px solid #1A237E;
   }
   
   #notices .notice {

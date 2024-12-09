@@ -263,6 +263,8 @@
           <hr>
           <h6><b>Pago Restante: {{(productoSelect.TotalDetalle - productoSelect.Adelantos)  | moneda}}</b></h6>
           <hr>
+          <h6><b>Mano de obra neta + Operativos: {{totalManoObraNeta}}</b></h6>
+          <hr>
           <b-row v-if="productoSelect.Imagen">
             <b-col class="text-center">
               <b-img :src="'/resources/images/pedidos/' + productoSelect.Imagen" fluid alt="" style="width: 500px; height: 500px;" @error="setAltImg"></b-img>
@@ -298,6 +300,7 @@ export default {
       adelantos: [],
       productos: [],
       gastos: [],
+      totalManoObraNeta: 0,
       fields: [
         { key: "IdPreOrden", label: "ID", sortable: true },
         { key: "Nombre", sortable: true },
@@ -336,16 +339,27 @@ export default {
       this.fechaIni = "";
       this.actualizarTabla();
     },
+    calcularUtilidad() {
+      let manoObra = this.productos.filter(v => v.CodigoBarra == "MANODEOBRA");
+      let totalManoObra = manoObra.reduce((total, prod) => {
+        return total + parseFloat(prod.Cantidad * prod.Precio);
+      }, 0);
+      let gasto = this.gastos.reduce((total, gasto) => {
+        return total + parseFloat(gasto.Importe);
+      }, 0);
+      this.totalManoObraNeta = totalManoObra - gasto;
+    },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
     rowClick(item, index) {
       this.productoSelect = item;
     },
-    verDetalle(id, item) {
+    async verDetalle(id, item) {
       this.productoSelect = item;
-      this.cargarCajaBanco(id);
-      this.getProductos(id);
+      await this.cargarCajaBanco(id);
+      await this.getProductos(id);
+      this.calcularUtilidad();
       // this.cargarGastos(id);
       this.$refs["modalDetalle"].show();
     },
@@ -363,9 +377,9 @@ export default {
     //       // this.calculoGastosAdelantos();
     //     });
     // },
-    getProductos(id) {
+    async getProductos(id) {
       this.productos = [];
-      this.axios
+      await this.axios
         .get(this.API + "proyecto/detalle", {
           params: { IdPreOrden: id }
         })
@@ -379,10 +393,10 @@ export default {
           console.log(err);
         });
     },
-    cargarCajaBanco(id) {
+    async cargarCajaBanco(id) {
       this.gastos = [];
       this.adelantos = [];
-      this.axios
+      await this.axios
         .get(this.API + "proyecto/cajaybanco/todo", {
           params: {
             IdPreOrden: id
