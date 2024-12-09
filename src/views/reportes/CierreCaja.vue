@@ -63,7 +63,17 @@
                <!-- <td> {{ produtos }} </td> -->
                <!--  -->
             </tr>
+            
           </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0) }}</b></td>
+            </tr>
+          </tfoot>
         </table>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">

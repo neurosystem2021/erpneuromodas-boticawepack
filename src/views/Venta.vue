@@ -1292,6 +1292,7 @@ export default {
       } else {
         this.$toasted.show("No se encontró ningun producto");
       }
+      this.loadCode = "";
     },
     startRecognition() {
       this.busqueda = "";
