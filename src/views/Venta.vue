@@ -156,6 +156,7 @@
                       @input="metodoPagoCambio(1)"
                       @focus="abrirModalTouch(data.index, 1)"
                       class="form-control"
+                      @keydown.enter="irTxtLoadBarcode"
                       />
                       <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
                       v-if="data.item.CantidadPresentacion">
@@ -219,14 +220,14 @@
                 <b-col cols="4">
                   <b-row>
                     <b-col md="12" class="mt-1">
-                    <b-button block style="background: #6D4C41; color: #fff;" @click="anadirVentana()"> Nueva Ventana</b-button>
+                    <b-button class="btnAction" block style="background: #B71C1C; color: #fff; font-weight: bold; font-size: 1.2rem" @click="anadirVentana()"> Nueva Ventana</b-button>
                   </b-col>
                     <b-col md="12" class="mt-1">
-                      <b-button block v-if="ventas.length>1" variant="dark" @click="eliminarVentana()"> Cancelar Venta</b-button>
+                      <b-button class="btnAction" block v-if="ventas.length>1" variant="dark" style="font-weight: bold; font-size: 1.2rem"  @click="eliminarVentana()"> Cancelar Venta</b-button>
                     </b-col>
                     <b-col md="12" class="mt-1">
-                      <b-button v-if="touchHab" variant="danger" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                      <b-button v-else variant="success" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                      <b-button class="btnAction" v-if="touchHab" variant="danger" style="font-weight: bold; font-size: 1.2rem" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                      <b-button class="btnAction" v-else style="background: #00796B; color: #fff; font-weight: bold; font-size: 1.2rem" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                     </b-col>
                     <!-- <b-col md="12" class="mt-1">
                    
@@ -236,10 +237,10 @@
                       <proformas :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen" @onSelectProforma="cargarProforma"></proformas>
                     </b-col>
                   <b-col md="12" class="mt-1">
-                    <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
+                    <!-- <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button> -->
                   </b-col>
                   <b-col md="12" class="mt-1">
-                      <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
+                      <b-button type="button" block variant="secondary" class="btnAction" @click="setScreen" style="font-weight: bold; font-size: 1.2rem" ><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
                   </b-col>
                   <!-- <b-col md="12" class="mt-1">
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
@@ -250,8 +251,8 @@
                 <b-col cols="4">
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
-                    <b-button class="mx-1" block variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                    <b-button class="mx-1" block variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
+                      <b-button class="mx-1 btnAction" block variant="primary" style="font-weight: bold; font-size: 1.2rem"  @click="guardarProforma()"> Crear Proforma</b-button>
+                      <b-button class="mx-1 btnAction" block variant="success" style="font-weight: bold; font-size: 1.5rem"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                   </b-row>
                     </b-col>
 
@@ -599,6 +600,7 @@
                 inputmode="none"
                 class="form-control"
                 @keydown.enter.prevent="loadBarcode"
+                id="txtLoadBarcode"
               />
               <b-input-group-append>
                 <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
@@ -1336,6 +1338,9 @@ export default {
     },
     search() {
       this.filtrarProductos(this.busqueda);
+    },
+    irTxtLoadBarcode() {
+      document.getElementById("txtLoadBarcode").focus();
     },
 
     getProductosCategoria(idProductoCategoria) {
@@ -2285,6 +2290,19 @@ export default {
   background-color: #e6e6e6;
   border-bottom: none;
 } */
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+}
+/* .btnAction:hover {
+  border: 1px solid #b71c1c !important;
+  color: #b71c1c !important;
+  background: #FFEBEE !important;
+  border-radius: 25px;
+} */
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
@@ -2333,4 +2351,5 @@ export default {
 .hidden {
   display: none;
 }
+
 </style>
