@@ -190,6 +190,7 @@
                             </b-button> -->
                           </b-input-group-append>
                         <input v-model="loadCode"
+                                :id="`txtCodeBar${index}`"
                                 @keydown.enter.prevent="loadBarcode"
                                 type="text"
                                 class="form-control"
@@ -266,6 +267,7 @@
                       @input="metodoPagoCambio(1)"
                        @focus="abrirModalTouch(data.index, 1)"
                        class="form-control"
+                       @keydown.enter="irCodeBar"
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -500,11 +502,11 @@
                   </b-col>
                   <b-col cols="3">
                     <b-row class="centrado d-flex justify-content-center my-2" >
-                      <b-button block class="mx-1" variant="success" @click="guardarVenta()"> Efectuar Venta</b-button>
-                      <b-button block class="mx-1" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button block variant="warning" @click="anadirVentana()"> Añadir Venta</b-button>
-                      <b-button v-if="touchHab" variant="danger" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                      <b-button v-else variant="success" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                      <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
+                      <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                      <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
                     </b-row>
                   </b-col>
@@ -998,6 +1000,10 @@ export default {
     this.loadClienteVarios();
   },
   methods: {
+    irCodeBar() {
+      let txtCodeBar = `txtCodeBar${this.ventaActiva}`;
+      document.getElementById(txtCodeBar).focus();
+    },
     activarModalTouch() {
       this.touchHab = !this.touchHab;
     },
@@ -1058,13 +1064,12 @@ export default {
       let inputElement = autoComplete.$el.querySelector("input");
       if (inputElement) {
         // Establece el valor
-        
+
         // Dispara el evento 'input' para notificar el cambio
         let event = new Event("input", { bubbles: true });
         inputElement.value = this.query;
         inputElement.dispatchEvent(event);
       }
-     
     },
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
@@ -1289,6 +1294,7 @@ export default {
             }
           });
       }
+      this.loadCode = "";
     },
     setPuntoVenta(obj) {
       this.ventas[this.ventaActiva].puntoVenta = obj;
@@ -2386,5 +2392,14 @@ export default {
 }
 #modalCantidad .modal-dialog {
   max-width: 55% !important;
+}
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 </style>
