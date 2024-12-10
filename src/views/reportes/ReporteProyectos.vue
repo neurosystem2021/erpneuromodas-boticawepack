@@ -146,6 +146,20 @@
           </b-row>
           <hr>
           <b-row>
+            <b-col md="6">
+              <div style="left: 1rem;" v-if="productoSelect.IdProducto">
+                  <b-input-group>
+                    <b-form-input
+                      v-model="cantidadCodigoBarra"
+                      type="number"
+                      style="width:80px;"
+                    ></b-form-input>
+                    <b-input-group-append>
+                      <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + productoSelect.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+                    </b-input-group-append>
+                  </b-input-group>
+                </div>
+            </b-col>
             <b-col md="12">
               <table>
                 <tbody>
@@ -261,9 +275,25 @@
             </b-col>
           </b-row>
           <hr>
-          <h6><b>Pago Restante: {{(productoSelect.TotalDetalle - productoSelect.Adelantos)  | moneda}}</b></h6>
+          
+          <table class="tbl" width="100%">
+            <thead>
+              <tr>
+                <th>Mano de obra bruta</th>
+                <th>Gastos</th>
+                <th>Ganancia Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ totalManoObra }}</td>
+                <td>{{ totalGasto }}</td>
+                <td>{{ totalManoObraNeta }}</td>
+              </tr>
+            </tbody>
+          </table>
           <hr>
-          <h6><b>Mano de obra neta + Operativos: {{totalManoObraNeta}}</b></h6>
+          <h6><b>Pago Restante: {{(productoSelect.TotalDetalle - productoSelect.Adelantos)  | moneda}}</b></h6>
           <hr>
           <b-row v-if="productoSelect.Imagen">
             <b-col class="text-center">
@@ -301,6 +331,9 @@ export default {
       productos: [],
       gastos: [],
       totalManoObraNeta: 0,
+      totalManoObra: 0,
+      totalGasto: 0,
+      cantidadCodigoBarra: 1,
       fields: [
         { key: "IdPreOrden", label: "ID", sortable: true },
         { key: "Nombre", sortable: true },
@@ -341,13 +374,13 @@ export default {
     },
     calcularUtilidad() {
       let manoObra = this.productos.filter(v => v.CodigoBarra == "MANODEOBRA");
-      let totalManoObra = manoObra.reduce((total, prod) => {
+      this.totalManoObra = manoObra.reduce((total, prod) => {
         return total + parseFloat(prod.Cantidad * prod.Precio);
       }, 0);
-      let gasto = this.gastos.reduce((total, gasto) => {
+      this.totalGasto = this.gastos.reduce((total, gasto) => {
         return total + parseFloat(gasto.Importe);
       }, 0);
-      this.totalManoObraNeta = totalManoObra - gasto;
+      this.totalManoObraNeta = this.totalManoObra - this.totalGasto;
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";

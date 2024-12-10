@@ -185,6 +185,8 @@ export default {
       }
 
       data.Precio = data.PrecioContado;
+      data.cantidad = 1;
+      data.Cantidad = 1;
 
       this.productos.push(data);
       this.$toasted.success("Producto agregado");

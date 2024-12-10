@@ -15,9 +15,13 @@
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             id="txtAddProduct"
+            @keydown.native.prevent.tab="irtxtBarcode"
             :classes="{input: 'form-control'}">
           </autocomplete>
-          <input v-model="loadCode"
+          <input 
+                  id="txtBarcode"
+                  v-model="loadCode"
+                  @keydown.prevent.tab="irtxtAddProduct"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
@@ -398,8 +402,10 @@ Vue.use(VueQuagga);
 
 export default {
   mounted() {
+    document.getElementById("txtBarcode").focus();
     // this.alterarBuscadorProductos()
   },
+
   data() {
     return {
       readerSize: {
@@ -576,6 +582,18 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    irtxtBarcode(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      document.getElementById("txtBarcode").focus();
+    },
+    irtxtAddProduct(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      document.getElementById("txtAddProduct").focus();
+    },
     setSubtotal(index, val, prod) {
       let precio = this.$options.filters.redondear(
         val / this.productos[index].cantidad,
@@ -787,9 +805,7 @@ export default {
         }
       }
     },
-    irtxtAddProduct() {
-      document.getElementById("txtAddProduct").focus();
-    },
+
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;

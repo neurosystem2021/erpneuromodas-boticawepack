@@ -1010,7 +1010,7 @@ export default {
       // this.$refs.inputPuntoVenta.setValue('CAJA1')
       // this.$refs.inputVendedor.setValue('')
     },
-    guardarProforma() {
+    async guardarProforma() {
       this.inProgress = true;
 
       if (!this.productos.length) {
@@ -1044,7 +1044,7 @@ export default {
 
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
-      this.axios
+      await this.axios
         .post(this.API + "proformas", this.venta)
         .then(response => {
           this.$toasted.success("Proforma Guardada con exito");
@@ -1062,8 +1062,9 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      window.location.reload();
     },
-    guardarVenta(evt) {
+    async guardarVenta(evt) {
       evt.preventDefault();
 
       this.inProgress = true;
@@ -1251,7 +1252,7 @@ export default {
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
-      this.axios
+      await this.axios
         .post(this.API + "ventas", this.venta)
         .then(response => {
           // limpiar preorden seleccionado
@@ -1283,6 +1284,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      window.location.reload();
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
