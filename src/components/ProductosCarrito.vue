@@ -32,6 +32,14 @@
           <small style="display: block; width:105px" v-show="productos[data.index].PrecioDocena">Por 12 -> S/{{productos[data.index].PrecioDocena}}</small>
           <small v-show="productos[data.index].PrecioCentena">Por 100 -> S/{{productos[data.index].PrecioCentena}}</small>
         </template>
+        <!-- @input="(val) => {
+              $emit('onInputCantidad', val)
+              if (tipo != 'mov') {
+                productos[data.index].precio = (val >= 12 && val < 100) ? 
+                productos[data.index].PrecioDocena : ((val >= 100) ? 
+                productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
+              }
+            }" -->
         <template slot="cantidad" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].cantidad"
@@ -40,12 +48,6 @@
             style="width: 75px"
             min="0"
             step="0.001"
-            @input="(val) => {
-              $emit('onInputCantidad', val)
-              if (tipo != 'mov') {
-                productos[data.index].precio = (val >= 12 && val < 100) ? productos[data.index].PrecioDocena : ((val >= 100) ? productos[data.index].PrecioCentena : productos[data.index].PrecioContado)
-              }
-            }"
             placeholder="Cantidad"></b-form-input>
         </template>
         <template slot="precio" slot-scope="data">
