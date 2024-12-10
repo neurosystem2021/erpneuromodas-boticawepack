@@ -157,6 +157,7 @@
                       @focus="abrirModalTouch(data.index, 1)"
                       class="form-control"
                       @keydown.enter="irTxtLoadBarcode"
+                      @keydown.tab="irTxtLoadBarcode"
                       />
                       <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
                       v-if="data.item.CantidadPresentacion">
@@ -600,6 +601,7 @@
                 inputmode="none"
                 class="form-control"
                 @keydown.enter.prevent="loadBarcode"
+                @keydown.tab="irAlPrimerProducto"
                 id="txtLoadBarcode"
               />
               <b-input-group-append>
@@ -1082,6 +1084,10 @@ export default {
         this.$set(this.mostrarOp, opcionesIndex, false);
       }
     });
+    this.$forceUpdate();
+    this.$nextTick(() => {
+      this.irTxtLoadBarcode();
+    });
   },
   methods: {
     activarModalTouch() {
@@ -1339,7 +1345,10 @@ export default {
     search() {
       this.filtrarProductos(this.busqueda);
     },
-    irTxtLoadBarcode() {
+    irTxtLoadBarcode(event) {
+      if (event) {
+        event.preventDefault();
+      }
       document.getElementById("txtLoadBarcode").focus();
     },
 
@@ -1397,6 +1406,9 @@ export default {
       });
       this.$toasted.success("Se añadió una opción más de venta");
       this.$forceUpdate();
+      this.$nextTick(() => {
+        this.irTxtLoadBarcode();
+      });
     },
     eliminarVentana() {
       this.ventas.splice(this.ventaActiva, 1);
@@ -1414,6 +1426,10 @@ export default {
         block: "start"
       });
       this.$toasted.info("Opción de venta cerrada.");
+      this.$forceUpdate();
+      this.$nextTick(() => {
+        this.irTxtLoadBarcode();
+      });
     },
     setTipoVenta(obj) {
       this.isNota[this.ventaActiva] = false;
@@ -1482,6 +1498,10 @@ export default {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
         )[0].cantidad += 1;
+        this.$nextTick(() => {
+          this.irTxtLoadBarcode();
+        });
+
         return false;
       }
       // console.log("producto", producto);
@@ -1510,11 +1530,19 @@ export default {
       prod.CantidadPresentacion = null;
       productos.unshift(prod);
       this.$nextTick(() => {
-        let input = document.getElementById("input0");
-        input.focus();
-        input.select();
+        this.irTxtLoadBarcode();
       });
       this.metodoPagoCambio(1);
+    },
+    irAlPrimerProducto(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      let input = document.getElementById("input0");
+      if (input) {
+        input.focus();
+        input.select();
+      }
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
@@ -1636,6 +1664,7 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
+      console.log(tipo);
       const metodos = ["efectivo", "visa", "mastercard", "delivery"];
       const ventaActual = this.ventas[this.ventaActiva].pago;
       metodos.forEach(metodo => {
@@ -2149,6 +2178,12 @@ export default {
         // this.loadClienteVarios();
       });
       this.ventas[this.ventaActiva].cliente = proforma;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          console.log("llegó");
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };
@@ -2351,5 +2386,4 @@ export default {
 .hidden {
   display: none;
 }
-
 </style>
