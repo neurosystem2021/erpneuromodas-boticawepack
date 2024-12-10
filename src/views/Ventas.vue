@@ -904,6 +904,7 @@ export default {
             parseFloat(this.venta.pago.mastercard.monto) +
             parseFloat(this.venta.pago.transferencia.monto))
       ).toFixed(2);
+      this.metodoPagoCambio(1);
     },
     productos() {
       setTimeout(() => {
@@ -1001,7 +1002,6 @@ export default {
       this.axios
         .get(this.API + "config/stock?id_emprea=" + this.empresa)
         .then(res => {
-          console.log(res.data);
           this.ventaSinStock = res.data;
         })
         .catch(err => {

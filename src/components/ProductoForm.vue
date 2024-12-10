@@ -786,11 +786,19 @@ export default {
         })
         .then(response => {
           if (this.cbGuardar) {
-            this.cbGuardar(
-              response.data.insertId,
-              this.producto.precios,
-              this.producto
-            );
+            let prod = this.$store.state.cart.productos.filter(
+              producto => producto.IdProducto == response.data.insertId
+            )[0];
+            if (prod) {
+              // prod.precio = this.producto.PrecioCosto;
+              // prod.precio = this.producto.PrecioCosto;
+              prod.precio = this.producto.PrecioContado;
+            }
+            // this.cbGuardar(
+            //   response.data.insertId,
+            //   this.producto.precios,
+            //   this.producto
+            // );
           }
           if (response.data.error) {
             this.$toasted.show(

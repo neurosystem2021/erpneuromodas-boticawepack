@@ -264,7 +264,7 @@
            <b-button
             style="margin-top: 5px"
             :disabled="bloquearInput ? true : false"
-            v-if="idPerfil == 1 ? true : false"
+            v-if="isVentas ?( idPerfil == 1 ? true : false) :false "
             variant="primary"
             size="sm"
             @click="editarProducto(productos[data.index])"
@@ -637,9 +637,15 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = 0;
-      this.productos.map(value => {
-        sumatoria += parseFloat(value.subtotal) - parseFloat(value.descuento) + parseFloat(value.igv);
-      });
+
+      sumatoria = this.productos.reduce((total, value) => {
+        return (
+          total +
+          parseFloat(value.subtotal) -
+          parseFloat(value.descuento) +
+          parseFloat(value.igv ? value.igv : 0)
+        );
+      }, 0);
 
       this.actualizarTotal(sumatoria);
       return this.$options.filters.redondear(sumatoria);
@@ -673,7 +679,7 @@ export default {
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto",
-      obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStock"
     }),
     reCalcularPrecioUnitario(index) {
       let prod = { ...this.productos[index] };
@@ -1238,11 +1244,11 @@ export default {
         "normalPrecioContado",
         parseFloat(normalPrecio).toFixed(2)
       );
-      Vue.set(
-        this.productos[index],
-        "nuevoPrecioContado",
-        Math.ceil(nuevoPrecio)
-      );
+      // Vue.set(
+      //   this.productos[index],
+      //   "nuevoPrecioContado",
+      //   Math.ceil(nuevoPrecio)
+      // );
       this.getSubtotal(index);
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
