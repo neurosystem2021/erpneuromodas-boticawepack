@@ -45,90 +45,120 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import { mapActions } from 'vuex'
+import config from "@/store/config.js";
+import { mapActions } from "vuex";
 
-    export default {
-        mounted () {
-            this.axios.get(this.API + 'preorden/count').then((response) => {
-                this.totalRows = response.data.total
-            })
+export default {
+  mounted() {
+    this.axios.get(this.API + "preorden/count").then(response => {
+      this.totalRows = response.data.total;
+    });
 
-            if(this.$route.query.idPreOrden && this.$route.query.idCliente) {
-                this.selectPreOrden({
-                    IdPreOrden: this.$route.query.idPreOrden,
-                    IdCliente: this.$route.query.idCliente
-                })
-            }
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                filter: '',
-                items: [],
-                isBusy: false,
-                fields: [ 'IdPreOrden', 'FechaReg', 'Cliente', 'DniRuc', 'imprimir'],
-                totalRows: 50,
-                perPage: 5,
-                currentPage: 1
-            }
-        },
-        props: ['idAlmacen'],
-        methods: {
-            ...mapActions({
-                add: 'agregarProducto',
-                limpiar: 'limpiarCarrito',
-                obtenerStok: 'obtenerStock'
-            }),
-            cargarPreOrden () {
-                this.show = true
-                this.$refs.tablaPreOrden.refresh()
-            },
-            selectPreOrden (item) {
-                this.axios.get(this.API + 'preorden/detalle', {
-                    params: {
-                        idPreOrden: item.IdPreOrden
-                    }
-                }).then((response) => {
-                    this.limpiar();
-                    
-                    response.data.map((item) => {
-                        if (!item.EsHabitacion) {
-                            this.add([item.IdProducto, () => {
-                                this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                            }, { setPrecio: true, cantidad: item.Cantidad, precio: item.Precio } ])
-
-                            this.filter = ''
-                            this.show = false
-                        }
-                    })
-                    this.$emit('onPreOrden', item)
-                    this.$emit('onSelectPreOrden', item.IdCliente)
-                })
-                //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
-            },
-            myProvider (ctx) {
-                // Here we don't set isBusy prop, so busy state will be handled by table itself
-                // this.isBusy = true
-                let promise = this.axios.get(this.API + 'preorden?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
-
-                return promise.then((result) => {
-                this.items = result.data
-                //this.totalRows = this.items.length
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                return(this.items)
-                }).catch(error => {
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                // Returning an empty array, allows table to correctly handle busy state in case of error
-                return []
-                })
-            }
-        }
+    if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
+      this.selectPreOrden({
+        IdPreOrden: this.$route.query.idPreOrden,
+        IdCliente: this.$route.query.idCliente
+      });
     }
+  },
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      filter: "",
+      items: [],
+      isBusy: false,
+      fields: ["IdPreOrden", "FechaReg", "Cliente", "DniRuc", "imprimir"],
+      totalRows: 50,
+      perPage: 5,
+      currentPage: 1
+    };
+  },
+  props: ["idAlmacen"],
+  props: {
+    EsVenta: {
+      type: Boolean,
+      default: false
+    }
+  },
+  methods: {
+    ...mapActions({
+      add: "agregarProducto",
+      limpiar: "limpiarCarrito",
+      obtenerStok: "obtenerStock"
+    }),
+    cargarPreOrden() {
+      this.show = true;
+      this.$refs.tablaPreOrden.refresh();
+    },
+    selectPreOrden(item) {
+      console.log("ya ha");
+      this.axios
+        .get(this.API + "preorden/detalle", {
+          params: {
+            idPreOrden: item.IdPreOrden
+          }
+        })
+        .then(response => {
+          this.limpiar();
+          let res = response.data;
+
+          if (this.EsVenta) {
+            res = res.filter(r => r.Pagado == 0);
+          } // console.log(response);
+          res.map(item => {
+            if (!item.EsHabitacion) {
+              this.add([
+                item.IdProducto,
+                () => {
+                  this.obtenerStok({ IdAlmacen: this.idAlmacen });
+                },
+                {
+                  setPrecio: true,
+                  cantidad: item.Cantidad,
+                  precio: item.Precio
+                }
+              ]);
+
+              this.filter = "";
+              this.show = false;
+            }
+          });
+          this.$emit("onPreOrden", item);
+          this.$emit("onSelectPreOrden", item.IdCliente);
+        });
+      //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let promise = this.axios.get(
+        this.API +
+          "preorden?limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          ctx.filter
+      );
+
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
+    }
+  }
+};
 </script>
 <style>
-
 </style>

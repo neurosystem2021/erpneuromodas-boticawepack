@@ -25,7 +25,9 @@
                         <pre-orden-lista 
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"></pre-orden-lista>
+                            @onPreOrden="selectPreOrden"
+                            :EsVenta="true"
+                            ></pre-orden-lista>
                     </b-button-group>
                     <b-button-group size="sm" class="ocularMovil2">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->

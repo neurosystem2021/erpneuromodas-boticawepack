@@ -251,6 +251,8 @@
                           <th class="text-center">Cantidad</th>
                           <th class="text-center">Precio</th>
                           <th class="text-center">Total</th>
+                          <th class="text-center">Pagado</th>
+                          <th class="text-center">Deuda</th>
                           <th class="text-center">Incluido Mano de Obra</th>
                       </tr>
                   </thead>
@@ -261,6 +263,8 @@
                           <td class="text-center">{{ prod.Cantidad }}</td>
                           <td class="text-center">{{ prod.Precio | moneda }}</td>
                           <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
+                          <td class="text-center">{{ prod.MontoPagado }}</td>
+                          <td class="text-center">{{ prod.Deuda }}</td>
                           <td class="text-center"><span v-if="prod.EsManoDeObra==1"><b-badge style="font-size:0.8rem" variant="primary">SI</b-badge></span><span v-else>-</span></td>
                       </tr>
                   </tbody>
@@ -269,6 +273,17 @@
                     <td colspan="3"></td>
                     <td class="text-center"><b>TOTAL PRODUCTOS</b></td>
                     <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{productoSelect.TotalDetalle | moneda}} </td>
+                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                      productos.reduce((total,producto)=>{
+                        return total + parseFloat(producto.MontoPagado)
+                      },0)
+                    }} </td>
+                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                      productos.reduce((total,producto)=>{
+                        return total + parseFloat(producto.Deuda)
+                      },0)
+                    }} </td>
+                   
                   </tr>
                 </tfoot>
               </table>

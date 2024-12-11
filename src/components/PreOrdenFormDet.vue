@@ -32,15 +32,18 @@
           <th>Precio</th>
           <th>Cantidad</th>
           <th>Total</th>
+          <th>Pagado</th>
+          <th>Deuda</th>
+          <th class="text-center">Estado</th>
           <th class="text-center">Quitar</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
+        <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled,'bg-facturado':prod.Pagado}">
           <td>
             <input 
             @change="(e) => addManoDeObra(index, e)"
-            v-if="prod.CodigoBarra != 'MANODEOBRA' " 
+            v-if="prod.CodigoBarra != 'MANODEOBRA' && prod.Pagado==0" 
             v-model="prod.EsManoDeObra"
             class="form-check-input" type="checkbox" />
           </td>
@@ -48,15 +51,23 @@
           <td>{{ prod.Producto }}</td>
           <td>
             <span class="hideInModal">{{ prod.Precio }}</span>
-            <input :disabled="prod.isDisabled" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
+            <input :disabled="prod.isDisabled || prod.Pagado" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
           <td>
             <span class="hideInModal">{{ prod.Cantidad }}</span>
-            <input :disabled="prod.isDisabled" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
+            <input :disabled="prod.isDisabled || prod.Pagado" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
           </td>
           <td>
-            <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2) }}</span>
+            <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2)}}</span>
             
+          </td>
+          <td>{{ prod.MontoPagado }}</td>
+          <td>
+            <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2) - prod.MontoPagado }}</span>
+            
+          </td>
+          <td>
+             {{ prod.Pagado==1 ? 'Facturado' : ''}}
           </td>
           <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
@@ -250,5 +261,8 @@ export default {
 }
 .form-check-input {
   margin-left: 0.75rem !important;
+}
+.bg-facturado {
+  background: #dcedc8 !important;
 }
 </style>
