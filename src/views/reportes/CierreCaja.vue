@@ -528,8 +528,8 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
-        this.totalVentasVisa +
-        this.totalVentasYape +
+        //this.totalVentasVisa +
+        //this.totalVentasYape +
         this.totalIngresos -
         this.totalSalidas -
         this.totalAdelantosActivos
