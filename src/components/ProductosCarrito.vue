@@ -622,9 +622,9 @@ export default {
           }
         });
 
-        if (!cambio) {
-          this.productos[index].precio = this.productos[index].PrecioContado;
-        }
+        // if (!cambio) {
+        //   this.productos[index].precio = this.productos[index].PrecioContado;
+        // }
       }
     },
     obtenerAnaquel(data) {
