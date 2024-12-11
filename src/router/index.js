@@ -14,6 +14,7 @@ import AgenteOperacion from "@/views/AgenteOperacion.vue";
 import AgenteCierreCaja from "@/views/AgenteCierreCaja.vue";
 import AgenteGeneral from "@/views/AgenteGeneral.vue";
 import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
+import Traslado from "@/views/Traslado.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -199,6 +200,11 @@ export default new Router({
       path: "/reportes/proyectos",
       name: "ReporteProyectos",
       component: ReporteProyectos
+    },
+    {
+      path: "/traslado",
+      name: "ReporteProyectos",
+      component: Traslado
     }
   ]
 });
