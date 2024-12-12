@@ -25,6 +25,28 @@
                   </autocomplete>
                   </b-input-group>
                 </b-col>
+                <b-col md="4" class="docInfo" v-if="isNota[index]">
+                <b-input-group prepend="Doc. Referenc" class="mt-2" >
+                   <autocomplete
+                       required="required"
+                       :id="`inputDocRef${index}`"
+                       :ref="`inputDocRef${index}`"
+                       :url="API + 'ventas/lista/'+ventas[index].puntoVenta.IdDocVentaPuntoVenta"
+                       anchor="NroComprobante"
+                       initValue=""
+                       label="writer"
+                       placeholder=""
+                       :on-select="setDocRef"
+                       :onFocus="focusAutocomplete.bind(null, `inputDocRef${index}`)"
+                       :classes="{input: 'form-control'}">
+                   </autocomplete>
+                </b-input-group>
+                </b-col>
+                <b-col md="3" class="docInfo" v-if="isNota[index]">
+                            <b-input-group class="mt-2"  style="margin-bottom:-20px">
+                                <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
+                            </b-input-group>
+                </b-col>
                 <b-col cols="3">
                   <b-form-checkbox
                     :id="`checkbox-${index}`"
@@ -42,19 +64,19 @@
                   :id="`txtNombreOrganizacion-${index}`"
                   placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
                 </b-col>
+                 
               </b-row>
               <b-row>
                 <b-col cols="6">
                   <b-row>
                     <b-col cols="12">
-                      <b-form-group>
+                      <b-form-group v-if="ventas[index].verCliente">
                         <b-input-group class="mt-2">
-                          <!-- <clientes-form 
-                            v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" 
-                            idModal="editCliente" @onAddCliente="setCliente" 
-                            :editCliente="venta.cliente">
-                          </clientes-form> -->
-                            <autocomplete
+                            <AutoComplete  
+                            :value="ventas[index].cliente.Cliente"
+                            @guardarCliente="setCliente"
+                            />
+                            <!-- <autocomplete
                                 required="required"
                                 :id="`inputCliente${index}`"
                                 :url="API + 'clientes'"
@@ -66,8 +88,12 @@
                                 :onInput="(val) => newDniRuc = val"
                                 :on-select="setCliente" 
                                 :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
+                                :classes="{input: 'form-control'}"
+                                :ref="`inputCliente${index}`"
+                                 v-model="ventas[index].cliente.Cliente"
+                                 
+                              >
+                            </autocomplete> -->
                             <b-input-group-append>
                                 <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                             </b-input-group-append>
@@ -94,18 +120,7 @@
                   </b-col>
 
               </b-row>
-              <!-- <b-row>
-                <b-col cols="12">
-                  <b-form-group>
-                    <input
-                      v-model="ventas[ventaActiva].Observacion"
-                      type="text"
-                      class="form-control"
-                      placeholder="Observación"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-row> -->
+              
               <div style="height: 40vh;" class="px-0 mx-0">
               <b-row style="position: relative;max-height: 40vh;overflow-y: scroll;" >
                 <b-table striped hover :fields="headerTable"  :items="venta.productos"> 
@@ -905,10 +920,11 @@ import Proformas from "@/components/ProformaLista.vue";
 // //import DeliveryModal from '@/components/DeliveryModal.vue'
 // import Spinner from "vue-simple-spinner";
 import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
+import AutoComplete from "@/components/AutoComplete.vue";
 // import debounce from "lodash";
 import Swal from "sweetalert2";
 export default {
-  components: { ProductosCarritoNuevo, ClientesForm, Proformas },
+  components: { ProductosCarritoNuevo, ClientesForm, Proformas, AutoComplete },
   data() {
     return {
       navDisabled: false,
@@ -922,6 +938,19 @@ export default {
       productosCategoria: [],
       isNota: [],
       tieneIgv: [],
+      itemsMotivoNota: [
+        { value: null, text: "-- SELECCIONE EL MOTIVO --" },
+        { value: "01", text: "ANULACION DE LA OPERACION" },
+        { value: "02", text: "ANULACION POR ERROR EN EL RUC" },
+        { value: "03", text: "CORRECION POR ERROR EN LA DESCRIPCION" },
+        { value: "04", text: "DESCUENTO GLOBAL" },
+        { value: "05", text: "DESCUENTO POR ITEM" },
+        { value: "06", text: "DEVOLUCION TOTAL" },
+        { value: "07", text: "DEVOLUCION POR ITEM" },
+        { value: "08", text: "BONIFICACION" },
+        { value: "09", text: "DISMINUCION EN EL VALOR" },
+        { value: "10", text: "OTROS CONCEPTOS" }
+      ],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "Producto" },
@@ -949,6 +978,7 @@ export default {
       tabActive: 0,
       ventaActiva: 0,
       venta: {
+        verCliente: true,
         pagocon: 0,
         cliente: {},
         EsCredito: 0,
@@ -1000,6 +1030,8 @@ export default {
       },
       ventas: [
         {
+          verCliente: true,
+          pagocon: 0,
           pagocon: 0,
           cliente: {},
           EsCredito: 0,
@@ -1550,6 +1582,83 @@ export default {
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
+    setDocRef(obj) {
+      this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
+      this.ventas[this.ventaActiva].NroComprobanteModifica = obj.NroComprobante;
+      if (
+        this.ventas[this.ventaActiva].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.ventaActiva].tipoVenta.CodSunat == "08"
+      ) {
+        this.ventas[this.ventaActiva].Serie = this.ventas[
+          this.ventaActiva
+        ].Serie.replace(/^./, obj.NroComprobante[0]);
+      }
+      this.axios
+        .get(this.API + "ventas/solonumero", {
+          params: {
+            serie: this.ventas[this.ventaActiva].Serie,
+            idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.ventas[this.ventaActiva].Numero = response.data.numero;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+      //Cargar producto del documento afectado nota credito
+      this.axios
+        .get(this.API + "venta/detalle/comprobante", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta,
+            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
+              .IdDocVentaPuntoVenta
+          }
+        })
+        .then(response => {
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
+                idCliente: response.data[0].IdCliente
+              }
+            })
+            .then(response => {
+              if (response.data) {
+                this.setCliente(response.data.IdCliente);
+
+                this.ventas[this.ventaActiva].CampoDireccion =
+                  response.data.Direccion;
+                this.ventas[this.ventaActiva].cliente = response.data;
+
+                // let txtCliente = `inputCliente${this.ventaActiva}`;
+                this.ventas[this.ventaActiva].verCliente = false;
+                this.initValueCliente = this.ventas[
+                  this.ventaActiva
+                ].cliente.Cliente;
+                this.ventas[this.ventaActiva].verCliente = true;
+                this.$forceUpdate();
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+
+          this.ventas.productos = [];
+
+          response.data.forEach(element => {
+            this.setProducto(element);
+          });
+          this.ventas[this.ventaActiva].NotaIdMotivo = null;
+          this.$forceUpdate();
+        });
+    },
+    someMethod(text) {
+      this.someMethod = text;
+    },
     setCliente(obj, dni = false) {
       let params = {};
       if (dni) {
@@ -1664,7 +1773,6 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      console.log(tipo);
       const metodos = ["efectivo", "visa", "mastercard", "delivery"];
       const ventaActual = this.ventas[this.ventaActiva].pago;
       metodos.forEach(metodo => {
