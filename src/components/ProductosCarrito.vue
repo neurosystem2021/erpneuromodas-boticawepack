@@ -356,7 +356,7 @@
             type="number"
             style="width: 120px"
             min="0"
-            step="0.00001"
+            step="0.00000001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -826,12 +826,35 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = 0;
-      this.productos.map(value => {
-        sumatoria += parseFloat(value.total);
-      });
+      let total = 0;
+      if (this.igvTotal) {
+        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal / 1.18;
+      } else {
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
+          if (value.descuento) {
+            sumatoria -= value.descuento;
+          }
+        });
+      }
+      let igv = 0;
+      if (this.productos.length > 0) {
+        if (this.gravada == 1) {
+          igv = this.productos.reduce((total, item) => {
+            let x = item.total / 1.18;
+            return total + parseFloat(item.total) - parseFloat(x);
+          }, 0);
+        } else {
+          igv = this.productos.reduce((total, item) => {
+            return total + parseFloat(item.igv);
+          }, 0);
+        }
+      }
 
-      this.actualizarTotal(sumatoria);
-      return this.$options.filters.redondear(sumatoria);
+      total = parseFloat(sumatoria) + parseFloat(igv);
+      this.actualizarTotal(total);
+      return this.$options.filters.redondear(total);
     },
     sumatoriaIgv() {
       let sumatoria = 0;
