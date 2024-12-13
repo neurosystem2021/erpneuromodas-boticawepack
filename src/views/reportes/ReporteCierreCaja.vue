@@ -202,9 +202,7 @@ export default {
         })
         .then(response => {
           this.cierres = response.data;
-          console.log('data:', this.cierres);
         });
-
     },
     cambiarEmpresa() {
       setTimeout(() => {

@@ -61,20 +61,12 @@
         <b-col cols="5">
         <table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
-            <tr style="background-color: #b2ebf2;">
+            <tr>
               <td>Gran Total S/.</td>
               <td>{{ granTotal | redondear }}</td>
             </tr>
           </tbody>
-        </table>      
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr style="background-color: #D4EDDA;">
-              <td>Total S/.</td>
-              <td>{{ granTotal2 | redondear }}</td>
-            </tr>
-          </tbody>
-        </table>       
+        </table>          
         <table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
             <tr>
@@ -568,7 +560,7 @@
 
       <br>
 
-      <b-alert variant="success" class="text-center" show><b>TOTAL: S/. {{ granTotal2 | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
   </div>
 </template>
@@ -646,17 +638,6 @@ export default {
     },
     granTotal() {
       return (
-        this.totalVentasTransferencia +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
-        this.totalVentasEfectivo +
-        this.totalIngresos -
-        this.totalSalidas -
-        this.totalAdelantosActivos
-      );
-    },
-    granTotal2() {
-      return (
         //this.totalVentasTransferencia +
         //this.totalVentasVisa +
         //this.totalVentasMastercard +
@@ -673,7 +654,8 @@ export default {
       return (
         this.totalVentasEfectivo +
         this.totalVentasVisa +
-        this.totalVentasMastercard
+        this.totalVentasMastercard+
+        this.totalVentasTransferencia
       );
     },
     totalSalidas() {
