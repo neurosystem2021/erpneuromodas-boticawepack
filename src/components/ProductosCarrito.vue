@@ -4,7 +4,13 @@
       <b-form-group>
         <b-input-group>
            <!-- <b-button variant="success" class="ml-1 btn-anadir" @click="abrirModalListProducto()"> Añadir </b-button> -->
-              <BusquedaProducto v-on:monto="cantProductos=$event" v-on:modal="abrirModal=$event"/>
+              <BusquedaProducto 
+              id="txtBusqueda" 
+              ref="txtBusqueda" 
+              v-on:monto="cantProductos=$event" 
+              v-on:modal="abrirModal=$event"
+              @iraCantidad="irTextCantidad"
+              />
               
                <!-- <b-input-group-text><strong class="text-danger">!</strong></b-input-group-text> -->
            
@@ -160,6 +166,7 @@
         <template slot="cantidad" slot-scope="data">
           <!-- cambiarCantidadPresentacion(productos[data.index],data.index) -->
           <input
+            :id="`txtCantidad${data.index}`"
             v-model="productos[data.index].cantidad"
             :disabled="productos[data.index].disabled ||bloquearInput?true:false || esDelivery"
             type="number"
@@ -167,7 +174,7 @@
             class="form-control"
             step="0.01"
             min="0"
-            
+            @keydown.enter="irabusqueda()"
             @input="(val) => {
               recalcularTotal(data.index)
               $emit('onInputCantidad', val.target.value)
@@ -914,6 +921,19 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    irabusqueda() {
+      this.$refs.txtBusqueda.$refs.inputBusqueda.focus();
+      console.log("s");
+    },
+    irTextCantidad(val) {
+      if (val) {
+       this.$nextTick(()=>{
+        document.getElementById("txtCantidad0").focus();
+        document.getElementById("txtCantidad0").select();
+        // console.log("s");
+       })
+      }
+    },
     calcVuelto() {
       let vuelto = 0;
       if (this.pagocon) {
@@ -1654,6 +1674,7 @@ export default {
       this.$refs["modalCant"].show();
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj;
+      document.getElementById("txtCantidad0").focus();
     },
     setProductoUni(obj, precio) {
       this.objProd.cantxPrecio = 0;

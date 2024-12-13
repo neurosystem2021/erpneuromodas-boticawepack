@@ -7,6 +7,7 @@
         placeholder="Agregar Productos" 
         v-model="search" 
         @focus="buscarProductos"
+        ref="inputBusqueda" 
       />
       <b-button @click="startRecognition">
         <i class="fa fa-microphone"></i>
@@ -126,6 +127,7 @@ export default {
         this.lstProductos = [];
       });
       this.search = "";
+      this.$emit("iraCantidad", true);
     },
     obtenerClaseStock(producto) {
       const classStock = "tdstock ";
