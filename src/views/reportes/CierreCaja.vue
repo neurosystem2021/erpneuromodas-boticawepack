@@ -825,7 +825,7 @@ export default {
             idTurno: this.turno,
             user: sessionStorage.getItem("User"),
             //user:         this.vendedor.Usuario,
-            ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+            ingresos: this.totalIngresos.toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
             totalVentas: this.totalVentas,
