@@ -33,6 +33,7 @@
           <!--<b-badge variant="warning">proximos a vencer 4 meses</b-badge>-->
           <b-badge v-if="isVentas" variant="primary">Anteponer <b>*</b>  para buscar por compuesto</b-badge>
           <b-badge v-if="isVentas" style="background-color: #FFCE05 !important; color:black">Venta Estrategica</b-badge>
+          <b-badge v-if="isVentas" style="background-color: #6A1B9A !important; color:white"> Solo Nota Venta</b-badge>
           <b-badge v-if="isVentas" style="background-color: #28AA45 !important; color:white">Oferta</b-badge>
       </b-form-group>
 
@@ -183,6 +184,13 @@
         </template>-->
 
         <template slot="movimiento" slot-scope="data" v-if="(movTipo!=0 && movTipo!=undefined ) || isVentas">
+          <div v-if="productos[data.index].NotaVenta"
+           style="border-radius: 100%; height: 17px;width: 17px;
+            background: #6A1B9A;" 
+          >
+          </div>	
+            
+         
           <!--<div v-if="isNota" style="width: 135px; text-align:center">
             <div>
               {{productos[data.index].Lote}}
@@ -377,22 +385,26 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
-import axios from 'axios'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
+import axios from "axios";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
-    if(this.$route.query.idProducto) {
-        this.add([this.$route.query.idProducto, (obj) => {}, { setPrecio: this.setPrecio,  setSuma: true }])
+    if (this.$route.query.idProducto) {
+      this.add([
+        this.$route.query.idProducto,
+        obj => {},
+        { setPrecio: this.setPrecio, setSuma: true }
+      ]);
     }
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       productosCaja: {},
@@ -400,35 +412,35 @@ export default {
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
-      idPerfil: sessionStorage.getItem('IdPerfil'),
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       movimientoLotes: {},
       ProductosCodigoBarra: [],
-      codeBar:'',
-      PresentacionesProd:[],
+      codeBar: "",
+      PresentacionesProd: [],
       objProd: {},
-      objProdMedicion:'',
+      objProdMedicion: "",
       indexProdSelect: null
-    }
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     }
   },
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
-    bloquearInput:Boolean,
+    bloquearInput: Boolean,
     igvTotal: Boolean,
     isVentas: Boolean,
-    isNota:Boolean,
+    isNota: Boolean,
     movTipo: Number,
-    almacenDestino:Number,
-    almacenOrigen:Number,
+    almacenDestino: Number,
+    almacenOrigen: Number,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -436,34 +448,57 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center stocksize' },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center stocksize"
+          },
           //{ key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo', class:'stocksize' }, 
-          { key: 'movimiento', label: '', class:'text-center stocksize'  },
-          { key: 'ProductoMarca', label: 'Marca', class:'stocksize' },
-          //{ key: 'ProductoModelo', label: 'Modelo' }, 
-          //{ key: 'Color', label: 'Color' }, 
+          { key: "Producto", label: "Artículo", class: "stocksize" },
+          { key: "movimiento", label: "", class: "text-center stocksize" },
+          { key: "ProductoMarca", label: "Marca", class: "stocksize" },
+          //{ key: 'ProductoModelo', label: 'Modelo' },
+          //{ key: 'Color', label: 'Color' },
           //{ key: 'ProductoTalla', label: 'Talla' },
           //{ key: 'Genero' },
           //{ key: 'Botapie' },
-          { key: 'Presentacion', label: 'Present', class:'text-center stocksize' },
-          { key: 'eventPres', label: '', class:'text-center stocksize' },
-          { key: 'cantxPrecio', variant: 'warning', class:'text-center stocksize' },
+          {
+            key: "Presentacion",
+            label: "Present",
+            class: "text-center stocksize"
+          },
+          { key: "eventPres", label: "", class: "text-center stocksize" },
+          {
+            key: "cantxPrecio",
+            variant: "warning",
+            class: "text-center stocksize"
+          },
           //{ key: 'cantidad', class:'stocksize' },
-          { key: 'precio', label: 'P/U', class:'stocksize' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'stocksize' },
-          { key: 'igv', label: 'IGV', class:'stocksize' },
+          { key: "precio", label: "P/U", class: "stocksize" },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "stocksize"
+          },
+          { key: "igv", label: "IGV", class: "stocksize" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta', class:'stocksize' },
-          { key: 'total', label: 'Total', variant: 'danger', class:'stocksize' },
-          { key: 'Lote', label: 'C. Lote', class:'stocksize' },
-          { key: 'Registro', label: 'Reg. Sanitario', class:'stocksize' },
-          { key: 'fechavencimiento', label: 'Vencimiento', class:'stocksize' },
-          { key: 'acciones', label: '', class:'stocksize'}
-        ]
+          { key: "precioVenta", label: "Precio venta", class: "stocksize" },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "stocksize"
+          },
+          { key: "Lote", label: "C. Lote", class: "stocksize" },
+          { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
+          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
+          { key: "acciones", label: "", class: "stocksize" }
+        ];
       },
       type: Array
     }
@@ -473,209 +508,256 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       } else {
-        return this.API + 'productos'
+        return this.API + "productos";
       }
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto"
     }),
-    abrirLotes(target){
+    abrirLotes(target) {
       //this.$refs.popover.$emit('open')
-    },  
-    changeCant (val, prod, index) {
+    },
+    changeCant(val, prod, index) {
       if (val) {
-        prod.cantidad = prod.cantidadPress
-        prod.cantidad *= val
-      }else {
-        prod.cantidad = null
+        prod.cantidad = prod.cantidadPress;
+        prod.cantidad *= val;
+      } else {
+        prod.cantidad = null;
       }
       this.$nextTick(() => {
-        this.actualizarProd({Producto:prod,Pos:index})
-      })
+        this.actualizarProd({ Producto: prod, Pos: index });
+      });
     },
     changeMovimiento(hash, idProducto, index) {
-      if  (hash) {
+      if (hash) {
         // Stock
-        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash).Stock
-        let serieNumero = this.movimientoLotes[idProducto].find(m => m.value === hash).SerieNumero
-        let IdLote = this.movimientoLotes[idProducto].find(m => m.value === hash).IdLote
-        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash).Lote
-        let Registro = this.movimientoLotes[idProducto].find(m => m.value === hash).Registro
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Stock;
+        let serieNumero = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).SerieNumero;
+        let IdLote = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).IdLote;
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Lote;
+        let Registro = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).Registro;
         console.log(Registro);
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
-            Vue.set(this.productos[index], 'stockMovimiento', stock)
-            Vue.set(this.productos[index], 'SerieNumero', serieNumero)
-          })
+            Vue.set(this.productos[index], "stockMovimiento", stock);
+            Vue.set(this.productos[index], "SerieNumero", serieNumero);
+          });
         } else {
           this.$nextTick(() => {
-            Vue.set(this.productos[index], 'stockMovimiento', 0)
-            Vue.set(this.productos[index], 'SerieNumero', '----')
-          })
+            Vue.set(this.productos[index], "stockMovimiento", 0);
+            Vue.set(this.productos[index], "SerieNumero", "----");
+          });
         }
         // Fecha de vencimiento
-        var fechaVen = this.movimientoLotes[idProducto].find(m => m.value === hash).FechaVen
-        let hoy      = this.$moment().unix();
+        var fechaVen = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).FechaVen;
+        let hoy = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
-        let en4meses  = this.$moment().add(4,'months').unix();
-        let style = 'bg-success'
-        if(fechaVenUnix && fechaVenUnix < hoy) {
-          style = 'bg-danger text-white'
+        let en4meses = this.$moment()
+          .add(4, "months")
+          .unix();
+        let style = "bg-success";
+        if (fechaVenUnix && fechaVenUnix < hoy) {
+          style = "bg-danger text-white";
         }
         if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
-          style = 'bg-warning'
+          style = "bg-warning";
         }
         if (fechaVen) {
           this.$nextTick(() => {
-            if(!this.isVentas){
-              if(this.movTipo!=0 &&  this.movTipo!=undefined ){
-               this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
-               this.productos[index].IdLote = IdLote 
-               this.productos[index].Lote = Lote 
-               this.productos[index].Registro = Registro 
+            if (!this.isVentas) {
+              if (this.movTipo != 0 && this.movTipo != undefined) {
+                this.productos[index].FechaVen = this.$moment(fechaVen).format(
+                  "YYYY-MM-DD"
+                );
+                this.productos[index].IdLote = IdLote;
+                this.productos[index].Lote = Lote;
+                this.productos[index].Registro = Registro;
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
               }
-            }else{
-                 this.productos[index].Lote = Lote 
-                 this.productos[index].Registro = Registro 
-                 try {
-                  this.productos[index].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD")
-                 } catch (error) {
-                  
-                 }
-              }
-             Vue.set(this.productos[index], 'fechaVenMovimiento', `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${ this.$moment(fechaVen).format("DD-MM-YYYY") }</small>`)
-          })
+            } else {
+              this.productos[index].Lote = Lote;
+              this.productos[index].Registro = Registro;
+              try {
+                this.productos[index].FechaVen = this.$moment(fechaVen).format(
+                  "YYYY-MM-DD"
+                );
+              } catch (error) {}
+            }
+            Vue.set(
+              this.productos[index],
+              "fechaVenMovimiento",
+              `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${this.$moment(
+                fechaVen
+              ).format("DD-MM-YYYY")}</small>`
+            );
+          });
         } else {
           this.$nextTick(() => {
-            Vue.set(this.productos[index], 'fechaVenMovimiento', '')
-          })
+            Vue.set(this.productos[index], "fechaVenMovimiento", "");
+          });
         }
-          // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+        // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
       }
     },
-    loadMovimientoLotes ($idProducto) {
-      this.movimientoLotes[$idProducto]=[]
-      this.axios.get(this.API + 'movimientolotes/' + $idProducto+'/'+(this.isVentas?this.idAlmacen:(this.movTipo==0?this.almacenDestino:this.almacenOrigen)))
-        .then((response) => {
-          if(response.data.length > 0){
-            let indexProducto = this.productos.findIndex(p => p.IdProducto === $idProducto);
+    loadMovimientoLotes($idProducto) {
+      this.movimientoLotes[$idProducto] = [];
+      this.axios
+        .get(
+          this.API +
+            "movimientolotes/" +
+            $idProducto +
+            "/" +
+            (this.isVentas
+              ? this.idAlmacen
+              : this.movTipo == 0
+                ? this.almacenDestino
+                : this.almacenOrigen)
+        )
+        .then(response => {
+          if (response.data.length > 0) {
+            let indexProducto = this.productos.findIndex(
+              p => p.IdProducto === $idProducto
+            );
             // Cargar por defecto lote próximo a vencer.
-            let primeroVencer = response.data.reduce((a,b) => {
-              return (a.FechaVen && (new Date(a.FechaVen) < new Date(b.FechaVen))) ? a : b;
-            })
-            
+            let primeroVencer = response.data.reduce((a, b) => {
+              return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
+                ? a
+                : b;
+            });
+
             this.$nextTick(() => {
-              Vue.set(this.productos[indexProducto], 'hashMovimiento', primeroVencer.hashMovimiento);
-              this.changeMovimiento(primeroVencer.hashMovimiento, $idProducto, indexProducto)
-            })
-            
+              Vue.set(
+                this.productos[indexProducto],
+                "hashMovimiento",
+                primeroVencer.hashMovimiento
+              );
+              this.changeMovimiento(
+                primeroVencer.hashMovimiento,
+                $idProducto,
+                indexProducto
+              );
+            });
+
             this.movimientoLotes[$idProducto] = response.data.map(l => ({
               value: l.hashMovimiento,
-              text : l.Lote,
-              Stock : l.Stock,
+              text: l.Lote,
+              Stock: l.Stock,
               IdLote: l.IdLote,
               Lote: l.Lote,
               FechaVen: l.FechaVen,
-              SerieNumero: l.Serie + '-' + l.Numero,
+              SerieNumero: l.Serie + "-" + l.Numero,
               Registro: l.Registro
-            }))
+            }));
           }
         })
-        .catch((error) => {
-          console.log(error)
-        })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    loadBarcode (e) {
-      e.preventDefault()
-      let idProducto = this.loadCode
-      this.codeBar = this.loadCode
+    loadBarcode(e) {
+      e.preventDefault();
+      let idProducto = this.loadCode;
+      this.codeBar = this.loadCode;
 
-      if(idProducto){
-        if(this.isVentas){
-          let params = {codigoBarra: idProducto, idAlmacen: this.idAlmacen || 1}
-          this.loadCode = ''
-          axios.get(this.API + '/productos/codigobarra', {params: params})
-          .then((response) => {
-            if (response.data) {
-              this.setProducto(response.data[0])
-            }else{
-              this.$toasted.show('No se encontró ningun producto')
-              this.loadCode = ''
-            }
-          })
-        }else{
-          let params = {codigoBarra: idProducto}
-          this.loadCode = ''
-          axios.get(this.API + '/productos/id/'+idProducto, {params: params})
-          .then((response) => {
-            if (response.data) {
-              this.setProducto(response.data)
-            }else{
-              this.$toasted.show('No se encontró ningun producto')
-              this.loadCode = ''
-            }
-          })
+      if (idProducto) {
+        if (this.isVentas) {
+          let params = {
+            codigoBarra: idProducto,
+            idAlmacen: this.idAlmacen || 1
+          };
+          this.loadCode = "";
+          axios
+            .get(this.API + "/productos/codigobarra", { params: params })
+            .then(response => {
+              if (response.data) {
+                this.setProducto(response.data[0]);
+              } else {
+                this.$toasted.show("No se encontró ningun producto");
+                this.loadCode = "";
+              }
+            });
+        } else {
+          let params = { codigoBarra: idProducto };
+          this.loadCode = "";
+          axios
+            .get(this.API + "/productos/id/" + idProducto, { params: params })
+            .then(response => {
+              if (response.data) {
+                this.setProducto(response.data);
+              } else {
+                this.$toasted.show("No se encontró ningun producto");
+                this.loadCode = "";
+              }
+            });
         }
-
       }
     },
     /*alterarBuscadorProductos() {
@@ -707,118 +789,128 @@ export default {
       }
     },*/
     obtenerStockCaja(prod) {
-     axios.get(this.API + 'productos/stock/caja', {
-        params: {
-          idProducto: prod.IdProducto,
-          idAlmacen: this.idAlmacen
-        }
-      }).then((response) => {
-        Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
-        if(prod.ControlaStock==0){
-          let index = this.productos.findIndex((pro)=> pro.IdProducto === prod.IdProducto)
-          if(index !==-1){
-            this.productos[index].stock = response.data.stock || 0
+      axios
+        .get(this.API + "productos/stock/caja", {
+          params: {
+            idProducto: prod.IdProducto,
+            idAlmacen: this.idAlmacen
           }
-        }
-        //console.log(response.data.stock)
+        })
+        .then(response => {
+          Vue.set(this.productosCaja, prod.IdProducto, {
+            stock: response.data.stock
+          });
+          if (prod.ControlaStock == 0) {
+            let index = this.productos.findIndex(
+              pro => pro.IdProducto === prod.IdProducto
+            );
+            if (index !== -1) {
+              this.productos[index].stock = response.data.stock || 0;
+            }
+          }
+          //console.log(response.data.stock)
           //return response.data.stock
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
-    setProducto(obj){
-      if(!this.isVentas){
-        if(this.movTipo==undefined){
-          this.$toasted.show('Primero seleccione un tipo de movimiento')
-          return
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    setProducto(obj) {
+      if (!this.isVentas) {
+        if (this.movTipo == undefined) {
+          this.$toasted.show("Primero seleccione un tipo de movimiento");
+          return;
         }
       }
       try {
-        if(obj.Presentaciones !='' && obj.Presentaciones !=null){
-          this.PresentacionesProd = JSON.parse(obj.Presentaciones)
-          if(this.PresentacionesProd.length==0){
-             this.setProductoUni(obj)
-             return
+        if (obj.Presentaciones != "" && obj.Presentaciones != null) {
+          this.PresentacionesProd = JSON.parse(obj.Presentaciones);
+          if (this.PresentacionesProd.length == 0) {
+            this.setProductoUni(obj);
+            return;
           }
-        }else{
-          this.setProductoUni(obj)
-          return
+        } else {
+          this.setProductoUni(obj);
+          return;
         }
-      } catch (error) {
-        
-      }
-      this.objProd = {}
-      this.objProd = obj
-      this.indexProdSelect = null
-      this.$refs['modalCant'].show()
+      } catch (error) {}
+      this.objProd = {};
+      this.objProd = obj;
+      this.indexProdSelect = null;
+      this.$refs["modalCant"].show();
     },
-    setProductoUni (objIni,presentacion = false) {
-      let obj = {...objIni}
-      obj.cantxPrecio = 1
-      if(presentacion){
-        obj.Presentacion = presentacion.nombre
-        obj.cantidadPress = Number(presentacion.cantidad || 1)
-        obj.EsPresentacion = 1
-        obj.PrecioCostoF = presentacion.preciocosto || 0
-      }else{
-        obj.Presentacion = obj.ProductoMedicion
-        obj.cantidadPress = 1
-        obj.EsPresentacion = 0
-        obj.PrecioCostoF = obj.PrecioCosto || 0
+    setProductoUni(objIni, presentacion = false) {
+      let obj = { ...objIni };
+      obj.cantxPrecio = 1;
+      if (presentacion) {
+        obj.Presentacion = presentacion.nombre;
+        obj.cantidadPress = Number(presentacion.cantidad || 1);
+        obj.EsPresentacion = 1;
+        obj.PrecioCostoF = presentacion.preciocosto || 0;
+      } else {
+        obj.Presentacion = obj.ProductoMedicion;
+        obj.cantidadPress = 1;
+        obj.EsPresentacion = 0;
+        obj.PrecioCostoF = obj.PrecioCosto || 0;
       }
-      this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
+      obj.precio = 0;
+      obj.cantidad = 0;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj.Registro = ''
-      obj = this.onSetProducto(obj,presentacion)
-      if(this.indexProdSelect == null){
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.loadMovimientoLotes(obj.IdProducto)
-      },{ setPrecioCosto: (this.isVentas ? false : true)}])
-      }else{
-        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
-        this.indexProdSelect = null
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.Registro = "";
+      obj = this.onSetProducto(obj, presentacion);
+      if (this.indexProdSelect == null) {
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.loadMovimientoLotes(obj.IdProducto);
+          },
+          { setPrecioCosto: this.isVentas ? false : true }
+        ]);
+      } else {
+        this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
+        this.indexProdSelect = null;
       }
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
-      this.loadCode = ''
-      this.$refs.barcodeInput.focus() 
+      this.$refs["modalCant"].hide();
+      this.loadCode = "";
+      this.$refs.barcodeInput.focus();
     },
-    showPresentacion (obj, index=null) {
-      if (!obj.Presentaciones !== '' && index!=null) {
-        this.PresentacionesProd = obj.Presentaciones ? JSON.parse(obj.Presentaciones) : []
-        this.objProd = obj
-        this.indexProdSelect = index
-        this.$refs['modalCant'].show()
-        return
+    showPresentacion(obj, index = null) {
+      if (!obj.Presentaciones !== "" && index != null) {
+        this.PresentacionesProd = obj.Presentaciones
+          ? JSON.parse(obj.Presentaciones)
+          : [];
+        this.objProd = obj;
+        this.indexProdSelect = index;
+        this.$refs["modalCant"].show();
+        return;
       }
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let style = 'ss'
+        let style = "ss";
 
         // cambiar color los vencidos
-        var dt = new Date()
-        var anio = dt.getFullYear()
-        var mes =  dt.getMonth() + 1
-        var dia = dt.getDate()
-        var fechaVen = new Date(data.FechaVen).getTime()
-        
-        var hoy = anio + "-" + mes + "-" + dia
-        hoy = new Date(hoy).getTime()
-        var en4meses = anio + '-' + (mes + 4) + '-' + dia
-        en4meses = new Date(en4meses).getTime()
+        var dt = new Date();
+        var anio = dt.getFullYear();
+        var mes = dt.getMonth() + 1;
+        var dia = dt.getDate();
+        var fechaVen = new Date(data.FechaVen).getTime();
+
+        var hoy = anio + "-" + mes + "-" + dia;
+        hoy = new Date(hoy).getTime();
+        var en4meses = anio + "-" + (mes + 4) + "-" + dia;
+        en4meses = new Date(en4meses).getTime();
 
         // if(fechaVen < hoy && data.stock > 0) {
         /*if(fechaVen && fechaVen < hoy) {
@@ -831,34 +923,36 @@ export default {
           style = 'ambar'
         }*/
 
-        let styleStock = ''
-        let styleCondition = ''
-        let styleVencerText = ''
+        let styleStock = "";
+        let styleCondition = "";
+        let styleVencerText = "";
 
-        if(data.stock>0){
-          styleStock = 'table-info'
-        }else{
-          styleStock = 'table-danger'
+        if (data.stock > 0) {
+          styleStock = "table-info";
+        } else {
+          styleStock = "table-danger";
         }
 
-        if(data.VentaEstrategica==1){
-          styleCondition = 'background-color: #FFCE05 !important;'
+        if (data.VentaEstrategica == 1) {
+          styleCondition = "background-color: #FFCE05 !important;";
         }
 
-        if(data.Oferta==1){
-          styleCondition = 'background-color: #28AA45 !important; color:white !important;'
-          styleVencerText = 'color:white !important;'
+        if (data.Oferta == 1) {
+          styleCondition =
+            "background-color: #28AA45 !important; color:white !important;";
+          styleVencerText = "color:white !important;";
         }
 
-        if(data.Vencer==1){
-          styleCondition = 'background-color: #dc3545 !important; color:white !important;'
-          styleVencerText = 'color:white !important;'
+        if (data.Vencer == 1) {
+          styleCondition =
+            "background-color: #dc3545 !important; color:white !important;";
+          styleVencerText = "color:white !important;";
         }
         // if (!data.ControlaStock) {
         //   data.stock = '---'
         // }
 
-//<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
+        //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> |
         return `
         <style>
           #table-render {
@@ -891,134 +985,163 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="${styleStock} text-center"><b>${data.ControlaStock==1?data.stock:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'}</b></td>
-                <td style="padding-left:10px !important; ${styleVencerText}"><b>${data.Producto}</b></td>
-                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoFormaFarmaceutica}</td>
-                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoMedicion}</td>
-                <td style="padding-left:10px !important; ${styleVencerText}">${data.ProductoMarca}</td>
-                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}"><b>${data.Bloque}</b></td>
-                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}">${data.CompuestosProducto}</td>
-                <td class="table-success text-center"><b>${data.PrecioContado}</b></td>
-                <td class="text-center"><b style="font-size: 1.1rem">${data.Vencer==1?'<i class="fas fa-clock" style="color:white;"></i>':(data.Oferta==1?'<i class="fas fa-smile" style="color:white;"></i>':(data.VentaEstrategica==1?'<i class="fas fa-star" style="color:white;"></i>':''))}</b></td>
+                <td class="${styleStock} text-center"><b>${
+          data.ControlaStock == 1
+            ? data.stock
+            : '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+        }</b></td>
+                <td style="padding-left:10px !important; ${styleVencerText}"><b>${
+          data.Producto
+        }</b></td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${
+          data.ProductoFormaFarmaceutica
+        }</td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${
+          data.ProductoMedicion
+        }</td>
+                <td style="padding-left:10px !important; ${styleVencerText}">${
+          data.ProductoMarca
+        }</td>
+                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}"><b>${
+          data.Bloque
+        }</b></td>
+                <td style="font-size:10px; padding-left:10px !important; ${styleVencerText}">${
+          data.CompuestosProducto
+        }</td>
+                <td class="table-success text-center"><b>${
+                  data.PrecioContado
+                }</b></td>
+                <td class="text-center"><b style="font-size: 1.1rem">${
+                  data.Vencer == 1
+                    ? '<i class="fas fa-clock" style="color:white;"></i>'
+                    : data.Oferta == 1
+                      ? '<i class="fas fa-smile" style="color:white;"></i>'
+                      : data.VentaEstrategica == 1
+                        ? '<i class="fas fa-star" style="color:white;"></i>'
+                        : ""
+                }</b></td>
               </tr>
             </tbody>
           </table>   
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} 
-      `
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${
+        data.ProductoFormaFarmaceutica
+      } / ${data.ProductoMarca} 
+      `;
     },
-    setNuevoPrecioContado (index) {
-
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
 
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      precio += precio * (this.productos[index].PorcentajeUtilidad / 100);
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
+      let normalPrecio = this.$options.filters.redondear(precio);
+      let nuevoPrecio = this.$options.filters.redondeoMayor(precio);
 
-      let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+      Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantxPrecio * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantxPrecio * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
       if (total <= 0) {
-        Vue.set(this.productos[index], 'descuento', 0)
-        return
+        Vue.set(this.productos[index], "descuento", 0);
+        return;
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style>
 .danger {
-  background-color:#ff7675;
+  background-color: #ff7675;
   color: #ffffff;
 }
 .ambar {
   background-color: #feca57;
   color: #ffffff;
 }
-.tabla-carrito .table-sm td  {
-  font-size: .8rem!important;
+.tabla-carrito .table-sm td {
+  font-size: 0.8rem !important;
 }
 
-td.stocksize{
-  text-align: center !important; 
+td.stocksize {
+  text-align: center !important;
   vertical-align: middle !important;
 }
-td.stocksize2{
-  text-align: left !important; 
+td.stocksize2 {
+  text-align: left !important;
   vertical-align: middle !important;
   border-right: 2px #dee2e6 solid;
 }
-th.stocksize2{
+th.stocksize2 {
   border-right: 2px #dee2e6 solid;
 }
-th.stocksize2th{
-  text-align: left !important; 
+th.stocksize2th {
+  text-align: left !important;
   vertical-align: middle !important;
 }
-th.stocksize2th2{
+th.stocksize2th2 {
   width: 140px;
 }
-td.stocksizepro{
-  text-align: left !important; 
+td.stocksizepro {
+  text-align: left !important;
   vertical-align: middle !important;
 }
 .contentCard {
@@ -1035,20 +1158,19 @@ td.stocksizepro{
   align-items: center;
   justify-content: center;
 }
-.precioCart{
+.precioCart {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.ventasAncho{
-  width: 150px ;
+.ventasAncho {
+  width: 150px;
 }
-td.vertical{
+td.vertical {
   vertical-align: middle;
   text-align: center;
 }
-.popover{
-    min-width: 290px !important;
+.popover {
+  min-width: 290px !important;
 }
 </style>
-
