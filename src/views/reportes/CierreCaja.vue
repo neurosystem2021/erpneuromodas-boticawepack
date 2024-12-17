@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
     <br>
     <b-container class="bv-example-row">
       <div>
@@ -931,6 +931,9 @@ th {
 }
 .adelantos {
   background-color: #ffe8c5;
+}
+.fondo {
+  background:#EFF9FF;
 }
 @media print {
   .no-print {

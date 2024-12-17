@@ -586,7 +586,7 @@ export default {
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
           //{ key: 'Descripcion', label: 'Descripción'},
-          { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoMarca', variant: 'warning', label: 'Marca' },
           { key: 'ProductoModelo', label: 'Modelo/Color' },
           { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
           { key: 'eventPres', label: '' },

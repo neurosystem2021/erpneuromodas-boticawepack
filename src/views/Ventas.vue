@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
@@ -49,7 +49,7 @@
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
-                                        initValue="NOTA DE VENTA"
+                                        initValue="FACTURA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -512,7 +512,7 @@ export default {
                     { key: 'VentaEstrategica', label: '' },
                     { key: 'Producto' },
                     { key: 'ProductoModelo', label: 'Modelo' },
-                    { key: 'ProductoMarca', label: 'Marca' },
+                    { key: 'ProductoMarca', variant: 'warning', label: 'Marca' },
                     { key: 'Anaquel', label: 'Anaquel' },
                     //{ key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
@@ -637,10 +637,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
+                    IdTipoDoc: 6,
+                    TipoDoc: 'FACTURA ELEC.',
                     LimitItems: 0,
-                    CodSunat: '12'
+                    CodSunat: '01'
                 },
                 almacen: {
                     IdAlmacen: 1,
@@ -1137,7 +1137,7 @@ export default {
                 this.getVendedor()
                 this.getNumeroVenta()
                 this.loadClienteVarios()
-                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
+                this.$refs.inputTipoVenta.setValue('FACTURA ELEC.')
                 this.$refs.inputAlmacen.setValue('VENTA')
                 this.$refs.inputPuntoVenta.setValue('CAJA1')
                 this.$refs.inputCliente.setValue('')
@@ -1323,5 +1323,8 @@ export default {
     .ancho{
         width: calc(100% - 250px)
     }
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>
