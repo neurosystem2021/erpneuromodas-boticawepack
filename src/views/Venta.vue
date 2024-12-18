@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row id="header">
-      <b-col cols="7" class="px-0 py-0 mx-0 ">
+      <b-col cols="8" class="px-0 py-0 mx-0 ">
         <b-card no-body >
         <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
           <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)" class="pt-0">
@@ -121,8 +121,8 @@
 
               </b-row>
               
-              <div style="height: 40vh;" class="px-0 mx-0">
-              <b-row style="position: relative;max-height: 40vh;overflow-y: scroll;" >
+              <div style="height: 55vh;" class="px-0 mx-0">
+              <b-row style="position: relative;max-height: 55vh;overflow-y: scroll;" >
                 <b-table striped hover :fields="headerTable"  :items="venta.productos"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
@@ -154,7 +154,7 @@
                     <b-form-input
                       v-model="data.item.Descripcion"
                       type="text"
-                      style="text-align:center; font-weight:bold; width: 120px;font-size: 0.8rem"
+                      style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
                       autocomplete="false"
                       disabled
                       ></b-form-input>
@@ -165,7 +165,7 @@
                     <input
                       v-model="data.item.cantidad"
                       type="number"
-                      style="text-align:center; font-weight:bold; width: 90px;font-size: 0.8rem"
+                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       :id="`input${data.index}`"
                       @input="metodoPagoCambio(1)"
@@ -187,7 +187,7 @@
                       step="0.00001"
                       type="number"
                       @focus="abrirModalTouch(data.index,2)"
-                      style="text-align:center; font-weight:bold; width: 105px;font-size: 0.8rem"
+                      style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
                       autocomplete="false"  @input="metodoPagoCambio(1)"
                       class="form-control"
                       />
@@ -205,15 +205,15 @@
                      
                   </template>
                   <template slot="subtotal" slot-scope="data">
-               <span style="font-size: 0.8rem">
-                 {{ getSubTotalDetalle(data.item) }}
+                    <span style="font-size: 0.8rem">
+                      {{ parseFloat(getSubTotalDetalle(data.item)).toFixed(2) }}
 
-               </span>
+                    </span>
                      
                   </template>
                   <template slot="total" slot-scope="data">
                  <span style="font-size: 0.8rem">
-                   {{ getTotalDetalle(data.item) }}
+                   {{ parseFloat( getTotalDetalle(data.item)).toFixed(2) }}
 
                  </span>
                      
@@ -529,7 +529,7 @@
         </b-row> -->
       </b-card>
       </b-col>
-      <b-col md="5">
+      <b-col md="4">
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
@@ -952,26 +952,38 @@ export default {
         { value: "10", text: "OTROS CONCEPTOS" }
       ],
       headerTable: [
-        { key: "stock", label: "Stock", variant: "info", class: "text-center" },
-        { key: "Producto" },
-        { key: "pres", label: "" },
-        { key: "presentacion", label: "Presentacion" },
-        { key: "cantidad" },
-        { key: "precio", label: "Precio" },
+        {
+          key: "stock",
+          label: "Stock",
+          variant: "info",
+          class: "text-center",
+          thStyle: { width: "5%" }
+        },
+        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "pres", label: "", thStyle: { width: "5%" } },
+        {
+          key: "presentacion",
+          label: "Pres.",
+          thStyle: { width: "5%" }
+        },
+        { key: "cantidad", label: "Cant.", thStyle: { width: "7%" } },
+        { key: "precio", label: "Precio", thStyle: { width: "5%" } },
         {
           key: "subtotal",
-          label: "SubTotal",
+          label: "Sub Total",
           variant: "success",
-          class: "text-center"
+          class: "text-center",
+          thStyle: { width: "5%" }
         },
-        { key: "descuento", label: "Descuento" },
+        { key: "descuento", label: "Desc.", thStyle: { width: "5%" } },
         {
           key: "total",
           label: "Total",
           variant: "danger",
-          class: "text-center"
+          class: "text-center",
+          thStyle: { width: "5%" }
         },
-        { key: "acciones", label: "" }
+        { key: "acciones", label: "", thStyle: { width: "5%" } }
       ],
       busqueda: "",
       loadCode: "",
