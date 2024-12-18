@@ -827,31 +827,31 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       let total = 0;
+      let igv = 0;
       if (this.igvTotal) {
-        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
         sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map(value => {
-          sumatoria += parseFloat(value.subtotal);
-          if (value.descuento) {
-            sumatoria -= value.descuento;
-          }
-        });
-      }
-      let igv = 0;
-      if (this.productos.length > 0) {
-        if (this.gravada == 1) {
-          igv = this.productos.reduce((total, item) => {
-            let x = item.total / 1.18;
-            return total + parseFloat(item.total) - parseFloat(x);
-          }, 0);
-        } else {
-          igv = this.productos.reduce((total, item) => {
-            return total + parseFloat(item.igv);
-          }, 0);
-        }
+        sumatoria = this.productos.reduce((sum, producto) => {
+          return (
+            sum + parseFloat(producto.subtotal) - parseFloat(producto.descuento)
+          );
+        }, 0);
       }
 
+      if (this.productos.length > 0) {
+        if (!this.isVentas) {
+          if (this.gravada == 1) {
+            igv = this.productos.reduce((total, item) => {
+              let x = item.total / 1.18;
+              return total + parseFloat(item.total) - parseFloat(x);
+            }, 0);
+          } else {
+            igv = this.productos.reduce((total, item) => {
+              return total + parseFloat(item.igv);
+            }, 0);
+          }
+        }
+      }
       total = parseFloat(sumatoria) + parseFloat(igv);
       this.actualizarTotal(total);
       return this.$options.filters.redondear(total);
