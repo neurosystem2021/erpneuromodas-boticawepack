@@ -67,7 +67,7 @@
                  
               </b-row>
               <b-row>
-                <b-col cols="6">
+                <b-col cols="6" class="py-0">
                   <b-row>
                     <b-col cols="12">
                       <b-form-group v-if="ventas[index].verCliente">
@@ -108,22 +108,21 @@
                     </b-col>
                   </b-row>
                 </b-col>
-                <b-col cols="6">
+                <b-col cols="6" class="py-0">
                   <center>
 
                     <h1> 
                       {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
                       <p style="padding: 2px 0; border-radius: 25px;width:30% ; background: yellow; font-size: 1rem;"> Valor Referencial</p>
                     </h1>
-                    {{ fechaActual()}}
                   </center>
                   </b-col>
 
               </b-row>
               
-              <div style="height: 55vh;" class="px-0 mx-0">
-              <b-row style="position: relative;max-height: 55vh;overflow-y: scroll;" >
-                <b-table striped hover :fields="headerTable"  :items="venta.productos"> 
+              <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
+              <b-row style="position: relative;max-height: 40vh;">
+                <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
                       {{ data.item.stock }}
@@ -197,7 +196,7 @@
                     <input
                       v-model="data.item.descuento"
                       type="number"
-                      style="text-align:center; font-weight:bold; width: 100px;font-size: 0.8rem"
+                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
                       class="form-control"
