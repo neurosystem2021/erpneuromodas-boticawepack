@@ -820,6 +820,7 @@ export default {
       this.$refs[ref].handleDoubleClick();
     },
     setProducto(obj) {
+      console.log(obj);
       if (!this.isVentas) {
         if (this.movTipo == undefined) {
           this.$toasted.show("Primero seleccione un tipo de movimiento");
@@ -844,6 +845,7 @@ export default {
       this.$refs["modalCant"].show();
     },
     setProductoUni(objIni, presentacion = false) {
+      console.log('objIni',objIni)
       let obj = { ...objIni };
       obj.cantxPrecio = 1;
       if (presentacion) {
@@ -859,7 +861,8 @@ export default {
       }
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0;
+      console.log(obj);
+      obj.precio = this.isVentas ? 0 : obj.PrecioCosto;
       obj.cantidad = 0;
       //obj.IdLote = 0
       //obj.TieneIgv = 0

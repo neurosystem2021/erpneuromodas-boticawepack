@@ -492,47 +492,47 @@ export default {
     }
   },
   watch: {
-    items (items) {
-      //Vue.set(this.$refs.tablaProductos, 'localItems', [])
-      //console.log(this.$refs.tablaProductos.localItems)
-      //this.myProvider(false)
+    // items (items) {
+    //   //Vue.set(this.$refs.tablaProductos, 'localItems', [])
+    //   //console.log(this.$refs.tablaProductos.localItems)
+    //   //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/puntoventa/stock', {
-          params: {
-            idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen,
-            limit: items.length
-          }
-        }).then((response) => {
-             this.itemsStock = response.data
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+    //    this.axios.get(this.API + 'productos/puntoventa/stock', {
+    //       params: {
+    //         idProductos: items.map((item) => item.IdProducto),
+    //         idAlmacen: this.almacen.IdAlmacen,
+    //         limit: items.length
+    //       }
+    //     }).then((response) => {
+    //          this.itemsStock = response.data
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
 
-        // Cargar la sumatoria
-        this.getSumaStock()
-        //this.getSumaValorizado()
-        //this.getSumaValorizadoSin()
+    //     // Cargar la sumatoria
+    //     this.getSumaStock()
+    //     //this.getSumaValorizado()
+    //     //this.getSumaValorizadoSin()
 
-      /*console.log(items[0].hasOwnProperty('stock'))
-      if (!items[0].hasOwnProperty('stock')) {
-      //console.log(items)
-        // ejecutar solo cuando los productos no tengan stock
-        this.axios.get(this.API + 'productos/stock', {
-          params: {
-            idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
-          }
-        }).then((response) => {
-         // console.log(response.data)
-             this.items = []
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-      }*/
-    }
+    //   /*console.log(items[0].hasOwnProperty('stock'))
+    //   if (!items[0].hasOwnProperty('stock')) {
+    //   //console.log(items)
+    //     // ejecutar solo cuando los productos no tengan stock
+    //     this.axios.get(this.API + 'productos/stock', {
+    //       params: {
+    //         idProductos: items.map((item) => item.IdProducto),
+    //         idAlmacen: this.almacen.IdAlmacen
+    //       }
+    //     }).then((response) => {
+    //      // console.log(response.data)
+    //          this.items = []
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    //   }*/
+    // }
   },
   computed: {
     titleKardex () {
@@ -575,6 +575,7 @@ export default {
         }).then(r => {
           if (r.data) {
             this.verValorizado = true;
+            this.getSumaStock()
             this.getSumaValorizado()
             this.getSumaValorizadoSin()
           }
