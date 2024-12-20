@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="12" class="my-1">
@@ -505,5 +505,8 @@ export default {
 }
 .rowImprimir {
   background: #E3E3E3;
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>

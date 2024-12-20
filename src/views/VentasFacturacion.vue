@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="bv-example-row">
           
 
@@ -754,5 +754,8 @@ console.log(url)
 }
 .prod-detalle th, .prod-detalle td{
   background-color: #ffffff;
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>

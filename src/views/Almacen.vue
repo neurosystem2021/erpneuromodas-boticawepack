@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container fluid class="bv-example-row">
         <b-row>
           <b-col md="12"  class="my-1">
@@ -469,16 +469,19 @@ export default {
             limit: items.length
           }
         }).then((response) => {
-             this.itemsStock = response.data
+             this.itemsStock = response.data;
+              if(this.verValorizado){
+                this.getSumaValorizado();
+                this.getSumaValorizadoSin();
+              }
+             this.getSumaStock()
+             
         })
         .catch((error) => {
           console.log(error)
         })
 
         // Cargar la sumatoria
-        this.getSumaStock()
-        this.getSumaValorizado()
-        this.getSumaValorizadoSin()
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -532,6 +535,8 @@ export default {
         }).then(r => {
           if (r.data) {
             this.verValorizado = true;
+            this.getSumaValorizado();
+            this.getSumaValorizadoSin();
           }
         })
       }
@@ -743,5 +748,8 @@ export default {
   .imagenGrande{
     width: 100%;
   }
+  .fondo {
+  background:#EFF9FF;
+}
 </style>
 

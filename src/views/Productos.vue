@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container fluid class="ancho bv-example-row" style="width: calc(100% - 200px)">
         <b-row>
           <b-col md="6" class="my-1">
@@ -151,4 +151,7 @@ export default {
         width: calc(100% - 300px)
     }
   }
+  .fondo {
+  background:#EFF9FF;
+}
 </style>

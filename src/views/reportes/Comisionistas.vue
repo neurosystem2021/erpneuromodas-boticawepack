@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
     <h2 align-h="center" class="text-center" >Reporte de Comisionistas</h2>
       <b-container class="bv-example-row">
         <b-row>
@@ -205,5 +205,8 @@ export default {
   background-color: #ff7675;
   padding: 10px;
   font-size: 20px;
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>

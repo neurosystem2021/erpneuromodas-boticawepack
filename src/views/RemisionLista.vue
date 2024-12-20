@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="bv-example-row">
 
         <b-row>
@@ -351,5 +351,8 @@ export default {
 }
 .prod-detalle th, .prod-detalle td{
   background-color: #ffffff;
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style> 

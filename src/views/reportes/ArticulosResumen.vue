@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
       <br>
         <b-container fluid style="width:calc(100% - 5%)" class="bv-example-row">
           <b-row>
@@ -200,5 +200,8 @@ export default {
   .si-print {
     display: block !important;
   }
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>

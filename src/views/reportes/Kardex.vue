@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
       <br>
         <b-container class="bv-example-row">
           <b-row>
@@ -237,5 +237,7 @@ export default {
 </script>
 <style>
     
-
+.fondo {
+  background:#EFF9FF;
+}
 </style>

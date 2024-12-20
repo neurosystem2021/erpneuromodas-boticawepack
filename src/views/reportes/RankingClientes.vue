@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
     <h2 align-h="center" class="text-center" >Reporte Ranking de Clientes</h2>
       <b-container class="bv-example-row">
         <b-row>
@@ -151,5 +151,7 @@ export default {
 </script>
 
 <style>
-
+.fondo {
+  background:#EFF9FF;
+}
 </style>

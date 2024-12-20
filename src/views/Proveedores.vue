@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="bv-example-row">
         <b-row>
           <b-col class="text-center">
@@ -136,5 +136,7 @@ export default {
 </script>
 
 <style>
-
+.fondo {
+  background:#EFF9FF;
+}
 </style>

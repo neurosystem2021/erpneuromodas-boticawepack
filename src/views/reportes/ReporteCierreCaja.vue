@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
     <h2 align-h="center" class="text-center" >Reporte de Cierre de Caja</h2>
       <br>
         <b-container class="bv-example-row">
@@ -218,5 +218,7 @@ export default {
 </script>
 <style>
     
-
+.fondo {
+  background:#EFF9FF;
+}
 </style>

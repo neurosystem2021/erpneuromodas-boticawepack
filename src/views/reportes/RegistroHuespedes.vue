@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="container-huespedes">
         <b-row class="no-print">
           <b-col md="3" class="my-1">
@@ -136,4 +136,7 @@ export default {
       display: none !important;
     }
   }
+  .fondo {
+  background:#EFF9FF;
+}
 </style>

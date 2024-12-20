@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
       <b-container class="bv-example-row">
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
@@ -713,6 +713,9 @@ h6 {
 }
 .horaFechaImpreso{
  	display: none;
+}
+.fondo {
+  background:#EFF9FF;
 }
 </style>
 

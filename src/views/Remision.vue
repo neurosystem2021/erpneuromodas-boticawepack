@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarRemision" @reset="onReset" @keyup="afe" validated id="remision-form">
@@ -664,4 +664,7 @@ export default {
     border-bottom: 1px solid #cacaca;
     padding-bottom: 4px;
   }
+  .fondo {
+  background:#EFF9FF;
+}
 </style>

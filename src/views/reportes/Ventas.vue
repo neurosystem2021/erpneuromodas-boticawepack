@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="10" class="my-1">
@@ -380,6 +380,9 @@ export default {
 }
 .table-detalle thead th:first-child {
   max-width: 300px;
+}
+.fondo {
+  background:#EFF9FF;
 }
 @media (min-width: 992px) {
     .modal-xl .modal-dialog {

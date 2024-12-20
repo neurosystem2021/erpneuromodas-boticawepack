@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fondo">
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
@@ -487,4 +487,7 @@ return false
         width: calc(100% - 150px)
     }
   }
+  .fondo {
+  background:#EFF9FF;
+}
 </style>

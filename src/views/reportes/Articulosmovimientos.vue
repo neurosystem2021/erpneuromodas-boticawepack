@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fondo">
       <br>
         <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
           <b-row>
@@ -131,5 +131,7 @@ export default {
 </script>
 <style>
     
-
+.fondo {
+  background:#EFF9FF;
+}
 </style>
