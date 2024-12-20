@@ -841,10 +841,7 @@ export default {
       if (this.productos.length > 0) {
         if (!this.isVentas) {
           if (this.gravada == 1) {
-            igv = this.productos.reduce((total, item) => {
-              let x = item.total / 1.18;
-              return total + parseFloat(item.total) - parseFloat(x);
-            }, 0);
+            igv = 0;
           } else {
             igv = this.productos.reduce((total, item) => {
               return total + parseFloat(item.igv);
@@ -853,6 +850,7 @@ export default {
         }
       }
       total = parseFloat(sumatoria) + parseFloat(igv);
+      console.log("total", total);
       this.actualizarTotal(total);
       return this.$options.filters.redondear(total);
     },
