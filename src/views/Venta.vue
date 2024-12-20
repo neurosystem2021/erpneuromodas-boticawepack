@@ -272,11 +272,11 @@
                                         <b-button type="button" block variant="success" @click="setScreen"><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
                                     </b-col>-->
                                     <b-col md="12" class="mt-1">
-                                        <b-button v-if="touchHab" variant="danger" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                                        <b-button v-else variant="success" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                                        <b-button class="btnAction" v-if="touchHab" variant="danger" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                                        <b-button class="btnAction" v-else variant="success" block @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                                     </b-col>
                                     <b-col md="12" class="mt-1">
-                                        <b-button type="button" block variant="primary" @click="LimpiarPuntoVenta"><i class="fas fa-redo"></i> Actualizar</b-button>
+                                        <b-button class="btnAction"  type="button" block variant="primary" @click="LimpiarPuntoVenta"><i class="fas fa-redo"></i> Actualizar</b-button>
                                     </b-col>
                                     <b-col md="12" class="mt-1">
                                         <pago-deuda></pago-deuda>
@@ -294,7 +294,7 @@
                                         <config-venta @onUpdateConfig="loadClienteVarios()"></config-venta>
                                     </b-col>
                                     <b-col md="12" class="mt-1" v-if="false">
-                                        <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
+                                        <b-button class="btnAction"  variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button>
                                     </b-col>
                                 </b-row>
                             </template>
@@ -353,10 +353,10 @@
                             <b-button type="button" @click="LimpiarPuntoVenta" variant="dark" v-if="this.$route.query.idProyecto">Anular Pago Pedido</b-button>
                             <b-button type="button" @click="anularPagoOrden" variant="danger" v-if="this.$route.query.idPreOrden">Anular Pago Orden</b-button>
                             <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                            <b-button type="button" size="sm" v-if="!this.$route.query.idPreOrden && !this.$route.query.idPedido" :disabled="inProgress" variant="primary"  @click="guardarProforma">Crear Proforma</b-button>
-                            <b-button type="submit" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
-                            <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
-                            <b-button v-if="Object.keys(ultimaComanda).length !==0 " variant="info" @click="imprimirUltimaComanda">Imprimir última Comanda</b-button>
+                            <b-button type="button" size="sm" v-if="!this.$route.query.idPreOrden && !this.$route.query.idPedido" :disabled="inProgress" variant="primary" class="btnAction"   @click="guardarProforma">Crear Proforma</b-button>
+                            <b-button type="submit" :disabled="inProgress" variant="success" class="btnAction"  >Efectuar Venta</b-button>
+                            <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta" class="btnAction" >Imprimir última Venta</b-button>
+                            <b-button v-if="Object.keys(ultimaComanda).length !==0 " variant="info" @click="imprimirUltimaComanda" class="btnAction" >Imprimir última Comanda</b-button>
                         </b-col>
                     </b-row>
                     </b-form>
@@ -2582,5 +2582,15 @@ export default {
 }
 #modalCantidad .modal-dialog {
   max-width: 55% !important;
+}
+
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  font-size: 1.2rem;
+  font-weigth: bold;
 }
 </style>

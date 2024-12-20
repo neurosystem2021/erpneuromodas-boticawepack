@@ -205,8 +205,8 @@
           </b-row>
           <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-              <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
+              <b-button class="btnAction"  variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
+              <b-button class="btnAction"  v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
             </b-col>
           </b-row>
         </b-container>

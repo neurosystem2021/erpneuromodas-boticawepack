@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" variant="info">Pago Deuda</b-button>
+        <b-button block @click="show=true" variant="info" class="btnAction" >Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
             <b-modal id="modalConfigVenta" 
