@@ -58,7 +58,7 @@ Vue.component('editable',{
 
 Vue.use(new VueSocketIO({
   debug: false,
-  connection: 'https://pedi2.pe:5000',
+  connection: 'https://panel.pedi2.pe',
   options: { autoConnect: false } //Optional options
 }))
 
