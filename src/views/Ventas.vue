@@ -341,7 +341,7 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
-
+import Swal from "sweetalert2";
 export default {
   beforeMount() {
     this.initForm();
@@ -854,18 +854,30 @@ export default {
         });
     },
     guardarVenta(evt) {
-      if (evt) {
-        evt.preventDefault();
-      }
-
       if (this.venta.tipoVenta.IdTipoDoc != 3) {
         if (this.productos.some(v => v.NotaVenta == 1)) {
-          this.$toasted.error(
-            "Existe un producto, que no solo puede ir a notas de venta"
-          );
-          return true;
+          Swal.fire({
+            icon: "question",
+            title: "Productos Nota de venta",
+            text:
+              "Existe uno o más productos  que solo debe ir en nota de venta. ¿Desea continuar?",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showCancelButton: true,
+            cancelButtonText: "No, Cancelar",
+            cancelButtonColor: "red",
+            confirmButtonText: "Si, continuar"
+          }).then(res => {
+            if (res.isConfirmed) {
+              this.continuarGuardarVenta();
+            }
+          });
+        } else {
+          this.continuarGuardarVenta();
         }
       }
+    },
+    continuarGuardarVenta() {
       this.inProgress = true;
       let totalPagos = 0;
       totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
