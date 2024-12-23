@@ -1945,13 +1945,14 @@ export default {
 
         return;
       }
-
+      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
       if (
         productos.some(
           v =>
             v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
             v.stock
-        )
+        ) &&
+        this.ventas[this.ventaActiva].almacen.IdAlmacen != 1
       ) {
         this.$swal({
           position: "center",
@@ -1993,7 +1994,6 @@ export default {
         .toUpperCase()
         .trim();
       await this.axios.post(this.API + "ventas", venta).then(response => {
-        console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
