@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row id="header">
-      <b-col cols="8" class="px-0 py-0 mx-0 ">
+      <b-col cols="7" class="px-0 py-0 mx-0 ">
         <b-card no-body >
         <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
           <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)" class="pt-0">
@@ -75,6 +75,7 @@
                             <AutoComplete  
                             :value="ventas[index].cliente.Cliente"
                             @guardarCliente="setCliente"
+                            @dniRuc="setNewDniRuc"
                             />
                             <!-- <autocomplete
                                 required="required"
@@ -528,7 +529,7 @@
         </b-row> -->
       </b-card>
       </b-col>
-      <b-col md="4">
+      <b-col md="5">
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
@@ -1133,6 +1134,9 @@ export default {
     });
   },
   methods: {
+    setNewDniRuc(val) {
+      this.newDniRuc = val;
+    },
     activarModalTouch() {
       this.touchHab = !this.touchHab;
     },
@@ -1333,13 +1337,13 @@ export default {
       }
       let idProducto = this.loadCode;
 
-      let prod = await this.axios.get(this.API + "productos", {
+      let prod = await this.axios.get(this.API + "productos/id/" + idProducto, {
         params: {
-          filter: this.loadCode
+          codigoBarra: this.loadCode
         }
       });
-      if (prod.data.length > 0) {
-        this.setProducto(prod.data[0]);
+      if (prod.data) {
+        this.setProducto(prod.data);
       } else {
         this.$toasted.show("No se encontró ningun producto");
       }
@@ -1952,7 +1956,7 @@ export default {
             v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
             v.stock
         ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 1
+        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
       ) {
         this.$swal({
           position: "center",

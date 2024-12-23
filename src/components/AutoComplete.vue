@@ -69,8 +69,9 @@ export default {
       this.listado = [];
     },
     async buscar() {
+      this.$emit("dniRuc", this.text);
       await this.axios(`${this.API}clientes`, {
-        params: { search: this.text }
+        params: { q: this.text }
       }).then(res => {
         this.listado = res.data;
       });
@@ -105,7 +106,6 @@ export default {
   text-align: left;
   padding: 2px 10px;
 }
-
 
 .trDetails:hover {
   background: #007bff;
