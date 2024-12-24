@@ -739,7 +739,6 @@ export default {
         element.igv = 55555555;
       });
       this.$forceUpdate();
-      // console.log(this.igvGeneral);
     }
   },
   props: {
@@ -850,7 +849,7 @@ export default {
         }
       }
       total = parseFloat(sumatoria) + parseFloat(igv);
-      console.log("total", total);
+
       this.actualizarTotal(total);
       return this.$options.filters.redondear(total);
     },
@@ -1117,7 +1116,7 @@ export default {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
 
       this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
-        console.log('paste')
+    
         this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
       }
 
@@ -1174,6 +1173,11 @@ export default {
       }
     },
     setProducto(obj) {
+      // if (this.productos.some(v => v.IdProducto == obj.IdProducto)) {
+      //   this.$toasted.error("El producto ya se encuentra en la lista");
+      //   return false;
+      // }
+
       obj.TieneIgv = this.igvGeneral;
       this.precioCont = obj.PrecioContado;
       obj.subtotal = obj.PrecioContado;
@@ -1492,7 +1496,6 @@ export default {
     },
     //
     abrirCodigoBarra() {
-      console.log("abrirCodigoBarra");
       this.$refs["modalCodigoBarra"].show();
       this.modalAbiertCode = true;
       this.result = "";
