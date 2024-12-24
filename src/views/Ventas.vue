@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil2">

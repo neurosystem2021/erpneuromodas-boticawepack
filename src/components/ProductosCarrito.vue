@@ -13,16 +13,22 @@
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+            :classes="{input: 'form-control'}"
+            >
           </autocomplete>
           <input v-model="loadCode"
                   :disabled="bloquearInput?true:false"
                   @keydown.enter.prevent="loadBarcode"
+                  @keydown.prevent.tab="irAlPrimerProducto"
                   type="text"
                   class="form-control"
-                  placeholder="Codigo de Barra" />
+                  id="loadBarcode"
+                  placeholder="Codigo de Barra" 
+                  
+                  />
           <b-input-group-append>
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+            <b-button variant="warning" @click="startRecognition"><i class="fas fa-microphone"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
@@ -108,6 +114,7 @@
 
         <template slot="cantidad" slot-scope="data">
           <input
+            :id="`cantidad${data.index}`"
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -115,6 +122,8 @@
             min="0"
             @input="(val) => {$emit('onInputCantidad', val.target.value); actualizaDesc(data.index);} "
             placeholder="Cantidad"
+            @keydown.prevent.enter="iraBusquedaProducto"
+            @keydown.prevent.tab="iraBarcode"
             class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
@@ -271,24 +280,26 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from '@/components/ProductoForm'
-import config from '@/store/config.js'
-import sound from '../../static/beep.mp3'
-import Vue from "vue"
-import VueQuagga from "vue-quaggajs"
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "@/components/ProductoForm";
+import config from "@/store/config.js";
+import sound from "../../static/beep.mp3";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
 
-Vue.use(VueQuagga)
+Vue.use(VueQuagga);
 
 export default {
   mounted() {
-    // this.alterarBuscadorProductos()
+    this.$nextTick(() => {
+      this.$refs["autocompleteProducto"].$el.querySelector("input").focus();
+    });
   },
-  data () {
+  data() {
     return {
       readerSize: {
         width: 1600,
-        height: 1080,
+        height: 1080
       },
       detecteds: [
         "code_128_reader",
@@ -306,7 +317,7 @@ export default {
       result: "",
       format: "",
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
@@ -314,10 +325,10 @@ export default {
       vuelto: 0,
       pagocon: 0,
       productoSelect: {},
-      productoNombre:'',
-      productoUrl:'',
+      productoNombre: "",
+      productoUrl: "",
       modalAbiertCode: false
-    }
+    };
   },
   created() {
     // Add barcode scan listener and pass the callback function
@@ -328,19 +339,19 @@ export default {
     this.$barcodeScanner.destroy();
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     }
   },
   props: {
     tipo: String,
     setPrecio: Boolean,
-    bloquearInput:Boolean,
+    bloquearInput: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -348,26 +359,26 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "ProductoCategoria", label: "Categoria" },
+          { key: "Producto", label: "Artículo" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoModelo", label: "Modelo" },
+          { key: "Color", label: "Color" },
+          { key: "ProductoTalla", label: "Talla" },
+          { key: "Genero" },
+          { key: "Botapie" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     },
@@ -378,116 +389,188 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart"
     }),
-    abrirImagen(producto,url){
-      this.productoNombre = producto
-      this.productoUrl = url
-      this.$refs['modalImagen'].show()
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
     },
-    abrirCodigoBarra(){
-      this.$refs['modalCodigoBarra'].show()
-      this.modalAbiertCode=true;
-      this.result="";
+    search() {
+      const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+        "input"
+      );
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        const event = new Event("input", { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }, 100);
+    },
+    abrirImagen(producto, url) {
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
+    },
+    abrirCodigoBarra() {
+      this.$refs["modalCodigoBarra"].show();
+      this.modalAbiertCode = true;
+      this.result = "";
     },
     onBarcodeScanned(barcode) {
       if (this.modalAbiertCode) {
         this.result = barcode.codeResult.code;
         this.format = barcode.codeResult.format;
-        const audio = new Audio(sound)
-        audio.play()
-        if (this.result.length>0) {
+        const audio = new Audio(sound);
+        audio.play();
+        if (this.result.length > 0) {
           this.loadCode = this.result;
           this.loadBarcode();
-          this.$refs['modalCodigoBarra'].hide()
-          this.modalAbiertCode=false;
+          this.$refs["modalCodigoBarra"].hide();
+          this.modalAbiertCode = false;
         }
       }
-      
+
       // do something...
     },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     },
-    actualizaDesc (index) {
-      let descGeneral = this.$options.filters.redondear((Math.round(((this.productos[index].PorcentajeLiquidacion>0?this.productos[index].PorcentajeLiquidacion:0)*(this.productos[index].PrecioContado>0?this.productos[index].PrecioContado:0)/100)* 10) / 10)*parseFloat(this.productos[index].cantidad))
-      Vue.set(this.productos[index], 'descuento', descGeneral)
+    actualizaDesc(index) {
+      let descGeneral = this.$options.filters.redondear(
+        (Math.round(
+          (((this.productos[index].PorcentajeLiquidacion > 0
+            ? this.productos[index].PorcentajeLiquidacion
+            : 0) *
+            (this.productos[index].PrecioContado > 0
+              ? this.productos[index].PrecioContado
+              : 0)) /
+            100) *
+            10
+        ) /
+          10) *
+          parseFloat(this.productos[index].cantidad)
+      );
+      Vue.set(this.productos[index], "descuento", descGeneral);
     },
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    agregarObj(id){
+    agregarObj(id) {
       if (id) {
-        this.add([id, (obj) => {
-          this.$emit('onAddProducto')
-        }, { setPrecio: this.setPrecio }])
+        this.add([
+          id,
+          obj => {
+            this.$emit("onAddProducto");
+          },
+          { setPrecio: this.setPrecio }
+        ]);
       }
     },
-    loadBarcode (e) {
+    loadBarcode(e) {
       if (e) {
-        e.preventDefault()
+        e.preventDefault();
       }
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        this.add([
+          idProducto,
+          obj => {
+            if (obj) {
+              this.$emit("onAddProducto");
+              this.$toasted.show("Producto añadido correctamente");
+            } else {
+              this.$toasted.show("No se encontró ningun producto");
+            }
+            this.loadCode = "";
+          },
+          { setPrecio: this.setPrecio, setSuma: true }
+        ]);
       }
     },
     /*alterarBuscadorProductos() {
@@ -518,184 +601,215 @@ export default {
         this.pasteCode = false
       }
     },*/
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
-    editarProducto(datos){
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    editarProducto(datos) {
       this.productoSelect = datos;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEditAnt.show = true;
     },
-    setProducto (obj) {
-      this.$refs.autocompleteProducto.setValue('')
-      this.$refs.autocompleteProducto2.setValue('')
+    setProducto(obj) {
+      this.$refs.autocompleteProducto.setValue("");
+      this.$refs.autocompleteProducto2.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
+      obj.precio = 0;
+      obj.cantidad = 0;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      if (this.tipo=='mov') {
+      if (this.tipo == "mov") {
         obj.descuento = 0;
+      } else {
+        obj.descuento =
+          Math.round(
+            (((obj.PorcentajeLiquidacion > 0 ? obj.PorcentajeLiquidacion : 0) *
+              (obj.PrecioContado > 0 ? obj.PrecioContado : 0)) /
+              100) *
+              10
+          ) / 10;
       }
-      else{
-        obj.descuento = (Math.round(((obj.PorcentajeLiquidacion>0?obj.PorcentajeLiquidacion:0)*(obj.PrecioContado>0?obj.PrecioContado:0)/100)* 10) / 10)
-      }
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-      },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
+      obj.nuevoPrecioContado = 0;
+      obj = this.onSetProducto(obj);
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+        },
+        { setPrecioCosto: this.tipo == "mov" ? true : false }
+      ]);
 
+      this.$nextTick(() => {
+        document.getElementById("cantidad0").focus();
+        document.getElementById("cantidad0").select();
+      });
       // Vue.set(this.productos, obj.IdProducto, obj)
+    },
+    iraBusquedaProducto() {
+      this.$refs["autocompleteProducto"].$el.querySelector("input").focus();
+    },
+    iraBarcode() {
+      document.getElementById("loadBarcode").focus();
+
+      // this.$refs["autocompleteProducto"].$el.querySelector("input").focus();
+    },
+    irAlPrimerProducto() {
+      document.getElementById("cantidad0").focus();
+      document.getElementById("cantidad0").select();
+      // this.$refs["autocompleteProducto"].$el.querySelector("input").focus();
     },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo} / ${data.ProductoTalla}
+      `;
     },
-    setNuevoPrecioContado (index) {
-
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
 
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      precio += precio * (this.productos[index].PorcentajeUtilidad / 100);
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
+      let normalPrecio = this.$options.filters.redondear(precio);
+      let nuevoPrecio = this.$options.filters.redondeoMayor(precio);
 
-      let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+      Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
-      if (this.tipo=='mov') {
-        this.productos[index].descuento = 0; 
+      if (this.tipo == "mov") {
+        this.productos[index].descuento = 0;
       }
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style>
-  #modalImagen .modal-dialog {
-    max-width: 75% !important;
-  }
-  .imagenGrande{
-    width: 100%;
-  }
-  #modalCodigoBarra {
-    padding: 0!important;
-  }
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+.mostrarMovil {
+  display: none;
+}
+@media only screen and (max-width: 1440px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
     max-height: 50vh !important;
   }
-  #modalCodigoBarra .modal-body {
-    padding-bottom: 1px !important;
-    margin-bottom: 1px !important;
-  }
-  #codigoBarraStyle video, canvas{
-    width: 100%;
-    height: 100%;
-  }
   .cameraBarra {
     height: 50vh;
     width: auto;
-    margin: 0 auto;
   }
-  .mostrarMovil{
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .ocultarMovil {
     display: none;
   }
-  @media only screen and (max-width: 1440px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 50vw !important;
-      max-height: 50vh !important;
-    }
-    .cameraBarra {
-      height: 50vh;
-      width: auto;
-    }
+  .mostrarMovil {
+    display: block;
   }
-  @media only screen and (max-width: 750px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 100vw !important;
-      max-height: 80vh !important;
-    }
-    .cameraBarra {
-      height: 80vh;
-      width: auto;
-    }
-    .ocultarMovil {
-      display: none;
-    }
-    .mostrarMovil{
-      display: block;
-    }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
   }
-  @media only screen and (max-width: 375px) {
-    #modalCodigoBarra .modal-dialog {
-      max-width: 100vw !important;
-      max-height: 80vh !important;
-    }
-    .cameraBarra {
-      height: 80vh;
-      width: auto;
-    }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
   }
-  @media only screen and (max-width: 700px) {
+}
+@media only screen and (max-width: 700px) {
   /* For desktop: */
-    .ocularMovil{
-        display: none;
-    }
+  .ocularMovil {
+    display: none;
   }
+}
 </style>
