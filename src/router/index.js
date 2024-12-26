@@ -22,6 +22,8 @@ import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
+import ReporteUtilidadBrutaPorUsuario from '@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue'
+import ReporteMoviminetoPorProveedor from '@/views/reportes/ReporteMoviminetoPorProveedor.vue'
 import Formato from '@/views/reportes/Formato.vue'
 
 Vue.use(Router)
@@ -133,6 +135,16 @@ export default new Router({
       path: '/reportes/estadisticas',
       name: 'Estadisticas',
       component: Estadisticas
-    }
+    },
+    {
+      path: '/reportes/reporte_utilidad_bruta',
+      name: 'ReporteUtilidadBrutaPorUsuario',
+      component: ReporteUtilidadBrutaPorUsuario
+    },
+    {
+      path: '/reportes/reporte_movimineto_proveedor',
+      name: 'ReporteMoviminetoPorProveedor',
+      component: ReporteMoviminetoPorProveedor
+    },
   ]
 })

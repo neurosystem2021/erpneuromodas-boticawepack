@@ -707,6 +707,7 @@ export default {
                 <th style="width: 100px">Modelo</th>
                 <th style="width: 100px">Color</th>
                 <th class="table-primary" style="width: 65px">Precio</th>
+                <th style="width: 100px">Img</th>
               </tr>
             </thead>
             <tbody>
@@ -725,7 +726,17 @@ export default {
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoModelo}</td>
                 <td>${data.Color}</td>
+                </td>
                 <td class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="border: 1px solid #eaeaea;">
+                ${
+                  data.Imagen
+                    ? `<img class="imgProducto" style="border-radius: 10px;" src="/resources/images/productos/${
+                        data.Imagen
+                      }" alt="Imagen del producto" />`
+                    : `<img class="imgProducto" style="border-radius: 10px;" src="/static/no-photo.png" alt="Sin imagen disponible" />`
+                }
+              </td>
               </tr>
             </tbody>
           </table>   
@@ -737,6 +748,9 @@ export default {
         data.ProductoMarca
       } / ${data.ProductoModelo}
       `;
+    },
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     },
     setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
@@ -884,5 +898,11 @@ canvas {
   .ocularMovil {
     display: none;
   }
+}
+.imgProducto {
+  width: 40px;
+}
+.imgProducto:hover {
+  width: 120px;
 }
 </style>

@@ -323,13 +323,13 @@
                      
                         
                         <b-col cols="12">
-                          <b-button type="button" :disabled="inProgress"  class="btnAction my-2" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                          <b-button type="button" :disabled="inProgress"  class="btnAction my-2" style="font-weight: bold; font-size: 1.2rem"  variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         </b-col>
                         <b-col cols="12">
-                          <b-button type="submit" :disabled="inProgress"  class="btnAction my-2" variant="success" size="lg">Efectuar Venta</b-button>
+                          <b-button type="submit" :disabled="inProgress"  class="btnAction my-2" style="font-weight: bold; font-size: 1.2rem"  variant="success" size="lg">Efectuar Venta</b-button>
                         </b-col>
                         <b-col cols="12">
-                          <b-button v-if="ultimaVenta" target="_blank" class="btnAction my-2"  variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
+                          <b-button v-if="ultimaVenta" target="_blank" class="btnAction my-2"  style="font-weight: bold; font-size: 1.2rem"  variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
                         </b-col>
                         <b-col cols="12">
                           <b-button type="button" variant="secondary" class="btnAction my-2" @click="setScreen" style="font-weight: bold; font-size: 1.2rem" ><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
@@ -364,6 +364,7 @@ export default {
   data() {
     return {
       dni: "",
+      navDisabled: false,
       isNota: false,
       newDniRuc: "",
       ultimaVenta: "",
@@ -446,6 +447,16 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    setScreen() {
+      this.navDisabled = !this.navDisabled;
+      if (this.navDisabled) {
+        window.parent.document.getElementById("NavegadorParent").style.display =
+          "none";
+      } else {
+        window.parent.document.getElementById("NavegadorParent").style.display =
+          "block";
+      }
+    },
     configStock() {
       this.axios
         .get(this.API + "config/stock")
