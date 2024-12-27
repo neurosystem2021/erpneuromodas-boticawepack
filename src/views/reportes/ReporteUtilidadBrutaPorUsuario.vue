@@ -69,7 +69,6 @@
                 </tr>
             </tfoot>
                 </table>
-            </div>
         </b-col>
     </b-row>
   </b-container>

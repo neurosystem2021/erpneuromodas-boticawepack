@@ -24,6 +24,7 @@ import Kardex from '@/views/reportes/Kardex.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import ReporteUtilidadBrutaPorUsuario from '@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue'
 import ReporteMoviminetoPorProveedor from '@/views/reportes/ReporteMoviminetoPorProveedor.vue'
+import ReporteRankingCliente from '@/views/reportes/ReporteRankingCliente.vue'
 import Formato from '@/views/reportes/Formato.vue'
 
 Vue.use(Router)
@@ -145,6 +146,11 @@ export default new Router({
       path: '/reportes/reporte_movimineto_proveedor',
       name: 'ReporteMoviminetoPorProveedor',
       component: ReporteMoviminetoPorProveedor
+    },
+    {
+      path: '/reportes/reporte_ranking_cliente',
+      name: 'ReporteRankingCliente',
+      component: ReporteRankingCliente
     },
   ]
 })
