@@ -13,13 +13,13 @@ const mutations = {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
-        productos.unshift(item)
+        productos.push(item)
       } else {
         productos[index].cantidad += 1
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.unshift(item)
+        productos.push(item)
       }else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
