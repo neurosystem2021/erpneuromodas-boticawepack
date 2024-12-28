@@ -16,6 +16,7 @@
             :classes="{input: 'form-control'}"
             >
           </autocomplete>
+          <b-button variant="warning" @click="startRecognition"><i class="fas fa-microphone"></i></b-button>
           <input v-model="loadCode"
                   :disabled="bloquearInput?true:false"
                   @keydown.enter.prevent="loadBarcode"
@@ -28,7 +29,6 @@
                   />
           <b-input-group-append>
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
-            <b-button variant="warning" @click="startRecognition"><i class="fas fa-microphone"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
@@ -53,6 +53,7 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto2')"
             :classes="{input: 'form-control'}">
           </autocomplete>
+          <b-button variant="warning" @click="startRecognition"><i class="fas fa-microphone"></i></b-button>
         </b-input-group>
         </b-col><br/>
         </b-row>
