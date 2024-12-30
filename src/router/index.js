@@ -10,9 +10,10 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
-import Estadisticas from '@/views/reportes/Estadisticas.vue'
+import Impresoras from '@/views/Impresoras.vue'
 
 // Reportes
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
@@ -131,6 +132,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
+    },
+    {
+      path: '/impresoras',
+      name: 'Impresoras',
+      component: Impresoras
     },
     {
       path: '/reportes/estadisticas',

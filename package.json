@@ -14,6 +14,7 @@
     "bootstrap-vue": "^2.0.0-rc.11",
     "chart.js": "^2.9.4",
     "detect-browser": "^2.5.1",
+    "sweetalert2": "^11.15.3",
     "vue": "^2.5.2",
     "vue-axios": "^2.1.1",
     "vue-barcode-scanner": "^0.8.1",
