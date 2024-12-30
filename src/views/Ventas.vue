@@ -360,9 +360,11 @@ export default {
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
     this.configStock();
+    this.obtenerImpresoras();
   },
   data() {
     return {
+      lstImpresoras: [],
       dni: "",
       navDisabled: false,
       isNota: false,
@@ -447,6 +449,11 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    async obtenerImpresoras() {
+      await this.axios(`${this.API}impresora`).then(res => {
+        this.lstImpresoras = res.data;
+      });
+    },
     setScreen() {
       this.navDisabled = !this.navDisabled;
       if (this.navDisabled) {
@@ -984,6 +991,15 @@ export default {
           this.$refs.inputCliente.setValue("");
           this.$refs.inputVendedor.setValue("");
           //this.limpiarDespuesVenta()
+          this.venta.impresora = this.lstImpresoras;
+          fetch("http://localhost:5000/getcmdped.php", this.venta)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+            })
+            .catch(error => {
+              console.error("Error al obtener los usuarios:", error);
+            });
 
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,

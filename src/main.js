@@ -14,11 +14,12 @@ import VueMoment from "vue-moment";
 import { detect } from "detect-browser";
 import VueQuagga from "vue-quaggajs";
 import VueBarcodeScanner from "vue-barcode-scanner";
-import VueSweetalert2 from "sweetalert2";
 
-// If you don't need the styles, do not connect
-// import "sweetalert2/dist/sweetalert2.min.css";
-// Vue.use(VueSweetalert2);
+import VueSweetalert2 from 'vue-sweetalert2';
+
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+
 const browser = detect();
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -41,7 +42,7 @@ Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 Vue.use(VueQuagga);
 Vue.use(VueBarcodeScanner);
-
+Vue.use(VueSweetalert2);
 // Componentes
 Vue.component("autocomplete", Autocomplete);
 Vue.component("editable", {

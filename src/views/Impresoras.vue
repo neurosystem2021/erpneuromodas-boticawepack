@@ -10,9 +10,9 @@
                     <b-button  variant="primary" @click="abrirEditar(data.item)">
                         <i class="fas fa-pencil-alt fa-sm"></i>
                     </b-button>
-                    <!-- <b-button  variant="danger" @click="eliminar(data.item)">
+                    <b-button  variant="danger" @click="eliminar(data.item)">
                         <i class="fa fa-trash" aria-hidden="true"></i>
-                    </b-button> -->
+                    </b-button>
                 </template>
             </b-table>
         </b-col>
@@ -114,8 +114,18 @@ export default {
       this.modalEditarImpresora = false;
     },
     eliminar(item) {
-      Swal({
-        icon: "question"
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        text: `¿Desea Eliminar la impresora ${item.NombreImpresora}?`,
+        confirmButtonText: "Si, eliminar",
+        showCancelButton: true,
+        cancelButtonText: "No.",
+        cancelButtonColor: "red"
+      }).then(res => {
+        if (res.isConfirmed) {
+          console.log("Eliminar");
+        }
       });
     }
   }
