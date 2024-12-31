@@ -330,6 +330,30 @@
                 </b-row>
             </b-form>
         </b-container>
+        <b-modal v-model="validarEsNota" hide-footer hide-header>
+            <b-row>
+              <b-col cols="12">
+                <center>
+                  <h1 style="font-size: 5rem;"> ?</h1>
+
+                </center>
+              </b-col>
+              <b-col cols="12"> 
+                <center>
+
+                  <h2>Productos Nota de venta</h2>
+                  <h3>Existe uno o más productos  que solo debe ir en nota de venta. ¿Desea continuar? </h3>
+                </center>
+                </b-col>
+              <b-col>
+                <center>
+
+                  <b-button variant="danger" @click="continuarGuardarVenta()">Si, Continuar</b-button>
+                  <b-button variant="success" @click="validarEsNota=false" >No, Cancelar</b-button>
+                </center>
+              </b-col>
+            </b-row>
+        </b-modal>
     </div>
 </template>
 <script>
@@ -341,7 +365,8 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
-import Swal from "sweetalert2";
+// import * as Swal from "sweetalert2";
+
 export default {
   beforeMount() {
     this.initForm();
@@ -357,6 +382,7 @@ export default {
     });
   },
   mounted() {
+    // console.log(Swal.fire);
     // this.getNumeroVenta()
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
@@ -366,6 +392,7 @@ export default {
   },
   data() {
     return {
+      validarEsNota: false,
       dni: "",
       isNota: false,
       newDniRuc: "",
@@ -854,30 +881,20 @@ export default {
         });
     },
     guardarVenta(evt) {
+      evt.preventDefault();
       if (this.venta.tipoVenta.IdTipoDoc != 3) {
         if (this.productos.some(v => v.NotaVenta == 1)) {
-          Swal.fire({
-            icon: "question",
-            title: "Productos Nota de venta",
-            text:
-              "Existe uno o más productos  que solo debe ir en nota de venta. ¿Desea continuar?",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showCancelButton: true,
-            cancelButtonText: "No, Cancelar",
-            cancelButtonColor: "red",
-            confirmButtonText: "Si, continuar"
-          }).then(res => {
-            if (res.isConfirmed) {
-              this.continuarGuardarVenta();
-            }
-          });
+          console.log("val");
+          this.validarEsNota = true;
         } else {
+          this.validarEsNota = true;
           this.continuarGuardarVenta();
         }
       }
     },
     continuarGuardarVenta() {
+      console.log("val2");
+      this.validarEsNota = false;
       this.inProgress = true;
       let totalPagos = 0;
       totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
