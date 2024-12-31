@@ -766,11 +766,21 @@
     <b-modal v-model="datosProforma" title="Datos de Reparto" hide-footer>
       <b-form @submit="proformaInsertar">
         Repartidor
-        <b-select :items="repartidor" required></b-select>
+        <b-select 
+          :options="repartidor"
+          value-field="Usuario"
+          text-field="NombreUsuario"
+          required
+          v-model="IdRepartidor"
+          ></b-select>
         Fecha de Entrega
-        <input type="date" class="form-control" required>
+        <input type="date" class="form-control" required
+        v-model="fechaEntrega"
+        >
         Hora de Entrega
-        <input type="time" class="form-control" required>
+        <input type="time" class="form-control" required
+        v-model="HoraEntrega"
+        >
         <br>
         <b-button type="submit" variant="success">Aceptar</b-button>
         <b-button variant="danger">Cancelar</b-button>
@@ -834,14 +844,18 @@ export default {
     this.loadClienteVarios();
     this.escucharPedidos();
     this.configStock();
+    this.obtenerRepartidor();
     setTimeout(() => {
       this.recalcularTotalesPorEmpresa();
     }, 100);
   },
   data() {
     return {
+      IdRepartidor: "",
+      fechaEntrega: "",
+      HoraEntrega: "",
       repartidor: [],
-      datosProforma: true,
+      datosProforma: false,
       isNota: false,
       dni: "",
       adelanto: 0,
@@ -963,6 +977,13 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    async obtenerRepartidor() {
+      let res = await this.axios(`${this.API}repartidor`).then(res => {
+        if (res) {
+          this.repartidor = res.data;
+        }
+      });
+    },
     async recalcularTotalesPorEmpresa() {
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
@@ -1570,13 +1591,16 @@ export default {
         this.inProgress = false;
         return;
       }
+      this.datosProforma = true;
     },
-    proformaInsertar() {
-      console.log("llegó");
-      return;
+    async proformaInsertar(event) {
+      event.preventDefault();
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
-      this.axios
+      this.venta.IdRepartidor = this.IdRepartidor;
+      this.venta.fechaEntrega = this.fechaEntrega;
+      this.venta.HoraEntrega = this.HoraEntrega;
+      await this.axios
         .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
           this.$toasted.info("Proforma Guardada con exito");
@@ -1591,6 +1615,7 @@ export default {
           this.$refs.inputCliente.setValue("");
           this.$refs.inputVendedor.setValue("");
           this.getVendedor();
+          this.datosProforma = false;
           window.open(
             "/nuevo/index.html#/reportes/proforma/" +
               response.data.insertId +
