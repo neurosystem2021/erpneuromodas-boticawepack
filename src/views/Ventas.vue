@@ -763,7 +763,22 @@
         </b-row>
       </b-form>
     </b-container>
+    <b-modal v-model="datosProforma" title="Datos de Reparto" hide-footer>
+      <b-form @submit="proformaInsertar">
+        Repartidor
+        <b-select :items="repartidor" required></b-select>
+        Fecha de Entrega
+        <input type="date" class="form-control" required>
+        Hora de Entrega
+        <input type="time" class="form-control" required>
+        <br>
+        <b-button type="submit" variant="success">Aceptar</b-button>
+        <b-button variant="danger">Cancelar</b-button>
+      </b-form>
+  </b-modal>
   </div>
+    
+    
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
@@ -825,6 +840,8 @@ export default {
   },
   data() {
     return {
+      repartidor: [],
+      datosProforma: true,
       isNota: false,
       dni: "",
       adelanto: 0,
@@ -1553,7 +1570,10 @@ export default {
         this.inProgress = false;
         return;
       }
-
+    },
+    proformaInsertar() {
+      console.log("llegó");
+      return;
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
       this.axios
