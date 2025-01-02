@@ -884,16 +884,17 @@ export default {
       evt.preventDefault();
       if (this.venta.tipoVenta.IdTipoDoc != 3) {
         if (this.productos.some(v => v.NotaVenta == 1)) {
-          console.log("val");
           this.validarEsNota = true;
         } else {
-          this.validarEsNota = true;
+          // this.validarEsNota = true;
           this.continuarGuardarVenta();
         }
+        // this.continuarGuardarVenta();
+      } else {
+        this.continuarGuardarVenta();
       }
     },
     continuarGuardarVenta() {
-      console.log("val2");
       this.validarEsNota = false;
       this.inProgress = true;
       let totalPagos = 0;
