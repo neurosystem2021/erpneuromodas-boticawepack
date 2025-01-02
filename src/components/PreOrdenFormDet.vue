@@ -54,8 +54,8 @@
             <input :disabled="prod.isDisabled || prod.Pagado" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
           <td>
-            <span class="hideInModal">{{ prod.Cantidad }}</span>
-            <input :disabled="prod.isDisabled || prod.Pagado" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
+            <span class="hideInModal">{{ prod.Cantidad }}</span> 
+            <input :disabled="prod.isDisabled ==1 || prod.Pagado==1" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
           </td>
           <td>
             <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2)}}</span>
@@ -135,6 +135,7 @@ export default {
             this.productos = res.data.map(item => {
               item.PrecioMO = item.Precio;
               item.PrecioMOmM = item.Precio;
+              item.isDisabled = 0;
               if (item.IdProducto === this.idProducto) {
                 item.isDisabled = true;
               }
