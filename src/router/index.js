@@ -13,6 +13,7 @@ import Impresoras from '@/views/Impresoras.vue'
 import Proveedores from '@/views/Proveedores.vue'
 import ConversionConfig from '@/views/ConversionConfig.vue'
 import ConverionUnidades from '@/views/ConverionUnidades.vue'
+import IngresoProduccion from '@/views/IngresoProduccion.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -83,6 +84,11 @@ export default new Router({
       path: '/conversion_unidades',
       name: 'Ventas',
       component: ConverionUnidades
+    },
+    {
+      path: '/ingreso_produccion',
+      name: 'IngresoProduccion',
+      component: IngresoProduccion
     },
     {
       path: '/reportes/ventas',

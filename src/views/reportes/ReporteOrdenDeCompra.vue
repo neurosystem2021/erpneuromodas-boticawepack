@@ -79,7 +79,9 @@ export default {
       headerRepPro: [
         { key: "ProductoCategoria" },
         { key: "Producto" },
-        { key: "Cantidad" }
+        { key: "Cantidad", label: "Cantidad Pedida" },
+        { key: "CantidadRealizada" },
+        { key: "CantidadRestante" }
       ],
       lstRepProductos: [],
       API: config.API
