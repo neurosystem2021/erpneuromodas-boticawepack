@@ -231,7 +231,6 @@
           <b-col md="12">
             <b-table small
               ref="tablaProductos"
-              :filter="filter"
               :sort-by.sync="sortBy"
               :sort-desc.sync="sortDesc"
               striped
@@ -240,16 +239,17 @@
               @row-dblclicked="rowDblClick"
               id="tabla-productos" 
               :busy.sync="isBusy" 
-              :items="myProvider" 
+              :items="items" 
               :fields="fields"
               :per-page="perPage"
-              :current-page="currentPage">
-
+              >
+<!--  
+              -->
+                <template slot="verstock" slot-scope="data">
+                  <b-button variant="info" size="sm" @click="ObtenerStock(data.index,data.item)">Ver Stock</b-button>
+                </template>
                 <template slot="stock" slot-scope="data">
-                  
-                  <div :class="data.item.stock > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ data.item.stock}}
-                  </div>
+                    <span v-if="data.item.stock !== null && data.item.stock !== undefined" :class="data.item.stock<=0 ? 'bgStockNegativo' : 'bgStockPositivo'">{{ data.item.stock }}</span>
                 </template>
                 <template slot="presentaciones" slot-scope="data">
                   <b-button size="sm" variant="info" @click="showPresentacion(data.item)"><i class="fas fa-list"></i></b-button>
@@ -439,6 +439,7 @@ export default {
     this.axios.get(this.API + "productos/count").then(response => {
       this.totalRows = response.data.total;
     });
+    this.myProvider();
   },
   data() {
     return {
@@ -475,6 +476,12 @@ export default {
         },
         { key: "CompuestosProducto", label: "Compuestos", sortable: true },
         {
+          key: "verstock",
+          label: "Ver Stock.",
+          sortable: false,
+          class: "text-center"
+        },
+        {
           key: "stock",
           label: "Stock G.",
           sortable: false,
@@ -507,6 +514,9 @@ export default {
     };
   },
   watch: {
+    currentPage() {
+      this.myProvider();
+    }
     // items (items) {
     //   //Vue.set(this.$refs.tablaProductos, 'localItems', [])
     //   //console.log(this.$refs.tablaProductos.localItems)
@@ -592,6 +602,24 @@ export default {
     }
   },
   methods: {
+    async ObtenerStock(index, producto) {
+      let data = await this.axios(`${this.API}productos/puntoventa/stock`, {
+        params: {
+          idAlmacen: this.almacen.IdAlmacen,
+          idProductos: [producto.IdProducto],
+          noLimit: 1
+        }
+      }).then(res => {
+        return res.data;
+      });
+      console.log(data[0].stock);
+      this.items[index].stock = data[0].stock;
+      this.$forceUpdate();
+      console.log(this.items[index]);
+      // this.items[index].stock = data.stock;
+      // console.log(stock);
+      // console.log(producto);
+    },
     exportarFechas() {
       if (this.desdeInicio == 1 && this.exportar.fechaHasta == "") {
         this.$toasted.show("Ingrese una fecha final fin valida");
@@ -791,7 +819,9 @@ export default {
     actualizarTabla() {
       this.$refs.tablaProductos.refresh();
     },
-    myProvider(ctx) {
+    async myProvider(l = null) {
+      this.items = [];
+
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let url =
@@ -800,29 +830,20 @@ export default {
         "?controlaStock=1&idAlmacen=" +
         this.almacen.IdAlmacen +
         "&limit=" +
-        ctx.perPage +
+        this.perPage +
         "&page=" +
-        ctx.currentPage +
+        this.currentPage +
         "&filter=" +
-        (ctx.filter || "") +
+        (this.filter || "") +
         "&sortBy=" +
-        ctx.sortBy;
-      console.log(url);
-      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
-      let promise = this.axios.get(url);
-
-      return promise
+        this.sortBy;
+      url += "&sortDesc=" + (this.sortDesc ? 1 : 0);
+      await this.axios
+        .get(url)
         .then(result => {
           this.items = result.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
         })
         .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
           return [];
         });
     },
@@ -856,8 +877,11 @@ export default {
           this.APISTOCK = "productos/stock";
         }
       }
-
+      this.currentPage = 1;
       this.filter = filter;
+      setTimeout(() => {
+        this.myProvider("llegó");
+      }, 100);
     },
     exportarProductos() {}
   },
@@ -937,6 +961,22 @@ export default {
   justify-content: start;
   align-content: center;
   align-items: center;
+}
+.bgStockPositivo {
+  margin: 5px 10px;
+  /* border: 1px solid black; */
+  border-radius: 10px;
+  padding: 5px 15px !important;
+  background: #004d40;
+  color: #fff;
+}
+.bgStockNegativo {
+  margin: 5px 10px;
+  /* border: 1px solid black; */
+  border-radius: 10px;
+  padding: 5px 15px !important;
+  background: #dd2c00;
+  color: #fff;
 }
 </style>
 </style>
