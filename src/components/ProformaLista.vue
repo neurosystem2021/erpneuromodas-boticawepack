@@ -4,7 +4,7 @@
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
-                title="Buscar Proforma"
+                title="Buscar Orden de Pedido"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"

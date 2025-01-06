@@ -15,7 +15,7 @@
       <div id="details" class="clearfix">
         <div id="client">
           <br>
-          <h5 class="to" style="color:black">PROFORMA A:</h5>
+          <h5 class="to" style="color:black">ORDEN DE PEDIDO A:</h5>
           <table>
             <tbody>
               <tr>
@@ -42,7 +42,7 @@
           </table>
         </div>
         <div id="invoice">
-          <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
+          <h1>ORDEN DE PEDIDO {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
           <div style="height:15px"></div>
           <table>
             <tbody>
@@ -121,7 +121,7 @@
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div class="notice">ESTA ORDEN DE PEDIDO SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
       </div>
       <div>
         <br>

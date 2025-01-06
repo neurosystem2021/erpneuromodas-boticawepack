@@ -388,7 +388,7 @@
           <b-col md="6" class="ml-3">
             <b-row>
               <h5 class="mt-1">
-                Proforma Seleccionada:
+                Orden de Pedido Seleccionada:
                 <b-badge variant="info" style="font-size: 1.2rem">{{
                   venta.anioNumeroProforma
                 }}</b-badge>
@@ -734,7 +734,7 @@
               variant="primary"
               size="md"
               @click="guardarProforma"
-              >Crear Proforma</b-button
+              >Crear Orden de Pedido</b-button
             >
             <b-button
               type="submit"
@@ -1603,7 +1603,7 @@ export default {
       await this.axios
         .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
-          this.$toasted.info("Proforma Guardada con exito");
+          this.$toasted.info("Orden de Pedido Guardada con exito");
           //this.limpiarDespuesVenta()
           this.loadClienteVarios();
           this.diasValidosProf = 1;
