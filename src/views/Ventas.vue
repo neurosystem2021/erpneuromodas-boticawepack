@@ -6,7 +6,7 @@
 
     <b-container fluid class="ancho" id="conten">
       <div>
-        <div class="float-left">
+        <!-- <div class="float-left">
           <b-button-group size="sm">
             <b-form-select
               v-model="empresa"
@@ -16,17 +16,9 @@
               class="form-control my-2"
               @change="cambiarEmpresa"
             ></b-form-select>
-            <!-- <select
-              class="form-control"
-              v-model="empresa"
-              @change="cambiarEmpresa"
-              style="font-weight: bold; width: 350px"
-            >
-              <option value="imperiop1">EMP. FERRETERIA GOMEZ S.A.C</option>
-              <option value="imperiop2">EMP. ROLLING GOMEZ</option>
-            </select> -->
+          
           </b-button-group>
-        </div>
+        </div> -->
         <div class="float-right">
           <b-button-group size="sm" class="ocularMovil">
             <delivery-modal
@@ -426,7 +418,7 @@
                     <tr>
                       <td class="text-center">Opciones</td>
                     </tr>
-                    <tr v-if="puntosAplicados == 0">
+                    <!-- <tr v-if="puntosAplicados == 0">
                       <td>
                         <b-input-group prepend="S/" append="Descuento">
                           <input
@@ -447,7 +439,7 @@
                           Descuento general a toda la venta.
                         </b-form-text>
                       </td>
-                    </tr>
+                    </tr> -->
                     <tr>
                       <td>
                         <b-form-checkbox
@@ -664,7 +656,7 @@
                   </tbody>
                 </table>
               </template>
-              <template slot="totalEmpresa" >
+              <!-- <template slot="totalEmpresa" >
                 <table class="table b-table border table-footer table-sm">
                   <tbody>
                     <tr>
@@ -683,7 +675,7 @@
                       </tr>
                   </tbody>
                 </table>
-              </template>
+              </template> -->
               <template slot="adicional" v-if="!venta.EsCredito">
                 <table
                   class="table b-table border table-footer table-sm text-center"
@@ -896,8 +888,8 @@ export default {
             class: "text-center"
           },
           { key: "Producto" },
-          { key: "NombreEmpresa", label: "Empresa" },
-          { key: "ProductoPresentacion", label: "Anaquel" },
+          // { key: "NombreEmpresa", label: "Empresa" },
+          // { key: "ProductoPresentacion", label: "Anaquel" },
           { key: "Descripcion", label: "Descripción" },
           { key: "eventPres", label: "" },
           { key: "cantxPrecio", variant: "warning" },
@@ -1900,22 +1892,7 @@ export default {
           data.productos = productos;
           data.totalCart = totalCarr;
 
-          //if (data.pago.efectivo.monto != 0) {
-          //  data.pago.efectivo.monto = totalCarr;
-          //} else if (data.pago.mastercard.monto != 0) {
-          //  data.pago.mastercard.monto = totalCarr;
-          //} else if (data.pago.transferencia.monto != 0) {
-          //  data.pago.transferencia.monto = totalCarr;
-          //} else if (data.pago.visa.monto != 0) {
-          //  data.pago.visa.monto = totalCarr;
-          //}
-          // data.pago.forEach((element) => {
-          //   if (element.monto != 0) {
-          //     element.monto = totalCarr;
-          //   }
-          // });
           let comandaJson = JSON.stringify(dataImprimir);
-          console.log("dddd");
 
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
@@ -1930,15 +1907,15 @@ export default {
                 "noopener"
               );
               // -------------------------
-              await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                mode: "cors",
-                cache: "default",
-                body: comandaJson
-              }).catch(error => console.error("Error:", error));
+              // await fetch("http://localhost:5000/imprimir/getcmdped.php", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json"
+              //   },
+              //   mode: "cors",
+              //   cache: "default",
+              //   body: comandaJson
+              // }).catch(error => console.error("Error:", error));
             })
             .catch(error => {
               console.error(error);

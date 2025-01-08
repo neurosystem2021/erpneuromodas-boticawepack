@@ -16,7 +16,9 @@
                     <th width="10%">DESCRIPCIÓN</th>
                     <th width="10%">FECHA ENTREGA</th>
                     <th width="15%">REPARTIDOR</th>
-                    <th width="5%" style="text-align: center;">CANT.</th>
+                    <th width="5%" style="text-align: center;">CANT. PED</th>
+                    <th width="5%" style="text-align: center;">CANT. ENT.</th>
+                    <th width="5%" style="text-align: center;">CANT. RES</th>
                   </tr>
                   <tr v-for="(det,index) in data.item.detalle" :key="index" >
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Cliente }}</td>
@@ -25,6 +27,8 @@
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.FechaEntrega }} {{ det.HoraEntrega }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Repartidor }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.Cantidad }}</td>
+                    <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.CantEntregada }}</td>
+                    <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.Cantidad - det.CantEntregada }}</td>
 
                   </tr>
                 </table>
@@ -158,10 +162,13 @@ export default {
             productosMap[producto.IdProducto] = {
               Cantidad: 0,
               Precio: 0,
+              CantEntregada: 0,
               Productos: []
             };
           }
           productosMap[producto.IdProducto].Cantidad += producto.Cantidad;
+          productosMap[producto.IdProducto].CantEntregada +=
+            producto.CantEntregada;
           productosMap[producto.IdProducto].Productos.push(producto);
         });
 
@@ -187,6 +194,7 @@ export default {
             DisabledTotal: 0,
             Descripcion: "",
             Cantidad: grupo.Cantidad,
+            CantEntregada: grupo.CantEntregada,
             Precio: 0,
             Descuento: 0
           });
