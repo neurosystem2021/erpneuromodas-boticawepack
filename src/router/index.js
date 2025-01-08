@@ -15,6 +15,7 @@ import ConversionConfig from "@/views/ConversionConfig.vue";
 import ConverionUnidades from "@/views/ConverionUnidades.vue";
 import IngresoProduccion from "@/views/IngresoProduccion.vue";
 import EntregaPedido from "@/views/EntregaPedido.vue";
+// import ReporteProduccion from "@/views/ReporteProduccion.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -35,6 +36,8 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import ReporteOrdenDeCompra from "@/views/reportes/ReporteOrdenDeCompra.vue";
+import ReporteEntregaPedido from "@/views/reportes/ReporteEntregaPedido.vue";
+import ReporteProduccion from "@/views/reportes/ReporteProduccion.vue";
 
 Vue.use(Router);
 
@@ -205,6 +208,16 @@ export default new Router({
       path: "/reportes/orden_compra",
       name: "ReporteOrdenDeCompra",
       component: ReporteOrdenDeCompra
+    },
+    {
+      path: "/reportes/reporte_entrega_pedido",
+      name: "ReporteEntregaPedido",
+      component: ReporteEntregaPedido
+    },
+    {
+      path: "/reportes/reporte_produccion",
+      name: "ReporteProduccion",
+      component: ReporteProduccion
     }
   ]
 });

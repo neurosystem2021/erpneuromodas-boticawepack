@@ -152,7 +152,7 @@ export default {
 
       await this.axios.post(`${this.API}finalizar_entrega`, data).then(res => {
         if (res) {
-          Swal.fire({
+          this.$swal({
             icon: "success",
             title: "Confirmado",
             text: "Pedido Finalizado",

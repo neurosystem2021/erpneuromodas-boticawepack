@@ -757,14 +757,14 @@
     </b-container>
     <b-modal v-model="datosProforma" title="Datos de Reparto" hide-footer>
       <b-form @submit="proformaInsertar">
-        Repartidor
+        <!-- Repartidor
         <b-select 
           :options="repartidor"
           value-field="Usuario"
           text-field="NombreUsuario"
           required
           v-model="IdRepartidor"
-          ></b-select>
+          ></b-select> -->
         Fecha de Entrega
         <input type="date" class="form-control" required
         v-model="fechaEntrega"
@@ -774,6 +774,22 @@
         v-model="HoraEntrega"
         >
         <br>
+        <b-button type="submit" variant="success">Aceptar</b-button>
+        <b-button variant="danger">Cancelar</b-button>
+      </b-form>
+  </b-modal>
+  <b-modal v-model="modalRepartidor" hide-footer title="Asignar Repartidor">
+    <b-form @submit="continuarGuardarVenta">
+        Repartidor
+        <b-select 
+          :options="repartidor"
+          value-field="Usuario"
+          text-field="NombreUsuario"
+          required
+          v-model="IdRepartidor"
+          ></b-select> 
+          <br>
+          <br>
         <b-button type="submit" variant="success">Aceptar</b-button>
         <b-button variant="danger">Cancelar</b-button>
       </b-form>
@@ -843,6 +859,7 @@ export default {
   },
   data() {
     return {
+      modalRepartidor: false,
       IdRepartidor: "",
       fechaEntrega: "",
       HoraEntrega: "",
@@ -1558,34 +1575,29 @@ export default {
     // this.$refs.inputVendedor.setValue('')
     //},
     guardarProforma() {
-      this.inProgress = true;
-
       if (!this.productos.length) {
         this.$toasted.show("No hay productos para crear la proforma");
-        this.inProgress = false;
         return;
       }
 
       if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
         this.$toasted.show("Debe ingresar los días de validez de la proforma");
-        this.inProgress = false;
         return;
       }
 
       if (!this.venta.cliente.IdCliente) {
         this.$toasted.show("Debe seleccionar un cliente");
-        this.inProgress = false;
         return;
       }
 
       if (!this.venta.vendedor.Usuario) {
         this.$toasted.show("Debe seleccionar un vendedor");
-        this.inProgress = false;
         return;
       }
       this.datosProforma = true;
     },
     async proformaInsertar(event) {
+      this.inProgress = true;
       event.preventDefault();
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
@@ -1621,6 +1633,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.inProgress = false;
     },
     async guardarVenta(evt) {
       evt.preventDefault();
@@ -1804,6 +1817,10 @@ export default {
         this.inProgress = false;
         return;
       }
+
+      this.modalRepartidor = true;
+    },
+    async continuarGuardarVenta() {
       let productos = this.productos;
       if (this.venta.tipoVenta.CodSunat == "07") {
         productos = this.productos.map(item => {
@@ -1891,6 +1908,7 @@ export default {
 
           data.productos = productos;
           data.totalCart = totalCarr;
+          data.IdRepartidor = this.IdRepartidor;
 
           let comandaJson = JSON.stringify(dataImprimir);
 
@@ -1936,10 +1954,10 @@ export default {
 
       // this.$toasted.success("Venta realizada con exito");
 
-      setTimeout(() => {
-        this.inProgress = false;
-        window.location.reload();
-      }, 3000);
+      // setTimeout(() => {
+      //   this.inProgress = false;
+      //   window.location.reload();
+      // }, 3000);
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios
