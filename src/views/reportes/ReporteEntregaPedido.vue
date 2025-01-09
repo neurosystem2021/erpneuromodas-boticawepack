@@ -22,6 +22,7 @@
         </b-col>
         <b-col cols="3">
             <b-button variant="success" @click="obtenerListado()">Generar</b-button>
+            <b-button variant="danger" @click="exportar()">Exportar</b-button>
         </b-col>
         <br>
         <b-col cols="12">
@@ -98,6 +99,20 @@ export default {
               metodospago: JSON.parse(item.metodospago) // Convertir el string a array
             };
           });
+        }
+      });
+    },
+    async exportar() {
+      this.lstReporte = [];
+      await this.axios(`${this.API}reporte/entrega_pedido/exportar`, {
+        params: {
+          desde: this.desde,
+          hasta: this.hasta,
+          IdRepartidor: this.IdRepartidor
+        }
+      }).then(res => {
+        if (res) {
+          window.open(res.data);
         }
       });
     },
