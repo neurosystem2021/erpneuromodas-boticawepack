@@ -18,7 +18,9 @@
             text-field="NombreUsuario"
             required
             v-model="IdRepartidor"
+            :readonly="idPerfil != 1"
             ></b-select>
+            
         </b-col>
         <b-col cols="3">
             <b-button variant="success" @click="obtenerListado()">Generar</b-button>
@@ -67,12 +69,14 @@ export default {
         { thStyle: { width: "16%" }, key: "DniRuc", label: "Doc." },
         { thStyle: { width: "16%" }, key: "Cliente" },
         { thStyle: { width: "20%" }, key: "Dirección" },
+        { thStyle: { width: "20%" }, key: "created_at", label: "Hora Entrega" },
         { thStyle: { width: "20%" }, key: "MedotoPago", label: "Metodos Pago" }
         // { key: "" }
       ],
       desde: "",
       hasta: "",
-      IdRepartidor: ""
+      IdRepartidor: "",
+      idPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   mounted() {
@@ -81,6 +85,9 @@ export default {
 
     this.obtenerRepartidor();
     this.obtenerListado();
+    if (this.idPerfil != 1) {
+      this.IdRepartidor = sessionStorage.getItem("User");
+    }
   },
   methods: {
     async obtenerListado() {
@@ -103,7 +110,6 @@ export default {
       });
     },
     async exportar() {
-      this.lstReporte = [];
       await this.axios(`${this.API}reporte/entrega_pedido/exportar`, {
         params: {
           desde: this.desde,
@@ -112,7 +118,12 @@ export default {
         }
       }).then(res => {
         if (res) {
-          window.open(res.data);
+          let url = res.data;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          window.open(url, "_blank");
         }
       });
     },

@@ -22,6 +22,7 @@
         </b-col>
         <b-col cols="3">
             <b-button variant="success" @click="obtenerListado()">Generar</b-button>
+            <b-button size="sm" variant="danger" @click="exportar()">Exporta PDF</b-button>
         </b-col>
         <br>
         <b-col cols="12">
@@ -43,7 +44,7 @@ export default {
       lstReporte: [],
       header: [
         { key: "NombreUsuario" },
-        { key: "FechaReg" ,label:"Fecha Entrega"},
+        { key: "FechaReg", label: "Fecha Entrega" },
         { key: "Producto" },
         { key: "CantidadPedida" },
         { key: "CantidadRealizada" },
@@ -78,6 +79,24 @@ export default {
       }).then(res => {
         if (res) {
           this.lstReporte = res.data;
+        }
+      });
+    },
+    async exportar() {
+      await this.axios(`${this.API}report/pedido_entregado/exportar`, {
+        params: {
+          desde: this.desde,
+          hasta: this.hasta,
+          IdUsuario: this.IdUsuario
+        }
+      }).then(res => {
+        if (res) {
+          let url = res.data;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          window.open(url, "_blank");
         }
       });
     }

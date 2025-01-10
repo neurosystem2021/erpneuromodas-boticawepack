@@ -109,7 +109,12 @@ export default {
       await this.axios(`${this.API}reporte/ordencompra_persona/exportar`).then(
         res => {
           if (res) {
-            window.open(res.data);
+            let url = res.data;
+            url = url.replace(/\\/g, "");
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+              url = "http://" + url; // O "https://" si es necesario
+            }
+            window.open(url, "_blank");
           }
         }
       );
@@ -122,13 +127,17 @@ export default {
       });
     },
     async ExportarobtenerReporteProductos() {
-      await this.axios(`${this.API}reporte/ordencompra_productos/exportar`).then(
-        res => {
-          if (res) {
-            window.open(res.data);
+      await this.axios(
+        `${this.API}reporte/ordencompra_productos/exportar`
+      ).then(res => {
+        if (res) {
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
           }
+          window.open(url, "_blank");
         }
-      );
+      });
     },
     formatearDetalleRepCliente(data) {
       data.forEach(categoria => {
