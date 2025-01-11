@@ -118,7 +118,9 @@
         </tfoot>
       </table>
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
-        <h3 style="font-weight:bold">Información de pago</h3>
+        <h3 style="font-weight:bold">Información Adicional</h3>
+        <td style="text-transform: uppercase">OBSERVACIÓN: {{ proforma.DescripcionProforma }}</td>
+        <br>
         <div style="margin-bottom:10px;">
           CTA AHORROS SOLES 
         </div>

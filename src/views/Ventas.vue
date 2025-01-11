@@ -147,6 +147,21 @@
                                             style="text-transform:uppercase"
                                             placeholder="Información extra al comprobante" />
                                 </b-form-group>
+                                <b-input-group>
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsDescripcion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Descripción
+                                        </b-form-checkbox>
+                                        <input v-model="venta.DescripcionProforma"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                required
+                                                placeholder="Digite la Descripción" v-if="venta.EsDescripcion" />
+                                    </b-input-group>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -592,6 +607,8 @@ export default {
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
+                EsDescripcion: 0,
+                DescripcionProforma: '',
                 IdPreOrden: [],
                 CampoDireccion: '',
                 diasValidosProf: 0,
@@ -1025,6 +1042,7 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.DescripcionProforma = (''+this.venta.DescripcionProforma).trim().toUpperCase()
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.venta.Observacion = (''+this.venta.Observacion).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
