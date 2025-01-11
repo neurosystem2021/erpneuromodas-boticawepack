@@ -154,7 +154,7 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 80px"
-            step="1"
+            step="0.1"
             min="0"
             :disabled="bloquearInput?true:false"
             @input="(val) => cambiarCantidadPresentacion(productos[data.index],data.index,'PRESENTACION')"
