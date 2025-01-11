@@ -68,7 +68,7 @@
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto + ' ' + prod.ProductoMarca + ' ' + prod.ProductoModelo + ' ' + prod.ProductoTalla }}</td>
+                      <td class="detalle-producto">{{ prod.Producto + ' / ' + prod.ProductoMarca + ' / ' + prod.ProductoModelo + ' / ' + prod.ProductoTalla }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
