@@ -16,7 +16,7 @@
                     <th width="20%">PRODUCTO</th>
                     <th width="10%">DESCRIPCIÓN</th>
                     <th width="10%">FECHA ENTREGA</th>
-                    <th width="15%">REPARTIDOR</th>
+                    <!-- <th width="15%">REPARTIDOR</th> -->
                     <th width="5%" style="text-align: center;">CANT. PED</th>
                     <th width="5%" style="text-align: center;">CANT. ENT.</th>
                     <th width="5%" style="text-align: center;">CANT. RES</th>
@@ -26,7 +26,7 @@
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Producto }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Descripcion }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.FechaEntrega }} {{ det.HoraEntrega }}</td>
-                    <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Repartidor }}</td>
+                    <!-- <td :class="det.Cliente=='TOTAL' ? 'bg-total':''">{{ det.Repartidor }}</td> -->
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.Cantidad }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.CantEntregada }}</td>
                     <td :class="det.Cliente=='TOTAL' ? 'bg-total':''" style="text-align: center;">{{ det.Cantidad - det.CantEntregada }}</td>
@@ -131,6 +131,7 @@ export default {
         `${this.API}reporte/ordencompra_productos/exportar`
       ).then(res => {
         if (res) {
+          let url = res.data;
           url = url.replace(/\\/g, "");
           if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url; // O "https://" si es necesario

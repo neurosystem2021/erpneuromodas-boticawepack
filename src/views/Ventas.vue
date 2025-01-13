@@ -1924,40 +1924,20 @@ export default {
                 "_blank",
                 "noopener"
               );
-              // -------------------------
-              // await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json"
-              //   },
-              //   mode: "cors",
-              //   cache: "default",
-              //   body: comandaJson
-              // }).catch(error => console.error("Error:", error));
+              setTimeout(() => {
+                this.inProgress = false;
+                window.location.reload();
+              }, 3000);
             })
             .catch(error => {
               console.error(error);
-              // this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+             
               this.inProgress = false;
             });
 
-          // await this.axios
-          //   .post("http://localhost:5000/imprimir/getcmdped.php", comandaJson, {
-          //     baseURL: ""
-          //   })
-          //   .catch(err => {
-          //     console.error(err);
-          //   });
           this.$toasted.success("Venta realizada con exito");
         }
       });
-
-      // this.$toasted.success("Venta realizada con exito");
-
-      // setTimeout(() => {
-      //   this.inProgress = false;
-      //   window.location.reload();
-      // }, 3000);
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios

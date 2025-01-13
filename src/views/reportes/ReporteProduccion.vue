@@ -10,7 +10,7 @@
             Desde:
             <input type="date" class="form-control" v-model="hasta">
         </b-col>
-        <b-col cols="3">
+        <!-- <b-col cols="3">
             Repartidor:
             <b-select 
             :options="repartidor"
@@ -19,7 +19,7 @@
             required
             v-model="IdUsuario"
             ></b-select>
-        </b-col>
+        </b-col> -->
         <b-col cols="3">
             <b-button variant="success" @click="obtenerListado()">Generar</b-button>
             <b-button size="sm" variant="danger" @click="exportar()">Exporta PDF</b-button>

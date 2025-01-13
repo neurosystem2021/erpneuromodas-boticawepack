@@ -84,10 +84,10 @@ export default {
     this.hasta = this.$moment().format("YYYY-MM-DD");
 
     this.obtenerRepartidor();
-    this.obtenerListado();
     if (this.idPerfil != 1) {
       this.IdRepartidor = sessionStorage.getItem("User");
     }
+    this.obtenerListado();
   },
   methods: {
     async obtenerListado() {

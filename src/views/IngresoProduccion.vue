@@ -179,6 +179,24 @@ export default {
         });
     },
     async guardar() {
+      this.$swal
+        .fire({
+          icon: "question",
+          title: "Entregar Pedido",
+          text: "¿Está seguro de guardar registro.?",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          confirmButtonText: "Guardar Registro",
+          denyButtonText: `Cancelar`,
+          showDenyButton: true
+        })
+        .then(res => {
+          if (res.isConfirmed) {
+            this.continuarGuardar();
+          }
+        });
+    },
+    async continuarGuardar() {
       if (!this.lstRepProductos.some(v => !!v.cantidad && v.cantidad > 0)) {
         this.$toasted.show(
           "Es necesario al menos un producto con cantidad mayor que 0"
