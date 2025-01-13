@@ -516,6 +516,15 @@ export default {
   watch: {
     currentPage() {
       this.myProvider();
+    },
+    perPage() {
+      this.myProvider();
+    },
+    sortBy() {
+      this.myProvider();
+    },
+    sortDesc() {
+      this.myProvider();
     }
     // items (items) {
     //   //Vue.set(this.$refs.tablaProductos, 'localItems', [])
