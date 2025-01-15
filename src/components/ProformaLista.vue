@@ -185,7 +185,45 @@ export default {
           return [];
         });
     },
+
     eliminarProf(data) {
+      this.$swal({
+        title: "Ingrese sus datos",
+        html: `
+          <input type="text" id="input1" class="swal2-input" placeholder="Usuario">
+          <input type="password" id="input2" class="swal2-input" placeholder="Contraseña">
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const input1 = document.getElementById("input1").value;
+          const input2 = document.getElementById("input2").value;
+
+          if (!input1 || !input2) {
+            Swal.showValidationMessage("Por favor, complete ambos campos");
+          }
+
+          return { input1, input2 };
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.axios
+            .post(`${this.API}login`, {
+              user: result.value.input1,
+              password: result.value.input2
+            })
+            .then(res => {
+              if (res) {
+                console.log("a");
+                if (res.data.IdUsuarioPerfil == 1) {
+                  console.log("ab");
+                  this.continuarEliminarProf(data);
+                }
+              }
+            });
+        }
+      });
+    },
+    continuarEliminarProf(data) {
       this.$swal({
         target: document.getElementById("conten"),
         title:

@@ -71,7 +71,7 @@
             </table>
             <template #modal-footer>
                 <b-button variant="success" @click="finalizar()">Finalizar</b-button>
-                <b-button variant="danger">Cancelar</b-button>
+                <b-button variant="danger" @click="finalizarFlag=!finalizarFlag">Cancelar</b-button>
 
             </template>
       </b-modal>
@@ -131,6 +131,16 @@ export default {
     abrirModalFinalizar(producto) {
       this.item = producto;
       this.finalizarFlag = true;
+      let montoPagar = this.item.detalle.reduce((sum, producto) => {
+        return sum + parseFloat(producto.Cantidad * producto.Precio);
+      }, 0);
+
+      this.metodoPago = [
+        { label: "Efectivo", monto: montoPagar },
+        { label: "Yape", monto: 0 },
+        { label: "Plin", monto: 0 },
+        { label: "Tarjeta", monto: 0 }
+      ];
     },
     async finalizar() {
       let montoPagar = this.item.detalle.reduce((sum, producto) => {
@@ -163,6 +173,12 @@ export default {
             if (res.isConfirmed) {
               this.finalizarFlag = false;
               this.obtenerPedidosAsignado();
+              this.metodoPago = [
+                { label: "Efectivo", monto: 0 },
+                { label: "Yape", monto: 0 },
+                { label: "Plin", monto: 0 },
+                { label: "Tarjeta", monto: 0 }
+              ];
             }
           });
         }

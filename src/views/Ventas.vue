@@ -843,6 +843,7 @@ export default {
     this.initForm();
   },
   async mounted() {
+    this.fechaEntrega = this.$moment().format("YYYY-MM-DD");
     this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
@@ -1627,6 +1628,9 @@ export default {
               this.empresa,
             "_blank"
           );
+          setTimeout(() => {
+            window.location.reload();
+          }, 100);
         })
         .catch(error => {
           console.error(error);
@@ -1817,8 +1821,12 @@ export default {
         this.inProgress = false;
         return;
       }
-
-      this.modalRepartidor = true;
+      console.log(this.venta);
+      if (this.venta.idProforma) {
+        this.modalRepartidor = true;
+      } else {
+        this.continuarGuardarVenta();
+      }
     },
     async continuarGuardarVenta() {
       let productos = this.productos;
@@ -1927,11 +1935,11 @@ export default {
               setTimeout(() => {
                 this.inProgress = false;
                 window.location.reload();
-              }, 3000);
+              }, 4000);
             })
             .catch(error => {
               console.error(error);
-             
+
               this.inProgress = false;
             });
 

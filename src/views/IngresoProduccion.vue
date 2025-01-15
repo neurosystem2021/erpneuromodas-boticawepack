@@ -219,7 +219,16 @@ export default {
             })
             .then(res => {
               if (res.isConfirmed) {
-                window.location.reload();
+                window.open(
+                  "/imprimir/entregapedido.php?IdProduccion=" +
+                    response.data.insertId +
+                    "&preview=1&id_empresa=imperiop2",
+                  "_blank",
+                  "noopener"
+                );
+                setTimeout(() => {
+                  window.location.reload();
+                }, 100);
               }
             });
         })
