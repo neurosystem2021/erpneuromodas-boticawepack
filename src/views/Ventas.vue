@@ -843,7 +843,9 @@ export default {
     this.initForm();
   },
   async mounted() {
-    this.fechaEntrega = this.$moment().format("YYYY-MM-DD");
+    this.fechaEntrega = this.$moment()
+      .add("days", 1)
+      .format("YYYY-MM-DD");
     this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
