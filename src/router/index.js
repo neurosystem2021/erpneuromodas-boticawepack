@@ -9,6 +9,7 @@ import VentaReimpresion from '@/views/VentaReimpresion.vue'
 import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Remision from '@/views/Remision.vue'
+import ConfigurarOferta from '@/views/ConfigurarOferta.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -128,6 +129,11 @@ export default new Router({
       path: '/reportes/cantidades',
       name: 'ReporteCantidad',
       component: ReporteCantidad
+    },
+    {
+      path: '/oferta',
+      name: 'ConfigurarOferta',
+      component: ConfigurarOferta
     },
   ]
 })
