@@ -161,7 +161,6 @@
 </template>
 
 <script>
-import Swal from "sweetalert2";
 import config from "@/store/config.js";
 export default {
   data() {
@@ -352,7 +351,7 @@ export default {
         });
     },
     eliminar(item) {
-      this.$swal.fire({
+      this.$swal({
         icon: "question",
         text: "¿Desea Eliminar el registro?",
         showCancelButton: true,
