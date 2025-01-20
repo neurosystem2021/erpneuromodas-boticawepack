@@ -106,6 +106,7 @@
                   <label>Producto:</label>
                   <autocomplete
                     :url="API + 'productos'"
+                    :debounce="600"
                     ref="inputProducto"
                     anchor="Producto"
                     label="writer"
