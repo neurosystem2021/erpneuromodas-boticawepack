@@ -1896,13 +1896,14 @@ export default {
             this.$toasted.success("Venta realizada con exito");
             this.ultimaVenta = response.data.insertId;
             let IdOfertas = this.generarOfertas();
+            let IdOfertasString = IdOfertas.join(",");
             this.limpiarDespuesVenta();
 
             window.open(
               "/imprimir/index.php?IdDocVenta=" +
                 response.data.insertId +
                 "&IdOfertas=" +
-                IdOfertas,
+                IdOfertasString,
               "_blank"
             );
             this.$refs.carrito.pagocon = 0;
