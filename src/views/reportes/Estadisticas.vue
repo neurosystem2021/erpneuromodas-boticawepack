@@ -109,8 +109,8 @@
   </div>
 </template>
 <script>
-import BarChart from '@/components/BarChart'
-import LineChart from '@/components/LineChart'
+import BarChart from '../../components/BarChart'
+import LineChart from '../../components/LineChart'
 import config from '@/store/config.js'
 export default {
   mounted(){
