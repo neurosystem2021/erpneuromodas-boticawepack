@@ -23,6 +23,7 @@ import Vales from '@/views/reportes/Vales.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 import ReporteCantidad from '@/views/reportes/ReporteCantidad.vue'
+import Estadisticas from '@/views/reportes/Estadisticas.vue'
 
 
 Vue.use(Router)
@@ -129,6 +130,11 @@ export default new Router({
       path: '/reportes/cantidades',
       name: 'ReporteCantidad',
       component: ReporteCantidad
+    },
+    {
+      path: '/reportes/estadisticas',
+      name: 'Estadisticas',
+      component: Estadisticas
     },
     {
       path: '/oferta',
