@@ -1355,7 +1355,7 @@ export default {
             this.add([item, () => {}, false]);
           });
           this.venta.NotaIdMotivo = null;
-          this.bloquearInput = true;
+          // this.bloquearInput = true;
           this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
