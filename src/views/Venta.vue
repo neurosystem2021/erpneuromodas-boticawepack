@@ -220,10 +220,22 @@
                   </template>
                   <template slot="acciones" slot-scope="data">
                     <b-button 
+                      class="mx-auto mt-1"
                       variant="danger"
                       size="sm" 
                       @click="quitarProducto(data.index)">
                      <i class="fas fa-times fa-lg"></i>
+                    </b-button>
+
+                    <!-- @click="quitarProducto(data.index)"> -->
+                    <b-button 
+                    class="mx-auto mt-1"
+                      variant="info"
+                      size="sm"
+                      v-if="mostrarEditarProducto()"
+                      @click="editarProducto(data.item,data.index)"
+                      >
+                     <i class="fas fa-pencil-alt fa-sm"></i>
                     </b-button>
           
                      
@@ -903,7 +915,7 @@
               <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
             </div>
         </b-modal>
-
+        <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
   </b-container>
 </template>
@@ -912,21 +924,26 @@ import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import momemnt from "moment";
 import ClientesForm from "@/components/ClientesForm";
-// import ConfigVenta from "@/components/ConfigVenta";
-// import PagoDeuda from "@/components/PagoDeuda";
-// import PreOrdenLista from "@/components/PreOrdenLista.vue";
+
 import Proformas from "@/components/ProformaLista.vue";
-// //import OrdenesModal from '@/components/OrdenesModal.vue'
-// //import DeliveryModal from '@/components/DeliveryModal.vue'
-// import Spinner from "vue-simple-spinner";
+import ProductoForm from "@/components/ProductoForm";
 import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
 import AutoComplete from "@/components/AutoComplete.vue";
-// import debounce from "lodash";
+
 import Swal from "sweetalert2";
 export default {
-  components: { ProductosCarritoNuevo, ClientesForm, Proformas, AutoComplete },
+  components: {
+    ProductosCarritoNuevo,
+    ClientesForm,
+    Proformas,
+    AutoComplete,
+    ProductoForm
+  },
   data() {
     return {
+      productoSelect: {},
+      indexPos: 0,
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       navDisabled: false,
       vermas: false,
       tabActiva: 0,
@@ -1134,6 +1151,31 @@ export default {
     });
   },
   methods: {
+    mostrarEditarProducto() {
+      if (this.idPerfil != 1) {
+        return false;
+      }
+      if (this.ventas.length > 1) {
+        return false;
+      }
+      return true;
+    },
+    editarProducto(Pro, index) {
+      this.indexPos = index;
+      this.productoSelect = Pro;
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+    },
+    agregarObj(obj) {
+      this.productoSelect.precio = obj.PrecioContado;
+      const productos = [...this.ventas[0].productos];
+      productos[this.indexPos] = this.productoSelect;
+      this.ventas[0].productos = productos;
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
+      console.log(this.ventas[0].productos);
+    },
     setNewDniRuc(val) {
       this.newDniRuc = val;
     },
