@@ -55,21 +55,25 @@
     <b-row>
         <b-col cols="12">
             <b-table :fields="headerRepPro" :items="lstRepProductos">
-                <template slot="cantidad" slot-scope="data">
-                    <input type="number" v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
-                </template>
-                <template slot="diff" slot-scope="data">
-                    <span :class="(data.item.cantidad?data.item.cantidad :0) -data.item.CantidadRestante<0?'bg-red':'bg-green'">
-                      {{ (data.item.cantidad?data.item.cantidad :0) -data.item.CantidadRestante }}
-                    </span>
-                   
-                </template>
+              <template slot="cantidad" slot-scope="data">
+                <input type="number" v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
+              </template>
+              <template slot="diff" slot-scope="data">
+                <span :class="(data.item.cantidad?data.item.cantidad :0) -data.item.CantidadRestante<0?'bg-red':'bg-green'">
+                  {{ (data.item.cantidad?data.item.cantidad :0) -data.item.CantidadRestante }}
+                </span>
+                
+              </template>
+              <template slot="fechVencimiento" slot-scope="data">
+                  <input type="date" v-model="data.item.FechaVen" class="form-control" style="max-width: 150px;">
+              </template>
             </b-table>
         </b-col>
     </b-row>
     <b-row>
         <b-col cols="12" class="align-center">
             <b-button variant="success" @click="guardar()"> Guardar</b-button>
+            <b-button variant="info"  target="_blank"  :href="'/views/codigoBarra.php?hash='+ hash" v-if="hash"> Codigo Barra</b-button>
         </b-col>
     </b-row>
   </b-container>
@@ -81,6 +85,7 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      hash: "",
       lstTipoMovimiento: [],
       lstProveedor: [],
       empresa: "",
@@ -95,6 +100,7 @@ export default {
           variant: "warning"
         },
         { key: "cantidad", label: "Cantidad Realizada" },
+        { key: "fechVencimiento", label: "Fecha Vencimiento" },
         { key: "diff", label: "R/EXC" }
       ],
       lstRepProductos: [],
@@ -179,6 +185,17 @@ export default {
         });
     },
     async guardar() {
+      if (!this.lstRepProductos.some(v => !!v.cantidad && v.cantidad > 0)) {
+        this.$toasted.show(
+          "Es necesario al menos un producto con cantidad mayor que 0"
+        );
+        return false;
+      }
+
+      if (this.lstRepProductos.some(v => !v.FechaVen)) {
+        this.$toasted.show("Es necesario la fecha de Vencimiento");
+        return false;
+      }
       this.$swal
         .fire({
           icon: "question",
@@ -197,12 +214,6 @@ export default {
         });
     },
     async continuarGuardar() {
-      if (!this.lstRepProductos.some(v => !!v.cantidad && v.cantidad > 0)) {
-        this.$toasted.show(
-          "Es necesario al menos un producto con cantidad mayor que 0"
-        );
-        return false;
-      }
       this.data.productos = this.lstRepProductos.filter(
         v => !!v.cantidad && v.cantidad > 0
       );
@@ -218,17 +229,18 @@ export default {
               allowEscapeKey: false
             })
             .then(res => {
+              this.hash = response.data.hash;
+              window.open(
+                "/imprimir/entregapedido.php?IdProduccion=" +
+                  response.data.insertId +
+                  "&preview=1&id_empresa=imperiop2",
+                "_blank"
+              );
               if (res.isConfirmed) {
-                window.open(
-                  "/imprimir/entregapedido.php?IdProduccion=" +
-                    response.data.insertId +
-                    "&preview=1&id_empresa=imperiop2",
-                  "_blank",
-                  "noopener"
-                );
-                setTimeout(() => {
-                  window.location.reload();
-                }, 100);
+                this.obtenerListTipoMovimiento();
+                this.obtenerReporteProducto();
+                this.obtenerListProveedor();
+                this.cargarNumero();
               }
             });
         })
