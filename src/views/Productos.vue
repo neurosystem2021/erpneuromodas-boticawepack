@@ -141,7 +141,7 @@ export default {
       searchFilter: '',
       codigoBarraFilter: '',
       filter: '',
-      sortBy: 'IdProducto',
+      sortBy: 'CodigoBarra',
       sortDesc: false,
       productoSelect: {},
       items: [],
