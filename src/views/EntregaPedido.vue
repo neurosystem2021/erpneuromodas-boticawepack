@@ -58,14 +58,17 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th width="60%">Metodo de Pago</th>
-                        <th width="40%">Monto</th>
+                      <th width="35%">Metodo de Pago</th>
+                        <th width="30%"></th>
+                        <th width="35%">Monto</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(metodo,index) in metodoPago" :key="index">
                         <td>{{ metodo.label }}</td>
+                        <td> <b-checkbox value="1" unchecked-value="0" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
                         <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto"> </td>
+                        
                     </tr>
                     <tr>
                       <td>
@@ -117,6 +120,7 @@ export default {
         { label: "Tarjeta", monto: 0 }
       ],
       acuentaflag: 0,
+      montoPagar: 0
     };
   },
   mounted() {
@@ -138,16 +142,29 @@ export default {
     abrirModalFinalizar(producto) {
       this.item = producto;
       this.finalizarFlag = true;
-      let montoPagar = this.item.detalle.reduce((sum, producto) => {
+      this.montoPagar = this.item.detalle.reduce((sum, producto) => {
         return sum + parseFloat(producto.Cantidad * producto.Precio);
       }, 0);
 
       this.metodoPago = [
-        { label: "Efectivo", monto: montoPagar },
-        { label: "Yape", monto: 0 },
-        { label: "Plin", monto: 0 },
-        { label: "Tarjeta", monto: 0 }
+        { label: "Efectivo", monto: this.montoPagar, selected: 1 },
+        { label: "Yape", monto: 0, selected: 0 },
+        { label: "Plin", monto: 0, selected: 0 },
+        { label: "Tarjeta", monto: 0, selected: 0 }
       ];
+    },
+    cambiarMonto(metodos) {
+      this.metodoPago.forEach(metodo => {
+        if (metodo.label == metodos.label) {
+          metodo.monto = this.montoPagar;
+          metodo.selected = 1;
+        } else {
+          metodo.monto = 0;
+          metodo.selected = 0;
+        }
+        // console.log(metodos.;
+      });
+      // console.log(metodo);
     },
     async finalizar() {
       if (this.acuentaflag == 0) {

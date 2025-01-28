@@ -107,6 +107,9 @@
                          <tr v-for="(metodo,index) in data.item.metodospago.filter(v=>v.monto>0)" :key="index">
                           <td>{{ metodo.label }}</td>
                           <td>{{ metodo.monto }}</td>
+                          <td>
+                            <b-checkbox v-model="acuentaflag" value="1" unchecked-value="0">A Cuenta</b-checkbox>
+                          </td>
                         </tr>
                         <tr>
                           <th>Total:</th>
@@ -285,6 +288,7 @@ export default {
         .post(`${this.API}HistorialEntrega/actualizarcobro`, data)
         .then(async res => {
           await this.obtenerListado();
+          await this.generarResumenRerpote();
           this.pagarDeuda = false;
         });
     },
@@ -304,6 +308,7 @@ export default {
             this.resumen.Tarjeta += parseFloat(metodo.monto);
           }
         });
+        
         this.resumenDeuda.monto = 0;
         this.resumenDeuda.monto = this.lstReporte.reduce((sum, rep) => {
           return sum + parseFloat(rep.MontoPago);
