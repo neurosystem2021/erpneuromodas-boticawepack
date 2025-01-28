@@ -26,6 +26,9 @@
                       <template slot="update" slot-scope="data">
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
+                      <template slot="monto" slot-scope="data">
+                        {{ parseFloat(data.item.suma).toFixed(2) }}
+                      </template>
 
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
@@ -87,6 +90,7 @@ export default {
         "Cliente",
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
+        { key: "monto", label: "Monto" },
         { key: "UsuarioReg", label: "Empleado" },
         "update",
         "ver",
@@ -235,7 +239,7 @@ export default {
           (this.$store.state.esOrdenCompra ? item.precioc : item.precio);
         item.cantidadPres = presentacion.cantidad;
       }
-      
+
       this.$store.commit("AGREGAR_PRODUCTO", item);
     }
   }
