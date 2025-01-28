@@ -209,6 +209,7 @@
                                 :on-select="setProducto"
                                 :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
                                 :classes="{input: 'form-control'}"
+                                @keydown.native.tab.prevent="irCodeBar"
                                 style="min-width:960px ;">
                             </autocomplete>
                             <!-- <b-button variant="primary" @click="startRecognition">
@@ -293,7 +294,7 @@
                       @input="metodoPagoCambio(1)"
                        @focus="abrirModalTouch(data.index, 1)"
                        class="form-control"
-                       @keydown.enter="irCodeBar"
+                       @keydown.enter="irBusquedaProducto"
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -1044,6 +1045,10 @@ export default {
   methods: {
     irCodeBar() {
       let txtCodeBar = `txtCodeBar${this.ventaActiva}`;
+      document.getElementById(txtCodeBar).focus();
+    },
+    irBusquedaProducto() {
+      let txtCodeBar = `autocompleteProducto${this.ventaActiva}`;
       document.getElementById(txtCodeBar).focus();
     },
     setDocRef(obj) {
