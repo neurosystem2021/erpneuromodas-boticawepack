@@ -19,6 +19,9 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas 
                         :idAlmacen="venta.almacen.IdAlmacen" 
                         @onSelectProforma="setCliente"
@@ -154,7 +157,19 @@
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
+                                    <b-input-group>
+                                      <label style="margin-right: 10px;">Garantía: </label></br>
 
+                                      <b-form-radio-group 
+                                      v-model="venta.Garantia"
+                                      :options="[
+                                        { text: '3 Meses', value: 1 },
+                                        { text: '6 Meses', value: 2 },
+                                        { text: '12 Meses', value: 3 }
+                                      ]"
+                                      :disabled="bloquearInput?true:false">
+                                      </b-form-radio-group>
+                                    </b-input-group>
                                     <b-row v-if="this.$route.query.idPedido">
                                         <b-col>
                                             <b-form-group>
@@ -493,6 +508,7 @@ import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
+import Movimiento from '@/components/Movimiento'
 import Swal from "sweetalert2";
 export default {
   beforeMount() {
@@ -817,6 +833,7 @@ export default {
         CodSunatModifica: "",
         NotaIdMotivo: "",
         NotaDescMotivo: "",
+        Garantia: 0,
         EsDelivery: false,
         nombreLlevar: "",
         DireccionEntrega: "",
@@ -1532,6 +1549,7 @@ export default {
   components: {
     ProductosCarrito,
     ClientesForm,
+    Movimiento,
     ConfigVenta,
     PagoDeuda,
     PreOrdenLista,
