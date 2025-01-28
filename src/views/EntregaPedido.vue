@@ -66,13 +66,13 @@
                 <tbody>
                     <tr v-for="(metodo,index) in metodoPago" :key="index">
                         <td>{{ metodo.label }}</td>
-                        <td> <b-checkbox value="1" unchecked-value="0" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
+                        <td> <b-checkbox  size="lg"  value="1" unchecked-value="0" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
                         <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto"> </td>
                         
                     </tr>
                     <tr>
                       <td>
-                        <b-checkbox v-model="acuentaflag" value="1" unchecked-value="0">A Cuenta</b-checkbox>
+                        <b-checkbox size="lg"   v-model="acuentaflag" value="1" unchecked-value="0">A Cuenta</b-checkbox>
                       </td>
 
                     </tr>

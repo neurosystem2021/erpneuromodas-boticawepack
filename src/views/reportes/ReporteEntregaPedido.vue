@@ -107,9 +107,6 @@
                          <tr v-for="(metodo,index) in data.item.metodospago.filter(v=>v.monto>0)" :key="index">
                           <td>{{ metodo.label }}</td>
                           <td>{{ metodo.monto }}</td>
-                          <td>
-                            <b-checkbox v-model="acuentaflag" value="1" unchecked-value="0">A Cuenta</b-checkbox>
-                          </td>
                         </tr>
                         <tr>
                           <th>Total:</th>
@@ -134,7 +131,7 @@
                 <tbody>
                     <tr v-for="(metodo,index) in metodoPago" :key="index">
                         <td>{{ metodo.label }}</td>
-                        <td> <b-checkbox value="1" unchecked-value="0" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
+                        <td> <b-checkbox value="1" unchecked-value="0" size="lg" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
                         <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto"> </td>
                     </tr>
                     
@@ -291,6 +288,7 @@ export default {
           await this.generarResumenRerpote();
           this.pagarDeuda = false;
         });
+      window.location.reload();
     },
     generarResumenRerpote() {
       this.lstReporte.forEach(reporte => {
@@ -308,7 +306,7 @@ export default {
             this.resumen.Tarjeta += parseFloat(metodo.monto);
           }
         });
-        
+
         this.resumenDeuda.monto = 0;
         this.resumenDeuda.monto = this.lstReporte.reduce((sum, rep) => {
           return sum + parseFloat(rep.MontoPago);
