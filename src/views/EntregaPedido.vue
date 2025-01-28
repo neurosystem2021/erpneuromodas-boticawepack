@@ -67,6 +67,12 @@
                         <td>{{ metodo.label }}</td>
                         <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto"> </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <b-checkbox v-model="acuentaflag" value="1" unchecked-value="0">A Cuenta</b-checkbox>
+                      </td>
+
+                    </tr>
                 </tbody>
             </table>
             <template #modal-footer>
@@ -109,7 +115,8 @@ export default {
         { label: "Yape", monto: 0 },
         { label: "Plin", monto: 0 },
         { label: "Tarjeta", monto: 0 }
-      ]
+      ],
+      acuentaflag: 0,
     };
   },
   mounted() {
@@ -143,20 +150,23 @@ export default {
       ];
     },
     async finalizar() {
-      let montoPagar = this.item.detalle.reduce((sum, producto) => {
-        return sum + parseFloat(producto.Cantidad * producto.Precio);
-      }, 0);
+      if (this.acuentaflag == 0) {
+        let montoPagar = this.item.detalle.reduce((sum, producto) => {
+          return sum + parseFloat(producto.Cantidad * producto.Precio);
+        }, 0);
 
-      let montoPagado = this.metodoPago.reduce((sum, metodo) => {
-        return sum + parseFloat(metodo.monto);
-      }, 0);
+        let montoPagado = this.metodoPago.reduce((sum, metodo) => {
+          return sum + parseFloat(metodo.monto);
+        }, 0);
 
-      if (!(montoPagar == montoPagado)) {
-        this.$toasted.show("Los Monto no Coinciden");
-        return false;
+        if (!(montoPagar == montoPagado)) {
+          this.$toasted.show("Los Monto no Coinciden");
+          return false;
+        }
       }
       let data = {
         IdDocVenta: this.item.idDocVenta,
+        acuentaflag: this.acuentaflag,
         MedoPago: this.metodoPago
       };
 

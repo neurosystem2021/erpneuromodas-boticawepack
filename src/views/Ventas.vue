@@ -1830,7 +1830,9 @@ export default {
         this.continuarGuardarVenta();
       }
     },
-    async continuarGuardarVenta() {
+    async continuarGuardarVenta(e) {
+      e.preventDefault();
+      console.log("sssssssss");
       let productos = this.productos;
       if (this.venta.tipoVenta.CodSunat == "07") {
         productos = this.productos.map(item => {
@@ -1934,10 +1936,19 @@ export default {
                 "_blank",
                 "noopener"
               );
-              setTimeout(() => {
-                this.inProgress = false;
-                window.location.reload();
-              }, 4000);
+              console.log("llego");
+              this.inProgress = false;
+
+              this.$swal({
+                icon: "success",
+                title: "Registro Correcto",
+                allowOutsideClick: false,
+                allowEscapeKey: false
+              }).then(res => {
+                if (res.isConfirmed) {
+                  window.location.reload();
+                }
+              });
             })
             .catch(error => {
               console.error(error);
