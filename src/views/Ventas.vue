@@ -9,16 +9,37 @@
         </b-row>
       </b-modal>
       <b-row id="header">
-        <b-col cols="12" class="py-0">
+        <b-col cols="12"  class="py-0">
           <b-card no-body>
           <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2" >
             <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" class="mt-0 pt-0">
               <b-container fluid>
                 <b-row>
-                  <b-col cols="6">
+                  <b-col lg="6" xl="6" cols="12" >
                     <b-row>
-                  <b-col cols="4">
+                  <b-col lg="4" xl="4"  cols="12" class="mostrarMovil">
+                   Tipo de Venta: {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
+                  </b-col>
+                  <b-col lg="4" xl="4"  cols="12" class="ocultarMovil">
                     <b-input-group prepend="Doc. Venta" class="mt-2">
+                      <autocomplete
+                      required="required"
+                      :id="`inputTipoVenta${index}`"
+                      :url="API + 'ventas/tipos'"
+                      anchor="TipoDoc"
+                      initValue="BOLETA ELEC."
+                      class="font-weight-bold"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setTipoVenta"
+                      :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
+                      :classes="{input: 'form-control'}"
+                      >
+                    </autocomplete>
+                    </b-input-group>
+                  </b-col>
+                  <b-col lg="4" xl="4"  cols="12" class="mostrarMovil">
+                    <b-input-group class="mt-2">
                       <autocomplete
                       required="required"
                       :id="`inputTipoVenta${index}`"
@@ -57,7 +78,7 @@
                                 <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                             </b-input-group>
                 </b-col>
-                  <b-col md="4">
+                  <b-col md="4" class="ocultarMovil">
                     <b-input-group prepend="Alm." class="mt-2">
                         <autocomplete
                             required="required"
@@ -76,7 +97,7 @@
                         </autocomplete>
                     </b-input-group>
                     </b-col>
-                    <b-col md="4">
+                    <b-col md="4" class="ocultarMovil">
                         <b-input-group prepend="P.V. ">
                             <autocomplete
                             required="required"
@@ -98,28 +119,16 @@
                         
                         <b-form-group >
                           <b-input-group class="py-0">
+                          <b-input-group-prepend>
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
                             />
-                              <!-- <autocomplete
-                                  required="required"
-                                  :id="`inputCliente${index}`"
-                                  :url="API + 'clientes'"
-                                  anchor="ClienteDniRuc"
-                                  label="writer"
-                                  placeholder="Cliente"
-                                  class="font-weight-bold"
-                                  :initValue="initValueCliente"
-                                  :onInput="(val) => newDniRuc = val"
-                                  :on-select="setCliente" 
-                                  :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
-                                  :classes="{input: 'form-control'}">
-                              </autocomplete> -->
-                              <b-input-group-append>
-                                  <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-                              </b-input-group-append>
-                          </b-input-group>
+                          </b-input-group-prepend>
+                          <b-input-group-append>
+                            <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                          </b-input-group-append>
+                        </b-input-group>
   
                           <b-form-select v-if="ventas[ventaActiva].cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
                             <option :value="ventas[ventaActiva].cliente.Direccion">{{ venta.cliente.Direccion }}</option>
@@ -130,7 +139,7 @@
                      
                       
                   </b-col>
-                  <b-col cols="6">
+                  <b-col lg="6" xl="6"  cols="12">
                     <b-form-checkbox
                       :id="`checkbox-${index}`"
                       v-model="venta.EsOrganizacion"
@@ -140,7 +149,7 @@
                       Es Organización
                     </b-form-checkbox>  
                   </b-col>
-                  <b-col cols="6" class="pt-0" >
+                  <b-col lg="6" xl="6"  cols="12" class="pt-0" >
                     <b-form-input 
                     v-model="venta.nombreOrganizacion" 
                     v-if="venta.EsOrganizacion"
@@ -149,9 +158,9 @@
                   </b-col>
                 </b-row>
                   </b-col>
-                  <b-col cols="6">
+                  <b-col lg="6" xl="6"  cols="12" class="ocultarMovil">
                     <b-row>
-                        <b-col cols="6">
+                        <b-col lg="6" xl="6"  cols="12">
                     <center>
   
                       <h1> 
@@ -162,7 +171,7 @@
                     </center>
                     </b-col>
   
-                  <b-col cols="6">
+                  <b-col lg="6" xl="6"  cols="12">
                     <center>
   
                       <h1> 
@@ -193,7 +202,7 @@
                     :id="`txtNombreOrganizacion-${index}`"
                     placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
                   </b-col> -->
-                  <b-col md="12">
+                  <b-col lg="12" xl="12"  cols="12">
                     <b-form-group>
                         <b-input-group>
                           <b-input-group-append>
@@ -210,7 +219,8 @@
                                 :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
                                 :classes="{input: 'form-control'}"
                                 @keydown.native.tab.prevent="irCodeBar"
-                                style="min-width:960px ;">
+                                class="txtAutoComplete"
+                               >
                             </autocomplete>
                             <!-- <b-button variant="primary" @click="startRecognition">
                               <i class="fas fa-microphone"></i>
@@ -374,9 +384,9 @@
                 </b-row>
                 </div>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
-                  <b-col cols="3">
+                  <b-col lg="3" xl="3" cols="12">
                     <b-row>
-                      <b-col md="12" class="mt-1">
+                      <b-col cols="12" class="mt-1">
                         <!-- <b-button-group size="sm" class="ocularMovil">
                           <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       </b-button-group>  -->
@@ -397,7 +407,7 @@
                           <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                       </b-button-group>
                     </b-col>
-                      <b-col md="12" class="mt-1">
+                      <b-col cols="12" class="mt-1">
                         <table class="table b-table border table-footer">
                                     <tbody>
                                         <tr>
@@ -450,10 +460,10 @@
                    
                     </b-row>
                   </b-col>
-                  <b-col cols="3">
+                  <b-col lg="3" xl="3"  cols="12">
                    
   
-                    <b-col md="12" class="text-left">
+                    <b-col cols="12" class="text-left">
                       <table class="table b-table border table-footer table-sm">
                                 <tbody>
                                   <tr>
@@ -527,7 +537,7 @@
                       
                       </b-col>
                   </b-col>
-                  <b-col cols="3">
+                  <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
@@ -542,7 +552,7 @@
                       </b-button>
                     </b-row>
                   </b-col>
-                  <b-col cols="3">
+                  <b-col lg="3" xl="3"  cols="12">
                     <table class="table b-table border table-footer" style="font-size:0.85rem">
                       <tbody>
                         <tr>
@@ -1052,11 +1062,9 @@ export default {
     ocultarNav() {
       this.mostrarNav = !this.mostrarNav;
       if (!this.mostrarNav) {
-        window.parent.document.getElementById("navBar").style.display =
-          "none";
+        window.parent.document.getElementById("navBar").style.display = "none";
       } else {
-        window.parent.document.getElementById("navBar").style.display =
-          "block";
+        window.parent.document.getElementById("navBar").style.display = "block";
       }
     },
     irCodeBar() {
@@ -2546,5 +2554,29 @@ export default {
   box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
   font-size: 1.2rem;
   font-weight: bold;
+}
+.ocultarMovil {
+  display: inline;
+}
+.mostrarMovil {
+  display: none;
+}
+.b-input-group {
+  display: flex;
+  align-items: center;
+}
+.txtAutoComplete {
+  min-width: 960px;
+}
+@media (max-width: 1250px) {
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: inline;
+  }
+  .txtAutoComplete {
+    min-width: 320px !important;
+  }
 }
 </style>

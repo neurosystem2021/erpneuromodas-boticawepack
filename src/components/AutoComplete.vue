@@ -2,7 +2,7 @@
     <div class="txtText" v-click-outside="handleOutsideClick" >
       <input 
         type="text" 
-        class="form-control" 
+        class="form-control txtBuscar" 
         v-model="text"  
         @input="buscar"
         @focus="buscar"
@@ -106,7 +106,6 @@ export default {
   padding: 2px 10px;
 }
 
-
 .trDetails:hover {
   background: #007bff;
   color: #fff;
@@ -123,5 +122,13 @@ export default {
   max-height: 200px; /* Control de tamaño */
   overflow-y: auto; /* Scroll si es necesario */
   z-index: 1000; /* Asegura estar encima */
+}
+.txtBuscar {
+  min-width: 725px !important;
+}
+@media (max-width: 1250px) {
+  .txtBuscar {
+    min-width: 240px !important;
+  }
 }
 </style>
