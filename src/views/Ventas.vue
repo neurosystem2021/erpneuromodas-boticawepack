@@ -535,6 +535,11 @@
                       <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
+                      <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
+                        <i class="fas fa-bars"></i>
+                        <span v-if="mostrarNav"> Ocultar Nav</span>
+                        <span v-else> Mostrar Nav</span>
+                      </b-button>
                     </b-row>
                   </b-col>
                   <b-col cols="3">
@@ -863,6 +868,7 @@ export default {
   },
   data() {
     return {
+      mostrarNav: true,
       isNota: [],
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
@@ -1043,6 +1049,16 @@ export default {
     this.loadClienteVarios();
   },
   methods: {
+    ocultarNav() {
+      this.mostrarNav = !this.mostrarNav;
+      if (!this.mostrarNav) {
+        window.parent.document.getElementById("navBar").style.display =
+          "none";
+      } else {
+        window.parent.document.getElementById("navBar").style.display =
+          "block";
+      }
+    },
     irCodeBar() {
       let txtCodeBar = `txtCodeBar${this.ventaActiva}`;
       document.getElementById(txtCodeBar).focus();
@@ -1050,6 +1066,7 @@ export default {
     irBusquedaProducto() {
       let txtCodeBar = `autocompleteProducto${this.ventaActiva}`;
       document.getElementById(txtCodeBar).focus();
+      document.getElementById(txtCodeBar).select();
     },
     setDocRef(obj) {
       this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
