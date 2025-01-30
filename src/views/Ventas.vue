@@ -222,9 +222,9 @@
                                 class="txtAutoComplete"
                                >
                             </autocomplete>
-                            <!-- <b-button variant="primary" @click="startRecognition">
+                            <b-button variant="primary" @click="startRecognition">
                               <i class="fas fa-microphone"></i>
-                            </b-button> -->
+                            </b-button>
                           </b-input-group-append>
                         <input v-model="loadCode"
                                 :id="`txtCodeBar${index}`"
@@ -2410,6 +2410,60 @@ export default {
       //     this.showPresentacion(this.productoSelect);
       //   }
       // }
+    },
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        console.log("Speech recognition service disconnected");
+        console.log("query", this.query);
+        if (this.query) {
+          alert(`Dijiste: ${this.query}`);
+        } else {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      let ref = `autocompleteProducto${this.ventaActiva}`;
+      const inputElement = this.$refs[ref].$el.querySelector("input");
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        const event = new Event("input", { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }, 100);
     }
   },
   computed: {
@@ -2576,7 +2630,7 @@ export default {
     display: inline;
   }
   .txtAutoComplete {
-    min-width: 320px !important;
+    min-width: 280px !important;
   }
 }
 </style>
