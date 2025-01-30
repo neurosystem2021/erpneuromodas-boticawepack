@@ -65,6 +65,10 @@
           </tr>
         </tfoot>
       </table>
+      <br>
+      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+      </div>
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
         <div>NOTA:</div>
