@@ -1057,6 +1057,11 @@ export default {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
+    this.$nextTick(() => {
+      let inputElement = `autocompleteProducto${this.ventaActiva}`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+    });
   },
   methods: {
     ocultarNav() {
@@ -1188,8 +1193,6 @@ export default {
       };
 
       this.recognition.onend = async () => {
-        console.log("Speech recognition service disconnected");
-        console.log("query", this.query);
         if (!this.query) {
           alert("No se pudo captar ninguna palabra");
         }
@@ -1202,27 +1205,41 @@ export default {
         alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
+    // search() {
+    //   let text = `autocompleteProducto${this.ventaActiva}`;
+    //   console.log(text);
+    //   let autoComplete = document.getElementById(text);
+    //   // let buscarProducto = document.getElementById(text);
+    //   // let autoComplete = this.$refs[text];
+
+    //   if (!autoComplete || !autoComplete.$el) {
+    //     console.error(
+    //       "No se encontró el componente autocomplete o su elemento DOM."
+    //     );
+    //     return;
+    //   }
+
+    //   let inputElement = autoComplete.$el.querySelector("input");
+    //   if (inputElement) {
+    //     // Establece el valor
+
+    //     // Dispara el evento 'input' para notificar el cambio
+    //     let event = new Event("input", { bubbles: true });
+    //     inputElement.value = this.query;
+    //     inputElement.dispatchEvent(event);
+    //   }
+    // },
     search() {
-      let text = `autocompleteProducto${this.ventaActiva}`;
-      let buscarProducto = document.getElementById(text);
-      let autoComplete = this.$refs[text];
-
-      if (!autoComplete || !autoComplete.$el) {
-        console.error(
-          "No se encontró el componente autocomplete o su elemento DOM."
-        );
-        return;
-      }
-
-      let inputElement = autoComplete.$el.querySelector("input");
-      if (inputElement) {
-        // Establece el valor
-
-        // Dispara el evento 'input' para notificar el cambio
-        let event = new Event("input", { bubbles: true });
-        inputElement.value = this.query;
-        inputElement.dispatchEvent(event);
-      }
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true
+      });
+      let inputElement = `autocompleteProducto${this.ventaActiva}`;
+      let autocompleteInput = document.getElementById(inputElement);
+      setTimeout(() => {
+        document.getElementById(inputElement).value = this.query;
+        autocompleteInput.dispatchEvent(inputEvent);
+      }, 200);
     },
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
@@ -1480,6 +1497,14 @@ export default {
       document.getElementById(p).disabled = true;
       let e = `inputAlmacen${this.ventaActiva}`;
       document.getElementById(e).disabled = true;
+
+      setTimeout(() => {
+        this.$nextTick(() => {
+          let inputElement = `autocompleteProducto${this.ventaActiva}`;
+          let autocompleteInput = document.getElementById(inputElement);
+          autocompleteInput.focus();
+        });
+      }, 100);
     },
     eliminarCliente() {
       // this.$refs.inputCliente.setValue("");
@@ -2410,60 +2435,6 @@ export default {
       //     this.showPresentacion(this.productoSelect);
       //   }
       // }
-    },
-    startRecognition() {
-      if (!("webkitSpeechRecognition" in window)) {
-        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
-        return;
-      }
-
-      this.recognition = new webkitSpeechRecognition();
-      this.recognition.lang = "es-ES";
-      this.recognition.continuous = false;
-      this.recognition.interimResults = false;
-
-      this.recognition.onstart = () => {
-        console.log("Speech recognition service has started");
-      };
-
-      this.recognition.onresult = event => {
-        if (event.results.length > 0) {
-          this.query = event.results[0][0].transcript;
-          this.search();
-        }
-      };
-
-      this.recognition.onerror = event => {
-        console.error("Speech Recognition Error:", event);
-        alert(`Error en el reconocimiento de voz: ${event.error}`);
-      };
-
-      this.recognition.onend = async () => {
-        console.log("Speech recognition service disconnected");
-        console.log("query", this.query);
-        if (this.query) {
-          alert(`Dijiste: ${this.query}`);
-        } else {
-          alert("No se pudo captar ninguna palabra");
-        }
-      };
-
-      try {
-        this.recognition.start();
-      } catch (error) {
-        console.error("Error starting recognition:", error);
-        alert("No se pudo iniciar el reconocimiento de voz.");
-      }
-    },
-    search() {
-      let ref = `autocompleteProducto${this.ventaActiva}`;
-      const inputElement = this.$refs[ref].$el.querySelector("input");
-      inputElement.focus();
-      setTimeout(() => {
-        inputElement.value = this.query;
-        const event = new Event("input", { bubbles: true });
-        inputElement.dispatchEvent(event);
-      }, 100);
     }
   },
   computed: {
