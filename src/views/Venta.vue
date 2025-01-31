@@ -941,6 +941,7 @@ export default {
   },
   data() {
     return {
+      lstOfertas: [],
       productoSelect: {},
       indexPos: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -1133,6 +1134,7 @@ export default {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
+    this.ObtenerLstOfertas();
     this.$root.$on("bv::hide::popover", id => {
       const metodoPagoIndex = id.replace("popover-metodopago", "");
       const opcionesIndex = id.replace("popover-opciones", "");
@@ -1151,6 +1153,51 @@ export default {
     });
   },
   methods: {
+    async ObtenerLstOfertas() {
+      await this.axios(`${this.API}ofertas/listadoimpresion`).then(res => {
+        if (res) {
+          this.lstOfertas = res.data;
+        }
+      });
+    },
+    generarOfertas() {
+      let IdOferta = [];
+      let productos = this.ventas[this.ventaActiva].productos;
+      let IdProductos = productos.map(producto => {
+        return producto.IdProducto;
+      });
+      console.log("IdProductos", IdProductos);
+      this.lstOfertas.forEach(oferta => {
+        if (oferta.ProductoFlag == 1) {
+          let producto = productos.filter(
+            v => v.IdProducto == oferta.IdProducto
+          )[0];
+
+          if (producto) {
+            // console.log("entro");
+            if (oferta.MontoFlag == 1) {
+              // console.log("a");
+              if (oferta.Monto <= producto.cantidad * producto.precio) {
+                IdOferta.push(oferta.IdOferta);
+              }
+            } else if (oferta.CantidadFlag == 1) {
+              // console.log("b");
+              if (oferta.Cantidad <= producto.cantidad) {
+                // console.log("c");
+                IdOferta.push(oferta.IdOferta);
+              }
+            } else {
+              // console.log("d");
+              IdOferta.push(oferta.IdOferta);
+            }
+          }
+        } else if (oferta.MontoFlag == 1) {
+          // console.log("d");
+          IdOferta.push(oferta.IdOferta);
+        }
+      });
+      return IdOferta;
+    },
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1991,7 +2038,7 @@ export default {
 
         return;
       }
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+      // console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
       if (
         productos.some(
           v =>
@@ -2041,16 +2088,21 @@ export default {
         .trim();
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
+          let IdOfertas = this.generarOfertas();
+          let IdOfertasString = IdOfertas.join(",");
+
           this.$toasted.success("Venta realizada con exito");
           window.open(
-            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
-            "_blank",
-            "noopener"
+            "/imprimir/index.php?IdDocVenta=" +
+              response.data.insertId +
+              "&IdOfertas=" +
+              IdOfertasString,
+            "_blank"
           );
         }
 
         if (this.ventas.length == 1) {
-          window.location.reload();
+          // window.location.reload();
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
