@@ -487,9 +487,11 @@ export default {
     this.loadComisionista();
     this.escucharPedidos();
     this.getEstadoSistema();
+    this.ObtenerLstOfertas();
   },
   data() {
     return {
+      lstOfertas: [],
       isNota: false,
       dni: "",
       adelanto: 0,
@@ -595,6 +597,14 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    async ObtenerLstOfertas() {
+      await this.axios(`${this.API}ofertas/listadoimpresion`).then(res => {
+        if (res) {
+          this.lstOfertas = res.data;
+        }
+      });
+    },
+
     getEstadoSistema() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       if (hostUrl != null) {
@@ -1243,7 +1253,8 @@ export default {
         this.inProgress = false;
         return;
       }
-
+      let IdOfertas = this.generarOfertas();
+     
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
@@ -1276,8 +1287,13 @@ export default {
           this.$refs.inputVendedor.setValue("");
           this.$refs.inputComisionista.setValue("");
           this.$refs.carrito.pagocon = 0;
+          let IdOfertasString = IdOfertas.join(",");
+          this.limpiarDespuesVenta();
           window.open(
-            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+            "/imprimir/index.php?IdDocVenta=" +
+              response.data.insertId +
+              "&IdOfertas=" +
+              IdOfertasString,
             "_blank"
           );
         })
@@ -1287,6 +1303,41 @@ export default {
           this.inProgress = false;
         });
       window.location.reload();
+    },
+    generarOfertas() {
+      let IdOferta = [];
+    
+      this.lstOfertas.forEach(oferta => {
+        if (oferta.ProductoFlag == 1) {
+          let producto = this.productos.filter(
+            v => v.IdProducto == oferta.IdProducto
+          )[0];
+         
+          if (producto) {
+          
+            if (oferta.MontoFlag == 1) {
+            
+              if (oferta.Monto <= producto.cantidad * producto.precio) {
+                IdOferta.push(oferta.IdOferta);
+              }
+            } else if (oferta.CantidadFlag == 1) {
+             
+              if (oferta.Cantidad <= producto.cantidad) {
+                IdOferta.push(oferta.IdOferta);
+              }
+            } else {
+           
+              IdOferta.push(oferta.IdOferta);
+            }
+          }
+        } else if (oferta.MontoFlag == 1) {
+          IdOferta.push(oferta.IdOferta);
+        }
+        // else if (oferta.CantidadFlag == 1) {
+        //   console.log("Imprimir ofertas relacionadas con CantidadFlag");
+        // }
+      });
+      return IdOferta;
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
