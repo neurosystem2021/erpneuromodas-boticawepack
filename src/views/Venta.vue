@@ -273,7 +273,9 @@
                   <!-- <b-col md="12" class="mt-1">
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
                   </b-col> -->
-                 
+                  <b-col md="12" class="mt-1">
+                    <pago-deuda></pago-deuda>
+                  </b-col>
                   </b-row>
                 </b-col>
                 <b-col cols="4">
@@ -932,6 +934,7 @@ import Proformas from "@/components/ProformaLista.vue";
 import ProductoForm from "@/components/ProductoForm";
 import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
 import AutoComplete from "@/components/AutoComplete.vue";
+import PagoDeuda from "@/components/PagoDeuda";
 
 import Swal from "sweetalert2";
 export default {
@@ -940,6 +943,7 @@ export default {
     ClientesForm,
     Proformas,
     AutoComplete,
+    PagoDeuda,
     ProductoForm
   },
   data() {
