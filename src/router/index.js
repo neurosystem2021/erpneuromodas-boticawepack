@@ -15,6 +15,7 @@ import AgenteCierreCaja from "@/views/AgenteCierreCaja.vue";
 import AgenteGeneral from "@/views/AgenteGeneral.vue";
 import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
 import Traslado from "@/views/Traslado.vue";
+import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -211,6 +212,12 @@ export default new Router({
       path: "/reporte_utlidad_bruta",
       name: "ReporteUtilidadBruta",
       component: ReporteUtilidadBruta
+    },
+
+    {
+      path: "/oferta",
+      name: "ConfigurarOferta",
+      component: ConfigurarOferta
     }
   ]
 });

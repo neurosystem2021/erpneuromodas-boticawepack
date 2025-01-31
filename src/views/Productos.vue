@@ -1,8 +1,8 @@
 <template>
   <div>
-      <b-container fluid style="width: calc(80%) !important;" class="bv-example-row">
+      <b-container fluid class="bv-example-row">
         <b-row>
-          <b-col md="6" class="my-1">
+          <b-col md="4" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -13,17 +13,22 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="8" class="my-1">
             <b-row>
-            <b-col md="6">
+            <b-col md="3">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
             </b-col>
-            <b-col md="4">
+            <b-col md="2">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
+            <b-col md="5">
+                <b-form-group horizontal label="T. Cambio" class="mb-0">
+                  <input class="form-control" type="number" v-model="tipocambio" label="Tipo Cambio" placeholder="Tipo Cambio">
+                </b-form-group>
+              </b-col>
             <b-col md="2">
                 <codigo-multiple></codigo-multiple>
               </b-col>
@@ -52,6 +57,14 @@
               <h4><b-badge variant="info" style="width: 50px;" v-if="data.item.MostrarApp == 1">SI</b-badge></h4>
             </template>
           
+            <template slot="PrecioCostoDolar" slot-scope="data">
+              {{ parseFloat(data.item.PrecioCosto * tipocambio).toFixed(2) }}
+            </template>
+          
+            <template slot="PrecioContadoDolar" slot-scope="data">
+              {{ parseFloat(data.item.PrecioContado * tipocambio).toFixed(2) }}
+            </template>
+          
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
@@ -72,91 +85,112 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
-import ProductoForm from '@/components/ProductoForm'
-import CodigoMultiple from '@/components/CodigoMultiple'
+import config from "@/store/config.js";
+import ProductoForm from "@/components/ProductoForm";
+import CodigoMultiple from "@/components/CodigoMultiple";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "productos/count").then(response => {
+      this.totalRows = response.data.total;
+    });
+    this.obtnerTipoCambio();
   },
   data() {
     return {
+      tipocambio: 0,
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'IdProducto',
+      sortBy: "IdProducto",
       sortDesc: false,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
-            { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoMedicion', label: 'Medición', sortable: true },
-            { key: 'ProductoPresentacion', label: 'Presentación', sortable: true },
-            { key: 'PosOferta', label: 'Orden Oferta', sortable: true },
-            { key: 'MostrarApp', label: 'En App', sortable: true },
+        { key: "CodigoBarra", label: "Codigo", sortable: true },
+        { key: "Producto", sortable: true },
+        { key: "ProductoCategoria", label: "Categoría", sortable: true },
+        { key: "ProductoMarca", label: "Marca", sortable: true },
+        { key: "ProductoMedicion", label: "Medición", sortable: true },
+        { key: "ProductoPresentacion", label: "Presentación", sortable: true },
+        { key: "PosOferta", label: "Orden Oferta", sortable: true },
+        { key: "PrecioCosto", sortable: true },
+        { key: "PrecioCostoDolar", sortable: true },
+        { key: "PrecioContado", sortable: true },
+        { key: "PrecioContadoDolar", sortable: true },
+        { key: "MostrarApp", label: "En App", sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.productoSelect = item
-        this.$refs.productoForm.show = true;
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaProductos.refresh()
-      },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+    rowClick(item, index) {
+      this.productoSelect = item;
+      this.$refs.productoForm.show = true;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    async obtnerTipoCambio() {
+      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
+        res => {
+          this.tipocambio = res.data.Cotizacion[0].Venta;
+        }
+      );
+    },
+    actualizarTabla() {
+      this.$refs.tablaProductos.refresh();
+    },
+    nuevoProducto() {
+      this.productoSelect = {};
+      this.$refs.productoForm.show = true;
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "productos?limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
+      return promise
+        .then(result => {
+          this.items = result.data;
 
-        return promise.then((result) => {
-          this.items = result.data
-
-
-          this.items.map((r)=>{
+          this.items.map(r => {
             if (r.Anulado === 1) {
-              r._rowVariant = 'danger'
+              r._rowVariant = "danger";
             }
-          })
+          });
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    }
   },
   components: {
-      ProductoForm,
-      CodigoMultiple
+    ProductoForm,
+    CodigoMultiple
   }
-}
+};
 </script>
 
 <style>
-
 </style>
