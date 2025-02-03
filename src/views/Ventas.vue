@@ -267,12 +267,11 @@
                         >
                         <i class="fas fa-list"></i>
                       </b-button>
-                      
-                      <b-button @click="abrirImagen(data.item.Producto,data.index.Imagen == null ||data.index.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.index.Imagen)" style="margin-top:2px;"
+                      <b-button @click="abrirImagen(data.item.Producto,data.item.Imagen == null ||data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;"
                        :id="'popover-imagen' +data.index.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
                         <b-popover placement="right" :target="'popover-imagen' + data.index.IdProducto" :title="data.index.Producto" triggers="hover">
                       <div style="text-align:center">
-                        <b-img style="border-radius: 10px; width:200px" fluid :src="data.index.Imagen == null || data.index.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.index.Imagen" alt="" @error="setAltImg" ></b-img>	
+                        <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
                       </div>
                     </b-popover>
                        
@@ -906,6 +905,7 @@ export default {
       tieneIgv: [],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
+        { key: "CodigoBarra" },
         { key: "Producto" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
@@ -1071,7 +1071,6 @@ export default {
       }
     },
     agregarObj(obj) {
-    
       this.productoSelect.precio = obj.PrecioContado;
       const productos = [...this.ventas[0].productos];
       productos[this.indexPos] = this.productoSelect;
@@ -1079,7 +1078,6 @@ export default {
       this.$nextTick(() => {
         this.$forceUpdate();
       });
-      console.log(this.ventas[0].productos);
     },
     irCodeBar() {
       let txtCodeBar = `txtCodeBar${this.ventaActiva}`;
@@ -2009,7 +2007,6 @@ export default {
         .toUpperCase()
         .trim();
       await this.axios.post(this.API + "ventas", venta).then(response => {
-        console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
@@ -2207,7 +2204,6 @@ export default {
         .toUpperCase()
         .trim();
       await this.axios.post(this.API + "proformas", venta).then(response => {
-        console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");
           window.open(
@@ -2231,7 +2227,7 @@ export default {
       let venta = { ...this.venta };
       venta.cliente = proforma;
       let productos = [];
-      console.log("productos", proforma);
+
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
@@ -2275,7 +2271,7 @@ export default {
         productos.push(prod);
       });
       venta.productos = productos;
-      console.log(venta);
+
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
@@ -2346,7 +2342,6 @@ export default {
       this.$route.query.idPedido = obj.IdPedido;
       let venta = { ...this.venta };
       if (this.$route.query.idPedido) {
-        console.log(obj);
         this.infoDelivery = obj;
         this.venta.EsDelivery = true;
         // this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
@@ -2426,7 +2421,6 @@ export default {
       }
     },
     abrirImagen(producto, url) {
-      console.log(producto);
       this.productoNombre = producto;
       this.productoUrl = url;
       this.$refs["modalImagen"].show();
