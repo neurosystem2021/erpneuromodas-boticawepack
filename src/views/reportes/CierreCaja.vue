@@ -698,7 +698,7 @@ export default {
     },
     generarReporte() {
       let productos = [];
-      this.ventas.forEach(venta => {
+      this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
         venta.productos.forEach(producto => {
           productos.push(producto);
         });
