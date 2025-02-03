@@ -238,7 +238,7 @@
                             <producto-form 
                             :showButton="true" 
                             :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"
-                            :ref="`productoFormEdit${index}`" 
+                            :ref="productoFormEdit" 
                             :producto-update="productoSelect" />
                         </b-input-group-append>
                         </b-input-group>
@@ -1304,7 +1304,7 @@ export default {
     },
     editarProducto(Pro) {
       this.productoSelect = Pro;
-      let modalRef = this.$refs[`productoFormEdit${this.ventaActiva}`];
+      let modalRef = this.$refs[`productoFormEdit`];
       // .$refs
       //   .productoForm;
       console.log(modalRef.show);
@@ -1951,25 +1951,25 @@ export default {
 
         return;
       }
-      console.log(productos);
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        )
-      ) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        return;
-      }
+      // console.log(productos);
+      // if (
+      //   productos.some(
+      //     v =>
+      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+      //       v.stock
+      //   )
+      // ) {
+      //   this.$swal({
+      //     position: "center",
+      //     icon: "info",
+      //     title: "No se puede vender un producto sin stock",
+      //     showConfirmButton: true,
+      //     confirmButtonText: "Entiendo",
+      //     target: document.getElementById("conten"),
+      //     confirmButtonColor: "#0275d8"
+      //   });
+      //   return;
+      // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
@@ -2206,6 +2206,12 @@ export default {
           );
         }
       });
+      if (this.ventas.length == 1) {
+        window.location.reload();
+      } else {
+        this.eliminarVentana();
+        this.getVendedorInfo();
+      }
     },
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
@@ -2215,6 +2221,7 @@ export default {
       let venta = { ...this.venta };
       venta.cliente = proforma;
       let productos = [];
+      console.log("productos", proforma);
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
@@ -2257,8 +2264,8 @@ export default {
           : null;
         productos.push(prod);
       });
-
       venta.productos = productos;
+      console.log(venta);
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
