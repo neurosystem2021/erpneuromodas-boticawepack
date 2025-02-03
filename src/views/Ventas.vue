@@ -123,6 +123,7 @@
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
+                              @dniRuc="setNewDniRuc"
                             />
                           </b-input-group-prepend>
                           <b-input-group-append>
@@ -235,11 +236,6 @@
                         <b-input-group-append>
                             <!--<proveedores-tabla></proveedores-tabla>-->
                             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-                            <producto-form 
-                            :showButton="true" 
-                            :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"
-                            :ref="productoFormEdit" 
-                            :producto-update="productoSelect" />
                         </b-input-group-append>
                         </b-input-group>
                     </b-form-group>
@@ -354,15 +350,14 @@
                        <i class="fas fa-times fa-lg"></i>
                       </b-button>
             
-                      <b-button  
-                      style="margin-top:5px" 
-                      :disabled="bloquearInput?true:false"
-                       v-if="(idPerfil == 1) ? true : false"  
-                      variant="primary" 
+                      <b-button 
+                    class="mx-auto mt-1"
+                      variant="info"
                       size="sm"
-                       @click="editarProducto(data.item)">
-                      <i class="fas fa-pencil-alt fa-sm">
-                      </i>
+                      v-if="mostrarEditarProducto()"
+                      @click="editarProducto(data.item,data.index)"
+                      >
+                     <i class="fas fa-pencil-alt fa-sm"></i>
                     </b-button>
        
                     </template>
@@ -845,7 +840,12 @@
         </b-modal>
 
         <!-- MODALS TOUCH -->
-    </b-container>
+        <producto-form 
+        :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit"
+         :producto-update="productoSelect"
+         ></producto-form>
+        
+      </b-container>
   </template>
   <script>
 import { mapActions, mapState } from "vuex";
@@ -1045,8 +1045,6 @@ export default {
       modalPresentacion: false,
       producto: {},
       index: 0,
-
-      productoSelect: {},
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       objProd: {},
@@ -1071,6 +1069,16 @@ export default {
       } else {
         window.parent.document.getElementById("navBar").style.display = "block";
       }
+    },
+    agregarObj(obj) {
+      this.productoSelect.precio = obj.PrecioContado;
+      const productos = [...this.ventas[0].productos];
+      productos[this.indexPos] = this.productoSelect;
+      this.ventas[0].productos = productos;
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
+      console.log(this.ventas[0].productos);
     },
     irCodeBar() {
       let txtCodeBar = `txtCodeBar${this.ventaActiva}`;
@@ -1241,6 +1249,15 @@ export default {
         autocompleteInput.dispatchEvent(inputEvent);
       }, 200);
     },
+    mostrarEditarProducto() {
+      if (this.idPerfil != 1) {
+        return false;
+      }
+      if (this.ventas.length > 1) {
+        return false;
+      }
+      return true;
+    },
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
       this.cantidadInput = "";
@@ -1302,19 +1319,11 @@ export default {
         }
       });
     },
-    editarProducto(Pro) {
+    editarProducto(Pro, index) {
+      this.indexPos = index;
       this.productoSelect = Pro;
-      let modalRef = this.$refs[`productoFormEdit`];
-      // .$refs
-      //   .productoForm;
-      console.log(modalRef.show);
-      // modalRef.show = true;
-      // modalRef.nuevo = true;
-      // if (modalRef) {
-      //   modalRef.show();
-      // } else {
-      //   console.error("Referencia no encontrada");
-      // }
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
     },
     getVendedorInfo() {
       let usuario = sessionStorage.getItem("User");
@@ -2420,28 +2429,6 @@ export default {
       this.productoNombre = producto;
       this.productoUrl = url;
       this.$refs["modalImagen"].show();
-    },
-    agregarGuardar(id, pxp, obj) {
-      console.log("ddd");
-      // this.add([id, false, false, false, false, true, this.isVentas]);
-      // setTimeout(() => {
-      //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-      // }, 200);
-
-      // if (this.isVentas) {
-      //   let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
-      //   if (fPP.length != 4) {
-      //     obj.ProductoMedicion = obj.medicion.ProductoMedicion;
-      //     obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
-      //     obj.IdProductoMarca = obj.marca.IdProductoMarca;
-      //     obj.ProductoMarca = obj.marca.ProductoMarca;
-      //     obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
-      //     obj.ProductoCategoria = obj.categoria.ProductoCategoria;
-      //     this.productoSelect = obj;
-      //     this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
-      //     this.showPresentacion(this.productoSelect);
-      //   }
-      // }
     }
   },
   computed: {
