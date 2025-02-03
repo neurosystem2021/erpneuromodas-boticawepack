@@ -1071,6 +1071,7 @@ export default {
       }
     },
     agregarObj(obj) {
+    
       this.productoSelect.precio = obj.PrecioContado;
       const productos = [...this.ventas[0].productos];
       productos[this.indexPos] = this.productoSelect;
