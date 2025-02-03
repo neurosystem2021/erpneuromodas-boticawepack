@@ -706,9 +706,8 @@ export default {
         .then(response => {
           if (this.cbGuardar) {
             this.cbGuardar(
-              response.data.insertId,
-              this.producto.precios,
-              this.producto
+              this.producto.IdProducto ? this.producto : response.data.insertId,
+              this.producto.precios
             );
           }
           if (response.data.error) {
