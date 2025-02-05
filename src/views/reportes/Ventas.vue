@@ -140,7 +140,10 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" 
+              :href="'/api/index.php/reporte/ventasporvendedor?idAlmacen='+almacen.IdAlmacen+'&vendedor='+vendedor.Usuario+'&fechaInicio='+fechaInicio+
+              '&fechaFin='+fechaFin+'&declarado='+declarado+'&idTipoDoc='+tipoDoc.IdTipoDoc" 
+              target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
