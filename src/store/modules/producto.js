@@ -6,7 +6,7 @@ const state = {
   
 const mutations = {
   AGREGAR_PRODUCTO ({ productos }, producto) {
-    productos.push(producto)
+    productos.unshift(producto)
   },
   ELIMINAR_PRODUCTO ({ productos }, ) {
     const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)

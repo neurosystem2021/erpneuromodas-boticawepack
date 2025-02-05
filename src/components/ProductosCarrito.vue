@@ -7,21 +7,38 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1}"
+             :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': '1'}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+            :classes="{input: 'form-control'}"
+            @keydown.prevent.tab="irBusquedaBarCode()"
+            >
           </autocomplete>
+          <!-- <autocomplete
+            ref="autocompleteProducto"
+            :url="APIProductos"
+            :customParams="{idAlmacen: idAlmacen, 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': '1'}"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :classes="{input: 'form-control'}"
+            @keydown.prevent.tab="irBusquedaBarCode"
+            >
+          </autocomplete> -->
           <input v-model="loadCode"
                  :disabled="bloquearInput?true:false"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
-                  placeholder="Codigo de Barra" />
+                  placeholder="Codigo de Barra" 
+                  id="loadBarcode"/>
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
@@ -44,6 +61,7 @@
         
         <template slot="cantidad" slot-scope="data">
           <input
+            :id="`cantidad${data.index}`"
             v-model="productos[data.index].cantidad"
             :disabled="bloquearInput?true:false"
             type="number"
@@ -57,6 +75,8 @@
               productos[data.index].precio = (val.target.value >= productos[data.index].StockPorMayor && productos[data.index].StockPorMayor !== 0) ? productos[data.index].PrecioPorMayor : productos[data.index].PrecioContado
               }
             }"
+            @keydown.prevent.enter="irBusquedaProducto()"
+
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
@@ -196,22 +216,30 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
-import axios from 'axios'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
+import axios from "axios";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
-    if(this.$route.query.idProducto) {
-        this.add([this.$route.query.idProducto, (obj) => {}, { setPrecio: this.setPrecio,  setSuma: true }])
+    if (this.$route.query.idProducto) {
+      this.add([
+        this.$route.query.idProducto,
+        obj => {},
+        { setPrecio: this.setPrecio, setSuma: true }
+      ]);
     }
   },
-  data () {
+  beforeMount() {
+    this.irBusquedaProducto();
+  },
+
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       productosCaja: {},
@@ -219,25 +247,25 @@ export default {
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
-      idPerfil: sessionStorage.getItem('IdPerfil')
-    }
+      idPerfil: sessionStorage.getItem("IdPerfil")
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     }
   },
   props: {
     setPrecio: Boolean,
     idAlmacen: Number,
-    isVentas:Boolean,
-    isOrdenCompra:Boolean,
-    bloquearInput:Boolean,
+    isVentas: Boolean,
+    isOrdenCompra: Boolean,
+    bloquearInput: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -245,26 +273,26 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo' }, 
-          { key: 'Color', label: 'Color' }, 
-          { key: 'ProductoTalla', label: 'Talla' },
-          { key: 'Genero' },
-          { key: 'Botapie' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "ProductoCategoria", label: "Categoria" },
+          { key: "Producto", label: "Artículo" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoModelo", label: "Modelo" },
+          { key: "Color", label: "Color" },
+          { key: "ProductoTalla", label: "Talla" },
+          { key: "Genero" },
+          { key: "Botapie" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     },
@@ -275,81 +303,138 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen && this.isVentas) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       }
-      return this.API + 'productos'
+      return this.API + "productos";
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal - this.sumatoriaIgv;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
       obtenercant: "obtenercantidad"
     }),
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    irBusquedaProducto() {
+      this.$nextTick(() => {
+        let autoComplete = this.$refs["autocompleteProducto"];
+
+        if (!autoComplete || !autoComplete.$el) {
+          console.error("No se encontró el componente o su elemento DOM.");
+          return;
+        }
+
+        let inputElement = autoComplete.$el.querySelector("input");
+
+        if (inputElement) {
+          inputElement.focus(); // Enfoca el input
+          inputElement.select(); // Opcional: selecciona el texto dentro del input
+        } else {
+          console.error(
+            "No se encontró el input dentro del componente autocompleteProducto"
+          );
+        }
+      });
     },
-    loadBarcode (e) {
-      e.preventDefault()
+    irBusquedaBarCode() {
+      this.$nextTick(() => {
+        let inputElement = document.getElementById("loadBarcode");
+        inputElement.focus();
+        inputElement.select();
+      });
+    },
+    irBusquedaCantidad() {
+      this.$nextTick(() => {
+        let inputElement = document.getElementById("cantidad0");
+        inputElement.focus();
+        inputElement.select();
+        // let autoComplete = this.$refs["cantidad0"];
+
+        // if (!autoComplete || !autoComplete.$el) {
+        //   console.error("No se encontró el componente o su elemento DOM.");
+        //   return;
+        // }
+
+        // let inputElement = autoComplete.$el.querySelector("input");
+
+        // if (inputElement) {
+        //   inputElement.focus(); // Enfoca el input
+        //   inputElement.select(); // Opcional: selecciona el texto dentro del input
+        // } else {
+        //   console.error(
+        //     "No se encontró el input dentro del componente autocompleteProducto"
+        //   );
+        // }
+      });
+    },
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
+    },
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
+        this.add([
+          idProducto,
+          obj => {
+            if (obj) {
+              this.$emit("onAddProducto");
+              this.$toasted.show("Producto añadido correctamente");
+            } else {
+              this.$toasted.show("No se encontró ningun producto");
+            }
+            this.loadCode = "";
+          },
+          { setPrecio: this.setPrecio, setSuma: true },
+          true
+        ]);
       }
     },
     /*alterarBuscadorProductos() {
@@ -381,91 +466,131 @@ export default {
       }
     },*/
     obtenerStockCaja(prod) {
-     axios.get(this.API + 'productos/stock/caja', {
-        params: {
-          idProducto: prod.IdProducto,
-          idAlmacen: this.idAlmacen
-        }
-      }).then((response) => {
-        Vue.set(this.productosCaja, prod.IdProducto, {stock: response.data.stock})
-        if(this.isOrdenCompra){
-          this.obtenercant(response.data.stock)
-        }
-        //console.log(response.data.stock)
+      axios
+        .get(this.API + "productos/stock/caja", {
+          params: {
+            idProducto: prod.IdProducto,
+            idAlmacen: this.idAlmacen
+          }
+        })
+        .then(response => {
+          Vue.set(this.productosCaja, prod.IdProducto, {
+            stock: response.data.stock
+          });
+          if (this.isOrdenCompra) {
+            this.obtenercant(response.data.stock);
+          }
+          //console.log(response.data.stock)
           //return response.data.stock
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
-    setProducto (obj) {
-      
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    setProducto(obj) {
       if (obj.ControlaStock && obj.stock <= 0) {
-        this.$toasted.show('No esta permitido la venta sin stock!')
+        this.$toasted.show("No esta permitido la venta sin stock!");
         return;
       }
 
-      this.obtenerStockCaja(obj)
+      this.obtenerStockCaja(obj);
 
-      this.$refs.autocompleteProducto.setValue('')
+      this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
+      obj.precio = 0;
+      obj.cantidad = 0;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-      }])
-
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj = this.onSetProducto(obj);
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+        }
+      ]);
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.irBusquedaCantidad();
+        });
+      }, 100);
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
+    // renderChild(data) {
+    //   if (this.idAlmacen) {
+    //     let style = "ss";
+    //     if (data.stock <= 0) {
+    //       style = "danger";
+    //     }
+    //     // cambiar color los que faltan 4 meses por vencer
+    //     if (data.stock > 0) {
+    //       style = "success";
+    //     }
+    //     return `
+    //      <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
+    //       data.stock
+    //         ? Number.isInteger(data.stock)
+    //           ? data.stock
+    //           : data.stock.toFixed(2)
+    //         : data.stock
+    //     }</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${
+    //       data.PrecioContado
+    //         ? data.PrecioContado.toFixed(2)
+    //         : data.PrecioContado
+    //     }</b>
+    //   `;
+    //   }
+    //   return `
+    //     <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+    //     data.ProductoMarca
+    //   }
+    //   `;
+    // },
     renderChild(data) {
       if (this.idAlmacen && this.isVentas) {
-        let style = 'ss'
-        let styleBag = 'ss'
+        let style = "ss";
+        let styleBag = "ss";
         // cambiar color los vencidos
-        var dt = new Date()
-        var anio = dt.getFullYear()
-        var mes =  dt.getMonth() + 1
-        var dia = dt.getDate()
-        var fechaVen = new Date(data.FechaVen).getTime()
-        
-        var hoy = anio + "-" + mes + "-" + dia
-        hoy = new Date(hoy).getTime()
-        var en4meses = anio + '-' + (mes + 4) + '-' + dia
-        en4meses = new Date(en4meses).getTime()
+        var dt = new Date();
+        var anio = dt.getFullYear();
+        var mes = dt.getMonth() + 1;
+        var dia = dt.getDate();
+        var fechaVen = new Date(data.FechaVen).getTime();
+
+        var hoy = anio + "-" + mes + "-" + dia;
+        hoy = new Date(hoy).getTime();
+        var en4meses = anio + "-" + (mes + 4) + "-" + dia;
+        en4meses = new Date(en4meses).getTime();
 
         // if(fechaVen < hoy && data.stock > 0) {
-        if(fechaVen && fechaVen < hoy) {
-          style = 'danger'
+        if (fechaVen && fechaVen < hoy) {
+          style = "danger";
         }
 
         // cambiar color los que faltan 4 meses por vencer
         // if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
         if (fechaVen >= hoy && fechaVen <= en4meses) {
-          style = 'ambar'
+          style = "ambar";
         }
 
         if (!data.ControlaStock) {
-          data.stock = '--'
-          styleBag  = 'dark'
+          data.stock = "--";
+          styleBag = "dark";
         }
 
         if (data.stock > 0) {
-          styleBag  = 'table-success'
+          styleBag = "table-success";
         }
         if (data.stock <= 0) {
-          styleBag  = 'table-danger'
+          styleBag = "table-danger";
         }
 
-//<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> | 
+        //<b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock}</b> |
         return `
         <style>
           #table-render {
@@ -497,113 +622,130 @@ export default {
             </thead>
             <tbody>
               <tr>
-                <td class="${styleBag}"><b>${data.ControlaStock==1?data.stock:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'}</b></td>
+                <td class="${styleBag}"><b>${
+          data.ControlaStock == 1
+            ? data.stock
+            : '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+        }</b></td>
                 <td><b>${data.Producto}</b></td>
                 <td>${data.ProductoMarca}</td>
                 <td>${data.ProductoFormaFarmaceutica}</td>
                 <td style="font-size:10px">${data.CompuestosProducto}</td>
-                <td style="font-size:12px"><b>${data.FechaVen==null?'Sin Fecha':data.FechaVen}</b></td>
-                <td style="font-size:12px"><b>${data.IdLote==null || data.IdLote==0?'Sin Lote':data.IdLote}</b></td>
+                <td style="font-size:12px"><b>${
+                  data.FechaVen == null ? "Sin Fecha" : data.FechaVen
+                }</b></td>
+                <td style="font-size:12px"><b>${
+                  data.IdLote == null || data.IdLote == 0
+                    ? "Sin Lote"
+                    : data.IdLote
+                }</b></td>
                 <td class="table-success"><b>${data.PrecioContado}</b></td>
-                <td><b>${data.VentaEstrategica==1?'<i class="fas fa-star text-warning"></i>':''}</b></td>
+                <td><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star text-warning"></i>'
+                    : ""
+                }</b></td>
               </tr>
             </tbody>
-          </table>   
+          </table>
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${data.ProductoFormaFarmaceutica} / ${data.ProductoMarca} /
+        <b>${data.CodigoBarra}</b> / <b>${data.Producto}</b> / ${
+        data.ProductoFormaFarmaceutica
+      } / ${data.ProductoMarca} /
          V. Estratégica: ${data.VentaEstrategica}
-      `
+      `;
     },
-    setNuevoPrecioContado (index) {
 
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
 
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      precio += precio * (this.productos[index].PorcentajeUtilidad / 100);
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
+      let normalPrecio = this.$options.filters.redondear(precio);
+      let nuevoPrecio = this.$options.filters.redondeoMayor(precio);
 
-      let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+      Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
       if (total <= 0) {
         //alert('El total de un producto no puede ser menor o igual a 0')
-        Vue.set(this.productos[index], 'descuento', 0)
-        return
+        Vue.set(this.productos[index], "descuento", 0);
+        return;
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style>
 .danger {
-  background-color:#ff7675;
+  background-color: #ff7675;
   color: #ffffff;
 }
 .ambar {
   background-color: #feca57;
   color: #ffffff;
 }
-.tabla-carrito .table-sm td  {
-  font-size: .8rem!important;
+.tabla-carrito .table-sm td {
+  font-size: 0.8rem !important;
 }
 </style>
-

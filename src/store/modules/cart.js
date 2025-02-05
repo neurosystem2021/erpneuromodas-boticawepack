@@ -1,194 +1,204 @@
-
-import { API } from '../config.js'
-import axios from 'axios'
+import { API } from "../config.js";
+import axios from "axios";
 
 const state = {
   productos: [],
   productosFiltrados: [],
   totalCart: 0
-}
+};
 
 const mutations = {
-  AGREGAR_PRODUCTO ({ productos }, item) {
+  AGREGAR_PRODUCTO({ productos }, item) {
     if (item.setSuma) {
-      let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+      let index = productos.findIndex(
+        prod => prod.IdProducto == item.IdProducto
+      );
       if (index < 0) {
-        productos.push(item)
+        productos.unshift(item);
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad += 1;
       }
     } else {
       // if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.push(item)
+      productos.unshift(item);
       // }
     }
   },
-  ELIMINAR_PRODUCTO ({ productos }, index) {
+  ELIMINAR_PRODUCTO({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
-    productos.splice(index, 1)
+    productos.splice(index, 1);
   },
-  LLENAR_PRODUCTOS_FILTRADOS (state, items) {
-    state.productosFiltrados = items
+  LLENAR_PRODUCTOS_FILTRADOS(state, items) {
+    state.productosFiltrados = items;
   },
-  LIMPIAR_CART (state) {
-    state.productos = []
+  LIMPIAR_CART(state) {
+    state.productos = [];
   },
-  APLICAR_DESCUENTO (state, descuento) {
-    let cantidadTotal = 0
+  APLICAR_DESCUENTO(state, descuento) {
+    let cantidadTotal = 0;
     state.productos.forEach((prod, index) => {
-      cantidadTotal += parseFloat(prod.cantidad)
-    })
+      cantidadTotal += parseFloat(prod.cantidad);
+    });
     state.productos = state.productos.map(prod => {
       // prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
-      prod.descuento = ((descuento / 100) * (prod.precio*prod.cantidad)).toFixed(2)
-      return prod
-    })
+      prod.descuento = (
+        (descuento / 100) *
+        (prod.precio * prod.cantidad)
+      ).toFixed(2);
+      return prod;
+    });
   },
-  ACTUALIZAR_TOTAL (state, total) {
-    state.totalCart = total
+  ACTUALIZAR_TOTAL(state, total) {
+    state.totalCart = total;
   },
-  OBTENER_STOCK (state, items) {
-    state.productos = state.productos.map((prod) => {
-      let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
-      prod.stock = items[index] && items[index].stock
-      return prod
-    })
+  OBTENER_STOCK(state, items) {
+    state.productos = state.productos.map(prod => {
+      let index = items.findIndex(item => item.IdProducto == prod.IdProducto);
+      prod.stock = items[index] && items[index].stock;
+      return prod;
+    });
     //state.productos[index].stock = item.stock
     // Vue.set(state.productos[index], 'stock', item.stock)
   },
-  OBTENER_CANTIDAD (state, obj) {
-    state.productos = state.productos.map((prod) => {
-      if(obj.opc==0 && prod.ControlaStock==1){
-        prod.cantidad = (prod.StockMinimo || 0) - (prod.stock || 0)
+  OBTENER_CANTIDAD(state, obj) {
+    state.productos = state.productos.map(prod => {
+      if (obj.opc == 0 && prod.ControlaStock == 1) {
+        prod.cantidad = (prod.StockMinimo || 0) - (prod.stock || 0);
       }
-      if(obj.opc==1 && prod.ControlaStock==0){
-        prod.cantidad = (prod.StockMinimo || 0) - (obj.data || 0)
+      if (obj.opc == 1 && prod.ControlaStock == 0) {
+        prod.cantidad = (prod.StockMinimo || 0) - (obj.data || 0);
       }
-      return prod
-    })
+      return prod;
+    });
   }
-}
+};
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
-    let setPrecio = false
-    let cantidad = false
-    let setSuma = false
-    let setPreOr = false
-    let fechaVen = false
-    let idLote = false
+  agregarProducto({ commit }, [producto, cb, obje, isBarCode]) {
+    let setPrecio = false;
+    let cantidad = false;
+    let setSuma = false;
+    let setPreOr = false;
+    let fechaVen = false;
+    let idLote = false;
     if (obje) {
-      setPrecio = obje.setPrecio
-      cantidad = obje.cantidad
-      setSuma = obje.setSuma
-      setPreOr =obje.setPreOr
-      fechaVen = obje.fechaVen
-      idLote = obje.idLote
+      setPrecio = obje.setPrecio;
+      cantidad = obje.cantidad;
+      setSuma = obje.setSuma;
+      setPreOr = obje.setPreOr;
+      fechaVen = obje.fechaVen;
+      idLote = obje.idLote;
     }
 
-    if(typeof producto === 'object') {
-      commit('AGREGAR_PRODUCTO', producto)
-      if (cb) cb(producto)
+    if (typeof producto === "object") {
+      commit("AGREGAR_PRODUCTO", producto);
+      if (cb) cb(producto);
     } else {
-      let params = {}
+      let params = {};
 
       if (isBarCode) {
-        params = {codigoBarra: producto}
-      } 
+        params = { codigoBarra: producto };
+      }
 
-      axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
-        if (response.data) {
-          let obj = response.data
+      axios
+        .get(API + "productos/id/" + producto, { params: params })
+        .then(response => {
+          if (response.data) {
+            let obj = response.data;
 
-          if(setPrecio) {
-            obj.cantidad = cantidad || 1
-            
-            if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
-                obj.precio = obj.PrecioPorMayor
+            if (setPrecio) {
+              obj.cantidad = cantidad || 1;
+
+              if (
+                obj.cantidad >= obj.StockPorMayor &&
+                obj.StockPorMayor !== 0
+              ) {
+                obj.precio = obj.PrecioPorMayor;
+              } else {
+                obj.precio = obj.PrecioContado || 0;
+              }
             } else {
-                obj.precio = obj.PrecioContado || 0
+              obj.cantidad = 0;
+              obj.precio = 0;
             }
 
+            if (cantidad) {
+              obj.cantidad = cantidad;
+            }
+
+            if (setPreOr) {
+              obj.precio = setPreOr;
+            }
+
+            if (fechaVen) {
+              obj.FechaVen = fechaVen;
+            }
+
+            if (idLote) {
+              obj.IdLote = idLote;
+            }
+
+            if (setSuma) {
+              obj.setSuma = true;
+            }
+
+            obj.descuento = 0;
+            obj.nuevoPrecioContado = 0;
+            commit("AGREGAR_PRODUCTO", obj);
+            if (cb) cb(obj);
           } else {
-            obj.cantidad = 0
-            obj.precio = 0
+            if (cb) cb(false);
           }
-
-          if (cantidad) {
-            obj.cantidad = cantidad
-          }
-
-          if(setPreOr){
-            obj.precio = setPreOr
-          }
-
-          if(fechaVen){
-            obj.FechaVen = fechaVen
-          }
-
-          if(idLote){
-            obj.IdLote = idLote
-          }
-
-          if (setSuma) {
-            obj.setSuma = true
-          }
-
-          obj.descuento = 0
-          obj.nuevoPrecioContado = 0
-          commit('AGREGAR_PRODUCTO', obj)
-          if (cb) cb(obj)   
-        } else {
-          if (cb) cb(false)
-        }
-      })
+        });
     }
   },
-  eliminarProducto ({ commit }, index) {
-    commit('ELIMINAR_PRODUCTO', index)
+  eliminarProducto({ commit }, index) {
+    commit("ELIMINAR_PRODUCTO", index);
   },
-  buscarProductos ({ commit }, search) {
-    axios.get(API + 'productos?limit=10&q=' + search).then((response) => {
-      commit('LLENAR_PRODUCTOS_FILTRADOS', response.data)
-    })
+  buscarProductos({ commit }, search) {
+    axios.get(API + "productos?limit=10&q=" + search).then(response => {
+      commit("LLENAR_PRODUCTOS_FILTRADOS", response.data);
+    });
   },
-  limpiarCarrito ({ commit }) {
-    commit('LIMPIAR_CART')
+  limpiarCarrito({ commit }) {
+    commit("LIMPIAR_CART");
   },
-  aplicarDescuentoGeneral ({ commit }, descuento) {
-    commit('APLICAR_DESCUENTO', descuento)
+  aplicarDescuentoGeneral({ commit }, descuento) {
+    commit("APLICAR_DESCUENTO", descuento);
   },
-  actualizarTotalCart ({ commit }, total) {
-    commit('ACTUALIZAR_TOTAL', total)
+  actualizarTotalCart({ commit }, total) {
+    commit("ACTUALIZAR_TOTAL", total);
   },
   obtenerStock({ commit, state }, obj) {
     if (state.productos.length) {
-      axios.get(API + 'productos/puntoventa/stock', {
-        params: {
-          idProductos: state.productos.map(prod => prod.IdProducto),
-          idAlmacen: obj.IdAlmacen,
-          noLimit: 1
-        }
-      }).then((response) => {
-          commit('OBTENER_STOCK', response.data)
+      axios
+        .get(API + "productos/puntoventa/stock", {
+          params: {
+            idProductos: state.productos.map(prod => prod.IdProducto),
+            idAlmacen: obj.IdAlmacen,
+            noLimit: 1
+          }
+        })
+        .then(response => {
+          commit("OBTENER_STOCK", response.data);
           setTimeout(() => {
-            if(obj.CalculoCantidad==1){
-              commit('OBTENER_CANTIDAD', {opc: 0, stock: 0})
+            if (obj.CalculoCantidad == 1) {
+              commit("OBTENER_CANTIDAD", { opc: 0, stock: 0 });
             }
           }, 150);
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
-  obtenercantidad ({ commit }, data) {
-    commit('OBTENER_CANTIDAD', {opc: 1, data: data})
-  },
-}
+  obtenercantidad({ commit }, data) {
+    commit("OBTENER_CANTIDAD", { opc: 1, data: data });
+  }
+};
 
 export default {
-    state,
-    mutations,
-    actions
-}
+  state,
+  mutations,
+  actions
+};
