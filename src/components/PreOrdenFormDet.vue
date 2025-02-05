@@ -69,7 +69,7 @@
           <td>
              {{ prod.Pagado==1 ? 'Facturado' : ''}}
           </td>
-          <td class="text-center"><b-button :disabled="prod.isDisabled" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
+          <td class="text-center"><b-button :disabled="prod.isDisabled==1" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
     </table>

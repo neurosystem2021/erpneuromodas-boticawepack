@@ -36,7 +36,7 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
-
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -218,6 +218,11 @@ export default new Router({
       path: "/oferta",
       name: "ConfigurarOferta",
       component: ConfigurarOferta
+    },
+    {
+      path: "/reportes/reporte_utilidad_bruta",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
     }
   ]
 });
