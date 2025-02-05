@@ -2207,7 +2207,7 @@ export default {
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");
           window.open(
-            "/imprimir/proforma.php?IdProforma=" + response.data.insertId,
+            "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
             "_blank"
           );
         }
@@ -2279,6 +2279,12 @@ export default {
         this.getVendedorInfo();
       });
       this.ventas[this.ventaActiva].cliente = proforma;
+      setTimeout(() => {
+        this.$nextTick(() => {
+          console.log("hoña");
+          this.metodoPagoCambio(1);
+        });
+      }, 1000);
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };
