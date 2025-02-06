@@ -98,7 +98,7 @@ export default {
   },
   data() {
     return {
-      tipocambio: 0,
+      tipocambio: 1,
       API: config.API,
       pageOptions: [5, 10, 15, 50, 100],
       filter: null,
