@@ -71,8 +71,11 @@
       </div>
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
+      <div v-if="proforma.DescripcionProforma">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Plazo de Entrega: {{ proforma.DescripcionProforma }}</div>
+        <div class="notice">Forma de Pago: {{ proforma.DescripcionProforma2 }}</div>
+      </div>
       </div>
     </main>
     <!--<footer>

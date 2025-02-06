@@ -128,6 +128,25 @@
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
 
+                                    <b-input-group>
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsDescripcion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Nota
+                                        </b-form-checkbox>
+                                        <input v-model="venta.DescripcionProforma"
+                                                type="text"
+                                                class="form-control"
+                                                required
+                                                placeholder="Digite Plazo de Entrega" v-if="venta.EsDescripcion" />
+                                        <input v-model="venta.DescripcionProforma2"
+                                                type="text"
+                                                class="form-control"
+                                                required
+                                                placeholder="Forma de Pago" v-if="venta.EsDescripcion" />
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -485,7 +504,10 @@ export default {
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
                 NotaIdMotivo: '',
-                NotaDescMotivo: ''
+                NotaDescMotivo: '',
+                EsDescripcion: 0,
+                DescripcionProforma: '',
+                DescripcionProforma2: '',
             }
 
             this.isNota = false
@@ -843,6 +865,8 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.DescripcionProforma = (''+this.venta.DescripcionProforma).trim().toUpperCase()
+            this.venta.DescripcionProforma2 = (''+this.venta.DescripcionProforma2).trim().toUpperCase()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
