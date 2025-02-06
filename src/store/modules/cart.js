@@ -63,10 +63,10 @@ const mutations = {
   OBTENER_CANTIDAD(state, obj) {
     state.productos = state.productos.map(prod => {
       if (obj.opc == 0 && prod.ControlaStock == 1) {
-        prod.cantidad = (prod.StockMinimo || 0) - (prod.stock || 0);
+        prod.cantidad = (prod.cantidadPedida || 0) - (prod.stock || 0);
       }
       if (obj.opc == 1 && prod.ControlaStock == 0) {
-        prod.cantidad = (prod.StockMinimo || 0) - (obj.data || 0);
+        prod.cantidad = (prod.cantidadPedida || 0) - (obj.data || 0);
       }
       return prod;
     });

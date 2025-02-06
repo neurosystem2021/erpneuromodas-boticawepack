@@ -16,8 +16,11 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}"
             @keydown.prevent.tab="irBusquedaBarCode()"
+            :debounce="200"
+            @input="controlarBusqueda"
             >
           </autocomplete>
+          <b-button variant="info" @click="startRecognition"><i class="fa fa-microphone" aria-hidden="true"></i></b-button>
           <!-- <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
@@ -233,7 +236,11 @@ export default {
     }
   },
   beforeMount() {
-    this.irBusquedaProducto();
+    setTimeout(() => {
+      this.$nextTick(() => {
+        this.irBusquedaProducto();
+      });
+    }, 1000);
   },
 
   data() {
@@ -361,6 +368,116 @@ export default {
       actualizarTotal: "actualizarTotalCart",
       obtenercant: "obtenercantidad"
     }),
+    controlarBusqueda(query) {
+      if (query === "") {
+        // Si está vacío, dispara la búsqueda inmediatamente
+        this.$refs.autocompleteProducto.fetchResults();
+      }
+    },
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+        "input"
+      );
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        const event = new Event("input", { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }, 100);
+    },
+    // OTRA OPCION
+    abrirMicrofono() {
+      this.busqueda = "";
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.busqueda = event.results[0][0].transcript;
+          document.getElementById("autocompleteProducto").focus();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        this.handleError(event.error);
+      };
+
+      this.recognition.onend = async () => {
+        const inputEvent = new Event("input", {
+          bubbles: true,
+          cancelable: true
+        });
+        let autocompleteInput = document.getElementById("autocompleteProducto");
+        setTimeout(() => {
+          document.getElementById("autocompleteProducto").value = this.busqueda;
+          autocompleteInput.dispatchEvent(inputEvent);
+        }, 200);
+      };
+      this.recognition.start();
+    },
+    handleError(error) {
+      let errorMessage = "";
+      if (error === "no-speech") {
+        errorMessage =
+          "No se detectó ningún discurso. Por favor, inténtalo de nuevo.";
+      } else if (error === "audio-capture") {
+        errorMessage =
+          "No se pudo acceder al micrófono. Asegúrate de que esté correctamente conectado y de que el navegador tenga permisos para usarlo.";
+      } else if (error === "not-allowed") {
+        errorMessage =
+          "Permiso para usar el micrófono denegado. Por favor, habilita el acceso en la configuración de tu navegador.";
+      } else {
+        errorMessage =
+          "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+      }
+      alert(errorMessage);
+    },
     irBusquedaProducto() {
       this.$nextTick(() => {
         let autoComplete = this.$refs["autocompleteProducto"];
