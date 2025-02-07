@@ -39,6 +39,7 @@ import ReporteOrdenDeCompra from "@/views/reportes/ReporteOrdenDeCompra.vue";
 import ReporteEntregaPedido from "@/views/reportes/ReporteEntregaPedido.vue";
 import ReporteProduccion from "@/views/reportes/ReporteProduccion.vue";
 import ReporteVentaDia from "@/views/reportes/ReporteVentaDia.vue";
+import PedidosRealizados from "@/views/reportes/PedidosRealizados.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -223,6 +224,11 @@ export default new Router({
       path: "/reportes/ventadia",
       name: "ReporteVentaDia",
       component: ReporteVentaDia
+    },
+    {
+      path: "/reportes/PedidosRealizados",
+      name: "PedidosRealizados",
+      component: PedidosRealizados
     }
   ]
 });
