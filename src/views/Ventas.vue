@@ -327,9 +327,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Transfernecia</td>
+                                            <td>Transferencia</td>
                                             <td>
-                                              <b-button variant="info" size="sm" @click=cambiarMetodoPago(3)>
+                                              <b-button variant="info" size="sm" @click=cambiarMetodoPago(4)>
                                                   <i class="fa fa-check" aria-hidden="true"></i>
                                                 </b-button>
                                             </td>
