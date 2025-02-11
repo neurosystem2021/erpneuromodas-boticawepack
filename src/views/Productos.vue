@@ -1,8 +1,8 @@
-<template>
+  <template>
   <div>
       <b-container fluid class="bv-example-row">
         <b-row>
-          <b-col md="4" class="my-1">
+          <b-col md="3" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
               <b-input-group>
                 <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
@@ -13,9 +13,9 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="8" class="my-1">
+          <b-col md="9" class="my-1">
             <b-row>
-            <b-col md="3">
+            <b-col md="2">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -24,10 +24,13 @@
             <b-col md="2">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
-            <b-col md="5">
+            <b-col md="4">
                 <b-form-group horizontal label="T. Cambio" class="mb-0">
-                  <input class="form-control" type="number" v-model="tipocambio" label="Tipo Cambio" placeholder="Tipo Cambio">
+                  <input class="form-control" type="number" st v-model="tipocambio" label="Tipo Cambio" placeholder="Tipo Cambio">
                 </b-form-group>
+              </b-col>
+              <b-col md="2">
+                <b-button variant="success" @click="guardarTipoCambio()">Guardar</b-button>
               </b-col>
             <b-col md="2">
                 <codigo-multiple></codigo-multiple>
@@ -58,11 +61,11 @@
             </template>
           
             <template slot="PrecioCostoDolar" slot-scope="data">
-              {{ parseFloat(data.item.PrecioCosto * tipocambio).toFixed(2) }}
+              {{ parseFloat(data.item.PrecioCosto / tipocambio).toFixed(2) }}
             </template>
           
             <template slot="PrecioContadoDolar" slot-scope="data">
-              {{ parseFloat(data.item.PrecioContado * tipocambio).toFixed(2) }}
+              {{ parseFloat(data.item.PrecioContado / tipocambio).toFixed(2) }}
             </template>
           
           </b-table>
@@ -91,9 +94,7 @@ import CodigoMultiple from "@/components/CodigoMultiple";
 
 export default {
   mounted() {
-    this.axios.get(this.API + "productos/count").then(response => {
-      this.totalRows = response.data.total;
-    });
+    this.obtenerListado();
     this.obtnerTipoCambio();
   },
   data() {
@@ -116,9 +117,13 @@ export default {
         { key: "ProductoPresentacion", label: "Presentación", sortable: true },
         { key: "PosOferta", label: "Orden Oferta", sortable: true },
         { key: "PrecioCosto", sortable: true },
-        { key: "PrecioCostoDolar", sortable: true },
         { key: "PrecioContado", sortable: true },
-        { key: "PrecioContadoDolar", sortable: true },
+        { key: "PrecioCostoDolar", label: " Precio Costo ($)", sortable: true },
+        {
+          key: "PrecioContadoDolar",
+          label: " Precio Contado ($)",
+          sortable: true
+        },
         { key: "MostrarApp", label: "En App", sortable: true }
       ],
       totalRows: 50,
@@ -127,6 +132,11 @@ export default {
     };
   },
   methods: {
+    obtenerListado() {
+      this.axios.get(this.API + "productos/count").then(response => {
+        this.totalRows = response.data.total;
+      });
+    },
     rowClick(item, index) {
       this.productoSelect = item;
       this.$refs.productoForm.show = true;
@@ -134,11 +144,51 @@ export default {
       //console.log(this.$refs.productoForm.$refs.productoForm)
     },
     async obtnerTipoCambio() {
-      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
-        res => {
-          this.tipocambio = res.data.Cotizacion[0].Venta;
-        }
-      );
+      await this.axios(this.API + "tipocambio/usd").then(res => {
+        this.tipocambio = res.data;
+      });
+    },
+    async guardarTipoCambio() {
+      this.$swal
+        .fire({
+          icon: "question",
+          title: "Tipo de Cambio",
+          text:
+            "¿Está seguro de actualizar el tipo de cambio?. Este cambio se reflejará en el precio de los productos.  ",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+          confirmButtonText: "Si, cambiar",
+          cancelButtonColor: "red",
+          cancelButtonColor: "success"
+        })
+        .then(async res => {
+          if (res.isConfirmed) {
+            let data = {
+              tipoCambio: this.tipocambio
+            };
+            await this.axios
+              .post(this.API + "tipocambio/usd", data)
+              .then(res => {
+                if (res.data) {
+                  this.$swal
+                    .fire({
+                      icon: "success",
+                      title: "Correcto",
+                      text: "Registro Correcto",
+                      allowOutsideClick: false,
+                      allowEscapeKey: false
+                    })
+                    .then(res => {
+                      if (res.isConfirmed) {
+                        window.location.reload();
+                      }
+                    });
+                }
+              });
+          }
+        });
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh();

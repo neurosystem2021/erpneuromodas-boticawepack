@@ -2,7 +2,6 @@
   <b-row>
     <b-col md="12">
       <b-form-group>
-        <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -203,13 +202,18 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
+        <template slot="flete" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
             placeholder="Flete"></b-form-input>
-        </template>-->
+           <b v-if="productos[data.index].FLETE && productos[data.index].cantidad!=0 "> 
+            {{  
+              parseFloat(productos[data.index].FLETE / productos[data.index].cantidad).toFixed(2)
+            }}
+          </b>
+        </template>
         
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
@@ -455,6 +459,18 @@ export default {
     this.$barcodeScanner.destroy();
   },
   watch: {
+    gravadaflag() {
+      console.log("gravadaflag", this.gravadaflag);
+    },
+    igvflag() {
+      this.productos.forEach((element, index) => {
+        console.log("index", index);
+        Vue.set(this.productos[index], "TieneIgv", this.igvflag);
+        // this.productos[index] = element;
+        this.setNuevoPrecioContado(index);
+        // console.log("igvflag", this.igvflag);
+      });
+    },
     sumatoriaTotal(sum) {
       this.asignarVuelto();
     },
@@ -467,6 +483,8 @@ export default {
     }
   },
   props: {
+    gravadaflag: Number,
+    igvflag: Number,
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -554,7 +572,7 @@ export default {
     },
     sumatoriaIgv() {
       let sumatoria = 0;
-      if (this.igvTotal) {
+      if (this.igvTotal || this.gravadaflag) {
         sumatoria = this.sumatoriaTotal;
         //sumatoria = sumatoria * 0.18
         sumatoria = sumatoria - sumatoria / 1.18;
