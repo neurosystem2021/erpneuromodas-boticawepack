@@ -14,6 +14,9 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm" class="ocularMovil" v-if="false">
@@ -472,6 +475,7 @@ import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import DeliveryModal from '@/components/DeliveryModal.vue'
+import Movimiento from '@/components/Movimiento'
 import Swal from 'sweetalert2'
 export default {
     beforeMount () {
@@ -1359,6 +1363,7 @@ export default {
     components: {
         ProductosCarrito,
         ClientesForm,
+        Movimiento,
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,

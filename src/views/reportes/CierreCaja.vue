@@ -465,6 +465,34 @@
           </table>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col v-if="totalSalidasTarjeta">
+          <h5>Salidas de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
 
       <b-row>
           <b-col v-if="totalAdelantos">
@@ -521,6 +549,7 @@ export default {
       ventas: [],
       ingresos: [],
       ingresosTarjeta: [],
+      salidasTarjeta: [],
       salidas: [],
 	  adelantos: [],
       turno: null,
@@ -560,6 +589,13 @@ export default {
       let total = 0
       this.ingresosTarjeta.forEach(ingresoTar => {
         if (!ingresoTar.Anulado) total += ingresoTar.Importe
+      });
+      return total 
+    },
+    totalSalidasTarjeta () {
+      let total = 0
+      this.salidasTarjeta.forEach(salidaTar => {
+        if (!salidaTar.Anulado) total += salidaTar.Importe
       });
       return total 
     },
@@ -798,7 +834,8 @@ export default {
         params: params
       })
       .then(res => {
-        this.salidas = res.data
+        this.salidas = res.data.filter((sal)=> sal.EsTarjeta==0)
+        this.salidasTarjeta = res.data.filter((sal)=> sal.EsTarjeta==1)
       }).catch(err => {
         console.log(err)
       }) 
