@@ -276,6 +276,9 @@
                   <b-col md="12" class="mt-1">
                     <pago-deuda></pago-deuda>
                   </b-col>
+                  <b-col md="12" class="mt-1">
+                    <Movimiento></Movimiento>
+                  </b-col>
                   </b-row>
                 </b-col>
                 <b-col cols="4">
@@ -935,6 +938,7 @@ import ProductoForm from "@/components/ProductoForm";
 import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
 import AutoComplete from "@/components/AutoComplete.vue";
 import PagoDeuda from "@/components/PagoDeuda";
+import Movimiento from "@/components/Movimiento";
 
 import Swal from "sweetalert2";
 export default {
@@ -944,6 +948,7 @@ export default {
     Proformas,
     AutoComplete,
     PagoDeuda,
+    Movimiento,
     ProductoForm
   },
   data() {
