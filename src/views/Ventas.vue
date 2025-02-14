@@ -1433,7 +1433,7 @@ export default {
       }
 
       await this.axios
-        .post(this.API + "ventass", this.venta)
+        .post(this.API + "ventas", this.venta)
         .then(response => {
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
@@ -1469,7 +1469,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-      // window.location.reload();
+      window.location.reload();
     },
     generarOfertas() {
       let IdOferta = [];
