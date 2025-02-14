@@ -19,7 +19,26 @@
                 v-model="usuarioReg"
             />
         </b-col>
-        <b-col cols="3"> 
+        <b-col cols="3">
+          <b-form-checkbox
+           
+            value="1"
+            unchecked-value="0"
+            v-model="ServicioFlag"
+          >
+            Servicios
+          </b-form-checkbox>
+
+
+          <b-form-checkbox
+            value="1"
+            unchecked-value="0"
+            v-model="MercaderiaFlag"
+          >
+            Mercaderías
+          </b-form-checkbox>
+        </b-col> 
+        <b-col cols="12" class="mt-2"> 
             <b-button variant="success" @click="getReporteUtilidadPorUsuario()">Generar</b-button>
             <b-button variant="danger" @click="exportar()">Exportar PDF</b-button>
         </b-col>
@@ -84,6 +103,8 @@ export default {
       fechaInicio: "",
       fechaFin: "",
       usuarioReg: "",
+      ServicioFlag: 1,
+      MercaderiaFlag: 1,
       lstUsuario: [],
       fields: [
         { label: "Fecha", key: "FechaReg" },
@@ -110,10 +131,13 @@ export default {
       });
     },
     async getReporteUtilidadPorUsuario() {
+      this.lstReporte = [];
       let filtro = {
         params: {
           fechaInicio: this.fechaInicio,
           fechaFin: this.fechaFin,
+          ServicioFlag: this.ServicioFlag,
+          MercaderiaFlag: this.MercaderiaFlag,
           usuarioReg: this.usuarioReg
         }
       };
@@ -130,6 +154,8 @@ export default {
         params: {
           fechaInicio: this.fechaInicio,
           fechaFin: this.fechaFin,
+          ServicioFlag: this.ServicioFlag,
+          MercaderiaFlag: this.MercaderiaFlag,
           usuarioReg: this.usuarioReg
         }
       }).then(res => {

@@ -51,7 +51,7 @@
           <td>{{ prod.Producto }}</td>
           <td>
             <span class="hideInModal">{{ prod.Precio }}</span>
-            <input :disabled="prod.isDisabled || prod.Pagado" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
+            <input :disabled="prod.Pagado ==1" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
           <td>
             <span class="hideInModal">{{ prod.Cantidad }}</span> 

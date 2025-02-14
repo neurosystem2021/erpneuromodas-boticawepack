@@ -1,4 +1,4 @@
-<template>
+b-col<template>
   <b-container fluid>
     <b-row>
       <b-col cols="12"> 
@@ -27,11 +27,11 @@
               <i v-else class="fa fa-times" aria-hidden="true"></i>
 
           </template>
-          <template slot="CantidadFlag" slot-scope="data">
+          <!-- <template slot="CantidadFlag" slot-scope="data">
               <i v-if="data.item.CantidadFlag==1" class="fa fa-check" aria-hidden="true"></i>
               <i v-else class="fa fa-times" aria-hidden="true"></i>
 
-          </template>
+          </template> -->
         </b-table>
       </b-col>
 
@@ -41,7 +41,7 @@
         <b-col cols="12">
               <b-form-checkbox v-model="formulario.ProductoFlag" unchecked-value="0" value="1"> Producto </b-form-checkbox>
               <b-form-checkbox v-model="formulario.MontoFlag" unchecked-value="0" value="1"> Monto </b-form-checkbox>
-              <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox>
+              <!-- <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox> -->
         </b-col>
         <b-col cols="12" v-if="mostrarSiguientePaso()">
           <b-form @submit="guardar">
@@ -64,11 +64,11 @@
               <input type="number" v-model="formulario.Monto" class="form-control">
 
             </b-col>
-            <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
+            <!-- <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
               <input type="number" v-model="formulario.Cantidad" class="form-control">
 
             </b-col>
-          
+           -->
             <b-col cols="12">
               Descripcion
               <textarea rows="1" v-model="formulario.Descripcion" class="form-control"  style="overflow:hidden; resize:none;"></textarea>  
@@ -91,10 +91,26 @@
               Stockmax
               <input type="number" v-model="formulario.StockMax" class="form-control">    
             </b-col>
+            <b-col cols="12" class="mt-3"> 
+              Producto Asociado Oferta:
+              <autocomplete
+              ref="autocompleteProductoAsociado"
+              :url="APIProductos"
+              :onShouldRenderChild="renderChild"
+              anchor="Producto"
+              label="writer"
+              placeholder="Agregar Producto"
+              :on-select="setProductoAsociado"
+              :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoAsociado')"
+              :classes="{input: 'form-control'}">
+            </autocomplete>
+            </b-col>
             <b-col cols="12" style="text-align: end;" class="mt-5"> 
               <b-button type="submit" variant="success" >Guardar</b-button>
               <b-button variant="danger" @click="nuevaOfertaFlag=!nuevaOfertaFlag">Cancelar</b-button>
             </b-col>
+
+            
           </b-row>
         </b-form>
         </b-col>
@@ -147,6 +163,10 @@
               Stockmax
               <input type="number" v-model="formulario.StockMax" class="form-control">    
             </b-col>
+            <b-col cols="12" class="mt-3"> 
+              Producto Asociado
+              <input type="text" readonly v-model="formulario.ProductoAsociado" class="form-control">
+            </b-col>
             <b-col cols="12" style="text-align: end;" class="mt-5"> 
               <b-button type="submit" variant="success" >Guardar</b-button>
               <b-button variant="danger" @click="actualizarOfertaFlag=!actualizarOfertaFlag">Cancelar</b-button>
@@ -183,18 +203,19 @@ export default {
       },
       headers: [
         // { key: "tipo" },
-        { key: "Hash",label:"Código" },
+        { key: "Hash", label: "Código" },
         { key: "ProductoFlag", label: "Por Prodcuto" },
         { key: "MontoFlag", label: "Por Monto" },
-        { key: "CantidadFlag", label: "Por Cantidad Mínima" },
+        // { key: "CantidadFlag", label: "Por Cantidad Mínima" },
         { key: "Producto" },
         { key: "Monto" },
-        { key: "Cantidad" },
+        // { key: "Cantidad" },
         { key: "Descripcion" },
         { key: "Porcentaje" },
         { key: "FechaDesde" },
         { key: "FechaHasta" },
         { key: "StockMax" },
+        { key: "ProductoAsociado" ,label:"Producto Entregar Oferta"},
         { key: "estado" },
         { key: "action", label: "" }
       ],
@@ -293,6 +314,9 @@ export default {
     setProducto(obj) {
       this.formulario.IdProducto = obj.IdProducto;
     },
+    setProductoAsociado(obj) {
+      this.formulario.IdProductoAsociado = obj.IdProducto;
+    },
     focusAutocomplete(ref) {
       this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
@@ -305,6 +329,14 @@ export default {
       }
       if (this.formulario.MontoFlag == 1 && !this.formulario.Monto) {
         this.$toasted.error("Es Necesario un Monto ");
+        return false;
+      }
+      if (this.formulario.CantidadFlag == 1 && !this.formulario.Cantidad) {
+        this.$toasted.error("Es Necesario una Cantidad ");
+        return false;
+      }
+      if (!this.formulario.IdProductoAsociado) {
+        this.$toasted.error("Es Necesario el Producto asociado");
         return false;
       }
       if (this.formulario.CantidadFlag == 1 && !this.formulario.Cantidad) {

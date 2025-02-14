@@ -80,7 +80,8 @@
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
-                            </b-col>
+                                
+                                </b-col>
                             <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
                                     <label>Almacen:</label>
@@ -100,7 +101,9 @@
                                     <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
-                                </b-form-group>
+                                    
+                                    </b-form-group>
+                                    
                             </b-col>
                             <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
@@ -169,6 +172,34 @@
                                         </b-col>
                                     </b-row>
                                 </b-form-group>
+                              </b-col>
+                              <b-col cols="6" v-if="mostrarSeccionOferta()">
+                                
+                                  <b-form-group>
+                                    <label>Ofertas Activas:</label>
+                                    <b-select :options="lstOfertas"  value-field="IdOferta" text-field="Hash" v-model="IdOferta" @change="obtenerProductoOferta()"/>
+                                  </b-form-group>
+                                 
+                                
+                              </b-col>
+                            <b-col cols="6" v-if="mostrarSeccionOferta() && IdOferta">
+                              <b-form-group >
+                                    <label>Doc. Referencias Oferta:</label>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputDocRefOrden"
+                                        :url="API + '/ventas/ofertas'"
+                                        anchor="NroDocRef"
+                                        initValue=""
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setDocRefOferta" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputDocRefOrden')"
+                                        :customParams="{ IdOferta: IdOferta , IdCliente : venta.cliente.IdCliente}"
+                                        :debounce="1000"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                  </b-form-group>
                             </b-col>
                              <b-col cols="3">
                                 <b-form-checkbox
@@ -249,6 +280,19 @@
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
+                </b-row>
+                <b-row v-if="mostrarSeccionOferta()">
+                  <b-col cols="4">
+
+                    <b-table :fields="fieldsDocRef" :items="DocRefOfertas">
+                      <template slot="action" slot-scope="data">
+                        <b-button variant="danger" @click="eliminarDocRef(data.index)">
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </b-button>
+                      </template>
+                      </b-table>
+                      
+                  </b-col>
                 </b-row>
                 <b-row>
                     <b-col> 
@@ -491,6 +535,15 @@ export default {
   },
   data() {
     return {
+      fieldsDocRef: [
+        { key: "idDocVenta" },
+        { key: "IdProductos" },
+        { key: "NroDocRef", label: "Nro Doc. Referencia" },
+        { key: "Total", label: "Monto" },
+        { key: "action", label: "" }
+      ],
+      DocRefOfertas: [],
+      IdOferta: "",
       lstOfertas: [],
       isNota: false,
       dni: "",
@@ -604,7 +657,93 @@ export default {
         }
       });
     },
+    eliminarDocRef(index) {
+      this.DocRefOfertas.splice(index, 1);
+    },
+    validarDocRefOfetar() {
+      if (this.venta.tipoVenta.CodSunat == "99") {
+        let TotalMontoOfertas = this.DocRefOfertas.reduce((sum, oferta) => {
+          return sum + parseFloat(oferta.Total);
+        }, 0);
 
+        if (this.DocRefOfertas.length == 0) {
+          console.log("a");
+          return false;
+        }
+
+        let oferta = this.lstOfertas.filter(
+          v => v.IdOferta == this.IdOferta
+        )[0];
+        if (oferta.ProductoFlag == 1) {
+          let IdProducto = oferta.IdProducto;
+          let IdProductos = this.DocRefOfertas.map(v => {
+            return v.IdProductos;
+          });
+          console.log("ab");
+          this.$toasted.show(
+            "Los documentos de referencia no cumple con los requisitos. Producto no presente en el comprobante"
+          );
+          return IdProductos.includes(IdProducto);
+        }
+
+        if (oferta.MontoFlag == 1) {
+          if (oferta.Monto > TotalMontoOfertas) {
+            this.$toasted.show(
+              "Los documentos de referencia no cumple con los requisitos. La suma de los montos es menor a la promoción"
+            );
+            console.log("ac");
+            return false;
+          }
+        }
+        return true;
+      }
+      return true;
+    },
+
+    mostrarSeccionOferta() {
+      if (this.venta.tipoVenta.CodSunat == "99") {
+        return true;
+      }
+      return false;
+    },
+    async obtenerProductoOferta() {
+      this.$store.state.cart.productos = [];
+      this.$nextTick(async () => {
+        let query = this.lstOfertas.filter(v => v.IdOferta == this.IdOferta)[0];
+        console.log("query", query);
+        let stock = await this.axios(
+          `${this.API}productos/stock?idProductos[]=${
+            query.IdProductoAsociado
+          }&idAlmacen=${this.venta.almacen.IdAlmacen}`
+        ).then(res => {
+          return res.data;
+        });
+        console.log("stock", stock);
+
+        this.axios(
+          `${this.API}productos/stock/2?q=${
+            query.Producto
+          }&sortBy=stock&sortDesc=1&limit=25`
+        ).then(res => {
+          if (res.data) {
+            let producto = res.data[0];
+            producto.cantidad = 1;
+            producto.precio = 0;
+            producto.disabled = true;
+            producto.stock = stock[0].stock;
+            this.productos.push(producto);
+          }
+        });
+      });
+
+      setTimeout(() => {
+        const inputElement = this.$refs["inputDocRefOrden"].$el.querySelector(
+          "input"
+        );
+        inputElement.focus();
+        this.focusAutocomplete("inputDocRefOrden");
+      }, 1000);
+    },
     getEstadoSistema() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       if (hostUrl != null) {
@@ -691,7 +830,6 @@ export default {
       }
     },
     focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
     },
     initForm() {
@@ -763,6 +901,19 @@ export default {
       this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
       this.venta.tipoVenta = obj;
       this.getNumeroVenta();
+    },
+    setDocRefOferta(obj) {
+      console.log(obj);
+      if (!this.DocRefOfertas.some(v => v.idDocVenta == obj.idDocVenta)) {
+        this.DocRefOfertas.push(obj);
+      } else {
+        this.$swal.fire({
+          icon: "warning",
+          title: "Aviso",
+          text: "El Doc. ya encuentra en la lista."
+        });
+      }
+      // console.log(obj);
     },
     setDocRef(obj) {
       this.venta.CodSunatModifica = obj.CodSunat;
@@ -1228,33 +1379,41 @@ export default {
         }
       });
 
-      if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
-        this.$toasted.error(
-          "No se puede vender un producto con ganancia negativa"
-        );
-        this.inProgress = false;
-        return;
+      if (this.venta.tipoVenta.CodSunat != "99") {
+        if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+          this.$toasted.error(
+            "No se puede vender un producto con ganancia negativa"
+          );
+          this.inProgress = false;
+          return;
+        }
       }
-
       if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != "07") {
         this.$toasted.error("No se puede vender un producto sin stock");
         this.inProgress = false;
         return;
       }
+      if (this.venta.tipoVenta.CodSunat != "99") {
+        if (totalCero >= 1) {
+          this.$toasted.error("No se puede enviar un producto en S/. 0.00");
+          this.inProgress = false;
+          return;
+        }
 
-      if (totalCero >= 1) {
-        this.$toasted.error("No se puede enviar un producto en S/. 0.00");
+        if (this.totalCart <= 0) {
+          this.$toasted.show("La venta en S/. 0.00 no está permitido");
+          this.inProgress = false;
+          return;
+        }
+      }
+
+      if (!this.validarDocRefOfetar()) {
         this.inProgress = false;
         return;
       }
 
-      if (this.totalCart <= 0) {
-        this.$toasted.show("La venta en S/. 0.00 no está permitido");
-        this.inProgress = false;
-        return;
-      }
       let IdOfertas = this.generarOfertas();
-     
+
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
@@ -1262,11 +1421,19 @@ export default {
       this.venta.adelantosPreOrden = this.adelantosPreOrden;
       this.venta.IdPedido = this.$route.query.idPedido || null;
       this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
+      this.venta.IdOferta = this.IdOferta;
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
+
+      this.venta.IdDocVentas = "";
+      if (this.venta.tipoVenta.CodSunat == "99") {
+        let IdDocVentas = this.DocRefOfertas.map(v => v.idDocVenta);
+        this.venta.IdDocVentas = IdDocVentas.join(",");
+      }
+
       await this.axios
-        .post(this.API + "ventas", this.venta)
+        .post(this.API + "ventass", this.venta)
         .then(response => {
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
@@ -1302,31 +1469,27 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-      window.location.reload();
+      // window.location.reload();
     },
     generarOfertas() {
       let IdOferta = [];
-    
+
       this.lstOfertas.forEach(oferta => {
         if (oferta.ProductoFlag == 1) {
           let producto = this.productos.filter(
             v => v.IdProducto == oferta.IdProducto
           )[0];
-         
+
           if (producto) {
-          
             if (oferta.MontoFlag == 1) {
-            
               if (oferta.Monto <= producto.cantidad * producto.precio) {
                 IdOferta.push(oferta.IdOferta);
               }
             } else if (oferta.CantidadFlag == 1) {
-             
               if (oferta.Cantidad <= producto.cantidad) {
                 IdOferta.push(oferta.IdOferta);
               }
             } else {
-           
               IdOferta.push(oferta.IdOferta);
             }
           }

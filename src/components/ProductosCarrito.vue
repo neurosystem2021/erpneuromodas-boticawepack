@@ -17,6 +17,7 @@
             @keydown.native.prevent.tab="irtxtBarcode"
             :classes="{input: 'form-control'}">
           </autocomplete>
+          <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
           <input 
                   id="txtBarcode"
                   v-model="loadCode"
@@ -600,6 +601,57 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      // console.log("Búsqueda:", this.query);
+      const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+        "input"
+      );
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 1000);
+    },
     irtxtBarcode(event) {
       if (event) {
         event.preventDefault();
