@@ -478,6 +478,7 @@ export default {
     },
     data () {
         return {
+            FechaDocAnt: null, // Agregamos la propiedad aquí
             isNota: false,
             dni: '',
             adelanto: 0,
@@ -757,6 +758,7 @@ export default {
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
+            this.venta.FechaDocAnt = obj.FechaDocAnt; // Guardar la fecha del documento seleccionado
             if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
             }
@@ -1193,6 +1195,8 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.FechaDocAnt = this.venta.FechaDocAnt || null;
+            
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async(response) => {
                 if(response.data.error){
