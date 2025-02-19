@@ -1,164 +1,177 @@
-
-import { API } from '../config.js'
-import axios from 'axios'
+import { API } from "../config.js";
+import axios from "axios";
 
 const state = {
   productos: [],
   productosFiltrados: [],
   totalCart: 0
-}
+};
 
 const mutations = {
-  AGREGAR_PRODUCTO ({ productos }, item) {
+  AGREGAR_PRODUCTO({ productos }, item) {
     if (item.setSuma) {
-      let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
+      let index = productos.findIndex(
+        prod => prod.IdProducto == item.IdProducto && prod.index == item.index
+      );
       if (index < 0) {
-        productos.push(item)
+        productos.push(item);
       } else {
-        productos[index].cantidad += 1
+        productos[index].cantidad += 1;
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.push(item)
+      if (
+        !productos.find(
+          producto =>
+            producto.IdProducto === item.IdProducto &&
+            producto.index == item.index
+        )
+      ) {
+        productos.push(item);
       }
     }
   },
-  ELIMINAR_PRODUCTO ({ productos }, index) {
+  ELIMINAR_PRODUCTO({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
-    productos.splice(index, 1)
+    productos.splice(index, 1);
   },
-  LLENAR_PRODUCTOS_FILTRADOS (state, items) {
-    state.productosFiltrados = items
+  LLENAR_PRODUCTOS_FILTRADOS(state, items) {
+    state.productosFiltrados = items;
   },
-  LIMPIAR_CART (state) {
-    state.productos = []
+  LIMPIAR_CART(state) {
+    state.productos = [];
   },
-  APLICAR_DESCUENTO (state, descuento) {
-    let cantidadTotal = 0
+  APLICAR_DESCUENTO(state, descuento) {
+    let cantidadTotal = 0;
     state.productos.forEach((prod, index) => {
-      cantidadTotal += parseFloat(prod.cantidad)
-    })
+      cantidadTotal += parseFloat(prod.cantidad);
+    });
     state.productos = state.productos.map(prod => {
-      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
-      return prod
-    })
+      prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2);
+      return prod;
+    });
   },
-  ACTUALIZAR_TOTAL (state, total) {
-    state.totalCart = total
+  ACTUALIZAR_TOTAL(state, total) {
+    state.totalCart = total;
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, prod) {
-    let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+  ACTUALIZAR_PRODUCTO({ productos }, prod) {
+    let index = productos.findIndex(
+      p => p.IdProducto === prod.IdProducto && prod.index == p.index
+    );
     let prod2 = Object.assign({}, prod);
-    productos.splice(index, 1, prod2)
+    productos.splice(index, 1, prod2);
   },
-  OBTENER_STOCK (state, items) {
-    state.productos = state.productos.map((prod) => {
-      let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
-      prod.stock = items[index] && items[index].stock
-      return prod
-    })
+  OBTENER_STOCK(state, items) {
+    state.productos = state.productos.map(prod => {
+      let index = items.findIndex(item => item.IdProducto == prod.IdProducto);
+      prod.stock = items[index] && items[index].stock;
+      return prod;
+    });
     //state.productos[index].stock = item.stock
     // Vue.set(state.productos[index], 'stock', item.stock)
   }
-}
+};
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
-    let setPrecio = false
-    let cantidad = false
-    let setSuma = false
-    let setPrecioCosto = false
+  agregarProducto({ commit }, [producto, cb, obje, isBarCode]) {
+    let setPrecio = false;
+    let cantidad = false;
+    let setSuma = false;
+    let setPrecioCosto = false;
 
     if (obje) {
-      setPrecio = obje.setPrecio
-      cantidad = obje.cantidad
-      setSuma = obje.setSuma
-      setPrecioCosto = obje.setPrecioCosto
+      setPrecio = obje.setPrecio;
+      cantidad = obje.cantidad;
+      setSuma = obje.setSuma;
+      setPrecioCosto = obje.setPrecioCosto;
     }
 
-    if(typeof producto === 'object') {
+    if (typeof producto === "object") {
       if (setPrecioCosto) {
-        producto.precio = producto.PrecioCosto
-        producto.nuevoPrecioContado = producto.PrecioContado
+        producto.precio = producto.PrecioCosto;
+        producto.nuevoPrecioContado = producto.PrecioContado;
       }
 
-      commit('AGREGAR_PRODUCTO', producto)
-      if (cb) cb(producto)
+      commit("AGREGAR_PRODUCTO", producto);
+      if (cb) cb(producto);
     } else {
-      let params = {}
+      let params = {};
 
       if (isBarCode) {
-        params = {codigoBarra: producto}
-      } 
-      
-      axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
-        if (response.data) {
-          let obj = response.data
+        params = { codigoBarra: producto };
+      }
 
-          if(setPrecio) {
-            obj.cantidad = 1
-            obj.precio = obj.PrecioContado || 0
+      axios
+        .get(API + "productos/id/" + producto, { params: params })
+        .then(response => {
+          if (response.data) {
+            let obj = response.data;
+
+            if (setPrecio) {
+              obj.cantidad = 1;
+              obj.precio = obj.PrecioContado || 0;
+            } else {
+              obj.cantidad = 0;
+              obj.precio = 0;
+            }
+
+            if (cantidad) {
+              obj.cantidad = cantidad;
+            }
+
+            if (setSuma) {
+              obj.setSuma = true;
+            }
+
+            obj.descuento = 0;
+            obj.nuevoPrecioContado = 0;
+
+            commit("AGREGAR_PRODUCTO", obj);
+            if (cb) cb(obj);
           } else {
-            obj.cantidad = 0
-            obj.precio = 0
+            if (cb) cb(false);
           }
-
-          if (cantidad) {
-            obj.cantidad = cantidad
-          }
-
-          if (setSuma) {
-            obj.setSuma = true
-          }
-
-          obj.descuento = 0
-          obj.nuevoPrecioContado = 0
-        
-          commit('AGREGAR_PRODUCTO', obj)
-          if (cb) cb(obj)   
-        } else {
-          if (cb) cb(false)
-        }
-      })
+        });
     }
   },
-  eliminarProducto ({ commit }, index) {
-    commit('ELIMINAR_PRODUCTO', index)
+  eliminarProducto({ commit }, index) {
+    commit("ELIMINAR_PRODUCTO", index);
   },
-  buscarProductos ({ commit }, search) {
-    axios.get(API + 'productos?limit=10&q=' + search).then((response) => {
-      commit('LLENAR_PRODUCTOS_FILTRADOS', response.data)
-    })
+  buscarProductos({ commit }, search) {
+    axios.get(API + "productos?limit=10&q=" + search).then(response => {
+      commit("LLENAR_PRODUCTOS_FILTRADOS", response.data);
+    });
   },
-  limpiarCarrito ({ commit }) {
-    commit('LIMPIAR_CART')
+  limpiarCarrito({ commit }) {
+    commit("LIMPIAR_CART");
   },
-  aplicarDescuentoGeneral ({ commit }, descuento) {
-    commit('APLICAR_DESCUENTO', descuento)
+  aplicarDescuentoGeneral({ commit }, descuento) {
+    commit("APLICAR_DESCUENTO", descuento);
   },
-  actualizarTotalCart ({ commit }, total) {
-    commit('ACTUALIZAR_TOTAL', total)
+  actualizarTotalCart({ commit }, total) {
+    commit("ACTUALIZAR_TOTAL", total);
   },
-  actualizarProducto ({ commit }, prod) {
-    commit('ACTUALIZAR_PRODUCTO', prod)
+  actualizarProducto({ commit }, prod) {
+    commit("ACTUALIZAR_PRODUCTO", prod);
   },
   obtenerStock({ commit, state }, obj) {
-    axios.get(API + 'productos/puntoventa/stock', {
-      params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
-        idAlmacen: obj.IdAlmacen
-      }
-    }).then((response) => {
-        commit('OBTENER_STOCK', response.data)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+    axios
+      .get(API + "productos/puntoventa/stock", {
+        params: {
+          idProductos: state.productos.map(prod => prod.IdProducto),
+          idAlmacen: obj.IdAlmacen
+        }
+      })
+      .then(response => {
+        commit("OBTENER_STOCK", response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
-}
+};
 
 export default {
-    state,
-    mutations,
-    actions
-}
+  state,
+  mutations,
+  actions
+};

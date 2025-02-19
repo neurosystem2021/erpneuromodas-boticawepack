@@ -20,6 +20,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
+import 'sweetalert2/dist/sweetalert2.min.css';
 // import 'leaflet/dist/leaflet.css';
 
 Vue.prototype.$browser = detect()

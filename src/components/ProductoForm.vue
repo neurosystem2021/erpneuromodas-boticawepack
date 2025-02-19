@@ -156,7 +156,27 @@
               Seleccione esta opción si el producto contiene mas productos
             </b-form-checkbox>
           </b-form-group>
-          
+          <hr>
+          <b-form-group>
+            Bomba Tiene :
+          </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TieneCaraA"
+                   :value="1"
+                   :unchecked-value="0">
+              Cara A
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TieneCaraB"
+                   :value="1"
+                   :unchecked-value="0">
+              Cara B
+            </b-form-checkbox>
+          </b-form-group>
         </b-col>
       </b-row>
 
@@ -324,6 +344,8 @@ export default {
         this.producto.IdProducto = newVal.IdProducto
 
         this.producto.EsPadre = newVal.EsPadre
+        this.producto.TieneCaraA = newVal.TieneCaraA
+        this.producto.TieneCaraB = newVal.TieneCaraB
         Vue.nextTick(() => {
            if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
         })

@@ -2,8 +2,8 @@
     <div>
         <Menu v-if="false"></Menu>
 
-        <br />
-        <b-container fluid class="bv-example-row" id="conten">
+       
+        <b-container fluid class="mt-5">
             <b-row>
                 <b-col md="9" style="border-right: 3px solid #C0C0C0; background: white">
                     <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
@@ -475,7 +475,7 @@
                                         <b-row style="justify-content: center; margin-top:5px">
                                             <b-col md="12">
                                                 <b-button :disabled="inProgress" variant="danger" size="sm" @click="limpiarPuntoVenta" class="mb-3" v-if="venta.EsFacturaVale == 1">CANCELAR FACTURACION</b-button>
-                                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">REALIZAR VENTA</b-button>
+                                                <b-button type="submit" :disabled="inProgress" class="btnAction" variant="success" size="lg">REALIZAR VENTA</b-button>
                                                 <!--<h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>-->
                                             </b-col>
                                         </b-row>
@@ -507,7 +507,8 @@
                             </b-row>-->
                             <b-button v-b-toggle.collapse-1 variant="warning" block class="mb-1" style="margin-top: -10px; font-weight: bold;" v-if="idPerfil==1">ACCESOS DIRECTOS</b-button>
                             <b-collapse id="collapse-1" class="mt-1 mb-1">
-                                <b-col md="12" class="mt-1">
+                              <b-col md="12" class="mt-1">
+                                  
                                     <vale-lista @facturar="cargarValesInfo"></vale-lista>
                                 </b-col>
                                 <b-col md="12" class="mt-1">
@@ -523,10 +524,36 @@
                                     <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                                 </b-col>-->      
                             </b-collapse>
+                            
                         </b-col>
                     </b-row>
-                    <b-row  style="height:75vh; overflow-y: scroll; background: #E6E6E6; place-content: flex-start; align-items: center; display: flex; justify-content: center;">     
-                        <b-col md="10" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)" :class="{'seleccionProducto': producto.IdProducto == idProductoSelect }">
+                    <b-row>    
+                      <b-col cols="12">
+                        <b-form-select v-model="IdSurtidor" :options="Surtidor" class="mb-3" disabled/>
+                      </b-col>
+                        <b-col cols="6" v-for="(producto , index2) in productosData" :key="index2">
+                          <b-card :class="[producto.caraActiva ? 'divProducto' : '', 'mx-1']" @click="anadirProducto(producto)">
+                            <b-row style="margin: 0;">
+                                <b-col md="7">
+                                    <label class="font-weight-bold" style="font-size:0.7rem; cursor:pointer">{{producto.Producto}}</label>
+                                </b-col>
+                                <b-col md="5" style="align-items: center; justify-content: center; display: flex;">
+                                    <b-badge variant="dark" style="font-size: 0.8rem;">S/ {{  parseFloat(producto.PrecioContado).toFixed(2) }}</b-badge>
+                                </b-col>
+                            </b-row>
+                            <b-img  src="static/bombagasolina.png" @error="setAltImg" style="max-width: 150px;" :class="!producto.caraActiva?'imgDisable' :''"></b-img>
+                            <center>
+                              <b-row class="text-center" style="margin-top:2px; border-top: 1px solid #E6E6E6;">
+                                <b-col>
+                                    <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:265px; padding: 4px;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
+                                </b-col>               
+                            </b-row>
+                              <p class="font-weight-bold my-0">{{producto.DescripcionCara}}</p>
+                            </center>
+                          </b-card>
+                        </b-col>
+
+                        <!-- <b-col md="10" id="productoPunto" class="mx-0 mt-2 text-center bg-white p-0" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer; height: fit-content; " v-for="(producto , index2) in productosData" :key="index2" @click="setProducto(producto)" :class="{'seleccionProducto': producto.IdProducto == idProductoSelect }">
                             <b-row style="margin: 0;">
                                 <b-col md="7">
                                     <label class="font-weight-bold" style="font-size:0.7rem; cursor:pointer">{{producto.Producto}}</label>
@@ -540,7 +567,7 @@
                                     <b-img style="border-radius: 10px; object-fit: contain; margin-bottom:5px; width:265px; padding: 4px;" fluid :src="'/resources/images/productos/' + producto.Imagen" @error="setAltImg" alt="" ></b-img>
                                 </b-col>               
                             </b-row>
-                        </b-col>
+                        </b-col> -->
                     </b-row>
                 </b-col>
             </b-row>
@@ -666,13 +693,30 @@ export default {
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
+    this.IdSurtidor = sessionStorage.getItem("IdSurtidor");
+    if (this.IdSurtidor == 0) {
+      this.$swal.fire({
+        icon: "warning",
+        title: "Surtidor",
+        text: "No se ha seleccionado un surtido"
+      });
+    }
     //this.obtenerSurtidor()
     //this.estadoSistema()
-    this.ObtenerLstOfertas();
+    // this.ObtenerLstOfertas();
+    this.obtenerHistorialActivo();
   },
   data() {
     return {
       lstOfertas: [],
+      lstHistorico: [],
+      IdSurtidor: "",
+      Surtidor: [
+        { value: 1, text: "Surtidor 1" },
+        { value: 2, text: "Surtidor 2" },
+        { value: 0, text: "Administrador" }
+      ],
+      Cara: "",
       dni: "",
       isNota: false,
       newDniRuc: "",
@@ -711,7 +755,11 @@ export default {
             variant: "info",
             class: "fontsize thsize"
           },
-          //{ key: 'CodigoBarra', label: 'Código' },
+          {
+            key: "DescripcionCara",
+            label: "Cara",
+            class: "productosize thsize"
+          },
           { key: "Producto", class: "productosize thsize" },
           //{ key: 'ProductoCategoria', label: 'Categoría' },
           //{ key: 'ProductoMarca', label: 'Marca' },
@@ -793,6 +841,31 @@ export default {
           this.lstOfertas = res.data;
         }
       });
+    },
+    async obtenerHistorialActivo() {
+      await this.axios(`${this.API}historialgalones/obtener_activos`).then(
+        res => {
+          if (res) {
+            this.lstHistorico = res.data;
+          }
+        }
+      );
+    },
+    anadirProducto(producto) {
+      // producto.IdHistorico = null;
+      // if (this.lstHistorico.length > 0) {
+      //   let Historico = this.lstHistorico.filter(
+      //     v =>
+      //       v.IdProducto == producto.IdProducto &&
+      //       v.Cara == producto.Cara &&
+      //       v.IdSurtidor == this.IdSurtidor
+      //   );
+
+      //   producto.IdHistorico = Historico.IdHistorico;
+      // }
+      if (producto.caraActiva) {
+        this.setProducto(producto);
+      }
     },
     generarOfertas() {
       let IdOferta = [];
@@ -978,17 +1051,37 @@ export default {
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
-    cargarProductos() {
+    async cargarProductos() {
       this.productoSelect = {};
+      this.productosData = [];
       this.idProductoSelect = null;
-      this.axios
+      await this.axios
         .get(this.API + "productos/lineal")
         .then(response => {
-          this.productosData = response.data;
-          if (this.productosData.length > 0) {
-            this.productoSelect = this.productosData[0];
-            this.idProductoSelect = this.productosData[0].IdProducto;
-          }
+          let index = 0;
+          response.data.forEach(producto => {
+            let prodA = { ...producto };
+            let prodB = { ...producto };
+            prodA.caraActiva = producto.TieneCaraA == 1;
+            prodA.CaraA = producto.TieneCaraA == 1;
+            prodA.Cara = 1;
+            prodA.DescripcionCara = "CARA A";
+            prodA.index = index;
+            this.productosData.push(prodA);
+            index++;
+            prodB.caraActiva = producto.TieneCaraB == 1;
+            prodB.CaraB = producto.TieneCaraB == 1;
+            prodB.Cara = 2;
+            prodB.DescripcionCara = "CARA B";
+            prodB.index = index;
+            this.productosData.push(prodB);
+            index++;
+          });
+          //this.productosData = response.data;
+          //  if (this.productosData.length > 0) {
+          //  this.productoSelect = this.productosData[0];
+          // this.idProductoSelect = this.productosData[0].IdProducto;
+          // }
         })
         .catch(error => {
           console.log(error);
@@ -996,6 +1089,7 @@ export default {
           this.idProductoSelect = null;
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
+      console.log(this.productosData);
     },
     ocultarNav() {
       this.navDisabled = !this.navDisabled;
@@ -1040,10 +1134,6 @@ export default {
       }
     },
     setProducto(obj) {
-      /*    if(this.ventaSeleccionadas.length>0){
-                this.$toasted.info('Tiene ventas seleccionadas, limpie el punto de venta',{duration:3000})
-                return
-            }*/
       obj = Object.assign({}, obj);
       this.productoSelect = obj;
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
@@ -1055,6 +1145,18 @@ export default {
       this.$refs["modalCant"].show();
     },
     setProductoUni(obj, seleccion = false, precio = false) {
+      obj.IdHistorico = null;
+      if (this.lstHistorico.length > 0) {
+        let Historico = this.lstHistorico.filter(
+          v =>
+            v.IdProducto == obj.IdProducto &&
+            v.Cara == obj.Cara &&
+            v.IdSurtidor == this.IdSurtidor
+        );
+
+        obj.IdHistorico = Historico[0].IdHistorico;
+      }
+      // console.log('Historico',obj);
       obj.precio = 0;
       obj.cantidad = 0;
       //obj.IdLote = 0
@@ -1064,7 +1166,9 @@ export default {
       obj.nuevoPrecioContado = 0;
       this.idProductoSelect = obj.IdProducto;
       obj = this.onSetProducto(obj, precio);
-      let existe = this.productos.find(p => p.IdProducto == obj.IdProducto);
+      let existe = this.productos.find(
+        p => p.IdProducto == obj.IdProducto && p.index == obj.index
+      );
       if (existe == undefined) {
         this.$toasted.info("Producto agregado");
         this.add([
@@ -1865,6 +1969,7 @@ export default {
       }
 
       this.venta.productos = this.productos;
+      this.venta.IdSurtidor = this.IdSurtidor;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
       this.venta.PagoCon = this.$refs.carrito.pagocon;
@@ -2062,5 +2167,12 @@ td.productosize {
 }
 #modalCantidad .modal-dialog {
   max-width: 47% !important;
+}
+.divProducto {
+  cursor: pointer !important;
+}
+
+.imgDisable {
+  filter: grayscale(100%);
 }
 </style>

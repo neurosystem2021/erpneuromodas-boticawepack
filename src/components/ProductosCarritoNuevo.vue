@@ -1,7 +1,7 @@
 <template>
     <b-col md="12">
       <b-row>
-        <b-col md="12">
+        <b-col md="12" v-if="(type === 'mov') ? true : false">
           <b-form-group>
             <b-input-group>
               <autocomplete

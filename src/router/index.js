@@ -10,6 +10,9 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Remision from '@/views/Remision.vue'
 import ConfigurarOferta from '@/views/ConfigurarOferta.vue'
+import HistorialGalones from '@/views/HistorialGalones.vue'
+import Diesel from '@/views/Diesel.vue'
+import GasoholRegular from '@/views/GasoholRegular.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -127,6 +130,11 @@ export default new Router({
       component: ValesFacturados
     },
     {
+      path: '/historial-galones',
+      name: 'HistorialGalones',
+      component: HistorialGalones
+    },
+    {
       path: '/reportes/cantidades',
       name: 'ReporteCantidad',
       component: ReporteCantidad
@@ -140,6 +148,16 @@ export default new Router({
       path: '/oferta',
       name: 'ConfigurarOferta',
       component: ConfigurarOferta
+    },
+    {
+      path: '/diesel',
+      name: 'Diesel',
+      component: Diesel
+    },
+    {
+      path: '/GasoholRegular',
+      name: 'GasoholRegular',
+      component: GasoholRegular
     },
   ]
 })
