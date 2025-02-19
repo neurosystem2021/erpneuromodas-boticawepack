@@ -79,7 +79,6 @@ const mutations = {
 
 const actions = {
   agregarProducto ({ commit }, [producto, cb, obje, isBarCode, isClienteVip, actualizar, isVentas]) {
-    console.log(obje)
     let setPrecio = false
     let cantidad = false
     let precio = false
