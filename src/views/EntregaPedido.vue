@@ -28,19 +28,21 @@
                             <td>{{ detalle.Producto }}</td>
                             <td>{{ detalle.Cantidad }}</td>
                             <td>{{ detalle.Precio }}</td>
-                            <td>{{ detalle.Cantidad * detalle.Precio }}</td>
+                            <td>{{ parseFloat(detalle.Cantidad * detalle.Precio).toFixed(2) }}</td>
                         </tr>
                         <tr>
                             <th>Total</th>
-                            <th>{{ data.item.detalle.reduce((sum,producto)=>{
+                            <th>{{ parseFloat(data.item.detalle.reduce((sum,producto)=>{
                                 return sum+parseFloat(producto.Cantidad)
-                            },0) }}</th>
-                            <th>{{ data.item.detalle.reduce((sum,producto)=>{
+                            },0) ).toFixed(2)
+                            }}</th>
+                            <th>{{ parseFloat(data.item.detalle.reduce((sum,producto)=>{
                                 return sum+parseFloat(producto.Precio)
-                            },0) }}</th>
-                            <th>{{ data.item.detalle.reduce((sum,producto)=>{
+                            },0) ).toFixed(2)
+                            }}</th>
+                            <th>{{ parseFloat(data.item.detalle.reduce((sum,producto)=>{
                                 return sum+parseFloat(producto.Cantidad*producto.Precio)
-                            },0)
+                            },0)).toFixed(2)
                              }}</th>
                         </tr>
                     
@@ -142,9 +144,11 @@ export default {
     abrirModalFinalizar(producto) {
       this.item = producto;
       this.finalizarFlag = true;
-      this.montoPagar = this.item.detalle.reduce((sum, producto) => {
-        return sum + parseFloat(producto.Cantidad * producto.Precio);
-      }, 0);
+      this.montoPagar = parseFloat(
+        this.item.detalle.reduce((sum, producto) => {
+          return sum + parseFloat(producto.Cantidad * producto.Precio);
+        }, 0)
+      ).toFixed(2);
 
       this.metodoPago = [
         { label: "Efectivo", monto: this.montoPagar, selected: 1 },
@@ -168,13 +172,17 @@ export default {
     },
     async finalizar() {
       if (this.acuentaflag == 0) {
-        let montoPagar = this.item.detalle.reduce((sum, producto) => {
-          return sum + parseFloat(producto.Cantidad * producto.Precio);
-        }, 0);
+        let montoPagar = parseFloat(
+          this.item.detalle.reduce((sum, producto) => {
+            return sum + parseFloat(producto.Cantidad * producto.Precio);
+          }, 0)
+        ).toFixed(2);
 
-        let montoPagado = this.metodoPago.reduce((sum, metodo) => {
-          return sum + parseFloat(metodo.monto);
-        }, 0);
+        let montoPagado = parseFloat(
+          this.metodoPago.reduce((sum, metodo) => {
+            return sum + parseFloat(metodo.monto);
+          }, 0)
+        ).toFixed(2);
 
         if (!(montoPagar == montoPagado)) {
           this.$toasted.show("Los Monto no Coinciden");

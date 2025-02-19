@@ -78,6 +78,15 @@ export default {
             key: "Cliente",
             label: "Nombre Cliente",
             class: "centrado"
+          },
+          {
+            key: "Repartidor"
+          },
+          {
+            key: "FechaEntrega"
+          },
+          {
+            key: "HoraEntrega"
           }
         ];
         this.Pedidos.forEach(pedido => {

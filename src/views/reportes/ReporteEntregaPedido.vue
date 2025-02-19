@@ -18,7 +18,7 @@
             text-field="NombreUsuario"
             required
             v-model="IdRepartidor"
-            :readonly="idPerfil != 1"
+            :disabled="idPerfil != 1"
             ></b-select>
             
         </b-col>
@@ -161,6 +161,7 @@ export default {
         { thStyle: { width: "12%" }, key: "Cliente" },
         { thStyle: { width: "15%" }, key: "Dirección" },
         { thStyle: { width: "5%" }, key: "MontoPago", label: "Monto" },
+        { thStyle: { width: "5%" }, key: "deuda", label: "Deuda" },
         { thStyle: { width: "12%" }, key: "created_at", label: "Hora Entrega" },
         {
           thStyle: { width: "5%" },
@@ -202,9 +203,9 @@ export default {
     this.hasta = this.$moment().format("YYYY-MM-DD");
 
     this.obtenerRepartidor();
-    if (this.idPerfil != 1) {
+    // if (this.idPerfil != 1) {
       this.IdRepartidor = sessionStorage.getItem("User");
-    }
+    // }
     this.obtenerListado();
   },
   methods: {
@@ -219,9 +220,16 @@ export default {
       }).then(res => {
         if (res) {
           this.lstReporte = res.data.map(item => {
+            let monto = item.MontoPago;
+            let medotodospago = JSON.parse(item.metodospago);
+            let sum = medotodospago.reduce((suma, metodo) => {
+              return suma + parseFloat(metodo.monto);
+            }, 0);
+            // console.log(sum);
             return {
               ...item,
-              metodospago: JSON.parse(item.metodospago) // Convertir el string a array
+              deuda: parseFloat(monto).toFixed(2) - parseFloat(sum).toFixed(2),
+              metodospago: medotodospago
             };
           });
         }
