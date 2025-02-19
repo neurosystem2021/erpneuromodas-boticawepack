@@ -388,6 +388,9 @@
                           <pago-deuda></pago-deuda>
                       </b-button-group>
                       <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                      <b-button-group size="sm">
                           <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" @cargarProforma="cargarProforma"></proformas>
                       </b-button-group>
                       <b-button-group size="sm" class="ocularMovil" v-if="false">
@@ -430,6 +433,82 @@
                                                 </b-form-checkbox>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td  class="text-center">Proforma</td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <b-input-group>
+                                              <b-form-checkbox 
+                                              :disabled="bloquearInput?true:false"
+                                              v-model="venta.EsCreditoProforma"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                                Proforma a Credito
+                                              </b-form-checkbox>
+                                              <div v-if="venta.EsCreditoProforma">
+                                                <div class="mb-3">
+                                                  <input v-model="venta.FechaCreditoProforma"
+                                                    type="date"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Fecha Crédito"/>
+                                                </div>
+                                              </div>
+                                            </b-input-group>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <b-input-group>
+                                              <b-form-checkbox 
+                                              :disabled="bloquearInput?true:false"
+                                              v-model="venta.EsDescripcion"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                                Nota
+                                              </b-form-checkbox>
+                                              <div v-if="venta.EsDescripcion">
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Plazo de Entrega"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma2"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Validez de la oferta"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma3"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Lugar de Entrega"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma4"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Garantia"/>
+                                                </div>
+                                                <div>
+                                                  <input v-model="venta.DescripcionProforma5"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Tiempo de entrega"/>
+                                                </div>
+                                              </div>
+                                            </b-input-group>
+                                          </td>
+                                        </tr>
+                                        
                                         <!-- <tr>
                                             <td>
                                                 <b-input-group prepend="Prof. válida por:" append="días">
@@ -862,12 +941,15 @@ import DeliveryModal from "@/components/DeliveryModal.vue";
 import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
+import Movimiento from '@/components/Movimiento';
 import Swal from "sweetalert2";
+import { Bar } from 'vue-chartjs';
 export default {
   components: {
     ClientesForm,
     Proformas,
     PagoDeuda,
+    Movimiento,
     PreOrdenLista,
     DeliveryModal,
     ConfigVenta,
@@ -969,6 +1051,14 @@ export default {
         CodSunatModifica: "",
         NotaIdMotivo: "",
         NotaDescMotivo: "",
+        EsCreditoProforma: 0,
+        FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
+        EsDescripcion: 0,
+        DescripcionProforma: '',
+        DescripcionProforma2: '',
+        DescripcionProforma3: '',
+        DescripcionProforma4: '',
+        DescripcionProforma5: '',
         IdPreOrden: null,
         CampoDireccion: "",
         EsDelivery: false,

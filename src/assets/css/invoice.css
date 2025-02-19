@@ -60,11 +60,21 @@
     margin-bottom: 9px;
   }
   
+  #client2 {
+    padding-left: 6px;
+    border-left: 6px solid #57B223;
+    float: left;
+    width: 21cm;
+  }
+  #client2 .to {
+    color: #777777;
+  }
+  
   #client {
     padding-left: 6px;
     border-left: 6px solid #57B223;
     float: left;
-    width: 12cm;
+    width: 10cm;
   }
   
   #client .to {
@@ -80,7 +90,7 @@
   #invoice {
     float: right;
     text-align: right;
-    width: 9cm;
+    width: 10cm;
   }
   
   #invoice h1 {

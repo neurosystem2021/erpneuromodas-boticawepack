@@ -12,8 +12,8 @@
                 body-text-variant="dark">           
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresaselec" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                            <option value="imperiop1">EMP. ROLLING GOMEZ S.A.C</option>
-                            <option value="imperiop2">EMP. FERRETERIA GOMEZ</option>
+                            <option value="imperiop1">EMP. FERRETERIA VENTURO</option>
+                            <option value="imperiop2">EMP. FERRETERIA VENTURO</option>
                         </select>
                     </b-button-group>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  

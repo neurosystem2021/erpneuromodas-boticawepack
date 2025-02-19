@@ -38,6 +38,10 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
               </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:30% !important;">Lugar de Entrega</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma3 }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -56,11 +60,19 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCreditoProforma == 1 ? 'CRÉDITO' : 'CONTADO'}}</td>
+              </tr>
+              <tr v-if="proforma.EsCreditoProforma == 1">
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha De Pago</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCreditoProforma }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma }}</td>
+              </tr>
+              <tr v-if="proforma.EsCreditoProforma == 1">
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega de Cotización</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma5 }}</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -117,11 +129,24 @@
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
-      <br>
-      <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+      <div id="details" class="clearfix">
+        <div id="client2">
+          <div>NOTA:</div>
+          <table>
+            <tbody>
+              <div>
+                <tr>
+                  <td class="celda" style="width:47% !important;">Validez de la Oferta</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma2 }}</td>
+                </tr>
+                <tr>
+                <td class="celda" style="width:47% !important;">Garantía del bien o servicio</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma4 }}</td>
+              </tr>
+              </div>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div>
         <br>

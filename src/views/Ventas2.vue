@@ -9,8 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                            <option value="imperiop1">EMP. FERRETERIA GOMEZ S.A.C</option>
-                            <option value="imperiop2">EMP. ROLLING GOMEZ</option>
+                            <option value="imperiop1">EMP. FERRETERIA VENTURO</option>
+                            <option value="imperiop2">EMP. FERRETERIA VENTURO</option>
                         </select>
                     </b-button-group>
                 </div>
@@ -1236,6 +1236,12 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.FechaCreditoProforma = this.$moment().format("YYYY-MM-DDTH:mm:ss")
+            this.venta.DescripcionProforma = (''+this.venta.DescripcionProforma).trim()
+            this.venta.DescripcionProforma2 = (''+this.venta.DescripcionProforma2).trim()
+            this.venta.DescripcionProforma3 = (''+this.venta.DescripcionProforma3).trim()
+            this.venta.DescripcionProforma4 = (''+this.venta.DescripcionProforma3).trim()
+            this.venta.DescripcionProforma5 = (''+this.venta.DescripcionProforma3).trim()
             this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
             this.venta.adelantosPreOrden = this.adelantosPreOrden
             this.venta.IdPedido = this.$route.query.idPedido || null

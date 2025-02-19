@@ -7,8 +7,8 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                        <option value="imperiop1">EMP. ROLLING GOMEZ S.A.C</option>
-                        <option value="imperiop2">EMP. FERRETERIA GOMEZ</option>
+                        <option value="imperiop1">EMP. FERRETERIA VENTURO</option>
+                        <option value="imperiop2">EMP. FERRETERIA VENTURO</option>
                       </select>
                   </b-button-group>
               </div>
@@ -498,6 +498,34 @@
           </table>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col v-if="totalSalidasTarjeta">
+          <h5>Salidas de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
 
       <b-row class="no-print">
           <b-col v-if="totalAdelantos">
@@ -575,6 +603,7 @@ export default {
       ventas: [],
       ingresos: [],
       ingresosTarjeta: [],
+      salidasTarjeta: [],
       salidas: [],
 	  adelantos: [],
       turno: null,
@@ -620,6 +649,13 @@ export default {
       let total = 0
       this.ingresos.forEach(ingreso => {
         if (!ingreso.Anulado) total += ingreso.Importe
+      });
+      return total 
+    },
+    totalSalidasTarjeta () {
+      let total = 0
+      this.salidasTarjeta.forEach(salidaTar => {
+        if (!salidaTar.Anulado) total += salidaTar.Importe
       });
       return total 
     },
@@ -750,7 +786,7 @@ export default {
           idTurno:      this.turno,
           user: sessionStorage.getItem("User"),
           //user:         this.vendedor.Usuario,
-          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+          ingresos:     this.totalIngresos.toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
           totalVentas:  this.totalVentas
@@ -831,7 +867,8 @@ export default {
         params: params
       })
       .then(res => {
-        this.salidas = res.data
+        this.salidas = res.data.filter((sal)=> sal.EsTarjeta==0)
+        this.salidasTarjeta = res.data.filter((sal)=> sal.EsTarjeta==1)
       }).catch(err => {
         console.log(err)
       }) 
