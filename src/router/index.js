@@ -82,12 +82,12 @@ export default new Router({
     },
     {
       path: "/conversion_configuracion",
-      name: "Ventas",
+      name: "ConversionConfig",
       component: ConversionConfig
     },
     {
       path: "/conversion_unidades",
-      name: "Ventas",
+      name: "ConverionUnidades",
       component: ConverionUnidades
     },
     {

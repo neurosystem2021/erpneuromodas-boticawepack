@@ -1925,7 +1925,7 @@ export default {
           let comandaJson = JSON.stringify(dataImprimir);
 
           await this.axios
-            .post(this.API + "ventas?id_empresa=" + element.value, data)
+            .post(this.API + "ventass?id_empresa=" + element.value, data)
             .then(async response => {
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
