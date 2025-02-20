@@ -710,6 +710,7 @@ export default {
               this.producto.precios
             );
           }
+          this.$emit("actualizarProducto", this.producto);
           if (response.data.error) {
             this.$toasted.show(
               response.data.error + " - " + response.data.codigoBarra

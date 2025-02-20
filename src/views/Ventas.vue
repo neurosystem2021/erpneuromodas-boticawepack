@@ -926,7 +926,7 @@
         <!-- MODALS TOUCH -->
         <producto-form 
         :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit"
-         :producto-update="productoSelect"
+         :producto-update="productoSelect"  @actualizarProducto="actualizarRegistro($event)"
          ></producto-form>
         
       </b-container>
@@ -947,9 +947,9 @@ import DeliveryModal from "@/components/DeliveryModal.vue";
 import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
-import Movimiento from '@/components/Movimiento';
+import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
-import { Bar } from 'vue-chartjs';
+import { Bar } from "vue-chartjs";
 export default {
   components: {
     ClientesForm,
@@ -1060,11 +1060,11 @@ export default {
         EsCreditoProforma: 0,
         FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
         EsDescripcion: 0,
-        DescripcionProforma: '',
-        DescripcionProforma2: '',
-        DescripcionProforma3: '',
-        DescripcionProforma4: '',
-        DescripcionProforma5: '',
+        DescripcionProforma: "",
+        DescripcionProforma2: "",
+        DescripcionProforma3: "",
+        DescripcionProforma4: "",
+        DescripcionProforma5: "",
         IdPreOrden: null,
         CampoDireccion: "",
         EsDelivery: false,
@@ -1158,6 +1158,39 @@ export default {
     });
   },
   methods: {
+    async actualizarRegistro(event) {
+      let producto = { ...event };
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      // console.log("prod", prod.PreciosPorProducto);
+      let pres = [];
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+      prod.PreciosPorProducto = pres;
+      prod.presentacion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
+      prod.ProductoPresentacion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
+      prod.cantidad = 1;
+      prod.precio = prod.PrecioContado;
+      prod.descuento = 0;
+      prod.tienePresentacion = prod.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
+      prod.bloquearInputPrecio = false;
+      prod.CantidadPresentacion = 1;
+      prod.esPresentacion = false;
+      prod.pres = "";
+
+      let index = this.ventas[this.ventaActiva].productos.findIndex(
+        v => v.IdProducto == producto.IdProducto
+      );
+      console.log(index);
+      Vue.set(this.ventas[this.ventaActiva].productos, index, prod);
+    },
     ocultarNav() {
       this.mostrarNav = !this.mostrarNav;
       if (!this.mostrarNav) {
@@ -1801,17 +1834,21 @@ export default {
     },
     getSubTotalDetalle(prod) {
       let subtotal = 0;
+
       if (prod.esPresentacion) {
-        subtotal = prod.CantidadPresentacion * prod.precio;
+        subtotal = prod.CantidadPresentacion * prod.cantidad * prod.precio;
       } else {
-        prod.cantidad * prod.precio;
+        subtotal = prod.cantidad * prod.precio;
+        // console.log(prod);
       }
       return subtotal;
     },
     getTotalDetalle(prod) {
       let total = 0;
       if (prod.esPresentacion) {
-        total = prod.CantidadPresentacion * prod.precio - prod.descuento;
+        total =
+          prod.CantidadPresentacion * prod.cantidad * prod.precio -
+          prod.descuento;
       } else {
         total = prod.cantidad * prod.precio - prod.descuento;
       }
@@ -1825,7 +1862,12 @@ export default {
       } else {
         let subtotal = prod.reduce((total, prod) => {
           if (prod.esPresentacion) {
-            return total + parseFloat(prod.CantidadPresentacion * prod.precio);
+            return (
+              total +
+              parseFloat(
+                prod.CantidadPresentacion * prod.cantidad * prod.precio
+              )
+            );
           } else {
             return total + parseFloat(prod.cantidad * prod.precio);
           }
@@ -1858,7 +1900,8 @@ export default {
             return (
               total +
               parseFloat(
-                prod.CantidadPresentacion * prod.precio - prod.descuento
+                prod.CantidadPresentacion * prod.cantidad * prod.precio -
+                  prod.descuento
               )
             );
           } else {
