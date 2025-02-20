@@ -1,6 +1,10 @@
 <template>
   <b-container fluid>
     <b-row>
+      <b-col cols="12" class="my-2">
+            <center> <h1>REGISTRO DE PEDIDOS POR FECHA </h1></center>
+            <h5>*Por Defecto la fecha de Entrega, será la fecha de hoy.*</h5>
+      </b-col>
         <b-col cols="4" class="my-2">
             <b-input-group prepend="Fecha. Reg." class="mt-2">
                 
@@ -43,6 +47,8 @@ export default {
     };
   },
   mounted() {
+    this.FechaEntrega = this.$moment().format("YYYY-MM-DD");
+    this.obtenerListado();
     // this.reCalcularHeader();
     // this.formatearProductos();
   },

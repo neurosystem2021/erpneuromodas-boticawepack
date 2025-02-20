@@ -779,7 +779,7 @@
       </b-form>
   </b-modal>
   <b-modal v-model="modalRepartidor" hide-footer title="Asignar Repartidor">
-    <b-form @submit="continuarGuardarVenta">
+    <b-form @submit.prevent="continuarGuardarVenta">
         Repartidor
         <b-select 
           :options="repartidor"
@@ -1220,6 +1220,7 @@ export default {
       let empresa = this.$store.state.empresas.filter(
         v => v.value == this.empresa
       )[0];
+      this.venta.IdDocVentaRef = obj.IdDocVenta;
       this.venta.EsSeparado = obj.EsSeparado;
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
@@ -1296,6 +1297,7 @@ export default {
           this.bloquearInput = true;
           this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
+      console.log(this.venta.IdDocVentaRef);
     },
     setDocRefConsumo(obj) {
       this.venta.SeparadoId = obj.IdDocVenta;
@@ -1831,7 +1833,7 @@ export default {
       }
     },
     async continuarGuardarVenta(e) {
-      e.preventDefault();
+      // e.preventDefault();
       console.log("sssssssss");
       let productos = this.productos;
       if (this.venta.tipoVenta.CodSunat == "07") {
@@ -1925,7 +1927,7 @@ export default {
           let comandaJson = JSON.stringify(dataImprimir);
 
           await this.axios
-            .post(this.API + "ventass?id_empresa=" + element.value, data)
+            .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {
               /** --------RECUERDA ESTA PARTE  */
               this.emitirauto(response.data.insertId, element.value);
