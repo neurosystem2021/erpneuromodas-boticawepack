@@ -1,8 +1,432 @@
 <template>
   
-  <div>
+  <b-container fluid class="px-5 py-5">
+    <b-row>
+      <b-col cols="3">
+        <div class="alinear">
+          <center>
+          </center>
+          <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+          <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+          <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+        </div>
+        <h2 class="text-center">Mi Cierre de Caja</h2> 
+      <br>
+      <b-row  align-h="end" class=" no-print">
+        <b-col cols="12">
+           
+            <b-button-group>
+              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
+                Cerrar Caja</b-button>
+            </b-button-group>
+            <b-button-group>
+              <cierres-caja></cierres-caja>
+            </b-button-group>
+            <b-button-group>
+              <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
+            </b-button-group>
+          </b-col>
+        <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
+            Turno
+            
+              <b-form-select v-model="turno" :options="turnos" />
+           
+        </b-col>
+        <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
+          <label v-if="!this.$route.params.id">Vendedor:</label>
+            <b-form-group size="sm">
+              <autocomplete
+                  required="required"
+                  ref="inputVendedor"
+                  :url="API + 'usuarios'"
+                  anchor="NombreUsuario"
+                  label="writer"
+                  :on-select="setVendedor" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
+        </b-col>
+          
+      </b-row>
+      <b-row class="px-3">
+       
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Gran Total S/.</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ totalSalidas | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Crédito S/.</td>
+              <td>{{ totalVentasCredito | redondear }} </td>
+            </tr>
+          
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Yape/Plin S/.</td>
+              <td>{{ totalVentasMastercard | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | redondear }} </td>
+            </tr>
+            
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+
+            <tr>
+              <td>Vales de Crédito S/.</td>
+              <td>{{ totalVentasValeCredito | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Canjes S/.</td>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </b-row>
+      </b-col>
+      <b-col cols="9" class="no-print">
+        
+          <b-card no-body>
+            <b-tabs card>
+              <b-tab title="Ventas" active >
+                <b-card-text>
+                  <div class="details px-5" >
+
+                  
+                  <hr class="no-print">
+                  <b-row class="no-print">
+                    <h5>Ventas Efectivo</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.EfectivoDesc }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ item.Efectivo | redondear }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Efectivo</b></td>
+                          <td class="total"><b>S/. {{ totalVentasEfectivo | redondear}}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+
+                  <b-row class="no-print">
+                    <h5>Ventas Tarjeta</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.VisaDesc }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ item.Visa | redondear }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Tarjeta</b></td>
+                          <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+                  
+
+                  <b-row class="no-print">
+                    <h5>Ventas Yape / Plin</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.MastercardDesc }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ item.Mastercard | redondear}}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Yape / Plin</b></td>
+                          <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+                  <b-row class="no-print">
+                    <h5>Ventas Transferencia</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.TransferenciaDesc }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ item.Transferencia | redondear}}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Transferencia</b></td>
+                          <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+                  <b-row class="no-print">
+                    <h5>Ventas Vale Crédito (No Suma)</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.Placa }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Vale</b></td>
+                          <td class="total"><b>S/. {{ totalVentasValeCredito | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+                  <b-row class="no-print">
+                    <h5>Ventas Canje</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasValeCanje" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ item.Placa }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="total"><b>Total Canje</b></td>
+                          <td class="total"><b>S/. {{ totalVentasCanje | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+                  <b-row class="credito no-print">
+                    <h5>Ventas a Credito</h5><br>
+                    <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+                          <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                          <td>{{ item.FechaDoc }}</td>
+                          <td>{{ item.Cliente }}</td>
+                          <td>{{ estadoVenta(item) }}</td>
+                          <td>S/. {{ item.Total | redondear }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="3"></td>
+                          <td><b>Total Credito</b></td>
+                          <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </b-row>
+
+
+                  <b-row class="no-print">
+                    <b-col v-if="totalIngresos">
+                      <h5>Ingresos</h5><br>
+                      <table class="table b-table table-sm">
+                        <thead>
+                          <tr>
+                            <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, index) in ingresos" :key="index">
+                            <td>{{ item.IdCajaBanco }}</td>
+                            <td>{{ item.FechaDoc }}</td>
+                            <td>{{ item.Concepto }}</td>
+                            <td>S/. {{ item.Importe }}</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="2"></td>
+                            <td class="total"><b>Total Ingresos</b></td>
+                            <td class="total"><b>S/. {{ totalIngresos }}</b></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </b-col>
+                    <b-col v-if="totalSalidas">
+                      <h5>Salidas</h5><br>
+                      <table class="table b-table table-sm">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Detalle</th>
+                            <th>Salida</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, index) in salidas" :key="index">
+                            <td>{{ item.IdCajaBanco }}</td>
+                            <td>{{ item.FechaDoc }}</td>
+                            <td>{{ item.Concepto }}</td>
+                            <td>S/. {{ item.Importe }}</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="2"></td>
+                            <td class="total-salida"><b>Total Salidas</b></td>
+                            <td class="total-salida"><b>S/. {{ totalSalidas }}</b></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </b-col>
+                  </b-row>
+                </div>
+
+                  <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+              
+                            </b-card-text>
+                          </b-tab>
+                          <b-tab title="Productos" class="px-5">
+                            <b-card-text>
+                              <b-row class="print">
+                                <b-col cols="12">
+                              
+                                        <table class="table tbl-historico" size="sm" >
+                                            <thead>
+                                              <tr>
+                                                <th width="5px">Producto</th>
+                                                <th width="1px">Surtidor</th>
+                                                <th width="1px">Cara</th>
+                                                <th width="5px">V. I.</th>
+                                                <th width="5px">V.</th>
+                                                <th width="5px">Dif</th>              
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(resumen,index) in resumenHistorial" :key="index">
+                                                  <td width="5px">{{resumen.Producto}}</td>
+                                                  <td width="1px">Isla {{resumen.IdSurtidor}}</td>
+                                                  <td width="1px">Cara {{resumen.Cara}}</td>
+                                                  <td width="5px">{{resumen.ValorInicial}}</td>
+                                                  <td width="5px">{{resumen.VentaTotal}}</td>
+                                                  <td width="5px">{{resumen.Restante}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                </b-col>
+                                <b-col cols="12">
+
+                                  <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+                                </b-col>
+                            </b-row>
+                </b-card-text>
+              </b-tab>
+              <!-- <b-tab title="Operaciones" class="px-5">
+                <b-card-text>Tab contents 2</b-card-text>
+              </b-tab> -->
+            </b-tabs>
+          </b-card>
+        
+
+
+      </b-col>
+    </b-row>
     <br>
-    <b-container class="bv-example-row">
+    <!-- <b-container class="bv-example-row">
       <b-row  align-h="end" class=" no-print">
               <label v-if="!this.$route.params.id">Vendedor:</label>
           <b-col cols="3" v-if="!this.$route.params.id">
@@ -35,76 +459,10 @@
           </b-col>
       </b-row>
       <br class="no-print" /><br class="no-print" />
-      <div class="alinear">
-        <h2 class="text-center">Cierre de Caja</h2> 
-        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-        <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-      </div>
-      <br>
-      <b-row>
-        <b-col cols="5">
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr>
-              <td>Gran Total S/.</td>
-              <td>{{ granTotal | redondear }}</td>
-            </tr>
-          </tbody>
-        </table>          
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr>
-              <td>Ingresos S/.</td>
-              <td>{{ totalIngresos | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Salida S/.</td>
-              <td>{{ totalSalidas | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Crédito S/.</td>
-              <td>{{ totalVentasCredito | redondear }} </td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr>
-              <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Tarjeta S/.</td>
-              <td>{{ totalVentasVisa | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Yape/Plin S/.</td>
-              <td>{{ totalVentasMastercard | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Transferencia S/.</td>
-              <td>{{ totalVentasTransferencia | redondear }} </td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
-          <tbody>
-            <tr>
-              <td>Vales de Crédito S/.</td>
-              <td>{{ totalVentasValeCredito | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Canjes S/.</td>
-              <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
-          </tbody>
-        </table>
-        </b-col>
-      </b-row>
+      
 
-      <br>
-      <b-row class="no-print">
+      <br> -->
+      <!-- <b-row class="no-print">
         <h2 class="text-center">Resumen de Productos</h2>
         
         <table class="table b-table table-sm">
@@ -133,304 +491,18 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-      <b-row class="print">
-        
-          <h2>Resumen: </h2> 
-
-      
-        
-        <b-col cols="12">
-        
-        <table class="table tbl-historico" size="sm" >
-            <thead>
-              <tr>
-                <th width="5px">Producto</th>
-                <th width="1px">Surtidor</th>
-                <th width="1px">Cara</th>
-                <th width="5px">V. I.</th>
-                <th width="5px">V.</th>
-                <th width="5px">Dif</th>              
-              </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(resumen,index) in resumenHistorial" :key="index">
-                  <td width="5px">{{resumen.Producto}}</td>
-                  <td width="1px">{{resumen.IdSurtidor}}</td>
-                  <td width="1px">{{resumen.Cara}}</td>
-                  <td width="5px">{{resumen.ValorInicial}}</td>
-                  <td width="5px">{{resumen.VentaTotal}}</td>
-                  <td width="5px">{{resumen.Restante}}</td>
-                </tr>
-            </tbody>
-        </table>
-      </b-col>
-      </b-row>
+      </b-row> -->
+     
       <!--<h2 class="text-center">Cierre de Caja</h2> 
       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
       <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>-->
-      <hr class="no-print">
-      <b-row class="no-print">
-        <h5>Ventas Efectivo</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.EfectivoDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear}}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
+     
 
+      <!-- <br>
 
-      <b-row class="no-print">
-        <h5>Ventas Tarjeta</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.VisaDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Visa | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Tarjeta</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      
-
-      <b-row class="no-print">
-        <h5>Ventas Yape / Plin</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.MastercardDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear}}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Yape / Plin</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      <b-row class="no-print">
-        <h5>Ventas Transferencia</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.TransferenciaDesc }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Transferencia | redondear}}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Transferencia</b></td>
-              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      <b-row class="no-print">
-        <h5>Ventas Vale Crédito (No Suma)</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasValeCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Vale</b></td>
-              <td class="total"><b>S/. {{ totalVentasValeCredito | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      <b-row class="no-print">
-        <h5>Ventas Canje</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasValeCanje" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ item.Placa }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ (item.Transferencia + item.Efectivo + item.Visa + item.Mastercard) | redondear}}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4"></td>
-              <td class="total"><b>Total Canje</b></td>
-              <td class="total"><b>S/. {{ totalVentasCanje | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-      <b-row class="credito no-print">
-        <h5>Ventas a Credito</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Total | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3"></td>
-              <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-
-      <b-row class="no-print">
-        <b-col v-if="totalIngresos">
-          <h5>Ingresos</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
-                <td class="total"><b>S/. {{ totalIngresos }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-        <b-col v-if="totalSalidas">
-          <h5>Salidas</h5><br>
-          <table class="table b-table table-sm">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Fecha</th>
-                <th>Detalle</th>
-                <th>Salida</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
-                <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas }}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-        </b-col>
-      </b-row>
-      
-
-      <br>
-
-      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      <b-alert variant="success" class="text-center no-print" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert> -->
     </b-container>
-  </div>
+  </b-container>
 </template>
 <script>
 import config from "@/store/config.js";
@@ -959,6 +1031,10 @@ th {
 .credito {
   background: #f9f9f9;
   padding: 10px;
+}
+.details {
+  max-height: 79vh;
+  overflow-y: auto;
 }
 @media print {
   .no-print {
