@@ -436,6 +436,19 @@
                                         <tr>
                                             <td  class="text-center">Proforma</td>
                                         </tr>
+                                          <tr>
+                                              <td>
+                                                <b-input-group prepend="Proforma válido por:" append="días">
+                                                  <b-form-input
+                                                      :disabled="bloquearInput?true:false"
+                                                      v-model="venta.DescripcionProforma5"
+                                                      min="0"
+                                                      value="0"
+                                                      type="number"
+                                                  ></b-form-input>
+                                                </b-input-group>
+                                              </td>
+                                          </tr>
                                         <tr>
                                           <td>
                                             <b-input-group>
@@ -467,7 +480,7 @@
                                               :value="1"
                                               :unchecked-value="0">
                                                 Nota
-                                              </b-form-checkbox>
+                                              </b-form-checkbox>                                              
                                               <div v-if="venta.EsDescripcion">
                                                 <div class="mb-3">
                                                   <input v-model="venta.DescripcionProforma"
@@ -496,13 +509,6 @@
                                                     class="form-control"
                                                     required
                                                     placeholder="Garantia"/>
-                                                </div>
-                                                <div>
-                                                  <input v-model="venta.DescripcionProforma5"
-                                                    type="text"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Tiempo de entrega"/>
                                                 </div>
                                               </div>
                                             </b-input-group>

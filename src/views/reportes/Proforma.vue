@@ -38,7 +38,7 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
               </tr>
-              <tr>
+              <tr v-if="proforma.DescripcionProforma3">
                 <td class="celda" style="font-weight:bold; width:30% !important;">Lugar de Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma3 }}</td>
               </tr>
@@ -66,13 +66,9 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Fecha De Pago</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCreditoProforma }}</td>
               </tr>
-              <tr>
+              <tr v-if="proforma.DescripcionProforma">
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma }}</td>
-              </tr>
-              <tr v-if="proforma.EsCreditoProforma == 1">
-                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega de Cotización</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma5 }}</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -126,23 +122,28 @@
           </tr>
         </tfoot>
       </table>
+      <br>
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
-      <div id="details" class="clearfix">
-        <div id="client2">
+      <div id="details" class="clearfix" >
+        <div id="client2" v-if="proforma.DescripcionProforma2 || proforma.DescripcionProforma4 || proforma.DescripcionProforma5">
           <div>NOTA:</div>
           <table>
             <tbody>
               <div>
-                <tr>
-                  <td class="celda" style="width:47% !important;">Validez de la Oferta</td>
+                <tr v-if="proforma.DescripcionProforma5">
+                  <td class="celda" style="width:40% !important;">ESTA PROFORMA SOLO TIENE VALIDEZ DE</td>
+                  <td class="celda" style="font-weight:bold; text-transform: uppercase">: {{ proforma.DescripcionProforma5 }} DIAS. </td>
+                </tr>
+                <tr v-if="proforma.DescripcionProforma2">
+                  <td class="celda" style="width:47% !important;">VALIDEZ DE LA OFERTA</td>
                   <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma2 }}</td>
                 </tr>
-                <tr>
-                <td class="celda" style="width:47% !important;">Garantía del bien o servicio</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma4 }}</td>
-              </tr>
+                <tr v-if="proforma.DescripcionProforma4">
+                  <td class="celda" style="width:47% !important;">GARANTÍA DEL BIEN O SERVICIO</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma4 }}</td>
+                </tr>
               </div>
             </tbody>
           </table>
@@ -215,12 +216,12 @@ export default {
       this.axios.get(API + 'proformas/id/' + this.idProforma)
 			.then(res => {
 				this.proforma = res.data
-        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
+        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DescripcionProforma5).toISOString().substring(0,10);
 			})
     },
-    calcularFechaHasta(actual,dias){
+    calcularFechaHasta(actual){
     var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
+    date.setDate(date.getDate() + Number(this.proforma.DescripcionProforma5));
     return date;
     },
     getEmpresa () {
