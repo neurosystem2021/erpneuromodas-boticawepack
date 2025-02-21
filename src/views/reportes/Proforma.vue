@@ -138,8 +138,9 @@
       </div>
       <div>
         <br>
-        <br>
-        <br>
+        <div id="accounts" style="margin-top:-10px; font-weight:bold; margin-left: 450px;">
+          <img style="max-width: 100%" src="/resources/images/firma.png" />
+        </div>
         <table>
           <tbody>
             <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:50%"></td>
