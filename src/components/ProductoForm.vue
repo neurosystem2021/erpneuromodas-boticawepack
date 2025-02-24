@@ -18,6 +18,26 @@
               <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
           <b-form-group>
+            <label>Tipo:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'tipoproducto'"
+                ref="inputTipoProducto"
+                anchor="TipoProducto"
+                label="writer"
+                :placeholder="producto.tipoproducto.TipoProducto"
+                :on-select="setTipoProducto"
+                :onFocus="focusAutocomplete.bind(null, 'inputTipoProducto')"
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <!-- <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn> -->
+                <!--<categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>-->
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
               <autocomplete
@@ -311,6 +331,10 @@ export default {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
         }
+        this.producto.tipoproducto = {
+          IdTipoProducto: newVal.IdTipoProducto,
+          TipoProducto: newVal.TipoProducto
+        }
        
        // this.$refs.inputCategoria.setValue('')
         this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
@@ -360,6 +384,7 @@ export default {
         this.producto.PrecioCosto = newVal.PrecioCosto
         this.producto.PrecioContado = newVal.PrecioContado
         this.producto.MasMovido = newVal.MasMovido
+        this.producto.IdTipoProducto = newVal.IdTipoProducto
         this.$refs.file.value=null
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto)
@@ -409,6 +434,10 @@ export default {
       this.producto.precioContadoNormal = nuevoPrecioContado
       this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
 
+    },
+    setTipoProducto (obj) {
+      this.producto.tipoproducto = obj
+      this.$refs.TipoProducto.setValue(obj.TipoProducto)
     },
     setCategoria (obj) {
       this.producto.categoria = obj
@@ -464,6 +493,7 @@ export default {
         Imagen: null,
         marca: {},
         modelo: {},
+        tipoproducto: {},
         //talla: {},
         medicion: {
           IdProductoMedicion:6,

@@ -9,13 +9,14 @@
                 style="width:45%"
                 :url="APIProductos"
                 :onShouldRenderChild="renderChild"
-                :customParams="{'sinMovidos': 1}"
+                :customParams="{'sinMovidos': '1'}"
                 anchor="Producto"
                 label="writer"
                 placeholder="Agregar Producto"
                 :on-select="setProducto"
                 :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-                :classes="{input: 'form-control'}">
+                :classes="{input: 'form-control'}"
+              >
               </autocomplete>
               <input v-model="loadCode"
                       @keydown.enter.prevent="loadBarcode"
@@ -42,7 +43,8 @@
           </div>
         </template>
         <template slot="stock" slot-scope="data">
-          {{ $options.filters.redondear(data.item.stock, 4) }}
+          <b-img  src="static/bombagasolina.png" @error="setAltImg" style="max-width: 30px;" class="mx-1"></b-img>
+          <!-- {{ $options.filters.redondear(data.item.stock, 4) }} -->
         </template>
         <template slot="cantidad" slot-scope="data">
           <input
@@ -313,56 +315,56 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
-import Vue from 'vue'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
+import Vue from "vue";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
-  beforeMount(){
-    this.cargarProductos()
+  beforeMount() {
+    this.cargarProductos();
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
       handleKeyDown: false,
       vuelto: 0,
       pagocon: 0,
-      productosData:[],
+      productosData: [],
       accionBoton: 1,
-      productoSelectIndex:null,
-      idPerfil: sessionStorage.getItem('IdPerfil'),
+      productoSelectIndex: null,
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       productoSelect: {},
       preciosProd: [],
       actualizarPrecio: false
-    }
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     }
   },
   props: {
     type: {
-        default: '',
-        type: String
+      default: "",
+      type: String
     },
     setPrecio: Boolean,
     idAlmacen: Number,
-    bloquearInput:Boolean,
+    bloquearInput: Boolean,
     igvTotal: Boolean,
     EsVale: Number,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -370,22 +372,22 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'ProductoCategoria', label: 'Categoria' },
-          { key: 'Producto', label: 'Artículo'}, 
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoMedicion', label: 'Medicion' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "ProductoCategoria", label: "Categoria" },
+          { key: "Producto", label: "Artículo" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoMedicion", label: "Medicion" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     }
@@ -395,164 +397,224 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       }
-      return this.API + 'productos'
+      return this.API + "productos";
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto"
     }),
-    changeCant (val, prod) {
+    changeCant(val, prod) {
       if (val) {
-        if(val.slice(-1)!='0'){
-          prod.cantidad = Number(val)
+        if (val.slice(-1) != "0") {
+          prod.cantidad = Number(val);
           this.$nextTick(() => {
-            this.actualizarProd(prod)
-          })
+            this.actualizarProd(prod);
+          });
         }
       }
     },
-    addNumber(number){
-      if(this.productos.length==0){
-          this.productoSelectIndex=null
-          return;
+    addNumber(number) {
+      if (this.productos.length == 0) {
+        this.productoSelectIndex = null;
+        return;
       }
-      if(this.productoSelectIndex!=null){
-        if(this.accionBoton==1){
-          this.productos[this.productoSelectIndex].sutotal = Number((this.productos[this.productoSelectIndex].sutotal==undefined?'':(this.productos[this.productoSelectIndex].sutotal.toString()=='0'?'':this.productos[this.productoSelectIndex].sutotal.toString())) + number)
-          this.setSubtotal(this.productoSelectIndex, this.productos[this.productoSelectIndex].sutotal )   
-        }else if (this.accionBoton==2){
-           this.productos[this.productoSelectIndex].cantidad = Number(this.productos[this.productoSelectIndex].cantidad.toString() + number)
-          
-        }else if(this.accionBoton==3){
-          this.productos[this.productoSelectIndex].descuento = Number(this.productos[this.productoSelectIndex].descuento.toString() + number)
-        }
-        
-      }
-    },
-    cambiarSeleccion(index){
-      this.productoSelectIndex=index;
-    },
-    addPoint(){
-        if(this.productos.length==0){
-          this.productoSelectIndex=null
-          return;
-         }
-        if(this.accionBoton==1 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
-          this.$nextTick(()=>{
-            this.productos[this.productoSelectIndex].sutotal = this.productos[this.productoSelectIndex].sutotal + '.'
-          }) 
-        }else if (this.accionBoton==2 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
-          this.$nextTick(()=>{
-            this.productos[this.productoSelectIndex].cantidad = this.productos[this.productoSelectIndex].cantidad + '.'
-          })
-          
-        }else if(this.accionBoton==3 && !(''+this.productos[this.productoSelectIndex].sutotal).includes('.')){
-          this.$nextTick(()=>{
-            this.productos[this.productoSelectIndex].descuento = this.productos[this.productoSelectIndex].descuento + '.'
-          })
-        }
-    },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
-    },
-    deleteNumber(){
-      if(this.productos.length==0){
-          this.productoSelectIndex=null
-          return;
-      }
-      if(this.productoSelectIndex!=null){
-          if(this.accionBoton==1){
-          this.productos[this.productoSelectIndex].sutotal =(this.productos[this.productoSelectIndex].sutotal==undefined?'':(this.productos[this.productoSelectIndex].sutotal.toString()=='0'?'':this.productos[this.productoSelectIndex].sutotal.toString().slice(0,-1)))
-          this.actualizarProd(this.productos[this.productoSelectIndex])         
-        }else if (this.accionBoton==2){
-          this.productos[this.productoSelectIndex].cantidad =(this.productos[this.productoSelectIndex].cantidad==undefined?'':(this.productos[this.productoSelectIndex].cantidad.toString()=='0'?'':this.productos[this.productoSelectIndex].cantidad.toString().slice(0,-1)))
-          this.actualizarProd(this.productos[this.productoSelectIndex])
-        }else if(this.accionBoton==3){
-          this.productos[this.productoSelectIndex].descuento =(this.productos[this.productoSelectIndex].descuento==undefined?'':(this.productos[this.productoSelectIndex].descuento.toString()=='0'?'':this.productos[this.productoSelectIndex].descuento.toString().slice(0,-1)))
-          this.actualizarProd(this.productos[this.productoSelectIndex])
+      if (this.productoSelectIndex != null) {
+        if (this.accionBoton == 1) {
+          this.productos[this.productoSelectIndex].sutotal = Number(
+            (this.productos[this.productoSelectIndex].sutotal == undefined
+              ? ""
+              : this.productos[this.productoSelectIndex].sutotal.toString() ==
+                "0"
+                ? ""
+                : this.productos[this.productoSelectIndex].sutotal.toString()) +
+              number
+          );
+          this.setSubtotal(
+            this.productoSelectIndex,
+            this.productos[this.productoSelectIndex].sutotal
+          );
+        } else if (this.accionBoton == 2) {
+          this.productos[this.productoSelectIndex].cantidad = Number(
+            this.productos[this.productoSelectIndex].cantidad.toString() +
+              number
+          );
+        } else if (this.accionBoton == 3) {
+          this.productos[this.productoSelectIndex].descuento = Number(
+            this.productos[this.productoSelectIndex].descuento.toString() +
+              number
+          );
         }
       }
     },
-    cargarProductos(){
-      this.axios.get(this.API+'productos/lineal')
-      .then((response) => {
-        this.productosData = response.data
-      })
-      .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+    cambiarSeleccion(index) {
+      this.productoSelectIndex = index;
     },
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    addPoint() {
+      if (this.productos.length == 0) {
+        this.productoSelectIndex = null;
+        return;
+      }
+      if (
+        this.accionBoton == 1 &&
+        !("" + this.productos[this.productoSelectIndex].sutotal).includes(".")
+      ) {
+        this.$nextTick(() => {
+          this.productos[this.productoSelectIndex].sutotal =
+            this.productos[this.productoSelectIndex].sutotal + ".";
+        });
+      } else if (
+        this.accionBoton == 2 &&
+        !("" + this.productos[this.productoSelectIndex].sutotal).includes(".")
+      ) {
+        this.$nextTick(() => {
+          this.productos[this.productoSelectIndex].cantidad =
+            this.productos[this.productoSelectIndex].cantidad + ".";
+        });
+      } else if (
+        this.accionBoton == 3 &&
+        !("" + this.productos[this.productoSelectIndex].sutotal).includes(".")
+      ) {
+        this.$nextTick(() => {
+          this.productos[this.productoSelectIndex].descuento =
+            this.productos[this.productoSelectIndex].descuento + ".";
+        });
+      }
     },
-    loadBarcode (e) {
-      e.preventDefault()
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
+    deleteNumber() {
+      if (this.productos.length == 0) {
+        this.productoSelectIndex = null;
+        return;
+      }
+      if (this.productoSelectIndex != null) {
+        if (this.accionBoton == 1) {
+          this.productos[this.productoSelectIndex].sutotal =
+            this.productos[this.productoSelectIndex].sutotal == undefined
+              ? ""
+              : this.productos[this.productoSelectIndex].sutotal.toString() ==
+                "0"
+                ? ""
+                : this.productos[this.productoSelectIndex].sutotal
+                    .toString()
+                    .slice(0, -1);
+          this.actualizarProd(this.productos[this.productoSelectIndex]);
+        } else if (this.accionBoton == 2) {
+          this.productos[this.productoSelectIndex].cantidad =
+            this.productos[this.productoSelectIndex].cantidad == undefined
+              ? ""
+              : this.productos[this.productoSelectIndex].cantidad.toString() ==
+                "0"
+                ? ""
+                : this.productos[this.productoSelectIndex].cantidad
+                    .toString()
+                    .slice(0, -1);
+          this.actualizarProd(this.productos[this.productoSelectIndex]);
+        } else if (this.accionBoton == 3) {
+          this.productos[this.productoSelectIndex].descuento =
+            this.productos[this.productoSelectIndex].descuento == undefined
+              ? ""
+              : this.productos[this.productoSelectIndex].descuento.toString() ==
+                "0"
+                ? ""
+                : this.productos[this.productoSelectIndex].descuento
+                    .toString()
+                    .slice(0, -1);
+          this.actualizarProd(this.productos[this.productoSelectIndex]);
+        }
+      }
+    },
+    cargarProductos() {
+      this.axios
+        .get(this.API + "productos/lineal")
+        .then(response => {
+          this.productosData = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
+    },
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: (this.tipo == 'mov' ? true : false) }, true])
+        this.add([
+          idProducto,
+          obj => {
+            if (obj) {
+              this.$emit("onAddProducto");
+              this.$toasted.show("Producto añadido correctamente");
+            } else {
+              this.$toasted.show("No se encontró ningun producto");
+            }
+            this.loadCode = "";
+          },
+          {
+            setPrecio: this.setPrecio,
+            setSuma: true,
+            setPrecioCosto: this.tipo == "mov" ? true : false
+          },
+          true
+        ]);
       }
     },
     /*alterarBuscadorProductos() {
@@ -583,25 +645,25 @@ export default {
         this.pasteCode = false
       }
     },*/
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
-    setProducto (obj) {
-      this.actualizarPrecio = false
-      this.$refs.autocompleteProducto.setValue('')
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    setProducto(obj) {
+      this.actualizarPrecio = false;
+      this.$refs.autocompleteProducto.setValue("");
       obj = Object.assign({}, obj);
-      this.productoSelect = obj
+      this.productoSelect = obj;
       //obj.FLETE = 0
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-      this.preciosProd = this.preciosProd.filter(p => p.precio > 0)
-      if (this.preciosProd.length==0) {
-          this.setProductoUni(obj)
-          return
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
+      if (this.preciosProd.length == 0) {
+        this.setProductoUni(obj);
+        return;
       }
-      this.$refs['modalCantC'].show()
+      this.$refs["modalCantC"].show();
 
-/*
+      /*
       obj = Object.assign({}, obj);
       //obj.FLETE = 0
       obj.precio = 0
@@ -617,221 +679,230 @@ export default {
 
       // Vue.set(this.productos, obj.IdProducto, obj)*/
     },
-    setProductoUni(obj, seleccion = false, precio = false){
-        obj.precio = 0
-        obj.cantidad = 0
-        //obj.IdLote = 0
-        //obj.TieneIgv = 0
-        obj.descuento = 0
-        obj.sutotal = ''
-        obj.nuevoPrecioContado = 0
-        obj = this.onSetProducto(obj, precio)
-        let existe = this.productos.find(p=>p.IdProducto == obj.IdProducto)
-        if(existe==undefined){
-            this.$toasted.info('Producto agregado')
-            this.add([obj, () => {
-              this.$emit('onAddProducto')
-              this.actualizarProd(obj)
-            }])
-        }else{
-          if(this.actualizarPrecio){
-            this.$toasted.info('El precio cambiado')
-            this.actualizarProd(obj)
-            this.actualizarPrecio = false
-          }else{
-            this.$toasted.error('El producto ya esta agregado')
+    setProductoUni(obj, seleccion = false, precio = false) {
+      obj.precio = 0;
+      obj.cantidad = 0;
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      obj.descuento = 0;
+      obj.sutotal = "";
+      obj.nuevoPrecioContado = 0;
+      obj = this.onSetProducto(obj, precio);
+      let existe = this.productos.find(p => p.IdProducto == obj.IdProducto);
+      if (existe == undefined) {
+        this.$toasted.info("Producto agregado");
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto");
+            this.actualizarProd(obj);
           }
-            
+        ]);
+      } else {
+        if (this.actualizarPrecio) {
+          this.$toasted.info("El precio cambiado");
+          this.actualizarProd(obj);
+          this.actualizarPrecio = false;
+        } else {
+          this.$toasted.error("El producto ya esta agregado");
         }
-        this.$refs['modalCantC'].hide()
+      }
+      this.$refs["modalCantC"].hide();
     },
-    showPresentacion(obj){
-        obj = Object.assign({}, obj);
-        this.productoSelect = obj
-        this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-        this.preciosProd = this.preciosProd.filter(p => p.precio > 0)
-        this.actualizarPrecio = true
-        this.$refs['modalCantC'].show()
+    showPresentacion(obj) {
+      obj = Object.assign({}, obj);
+      this.productoSelect = obj;
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
+      this.actualizarPrecio = true;
+      this.$refs["modalCantC"].show();
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let style = 'ss'
+        let style = "ss";
 
         return `
         <div>
-          <b class="bg-success" style="color: #fff; padding: 0 6px">${data.stock>0?data.stock.toFixed(2):0}</b> | <b>${data.CodigoBarra}</b> / 
+          <b class="bg-success" style="color: #fff; padding: 0 6px">${
+            data.stock > 0 ? data.stock.toFixed(2) : 0
+          }</b> | <b>${data.CodigoBarra}</b> / 
           <b>${data.Producto}</b> / ${data.ProductoCategoria} 
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion}
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoMedicion}
+      `;
     },
-    setNuevoPrecioContado (index) {
-
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
 
-      precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      precio += precio * (this.productos[index].PorcentajeUtilidad / 100);
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
+      let normalPrecio = this.$options.filters.redondear(precio);
+      let nuevoPrecio = this.$options.filters.redondeoMayor(precio);
 
-      let normalPrecio = this.$options.filters.redondear(precio)
-      let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+      Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     setSubtotal(index, val) {
-
-      if(val.toString().slice(-1)=='.'){
-        return
+      if (val.toString().slice(-1) == ".") {
+        return;
       }
 
-      let cantidad = this.$options.filters.redondear(val / this.productos[index].precio, 5)
+      let cantidad = this.$options.filters.redondear(
+        val / this.productos[index].precio,
+        5
+      );
       //let cantidad=2
       // Vue.set(this.productos[index], 'subtotal', val)
-      Vue.set(this.productos[index], 'cantidad', cantidad)
+      Vue.set(this.productos[index], "cantidad", cantidad);
       //this.getSubtotal(index)
     },
 
     getSubtotal(index) {
-
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 <style scoped>
-  .contentCard {
-    cursor: pointer;
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  border-right: 2px solid black;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+
+.calc__numbers {
+  width: 15.5vw;
+  height: 15.5vw;
+}
+.calc__numbers td {
+  min-width: 65px;
+  min-height: 65px;
+  border: 0.7px solid #a3a3a3;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.75rem;
+  font-weight: bold;
+  font-family: Arial;
+  color: black;
+  background-color: #fff;
+}
+.calc__numbers td:last-child {
+  background-color: #eaeaea;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+}
+.calc__numbers .accionActiva {
+  color: #fff !important;
+  background: #65ba9b !important;
+}
+.pagocon .input-group-text {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.fontsize {
+  font-size: 50px !important;
+}
+.popover {
+  max-width: 420px !important;
+}
+.new {
+  animation: blink 0.3s ease;
+}
+@keyframes blink {
+  0% {
+    background-color: yellow;
   }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
+  100% {
+    background-color: white;
   }
-  .nomCart {
-    display: flex;
-    align-items: center;
-    border-right: 2px solid black;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
- 
-    .calc__numbers {
-        width:  15.5vw;
-        height: 15.5vw;
-    }
-    .calc__numbers td {
-    min-width: 65px;
-    min-height: 65px;
-    border: 0.7px solid #A3A3A3;
-    cursor: pointer;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 0.75rem;
-    font-weight: bold;
-    font-family: Arial;
-    color: black;
-    background-color: #fff;
-    }
-    .calc__numbers td:last-child {
-    background-color: #EAEAEA;
-    }
-    .calc__numbers .botones:hover {
-    color: #fff;
-    background: #65BA9B;
-    }
-    .calc__numbers .accionActiva{
-        color: #fff !important;
-        background: #65BA9B !important;
-    }
-    .pagocon .input-group-text{
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-    .fontsize{
-      font-size: 50px !important;
-    }
-    .popover {
-    max-width: 420px !important;
-    }
-    .new {
-      animation: blink 0.3s ease;
-    }
-    @keyframes blink {
-      0% {
-        background-color: yellow;
-      }
-      100% {
-        background-color: white;
-      }
-    }
+}
 </style>
 <style>
-.selectionProducto{
+.selectionProducto {
   background-color: #f9f964 !important;
   font-weight: bold;
 }
 .danger {
-  background-color:#ff7675;
+  background-color: #ff7675;
   color: #ffffff;
 }
 .ambar {
   background-color: #feca57;
   color: #ffffff;
 }
-.tabla-carrito .table-sm td  {
-  font-size: .8rem!important;
+.tabla-carrito .table-sm td {
+  font-size: 0.8rem !important;
 }
 /* The heart of the matter */
 .contenedor {
@@ -842,11 +913,10 @@ export default {
 .columna {
   flex: 0 0 auto !important;
 }
-.popover-body{
-  background-color: #C1C1C1;
+.popover-body {
+  background-color: #c1c1c1;
 }
 .popover {
-max-width: 420px !important;
+  max-width: 420px !important;
 }
 </style>
-

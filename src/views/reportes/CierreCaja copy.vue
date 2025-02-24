@@ -146,7 +146,7 @@
             <thead>
               <tr>
                 <th width="5px">Producto</th>
-                <th width="1px">Surtidor</th>
+                <th width="1px">Isla</th>
                 <th width="1px">Cara</th>
                 <th width="5px">V. I.</th>
                 <th width="5px">V.</th>
@@ -476,7 +476,7 @@ export default {
       resumenHistorial: [],
       fieldsHistorial: [
         { key: "Producto" },
-        { key: "IdSurtidor", label: "Surtidor" },
+        { key: "IdSurtidor", label: "Isla" },
         { key: "Cara" },
         { key: "ValorInicial", label: "L. I." },
         { key: "VentaTotal", label: "V." },

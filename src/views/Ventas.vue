@@ -697,8 +697,8 @@ export default {
     if (this.IdSurtidor == 0) {
       this.$swal.fire({
         icon: "warning",
-        title: "Surtidor",
-        text: "No se ha seleccionado un surtido"
+        title: "Isla",
+        text: "No se ha seleccionado una isla"
       });
     }
     //this.obtenerSurtidor()

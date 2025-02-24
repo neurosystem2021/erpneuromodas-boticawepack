@@ -116,6 +116,7 @@ export default {
         { key: "ProductoCategoria", label: "Categoría", sortable: true },
         // { key: 'ProductoMarca', label: 'Marca', sortable: true },
         { key: "ProductoMedicion", label: "Medición", sortable: true },
+        { key: "TipoProducto", sortable: true },
         { key: "stock", label: "Stock", sortable: true },
         { key: "PrecioContado", label: "Precio Contado", sortable: true },
         { key: "PrecioCosto", label: "Precio Costo", sortable: true },

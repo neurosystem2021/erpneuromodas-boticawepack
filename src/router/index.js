@@ -11,8 +11,9 @@ import Clientes from '@/views/Clientes.vue'
 import Remision from '@/views/Remision.vue'
 import ConfigurarOferta from '@/views/ConfigurarOferta.vue'
 import HistorialGalones from '@/views/HistorialGalones.vue'
-import Diesel from '@/views/Diesel.vue'
-import GasoholRegular from '@/views/GasoholRegular.vue'
+import Liquido from '@/views/Liquido.vue'
+import GLP from '@/views/GLP.vue'
+import Alta from '@/views/Alta.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -27,6 +28,7 @@ import RemisionLista from '@/views/RemisionLista.vue'
 import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 import ReporteCantidad from '@/views/reportes/ReporteCantidad.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
+import ReporteGalones from '@/views/reportes/ReporteGalones.vue'
 
 
 Vue.use(Router)
@@ -150,14 +152,24 @@ export default new Router({
       component: ConfigurarOferta
     },
     {
-      path: '/diesel',
-      name: 'Diesel',
-      component: Diesel
+      path: '/liquidos',
+      name: 'Liquido',
+      component: Liquido
     },
     {
-      path: '/GasoholRegular',
-      name: 'GasoholRegular',
-      component: GasoholRegular
+      path: '/glp',
+      name: 'GLP',
+      component: GLP
+    },
+    {
+      path: '/alta',
+      name: 'Alta',
+      component: Alta
+    },
+    {
+      path: '/reportes/galones',
+      name: 'ReporteGalones',
+      component: ReporteGalones
     },
   ]
 })
