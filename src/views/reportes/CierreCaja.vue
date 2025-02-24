@@ -372,9 +372,8 @@
         </table>
       </b-row>
 
-
       <b-row>
-        <b-col v-if="totalIngresos">
+        <b-col v-show="ingresos.length">
           <h5>Ingresos Caja Principal</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -383,7 +382,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresos" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -399,7 +398,7 @@
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col v-show="salidas.length">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -408,7 +407,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
+              <tr v-for="(item, index) in salidas" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
