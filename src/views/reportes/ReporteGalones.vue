@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-row>
+    <b-row class="mt-2">
         <b-col cols="8">
             <b-row>
                 <b-col cols="12">
@@ -77,7 +77,7 @@
           </template>
         </b-table>
       </b-col>
-      <b-col cols="12">
+      <b-col cols="12" class="mt-5">
         <b-row>
           <b-col cols="6">
             
@@ -145,7 +145,7 @@ export default {
     };
   },
   mounted() {
-    this.fechaInicio = "2024-01-01";
+    this.fechaInicio = this.$moment().format("YYYY-MM-DD");
     this.fechaFin = this.$moment().format("YYYY-MM-DD");
     this.obtenerProductos();
     this.obtenerListado();
@@ -175,9 +175,7 @@ export default {
             let listado = res.data;
             listado.map(element => {
               if (element.Estado == 0) {
-                element.variant = "danger";
-                element._cellVariants = "danger";
-                // element.variant = "warning";
+                element._rowVariant = "danger";
               }
             });
             this.lstReporte = listado;
