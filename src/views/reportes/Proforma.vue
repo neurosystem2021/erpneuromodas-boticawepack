@@ -127,9 +127,9 @@
       </div>
       <br>
       <div id="notices">
-        <div class="notice"><b>VALIDEZ DE OFERTA :</b> {{proforma.DiasValidos}} DIAS</div>
+        <!--<div class="notice"><b>VALIDEZ DE OFERTA :</b> {{proforma.DiasValidos}} DIAS</div>
         <div class="notice"><b>PLAZO DE ENTREGA  :</b> 5 DIAS</div>
-        <div class="notice"><b>CONDICION DE PAGO :</b> CONTADO COMERCIAL</div>
+        <div class="notice"><b>CONDICION DE PAGO :</b> CONTADO COMERCIAL</div>-->
       </div>
       <br>
       <div id="notices" style="text-align: center;">
