@@ -23,7 +23,7 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form :showButton="showButton" @actualizarProducto="actualizarRegistro($event)" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -113,7 +113,7 @@
           </div>
         </template>
 
-        <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
+        <template slot="cantxPrecio" slot-scope="data" v-if="data.item.tipo=='PRESENTACION'">
           <input
             v-model="productos[data.index].cantxPrecio"
             type="number"
@@ -121,7 +121,7 @@
             step="0.001"
             min="0"
             :disabled="bloquearInput?true:false"
-            @input="(val) => changeCant(val.target.value, productos[data.index])"
+            @input="(val) => changeCantidadPresentacion(val.target.value,data.item)"
             placeholder="Cantidad"
             class="form-control" />
           <span>x{{productos[data.index].cantidadPres}}</span>
@@ -129,42 +129,14 @@
 
         <template slot="cantidad" slot-scope="data">
           <input
-            v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].estadoPxP == false || bloquearInput?true:false || esDelivery"
+            v-model="data.item.cantidad"
+            :disabled="data.item.tipo=='PRESENTACION'"
             type="number"
             style="width: 95px"
             class="form-control"
             step="0.001"
             min="0"
-            @input="(val) => {
-              $emit('onInputCantidad', val.target.value)
-              /*if(isVentas){
-                if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
-                return
-                }
-
-                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-                if(reg && reg.cantidad){
-                  productos[data.index].precio = reg.precio
-                  return
-                }
-                
-                productos[data.index].precio = productos[data.index].PrecioContado 
-              }else{
-                if(productos[data.index].EsObsequio==1){
-                    productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
-                }else{
-                    productos[data.index].precio = productos[data.index].PrecioCosto; 
-                }
-              }*/
-              if(productos[data.index].EsObsequio==1){
-                    productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
-              }
-
-            }"
+            @input="(val) => changeCantidad(val.target.value,data.item)"
             placeholder="Cantidad"/>
         </template>
         <template slot="precio" slot-scope="data">
@@ -382,18 +354,18 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
@@ -405,22 +377,22 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
-      medicionPro:'UNIDAD',
+      medicionPro: "UNIDAD",
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil'),
-      productoNombre:'',
-      productoUrl:''
-    }
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      productoNombre: "",
+      productoUrl: ""
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     },
-    productos (prods) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+    productos(prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
-        this.productos[pi].precioBruta = this.productos[pi].precio
+        this.productos[pi].precioBruta = this.productos[pi].precio;
       }
     }
   },
@@ -432,12 +404,12 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
-    bloquearInput:Boolean,
-    esDelivery:Boolean,
+    bloquearInput: Boolean,
+    esDelivery: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -445,27 +417,32 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'CodigoBarra', label: 'Código'},
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "CodigoBarra", label: "Código" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'Descripcion', label: 'Descripción'},
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoPresentacion', label: 'Anaquel' }, 
+          { key: "Producto", label: "Artículo" },
+          { key: "Descripcion", label: "Descripción" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoPresentacion", label: "Anaquel" },
           // { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "obsequio", label: "Obsequio", class: "thcenter" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta (S/)" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     }
@@ -475,136 +452,154 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       } else {
-        return this.API + 'productos'
+        return this.API + "productos";
       }
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
-      obtenerStok: 'obtenerStock',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock"
     }),
-    abrirImagen(producto,url){
-      this.productoNombre = producto
-      this.productoUrl = url
-      this.$refs['modalImagen'].show()
+    abrirImagen(producto, url) {
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
     },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     },
-    changeCant (val, prod) {
-      if (val>0) {
-        prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
-      }
-      this.$nextTick(() => {
-        this.actualizarProd(prod)
-      })
+    changeCantidadPresentacion(val, prod) {
+      let obj = { ...prod };
+
+      obj.subtotal = prod.cantidad * val * prod.precio;
+      let index = this.$store.state.cart.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+      Vue.set(this.$store.state.cart.productos, index, obj);
+    },
+    changeCantidad(val, prod) {
+      let obj = { ...prod };
+
+      obj.subtotal = prod.cantidad * prod.precio;
+      let index = this.$store.state.cart.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+      Vue.set(this.$store.state.cart.productos, index, obj);
+    },
+    cambiarPrecio(index, prod) {
+      var utilidad =
+        this.productos[index].PrecioCosto *
+        (this.productos[index].PorcentajeUtilidad / 100);
+      this.productos[index].precio = Math.ceil(
+        this.productos[index].PrecioCosto + utilidad
+      );
     },
 
-    cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
-    },
-    
-    addManoDeObra (index, e) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-      if ( pi < 0 ) {
-        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
-        
-        this.productos[index].EsManoDeObra = 0
-        return ;
+    addManoDeObra(index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+      if (pi < 0) {
+        this.$toasted.error("Primero seleccione el producto MANODEOBRA");
+
+        this.productos[index].EsManoDeObra = 0;
+        return;
       }
 
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = true
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) -
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = true;
       } else {
-        e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].precio = 0
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = false
+        e.target.parentNode.parentNode.removeAttribute("style");
+        this.productos[pi].precio = 0;
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) +
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = false;
       }
     },
 
-    updateManoDeObraNeta (index) {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    updateManoDeObraNeta(index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
-      })
-      
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
+
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
-        this.productos[pi].precio = precio
+        this.productos[pi].precio = precio;
       }
     },
 
-    asignarDisabledProf (index, e) {
+    asignarDisabledProf(index, e) {
       if (e.target.checked === true) {
-        this.productos[index].disabledProf = 1
-        return
+        this.productos[index].disabledProf = 1;
+        return;
       }
-      this.productos[index].disabledProf = 0
+      this.productos[index].disabledProf = 0;
     },
 
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     // loadBarcode (e) {
     //   e.preventDefault()
@@ -623,21 +618,22 @@ export default {
     //   }
     // },
 
-    loadBarcode (e) {
-      e.preventDefault()
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = {codigoBarra: idProducto}
-        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
-        .then((response) => {
-          if (response.data.IdProducto) {
-            this.setProducto(response.data)
-          } else {
-            this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
-          }
-        })
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data);
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
       }
     },
 
@@ -669,130 +665,215 @@ export default {
         this.pasteCode = false
       }
     },*/
-    setObsequio(index){
-      this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+    setObsequio(index) {
+      this.productos[index].precio = 0;
+      this.productos[index].nuevoPrecioContado = 0;
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
-    editarProducto(Pro){
-      this.productoSelect = Pro
+    editarProducto(Pro) {
+      this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    agregarGuardar(id,pxp,obj){
-      this.add([id,false,false,false,false,true,this.isVentas]);
+    agregarGuardar(id, pxp, obj) {
+      this.add([id, false, false, false, false, true, this.isVentas]);
       setTimeout(() => {
-              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, 200); 
-      
-      if(this.isVentas){
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
-        if(fPP.length!=4){
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-          obj.IdProductoMarca= obj.marca.IdProductoMarca
-          obj.ProductoMarca= obj.marca.ProductoMarca
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria
-          this.productoSelect = obj
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-          this.showPresentacion(this.productoSelect)
-        } 
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      }, 200);
+
+      if (this.isVentas) {
+        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+        if (fPP.length != 4) {
+          obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+          obj.IdProductoMarca = obj.marca.IdProductoMarca;
+          obj.ProductoMarca = obj.marca.ProductoMarca;
+          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+          obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+          this.productoSelect = obj;
+          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+          this.showPresentacion(this.productoSelect);
+        }
       }
     },
-    setProducto (obj) {
-      this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
-      this.loadCode = ''
-      this.preciosProd = []
-      this.objProd = {}
-      obj.EsObsequio = 0
-      obj.EsVenta = this.isVentas
-
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = '';
+    setProducto(obj) {
+      if (
+        this.$store.state.cart.productos.some(
+          v => v.IdProducto == obj.IdProducto
+        )
+      ) {
+        return false;
       }
 
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-      let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
-      
+      this.precioCont = obj.PrecioContado;
+      obj.estadoPxP = false;
+      this.loadCode = "";
+      this.preciosProd = [];
+      this.objProd = {};
+      obj.EsObsequio = 0;
+      obj.EsVenta = this.isVentas;
+      // obj.cantidad = 1;
+
+      // if (!this.isVentas) {
+      //   obj.PreciosPorProducto = "";
+      // }
+
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      let fPP = this.preciosProd.filter(
+        p => p.cantidad === 0 || p.cantidad === "0"
+      );
+
       if (!obj.PreciosPorProducto || fPP.length === 5) {
-        obj.estadoPxP = true
-        this.setProductoUni(obj)
-        return
+        obj.estadoPxP = true;
+        this.setProductoUni(obj);
+        return;
       }
 
-      this.$refs['modalCant'].show()
+      this.$refs["modalCant"].show();
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
-    },  
-    setProductoUni (obj) {
-      this.objProd.cantxPrecio = 1
-      this.$refs.autocompleteProducto.setValue('')
+      this.objProd = obj;
+    },
+    async actualizarRegistro(event) {
+      console.log("event", event);
+      let obj = { ...event };
+      this.precioCont = obj.PrecioContado;
+      obj.estadoPxP = false;
+      this.loadCode = "";
+      this.preciosProd = [];
+      this.objProd = {};
+      obj.EsObsequio = 0;
+      obj.EsVenta = this.isVentas;
+      obj.cantidad = 1;
+      obj.subtotal = 0;
+      obj.tipo = "UNIDAD";
+      obj.PreciosPorProducto = JSON.stringify(obj.PreciosPorProducto);
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      let fPP = this.preciosProd.filter(
+        p => p.cantidad === 0 || p.cantidad === "0"
+      );
+      console.log(this.preciosProd);
+      if (!obj.PreciosPorProducto || fPP.length === 5) {
+        obj.estadoPxP = true;
+      }
+
+      let index = this.$store.state.cart.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+
+      Vue.set(this.$store.state.cart.productos, index, obj);
+    },
+    async obtenerStockBuscador(IdProducto) {
+      let res = {};
+      await this.axios(this.API + "productos/puntoventa/stock", {
+        params: {
+          idProductos: [IdProducto],
+          idAlmacen: this.IdAlmacen
+        }
+      }).then(response => {
+        res = response.data[0];
+        // return response.data;
+      });
+      return res;
+    },
+    setProductoUni(obj) {
+      let index = this.$store.state.cart.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+      this.objProd.cantxPrecio = 1;
+      this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
+      obj.precio = 0;
+      obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, this.cliente.EsVIP])
+      obj.descuento = 0;
+      obj.tipo = "UNIDAD";
+      obj.nuevoPrecioContado = 0;
+      obj.subtotal = 0;
+      if (index == -1) {
+        obj = this.onSetProducto(obj);
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+          },
+          { setPrecioCosto: this.tipo == "mov" ? true : false },
+          false,
+          this.cliente.EsVIP
+        ]);
+      } else {
+        Vue.set(this.$store.state.cart.productos, index, obj);
+      }
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
-      obj.cantidadPres = obj.cantidad
-      this.actualizarProd(obj)
+      this.$refs["modalCant"].hide();
+      obj.cantidadPres = obj.cantidad;
+      // this.actualizarProd(obj);
     },
-    setProductoCant (prod) {
-      this.objProd.cantxPrecio = 1
-      this.cant = prod.cantidad
-      let obj = this.objProd
-      this.$refs.autocompleteProducto.setValue('')
+    setProductoCant(prod) {
+      this.objProd.cantxPrecio = 1;
+      this.cant = prod.cantidad;
+      let obj = this.objProd;
+      this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = 0
-      obj.cantidad = 0
+      obj.tipo = "PRESENTACION";
+      obj.precio = 0;
+      obj.cantidad = prod.cantidad;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-      }, false, false, this.cliente.EsVIP])
-      this.$refs['modalCant'].hide()
-      obj.cantidadPres = this.cant
-      this.actualizarProd(obj)
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.subtotal = 0;
+      let index = this.$store.state.cart.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+      if (index == -1) {
+        obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+          },
+          false,
+          false,
+          this.cliente.EsVIP
+        ]);
+      } else {
+        Vue.set(this.$store.state.cart.productos, index, obj);
+      }
+      this.$refs["modalCant"].hide();
+      obj.cantidadPres = this.cant;
+      this.actualizarProd(obj);
     },
-    showPresentacion (obj) {
-      if (!obj.PreciosPorProducto !== '') {
-        this.precioCont = obj.PrecioContado
-        obj.estadoPxP = false
-        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
-        this.objProd = obj
-        this.$refs['modalCant'].show()
-        return
+    showPresentacion(obj) {
+      if (!obj.PreciosPorProducto !== "") {
+        this.precioCont = obj.PrecioContado;
+        obj.estadoPxP = false;
+        this.preciosProd = obj.PreciosPorProducto
+          ? JSON.parse(obj.PreciosPorProducto)
+          : [];
+        this.objProd = obj;
+        this.$refs["modalCant"].show();
+        return;
       }
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let styleStock = ''
-        if(data.stock <= 0){
-          styleStock = 'table-danger'
-        }else{
-          styleStock = 'table-success'
+        let styleStock = "";
+        if (data.stock <= 0) {
+          styleStock = "table-danger";
+        } else {
+          styleStock = "table-success";
         }
 
         if (data.EsPadre == 1) {
-          styleStock = ''
+          styleStock = "";
         }
 
         return `
@@ -821,167 +902,177 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${
+          data.EsPadre == 1
+            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+            : data.stock
+              ? Number.isInteger(data.stock)
+                ? data.stock
+                : data.stock.toFixed(2)
+              : data.stock
+        }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
                 <td style="width: 5%">
-                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
               </tr>
             </tbody>
           </table>   
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
-    setNuevoPrecioContado (index) {
+    setNuevoPrecioContado(index) {
+      let obj = JSON.parse(
+        JSON.stringify(this.$store.state.cart.productos[index])
+      );
+      console.log(obj.tipo);
+      let prod = JSON.parse(
+        JSON.stringify(this.$store.state.cart.productos[index])
+      );
 
-      // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      if (obj.tipo == "UNIDAD") {
+        obj.subtotal = Number(prod.cantidad) * Number(prod.precio);
       }
-      let precioFinal=0
-      //if(this.isVentas){
-        //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-       // let precioFinal = 
-      // }else{
-      precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
-       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-      //}
-
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
-
-      let normalPrecio = this.$options.filters.redondear(precioFinal)
-      //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1)
-      
-      if (this.tipoCambio > 0) {
-        normalPrecio *= this.tipoCambio
-        nuevoPrecio *= this.tipoCambio
+      if (obj.tipo == "PRESENTACION") {
+        obj.subtotal =
+          Number(prod.cantxPrecio) *
+          Number(prod.cantidadPres) *
+          Number(prod.precio);
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
-      this.getSubtotal(index)
-
-      // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
-      this.updateManoDeObraNeta(index)
+      Vue.set(this.$store.state.cart.productos, index, obj);
+      this.$forceUpdate(); // Forzar actualización de Vue
     },
-    actualizarDescu(index){
+
+    actualizarDescu(index) {
       let obj = this.productos[index];
-       this.actualizarProd(obj)
+      this.actualizarProd(obj);
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].subtotal
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     },
 
     formatFecha(fecha) {
       if (fecha) {
-			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+        return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
       } else {
-        return ''
+        return "";
       }
-		}
+    }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style scoped>
-  .contentCard {
-    cursor: pointer;
-  }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
-  .oferta{
-     border: 4px solid #dc3545;
-  }
-  .ofertanom{
-    color: #dc3545;
-    border-right: 2px solid #dc3545;
-  }
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+.oferta {
+  border: 4px solid #dc3545;
+}
+.ofertanom {
+  color: #dc3545;
+  border-right: 2px solid #dc3545;
+}
 </style>
 <style>
-  .popover{
-    max-width: 420px !important;
-  }
-  .nomCart {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    border-right: 2px solid black;
-  }
-  #modalImagen .modal-dialog {
-    max-width: 75% !important;
-  }
-  .imagenGrande{
-    width: 100%;
-  }
-  .obsequio{
-    display: flex;
-    justify-content: center;
-    justify-items: center;
-  }
+.popover {
+  max-width: 420px !important;
+}
+.nomCart {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  border-right: 2px solid black;
+}
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+.obsequio {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
 </style>

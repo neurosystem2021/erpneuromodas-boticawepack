@@ -704,13 +704,19 @@ export default {
           PreciosPorProducto: this.producto.precios
         })
         .then(response => {
-          if (this.cbGuardar) {
-            this.cbGuardar(
-              this.producto.IdProducto ? this.producto : response.data.insertId,
-              this.producto.precios
-            );
-          }
-          this.$emit("actualizarProducto", this.producto);
+          // if (this.cbGuardar) {
+          //   console.log("cbGuardar");
+          //   this.cbGuardar(
+          //     this.producto.IdProducto ? this.producto : response.data.insertId,
+          //     this.producto.precios
+          //   );
+          // }
+          this.$emit("actualizarProducto", {
+            ...this.producto,
+            PreciosPorProducto: this.producto.precios
+              ? this.producto.precios
+              : []
+          });
           if (response.data.error) {
             this.$toasted.show(
               response.data.error + " - " + response.data.codigoBarra
