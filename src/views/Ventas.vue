@@ -508,7 +508,7 @@ import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
-import Movimiento from '@/components/Movimiento'
+import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
 export default {
   beforeMount() {

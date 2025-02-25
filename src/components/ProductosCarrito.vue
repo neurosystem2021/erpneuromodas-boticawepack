@@ -29,7 +29,7 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-
+        <label style="font-size: 0.8rem;" class="mb-2" v-if="isVentas">Busqueda avanzada (Producto, Categoria, Marca, Modelo)</label>
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{objProd.Producto}}</h3>
