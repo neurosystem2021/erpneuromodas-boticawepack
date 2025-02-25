@@ -44,7 +44,7 @@
         </template>
         <template slot="stock" slot-scope="data">
           <b-img  src="static/bombagasolina.png" @error="setAltImg" style="max-width: 30px;" class="mx-1"></b-img>
-          <!-- {{ $options.filters.redondear(data.item.stock, 4) }} -->
+          {{ $options.filters.redondear(data.item.stock, 4) }}
         </template>
         <template slot="cantidad" slot-scope="data">
           <input
