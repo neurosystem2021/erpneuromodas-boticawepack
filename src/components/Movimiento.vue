@@ -248,7 +248,7 @@
               });
               if (response.data) {
                 console.log(response.data);
-                if (response.data.IdUsuarioPerfil == 1) {
+                if (response.data.IdUsuarioPerfil == 1 || response.data.IdUsuarioPerfil == 3) {
                   this.showMovimientoModal = true;
                 } else {
                   this.$swal.fire({
