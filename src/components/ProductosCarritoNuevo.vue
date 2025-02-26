@@ -255,11 +255,10 @@
                     autocomplete="off"
                     @focus="abrirPop1(data.index)"
                     v-bind:class="{ new: data.item.IdProducto==productoChange }"
-                    @input="(val) => {
-                    $emit('onInputCantidad', val.target.value);actualizaDesc(data.index, productos[data.index]);
-                    }"
+                    @input="changeCantidad(data.index)"
                     class="form-control"
-                    placeholder="Cantidad"/>
+                    placeholder="Cantidad"
+                  />
                   </div>
                 </template>
                 <template slot="Presentacion" slot-scope="data" >
@@ -286,7 +285,13 @@
                     />
                 </template>
                 <template slot="subtotal" slot-scope="data">
-                {{ getSubtotal(data.index) }}
+                    <input                      
+                      type="number" 
+                      style="width: 90px;" 
+                      class="form-control my-2"
+                      v-model="data.item.subtotal"
+                      @input="recalcularKilake(data.index)"
+                    >
                 </template>
                 <template slot="igv" slot-scope="data">
                 <b-form-checkbox
@@ -854,9 +859,8 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      if (obj.Calcularkilage) {
-        obj.factor = obj.PrecioContado;
-      }
+      obj.factor = obj.PrecioContado;
+
       obj.precio = obj.PrecioContado;
       obj.cantidad = 1;
       obj.descuento = 0;
@@ -891,9 +895,7 @@ export default {
       let prod = { ...producto };
       let obj = { ...this.objProd };
 
-      if (obj.Calcularkilage) {
-        obj.factor = prod.precio;
-      }
+      obj.factor = prod.precio;
 
       obj.Presentacion = prod.nombre;
       obj.CantidadPresentacion = prod.cantidad;
@@ -942,10 +944,10 @@ export default {
     // },
     setNuevaCantidad(prod, index) {
       let producto = { ...prod };
-      if (producto.Calcularkilage) {
-        producto.cantidad = producto.precio / producto.factor;
-        Vue.set(this.productos, index, producto);
-      }
+
+      // producto.cantidad = producto.precio / producto.factor;
+      producto.subtotal = producto.cantidad * producto.precio;
+      Vue.set(this.productos, index, producto);
     },
     setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
@@ -980,6 +982,20 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio
       //this.updateManoDeObraNeta(index)
+    },
+    changeCantidad(index) {
+      let producto = { ...this.productos[index] };
+      producto.subtotal = producto.cantidad * producto.precio;
+      Vue.set(this.productos, index, producto);
+      // $emit('onInputCantidad', val.target.value);
+      // actualizaDesc(data.index, productos[data.index]);
+    },
+    recalcularKilake(index) {
+      let producto = { ...this.productos[index] };
+      producto.cantidad = parseFloat(
+        producto.subtotal / producto.precio
+      ).toFixed(2);
+      Vue.set(this.productos, index, producto);
     },
     ActualizarDesc(index, val) {
       Vue.delete(this.productos[index], "descuento");

@@ -450,7 +450,8 @@
                                 <b-col v-if="cargandoProductos" style="display: flex; justify-content: center;  align-items: center; height:70.5vh;">
                                     <vue-simple-spinner size="huge"></vue-simple-spinner>
                                 </b-col>
-                                <b-col id="productoPunto" class="m-2 text-center bg-white p-2" cols="2" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer" v-for="(producto , index2) in productosCategoria" :key="index2" @click="setProducto(producto)">
+                                <b-col id="productoPunto" class="m-2 text-center bg-white p-2" cols="2" style="border: 2px solid #E0E0E0; border-radius: 10px; cursor:pointer" 
+                                v-for="(producto , index2) in productosCategoria" :key="index2" @click="setProducto(producto)">
                                     <b-row class="mb-1">
                                         <b-col md="4" class="text-left" v-if="false">
                                             <b-badge :variant="parseFloat(producto.stock)<=0?'danger':'success'" style="font-size: 0.8rem;">{{producto.stock? Number.isInteger(producto.stock)?producto.stock:producto.stock.toFixed(2):producto.stock}}</b-badge>
@@ -943,10 +944,9 @@ export default {
       }
     },
     setProducto(obj) {
-      if (obj.Calcularkilage) {
-        console.log("sss");
-        obj.factor = obj.PrecioContado;
-      }
+      console.log("ssss");
+      obj.factor = obj.PrecioContado;
+
       this.precioCont = obj.PrecioContado;
       this.medicionPro = obj.ProductoMedicion;
       this.loadCode = "";
@@ -965,9 +965,8 @@ export default {
       this.objProd = { ...obj };
     },
     setProductoUni(obj) {
-      if (obj.Calcularkilage) {
-        obj.factor = obj.PrecioContado;
-      }
+      obj.factor = obj.PrecioContado;
+
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
       this.venta.pago.delivery.monto = 0;
@@ -979,6 +978,7 @@ export default {
       obj.indicacion = "";
       obj.Presentacion = obj.ProductoMedicion;
       obj.CantidadPresentacion = 1;
+      obj.subtotal = obj.PrecioContado;
       obj.EsPresentacion = 0;
       obj.precioc = obj.PrecioCosto;
       obj = this.onSetProducto(obj);
@@ -1004,6 +1004,7 @@ export default {
       let obj = { ...this.objProd };
       obj.Presentacion = prod.nombre;
       obj.CantidadPresentacion = prod.cantidad;
+      obj.subtotal = prod.cantidad;
       obj.EsPresentacion = 1;
       obj.precioc = prod.precioc;
       obj.subt = "";
