@@ -12,6 +12,7 @@ import VueAxios from 'vue-axios'
 import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
+import VueSweetalert2 from 'vue-sweetalert2';
 
 const browser = detect();
 
@@ -19,6 +20,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 Vue.prototype.$browser = detect()
 
@@ -33,6 +35,7 @@ Vue.use(Toasted, {
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
+Vue.use(VueSweetalert2)
 
 // Componentes 
 Vue.component('autocomplete', Autocomplete)
