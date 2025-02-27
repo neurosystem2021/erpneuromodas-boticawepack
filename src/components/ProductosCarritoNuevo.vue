@@ -289,6 +289,7 @@
                       type="number" 
                       style="width: 90px;" 
                       class="form-control my-2"
+                      step="0.001"
                       v-model="data.item.subtotal"
                       @input="recalcularKilake(data.index)"
                     >
