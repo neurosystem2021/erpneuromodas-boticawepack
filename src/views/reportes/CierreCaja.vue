@@ -291,7 +291,7 @@
                                           <tbody>
                                               <tr v-for="(resumen,index) in resumenHistorial" :key="index">
                                                 <td width="5px">{{resumen.Producto}}</td>
-                                                <td width="1px">Isla {{resumen.IdSurtidor}}</td>
+                                                <td width="1px"> {{resumen.Isla}}</td>
                                                 <td width="1px">Cara {{resumen.Cara}}</td>
                                                 <td width="5px">{{resumen.ValorInicial}}</td>
                                                 <td width="5px">{{resumen.VentaTotal}}</td>
@@ -435,7 +435,7 @@ import config from "@/store/config.js";
 import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
-  mounted() {
+  async mounted() {
     // this.loadData()
     // if (this.$route.params.id) {
     //   this.getCierre(this.$route.params.id)
@@ -447,10 +447,12 @@ export default {
       this.getVendedor();
     }
     if (!this.$route.params.id) {
-      this.obtenerHistorioGalones();
+      await this.obtenerHistorioGalones();
     } else {
-      this.obtenerHistorioGalonesCierre();
+      await this.obtenerHistorioGalonesCierre();
     }
+    console.log(this.historial);
+    console.log(this.ventas);
   },
   data() {
     return {
@@ -474,7 +476,7 @@ export default {
       resumenHistorial: [],
       fieldsHistorial: [
         { key: "Producto" },
-        { key: "IdSurtidor", label: "Isla" },
+        { key: "Isla", label: "Isla" },
         { key: "Cara" },
         { key: "ValorInicial", label: "L. I." },
         { key: "VentaTotal", label: "V." },
@@ -643,69 +645,114 @@ export default {
       });
       this.recalcularHistorialVer();
     },
+    // recalcularHistorial() {
+    //   let acumulados = {}; // Guardará los valores iniciales corregidos
+
+    //   // Agrupar el historial por Surtidor - Producto - Cara
+    //   this.historial.forEach(element => {
+    //     let clave = `${element.Isla}-${element.IdProducto}-${
+    //       element.Cara
+    //     }`;
+
+    //     // Si la clave no existe en acumulados, registrar el primer valor inicial
+    //     if (!acumulados.hasOwnProperty(clave)) {
+    //       acumulados[clave] = element.Galones;
+    //     }
+
+    //     // Restar ventas de turnos anteriores (IdCierre !== null)
+    //     let ventasAnteriores = this.ventas
+    //       .filter(
+    //         v =>
+    //           v.Isla == element.Isla &&
+    //           v.IdProducto == element.IdProducto &&
+    //           v.Cara == element.Cara &&
+    //           v.IdCierre !== null
+    //       ) // Solo ventas de turnos cerrados
+    //       .reduce((sum, v) => sum + v.Total, 0);
+
+    //     acumulados[clave] -= ventasAnteriores;
+    //   });
+
+    //   // Generar el resultado final agrupado
+    //   this.resumenHistorial = Object.keys(acumulados).map(clave => {
+    //     let [Isla, IdProducto, Cara] = clave.split("-").map(Number);
+
+    //     // Obtener el producto y datos generales del historial
+    //     let ref = this.historial.find(
+    //       h =>
+    //         h.Isla == Isla &&
+    //         h.IdProducto == IdProducto &&
+    //         h.Cara == Cara
+    //     );
+
+    //     // Obtener total vendido en el turno actual (IdCierre === null)
+    //     let ventasActuales = this.ventas
+    //       .filter(
+    //         v =>
+    //           v.Isla == Isla &&
+    //           v.IdProducto == IdProducto &&
+    //           v.Cara == Cara &&
+    //           v.IdCierre === null
+    //       ) // Solo ventas del turno actual
+    //       .reduce((sum, v) => sum + v.Total, 0);
+
+    //     let saldoFinal = acumulados[clave] - ventasActuales;
+
+    //     return {
+    //       Isla,
+    //       IdProducto,
+    //       Cara,
+    //       Producto: ref.Producto,
+    //       ValorInicial: acumulados[clave], // VI después de ventas anteriores
+    //       VentaTotal: ventasActuales, // Lo vendido en el turno actual
+    //       Restante: saldoFinal // VI - VentaTotal del turno actual
+    //     };
+    //   });
+    // },
     recalcularHistorial() {
-      let acumulados = {}; // Guardará los valores iniciales corregidos
+      let acumulados = {}; // Objeto para agrupar valores iniciales
 
-      // Agrupar el historial por Surtidor - Producto - Cara
+      console.log("Historial:", this.historial);
+      console.log("Ventas:", this.ventas);
+
+      // Paso 1: Inicializar valores desde el historial
       this.historial.forEach(element => {
-        let clave = `${element.IdSurtidor}-${element.IdProducto}-${
-          element.Cara
-        }`;
+        let clave = `${element.Isla}-${element.IdProducto}-${element.Cara}`;
 
-        // Si la clave no existe en acumulados, registrar el primer valor inicial
-        if (!acumulados.hasOwnProperty(clave)) {
-          acumulados[clave] = element.Galones;
+        if (!acumulados[clave]) {
+          acumulados[clave] = {
+            Isla: element.Isla,
+            IdProducto: element.IdProducto,
+            Cara: element.Cara,
+            Producto: element.Producto,
+            ValorInicial: parseFloat(element.Galones), // Convertir a número
+            VentaTotal: 0, // Se calculará después
+            Restante: 0 // Se calculará después
+          };
         }
-
-        // Restar ventas de turnos anteriores (IdCierre !== null)
-        let ventasAnteriores = this.ventas
-          .filter(
-            v =>
-              v.IdSurtidor == element.IdSurtidor &&
-              v.IdProducto == element.IdProducto &&
-              v.Cara == element.Cara &&
-              v.IdCierre !== null
-          ) // Solo ventas de turnos cerrados
-          .reduce((sum, v) => sum + v.Total, 0);
-
-        acumulados[clave] -= ventasAnteriores;
       });
 
-      // Generar el resultado final agrupado
-      this.resumenHistorial = Object.keys(acumulados).map(clave => {
-        let [IdSurtidor, IdProducto, Cara] = clave.split("-").map(Number);
+      console.log("Inicialización:", acumulados);
 
-        // Obtener el producto y datos generales del historial
-        let ref = this.historial.find(
-          h =>
-            h.IdSurtidor == IdSurtidor &&
-            h.IdProducto == IdProducto &&
-            h.Cara == Cara
-        );
-
-        // Obtener total vendido en el turno actual (IdCierre === null)
-        let ventasActuales = this.ventas
-          .filter(
-            v =>
-              v.IdSurtidor == IdSurtidor &&
-              v.IdProducto == IdProducto &&
-              v.Cara == Cara &&
-              v.IdCierre === null
-          ) // Solo ventas del turno actual
-          .reduce((sum, v) => sum + v.Total, 0);
-
-        let saldoFinal = acumulados[clave] - ventasActuales;
-
-        return {
-          IdSurtidor,
-          IdProducto,
-          Cara,
-          Producto: ref.Producto,
-          ValorInicial: acumulados[clave], // VI después de ventas anteriores
-          VentaTotal: ventasActuales, // Lo vendido en el turno actual
-          Restante: saldoFinal // VI - VentaTotal del turno actual
-        };
+      // Paso 2: Sumar todas las ventas sin filtrar por IdCierre
+      this.ventas.forEach(v => {
+        let clave = `${v.Isla}-${v.IdProducto}-${v.Cara}`;
+        if (acumulados[clave]) {
+          acumulados[clave].VentaTotal += v.Total; // Sumar todas las ventas
+        }
       });
+
+      console.log("Después de calcular VentaTotal:", acumulados);
+
+      // Paso 3: Calcular el restante
+      Object.keys(acumulados).forEach(clave => {
+        acumulados[clave].Restante =
+          acumulados[clave].ValorInicial - acumulados[clave].VentaTotal;
+      });
+      this.resumenHistorial = Object.values(acumulados);
+      // console.log("Resultado final:", acumulados);
+
+      return acumulados;
     },
     recalcularHistorialVer() {
       let idCierreActual = parseInt(this.$route.params.id); // ID del cierre actual
@@ -717,13 +764,11 @@ export default {
 
       // Paso 1: Inicializar valores desde el historial
       this.historial.forEach(element => {
-        let clave = `${element.IdSurtidor}-${element.IdProducto}-${
-          element.Cara
-        }`;
+        let clave = `${element.Isla}-${element.IdProducto}-${element.Cara}`;
 
         if (!acumulados[clave]) {
           acumulados[clave] = {
-            IdSurtidor: element.IdSurtidor,
+            Isla: element.Isla,
             IdProducto: element.IdProducto,
             Cara: element.Cara,
             Producto: element.Producto,
@@ -738,7 +783,7 @@ export default {
 
       // Paso 2: Restar ventas de cierres anteriores (IdCierre < idCierreActual)
       this.ventas.forEach(v => {
-        let clave = `${v.IdSurtidor}-${v.IdProducto}-${v.Cara}`;
+        let clave = `${v.Isla}-${v.IdProducto}-${v.Cara}`;
         if (acumulados[clave]) {
           if (v.IdCierre < idCierreActual) {
             acumulados[clave].ValorInicial -= v.Total;
@@ -753,7 +798,7 @@ export default {
 
       // Paso 3: Calcular el total vendido en el cierre actual (IdCierre = idCierreActual)
       this.ventas.forEach(v => {
-        let clave = `${v.IdSurtidor}-${v.IdProducto}-${v.Cara}`;
+        let clave = `${v.Isla}-${v.IdProducto}-${v.Cara}`;
         if (acumulados[clave]) {
           if (v.IdCierre === idCierreActual) {
             acumulados[clave].VentaTotal += v.Total;
