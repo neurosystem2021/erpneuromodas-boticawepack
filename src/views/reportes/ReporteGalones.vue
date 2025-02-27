@@ -154,7 +154,12 @@ export default {
     async obtenerProductos() {
       await this.axios(`${this.API}productos`).then(res => {
         if (res.data) {
-          this.lstProductos = res.data;
+          let productos = res.data;
+          productos.map(producto => {
+            return (producto.Producto =
+              producto.Isla + " - " + producto.Producto);
+          });
+          this.lstProductos = productos;
           let pre = {
             IdProducto: "",
             Producto: "Seleccione un Producto"
@@ -163,6 +168,7 @@ export default {
         }
       });
     },
+
     async obtenerListado() {
       let params = {
         fechaInicio: this.fechaInicio,

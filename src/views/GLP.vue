@@ -38,15 +38,23 @@
   <b-modal v-model="modal" hide-footer size="lg" :title="`Registrar información del cronómetro`">
     <b-row>
 
-        <b-col cols="12" class="my-2">
+      <b-col cols="12" class="my-2">
+            Isla
+            <b-form-select v-model="IdSurtidor" :options="Surtidor" class="mb-3"  
+               value-field="IdIsla"
+               text-field="Isla"
+               @change="obtenerProductoPorTipo($event)"
+               />
+        </b-col>
+
+        <b-col cols="12" class="my-2" v-if="IdSurtidor">
             Producto:
-           <b-form-select v-model="IdProduco" value-field="IdProducto" text-field="Producto" :options="Productos" class="mb-3" @change="obtenerProducto()"/>
+           <b-form-select 
+            v-model="IdProduco" value-field="IdProducto" text-field="Producto"
+            :options="Productos" class="mb-3" @change="obtenerProducto()"/>
 
         </b-col>
-        <b-col cols="12" class="my-2" v-if="IdProduco">
-            Isla
-            <b-form-select v-model="IdSurtidor" :options="Surtidor" class="mb-3"/>
-        </b-col>
+        
         <b-col cols="6" class="my-2" v-if="IdProduco">
             <div class="cardCaraA">
                 Cronómetro Lado A
@@ -87,7 +95,7 @@ export default {
       currentPage: 1,
       fields: [
         // { key: "IdHistorico" },
-        { key: "IdSurtidor", label: "Isla" },
+        { key: "Isla", label: "Isla" },
         { key: "FechaReg" },
         // { key: "Turno", label: "Turno" },
         { key: "Estado" },
@@ -100,10 +108,7 @@ export default {
       producto: {},
       Productos: [],
       fecha: null,
-      Surtidor: [
-        { value: 1, text: "Isla 1" },
-        { value: 2, text: "Isla 2" }
-      ],
+      Surtidor: [],
       IdSurtidor: null,
       IdProduco: null,
       IdTipoProducto: 2,
@@ -113,15 +118,28 @@ export default {
   },
   mounted() {
     this.obtenerListadoHistorial();
-    this.obtenerProductoPorTipo();
+    this.ObtenerIsla();
+    // this.obtenerProductoPorTipo();
     // this.obtenerProducto();
     this.fecha = this.$moment().format("YYYY-MM-DD");
   },
   methods: {
-    async obtenerProductoPorTipo() {
-      await this.axios(
-        `${this.API}producto/tipoproducto?IdTipoProducto=${this.IdTipoProducto}`
-      ).then(res => {
+    async ObtenerIsla() {
+      await this.axios(`${this.API}isla`).then(res => {
+        if (res.data) {
+          this.Surtidor = res.data;
+        }
+      });
+    },
+    async obtenerProductoPorTipo(IdSurtidor) {
+      console.log(IdSurtidor);
+      let params = {
+        IdTipoProducto: this.IdTipoProducto,
+        IdIsla: IdSurtidor
+      };
+      await this.axios(`${this.API}producto/tipoproducto`, {
+        params: params
+      }).then(res => {
         if (res.data) {
           this.Productos = res.data;
         }

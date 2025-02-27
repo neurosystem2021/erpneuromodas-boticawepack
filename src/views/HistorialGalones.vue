@@ -115,7 +115,8 @@ export default {
                 CaraDescripcion: caras.text,
                 IdProducto: productos.IdProducto,
                 Producto: productos.Producto,
-                Galones: 0
+                Galones: 0,
+                IdSurtidor: this.IdSurtidor
               };
               this.lstFormHistorial.push(historial);
             });

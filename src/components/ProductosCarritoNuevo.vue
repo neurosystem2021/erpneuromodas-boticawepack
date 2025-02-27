@@ -322,14 +322,15 @@ import Vue from "vue";
 
 export default {
   mounted() {
+    this.IdIsla = sessionStorage.getItem("IdSurtidor");
+    this.cargarProductos();
     // this.alterarBuscadorProductos()
   },
-  beforeMount() {
-    this.cargarProductos();
-  },
+  beforeMount() {},
   data() {
     return {
       API: config.API,
+      IdIsla: "",
       loadCode: "",
       pasteCode: false,
       producto: {},
@@ -579,8 +580,9 @@ export default {
       }
     },
     cargarProductos() {
+      let params = { IdIsla: this.IdIsla };
       this.axios
-        .get(this.API + "productos/lineal")
+        .get(this.API + "productos/lineal", { params: params })
         .then(response => {
           this.productosData = response.data;
         })

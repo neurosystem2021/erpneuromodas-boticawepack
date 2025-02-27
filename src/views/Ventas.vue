@@ -529,7 +529,14 @@
                     </b-row>
                     <b-row>    
                       <b-col cols="12">
-                        <b-form-select v-model="IdSurtidor" :options="Surtidor" class="mb-3" disabled/>
+                        <b-form-select 
+                          v-model="IdIsla" 
+                          :options="Surtidor" 
+                          class="mb-3" 
+                          disabled 
+                          value-field="IdIsla"
+                          text-field="Isla"
+                        />
                       </b-col>
                         <b-col cols="6" v-for="(producto , index2) in productosData" :key="index2">
                           <b-card :class="[producto.caraActiva ? 'divProducto' : '', 'mx-1']" @click="anadirProducto(producto)">
@@ -686,15 +693,15 @@ import ValeLista from "@/components/ValeLista.vue";
 export default {
   beforeMount() {
     this.initForm();
-    this.cargarProductos();
+   
   },
   mounted() {
     //this.getNumeroVenta()
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
-    this.IdSurtidor = sessionStorage.getItem("IdSurtidor");
-    if (this.IdSurtidor == 0) {
+    this.IdIsla = sessionStorage.getItem("IdSurtidor");
+    if (this.IdIsla == 0) {
       this.$swal.fire({
         icon: "warning",
         title: "Isla",
@@ -705,12 +712,14 @@ export default {
     //this.estadoSistema()
     // this.ObtenerLstOfertas();
     this.obtenerHistorialActivo();
+    this.ObtenerIsla();
+    this.cargarProductos();
   },
   data() {
     return {
       lstOfertas: [],
       lstHistorico: [],
-      IdSurtidor: "",
+      IdIsla: "",
       Surtidor: [
         { value: 1, text: "Surtidor 1" },
         { value: 2, text: "Surtidor 2" },
@@ -797,11 +806,11 @@ export default {
       idProductoSelect: null,
       surtidores: [
         {
-          IdSurtidor: 1,
+          IdIsla: 1,
           itemsCara: [{ value: 0, text: "0" }, { value: 1, text: "1" }]
         },
         {
-          IdSurtidor: 2,
+          IdIsla: 2,
           itemsCara: [{ value: 3, text: "3" }, { value: 4, text: "4" }]
         }
       ],
@@ -842,6 +851,13 @@ export default {
         }
       });
     },
+    async ObtenerIsla() {
+      await this.axios(`${this.API}isla`).then(res => {
+        if (res) {
+          this.Surtidor = res.data;
+        }
+      });
+    },
     async obtenerHistorialActivo() {
       await this.axios(`${this.API}historialgalones/obtener_activos`).then(
         res => {
@@ -858,7 +874,7 @@ export default {
       //     v =>
       //       v.IdProducto == producto.IdProducto &&
       //       v.Cara == producto.Cara &&
-      //       v.IdSurtidor == this.IdSurtidor
+      //       v.IdIsla == this.IdIsla
       //   );
 
       //   producto.IdHistorico = Historico.IdHistorico;
@@ -953,16 +969,16 @@ export default {
       this.idSurtidor = 0;
       this.itemsCaraSelect = [];
       this.idCara = null;
-      let id = sessionStorage.getItem("IdSurtidor");
+      let id = sessionStorage.getItem("IdIsla");
       if (!(id > 0)) {
         this.$toasted.show("No se especifico un surtidor, ingrese nuevamente", {
           duration: 4000
         });
         return;
       }
-      let surtidor = this.surtidores.find(s => s.IdSurtidor == id);
+      let surtidor = this.surtidores.find(s => s.IdIsla == id);
       if (surtidor) {
-        this.idSurtidor = surtidor.IdSurtidor;
+        this.idSurtidor = surtidor.IdIsla;
         this.itemsCaraSelect = surtidor.itemsCara;
         this.idCara = surtidor.itemsCara[0].value;
       } else {
@@ -1052,11 +1068,12 @@ export default {
       event.target.src = "static/no-photo.png";
     },
     async cargarProductos() {
+      let params = { IdIsla: this.IdIsla };
       this.productoSelect = {};
       this.productosData = [];
       this.idProductoSelect = null;
       await this.axios
-        .get(this.API + "productos/lineal")
+        .get(this.API + "productos/lineal", { params: params })
         .then(response => {
           let index = 0;
           response.data.forEach(producto => {
@@ -1151,7 +1168,7 @@ export default {
           v =>
             v.IdProducto == obj.IdProducto &&
             v.Cara == obj.Cara &&
-            v.IdSurtidor == this.IdSurtidor
+            v.IdIsla == this.IdIsla
         );
 
         obj.IdHistorico = Historico[0].IdHistorico;
@@ -1969,7 +1986,7 @@ export default {
       }
 
       this.venta.productos = this.productos;
-      this.venta.IdSurtidor = this.IdSurtidor;
+      this.venta.IdIsla = this.IdIsla;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
       this.venta.PagoCon = this.$refs.carrito.pagocon;
