@@ -1,31 +1,52 @@
 <template>
-  <div>
-    <div>
-      <b-card no-body>
-       
-            <b-container class="bv-example-row" id="conten">
+  
+            <b-container class="bv-example-row" id="conten" fluid>
               <b-row>
                 
               </b-row>
               <b-row>
-                <b-col>
-                  <h3>Valor de venta por día</h3>
-                  <bar-chart ref="chartGrafica"></bar-chart>
+                <b-col cols="12">
+                  <b-row>
+                   <b-col cols="12"> <h3>Ranking de Ventas por Vendedor </h3></b-col>
+
+                    <b-col cols="2"> 
+                        Desde Hasta
+                        <input type="date" class="form-control">
+                    </b-col>
+                    <b-col cols="10">
+                      <DoughnutVendedor ref="chartGrafica"></DoughnutVendedor>
+                    </b-col>
+                  </b-row>
                 </b-col>
+                <b-col cols="12">
+                  <b-row>
+                    <b-col cols="12">
+                      <h3>Ranking de Productos Más Vendidos </h3>
+                    </b-col>
+                    <b-col cols="2"> 
+                        Desde Hasta
+                        <input type="date" class="form-control">
+                    </b-col>
+                    <b-col cols="10">
+
+                      <BarChartProductos ref="barChartGrafica"></BarChartProductos>
+                    </b-col>
+                  </b-row>
+                  </b-col>
               </b-row>
             </b-container>
 
-      </b-card>
-    </div>
-  </div>
+     
 </template>
 <script>
-import BarChart from "@/components/Dashboard/BarChart";
+import DoughnutVendedor from "@/components/Dashboard/DoughnutVendedor";
+import BarChartProductos from "@/components/Dashboard/BarChartProductos";
 import LineChart from "@/components/LineChart";
 import config from "@/store/config.js";
 export default {
   mounted() {
     this.getDataRankinVendedor();
+    this.getProdcutosMasVendidos();
     // this.getAlmacenes();
   },
   data() {
@@ -45,7 +66,24 @@ export default {
         })
         .then(response => {
           // console.log(response.data);
-          this.$refs.chartGrafica.GraficarDias(response.data);
+          this.$refs.chartGrafica.GraficarVentas(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    getProdcutosMasVendidos(anio, mes, dias, idAlmacen) {
+      this.axios
+        .get(this.API + "reporte/productomasvendidos", {
+          params: {
+            anio: anio,
+            mes: mes,
+            idAlmacen: idAlmacen || this.idAlmacen
+          }
+        })
+        .then(response => {
+          // console.log(response.data);
+          this.$refs.barChartGrafica.GraficarProductoVendidos(response.data);
         })
         .catch(error => {
           console.log(error);
@@ -53,8 +91,8 @@ export default {
     }
   },
   components: {
-    BarChart,
-    LineChart
+    DoughnutVendedor,
+    BarChartProductos
   }
 };
 </script>

@@ -5,29 +5,19 @@ export default {
   extends: Doughnut, // Extiende el componente
   data() {
     return {
-      //   chartData: {
-      //     labels: [],
-      //     datasets: [
-      //       {
-      //         label: "Ventas",
-      //         backgroundColor: ["#ff6384", "#36a2eb", "#ffce56"],
-      //         data: [30, 50, 20]
-      //       }
-      //     ]
-      //   },
       chartData: {},
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        legend: { display: true }
+        legend: { display: true, position: "left" }
       }
     };
   },
   mounted() {
-    // this.renderChart(this.chartData, this.options); // Renderiza el gráfico
+  
   },
   methods: {
-    GraficarDias(data) {
+    GraficarVentas(data) {
       this.$nextTick(() => {
         let labels = [];
         let datos = [];
@@ -41,7 +31,7 @@ export default {
           labels: labels,
           datasets: [
             {
-              label: "Ventas",
+              label: "Ranking de Ventas por Usuario",
               backgroundColor: colores,
               data: datos
             }
