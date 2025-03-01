@@ -21,7 +21,6 @@
             <label>Isla:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'isla'"
                 ref="inputIsla"
                 anchor="Isla"

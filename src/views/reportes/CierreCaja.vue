@@ -27,7 +27,11 @@
                           <tr v-for="(productos,index) in productosVendidos" :key="index">
                             <td>{{productos.Producto}}</td>
                             <td>{{productos.Isla}}</td>
-                            <td>{{productos.Cara==1 ? 'Cara A' : 'Cara B'}}</td>
+                            <td>{{
+                              productos.Isla ? 
+                            productos.Cara==1 ? 'Cara A' : 'Cara B'
+                            : ''
+                            }}</td>
                             <td>{{productos.CantidadVendida}}</td>
                             <td>{{productos.MontoVendido}}</td>
                           </tr>
@@ -329,9 +333,9 @@
                                                 <td width="5px">{{resumen.Producto}}</td>
                                                 <td width="1px"> {{resumen.Isla}}</td>
                                                 <td width="1px">Cara {{resumen.Cara}}</td>
-                                                <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(2)}}</td>
-                                                <td width="5px">{{parseFloat(resumen.Restante).toFixed(2)}}</td>
-                                                <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(2)}}</td>
+                                                <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(4)}}</td>
+                                                <td width="5px">{{parseFloat(resumen.Restante).toFixed(4)}}</td>
+                                                <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(4)}}</td>
                                               </tr>
                                           </tbody>
                                       </table>
@@ -352,7 +356,7 @@
 
 
     </b-col>
-      <b-col cols="3" class="card elevation-2 px-3 py-4">
+      <b-col cols="3" class="card elevation-2">
         <div class="alinear">
           <center>
           </center>
@@ -458,7 +462,35 @@
           </tbody>
         </table>
         
+        <b-row class="print ocultarNoPrint">
+           <b-col cols="12">
+            <table class="table tbl-historico" size="sm" >
+              <thead>
+                <tr>
+                  <th width="5px">PRODUCTO</th>
+                  <th width="1px">ISLA</th>
+                  <th width="1px">CARA</th>
+                  <th width="5px">V. I.</th>
+                  <th width="5px">V. F</th>              
+                  <th width="5px">VENTA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(resumen,index) in resumenHistorial" :key="index">
+                  <td width="5px">{{resumen.Producto}}</td>
+                  <td width="1px"> {{resumen.Isla}}</td>
+                  <td width="1px">Cara {{resumen.Cara}}</td>
+                  <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(4)}}</td>
+                  <td width="5px">{{parseFloat(resumen.Restante).toFixed(4)}}</td>
+                  <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(4)}}</td>
+                </tr>
+              </tbody>
+            </table>
+            </b-col>
+            </b-row>
       </b-row>
+
+      
       </b-col>
     
     </b-row>
@@ -1021,14 +1053,9 @@ th {
   max-height: 79vh;
   overflow-y: auto;
 }
-@media print {
-  .no-print {
-    display: none;
-  }
-  .tbl-historico {
-    max-width: 30px;
-    font-size: 0.55rem;
-  }
+
+.ocultarNoPrint {
+  display: none;
 }
 .alinear * {
   text-align: left !important;
@@ -1036,5 +1063,33 @@ th {
 .tableResumen {
   width: 100%;
   font-weight: bold;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  .tableResumen{
+    width: 100%; 
+    border-collapse: collapse; 
+
+  }
+  .tbl-historico {
+    width: 100%; 
+    font-size: 0.5rem; 
+    border-collapse: collapse; 
+  }
+
+  .tbl-historico th,
+  .tbl-historico td {
+    padding: 2px 4px;
+    text-align: left;
+    white-space: nowrap; 
+  }
+
+  .ocultarNoPrint {
+    display: block;
+    font-size: 0.6rem;
+  }
 }
 </style>

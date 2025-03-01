@@ -171,7 +171,7 @@
                                     
                                     <b-col md="8">
                                         <b-form-group style="margin-bottom: 0 !important;">
-                                            <b-input-group class="mt-2">            
+                                            <b-input-group class="mt-2" prepend="Cliente" >            
                                                 <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                                 <autocomplete
                                                     required="required"
@@ -231,6 +231,19 @@
                                     {{ venta.FechaDoc }}
                                 </b-form-group>
                             </b-col>
+                        </b-row>
+                        <b-row class="mx-2">
+                          <autocomplete
+                            ref="autocompleteProducto"
+                            :url="APIProductos"
+                            :onShouldRenderChild="renderChild"
+                            anchor="Producto"
+                            label="writer"
+                            placeholder="Agregar Producto"
+                            :on-select="setProducto"
+                            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                            :classes="{input: 'form-control'}">
+                          </autocomplete>
                         </b-row>
                         <b-row class="text-center">
                             <b-col md="3" >
@@ -838,7 +851,13 @@ export default {
     ...mapState({
       productos: state => state.cart.productos,
       totalCart: state => state.cart.totalCart
-    })
+    }),
+    APIProductos() {
+      if (this.idAlmacen) {
+        return this.API + "productos/stock/" + this.idAlmacen;
+      }
+      return this.API + "productos";
+    }
   },
   methods: {
     ...mapActions({
@@ -854,6 +873,17 @@ export default {
           this.lstOfertas = res.data;
         }
       });
+    },
+    setProducto(obj) {
+      obj = Object.assign({}, obj);
+      this.productoSelect = obj;
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
+      if (this.preciosProd.length == 0) {
+        this.setProductoUni(obj);
+        return;
+      }
+      // this.$refs["modalCant"].show();
     },
     async ObtenerIsla() {
       await this.axios(`${this.API}isla`).then(res => {
@@ -1155,29 +1185,36 @@ export default {
       }
     },
     setProducto(obj) {
+      this.actualizarPrecio = false;
+      this.$refs.autocompleteProducto.setValue("");
       obj = Object.assign({}, obj);
       this.productoSelect = obj;
+      //obj.FLETE = 0
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
-      if (this.preciosProd.length == 0) {
+      // if (this.preciosProd.length == 0) {
         this.setProductoUni(obj);
-        return;
-      }
-      this.$refs["modalCant"].show();
+        // return;
+      // }
+      // this.$refs["modalCantC"].show();
+
+      /*
+      obj = Object.assign({}, obj);
+      //obj.FLETE = 0
+      obj.precio = 0
+      obj.cantidad = 0
+      //obj.IdLote = 0
+      //obj.TieneIgv = 0
+      obj.descuento = 0
+      obj.nuevoPrecioContado = 0
+      obj = this.onSetProducto(obj)
+      this.add([obj, () => {
+        this.$emit('onAddProducto', obj)
+      }])
+
+      // Vue.set(this.productos, obj.IdProducto, obj)*/
     },
     setProductoUni(obj, seleccion = false, precio = false) {
-      obj.IdHistorico = null;
-      if (this.lstHistorico.length > 0) {
-        let Historico = this.lstHistorico.filter(
-          v =>
-            v.IdProducto == obj.IdProducto &&
-            v.Cara == obj.Cara &&
-            v.IdIsla == this.IdIsla
-        );
-
-        obj.IdHistorico = Historico[0].IdHistorico;
-      }
-      // console.log('Historico',obj);
       obj.precio = 0;
       obj.cantidad = 0;
       //obj.IdLote = 0
@@ -1185,24 +1222,35 @@ export default {
       obj.descuento = 0;
       obj.sutotal = "";
       obj.nuevoPrecioContado = 0;
-      this.idProductoSelect = obj.IdProducto;
       obj = this.onSetProducto(obj, precio);
-      let existe = this.productos.find(
-        p => p.IdProducto == obj.IdProducto && p.index == obj.index
-      );
+      let existe = this.productos.find(p => p.IdProducto == obj.IdProducto);
       if (existe == undefined) {
         this.$toasted.info("Producto agregado");
         this.add([
           obj,
           () => {
-            this.onAddProducto(obj);
+            this.$emit("onAddProducto");
             this.actualizarProd(obj);
           }
         ]);
       } else {
-        this.$toasted.error("El producto ya esta agregado");
+        if (this.actualizarPrecio) {
+          this.$toasted.info("El precio cambiado");
+          this.actualizarProd(obj);
+          this.actualizarPrecio = false;
+        } else {
+          this.$toasted.error("El producto ya esta agregado");
+        }
       }
-      this.$refs["modalCant"].hide();
+      // this.$refs["modalCantC"].hide();
+    },
+    showPresentacion(obj) {
+      obj = Object.assign({}, obj);
+      this.productoSelect = obj;
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
+      this.actualizarPrecio = true;
+      this.$refs["modalCantC"].show();
     },
     limpiarPuntoVenta() {
       this.ultimaVentaCliente = "";
@@ -2044,6 +2092,46 @@ export default {
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
       this.venta.cliente = {};
+    },
+    renderChild(data) {
+      if (this.idAlmacen) {
+        let style = "ss";
+
+        // cambiar color los vencidos
+        var dt = new Date();
+        var anio = dt.getFullYear();
+        var mes = dt.getMonth() + 1;
+        var dia = dt.getDate();
+        var fechaVen = new Date(data.FechaVen).getTime();
+
+        var hoy = anio + "-" + mes + "-" + dia;
+        hoy = new Date(hoy).getTime();
+        var en4meses = anio + "-" + (mes + 4) + "-" + dia;
+        en4meses = new Date(en4meses).getTime();
+
+        if (fechaVen < hoy && data.stock > 0) {
+          style = "danger";
+        }
+
+        // cambiar color los que faltan 4 meses por vencer
+        if (fechaVen >= hoy && fechaVen <= en4meses && data.stock > 0) {
+          style = "ambar";
+        }
+
+        return `
+        <div class="${style}">
+          <b class="bg-success" style="color: #fff; padding: 0 6px">${
+            data.stock
+          }</b> | <b>${data.CodigoBarra}</b> / 
+          <b>${data.Producto}</b> / ${data.ProductoMarca} 
+        </div>
+        `;
+      }
+      return `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoMedicion}
+      `;
     }
   },
   components: {
