@@ -150,7 +150,7 @@
                                          </b-input-group>
                                         <b-input-group prepend="Km">
                                             <input v-model="venta.Km"
-                                                    type="text"
+                                                    type="number"
                                                     style="text-transform:uppercase;"
                                                     class="form-control"
                                                     placeholder="Kilometraje" />
@@ -271,7 +271,9 @@
                                     :bloquearInput="bloquearInput" 
                                     :fields="carrito.fields"
                                     :idAlmacen="venta.almacen.IdAlmacen"
-                                    :onSetProducto="onSetProducto">
+                                    :onSetProducto="onSetProducto"
+                                    :touchHab="touchHab" 
+                                    >
 
                                     <template slot="operaciones">
                                         <table class="table b-table border table-footer">
@@ -475,7 +477,9 @@
                                         <b-row style="justify-content: center; margin-top:5px">
                                             <b-col md="12">
                                                 <b-button :disabled="inProgress" variant="danger" size="sm" @click="limpiarPuntoVenta" class="mb-3" v-if="venta.EsFacturaVale == 1">CANCELAR FACTURACION</b-button>
-                                                <b-button type="submit" :disabled="inProgress" class="btnAction" variant="success" size="lg">REALIZAR VENTA</b-button>
+                                                <b-button type="submit" :disabled="inProgress" class="btnAction my-2" variant="success" size="lg">REALIZAR VENTA</b-button>
+                                                <b-button  v-if="touchHab" variant="danger" class="btnAction my-2"  @click="()=> {touchHab=!touchHab}"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                                                <b-button  v-else variant="info" class="btnAction my-2"  @click="()=> {touchHab=!touchHab}"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                                                 <!--<h6 v-if="ventaPrueba==1"><br><b-badge variant="danger">MODO PRUEBA CON EL SURTIDOR <br> <br> COMUNICARSE CON EL ADMINISTRADOR</b-badge></h6>-->
                                             </b-col>
                                         </b-row>
@@ -693,7 +697,6 @@ import ValeLista from "@/components/ValeLista.vue";
 export default {
   beforeMount() {
     this.initForm();
-   
   },
   mounted() {
     //this.getNumeroVenta()
@@ -717,6 +720,7 @@ export default {
   },
   data() {
     return {
+      touchHab: false,
       lstOfertas: [],
       lstHistorico: [],
       IdIsla: "",

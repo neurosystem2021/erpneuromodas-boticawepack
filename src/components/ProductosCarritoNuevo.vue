@@ -1,5 +1,110 @@
 <template>
     <b-col md="12">
+        <!-- MODALS TOUCH -->
+
+        <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngPre" id="ingPre" size="sm" hide-footer class="ingPre" title="Precio" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="modalIngDesc" id="ingDesc" size="sm" hide-footer class="ingDesc" title="Descuento" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
+        <!-- MODALS TOUCH -->
       <b-row>
         <b-col md="12" v-if="(type === 'mov') ? true : false">
           <b-form-group>
@@ -55,6 +160,7 @@
             style="width: 110px"
             step="0.000001"
             min="0"
+             @focus="abrirPop1(data.index)"
             class="form-control"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
@@ -72,6 +178,7 @@
             style="width: 110px"
             step="0.00001"
             placeholder="Precio"
+             @focus="abrirPop2(data.index)"
             @input="setNuevoPrecioContado(data.index)"
             class="form-control"/>
         </template>
@@ -142,6 +249,7 @@
             min="0"
             step="0.01"
             class="form-control"
+             @focus="abrirPop3(data.index)"
             value="0">
             <b-form-text>
             </b-form-text>
@@ -344,7 +452,9 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoSelect: {},
       preciosProd: [],
-      actualizarPrecio: false
+      actualizarPrecio: false,
+      cantidadInput: "",
+      objProd: {}
     };
   },
   watch: {
@@ -353,6 +463,7 @@ export default {
     }
   },
   props: {
+    // objProd: {},
     type: {
       default: "",
       type: String
@@ -362,6 +473,7 @@ export default {
     bloquearInput: Boolean,
     igvTotal: Boolean,
     EsVale: Number,
+    touchHab: Boolean,
     onSetProducto: {
       type: Function,
       default(obj) {
@@ -457,6 +569,36 @@ export default {
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto"
     }),
+    abrirPop1(index) {
+      if (!this.touchHab) {
+        return;
+      }
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngCant"].show();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
+    },
+    abrirPop2(index) {
+      if (!this.touchHab) {
+        return;
+      }
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngPre"].show();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngDesc"].hide();
+    },
+    abrirPop3(index) {
+      if (!this.touchHab) {
+        return;
+      }
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngDesc"].show();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+    },
     changeCant(val, prod) {
       if (val) {
         if (val.slice(-1) != "0") {
@@ -468,40 +610,74 @@ export default {
       }
     },
     addNumber(number) {
-      if (this.productos.length == 0) {
-        this.productoSelectIndex = null;
-        return;
-      }
-      if (this.productoSelectIndex != null) {
-        if (this.accionBoton == 1) {
-          this.productos[this.productoSelectIndex].sutotal = Number(
-            (this.productos[this.productoSelectIndex].sutotal == undefined
-              ? ""
-              : this.productos[this.productoSelectIndex].sutotal.toString() ==
-                "0"
-                ? ""
-                : this.productos[this.productoSelectIndex].sutotal.toString()) +
-              number
-          );
-          this.setSubtotal(
-            this.productoSelectIndex,
-            this.productos[this.productoSelectIndex].sutotal
-          );
-        } else if (this.accionBoton == 2) {
-          this.productos[this.productoSelectIndex].cantidad = Number(
-            this.productos[this.productoSelectIndex].cantidad.toString() +
-              number
-          );
-        } else if (this.accionBoton == 3) {
-          this.productos[this.productoSelectIndex].descuento = Number(
-            this.productos[this.productoSelectIndex].descuento.toString() +
-              number
-          );
-        }
-      }
+      this.cantidadInput = this.cantidadInput + number;
     },
+    // addNumber(number) {
+    //   if (this.productos.length == 0) {
+    //     this.productoSelectIndex = null;
+    //     return;
+    //   }
+    //   if (this.productoSelectIndex != null) {
+    //     if (this.accionBoton == 1) {
+    //       this.productos[this.productoSelectIndex].sutotal = Number(
+    //         (this.productos[this.productoSelectIndex].sutotal == undefined
+    //           ? ""
+    //           : this.productos[this.productoSelectIndex].sutotal.toString() ==
+    //             "0"
+    //             ? ""
+    //             : this.productos[this.productoSelectIndex].sutotal.toString()) +
+    //           number
+    //       );
+    //       this.setSubtotal(
+    //         this.productoSelectIndex,
+    //         this.productos[this.productoSelectIndex].sutotal
+    //       );
+    //     } else if (this.accionBoton == 2) {
+    //       this.productos[this.productoSelectIndex].cantidad = Number(
+    //         this.productos[this.productoSelectIndex].cantidad.toString() +
+    //           number
+    //       );
+    //     } else if (this.accionBoton == 3) {
+    //       this.productos[this.productoSelectIndex].descuento = Number(
+    //         this.productos[this.productoSelectIndex].descuento.toString() +
+    //           number
+    //       );
+    //     }
+    //   }
+    // },
     cambiarSeleccion(index) {
       this.productoSelectIndex = index;
+    },
+    ingresaNum(index) {
+      index = this.capturaIndex;
+      this.cantidadInput == "" ? (this.cantidadInput = 1) : this.cantidadInput;
+
+      if (this.$refs["modalIngCant"].is_show) {
+        this.productos[index].cantidad = this.cantidadInput;
+        this.actualizaDesc(index, this.productos[index]);
+      }
+      if (this.$refs["modalIngPre"].is_show) {
+        this.productos[index].precio = this.cantidadInput;
+        this.setNuevoPrecioContado(index);
+      }
+      if (this.$refs["modalIngDesc"].is_show) {
+        this.productos[index].descuento = this.cantidadInput;
+        this.ActualizarDesc(index, this.cantidadInput);
+      }
+
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
+    },
+    actualizaDesc(index, prod) {
+      //Vue.delete(this.productos[index], 'descuento');
+      // Vue.set(this.productos[index], "descuento", parseFloat(prod.descuento));
+      // this.actualizarProd({ Producto: prod, Pos: index });
+    },
+    ActualizarDesc(index, val) {
+      Vue.delete(this.productos[index], "descuento");
+      Vue.set(this.productos[index], "descuento", parseFloat(val));
     },
     addPoint() {
       if (this.productos.length == 0) {
@@ -920,5 +1096,146 @@ export default {
 }
 .popover {
   max-width: 420px !important;
+}
+</style>
+
+<style scoped>
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid black;
+}
+.nomCart2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers td {
+  min-width: 40px;
+  min-height: 40px;
+  border: 0.5px solid #a3a3a3;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  padding: 1.8% 1.8%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  font-family: Arial;
+  color: black;
+  background-color: #fff;
+}
+.calc__numbers td:last-child {
+  background-color: #eaeaea;
+}
+.calc__numbers2 td:last-child {
+  background-color: white;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+}
+.calc__numbers .accionActiva {
+  color: #fff !important;
+  background: #65ba9b !important;
+}
+.pagocon .input-group-text {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.fontsize {
+  font-size: 50px !important;
+}
+.new {
+  animation: blink 0.3s ease;
+}
+@keyframes blink {
+  0% {
+    background-color: yellow;
+  }
+  100% {
+    background-color: white;
+  }
+}
+</style>
+
+<style>
+.ingCant .modal-backdrop {
+  background: transparent;
+}
+.ingPre .modal-backdrop {
+  background: transparent;
+}
+.ingDesc .modal-backdrop {
+  background: transparent;
+}
+#ingCant {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 25vw;
+}
+#ingPre {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 10vw;
+}
+#ingDesc {
+  height: unset !important;
+  right: unset !important;
+  bottom: unset !important;
+  margin-left: 20vw;
+}
+td.fontsize {
+  font-size: 0.75rem !important;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle !important;
+}
+td.stocksize {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+th.stocksize {
+  font-size: 0.8rem !important;
+  text-align: center;
+}
+th.thsize {
+  font-size: 0.85rem !important;
+  text-align: center;
+}
+td.thsize {
+  vertical-align: middle !important;
+}
+.popover-body {
+  background-color: #c1c1c1;
+}
+.bs-popover-bottom {
+  max-width: 370px !important;
+}
+
+#carrito td {
+  margin: 0 0.3rem !important;
+  padding: 0 0.3rem !important;
 }
 </style>
