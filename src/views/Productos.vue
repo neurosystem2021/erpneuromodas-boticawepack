@@ -31,7 +31,7 @@
           </b-col>
           <b-col md="4" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="6">
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
@@ -39,6 +39,9 @@
             <b-col md="4">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
+            <!-- <b-col md="2">
+              <codigo-multiple></codigo-multiple>
+            </b-col> -->
             </b-row>
           </b-col>
 
@@ -90,7 +93,7 @@
 <script>
 import config from "@/store/config.js";
 import ProductoForm from "@/components/ProductoForm";
-
+import CodigoMultiple from "@/components/CodigoMultiple";
 export default {
   mounted() {
     this.axios.get(this.API + "productos/count").then(response => {
@@ -121,8 +124,8 @@ export default {
         { key: "stock", label: "Stock", sortable: true },
         { key: "PrecioContado", label: "Precio Contado", sortable: true },
         { key: "PrecioCosto", label: "Precio Costo", sortable: true },
-        { key: "TieneCaraA"},
-        { key: "TieneCaraB"},
+        { key: "TieneCaraA" },
+        { key: "TieneCaraB" }
       ],
       totalRows: 50,
       perPage: 10,
@@ -196,7 +199,8 @@ export default {
     }
   },
   components: {
-    ProductoForm
+    ProductoForm,
+    CodigoMultiple,
   }
 };
 </script>
