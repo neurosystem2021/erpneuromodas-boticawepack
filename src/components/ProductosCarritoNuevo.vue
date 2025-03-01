@@ -2,6 +2,40 @@
     <b-col md="12">
         <!-- MODALS TOUCH -->
 
+        <b-modal ref="modalIngSubTotal" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
+
         <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
           <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
           <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
@@ -194,7 +228,8 @@
               style="width: 110px"
               placeholder="Subtotal"
               @input="val => setSubtotal(data.index, val.target.value)"
-              class="form-control"/>
+              class="form-control"
+              @focus="abrirPop4(data.index)"/>
             <b>{{ getSubtotal(data.index) }}</b>
           </div>
 
@@ -599,6 +634,17 @@ export default {
       this.$refs["modalIngCant"].hide();
       this.$refs["modalIngPre"].hide();
     },
+    abrirPop4(index) {
+      if (!this.touchHab) {
+        return;
+      }
+      this.capturaIndex = index;
+      this.objProd = this.productos[index];
+      this.$refs["modalIngDesc"].hide();
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngSubTotal"].show();
+    },
     changeCant(val, prod) {
       if (val) {
         if (val.slice(-1) != "0") {
@@ -652,6 +698,14 @@ export default {
       index = this.capturaIndex;
       this.cantidadInput == "" ? (this.cantidadInput = 1) : this.cantidadInput;
 
+      if (this.$refs["modalIngSubTotal"].is_show) {
+        let producto = { ...this.productos[index] };
+        this.productos[index].cantidad = parseFloat(
+          this.cantidadInput / producto.precio
+        ).toFixed(4);
+        this.productos[index].sutotal = this.cantidadInput;
+        this.setNuevoPrecioContado(index, this.productos[index]);
+      }
       if (this.$refs["modalIngCant"].is_show) {
         this.productos[index].cantidad = this.cantidadInput;
         this.actualizaDesc(index, this.productos[index]);
@@ -669,6 +723,7 @@ export default {
       this.$refs["modalIngCant"].hide();
       this.$refs["modalIngPre"].hide();
       this.$refs["modalIngDesc"].hide();
+      this.$refs["modalIngSubTotal"].hide();
     },
     actualizaDesc(index, prod) {
       //Vue.delete(this.productos[index], 'descuento');
@@ -678,6 +733,18 @@ export default {
     ActualizarDesc(index, val) {
       Vue.delete(this.productos[index], "descuento");
       Vue.set(this.productos[index], "descuento", parseFloat(val));
+    },
+    actualizaSubTotal(index, val) {
+      Vue.delete(this.productos[index], "subtotal");
+      Vue.set(this.productos[index], "subtotal", parseFloat(val));
+      // console.log(this.productos);
+    },
+    cerrrarNum() {
+      this.cantidadInput = "";
+      this.$refs["modalIngCant"].hide();
+      this.$refs["modalIngPre"].hide();
+      this.$refs["modalIngDesc"].hide();
+      this.$refs["modalIngSubTotal"].hide();
     },
     addPoint() {
       if (this.productos.length == 0) {
