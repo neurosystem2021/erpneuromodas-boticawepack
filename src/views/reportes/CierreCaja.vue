@@ -10,7 +10,43 @@
               <b-card-text>
                 <div class="details px-5" >
 
-                
+                  <hr class="no-print">
+                  <b-row class="no-print">
+                  <h5>Resumen Productos</h5><br>
+                  <table class="table b-table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Producto</th>
+                          <th>Isla</th>
+                          <th>Cara</th>
+                          <th>Cantidad</th>
+                          <th>Monto</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <tr v-for="(productos,index) in productosVendidos" :key="index">
+                            <td>{{productos.Producto}}</td>
+                            <td>{{productos.Isla}}</td>
+                            <td>{{productos.Cara==1 ? 'Cara A' : 'Cara B'}}</td>
+                            <td>{{productos.CantidadVendida}}</td>
+                            <td>{{productos.MontoVendido}}</td>
+                          </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="2"></td>
+                          <td class="total"><b>Total Efectivo</b></td>
+                          <td class="total"><b>{{ productosVendidos.reduce((sum,productos)=>{
+                            return sum + parseFloat(productos.CantidadVendida);
+                          },0) | redondear}}</b></td>
+                          <td class="total"><b>S/. {{ productosVendidos.reduce((sum,productos)=>{
+                            return sum + parseFloat(productos.MontoVendido);
+                          },0) | redondear}}</b></td>
+                        </tr>
+                      </tfoot>
+                  </table>
+                  </b-row>
+                {{  }}
                 <hr class="no-print">
                 <b-row class="no-print">
                   <h5>Ventas Efectivo</h5><br>
@@ -280,12 +316,12 @@
                                       <table class="table tbl-historico" size="sm" >
                                           <thead>
                                             <tr>
-                                              <th width="5px">Producto</th>
-                                              <th width="1px">Isla</th>
-                                              <th width="1px">Cara</th>
+                                              <th width="5px">PRODUCTO</th>
+                                              <th width="1px">ISLA</th>
+                                              <th width="1px">CARA</th>
                                               <th width="5px">V. I.</th>
-                                              <th width="5px">V.</th>
-                                              <th width="5px">Dif</th>              
+                                              <th width="5px">V. F</th>              
+                                              <th width="5px">VENTA</th>
                                             </tr>
                                           </thead>
                                           <tbody>
@@ -293,9 +329,9 @@
                                                 <td width="5px">{{resumen.Producto}}</td>
                                                 <td width="1px"> {{resumen.Isla}}</td>
                                                 <td width="1px">Cara {{resumen.Cara}}</td>
-                                                <td width="5px">{{resumen.ValorInicial}}</td>
-                                                <td width="5px">{{resumen.VentaTotal}}</td>
-                                                <td width="5px">{{resumen.Restante}}</td>
+                                                <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(2)}}</td>
+                                                <td width="5px">{{parseFloat(resumen.Restante).toFixed(2)}}</td>
+                                                <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(2)}}</td>
                                               </tr>
                                           </tbody>
                                       </table>
