@@ -148,6 +148,7 @@
                     <b-form-group>
                       <label>Moneda:</label>
                       <autocomplete
+                        ref="inputMoneda"
                         :url="API + 'monedas'"
                         initValue="PEN"
                         anchor="Moneda"
@@ -541,6 +542,9 @@ export default {
               this.$refs.inputMovimiento.setValue("");
               this.$refs.inputProveedor.setValue("");
               this.$toasted.success("Movimiento guardado correctamente ");
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
             }
             this.inProgress = false;
           })

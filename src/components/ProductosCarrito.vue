@@ -157,7 +157,7 @@
                 
                 productos[data.index].precio = productos[data.index].PrecioContado 
               }else{
-            
+                cambiarPrecioVenta(data.index)
               }
 
             }"
@@ -208,7 +208,9 @@
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
-            placeholder="Flete"></b-form-input>
+            placeholder="Flete"
+            @input="cambiarPrecioVenta(data.index)"
+            ></b-form-input>
            <b v-if="productos[data.index].FLETE && productos[data.index].cantidad!=0 "> 
             {{  
               parseFloat(productos[data.index].FLETE / productos[data.index].cantidad).toFixed(2)
@@ -366,6 +368,12 @@
               <tr>
                 <td><b>SubTotal</b></td>
                 <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+              </tr>
+              <tr v-if="productos.some(v=>v.FLETE >0)">
+                <td><b>Total Flete</b></td>
+                <td class="table-danger">{{ productos.reduce((sum,producto)=>{
+                  return sum + parseFloat(producto.FLETE)
+                },0)  }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
                 <td><b>IGV</b></td>
@@ -601,6 +609,21 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    cambiarPrecioVenta(index) {
+      let producto = { ...this.productos[index] };
+      let precioFinal =
+        (producto.precio * producto.PorcentajeUtilidad) / 100 + producto.precio;
+
+      let nuevoPrecioContado =
+        precioFinal +
+        producto.FLETE / (producto.cantidad ? producto.cantidad : 1);
+      // console.log(producto.nuevoPrecioContado);
+      Vue.set(
+        this.productos[index],
+        "nuevoPrecioContado",
+        parseFloat(nuevoPrecioContado).toFixed(2)
+      );
+    },
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
@@ -1126,10 +1149,10 @@ export default {
     },
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);
-
+      /*
       if (this.productos[index].FLETE) {
         total += parseFloat(this.productos[index].FLETE);
-      }
+      }*/
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
       }
