@@ -34,7 +34,11 @@
             <b-col md="4">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
+            <!-- <b-col md="2">
+                <codigo-multiple></codigo-multiple>
+              </b-col> -->
             </b-row>
+
           </b-col>
 
           <b-table small
@@ -72,7 +76,7 @@
 <script>
 import config from "@/store/config.js";
 import ProductoForm from "@/components/ProductoForm";
-
+import CodigoMultiple from "@/components/CodigoMultiple";
 export default {
   mounted() {
     this.axios
@@ -169,7 +173,8 @@ export default {
     }
   },
   components: {
-    ProductoForm
+    ProductoForm,
+    CodigoMultiple
   }
 };
 </script>
