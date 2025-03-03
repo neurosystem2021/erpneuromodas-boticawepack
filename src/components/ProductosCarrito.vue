@@ -611,17 +611,24 @@ export default {
     }),
     cambiarPrecioVenta(index) {
       let producto = { ...this.productos[index] };
-      let precioFinal =
-        (producto.precio * producto.PorcentajeUtilidad) / 100 + producto.precio;
+      let flete = producto.FLETE
+        ? parseFloat(
+            producto.FLETE / (producto.cantidad ? producto.cantidad : 1)
+          )
+        : 0;
+      let precio = parseFloat(producto.precio);
 
-      let nuevoPrecioContado =
-        precioFinal +
-        producto.FLETE / (producto.cantidad ? producto.cantidad : 1);
-      // console.log(producto.nuevoPrecioContado);
+      if (producto.TieneIgv) {
+        precio += precio * 0.18;
+      }
+      let precioFinal =
+        (producto.precio * producto.PorcentajeUtilidad) / 100 + precio + flete;
+
+      console.log(producto.nuevoPrecioContado);
       Vue.set(
         this.productos[index],
         "nuevoPrecioContado",
-        parseFloat(nuevoPrecioContado).toFixed(2)
+        parseFloat(precioFinal).toFixed(2)
       );
     },
     startRecognition() {
@@ -906,9 +913,9 @@ export default {
       this.preciosProd = [];
       this.objProd = {};
 
-      if (!this.isVentas) {
-        obj.PreciosPorProducto = "";
-      }
+      // if (!this.isVentas) {
+      //   obj.PreciosPorProducto = "";
+      // }
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
@@ -1079,27 +1086,30 @@ export default {
     //   this.$emit('onInputCantidad', val)
     // },
     setNuevoPrecioContado(index) {
+      let producto = { ...this.productos[index] };
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio);
-      if (this.productos[index].TieneIgv) {
+      let precio = parseFloat(producto.precio);
+      let flete = producto.FLETE
+        ? parseFloat(
+            producto.FLETE / (producto.cantidad ? producto.cantidad : 1)
+          )
+        : 0;
+
+      if (producto.TieneIgv) {
         precio += precio * 0.18;
       }
       let precioFinal = 0;
-      //if(this.isVentas){
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precioFinal =
-      // }else{
-      precioFinal =
-        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
-      // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-      //}
 
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
+      precioFinal =
+        (precio * producto.PorcentajeUtilidad) / 100 + precio + flete;
+      // +parseFloat(flete).toFixed(2);
+      // + parseFloat(producto.PorcentajeUtilidad.FLETE /
+      //   (producto.PorcentajeUtilidad.cantidad
+      //     ? producto.PorcentajeUtilidad.cantidad
+      //     : 1));
 
       let normalPrecio = this.$options.filters.redondear(precioFinal);
-      //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
+
       let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
 
       if (this.tipoCambio > 0) {
@@ -1119,8 +1129,6 @@ export default {
       );
       this.getSubtotal(index);
 
-      // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio
       this.updateManoDeObraNeta(index);
     },
     actualizarDescu(index) {

@@ -13,9 +13,8 @@
                 no-close-on-backdrop>
 
                 <b-row>
-                    <b-col md="12">
+                    <b-col md="6">
                         <b-form-group>
-                            <label>Agregar Productos:</label>
                             <b-input-group>
                             <autocomplete
                                 ref="autocompleteProductoCode"
@@ -31,6 +30,21 @@
                             </autocomplete>
                             </b-input-group>
                         </b-form-group>
+                    </b-col>
+                    <b-col md="6">
+                        <b-input-group>
+                            
+                            <input 
+                            id="txtBarcode"
+                            v-model="loadCode"
+                            @keydown.enter.prevent="loadBarcode"
+                            type="text"
+                            class="form-control"
+                            placeholder="Codigo de Barra" />
+                            <b-input-group-append>
+                                <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+                            </b-input-group-append>
+                        </b-input-group>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -75,61 +89,95 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
-    export default {
-        mounted () {
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                productos:[]
-            }
-        },
-        watch: {
-            show (val) {
-                if(val==true){
-                    this.productos = []
-                    this.$refs.autocompleteProductoCode.setValue('')
-                }
-            },
-        },
-        methods: {
-            renderChild(data) {
-                return `
-                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} / ${data.Botapie}
-                `
-            },
-            focusAutocomplete (ref) {
-                this.$refs[ref].type = ""
-                this.$refs[ref].handleDoubleClick()
-            },
-            agregarPro(obj){
-                let index = this.productos.findIndex(prod => prod.IdProducto == obj.IdProducto)
-                if (index >= 0) {
-                    this.$toasted.show('El producto ya está agregado')
-                    return
-                }
-                obj.cantidad = 1
-                this.productos.push(obj)
-                this.$refs.autocompleteProductoCode.setValue('') 
-            },
-            quitarProducto(index){
-                this.productos.splice(index, 1)
-            },
-            imprimirCodigoMulti(evt){
-                evt.preventDefault()
-                let finalArray = this.productos.map((er)=>{
-                    return [parseInt(er.IdProducto),parseInt(er.cantidad)]
-                })
-                let stringJson = JSON.stringify(finalArray)
-                window.open('/views/codigoBarra.php?array=' +stringJson,'_blank');
-            }
-        }
+import config from "@/store/config.js";
+export default {
+  mounted() {},
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      productos: [],
+    };
+  },
+  watch: {
+    show(val) {
+      if (val == true) {
+        this.productos = [];
+        this.$refs.autocompleteProductoCode.setValue("");
+      }
     }
+  },
+  methods: {
+    renderChild(data) {
+      return `
+                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${
+        data.Genero
+      } / ${data.Botapie}
+                `;
+    },
+    loadBarcode(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      let idProducto = this.loadCode;
+
+      if (idProducto) {
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data) {
+              let producto = response.data;
+              if (
+                !this.productos.some(v => v.IdProducto == producto.IdProducto)
+              ) {
+                this.productos.push(producto);
+                this.$toasted.show("Producto añadido correctamente");
+              } else {
+                this.$toasted.error("El producto ya se encuentra en la lista");
+              }
+            } else {
+              this.$toasted.error("No se encontró ningun producto");
+            }
+            // console.log(response.data);
+          });
+      }
+    },
+
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    agregarPro(obj) {
+      let index = this.productos.findIndex(
+        prod => prod.IdProducto == obj.IdProducto
+      );
+      if (index >= 0) {
+        this.$toasted.show("El producto ya está agregado");
+        return;
+      }
+      obj.cantidad = 1;
+      this.productos.push(obj);
+      this.$refs.autocompleteProductoCode.setValue("");
+    },
+    quitarProducto(index) {
+      this.productos.splice(index, 1);
+    },
+    imprimirCodigoMulti(evt) {
+      evt.preventDefault();
+      let finalArray = this.productos.map(er => {
+        return [parseInt(er.IdProducto), parseInt(er.cantidad)];
+      });
+      let stringJson = JSON.stringify(finalArray);
+      window.open("/views/codigoBarra.php?array=" + stringJson, "_blank");
+    }
+  }
+};
 </script>
 <style>
-    #modalCodigoMulti .modal-dialog{
-    max-width: 65% !important;
-  }
+#modalCodigoMulti .modal-dialog {
+  max-width: 65% !important;
+}
 </style>

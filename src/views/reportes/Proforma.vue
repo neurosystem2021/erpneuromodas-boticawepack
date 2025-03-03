@@ -85,7 +85,7 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#1A237E; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#B71C1C; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:1.1rem"><span v-if="prod.DisabledTotal === 0">S/. {{ prod.Precio | moneda }}</span></td>
             <td class="total" style="font-size:1.1rem">
@@ -109,8 +109,8 @@
           </tr>
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#1A237E;color: white;" class="text-right">TOTAL</td>
-            <td style="background:#1A237E;color:white">S/. {{ total | redondear }}</td>
+            <td colspan="2" style="background:#B71C1C;color: white;" class="text-right">TOTAL</td>
+            <td style="background:#B71C1C;color:white">S/. {{ total | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -129,9 +129,9 @@
         <br>
         <table>
           <tbody>
-            <td style="border: none !important; border-top:3px  solid #1A237E; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px  solid #B71C1C; background: white !important; width:50%"></td>
             <td style="border: none !important; border-top:3px  solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px  solid #1A237E; background: white !important; width:10%"></td>
+            <td style="border: none !important; border-top:3px  solid #B71C1C; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>

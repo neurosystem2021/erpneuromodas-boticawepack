@@ -274,6 +274,8 @@ export default {
         { key: "ProductoModelo", label: "Modelo" },
         // { key: 'ProductoPresentacion', label: 'Present.' },
         // { key: 'ProductoMedicion', label: 'Medición' },
+        { key: "eventPres", label: "" },
+        { key: "cantxPrecio", variant: "warning" },
         { key: "cantidad" },
         { key: "precio", label: "P/U" },
         { key: "subtotal", label: "SubTotal", variant: "success" },
