@@ -624,10 +624,15 @@ export default {
       let precioFinal =
         (producto.precio * producto.PorcentajeUtilidad) / 100 + precio + flete;
 
-      console.log(producto.nuevoPrecioContado);
+      precioFinal = precioFinal * this.tipoCambio;
       Vue.set(
         this.productos[index],
         "nuevoPrecioContado",
+        parseFloat(precioFinal).toFixed(2)
+      );
+      Vue.set(
+        this.productos[index],
+        "normalPrecioContado",
         parseFloat(precioFinal).toFixed(2)
       );
     },
