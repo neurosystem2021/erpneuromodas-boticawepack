@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row" fluid>
         <b-row>
           <b-col md="12" class="my-1">
               <b-form-select
@@ -25,7 +25,7 @@
           </b-col>
           <b-col md="6" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="4">
 
               <b-form-group horizontal label="Mostrar" class="mb-0">
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
@@ -34,9 +34,9 @@
             <b-col md="4">
               <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
-            <!-- <b-col md="2">
+            <b-col md="2">
                 <codigo-multiple></codigo-multiple>
-              </b-col> -->
+              </b-col>
             </b-row>
 
           </b-col>
