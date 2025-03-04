@@ -73,9 +73,26 @@
     <b-row>
         <b-col cols="12" class="align-center">
             <b-button variant="success" @click="guardar()"> Guardar</b-button>
-            <b-button variant="info"  target="_blank"  :href="'/views/codigoBarra.php?hash='+ hash" v-if="hash"> Codigo Barra</b-button>
+            <b-button variant="info"  @click="abrirModalImpresionCodigoBarra()" v-if="hash"> Codigo Barra</b-button>
         </b-col>
     </b-row>
+    <b-modal v-model="imprimirCodigoBarra" size="lg" hide-footer>
+      <b-form @submit="imprimirCodigoMulti">
+        <b-row>
+          <b-col cols="12">
+            <b-table :items="productosEntregado" :fields="headerProductoEntregado">
+              <template slot="cantidad" slot-scope="data">
+                <input type="number" required v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
+              </template>
+            </b-table>
+          </b-col>
+          <b-col cols="12">
+            <b-button type="submit" variant="success"> Imprimir</b-button>
+            <b-button variant="danger" @click="imprimirCodigoBarra=!imprimirCodigoBarra"> Cerrar</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
   </b-container>
 </template>
 
@@ -85,6 +102,7 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      imprimirCodigoBarra: false,
       hash: "",
       lstTipoMovimiento: [],
       lstProveedor: [],
@@ -110,7 +128,13 @@ export default {
         Serie: "PROD",
         Numero: "",
         FechaPeriodoTributario: ""
-      }
+      },
+      productosEntregado: [],
+      headerProductoEntregado: [
+        { key: "cantidad", label: "Cantidad" },
+        { key: "ProductoCategoria" },
+        { key: "Producto" }
+      ]
     };
   },
   mounted() {
@@ -127,6 +151,18 @@ export default {
     console.log(this.data);
   },
   methods: {
+    abrirModalImpresionCodigoBarra() {
+      this.imprimirCodigoBarra = true;
+    },
+    imprimirCodigoMulti(evt) {
+      evt.preventDefault();
+      let finalArray = this.productosEntregado.map(er => {
+        return [parseInt(er.IdProducto), parseInt(er.cantidad)];
+      });
+      let stringJson = JSON.stringify(finalArray);
+      console.log(stringJson);
+      window.open("/views/codigoBarra.php?array=" + stringJson, "_blank");
+    },
     async obtenerReporteProducto() {
       await this.axios(`${this.API}reporte/ordencompra_productos`).then(res => {
         if (res) {
@@ -192,7 +228,11 @@ export default {
         return false;
       }
 
-      if (this.lstRepProductos.some(v => !v.FechaVen)) {
+      if (
+        this.lstRepProductos.some(
+          v => !v.FechaVen && !!v.cantidad && v.cantidad > 0
+        )
+      ) {
         this.$toasted.show("Es necesario la fecha de Vencimiento");
         return false;
       }
@@ -214,7 +254,7 @@ export default {
         });
     },
     async continuarGuardar() {
-      this.data.productos = this.lstRepProductos.filter(
+      this.productosEntregado = this.data.productos = this.lstRepProductos.filter(
         v => !!v.cantidad && v.cantidad > 0
       );
       await this.axios
