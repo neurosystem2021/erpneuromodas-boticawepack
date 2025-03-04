@@ -224,13 +224,29 @@
           <b-row align-h="center" class="text-center">
             <b-col cols="4">
               <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-              <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
+              <b-button v-if="ultimoMovimiento" @click="abrirModalImprimir()" variant="info" size="lg">Código de Barra</b-button>
             </b-col>
           </b-row>
         </b-container>
         <br><br>
     </b-form>
-
+    <b-modal v-model="imprimirCodigoBarra" size="lg" hide-footer>
+      <b-form @submit="imprimirCodigoMulti">
+        <b-row>
+          <b-col cols="12">
+            <b-table :items="lstProductos" :fields="headerProductoEntregado">
+              <template slot="cantidad" slot-scope="data">
+                <input type="number" required v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
+              </template>
+            </b-table>
+          </b-col>
+          <b-col cols="12">
+            <b-button type="submit" variant="success"> Imprimir</b-button>
+            <b-button variant="danger" @click="imprimirCodigoBarra=!imprimirCodigoBarra"> Cerrar</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
   </div>
 </template>
 
@@ -252,6 +268,14 @@ export default {
       newRuc: "",
       API: config.API,
       ultimoMovimiento: "",
+      imprimirCodigoBarra: false,
+      headerProductoEntregado: [
+        { key: "cantidad" },
+        { key: "Producto" },
+        { key: "ProductoMarca", label: "Marca" },
+        { key: "ProductoModelo", label: "Modelo" }
+      ],
+      lstProductos: [],
       movimiento: this.initMovimiento(),
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
@@ -302,10 +326,21 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    abrirModalImprimir() {
+      this.imprimirCodigoBarra = true;
+    },
     async obtnerTipoCambio() {
       await this.axios(this.API + "tipocambio/usd").then(res => {
         this.tipocambio = res.data;
       });
+    },
+    imprimirCodigoMulti(evt) {
+      evt.preventDefault();
+      let finalArray = this.lstProductos.map(er => {
+        return [parseInt(er.IdProducto), parseInt(er.cantidad)];
+      });
+      let stringJson = JSON.stringify(finalArray);
+      window.open("/views/codigoBarra.php?array=" + stringJson, "_blank");
     },
     prevent(evt) {
       if (evt.target.tagName !== "TEXTAREA") {
@@ -529,6 +564,7 @@ export default {
 
       let r = confirm("¿Desea Guardar el Movimiento?");
       if (r == true) {
+        this.lstProductos = this.productos;
         this.axios
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
@@ -544,9 +580,6 @@ export default {
               this.$refs.inputMovimiento.setValue("");
               this.$refs.inputProveedor.setValue("");
               this.$toasted.success("Movimiento guardado correctamente ");
-              setTimeout(() => {
-                window.location.reload();
-              }, 1000);
             }
             this.inProgress = false;
           })
