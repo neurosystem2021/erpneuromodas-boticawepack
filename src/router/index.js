@@ -29,7 +29,7 @@ import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 import ReporteCantidad from '@/views/reportes/ReporteCantidad.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ReporteGalones from '@/views/reportes/ReporteGalones.vue'
-
+import Dashboard from '@/views/reportes/Dashboard.vue'
 
 Vue.use(Router)
 
@@ -170,6 +170,10 @@ export default new Router({
       path: '/reportes/galones',
       name: 'ReporteGalones',
       component: ReporteGalones
+    },{
+      path: '/reporte/dashboard',
+      name: 'Dashboard',
+      component: Dashboard
     },
   ]
 })
