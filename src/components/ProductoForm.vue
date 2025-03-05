@@ -338,7 +338,7 @@ export default {
         }
         this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
         this.producto.IdProducto = newVal.IdProducto
-        this.producto.Genero = newVal.Genero
+        this.producto.Genero = newVal.Genero || this.generos[0];
         this.producto.Botapie = newVal.Botapie
         this.producto.Color = newVal.Color
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
@@ -428,7 +428,7 @@ export default {
         StockMinimo: 0,
         PrecioContado: '',
         Botapie: '',
-        Genero: '',
+        Genero: this.generos[0],
         categoria: {},
         marca: {},
         // modelo: {},
