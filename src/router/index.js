@@ -12,6 +12,7 @@ import Clientes from "@/views/Clientes.vue";
 import Habitaciones from "@/views/Habitaciones.vue";
 import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
+import CajaBancos from "@/views/CajaBancos.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -78,6 +79,11 @@ export default new Router({
       path: "/ventas2",
       name: "Ventas2",
       component: Ventas2
+    },
+    {
+      path: "/cajabancos",
+      name: "CajaBancos",
+      component: CajaBancos
     },
     {
       path: "/reportes/ventas",

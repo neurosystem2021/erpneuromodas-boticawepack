@@ -31,10 +31,11 @@
         </b-col>
         <b-col cols="3" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-            <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+            <b-button variant="success" :disabled="activarBotones" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Excel</b-button>
+            <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button>
         </b-col>
         <b-col cols="12" class="mt-4">
-            <table class="table table-hover table-striped ">
+            <table ref="miTabla" class="table table-hover table-striped ">
                 <thead>
                     <tr>
                         <th># Movimiento</th>
@@ -78,7 +79,7 @@
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
                         <td>
                           <b-button size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                          <b-button size="sm" class="mx-1 my-1" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
+                          <b-button size="sm" class="mx-1 my-1" @click="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
                         </td>
                     </tr>
                 </tbody>
@@ -165,21 +166,46 @@ export default {
         }
       });
     },
-    async exportarReporte() {
-      // http://localhost/api/index.php/reporte/utilidadbruta/excel?fechaInicio=2024-01-01&fechaFin=2026-01-01&almacen=0
-
-      let params = {
-        fechaInicio: this.fechaInicio,
-        fechaFin: this.fechaFin,
-        almacen: this.almacen
-      };
-      await this.axios(`${this.API}reporte/utilidadbruta/excel`, {
-        params: params
-      }).then(res => {
-        console.log(res.data);
-        window.open(res.data, "_blank");
-      });
+    imprimirMovimiento(reporte) {
+      window.open(
+        `/imprimir/index.php?hashMovimiento=${reporte.IdMovimiento}`,
+        "_blank"
+      );
     },
+    async exportarXls() {
+      const table = this.$refs.miTabla; // Obtener la referencia de la tabla
+      let txt = "";
+
+      // Recorrer las filas del tbody
+      table.querySelectorAll("tbody tr").forEach(tr => {
+        let rowData = [];
+        tr.querySelectorAll("td").forEach(td => {
+          rowData.push(td.textContent.trim()); // Obtener el texto y limpiar espacios
+        });
+        txt += rowData.join("|") + "\r\n"; // Separar con | y agregar salto de línea
+      });
+
+      // Crear un Blob con los datos en formato TXT
+      const blob = new Blob([txt], { type: "text/plain" });
+
+      // Crear un enlace para descargar el archivo
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "tabla_exportada.txt";
+      a.click();
+
+      // Liberar el objeto URL
+      URL.revokeObjectURL(a.href);
+    },
+    async exportarReporte() {
+      window.open(
+        `/views/ReporteExcel6.php?&fechaIni=${this.fechaInicio}&fechaFin=${
+          this.fechaFin
+        }&descripcion=${this.descripcion}&declarado=${this.declarado}`,
+        "_blank"
+      );
+    },
+
     elimimnarRegistro(item) {
       this.$swal({
         icon: "question",
@@ -241,6 +267,14 @@ export default {
           this.TotalUSD = parseFloat(TotalUSD).toFixed(2);
         }
       });
+    }
+  },
+  computed: {
+    activarBotones() {
+      if (this.lstReporte.length == 0) {
+        return true;
+      }
+      return false;
     }
   }
 };
