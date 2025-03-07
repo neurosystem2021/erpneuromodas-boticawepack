@@ -47,60 +47,62 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
   data() {
     return {
       API: config.API,
       show: false,
       proveedor: {
-        Proveedor: '',
-        Ruc: '',
-        Direccion: '',
-        Telefono: '',
-        Observacion: '',
+        Proveedor: "",
+        Ruc: "",
+        Direccion: "",
+        Telefono: "",
+        Observacion: "",
         FechaReg: null
       }
-    }
+    };
   },
-  props: ['newRuc'],
+  props: ["newRuc"],
   methods: {
-    shownProveedorForm () {
-      this.proveedor.Ruc = this.$parent.$parent.newRuc
-      this.proveedor.Direccion = ''
-      this.proveedor.Proveedor = ''
-      this.proveedor.Telefono = ''
+    shownProveedorForm() {
+      this.proveedor.Ruc = this.$parent.$parent.newRuc;
+      this.proveedor.Direccion = "";
+      this.proveedor.Proveedor = "";
+      this.proveedor.Telefono = "";
     },
     consultarRUC() {
-      this.axios.get(this.API + 'consultarRUC', {
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-            type: 'RUC',
+            type: "RUC",
             numero: this.proveedor.Ruc
           }
-      }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data
-          this.proveedor.Proveedor = data.razonSocial
-          this.proveedor.Direccion = data.direccion
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el RUC')        
-          console.log(error)
-      })
+        })
+        .then(response => {
+          this.$toasted.show("Proveedor encontrado, se llenarán sus datos");
+          var data = response.data;
+          this.proveedor.Proveedor = data.razonSocial;
+          this.proveedor.Direccion = data.direccion;
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el RUC");
+          console.log(error);
+        });
     },
     guardarProveedor() {
-      this.axios.post(this.API + 'proveedores', this.proveedor)
-      .then((response) => {
-        this.$toasted.success('Proveedor guardado correctamente')
-        this.$refs.proveedorForm.hide()
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.axios
+        .post(this.API + "proveedores", this.proveedor)
+        .then(response => {
+          this.$toasted.success("Proveedor guardado correctamente");
+          this.$refs.proveedorForm.hide();
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
-}
+};
 </script>
 <style>
-
 </style>

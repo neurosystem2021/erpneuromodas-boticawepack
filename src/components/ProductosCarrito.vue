@@ -23,7 +23,14 @@
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" @actualizarProducto="actualizarRegistro($event)" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form 
+            :showButton="showButton"
+            @actualizarProducto="actualizarRegistro($event)" 
+            :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" 
+            ref="productoFormEdit" 
+            :producto-update="productoSelect"
+            
+            ></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -737,7 +744,7 @@ export default {
       this.objProd = obj;
     },
     async actualizarRegistro(event) {
-      console.log("event", event);
+      console.log("actualizarRegistro", event);
       let obj = { ...event };
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
@@ -748,13 +755,15 @@ export default {
       obj.EsVenta = this.isVentas;
       obj.cantidad = 1;
       obj.subtotal = 0;
+      obj.precio= obj.PrecioCosto;
+      obj.nuevoPrecioContado= obj.PrecioContado;
+      obj.subtotal = 0;
       obj.tipo = "UNIDAD";
       obj.PreciosPorProducto = JSON.stringify(obj.PreciosPorProducto);
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(
         p => p.cantidad === 0 || p.cantidad === "0"
       );
-      console.log(this.preciosProd);
       if (!obj.PreciosPorProducto || fPP.length === 5) {
         obj.estadoPxP = true;
       }
@@ -792,7 +801,8 @@ export default {
       obj.descuento = 0;
       obj.tipo = "UNIDAD";
       obj.nuevoPrecioContado = 0;
-      obj.subtotal = 0;
+      obj.subtotal = obj.PrecioCosto;
+      // obj.subtotal = 0;
       if (index == -1) {
         obj = this.onSetProducto(obj);
         this.add([
@@ -828,7 +838,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      obj.subtotal = 0;
+      
       let index = this.$store.state.cart.productos.findIndex(
         v => v.IdProducto == obj.IdProducto
       );
