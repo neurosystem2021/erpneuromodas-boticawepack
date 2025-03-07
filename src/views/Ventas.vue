@@ -704,6 +704,7 @@
               variant="primary"
               size="md"
               @click="guardarProforma"
+              class="btnAction"
               >Crear Proforma</b-button
             >
             <b-button
@@ -712,9 +713,11 @@
               v-if="idPerfil == 1 || idPerfil == 14"
               variant="success"
               size="lg"
+              class="btnAction"
               >Efectuar Venta</b-button
             >
             <b-button
+               class="btnAction"
               v-if="ultimaVenta"
               target="_blank"
               variant="info"
