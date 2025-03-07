@@ -20,8 +20,8 @@
                     <input type="date" class="form-control" v-model="FechaDoc">
                 </b-col>
                 <b-col cols="12" class="mt-2 text-center">
-                    <b-button variant="success"><i class="fa fa-file-excel" aria-hidden="true"></i></b-button>
-                    <b-button variant="info"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                    <b-button variant="success"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
+                    <b-button variant="info"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
                 </b-col>
             </b-row>
         </b-col>
@@ -156,7 +156,9 @@
                     <td>{{deuda.Aplicado}}</td>
                     <td>{{deuda.Saldo}}</td>
                     <td>
-                      <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
+                      <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
+                      <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                      <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
                       <b-button class="mx-1 my-1" style="width: 100%;" variant="info">Letras</b-button>
                     </td>
 
