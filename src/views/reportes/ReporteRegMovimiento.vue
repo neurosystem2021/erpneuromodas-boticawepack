@@ -59,7 +59,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(reporte,index) in lstReporte" :key="index">
+                    <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirDedetalle(reporte)">
                         <td style="text-align: center;">{{reporte.IdMovimiento}}</td>
                         <td>{{reporte.UsuarioReg}}</td>
                         <td>{{reporte.AlmacenOrigen}}</td>
@@ -96,6 +96,54 @@
             </b-row>
         </b-col>
     </b-row>
+    <b-modal v-model="detalleMovimiento" no-close-on-backdrop no-close-on-esc>
+        <b-row>
+          <b-col cols="6">
+            <b-input-group>
+              <input type="text" class="form-control" v-model="FechaPeriodoTributario">
+              <b-button variant="warning" @click="actualizarPeriodo()">Actualizar Periodo</b-button>
+            </b-input-group>
+          </b-col>
+          <b-col cols="6">
+            Periodo Tributario:
+            El valor debe ser AAAAMM
+          </b-col>
+          
+
+          <b-col cols="12" class="mt-2">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cod. Barra</th>
+                  <th>Marca</th>
+                  <th>Producto</th>
+                  <th>Descripcion</th>
+                  <th>Medida</th>
+                  <th>Cantidad</th>
+                  <th>Precio</th>
+                  <th>IGV</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(detalle,index) in lstDetalle" :key="index" >
+                  <td>{{ detalle.hashMovimiento }}</td>
+                  <td>{{ detalle.CodigoBarra }}</td>
+                  <td>{{ detalle.ProductoMarca }}</td>
+                  <td>{{ detalle.Producto }}</td>
+                  <td>{{ detalle.Descripcion }}</td>
+                  <td>{{ detalle.ProductoMedicion }}</td>
+                  <td>{{ detalle.Cantidad }}</td>
+                  <td>{{ detalle.Precio }}</td>
+                  <td>{{ parseFloat(detalle.Cantidad * detalle.Precio * 0.18).toFixed(2)}}</td>
+                  <td>{{ parseFloat(parseFloat(detalle.Cantidad * detalle.Precio)+ parseFloat(detalle.Cantidad * detalle.Precio * 0.18)).toFixed(2)}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+        </b-row>
+    </b-modal>
   </b-container>
 </template>
 
@@ -104,12 +152,14 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      detalleMovimiento: false,
       fechaInicio: "",
       fechaFin: "",
       descripcion: "",
       declarado: true,
       API: config.API,
       lstReporte: [],
+      lstDetalle: [],
       items: [
         {
           text: "MOVIMIENTO",
@@ -141,7 +191,9 @@ export default {
       IgvlPEN: 0,
       IgvlUSD: 0,
       TotalPEN: 0,
-      TotalUSD: 0
+      TotalUSD: 0,
+      FechaPeriodoTributario: "",
+      IdMovimiento: ""
     };
   },
   mounted() {
@@ -267,6 +319,51 @@ export default {
           this.TotalUSD = parseFloat(TotalUSD).toFixed(2);
         }
       });
+    },
+    async abrirDedetalle(reporte) {
+      this.FechaPeriodoTributario = reporte.FechaPeriodoTributario;
+      this.IdMovimiento = reporte.IdMovimiento;
+      this.lstDetalle = [];
+      let params = {
+        IdMovimiento: reporte.IdMovimiento
+      };
+      await this.axios(`${this.API}movmiento/detalles`, {
+        params: params
+      }).then(res => {
+        if (res.data) {
+          this.lstDetalle = res.data;
+        }
+      });
+      this.detalleMovimiento = true;
+    },
+    async actualizarPeriodo() {
+      const regex = /^(20[0-9]{2})(0[1-9]|1[0-2])$/;
+      const match = this.FechaPeriodoTributario.match(regex);
+
+      if (!match) {
+        this.$toasted.error(
+          "El Periodo Tributario debe ser un año entre 2000 y 2099 con un mes válido (Ejemplo: 202403)."
+        );
+        return false;
+      }
+      let params = {
+        FechaPeriodoTributario: this.FechaPeriodoTributario,
+        IdMovimiento: this.IdMovimiento
+      };
+      await this.axios
+        .post(`${this.API}movmiento/actualizarperiodo`, params)
+        .then(res => {
+          if (res.data) {
+            if (res.data.updated) {
+              this.detalleMovimiento = false;
+              this.$swal({
+                icon: "success",
+                title: "Actualización Correcta"
+              });
+            }
+          }
+        });
+      // this.detalleMovimiento = false;
     }
   },
   computed: {
@@ -281,4 +378,8 @@ export default {
 </script>
 
 <style>
+.modal-dialog {
+  max-width: 60% !important;
+  width: 60% !important;
+}
 </style>
