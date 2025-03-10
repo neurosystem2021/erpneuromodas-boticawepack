@@ -2099,24 +2099,24 @@ export default {
         return;
       }
       // console.log(productos);
-      // if (
-      //   productos.some(
-      //     v =>
-      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-      //       v.stock
-      //   )
-      // ) {
-      //   this.$swal({
-      //     position: "center",
-      //     icon: "info",
-      //     title: "No se puede vender un producto sin stock",
-      //     showConfirmButton: true,
-      //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
-      //     confirmButtonColor: "#0275d8"
-      //   });
-      //   return;
-      // }
+      if (
+        productos.some(
+          v =>
+            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+            v.stock
+        )
+      ) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No se puede vender un producto sin stock",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
