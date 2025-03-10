@@ -233,6 +233,7 @@
                 <tbody>
                   <tr>
                     <td>{{ deuda.Id }}</td>
+                    <td>{{ deuda.FechaDoc }}</td>
                     <td>{{ deuda.FechaCredito }}</td>
                     <td>{{ deuda.Correlativo }}</td>
                     <td>{{ deuda.Total }}</td>
@@ -245,12 +246,30 @@
             <b-col cols="12">
               <b-form-group>
                 <b-input-group>
-              Número Letras: 
-              <b-button variant="info">+</b-button> 
-              <input type="number" disabled class="form-control" style="max-width: 100px;">
-              <b-button variant="warning">-</b-button> 
+             <span class="mr-5"> Número Letras: </span>
+              <b-button variant="info" @click="addLetra()">+</b-button> 
+              <input type="number" disabled class="form-control" v-model="nroLetras" style="max-width: 100px;">
+              <b-button variant="warning" :disabled="nroLetras==0" @click="removeLetra()" >-</b-button> 
               </b-input-group>
             </b-form-group>
+            </b-col>
+            <b-col cols="12">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Fecha Pago</th>
+                    <th>Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(letra,index) in letras" :key="index">
+                    <td>{{ index+1 }}</td>
+                    <td><input type="date"  v-model="letra.fechaLetra"></td>
+                    <td><input type="number" step="0.0001"  v-model="letra.montoLetra"></td>
+                  </tr>
+                </tbody>
+              </table>
             </b-col>
           </b-row>
         </b-col>
@@ -264,6 +283,8 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      letras: [],
+      nroLetras: 0,
       deuda: {},
       IdTipoCajaBanco: "",
       modalRegistro: true,
@@ -296,6 +317,24 @@ export default {
     this.ListarTipoOpe();
   },
   methods: {
+    addLetra() {
+      this.nroLetras += 1;
+      this.generLetrasPorCantidadLetras();
+    },
+    removeLetra() {
+      this.nroLetras -= 1;
+      this.generLetrasPorCantidadLetras();
+    },
+    generLetrasPorCantidadLetras() {
+      this.letras = [];
+      let montoLetra = this.deuda.Saldo / this.nroLetras;
+      for (let index = 0; index < this.nroLetras; index++) {
+        this.letras.push({
+          fechaLetra: "",
+          montoLetra: parseFloat(montoLetra).toFixed(2)
+        });
+      }
+    },
     focusAutocomplete(ref) {
       this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
