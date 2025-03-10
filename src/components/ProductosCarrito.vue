@@ -970,6 +970,7 @@ export default {
       });
     },
     setProductoCant(prod) {
+      console.log("prod", prod);
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -977,8 +978,8 @@ export default {
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = 0;
-      obj.cantidad = 0;
+      obj.precio = prod.precio;
+      obj.cantidad = prod.cantidad;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
