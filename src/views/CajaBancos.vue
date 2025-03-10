@@ -60,152 +60,200 @@
           </table>
         </b-col>
     </b-row>
+    <!-- MODAL AGREGAR  -->
     <b-modal 
       v-model="modalRegistro" 
       title="Agregar Tipo Caja" 
+      backdrop="static" 
       no-close-on-backdrop
       no-close-on-esc 
-      hide-footer >
+      hide-footer
+      no-stacking
+      container="body"  >
         <b-row>
-          <b-col cols="6">
+          <b-col cols="7">
             <b-row>
-              <b-col cols="12">
-                Tipo Operación:
-                <b-form-select
-                  v-model="IdTipoCajaBanco"
-                  :options="lstTipoOpe"
-                  value-field="IdTipoCajaBanco"
-                  text-field="TipoCajaBanco"
-                ></b-form-select>
+              <b-col cols="6">
+                <b-row>
+                  <b-col cols="12">
+                    Tipo Operación:
+                    <b-form-select
+                      v-model="IdTipoCajaBanco"
+                      :options="lstTipoOpe"
+                      value-field="IdTipoCajaBanco"
+                      text-field="TipoCajaBanco"
+                    ></b-form-select>
+                  </b-col>
+                  <b-col cols="12">
+                    {{ mostrarProveedor }}
+                    Cliente:
+                    <autocomplete
+                        required="required"
+                        ref="inputCliente"
+                        :url="API + 'clientes'"
+                        anchor="ClienteDniRuc"
+                        label="writer"
+                        placeholder=""
+                        :onInput="(val) => newDniRuc = val"
+                        :on-select="setCliente" 
+                        :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                        :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-col>
+                  <b-col cols="12">Proveedor
+                    {{ mostrarCliente }}
+                    <autocomplete
+                        required="required"
+                        ref="inputProveedor"
+                        :url="API + 'proveedor'"
+                        anchor="ProveedorDniRuc"
+                        label="writer"
+                        placeholder=""
+                        :onInput="(val) => newRuc = val"
+                        :on-select="setProveedor" 
+                        :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                        :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-col>
+                </b-row>
               </b-col>
-              <b-col cols="12">
-                {{ mostrarProveedor }}
-                Cliente:
-                <autocomplete
-                    required="required"
-                    ref="inputCliente"
-                    :url="API + 'clientes'"
-                    anchor="ClienteDniRuc"
-                    label="writer"
-                    placeholder=""
-                    :onInput="(val) => newDniRuc = val"
-                    :on-select="setCliente" 
-                    :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                    :classes="{input: 'form-control'}">
-                 </autocomplete>
+              <b-col cols="6">
+                <b-row>
+                  <b-col cols="12">
+                    Fecha Operacion: 
+                    <input type="date" class="form-control">
+                  </b-col>
+                  <b-col cols="12">
+                    Concepto: 
+                    <input type="number" class="form-control" v-model="Concepto">
+                  </b-col>
+                  <b-col cols="12">
+                    Importe: 
+                    <input type="number" class="form-control" v-model="Importe">
+                  </b-col>
+                </b-row>
               </b-col>
-              <b-col cols="12">Proveedor
-                {{ mostrarCliente }}
-                <autocomplete
-                    required="required"
-                    ref="inputProveedor"
-                    :url="API + 'proveedor'"
-                    anchor="ProveedorDniRuc"
-                    label="writer"
-                    placeholder=""
-                    :onInput="(val) => newRuc = val"
-                    :on-select="setProveedor" 
-                    :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
-                    :classes="{input: 'form-control'}">
-                </autocomplete>
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col cols="6">
-            <b-row>
-              <b-col cols="12">
-                Fecha Operacion: 
-                <input type="date" class="form-control">
-              </b-col>
-              <b-col cols="12">
-                Concepto: 
-                <input type="number" class="form-control" v-model="Concepto">
-              </b-col>
-              <b-col cols="12">
-                Importe: 
-                <input type="number" class="form-control" v-model="Importe">
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col cols="12" class="mt-3">
-            <div class="card">
-              {{ mostrarProveedor }}
-              <div class="card-header">Documentos a aplicar</div>
-           
-            <div class="card-body">
-            <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Fecha</th>
-                    <th>FechaVen</th>
-                    <th>Correlativo</th>
-                    <th>Total</th>
-                    <th>Aplicado</th>
-                    <th>Saldo</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(deuda,index) in lstDeudas" :key="index">
-                    <td>{{deuda.Id}}</td>
-                    <td>{{deuda.FechaDoc}}</td>
-                    <td>{{deuda.FechaCredito}}</td>
-                    <td>{{deuda.Correlativo}}</td>
-                    <td>{{deuda.Total}}</td>
-                    <td>{{deuda.Aplicado}}</td>
-                    <td>{{deuda.Saldo}}</td>
-                    <td>
-                      <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
-                      <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
-                      <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
-                      <b-button class="mx-1 my-1" style="width: 100%;" variant="info">Letras</b-button>
-                    </td>
+              <b-col cols="12" class="mt-3">
+                <div class="card">
+                  {{ mostrarProveedor }}
+                  <div class="card-header">Documentos a aplicar</div>
+              
+                <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>FechaVen</th>
+                        <th>Correlativo</th>
+                        <th>Total</th>
+                        <th>Aplicado</th>
+                        <th>Saldo</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(deuda,index) in lstDeudas" :key="index">
+                        <td>{{deuda.Id}}</td>
+                        <td>{{deuda.FechaDoc}}</td>
+                        <td>{{deuda.FechaCredito}}</td>
+                        <td>{{deuda.Correlativo}}</td>
+                        <td>{{deuda.Total}}</td>
+                        <td>{{deuda.Aplicado}}</td>
+                        <td>{{deuda.Saldo}}</td>
+                        <td>
+                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
+                          <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
+                          <b-button class="mx-1 my-1" style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
+                        </td>
 
-                  </tr>
-                </tbody>
-            </table>
-          </div>
-          </div>
-          </b-col>
-          <b-col cols="12" class="mt-3">
-              <div class="card">
-              {{ mostrarProveedor }}
-              <div class="card-header">Documentos Aplicados</div>
-              <div class="card-body">
-            <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Fecha</th>
-                    <th>FechaVen</th>
-                    <th>Correlativo</th>
-                    <th>Total</th>
-                    <th>Aplicado</th>
-                    <th>Saldo</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(deuda,index) in lstAplicado" :key="index">
-                    <td>{{deuda.Id}}</td>
-                    <td>{{deuda.FechaDoc}}</td>
-                    <td>{{deuda.FechaCredito}}</td>
-                    <td>{{deuda.Correlativo}}</td>
-                    <td>{{deuda.Total}}</td>
-                    <td>{{deuda.Aplicado}}</td>
-                    <td>{{deuda.Saldo}}</td>
-                    <td>
-                      <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
-                      <b-button class="mx-1 my-1" style="width: 100%;" variant="info">Letras</b-button>
-                    </td>
-
-                  </tr>
-                </tbody>
+                      </tr>
+                    </tbody>
                 </table>
-                </div>
               </div>
-          </b-col>
+              </div>
+              </b-col>
+              <b-col cols="12" class="mt-3">
+                  <div class="card">
+                  {{ mostrarProveedor }}
+                  <div class="card-header">Documentos Aplicados</div>
+                  <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>FechaVen</th>
+                        <th>Correlativo</th>
+                        <th>Total</th>
+                        <th>Aplicado</th>
+                        <th>Saldo</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(deuda,index) in lstAplicado" :key="index">
+                        <td>{{deuda.Id}}</td>
+                        <td>{{deuda.FechaDoc}}</td>
+                        <td>{{deuda.FechaCredito}}</td>
+                        <td>{{deuda.Correlativo}}</td>
+                        <td>{{deuda.Total}}</td>
+                        <td>{{deuda.Aplicado}}</td>
+                        <td>{{deuda.Saldo}}</td>
+                        <td>
+                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
+                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="info" >Letras</b-button> -->
+                        </td>
+
+                      </tr>
+                    </tbody>
+                    </table>
+                    </div>
+                  </div>
+              </b-col>
+            </b-row>
+        </b-col>
+        <b-col cols="5">
+          <b-row>
+            <b-col cols="12">
+            <h3>Letras</h3>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>FechaVen</th>
+                    <th>Correlativo</th>
+                    <th>Total</th>
+                    <th>Aplicado</th>
+                    <th>Saldo</th>
+                  </tr>	
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ deuda.Id }}</td>
+                    <td>{{ deuda.FechaCredito }}</td>
+                    <td>{{ deuda.Correlativo }}</td>
+                    <td>{{ deuda.Total }}</td>
+                    <td>{{ deuda.Aplicado }}</td>
+                    <td>{{ deuda.Saldo }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </b-col>
+            <b-col cols="12">
+              <b-form-group>
+                <b-input-group>
+              Número Letras: 
+              <b-button variant="info">+</b-button> 
+              <input type="number" disabled class="form-control" style="max-width: 100px;">
+              <b-button variant="warning">-</b-button> 
+              </b-input-group>
+            </b-form-group>
+            </b-col>
+          </b-row>
+        </b-col>
         </b-row>
     </b-modal>
   </b-container>
@@ -216,8 +264,10 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      deuda: {},
       IdTipoCajaBanco: "",
       modalRegistro: true,
+      letrasFlag: false,
       IdCuenta: "",
       lstCuentas: [],
       API: config.API,
@@ -315,6 +365,11 @@ export default {
           text: "El Importe no puede ser mayor que la deuda. Verifique."
         });
       }
+    },
+    generarLetras(deuda) {
+      console.log(deuda);
+      this.deuda = deuda;
+      this.letrasFlag = true;
     }
   },
   computed: {
@@ -340,6 +395,6 @@ export default {
 
 <style>
 .modal-dialog {
-  min-width: 70% !important;
+  min-width: 90% !important;
 }
 </style>
