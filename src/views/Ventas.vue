@@ -10,32 +10,6 @@
         </b-row>
         <br />
         <b-container class="bv-example-row"  id="conten" fluid>
-            <div>
-                <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil2">
-                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil2">
-                        <pre-orden-lista 
-                            v-show="!this.$route.query.idPreOrden"
-                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"
-                            :EsVenta="true"
-                            ></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil2">
-                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                    </b-button-group>
-                </div>
-            </div>
-            <br /><br />
             <b-row>
                 <b-col md="12" v-if="this.$route.query.idPedido">
                     <div class="form-inline">
@@ -48,8 +22,9 @@
                     <b-col md="7">
                         <b-row>
                             <b-col md="4">
-                                <b-form-group>
-                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                <b-form-group  class="my-0">
+                                  <span class="ocularMovil">Tipo de Venta</span>
+                                    <label><b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <b-input-group>
                                     <autocomplete
                                         required="required"
@@ -65,7 +40,7 @@
                                     </autocomplete>
                                     </b-input-group>
                                 </b-form-group>
-                                 <b-form-group v-if="isNota">
+                                 <b-form-group v-if="isNota" >
                                     <label>Doc. Referencia:</label>
                                     <autocomplete
                                         required="required"
@@ -82,9 +57,9 @@
                                 </b-form-group>
                                 
                                 </b-col>
-                            <b-col md="4" class="ocularMovil2">
+                            <b-col md="4" class="ocularMovil2 my-0">
                                 <b-form-group>
-                                    <label>Almacen:</label>
+                                    <label class="my-0">Almacen:</label>
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -107,7 +82,7 @@
                             </b-col>
                             <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <label>Punto de Venta:</label>
+                                    <label class="my-0">Punto de Venta:</label>
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -122,10 +97,9 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12">
-                                <b-form-group>
-                                    <label>Cliente:</label>
-                                    
+                            <b-col md="12" class="my-0">
+                                <b-form-group  class="my-0">
+                                  <label class="ocularMovil">Cliente</label>
                                     <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -151,7 +125,7 @@
                                             
                                         </b-input-group-append>
                                     </b-input-group>
-                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
+                                     <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-0">
                                         <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
@@ -201,9 +175,8 @@
                                     </autocomplete>
                                   </b-form-group>
                             </b-col>
-                             <b-col cols="3">
+                             <b-col cols="12" md="3" lg="3">
                                 <b-form-checkbox
-                               
                                 v-model="venta.EsOrganizacion"
                                 :value="true"
                                 :unchecked-value="false"
@@ -211,7 +184,7 @@
                                 Es Organización
                                 </b-form-checkbox>  
                             </b-col>
-                            <b-col cols="8" >
+                            <b-col cols="12" md="8" lg="8"  v-if="venta.EsOrganizacion" >
                                 <b-form-input 
                                 v-model="venta.nombreOrganizacion" 
                                 v-if="venta.EsOrganizacion"
@@ -219,7 +192,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil" >
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -382,8 +355,8 @@
                                     </tbody>
                                 </table>
                             </template>    
-                            <template slot="metodopago" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm">
+                            <template slot="metodopago" v-if="!venta.EsCredito" >
+                                <table class="table b-table border table-footer table-sm ocularMovil">
                                     <tbody>
                                         <tr>
                                             <td colspan="3" class="text-center">Metodo de Pago</td>
@@ -481,7 +454,7 @@
                                 </table>
                             </template>
                             <template slot="adicional" v-if="!venta.EsCredito">
-                                <table class="table b-table border table-footer table-sm text-center" >
+                                <table class="table b-table border table-footer table-sm text-center ocularMovil"  >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
                                         <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
@@ -496,14 +469,39 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button class="mt-1 mx-1 btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
+                        <b-button class="mt-1 mx-1 btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="mt-1 mx-1 btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button class="mt-1 mx-1 btnAction" v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
                 </b-row>
+                <div>
+                <div class="float-right">
+                    <b-button-group size="sm" class="ocularMovil2">
+                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                    </b-button-group>
+                    <b-button-group size="sm" class="ocularMovil2">
+                        <pre-orden-lista 
+                            v-show="!this.$route.query.idPreOrden"
+                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
+                            @onPreOrden="selectPreOrden"
+                            :EsVenta="true"
+                            ></pre-orden-lista>
+                    </b-button-group>
+                    <b-button-group size="sm" class="ocularMovil2">
+                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
+                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
+                    </b-button-group>
+                </div>
+            </div>
             </b-form>
         </b-container>
     </div>
@@ -577,7 +575,11 @@ export default {
       ],
       carrito: {
         fields: [
-          { key: "manoobra", label: "Mano de obra", class: "text-center" },
+          {
+            key: "manoobra",
+            label: "Mano de obra",
+            class: "text-center ocularMovil"
+          },
           {
             key: "stock",
             label: "Stock",
@@ -585,22 +587,22 @@ export default {
             class: "text-center"
           },
           { key: "Producto" },
-          { key: "Descripcion", label: "Descripción" },
+          { key: "Descripcion", label: "Descripción", class: "ocularMovil" },
           { key: "eventPres", label: "" },
-          { key: "cantxPrecio", variant: "warning" },
+          { key: "cantxPrecio", label: "CantxP", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
           // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
           /*{ key: 'ProductoMedicion', label: 'Medición' },*/
-          { key: "cantidad" },
-          { key: "precio", label: "Precio" },
-          { key: "utilidad", label: "Porcentaje Utilidad %" },
+          { key: "cantidad", label: "Cant" },
+          { key: "precio", label: "PU" },
+          // { key: "utilidad", label: "Porcentaje Utilidad %" },
           {
             key: "subtotal",
             label: "SubTotal",
             variant: "success",
             class: "text-center"
           },
-          { key: "descuento", label: "Descuento" },
+          { key: "descuento", label: "Desc", class: "ocularMovil" },
           {
             key: "total",
             label: "Total",
@@ -1676,7 +1678,15 @@ export default {
   animation: slide 20s linear infinite;
   white-space: pre;
 }
-
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  font-size: 1.2rem;
+  font-weigth: bold;
+}
 @keyframes slide {
   0% {
     transform: translatex(100vw);
