@@ -952,8 +952,8 @@ export default {
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0;
-      obj.cantidad = 0;
+      obj.precio = obj.precio;
+      obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
