@@ -273,8 +273,11 @@
                   <!-- <b-col md="12" class="mt-1">
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
                   </b-col> -->
-                  <b-col md="12" class="mt-1">
+                  <!-- <b-col md="12" class="mt-1">
                     <pago-deuda></pago-deuda>
+                  </b-col>-->
+                  <b-col md="12" class="mt-1">
+                    <delivery-modal style=" color: #fff; font-weight: bold; font-size: 1.2rem; border-radius: 25px"></delivery-modal>
                   </b-col>
                   <b-col md="12" class="mt-1">
                     <Movimiento></Movimiento>
@@ -932,7 +935,7 @@ import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import momemnt from "moment";
 import ClientesForm from "@/components/ClientesForm";
-
+import DeliveryModal from '@/components/DeliveryModal.vue'
 import Proformas from "@/components/ProformaLista.vue";
 import ProductoForm from "@/components/ProductoForm";
 import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
@@ -946,6 +949,7 @@ export default {
     ProductosCarritoNuevo,
     ClientesForm,
     Proformas,
+    DeliveryModal,
     AutoComplete,
     PagoDeuda,
     Movimiento,
