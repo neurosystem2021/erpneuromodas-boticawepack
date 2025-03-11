@@ -25,6 +25,23 @@
                         </autocomplete>
                       </b-form-group>
                     </b-col>
+                    <b-col md="3">
+                      <b-form-group>
+                        <label>Usuario:</label>
+                        <autocomplete
+                          ref="inputVendedor"
+                          required="required"
+                          initValue=""
+                          :url="API + 'usuarios'"
+                          anchor="NombreUsuario"
+                          label="writer"
+                          placeholder="Digite su usuario"
+                          :on-select="setVendedor"
+                          :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                          :classes="{input: 'form-control'}">
+                        </autocomplete>
+                      </b-form-group>
+                    </b-col>
                   </b-row>
   
                 </b-col>
@@ -236,6 +253,32 @@ export default {
     setProveedor(obj) {
       this.movimiento.proveedor = obj;
     },
+    getVendedor () {
+        /*let usuario = sessionStorage.getItem('User')*/
+        this.axios.get(this.API + 'usuarios/' + usuario)
+        .then((response) => {
+          this.setVendedor(response.data);
+          this.$nextTick(() => {
+            if (this.$refs.inputVendedor) {
+              this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+              /*this.$refs.inputVendedor.$refs.input.disabled = true;
+              if (response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputVendedor.$refs.input.disabled = true;
+              }*/
+            }
+          });
+        })
+        .catch((error) => {
+            console.log(error)
+            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        })
+    },
+    setVendedor (obj) {
+        this.vendedor = obj
+        this.loadData()
+        this.productosVendidos = []
+        this.productosVendidosTotal = 0
+    },
     setAlmacenOrigen(obj) {
       this.almacenOrigen = obj;
       this.obtenerStok({ IdAlmacen: this.almacenOrigen.IdAlmacen });
@@ -277,14 +320,14 @@ export default {
         return;
       }
 
-      let usuario = sessionStorage.getItem("User");
+      //let usuario = sessionStorage.getItem("User");
 
       this.axios
         .post(this.API + "traslado", {
           movimiento: this.movimiento,
-          productos: this.productos,
-          idAlmacen: this.almacenOrigen.IdAlmacen,
-          usuario: usuario
+          productos:  this.productos,
+          idAlmacen:  this.almacenOrigen.IdAlmacen,
+          user:       this.vendedor.Usuario,
         })
         .then(response => {
           if (response.data.error) {

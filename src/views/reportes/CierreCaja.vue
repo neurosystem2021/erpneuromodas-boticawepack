@@ -689,17 +689,17 @@ export default {
       return detalles
     },
     getVendedor () {
-        let usuario = sessionStorage.getItem('User')
+        /*let usuario = sessionStorage.getItem('User')*/
         this.axios.get(this.API + 'usuarios/' + usuario)
         .then((response) => {
           this.setVendedor(response.data);
           this.$nextTick(() => {
             if (this.$refs.inputVendedor) {
               this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-              this.$refs.inputVendedor.$refs.input.disabled = true;
+              /*this.$refs.inputVendedor.$refs.input.disabled = true;
               if (response.data.IdUsuarioPerfil !== 1) {
                 this.$refs.inputVendedor.$refs.input.disabled = true;
-              }
+              }*/
             }
           });
         })
@@ -731,8 +731,8 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
+          //user: sessionStorage.getItem("User"),
+          user:         this.vendedor.Usuario,
           ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
