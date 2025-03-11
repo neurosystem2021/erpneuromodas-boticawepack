@@ -219,7 +219,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil" >
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}

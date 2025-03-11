@@ -1,23 +1,32 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
+      <b-row>
+        <b-col cols="12" md="6" lg="6">
+          <b-form-group>
+            <b-input-group>
+              <autocomplete
+                ref="autocompleteProducto"
+                :url="APIProductos"
+                :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                :onShouldRenderChild="renderChild"
+                anchor="Producto"
+                label="writer"
+                placeholder="Agregar Producto"
+                :on-select="setProducto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                id="txtAddProduct"
+                @keydown.native.prevent.tab="irtxtBarcode"
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+              <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
+              </b-input-group>
+              </b-form-group>
+        </b-col>
+        <b-col cols="12" md="6" lg="6">
+          <b-form-group>
         <b-input-group>
-          <autocomplete
-            ref="autocompleteProducto"
-            :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            id="txtAddProduct"
-            @keydown.native.prevent.tab="irtxtBarcode"
-            :classes="{input: 'form-control'}">
-          </autocomplete>
-          <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
+          
           <input 
                   id="txtBarcode"
                   v-model="loadCode"
@@ -34,6 +43,9 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+        </b-col>
+      </b-row>
+      
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
