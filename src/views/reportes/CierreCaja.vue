@@ -427,7 +427,7 @@
       
 
       <b-row>
-        <b-col v-if="totalIngresosTarjeta">
+        <b-col v-if="ingresosTarjeta.length">
           <h5>Ingresos de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -436,7 +436,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
