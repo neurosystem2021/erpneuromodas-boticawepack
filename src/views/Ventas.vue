@@ -487,6 +487,9 @@
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
                     <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -520,6 +523,7 @@ import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
+import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
 export default {
   beforeMount() {
@@ -1665,6 +1669,7 @@ export default {
     PagoDeuda,
     PreOrdenLista,
     Proformas,
+    Movimiento,
     DeliveryModal
   }
 };
