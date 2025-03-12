@@ -11,6 +11,20 @@
     
   }
 }
+  /* Evita que los elementos se dividan entre páginas */
+  table, thead, tbody, tr, td, th, div {
+    page-break-inside: avoid;
+  }
+
+  /* Evita que ciertos elementos se impriman en una página nueva */
+  header, main, footer, #details, #notices {
+    page-break-before: avoid;
+    page-break-after: avoid;
+  }
+  .clearfix:after {
+    page-break-before: avoid;
+    page-break-after: avoid;
+  }
 .clearfix:after {
   content: "";
   display: table;
@@ -33,9 +47,11 @@ a {
 }
 
 header {
-  padding: 10px 0;
+  padding: 20px 0;
   margin-bottom: 20px;
   border-bottom: 1px solid #AAAAAA;
+  page-break-before: avoid;
+  page-break-after: avoid;
 }
 
 #logo {
