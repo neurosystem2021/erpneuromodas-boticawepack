@@ -1,10 +1,11 @@
 import { API } from "../config.js";
 import axios from "axios";
-
+import router from "@/router";
 const state = {
   productos: [],
   productosFiltrados: [],
-  totalCart: 0
+  totalCart: 0,
+  idPreOrden: 0
 };
 
 const mutations = {
@@ -73,6 +74,7 @@ const mutations = {
     state.totalCart = total;
   },
   OBTENER_STOCK(state, items) {
+    // console.log(items);
     state.productos = state.productos.map(prod => {
       let index = items.findIndex(item => item.IdProducto == prod.IdProducto);
       prod.stock = items[index] && items[index].stock;
@@ -95,6 +97,7 @@ const actions = {
     let setPrecioCosto = false;
     let setPreOr = false;
     let isDelivery = false;
+    let EsManoDeObra = 0;
     let descuento = 0;
     if (obje) {
       setPrecio = obje.setPrecio;
@@ -105,6 +108,7 @@ const actions = {
       setPreOr = obje.setPreOr;
       isDelivery = obje.isDelivery;
       descuento = obje.descuento;
+      EsManoDeObra = obje.EsManoDeObra;
     }
 
     if (typeof producto === "object") {
@@ -146,7 +150,7 @@ const actions = {
         .then(response => {
           if (response.data) {
             let obj = response.data;
-
+            obj.EsManoDeObra = EsManoDeObra;
             if (setPrecio) {
               obj.cantidad = 1;
               obj.precio = obj.PrecioContado || 0;
@@ -241,11 +245,13 @@ const actions = {
     commit("ACTUALIZAR_TOTAL", total);
   },
   obtenerStock({ commit, state }, obj) {
+    const idPreOrden = router.currentRoute.query.idPreOrden;
     axios
       .get(API + "productos/stock", {
         params: {
           idProductos: state.productos.map(prod => prod.IdProducto),
           idAlmacen: obj.IdAlmacen
+          // idPreOrden: idPreOrden ? idPreOrden : ""
         }
       })
       .then(response => {

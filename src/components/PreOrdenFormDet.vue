@@ -43,8 +43,9 @@
           <td>
             <input 
             @change="(e) => addManoDeObra(index, e)"
-            v-if="prod.CodigoBarra != 'MANODEOBRA' && prod.Pagado==0" 
+            v-if="prod.CodigoBarra != 'MANODEOBRA'" 
             v-model="prod.EsManoDeObra"
+            :disabled="prod.Pagado"
             class="form-check-input" type="checkbox" />
           </td>
           <td>{{ prod.IdProducto }}</td>

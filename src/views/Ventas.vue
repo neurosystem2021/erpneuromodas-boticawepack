@@ -222,7 +222,7 @@
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group class="ocularMovil">
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
@@ -235,7 +235,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group class="ocularMovil">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -288,9 +288,9 @@
                                 <table class="table b-table border table-footer">
                                     <tbody>
                                         <tr>
-                                            <td  class="text-center">Opciones</td>
+                                            <td  class="text-center ocularMovil">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0">
+                                        <tr v-if="puntosAplicados == 0" class="ocularMovil">
                                             <td>
                                                 <b-input-group prepend="S/">
                                                     <input
@@ -356,13 +356,14 @@
                                 </table>
                             </template>    
                             <template slot="metodopago" v-if="!venta.EsCredito" >
-                                <table class="table b-table border table-footer table-sm ocularMovil">
+                                <table class="table b-table border table-footer table-sm">
                                     <tbody>
                                         <tr>
                                             <td colspan="3" class="text-center">Metodo de Pago</td>
                                         </tr>
                                         <tr>
                                             <td>Efectivo</td>
+                                            <td><b-button @click="cargarMonto('efectivo')" size="sm" variant="primary"><i class="fa fa-check" aria-hidden="true"></i></b-button></td>                                     </b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
@@ -384,7 +385,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Tarjeta</td>
+                                            <td>Tarjeta</td> 
+                                            <td><b-button size="sm" @click="cargarMonto('visa')" variant="primary"><i class="fa fa-check" aria-hidden="true"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -408,6 +410,7 @@
                                         </tr>
                                         <tr>
                                             <td>Transferencia</td>
+                                            <td><b-button size="sm"  @click="cargarMonto('mastercard')" variant="primary"><i class="fa fa-check" aria-hidden="true"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -431,6 +434,7 @@
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: middle !important;">YAPE / PLIN</td>
+                                            <td><b-button size="sm" @click="cargarMonto('yape')" variant="primary"><i class="fa fa-check" aria-hidden="true"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.yape.descripcion"
@@ -577,7 +581,7 @@ export default {
         fields: [
           {
             key: "manoobra",
-            label: "Mano de obra",
+            label: "M.O.",
             class: "text-center ocularMovil"
           },
           {
@@ -586,7 +590,7 @@ export default {
             variant: "info",
             class: "text-center"
           },
-          { key: "Producto" },
+          { key: "Producto", class: "Producto", class: "clsProducto" },
           { key: "Descripcion", label: "Descripción", class: "ocularMovil" },
           { key: "eventPres", label: "" },
           { key: "cantxPrecio", label: "CantxP", variant: "warning" },
@@ -652,6 +656,17 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    cargarMonto(tipo) {
+      if (this.venta.pago && this.venta.pago.hasOwnProperty(tipo)) {
+        Object.keys(this.venta.pago).forEach(key => {
+          this.venta.pago[key].monto = key === tipo ? this.totalCart : 0;
+        });
+
+        console.log("Montos actualizados:", this.venta.pago);
+      } else {
+        console.error(`El tipo de pago "${tipo}" no existe en this.venta.pago`);
+      }
+    },
     async ObtenerLstOfertas() {
       await this.axios(`${this.API}ofertas/listadoimpresion`).then(res => {
         if (res) {
@@ -1438,7 +1453,7 @@ export default {
         .post(this.API + "ventas", this.venta)
         .then(response => {
           // limpiar preorden seleccionado
-          this.$router.replace("/ventas");
+          // this.$router.replace("/ventas");
           this.$toasted.success("Venta realizada con exito");
           this.inProgress = false;
           this.tieneIgv = false;
@@ -1717,5 +1732,15 @@ export default {
   .mostrarSerie {
     display: inline !important;
   }
+}
+@media (max-width: 850px) {
+  .ocularMovil {
+    display: none !important;
+  }
+}
+.clsProducto {
+  min-width: 200px !important;
+  white-space: normal;
+  word-wrap: break-word;
 }
 </style>

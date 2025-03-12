@@ -107,6 +107,7 @@ export default {
             res = res.filter(r => r.Pagado == 0);
           } // console.log(response);
           res.map(item => {
+            console.log(item);
             if (!item.EsHabitacion) {
               this.add([
                 item.IdProducto,
@@ -116,7 +117,8 @@ export default {
                 {
                   setPrecio: true,
                   cantidad: item.Cantidad,
-                  precio: item.Precio
+                  precio: item.Precio,
+                  EsManoDeObra: item.EsManoDeObra
                 }
               ]);
 
