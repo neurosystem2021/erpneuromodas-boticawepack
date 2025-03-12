@@ -2,7 +2,7 @@
   <b-row>
     <b-col md="12">
       <b-row>
-        <b-col cols="12" md="6" lg="6">
+        <b-col cols="12" lg="6">
           <b-form-group>
             <b-input-group>
               <autocomplete
@@ -23,7 +23,7 @@
               </b-input-group>
               </b-form-group>
         </b-col>
-        <b-col cols="12" md="6" lg="6">
+        <b-col cols="12" lg="6">
           <b-form-group>
         <b-input-group>
           
@@ -174,6 +174,17 @@
 
             }"
             placeholder="Cantidad"/>
+            <p><span class="mx-2">Prof.</span>  
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            :disabled="bloquearInput?true:false"
+            @change="(e) => {
+              $emit('onCheckProf', e)
+              asignarDisabledProf(data.index, e)
+            }"
+          />
+        </p>
         </template>
         <template slot="precio" slot-scope="data">
           <input
@@ -324,16 +335,7 @@
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
           <br>
-          <h6><i>Prof.</i></h6>
-          <input 
-            class="form-check-input" 
-            type="checkbox" 
-            :disabled="bloquearInput?true:false"
-            @change="(e) => {
-              $emit('onCheckProf', e)
-              asignarDisabledProf(data.index, e)
-            }"
-          />
+          
         </template>
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
@@ -429,6 +431,11 @@ Vue.use(VueQuagga);
 export default {
   mounted() {
     document.getElementById("txtBarcode").focus();
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.recalcularManoObra();
+      }, 1000);
+    });
     // this.alterarBuscadorProductos()
   },
 
@@ -773,34 +780,58 @@ export default {
         2
       );
     },
-
+    recalcularManoObra() {
+      this.productos.forEach((producto, index) => {
+        if (producto.EsManoDeObra) {
+          this.addManoDeObra(index, { target: {} });
+        }
+      });
+    },
     addManoDeObra(index, e) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+
       if (pi < 0) {
         this.$toasted.error("Primero seleccione el producto MANODEOBRA");
-
-        this.productos[index].EsManoDeObra = 0;
+        this.$set(this.productos, index, {
+          ...this.productos[index],
+          EsManoDeObra: 0
+        });
         return;
       }
 
-      if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
-        this.productos[pi].precio =
-          parseFloat(this.productos[pi].precio) -
-          parseFloat(this.productos[index].precio) *
-            parseFloat(this.productos[index].cantidad);
-        this.productos[index].disabled = true;
+      let productoMO = this.productos[pi];
+      let productoSeleccionado = this.productos[index];
+
+      if (!productoMO.precioOriginal) {
+        productoMO.precioOriginal = productoMO.precio;
+      }
+
+      let monto =
+        (productoSeleccionado.precio * productoSeleccionado.cantidad) /
+        productoMO.cantidad;
+
+      if (productoSeleccionado.EsManoDeObra) {
+        this.$set(
+          productoMO,
+          "precio",
+          parseFloat((productoMO.precio - monto).toFixed(2))
+        );
+        this.$set(productoSeleccionado, "disabled", true);
       } else {
-        e.target.parentNode.parentNode.removeAttribute("style");
-        this.productos[pi].precio = 0;
-        this.productos[pi].precio =
-          parseFloat(this.productos[pi].precio) +
-          parseFloat(this.productos[index].precio) *
-            parseFloat(this.productos[index].cantidad);
-        this.productos[index].disabled = false;
+        this.$set(
+          productoMO,
+          "precio",
+          parseFloat((productoMO.precio + monto).toFixed(2))
+        );
+
+        let hayDescuentos = this.productos.some(p => p.EsManoDeObra);
+        if (!hayDescuentos) {
+          this.$set(productoMO, "precio", productoMO.precioOriginal);
+        }
+
+        this.$set(productoSeleccionado, "disabled", false);
       }
     },
-
     updateManoDeObraNeta(index) {
       let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;

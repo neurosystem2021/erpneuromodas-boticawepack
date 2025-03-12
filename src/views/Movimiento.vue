@@ -580,6 +580,10 @@ export default {
               this.$refs.inputMovimiento.setValue("");
               this.$refs.inputProveedor.setValue("");
               this.$toasted.success("Movimiento guardado correctamente ");
+<<<<<<< HEAD
+=======
+              
+>>>>>>> 64be839adc77514599d5891275e1073d43d66f27
             }
             this.inProgress = false;
           })
