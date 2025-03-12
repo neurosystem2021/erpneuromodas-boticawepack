@@ -60,7 +60,7 @@
           </table>
         </b-col>
     </b-row>
-    <!-- MODAL AGREGAR  -->
+    <!-- MODAL AGREGAR  PROVEEDOR-->
     <b-modal 
       v-model="modalRegistro" 
       title="Agregar Tipo Caja" 
@@ -71,7 +71,7 @@
       no-stacking
       container="body"  >
         <b-row>
-          <b-col cols="7">
+          <b-col :cols="aplicarLetra?7:12">
             <b-row>
               <b-col cols="6">
                 <b-row>
@@ -84,8 +84,7 @@
                       text-field="TipoCajaBanco"
                     ></b-form-select>
                   </b-col>
-                  <b-col cols="12">
-                    {{ mostrarProveedor }}
+                  <b-col cols="12" v-if="mostrarCliente">
                     Cliente:
                     <autocomplete
                         required="required"
@@ -100,8 +99,8 @@
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                   </b-col>
-                  <b-col cols="12">Proveedor
-                    {{ mostrarCliente }}
+                  <b-col cols="12" v-if="mostrarProveedor">
+                    Proveedor
                     <autocomplete
                         required="required"
                         ref="inputProveedor"
@@ -165,7 +164,7 @@
                           <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
                           <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
                           <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
-                          <b-button class="mx-1 my-1" style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
+                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
                         </td>
 
                       </tr>
@@ -214,7 +213,7 @@
               </b-col>
             </b-row>
         </b-col>
-        <b-col cols="5">
+        <b-col :cols="aplicarLetra ?5:12" v-if="aplicarLetra">
           <b-row>
             <b-col cols="12">
             <h3>Letras</h3>
@@ -254,7 +253,7 @@
             </b-form-group>
             </b-col>
             <b-col cols="12">
-              <table class="table table-hover">
+              <table class="table table-hover small">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -265,11 +264,31 @@
                 <tbody>
                   <tr v-for="(letra,index) in letras" :key="index">
                     <td>{{ index+1 }}</td>
-                    <td><input type="date"  v-model="letra.fechaLetra"></td>
-                    <td><input type="number" step="0.0001"  v-model="letra.montoLetra"></td>
+                    <td>
+                      <input type="date" class="form-control" v-model="letra.FechaLetra">
+                      <p style="color:red">{{ letra.errorFecha }}</p>
+                    </td>
+                    <td><input type="number" step="0.0001" class="form-control"   v-model="letra.MontoLetra"></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">Total</td>
+                    <td colspan="1">
+                        {{ 
+                          parseFloat(
+                            letras.reduce((sum, letra) => {
+                              return sum + parseFloat(letra.MontoLetra);
+                            }, 0)
+                          ).toFixed(2)  
+                        }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
+              <p style="color:red">{{ errorLetras }}</p>
+            </b-col>
+            <b-col cols="12">
+                <b-button :disabled="letras.length==0" variant="success" @click="guardarLetras()">Guardar</b-button>
+                <b-button  variant="danger" @click="aplicarLetra=!aplicarLetra">Cancelar</b-button>
             </b-col>
           </b-row>
         </b-col>
@@ -283,6 +302,8 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      Tipo: "",
+      errorLetras: "",
       letras: [],
       nroLetras: 0,
       deuda: {},
@@ -308,7 +329,8 @@ export default {
       AplicadoDocVenta: "",
       TipoCajaBanco: "",
       lstDeudas: [],
-      lstAplicado: []
+      lstAplicado: [],
+      aplicarLetra: false
     };
   },
   mounted() {
@@ -327,11 +349,12 @@ export default {
     },
     generLetrasPorCantidadLetras() {
       this.letras = [];
-      let montoLetra = this.deuda.Saldo / this.nroLetras;
+      let MontoLetra = this.deuda.Saldo / this.nroLetras;
       for (let index = 0; index < this.nroLetras; index++) {
         this.letras.push({
-          fechaLetra: "",
-          montoLetra: parseFloat(montoLetra).toFixed(2)
+          IdDocDet: this.deuda.Id,
+          FechaLetra: "",
+          MontoLetra: parseFloat(MontoLetra).toFixed(2)
         });
       }
     },
@@ -408,22 +431,60 @@ export default {
     generarLetras(deuda) {
       console.log(deuda);
       this.deuda = deuda;
-      this.letrasFlag = true;
+      this.letras = [];
+      this.nroLetras = 0;
+      this.aplicarLetra = true;
+    },
+    guardarLetras() {
+      let val = true;
+      this.letras.forEach(letra => {
+        if (!letra.FechaLetra) {
+          letra.errorFecha = "Fecha requerida";
+          val = false;
+        } else {
+          letra.errorFecha = "";
+        }
+      });
+
+      let sumTotal = this.letras.reduce((sum, letra) => {
+        return sum + parseFloat(letra.MontoLetra);
+      }, 0);
+
+      if (parseFloat(this.Saldo).toFixed(2) < parseFloat(sumTotal).toFixed(2)) {
+        val = false;
+        this.errorLetras = "Defina correctamente el monto en cada Letra.";
+      }
+
+      this.$forceUpdate();
+    },
+    async guardarLetras() {
+      let data = {
+        Letras: this.letras,
+        Tipo: this.Tipo
+      };
+      await this.axios.post(`${this.API}letras/generar`, data).then(res => {
+        if (res.data) {
+          this.aplicarLetra = false;
+          this.getProveedorDeudas();
+        }
+      });
     }
   },
   computed: {
     mostrarProveedor() {
       if (this.IdTipoCajaBanco) {
+        this.Tipo = 1;
         return this.lstTipoOpe.some(
-          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
+          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
         );
       }
       return false;
     },
     mostrarCliente() {
       if (this.IdTipoCajaBanco) {
+        this.Tipo = 0;
         return this.lstTipoOpe.some(
-          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
+          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
         );
       }
       return false;
