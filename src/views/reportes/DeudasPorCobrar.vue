@@ -32,7 +32,7 @@
                     </b-form-group>
                 </b-col>
                 <b-col cols="3">
-                    <b-button class="my-2" variant="success" @click="obtenerListado()">Generar</b-button>
+                    <b-button class="my-2" variant="success" @click="obtenerDeudasPorCobrar()">Generar</b-button>
                     <b-button class="my-2" variant="danger" @click="exportar()">Exportar</b-button>
                 </b-col>
             </b-row>
@@ -119,6 +119,10 @@ export default {
       let res = await this.axios(`${this.API}repartidor`).then(res => {
         if (res) {
           this.repartidor = res.data;
+          this.repartidor.unshift({
+            Usuario: "",
+            NombreUsuario: "TODOS"
+          });
         }
       });
     },
@@ -145,6 +149,26 @@ export default {
         .catch(error => {
           console.error("Error al obtener deudas:", error);
         });
+    },
+    exportar() {
+      this.axios
+        .post(this.API + "exportar/reporte/deudatotal", {
+          desde: this.desde,
+          hasta: this.hasta,
+          IdRepartidor: this.IdRepartidor,
+          data: this.lstDeudas
+        })
+        .then(response => {
+          if (response.data.success) {
+            window.open(response.data.url, "_blank"); // Abrir en nueva pestaña
+          } else {
+            console.error(
+              "Error al generar el reporte:",
+              response.data.message
+            );
+          }
+        })
+        .catch(error => console.error("Error en la exportación:", error));
     }
   }
 };
