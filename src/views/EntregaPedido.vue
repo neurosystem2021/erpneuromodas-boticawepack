@@ -56,7 +56,11 @@
                 aria-controls="my-table"
                 ></b-pagination>
         </b-col>
-      <b-modal v-model="finalizarFlag" hide-footer :title="`Finalizar Pedido ${item.Correlativo}`">
+      
+    </b-row>
+
+    <!-- ddd -->
+    <b-modal v-model="finalizarFlag" hide-footer :title="`Finalizar Pedido ${item.Correlativo}`">
             <table class="table">
                 <thead>
                     <tr>
@@ -86,7 +90,6 @@
 
             </template>
       </b-modal>
-    </b-row>
   </b-container>
 </template>
 
@@ -96,10 +99,10 @@ import Swal from "sweetalert2";
 export default {
   data() {
     return {
+      API: config.API,
       finalizarFlag: false,
       perPage: 5,
       currentPage: 1,
-      API: config.API,
       lstRepartos: [],
       headers: [
         { key: "Correlativo", thStyle: { width: "5%" } },
@@ -188,6 +191,22 @@ export default {
           this.$toasted.show("Los Monto no Coinciden");
           return false;
         }
+      } else {
+        let montoPagar = parseFloat(
+          this.item.detalle.reduce((sum, producto) => {
+            return sum + parseFloat(producto.Cantidad * producto.Precio);
+          }, 0)
+        ).toFixed(2);
+
+        let montoPagado = parseFloat(
+          this.metodoPago.reduce((sum, metodo) => {
+            return sum + parseFloat(metodo.monto);
+          }, 0)
+        ).toFixed(2);
+        if (montoPagar < montoPagado) {
+          this.$toasted.show("Los Montos no pueden ser mayores");
+          return false;
+        }
       }
       let data = {
         IdDocVenta: this.item.idDocVenta,
@@ -195,7 +214,7 @@ export default {
         MedoPago: this.metodoPago
       };
 
-      await this.axios.post(`${this.API}finalizar_entrega`, data).then(res => {
+      await this.axios.post(`${this.API}finalizar_entregas`, data).then(res => {
         if (res) {
           this.$swal({
             icon: "success",

@@ -7,7 +7,7 @@
             <input type="date" class="form-control" v-model="desde">
         </b-col>
         <b-col cols="3">
-            Desde:
+            Hasta:
             <input type="date" class="form-control" v-model="hasta">
         </b-col>
         <b-col cols="3">
@@ -198,13 +198,13 @@ export default {
     };
   },
   mounted() {
-    this.desde = "2025-01-01";
-    // this.desde = this.$moment().format("YYYY-MM-DD");
+    // this.desde = "2025-01-01";
+    this.desde = this.$moment().format("YYYY-MM-DD");
     this.hasta = this.$moment().format("YYYY-MM-DD");
 
     this.obtenerRepartidor();
     // if (this.idPerfil != 1) {
-      this.IdRepartidor = sessionStorage.getItem("User");
+    this.IdRepartidor = sessionStorage.getItem("User");
     // }
     this.obtenerListado();
   },
@@ -237,14 +237,11 @@ export default {
       this.generarResumenRerpote();
     },
     mostrarCompletarPago(item) {
-      if (this.idPerfil == 1) {
-        let monto = item.MontoPago;
-        let sum = item.metodospago.reduce((suma, metodo) => {
-          return suma + parseFloat(metodo.monto);
-        }, 0);
-        return monto > sum;
-      }
-      return false;
+      let monto = item.MontoPago;
+      let sum = item.metodospago.reduce((suma, metodo) => {
+        return suma + parseFloat(metodo.monto);
+      }, 0);
+      return monto > sum;
     },
     abrirPagarDeuda(item) {
       this.item = item;
