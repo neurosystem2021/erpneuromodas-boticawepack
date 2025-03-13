@@ -5,7 +5,7 @@
       <div>
           <div class="no-print">
               <div class="float-left"  v-if="!this.$route.params.id">
-                  <b-button-group size="sm">
+                  <!-- <b-button-group size="sm">
                       <b-form-select
                       v-model="empresa"
                       :options="$store.state.empresas"
@@ -14,7 +14,7 @@
                       class="form-control my-2"
                       @change="cambiarEmpresa"
                     ></b-form-select>
-                  </b-button-group>
+                  </b-button-group> -->
               </div>
               <b-row align-h="end" class=" no-print">
                     <!--<label v-if="!this.$route.params.id" >Vendedor:</label>

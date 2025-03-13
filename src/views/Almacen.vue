@@ -2,7 +2,7 @@
   <div>
       <b-container fluid class="bv-example-row">
         <b-row>
-          <b-col md="12"  class="my-1">
+          <!-- <b-col md="12"  class="my-1">
              <label>Empresa:</label>
                   <b-form-select
                     v-model="empresa"
@@ -11,7 +11,7 @@
                     class="form-control my-2"
                     @change="cambiarEmpresa"
                   ></b-form-select>
-          </b-col>
+          </b-col> -->
           <b-col md="12"  class="my-1">
             <b-row>
               <b-col md="2" v-if="(idPerfil !== 1)">

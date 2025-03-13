@@ -5,7 +5,7 @@
 
         <b-container class="bv-example-row">
           <b-row>
-            <b-col cols="12">
+            <!-- <b-col cols="12">
                <b-form-select
               v-model="empresa"
               :options="$store.state.empresas"
@@ -14,7 +14,7 @@
               class="form-control my-2"
               @change="cambiarEmpresa"
             ></b-form-select>
-            </b-col>
+            </b-col> -->
             <b-col md="3" class="my-1">
               <b-form-group>
                 <label>Almacen:</label>

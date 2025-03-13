@@ -73,7 +73,7 @@
                     <tr v-for="(metodo,index) in metodoPago" :key="index">
                         <td>{{ metodo.label }}</td>
                         <td> <b-checkbox  size="lg"  value="1" unchecked-value="0" v-model="metodo.selected" @change="cambiarMonto(metodo)"></b-checkbox>  </td>
-                        <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto"> </td>
+                        <td> <input type="number" step="0.01" class="form-control" v-model="metodo.monto" @input="cambiarMontoPagar(metodo)"> </td>
                         
                     </tr>
                     <tr>
@@ -172,6 +172,15 @@ export default {
         // console.log(metodos.;
       });
       // console.log(metodo);
+    },
+    cambiarMontoPagar(metodos) {
+      if (metodos.label != "Efectivo") {
+        let metodo = this.metodoPago.filter(v => v.label == "Efectivo");
+        metodo[0].monto = 0;
+        metodo[0].selected = 0;
+        let newMetodo = this.metodoPago.filter(v => v.label == metodos.label);
+        newMetodo[0].selected = 1;
+      }
     },
     async finalizar() {
       if (this.acuentaflag == 0) {

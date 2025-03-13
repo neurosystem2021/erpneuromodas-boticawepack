@@ -5,7 +5,7 @@
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container fluid>
           <b-row>
-            <b-col cols="12">
+            <!-- <b-col cols="12">
                <b-form-select
               v-model="empresa"
               :options="$store.state.empresas"
@@ -14,7 +14,7 @@
               class="form-control my-2"
               @change="cambiarEmpresa"
             ></b-form-select>
-            </b-col>
+            </b-col> -->
               <b-col md="8">
 
                 <b-row>

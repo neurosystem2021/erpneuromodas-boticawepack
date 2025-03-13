@@ -2,7 +2,7 @@
   <div>
       <b-container class="bv-example-row">
         <b-row>
-          <b-col md="12" class="my-1">
+          <!-- <b-col md="12" class="my-1">
             <b-form-select
               v-model="empresa"
               :options="$store.state.empresas"
@@ -11,7 +11,7 @@
               class="form-control my-2"
               @change="cambiarEmpresa"
             ></b-form-select>
-          </b-col>
+          </b-col> -->
              <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
              
