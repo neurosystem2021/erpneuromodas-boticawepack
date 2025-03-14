@@ -11,7 +11,7 @@
                     @input="cargarOperaciones()"
                     value-field="IdCuenta"
                     text-field="Cuenta"
-
+                  
                     ></b-form-select>
 
                 </b-col>
@@ -20,8 +20,8 @@
                     <input type="date" class="form-control" v-model="FechaDoc">
                 </b-col>
                 <b-col cols="12" class="mt-2 text-center">
-                    <b-button variant="success"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
-                    <b-button variant="info"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
+                    <b-button variant="success" :disabled="!IdCuenta"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
+                    <b-button variant="info" :disabled="!IdCuenta" @click="abrirModalNuevaOperacion()"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
                 </b-col>
             </b-row>
         </b-col>
@@ -49,7 +49,7 @@
                     <td>{{ cajabanco.UsuarioReg }}</td>
                     <td>{{ cajabanco.Concepto }}</td>
                     <td>{{ cajabanco.Ingresos }}</td>
-                    <td>{{ cajabanco.Salidas }}</td>
+                    <td>{{ cajabanco.Salida }}</td>
                     <td>{{ (cajabanco.Ingresos?cajabanco.Ingresos: 0 )- (cajabanco.Salidas?cajabanco.Salidas: 0 ) }}</td>
                    
                     <td>
@@ -69,7 +69,9 @@
       no-close-on-esc 
       hide-footer
       no-stacking
-      container="body"  >
+      container="body"  
+      v-if="modalRegistro"
+      >
         <b-row>
           <b-col :cols="aplicarLetra?7:12">
             <b-row>
@@ -116,15 +118,15 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="6">
+              <b-col cols="6" v-if="IdTipoCajaBanco">
                 <b-row>
                   <b-col cols="12">
                     Fecha Operacion: 
-                    <input type="date" class="form-control">
+                    <input type="date" class="form-control" v-model="FechaDoc">
                   </b-col>
                   <b-col cols="12">
                     Concepto: 
-                    <input type="number" class="form-control" v-model="Concepto">
+                    <input type="text" class="form-control" v-model="Concepto">
                   </b-col>
                   <b-col cols="12">
                     Importe: 
@@ -138,7 +140,7 @@
                   <div class="card-header">Documentos a aplicar</div>
               
                 <div class="card-body">
-                <table class="table table-hover">
+                <table class="table">
                     <thead>
                       <tr>
                         <th>Id</th>
@@ -152,7 +154,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(deuda,index) in lstDeudas" :key="index">
+                      <tr v-for="(deuda,index) in lstDeudas" :key="index" :style="{background:deuda.Aplicado==1 ? '#FBE9E7' :''}">
                         <td>{{deuda.Id}}</td>
                         <td>{{deuda.FechaDoc}}</td>
                         <td>{{deuda.FechaCredito}}</td>
@@ -161,10 +163,10 @@
                         <td>{{deuda.Aplicado}}</td>
                         <td>{{deuda.Saldo}}</td>
                         <td>
-                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button>
-                          <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
+                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
                           <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
-                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
+                          <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
                         </td>
 
                       </tr>
@@ -178,17 +180,17 @@
                   {{ mostrarProveedor }}
                   <div class="card-header">Documentos Aplicados</div>
                   <div class="card-body">
-                <table class="table table-hover">
+                    <table class="table table-hover">
                     <thead>
                       <tr>
                         <th>Id</th>
                         <th>Fecha</th>
                         <th>FechaVen</th>
                         <th>Correlativo</th>
-                        <th>Total</th>
-                        <th>Aplicado</th>
                         <th>Saldo</th>
-                        <th></th>
+                        <th>Aplicado</th>
+                        <th>Saldo Fin</th>
+                        <!-- <th></th> -->
                       </tr>
                     </thead>
                     <tbody>
@@ -200,15 +202,33 @@
                         <td>{{deuda.Total}}</td>
                         <td>{{deuda.Aplicado}}</td>
                         <td>{{deuda.Saldo}}</td>
-                        <td>
-                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
-                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="info" >Letras</b-button> -->
+                      </tr>
+                      <tr style="background: #BBDEFB; font-weight: bold;">
+                        <td colspan="5" style="text-align: center;">
+                          Sumatoria
                         </td>
-
+                        <td>
+                          {{  parseFloat(
+                            lstAplicado.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Aplicado)
+                          },0)
+                          ).toFixed(2) }}
+                        </td>
+                        <td>
+                          {{  parseFloat(
+                            lstAplicado.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Saldo)
+                          },0)
+                          ).toFixed(2) }}
+                        </td>
                       </tr>
                     </tbody>
                     </table>
                     </div>
+                  </div>
+                  <div class="card-footer">
+                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
             </b-row>
@@ -303,12 +323,13 @@ export default {
   data() {
     return {
       Tipo: "",
+      bloquearAplicar: false,
       errorLetras: "",
       letras: [],
       nroLetras: 0,
       deuda: {},
       IdTipoCajaBanco: "",
-      modalRegistro: true,
+      modalRegistro: false,
       letrasFlag: false,
       IdCuenta: "",
       lstCuentas: [],
@@ -339,6 +360,9 @@ export default {
     this.ListarTipoOpe();
   },
   methods: {
+    abrirModalNuevaOperacion() {
+      this.modalRegistro = true;
+    },
     addLetra() {
       this.nroLetras += 1;
       this.generLetrasPorCantidadLetras();
@@ -363,14 +387,14 @@ export default {
       this.$refs[ref].handleDoubleClick();
     },
     async cargarCuentas() {
-      await this.axios(`${this.API}/cuentas/listarcuentas`).then(res => {
+      await this.axios(`${this.API}cuentas/listarcuentas`).then(res => {
         if (res.data) {
           this.lstCuentas = res.data;
         }
       });
     },
     async ListarTipoOpe() {
-      await this.axios(`${this.API}/ListarTipoOpe`).then(res => {
+      await this.axios(`${this.API}ListarTipoOpe`).then(res => {
         if (res.data) {
           this.lstTipoOpe = res.data;
         }
@@ -411,15 +435,18 @@ export default {
     },
     aplicarPago(deuda) {
       if (this.Importe < deuda.Total - deuda.Aplicado) {
+        deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,
           FechaDoc: deuda.FechaDoc,
+          Concepto: this.Concepto,
           FechaCredito: deuda.FechaCredito,
           Correlativo: deuda.Correlativo,
           Total: deuda.Total,
           Aplicado: this.Importe,
           Saldo: deuda.Total - this.Importe
         });
+        this.bloquearAplicar = true;
       } else {
         this.$swal({
           icon: "warning",
@@ -468,6 +495,71 @@ export default {
           this.getProveedorDeudas();
         }
       });
+    },
+    async GuardarMovimiento() {
+      let data = {
+        IdTipoCajaBanco: this.IdTipoCajaBanco,
+        IdCuenta: this.IdCuenta,
+        FechaDoc: this.FechaDoc,
+        Concepto: this.Concepto,
+        Importe: this.Importe,
+        TipoCajaBanco: this.Tipo,
+        AplicadoDocVenta: this.lstAplicado,
+        IdCliente: null,
+        IdProveedor: this.Proveedor.IdProveedor
+      };
+      await this.axios.post(`${this.API}movimiento/guardarMovimiento`, data);
+      this.cargarOperaciones();
+      this.modalRegistro = false;
+      this.limpiarLuegoPago();
+    },
+    limpiarLuegoPago() {
+      this.bloquearAplicar = false;
+      this.errorLetras = "";
+      this.letras = [];
+      this.nroLetras = 0;
+      this.deuda = {};
+      this.IdTipoCajaBanco = "";
+      this.modalRegistro = false;
+      this.letrasFlag = false;
+
+      this.FechaDoc = "";
+      this.Cliente = {};
+      this.Proveedor = {};
+      this.newDniRuc = {};
+      this.newRuc = {};
+      this.IdTipoCajaBanco = "";
+      this.FechaDocReg = "";
+      this.Concepto = "";
+      this.Importe = "";
+      this.IdCliente = "";
+      this.IdProveedor = "";
+      this.AplicadoDocVenta = "";
+      this.TipoCajaBanco = "";
+      this.lstDeudas = [];
+      this.lstAplicado = [];
+      this.aplicarLetra = false;
+    },
+    pagaLetra(letra) {
+      console.log(letra);
+      let idDoc = id.split("-")[0];
+
+      let data = {
+        IdLetraCaja: letra.Id,
+        IdDocDet: idDoc,
+        IdCuenta: this.IdCuenta,
+        Concepto: "Pago de Letra de " + letra.correlativo,
+        Importe: letra.total,
+        // IdTipoCajaBanco: $("#txtTipoOpeId").val(),
+        // Tipo: window.tipoCajaBanco,
+        // IdCliente: $("#txtCliente").is(":disabled")
+        //   ? 0
+        //   : $("#txtCliente").attr("data-idcliente"),
+        // IdProveedor: $("#txtProveedor").is(":disabled")
+        //   ? 0
+        //   : $("#txtProveedor").attr("data-idproveedor"),
+        // User: sessionStorage.getItem("User")
+      };
     }
   },
   computed: {
