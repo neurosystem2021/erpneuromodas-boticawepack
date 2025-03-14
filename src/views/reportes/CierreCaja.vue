@@ -562,42 +562,51 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CierresCaja from '@/components/CierresCaja.vue'
+import config from "@/store/config.js";
+import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
-  beforeMount () {
-    let empresa = sessionStorage.getItem('empresa') || 'imperiop2';
-    if (this.$route.query.empresa === 'imperiop1') {
-      empresa = 'imperiop1';
-    }
-    
-    // Interceptos XMLHttpRequest
-    let oldXHROpen = window.XMLHttpRequest.prototype.open;
-    window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        // do something with the method, url and etc.
-        var newUrl = url.indexOf(location.protocol + '//') !== -1 ? url : location.protocol + '//' + location.host + url;
-        newUrl = new URL(newUrl);
-        newUrl.searchParams.append('empresa', empresa);
-        url = newUrl.toString();
-        arguments[1] = url
-        return oldXHROpen.apply(this, arguments);
-    }
-  },
-  mounted () {
-    if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id)
-      this.loadData()
-    } else {
-        //this.getVendedor()
-      this.loadData()
+  beforeMount() {
+    let empresa = sessionStorage.getItem("empresa") || "imperiop2";
+    if (this.$route.query.empresa === "imperiop1") {
+      empresa = "imperiop1";
     }
 
-    if (sessionStorage.getItem('empresa')) {
-      this.empresa = sessionStorage.getItem('empresa');
+    // Interceptos XMLHttpRequest
+    let oldXHROpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(
+      method,
+      url,
+      async,
+      user,
+      password
+    ) {
+      // do something with the method, url and etc.
+      var newUrl =
+        url.indexOf(location.protocol + "//") !== -1
+          ? url
+          : location.protocol + "//" + location.host + url;
+      newUrl = new URL(newUrl);
+      newUrl.searchParams.append("empresa", empresa);
+      url = newUrl.toString();
+      arguments[1] = url;
+      return oldXHROpen.apply(this, arguments);
+    };
+  },
+  mounted() {
+    if (this.$route.params.id) {
+      this.getCierre(this.$route.params.id);
+      this.loadData();
+    } else {
+      //this.getVendedor()
+      this.loadData();
+    }
+
+    if (sessionStorage.getItem("empresa")) {
+      this.empresa = sessionStorage.getItem("empresa");
     }
   },
-  data () {
+  data() {
     return {
       API: config.API,
       ventas: [],
@@ -605,301 +614,332 @@ export default {
       ingresosTarjeta: [],
       salidasTarjeta: [],
       salidas: [],
-	  adelantos: [],
+      adelantos: [],
       turno: null,
       turnos: [
-        { value: null, text: 'Seleccione un Turno' },
-        { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' },
-        { value: 3, text: 'Noche' }
+        { value: null, text: "Seleccione un Turno" },
+        { value: 1, text: "Mañana" },
+        { value: 2, text: "Tarde" },
+        { value: 3, text: "Noche" }
       ],
       cierre: {},
       vendedor: {},
-      empresa: 'imperiop2'
-    }
+      empresa: "imperiop2"
+    };
   },
   computed: {
-    getFechaCierre () {
-      //return this.$route.params.id ? 
+    getFechaCierre() {
+      //return this.$route.params.id ?
     },
-    granTotal () {
-      return this.totalVentasEfectivo + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+    granTotal() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalIngresos -
+        this.totalSalidas -
+        this.totalAdelantosActivos
+      );
     },
-    granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo - this.totalSalidas
+    granTotalSinPagoCliente() {
+      return this.totalVentasEfectivo - this.totalSalidas;
     },
-    totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+    totalVentas() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard
+      );
     },
-    totalSalidas () {
-      let total = 0
+    totalSalidas() {
+      let total = 0;
       this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe
+        if (!salida.Anulado) total += salida.Importe;
       });
-      return total 
+      return total;
     },
-    totalIngresosTarjeta () {
-      let total = 0
+    totalIngresosTarjeta() {
+      let total = 0;
       this.ingresosTarjeta.forEach(ingresoTar => {
-        if (!ingresoTar.Anulado) total += ingresoTar.Importe
+        if (!ingresoTar.Anulado) total += ingresoTar.Importe;
       });
-      return total 
+      return total;
     },
-    totalIngresos () {
-      let total = 0
+    totalIngresos() {
+      let total = 0;
       this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe
+        if (!ingreso.Anulado) total += ingreso.Importe;
       });
-      return total 
+      return total;
     },
-    totalSalidasTarjeta () {
-      let total = 0
+    totalSalidasTarjeta() {
+      let total = 0;
       this.salidasTarjeta.forEach(salidaTar => {
-        if (!salidaTar.Anulado) total += salidaTar.Importe
+        if (!salidaTar.Anulado) total += salidaTar.Importe;
       });
-      return total 
+      return total;
     },
-  	totalAdelantos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado) total += ade.Importe
-  		})
-  		return total
-  	},
-    totalAdelantosActivos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado  &&  !ade.AnuladoVenta && !ade.EsCreditoVenta) total += ade.Importe
-  		})
-  		return total
-  	},
-    totalVentasEfectivo () {
-      let total = 0
+    totalAdelantos() {
+      let total = 0;
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado) total += ade.Importe;
+      });
+      return total;
+    },
+    totalAdelantosActivos() {
+      let total = 0;
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado && !ade.AnuladoVenta && !ade.EsCreditoVenta)
+          total += ade.Importe;
+      });
+      return total;
+    },
+    totalVentasEfectivo() {
+      let total = 0;
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado && venta.CodSunat!='07') total += venta.Efectivo
+        if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
       });
-      return total
+      return total;
     },
-    ventasEfectivo () {
+    ventasEfectivo() {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito
-      })
+        return venta.Efectivo > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasVisa () {
-      let total = 0
+    totalVentasVisa() {
+      let total = 0;
       this.ventasVisa.forEach(venta => {
-        if (!venta.Anulado) total += venta.Visa
+        if (!venta.Anulado) total += venta.Visa;
       });
-      return total
+      return total;
     },
-    ventasVisa () {
+    ventasVisa() {
       return this.ventas.filter(venta => {
-        return venta.Visa > 0  && !venta.EsCredito
-      })
+        return venta.Visa > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasMastercard () {
-      let total = 0
+    totalVentasMastercard() {
+      let total = 0;
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard
+        if (!venta.Anulado) total += venta.Mastercard;
       });
-      return total
+      return total;
     },
-    ventasMastercard () {
+    ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0  && !venta.EsCredito
-      })
-    },
-    totalVentasTransferencia () {
-      let total = 0
-      this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia
+        return venta.Mastercard > 0 && !venta.EsCredito;
       });
-      return total
+    },
+    totalVentasTransferencia() {
+      let total = 0;
+      this.ventasTransferencia.forEach(venta => {
+        if (!venta.Anulado) total += venta.Transferencia;
+      });
+      return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0  && !venta.EsCredito
-      })
-    },
-    totalVentasCredito () {
-      let total = 0
-      this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total
+        return venta.Transferencia > 0 && !venta.EsCredito;
       });
-      return total
     },
-    ventasCredito () {
+    totalVentasCredito() {
+      let total = 0;
+      this.ventasCredito.forEach(venta => {
+        if (!venta.Anulado) total += venta.Total;
+      });
+      return total;
+    },
+    ventasCredito() {
       return this.ventas.filter(venta => {
-        return venta.EsCredito
-      })
+        return venta.EsCredito;
+      });
     }
   },
   methods: {
-    cambiarEmpresa () {
-        sessionStorage.setItem('empresa', this.empresa)
-        window.location.reload();
-        return false;
+    cambiarEmpresa() {
+      sessionStorage.setItem("empresa", this.empresa);
+      window.location.reload();
+      return false;
     },
-    getDetalles (idDocVenta) {
-      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+    getDetalles(idDocVenta) {
+      let detalles = this.itemsDetalle.filter(
+        item => item.IdDocVenta == idDocVenta
+      );
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
       //this.items[index].productos = detalles
-      return detalles
+      return detalles;
     },
-    getVendedor () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            this.setVendedor(response.data)
-            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+          //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
 
-            if(response.data.IdUsuarioPerfil !== 1) {
-              //this.$refs.inputVendedor.$refs.input.disabled = true
-            }
+          if (response.data.IdUsuarioPerfil !== 1) {
+            //this.$refs.inputVendedor.$refs.input.disabled = true
+          }
         })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     },
-    imprimir () {
+    imprimir() {
       window.print();
     },
-    loadData () {
-      this.getVentas()
-      this.getIngresos()
-      this.getSalidas()
+    loadData() {
+      this.getVentas();
+      this.getIngresos();
+      this.getSalidas();
     },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
+    setVendedor(obj) {
+      this.vendedor = obj;
+      this.loadData();
     },
-    cerrarCaja () {
+    cerrarCaja() {
       if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
-        return
+        this.$toasted.show("Seleccione un Turno");
+        return;
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      let r = confirm("¿Está seguro de cerrar la caja?");
       if (r) {
-        this.axios.post(this.API + 'cierrecaja', {
-          idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
-          ingresos:     this.totalIngresos.toFixed(2),
-          salidas:      this.totalSalidas,
-          total:        this.granTotal,
-          totalVentas:  this.totalVentas
-        }).then(res => {
-          this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
-          // console.log(res)
-        })
+        this.axios
+          .post(this.API + "cierrecaja", {
+            idTurno: this.turno,
+            user: sessionStorage.getItem("User"),
+            //user:         this.vendedor.Usuario,
+            ingresos: this.totalIngresos.toFixed(2),
+            salidas: this.totalSalidas,
+            total: this.granTotal,
+            totalVentas: this.totalVentas
+          })
+          .then(res => {
+            this.loadData();
+            this.$toasted.show("¡Caja cerrada!");
+            // console.log(res)
+          });
       }
     },
-    focusAutocomplete (ref) {
-        // this.$refs[ref].type = ""
-        this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
     },
-    estadoVenta (venta) {
-        return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
+    estadoVenta(venta) {
+      return venta.Anulado
+        ? "ANULADO"
+        : venta.EsCredito
+          ? "CREDITO"
+          : "APLICADO";
     },
-    loadDetalles () {
-      this.axios.get(this.API + 'ventas/detalle', {
+    loadDetalles() {
+      this.axios
+        .get(this.API + "ventas/detalle", {
           params: {
-            idDocVentas: this.ventas.map((item) => item.idDocVenta),
+            idDocVentas: this.ventas.map(item => item.idDocVenta)
           }
-        }).then((response) => {
-            this.itemsDetalle = response.data
-            this.ventas = this.ventas.map((item) => {
-              item.productos = this.getDetalles(item.idDocVenta)
-              return item
-            })
         })
-        .catch((error) => {
-          console.log(error)
+        .then(response => {
+          this.itemsDetalle = response.data;
+          this.ventas = this.ventas.map(item => {
+            item.productos = this.getDetalles(item.idDocVenta);
+            return item;
+          });
         })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    getVentas () {
+    getVentas() {
       let params = {
         idCierre: this.$route.params.id
-      }
+      };
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
-      this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: params
-      })
-      .then(res => {
-        this.ventas = res.data
-        this.loadDetalles()
-		this.getAdelantos()
-      }).catch(err => {
-        console.log(err)
-      })
-    },
-    getIngresos () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
-      }
-      this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: params
-      })
-      .then(res => {
-        this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
-        this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
-      }).catch(err => {
-        console.log(err)
-      }) 
-    },
-    getSalidas () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
-      }
-      this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: params
-      })
-      .then(res => {
-        this.salidas = res.data.filter((sal)=> sal.EsTarjeta==0)
-        this.salidasTarjeta = res.data.filter((sal)=> sal.EsTarjeta==1)
-      }).catch(err => {
-        console.log(err)
-      }) 
-    },
-    getAdelantos() {
-        let params = {
-          idDocVentas: this.ventas.map(v => v.idDocVenta)
-        }
-        this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
+      this.axios
+        .get(this.API + "cierrecaja/ventas", {
           params: params
         })
         .then(res => {
-          this.adelantos = res.data
-        }).catch(err => {
-          console.log(err)
+          this.ventas = res.data;
+          this.loadDetalles();
+          this.getAdelantos();
         })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getIngresos() {
+      let params = {
+        idCierre: this.$route.params.id
+      };
+      if (this.vendedor.Usuario) {
+        //params.usuario = this.vendedor.Usuario
+      }
+      this.axios
+        .get(this.API + "cierrecaja/ingresos", {
+          params: params
+        })
+        .then(res => {
+          this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
+          this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getSalidas() {
+      let params = {
+        idCierre: this.$route.params.id
+      };
+      if (this.vendedor.Usuario) {
+        //params.usuario = this.vendedor.Usuario
+      }
+      this.axios
+        .get(this.API + "cierrecaja/salidas", {
+          params: params
+        })
+        .then(res => {
+          this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
+          this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getAdelantos() {
+      let params = {
+        idDocVentas: this.ventas.map(v => v.idDocVenta)
+      };
+      this.axios
+        .get(this.API + "cierrecaja/ingresos/adelantos", {
+          params: params
+        })
+        .then(res => {
+          this.adelantos = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     getCierre(id) {
-      this.axios.get(this.API + 'cierrecaja', {
-        params: {
-          idCierre: id
-        }
-      }).then(res =>{
-        this.cierre = res.data[0]
-      })
+      this.axios
+        .get(this.API + "cierrecaja", {
+          params: {
+            idCierre: id
+          }
+        })
+        .then(res => {
+          this.cierre = res.data[0];
+        });
     }
   },
   components: {
     CierresCaja
   }
-}
+};
 </script>
 <style scoped>
 /*th {
@@ -921,20 +961,23 @@ export default {
 .si-print {
   display: none;
 }*/
-th, td {
-  font-size: .9em;
+th,
+td {
+  font-size: 0.9em;
   vertical-align: middle;
 }
 th {
-  background-color: #f1f1f1;
+  background: #1a237e;
+  color: #ffff;
+  border: 1px solid #ffffff;
 }
 .total {
   background-color: #e4ff95;
 }
 .total-salida {
-  background-color: #ffd4d3;  
+  background-color: #ffd4d3;
 }
-.anulado td{
+.anulado td {
   /*font-style: italic;*/
   text-decoration: line-through;
 }
@@ -948,8 +991,9 @@ th {
   background-color: #ffffff;
   font-weight: normal;
 }
-.tabla-detalle th, .tabla-detalle td {
-  font-size: .9em;
+.tabla-detalle th,
+.tabla-detalle td {
+  font-size: 0.9em;
 }
 .detalle-producto {
   width: 270px;
@@ -958,7 +1002,7 @@ th {
   background-color: #ffe8c5;
 }
 .fondo-empresa {
-    background: #eff9ff;
+  background: #eff9ff;
 }
 @media print {
   .no-print {
