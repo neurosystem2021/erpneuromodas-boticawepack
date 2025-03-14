@@ -2,6 +2,7 @@
   <b-container fluid>
     <b-row>
         <b-col cols="3">
+          <div class="clsCuenta">
             <b-row>
                 <b-col cols="12">
                     Cuenta:
@@ -24,23 +25,24 @@
                     <b-button variant="info" :disabled="!IdCuenta" @click="abrirModalNuevaOperacion()"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
                 </b-col>
             </b-row>
+          </div>
         </b-col>
         <b-col cols="9" class="px-5">
+          <div class="clsCaja">
           <table class="table table-hover">
               <thead>
-                <tr>
-                  <th>Cuenta</th>
-                  <th colspan="5">Caja</th>
-                  <th></th>
+                <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                  <th style="border: 1px solid #ffffff;">Cuenta</th>
+                  <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
                 </tr>
-                <tr>
-                  <th>ID</th>
-                  <th>Usuario</th>
-                  <th>Concepto</th>
-                  <th>Ingresos</th>
-                  <th>Salida</th>
-                  <th>Saldo</th>
-                  <th></th>
+                <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
+                  <th style="border: 1px solid #ffffff;">ID</th>
+                  <th style="border: 1px solid #ffffff;">Usuario</th>
+                  <th style="border: 1px solid #ffffff;">Concepto</th>
+                  <th style="border: 1px solid #ffffff;">Ingresos</th>
+                  <th style="border: 1px solid #ffffff;">Salida</th>
+                  <th style="border: 1px solid #ffffff;">Saldo</th>
+                  <th style="border: 1px solid #ffffff;"></th>
                 </tr>
               </thead>
               <tbody>
@@ -53,11 +55,12 @@
                     <td>{{ (cajabanco.Ingresos?cajabanco.Ingresos: 0 )- (cajabanco.Salidas?cajabanco.Salidas: 0 ) }}</td>
                    
                     <td>
-                      <b-button variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                      <b-button variant="danger" @click="eliminarPago(cajabanco)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
                     </td>
                 </tr>
               </tbody>
           </table>
+          </div>
         </b-col>
     </b-row>
     <!-- MODAL AGREGAR  PROVEEDOR-->
@@ -84,6 +87,7 @@
                       :options="lstTipoOpe"
                       value-field="IdTipoCajaBanco"
                       text-field="TipoCajaBanco"
+                      @input="cambiarTipo($event)"
                     ></b-form-select>
                   </b-col>
                   <b-col cols="12" v-if="mostrarCliente">
@@ -118,7 +122,7 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="6" v-if="IdTipoCajaBanco">
+              <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
                 <b-row>
                   <b-col cols="12">
                     Fecha Operacion: 
@@ -136,21 +140,20 @@
               </b-col>
               <b-col cols="12" class="mt-3">
                 <div class="card">
-                  {{ mostrarProveedor }}
                   <div class="card-header">Documentos a aplicar</div>
               
                 <div class="card-body">
                 <table class="table">
                     <thead>
-                      <tr>
-                        <th>Id</th>
-                        <th>Fecha</th>
-                        <th>FechaVen</th>
-                        <th>Correlativo</th>
-                        <th>Total</th>
-                        <th>Aplicado</th>
-                        <th>Saldo</th>
-                        <th></th>
+                      <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                        <th style="border: 1px solid #ffffff;">Id</th>
+                        <th style="border: 1px solid #ffffff;">Fecha</th>
+                        <th style="border: 1px solid #ffffff;">FechaVen</th>
+                        <th style="border: 1px solid #ffffff;">Correlativo</th>
+                        <th style="border: 1px solid #ffffff;">Total</th>
+                        <th style="border: 1px solid #ffffff;">Aplicado</th>
+                        <th style="border: 1px solid #ffffff;">Saldo</th>
+                        <th style="border: 1px solid #ffffff;"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -163,12 +166,26 @@
                         <td>{{deuda.Aplicado}}</td>
                         <td>{{deuda.Saldo}}</td>
                         <td>
-                          <b-button class="mx-1 my-1" v-if="deuda.Aplicado=='0'" style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
-                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-else style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
                           <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
                           <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
                         </td>
 
+                      </tr>
+                      <tr style="background: #BBDEFB; font-weight: bold; ">
+                        <td colspan="4" style="text-align: center;border: 1px solid #ffffff;">
+                          Sumatoria
+                        </td>
+                        <td style="border: 1px solid #ffffff;">
+                          {{ parseFloat(
+                              lstDeudas.reduce((sum,d)=>{
+                                return sum + parseFloat(d.Total)
+                              },0)
+                          ).toFixed(2) }}
+                        </td>
+                        <td colspan="3"></td>
+                        
                       </tr>
                     </tbody>
                 </table>
@@ -177,19 +194,18 @@
               </b-col>
               <b-col cols="12" class="mt-3">
                   <div class="card">
-                  {{ mostrarProveedor }}
                   <div class="card-header">Documentos Aplicados</div>
                   <div class="card-body">
                     <table class="table table-hover">
                     <thead>
-                      <tr>
-                        <th>Id</th>
-                        <th>Fecha</th>
-                        <th>FechaVen</th>
-                        <th>Correlativo</th>
-                        <th>Saldo</th>
-                        <th>Aplicado</th>
-                        <th>Saldo Fin</th>
+                      <tr style="background: #7986CB; border: 1px solid #ffffff;">
+                        <th style="border: 1px solid #ffffff;">Id</th>
+                        <th style="border: 1px solid #ffffff;">Fecha</th>
+                        <th style="border: 1px solid #ffffff;">FechaVen</th>
+                        <th style="border: 1px solid #ffffff;">Correlativo</th>
+                        <th style="border: 1px solid #ffffff;">Saldo</th>
+                        <th style="border: 1px solid #ffffff;">Aplicado</th>
+                        <th style="border: 1px solid #ffffff;">Saldo Fin</th>
                         <!-- <th></th> -->
                       </tr>
                     </thead>
@@ -204,10 +220,10 @@
                         <td>{{deuda.Saldo}}</td>
                       </tr>
                       <tr style="background: #BBDEFB; font-weight: bold;">
-                        <td colspan="5" style="text-align: center;">
+                        <td colspan="5" style="text-align: center; border: 1px solid #ffffff;">
                           Sumatoria
                         </td>
-                        <td>
+                        <td style="border: 1px solid #ffffff;">
                           {{  parseFloat(
                             lstAplicado.reduce((sum,deuda)=>{
                             return sum + parseFloat(deuda.Aplicado)
@@ -417,6 +433,7 @@ export default {
     },
     setCliente(obj) {
       this.Cliente = obj;
+      this.getClienteDeudas();
     },
     setProveedor(obj) {
       this.Proveedor = obj;
@@ -430,6 +447,20 @@ export default {
       ).then(res => {
         if (res.data) {
           this.lstDeudas = res.data.aaData;
+        }
+      });
+    },
+    async getClienteDeudas() {
+      await this.axios(
+        `${this.API}clientes/deudas/letras?idCliente=${this.Cliente.IdCliente}`
+      ).then(res => {
+        if (res.data) {
+          let deuda = res.data.aaData;
+          deuda = deuda.map(d => {
+            d.Id = d.IdDocVenta;
+            return d;
+          });
+          this.lstDeudas = deuda;
         }
       });
     },
@@ -505,8 +536,9 @@ export default {
         Importe: this.Importe,
         TipoCajaBanco: this.Tipo,
         AplicadoDocVenta: this.lstAplicado,
-        IdCliente: null,
-        IdProveedor: this.Proveedor.IdProveedor
+        IdCliente: this.Cliente ? this.Cliente.IdCliente : null,
+        IdProveedor: this.Proveedor ? this.Proveedor.IdProveedor : null,
+        User: sessionStorage.getItem("User")
       };
       await this.axios.post(`${this.API}movimiento/guardarMovimiento`, data);
       this.cargarOperaciones();
@@ -522,13 +554,10 @@ export default {
       this.IdTipoCajaBanco = "";
       this.modalRegistro = false;
       this.letrasFlag = false;
-
-      this.FechaDoc = "";
       this.Cliente = {};
       this.Proveedor = {};
       this.newDniRuc = {};
       this.newRuc = {};
-      this.IdTipoCajaBanco = "";
       this.FechaDocReg = "";
       this.Concepto = "";
       this.Importe = "";
@@ -541,31 +570,84 @@ export default {
       this.aplicarLetra = false;
     },
     pagaLetra(letra) {
-      console.log(letra);
-      let idDoc = id.split("-")[0];
+      let idDoc = letra.Id.split("-");
 
       let data = {
-        IdLetraCaja: letra.Id,
-        IdDocDet: idDoc,
+        IdLetraCaja: idDoc[1],
+        IdDocDet: idDoc[0],
         IdCuenta: this.IdCuenta,
-        Concepto: "Pago de Letra de " + letra.correlativo,
-        Importe: letra.total,
-        // IdTipoCajaBanco: $("#txtTipoOpeId").val(),
-        // Tipo: window.tipoCajaBanco,
-        // IdCliente: $("#txtCliente").is(":disabled")
-        //   ? 0
-        //   : $("#txtCliente").attr("data-idcliente"),
-        // IdProveedor: $("#txtProveedor").is(":disabled")
-        //   ? 0
-        //   : $("#txtProveedor").attr("data-idproveedor"),
-        // User: sessionStorage.getItem("User")
+        Concepto: "Pago de Letra de " + letra.Correlativo,
+        Importe: letra.Total,
+        IdTipoCajaBanco: this.IdTipoCajaBanco,
+        Tipo: this.Tipo,
+        IdCliente: this.Cliente ? this.Cliente.IdCliente : null,
+        IdProveedor: this.Proveedor ? this.Proveedor.IdProveedor : null,
+        User: sessionStorage.getItem("User")
       };
+      this.$swal({
+        icon: "question",
+        title: "Pagar Letra",
+        text: `Esta seguro en pagar la letra: ${letra.Id}, Correlativo: ${
+          letra.Correlativo
+        }`,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Pagar",
+        cancelButtonText: "Cancelar"
+      }).then(async respuesta => {
+        if (respuesta.isConfirmed) {
+          await this.axios.post(`${this.API}letras/pagar`, data);
+          this.modalRegistro = false;
+          this.limpiarLuegoPago();
+          this.cargarOperaciones();
+        }
+      });
+    },
+    cambiarTipo(e) {
+      let val = this.lstTipoOpe.filter(v => v.IdTipoCajaBanco == e)[0];
+      this.Tipo = val.Tipo;
+    },
+    eliminarPago(data) {
+      console.log("cajabanco", data);
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        text: `¿Desea Eliminar el registro ${
+          data.Concepto
+        }?. Recuerde que este proceso es Irreversible`,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, Eliminar",
+        cancelButtonText: "Cancelar"
+      }).then(async respuesta => {
+        if (respuesta.isConfirmed) {
+          await this.axios
+            .post(`${this.API}movimiento/eliminarCajaBanco`, data)
+            .then(res => {
+              if (res) {
+                this.$swal({
+                  icon: "success",
+                  title: "Correcto",
+                  text: "Registro Eliminado."
+                });
+              }
+            });
+          this.modalRegistro = false;
+          this.limpiarLuegoPago();
+          this.cargarOperaciones();
+        }
+      });
     }
   },
   computed: {
     mostrarProveedor() {
       if (this.IdTipoCajaBanco) {
-        this.Tipo = 1;
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
         );
@@ -574,12 +656,25 @@ export default {
     },
     mostrarCliente() {
       if (this.IdTipoCajaBanco) {
-        this.Tipo = 0;
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
         );
       }
       return false;
+    },
+    mostrarDatosPrincipalesOperaciones() {
+      if (!this.IdTipoCajaBanco) {
+        return false;
+      }
+
+      if (
+        Object.keys(this.Cliente).length === 0 &&
+        Object.keys(this.Proveedor).length === 0
+      ) {
+        return false;
+      }
+
+      return true;
     }
   }
 };
@@ -588,5 +683,29 @@ export default {
 <style>
 .modal-dialog {
   min-width: 90% !important;
+}
+
+.clsCaja {
+  padding: 15px;
+  margin: 5px 0px;
+  border: 2px solid #1a237e;
+  border-radius: 25px;
+  box-shadow: 3px 3px #1a237e;
+}
+.clsCuenta {
+  padding: 15px;
+  margin: 5px 0px;
+  border: 2px solid #1a237e;
+  border-radius: 25px;
+  box-shadow: 3px 3px #1a237e;
+}
+
+.modal-header {
+  background: #1b5e20;
+  color: #ffffff;
+}
+
+.close {
+  color: #ffffff;
 }
 </style>
