@@ -1,6 +1,8 @@
 <template>
   <b-container fluid>
-    <b-row>
+    <b-tabs content-class="mt-3 mx-3" fill card>
+      <b-tab title="Caja Bancos">
+          <b-row>
         <b-col cols="3">
           <div class="clsCuenta">
             <b-row>
@@ -21,48 +23,204 @@
                     <input type="date" class="form-control" v-model="FechaDoc">
                 </b-col>
                 <b-col cols="12" class="mt-2 text-center">
-                    <b-button variant="success" :disabled="!IdCuenta"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
+                    <b-button variant="success" :disabled="!IdCuenta"  @click="exportarOperaciones()"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
                     <b-button variant="info" :disabled="!IdCuenta" @click="abrirModalNuevaOperacion()"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
                 </b-col>
             </b-row>
           </div>
-        </b-col>
-        <b-col cols="9" class="px-5">
-          <div class="clsCaja">
-          <table class="table table-hover">
-              <thead>
-                <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
-                  <th style="border: 1px solid #ffffff;">Cuenta</th>
-                  <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
-                </tr>
-                <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
-                  <th style="border: 1px solid #ffffff;">ID</th>
-                  <th style="border: 1px solid #ffffff;">Usuario</th>
-                  <th style="border: 1px solid #ffffff;">Concepto</th>
-                  <th style="border: 1px solid #ffffff;">Ingresos</th>
-                  <th style="border: 1px solid #ffffff;">Salida</th>
-                  <th style="border: 1px solid #ffffff;">Saldo</th>
-                  <th style="border: 1px solid #ffffff;"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(cajabanco,index) in lstCajaBanco" :key="index">
-                    <td>{{ cajabanco.IdCajaBanco }}</td>
-                    <td>{{ cajabanco.UsuarioReg }}</td>
-                    <td>{{ cajabanco.Concepto }}</td>
-                    <td>{{ cajabanco.Ingresos }}</td>
-                    <td>{{ cajabanco.Salida }}</td>
-                    <td>{{ (cajabanco.Ingresos?cajabanco.Ingresos: 0 )- (cajabanco.Salidas?cajabanco.Salidas: 0 ) }}</td>
-                   
-                    <td>
-                      <b-button variant="danger" @click="eliminarPago(cajabanco)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                    </td>
-                </tr>
-              </tbody>
-          </table>
-          </div>
-        </b-col>
-    </b-row>
+            </b-col>
+            <b-col cols="9" class="px-5">
+              <div class="clsCaja">
+              <table class="table table-hover">
+                  <thead>
+                    <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                      <th style="border: 1px solid #ffffff;">Cuenta</th>
+                      <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
+                    </tr>
+                    <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
+                      <th style="border: 1px solid #ffffff;">ID</th>
+                      <th style="border: 1px solid #ffffff;">Usuario</th>
+                      <th style="border: 1px solid #ffffff;">Concepto</th>
+                      <th style="border: 1px solid #ffffff;">Ingresos</th>
+                      <th style="border: 1px solid #ffffff;">Salida</th>
+                      <!-- <th style="border: 1px solid #ffffff;">Saldo</th> -->
+                      <th style="border: 1px solid #ffffff;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(cajabanco,index) in lstCajaBanco" :key="index">
+                        <td>{{ cajabanco.IdCajaBanco }}</td>
+                        <td>{{ cajabanco.UsuarioReg }}</td>
+                        <td>{{ cajabanco.Concepto }}</td>
+                        <td>{{ cajabanco.Ingresos }}</td>
+                        <td>{{ cajabanco.Salida }}</td>
+                        <!-- <td>{{ (cajabanco.Ingresos?parseFloat(cajabanco.Ingresos): 0 )- (cajabanco.Salida?parseFloat(cajabanco.Salida): 0 ) }}</td> -->
+                      
+                        <td>
+                          <b-button variant="danger" @click="eliminarPago(cajabanco)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                        </td>
+                    </tr>
+                  </tbody>
+              </table>
+              </div>
+            </b-col>
+        </b-row>
+        </b-tab>  
+      <b-tab title="Gasto">
+            
+            <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+            <div class="my-3">
+              <b-row>
+                <b-col md="4" class="clsCuenta">
+                  <label>Cuenta:</label>
+                  <autocomplete
+                  required="required"
+                  ref="inputCaja"
+                  :url="API + 'cuentas'"
+                  anchor="Cuenta"
+                  label="writer"
+                  placeholder=""
+                  :on-select="setCuenta" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
+                  :onInput="(val) => newDniRuc = val"
+                  :classes="{input: 'form-control'}"
+                  >
+                  </autocomplete>
+                  <br>
+                  <label>Gasto:</label>
+                  <b-form-group>
+                    <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <label>Descripción:</label>
+                  <b-form-group>
+                    <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </div>
+            <template>
+              <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
+              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+            </template>
+          </b-form>
+        </b-tab>
+        
+        <b-tab title="Ingreso">
+          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+            <div class="my-3">
+              <b-row>
+                <b-col md="4" class="clsCuenta">
+                  <label>Cuenta:</label>
+                  <autocomplete
+                  required="required"
+                  ref="inputCaja2"
+                  :url="API + 'cuentas'"
+                  anchor="Cuenta"
+                  label="writer"
+                  placeholder=""
+                  :on-select="setCuenta" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputCaja2')"
+                  :onInput="(val) => newDniRuc = val"
+                  :classes="{input: 'form-control'}"
+                  >
+                  </autocomplete>
+                  <br>
+                  <label>Ingreso:</label>
+                  <b-form-group>
+                    <input v-model="selectProducto.Ingreso" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <label>Descripción:</label>
+                  <b-form-group>
+                    <b-form-input v-model="selectProducto.IngresoDesc" required placeholder="Descripción"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </div>
+            <template>
+              <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
+              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+            </template>
+          </b-form>
+        </b-tab>
+
+        <b-tab title="Salida">
+          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+            <div class="my-3">
+              <b-row>
+                <b-col md="4" class="clsCuenta">
+                  <label>Cuenta:</label>
+                  <autocomplete
+                  required="required"
+                  ref="inputCaja3"
+                  :url="API + 'cuentas'"
+                  anchor="Cuenta"
+                  label="writer"
+                  placeholder=""
+                  :on-select="setCuenta" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputCaja3')"
+                  :onInput="(val) => newDniRuc = val"
+                  :classes="{input: 'form-control'}"
+                  >
+                  </autocomplete>
+                  <br>
+                  <label>Salida:</label>
+                  <b-form-group>
+                    <input v-model="selectProducto.Salida" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <label>Descripción:</label>
+                  <b-form-group>
+                    <b-form-input v-model="selectProducto.SalidaDesc" required placeholder="Descripción"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </div>
+            <template>
+              <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
+              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+            </template>
+          </b-form>
+        </b-tab>
+
+        <b-tab title="Dep. Cuenta Bancaria">
+          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+            <div class="my-3">
+              <b-row>
+                <b-col md="4" class="clsCuenta">
+                  <label>Cuenta:</label>
+                  <autocomplete
+                  required="required"
+                  ref="inputCaja4"
+                  :url="API + 'cuentas'"
+                  anchor="Cuenta"
+                  label="writer"
+                  placeholder=""
+                  :on-select="setCuenta" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputCaja4')"
+                  :onInput="(val) => newDniRuc = val"
+                  :classes="{input: 'form-control'}"
+                  >
+                  </autocomplete>
+                  <br>
+                  <label>Monto:</label>
+                  <b-form-group>
+                    <input v-model="selectProducto.Deposito" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <label>N° Cuenta - Descripción:</label>
+                  <b-form-group>
+                    <b-form-input v-model="selectProducto.DepositoDesc" required placeholder="Descripción"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </div>
+            <template>
+              <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
+              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+            </template>
+          </b-form>
+        </b-tab>
+      
+      </b-tabs>
+   
     <!-- MODAL AGREGAR  PROVEEDOR-->
     <b-modal 
       v-model="modalRegistro" 
@@ -338,6 +496,17 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      selectProducto: {
+        IdCuenta: "",
+        Gasto: "",
+        GastoDesc: "",
+        Ingreso: "",
+        IngresoDesc: "",
+        Salida: "",
+        SalidaDesc: "",
+        Deposito: "",
+        DepositoDesc: ""
+      },
       Tipo: "",
       bloquearAplicar: false,
       errorLetras: "",
@@ -430,6 +599,23 @@ export default {
           }
         }
       );
+    },
+    async exportarOperaciones() {
+      console.log("ssss");
+      // this.lstCajaBanco = [];
+      let params = {
+        IdCuenta: this.IdCuenta,
+        FechaDoc: this.FechaDoc
+      };
+      // controllers/server_processingCajaBanco.php?IdCuenta=1&FechaDoc=2025-03-06&_=1741274426193
+      await this.axios(`${this.API}ListarCajaBanco/exportar`, {
+        params: params
+      }).then(res => {
+        if (res.data) {
+          window.open(res.data.file, "_blank");
+          console.log(res.data);
+        }
+      });
     },
     setCliente(obj) {
       this.Cliente = obj;
@@ -643,6 +829,139 @@ export default {
           this.cargarOperaciones();
         }
       });
+    },
+    focusAutocomplete(ref) {
+      this.$refs[ref].handleDoubleClick();
+    },
+    insertarGasto() {
+      let usuario = sessionStorage.getItem("User");
+      if (this.selectProducto.Gasto <= 0) {
+        return;
+      }
+      let r = confirm("¿Desea Insertar un gasto?");
+      if (r) {
+        this.axios
+          .post(this.API + "cajaybanco/gasto", {
+            producto: this.selectProducto,
+            concepto: "Gasto " + " - " + this.selectProducto.GastoDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            IdCuenta: this.Cuenta.IdCuenta,
+            Gasto: this.selectProducto.Gasto,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            this.$refs.inputCaja.setValue("");
+            this.cargarGastos();
+            this.selectProducto.IdCuenta = "";
+            this.selectProducto.Gasto = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.GastoDesc = "";
+          });
+      }
+    },
+    setCuenta(obj) {
+      this.Cuenta = obj;
+    },
+    insertarIngreso() {
+      let usuario = sessionStorage.getItem("User");
+      if (this.selectProducto.Ingreso <= 0) {
+        return;
+      }
+      let r = confirm("¿Desea Insertar un ingreso?");
+      if (r) {
+        this.axios
+          .post(this.API + "cajaybanco/ingreso", {
+            producto: this.selectProducto,
+            concepto:
+              "Vale de Ingreso " + " - " + this.selectProducto.IngresoDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            IdCuenta: this.Cuenta.IdCuenta,
+            Ingreso: this.selectProducto.Ingreso,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            //this.cargarGastos();
+            this.$refs.inputCaja2.setValue("");
+            this.selectProducto.Ingreso = "";
+            this.selectProducto.Gasto = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.IngresoDesc = "";
+          });
+      }
+    },
+    insertarSalida() {
+      let usuario = sessionStorage.getItem("User");
+      if (this.selectProducto.Salida <= 0) {
+        return;
+      }
+      let r = confirm("¿Desea Insertar una salida?");
+      if (r) {
+        this.axios
+          .post(this.API + "cajaybanco/salida", {
+            producto: this.selectProducto,
+            concepto:
+              "Vale de Egreso " + " - " + this.selectProducto.SalidaDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            IdCuenta: this.Cuenta.IdCuenta,
+            Salida: this.selectProducto.Salida,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            //this.cargarGastos();
+            this.$refs.inputCaja3.setValue("");
+            this.selectProducto.IdCuenta = "";
+            this.selectProducto.Salida = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.SalidaDesc = "";
+          });
+      }
+    },
+    insertarDeposito() {
+      let usuario = sessionStorage.getItem("User");
+      if (this.selectProducto.Deposito <= 0) {
+        return;
+      }
+      let r = confirm("¿Desea Insertar un depósito?");
+      if (r) {
+        this.axios
+          .post(this.API + "cajaybanco/deposito", {
+            producto: this.selectProducto,
+            concepto: "Deposito " + " - " + this.selectProducto.DepositoDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdCuenta: this.Cuenta.IdCuenta,
+            IdHabitacion: this.selectProducto.IdProducto,
+            Deposito: this.selectProducto.Deposito,
+            Usuario: usuario
+          })
+          .then(res => {
+            // this.adelantos.push(res.data)
+            //this.cargarGastos();
+            this.$refs.inputCaja4.setValue("");
+            this.selectProducto.IdCuenta = "";
+            this.selectProducto.Deposito = "";
+            this.selectProducto.Producto = "";
+            this.selectProducto.DepositoDesc = "";
+          });
+      }
+    },
+    guardarProductos() {
+      this.axios
+        .post(this.API + "preorden/detalle", {
+          IdPreOrden: this.selectProducto.IdPreOrden,
+          IdHabitacion: this.selectProducto.IdProducto
+          // Otros parámetros...
+        })
+        .then(() => {
+          this.$toasted.success("Guardado correctamente");
+          this.getHabitaciones();
+          this.show = false;
+        });
     }
   },
   computed: {
