@@ -212,7 +212,7 @@ export default {
             return sum + parseFloat(metodo.monto);
           }, 0)
         ).toFixed(2);
-        if (montoPagar < montoPagado) {
+        if (parseFloat(montoPagar) < parseFloat(montoPagado)) {
           this.$toasted.show("Los Montos no pueden ser mayores");
           return false;
         }
