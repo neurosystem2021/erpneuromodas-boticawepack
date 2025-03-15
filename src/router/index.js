@@ -15,6 +15,7 @@ import Venta from '@/views/Venta.vue'
 import Venta2 from '@/views/Venta2.vue'
 import CategoriasNuevo from '@/views/CategoriasNuevo.vue'
 import Proveedores from '@/views/Proveedores.vue'
+import CajaBancos from '@/views/CajaBancos.vue'
 
 // Reportes
 import ReporteVentas from '@/views/reportes/Ventas.vue'
@@ -82,6 +83,10 @@ export default new Router({
       path: '/reportes/cierrecaja',
       name: 'CierreCaja',
       component: CierreCaja
+    },{
+      path: "/cajabancos",
+      name: "CajaBancos",
+      component: CajaBancos
     },
     {
       path: '/reportes/proforma/:id',
