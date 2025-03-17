@@ -47,7 +47,7 @@
         <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
               <th>ID</th>
               <th>Producto</th>
               <th>Cantidad Vendida</th>
@@ -78,7 +78,7 @@
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
                 <th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
@@ -151,7 +151,7 @@
         <h5>Ventas Tarjeta</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
               <th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
@@ -223,7 +223,7 @@
         <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
                 <th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
@@ -293,7 +293,7 @@
         <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
                 <th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
@@ -363,7 +363,7 @@
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
-            <tr>
+            <tr class="thDetalle">
               <th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
@@ -435,7 +435,7 @@
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
             <thead>
-              <tr>
+              <tr class="thDetalle">
                 <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
@@ -460,7 +460,7 @@
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
-              <tr>
+              <tr class="thDetalle">
                 <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
@@ -487,7 +487,7 @@
           <h5>Ingresos de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
             <thead>
-              <tr>
+              <tr class="thDetalle">
                 <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
@@ -515,7 +515,7 @@
           <h5>Salidas de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
             <thead>
-              <tr>
+              <tr class="thDetalle">
                 <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
@@ -639,19 +639,19 @@ export default {
       });
       return total;
     },
-    totalIngresosTarjeta () {
-      let total = 0
+    totalIngresosTarjeta() {
+      let total = 0;
       this.ingresosTarjeta.forEach(ingresoTar => {
-        if (!ingresoTar.Anulado) total += ingresoTar.Importe
+        if (!ingresoTar.Anulado) total += ingresoTar.Importe;
       });
-      return total 
+      return total;
     },
-    totalSalidasTarjeta () {
-      let total = 0
+    totalSalidasTarjeta() {
+      let total = 0;
       this.salidasTarjeta.forEach(salidaTar => {
-        if (!salidaTar.Anulado) total += salidaTar.Importe
+        if (!salidaTar.Anulado) total += salidaTar.Importe;
       });
-      return total 
+      return total;
     },
     totalAdelantos() {
       let total = 0;
@@ -894,8 +894,8 @@ export default {
           params: params
         })
         .then(res => {
-          this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
-          this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
+          this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
+          this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
         })
         .catch(err => {
           console.log(err);
@@ -913,8 +913,8 @@ export default {
           params: params
         })
         .then(res => {
-          this.salidas = res.data.filter((sal)=> sal.EsTarjeta==0)
-          this.salidasTarjeta = res.data.filter((sal)=> sal.EsTarjeta==1)
+          this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
+          this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
         })
         .catch(err => {
           console.log(err);
@@ -978,7 +978,9 @@ td {
   vertical-align: middle;
 }
 th {
-  background-color: #f1f1f1;
+  background: #1a237e;
+  /* color: #ffff; */
+  border: 1px solid #ffffff;
 }
 .total {
   background-color: #e4ff95;
@@ -1017,5 +1019,14 @@ th {
   .si-print {
     display: block;
   }
+}
+
+.tableResumen {
+  width: 100%;
+  font-weight: bold;
+}
+
+.thDetalle {
+  color: white;
 }
 </style>
