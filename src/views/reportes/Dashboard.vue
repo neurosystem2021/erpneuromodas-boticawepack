@@ -71,7 +71,7 @@ import DoughnutVendedor from "@/components/Dashboard/DoughnutVendedor";
 import BarChartProductos from "@/components/Dashboard/BarChartProductos";
 import BarChartCompras from "@/components/Dashboard/BarChartCompras";
 import BarChartUtilidadBruta from "@/components/Dashboard/BarChartUtilidadBruta";
-import LineChart from "@/components/LineChart";
+// import LineChart from "@/components/LineChart";
 import config from "@/store/config.js";
 export default {
   mounted() {

@@ -1035,6 +1035,12 @@ export default {
 th {
   background-color: #f1f1f1;
 }
+
+th {
+  background: #1a237e;
+  color: #ffff;
+  border: 1px solid #ffffff;
+}
 .total {
   background-color: #e4ff95;
 }
@@ -1069,22 +1075,21 @@ th {
     display: none;
   }
 
-  .tableResumen{
-    width: 100%; 
-    border-collapse: collapse; 
-
+  .tableResumen {
+    width: 100%;
+    border-collapse: collapse;
   }
   .tbl-historico {
-    width: 100%; 
-    font-size: 0.5rem; 
-    border-collapse: collapse; 
+    width: 100%;
+    font-size: 0.5rem;
+    border-collapse: collapse;
   }
 
   .tbl-historico th,
   .tbl-historico td {
     padding: 2px 4px;
     text-align: left;
-    white-space: nowrap; 
+    white-space: nowrap;
   }
 
   .ocultarNoPrint {
