@@ -1,8 +1,16 @@
 <template>
   <b-container fluid>
+      <b-row>
+        <b-col cols="12">
+          <b-breadcrumb :items="items"></b-breadcrumb>
+       </b-col>
+      </b-row>
     <b-tabs content-class="mt-3 mx-3" fill card>
       <b-tab title="Caja Bancos">
           <b-row>
+            <b-col cols="12">
+        <b-breadcrumb :items="items"></b-breadcrumb>
+       </b-col>
         <b-col cols="3">
           <div class="clsCuenta">
             <b-row>
@@ -496,6 +504,16 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      items: [
+        {
+          text: "CAJA BANCOS",
+          href: "#"
+        },
+        {
+          text: "REPORTE",
+          active: true
+        }
+      ],
       selectProducto: {
         IdCuenta: "",
         Gasto: "",

@@ -13,6 +13,7 @@ import Habitaciones from "@/views/Habitaciones.vue";
 import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
+import Login from "@/views/Security/Login.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -39,11 +40,17 @@ Vue.use(Router);
 
 export default new Router({
   // mode: 'history',
+  
   routes: [
     {
       path: "/",
       name: "Movimiento",
       component: Movimiento
+    },
+    {
+      path: "/Login",
+      name: "Login",
+      component: Login
     },
     {
       path: "/productos",
