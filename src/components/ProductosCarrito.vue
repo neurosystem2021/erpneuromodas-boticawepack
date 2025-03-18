@@ -36,6 +36,7 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <b-button @click="startRecognitionCodeBar" variant="info"><i class="fas fa-microphone"></i> </b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
@@ -369,10 +370,11 @@
     <b-col md="2">
       <slot name="adicional"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="!isVentas">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
+                
                 <td class="table-success">SubTotal</td>
                 <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
               </tr>
@@ -441,6 +443,7 @@ export default {
 
   data() {
     return {
+      vuelto: 0,
       readerSize: {
         width: 1600,
         height: 1080
@@ -476,7 +479,9 @@ export default {
       medicionPro: "UNIDAD",
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
-      modalAbiertCode: false
+      modalAbiertCode: false,
+      queryCodeBar: "",
+      query: ""
     };
   },
   created() {
@@ -696,6 +701,46 @@ export default {
         alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
+    startRecognitionCodeBar() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.queryCodeBar = event.results[0][0].transcript;
+          this.searchCodeBar();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.queryCodeBar) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
     search() {
       // console.log("Búsqueda:", this.query);
       const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
@@ -705,6 +750,20 @@ export default {
       setTimeout(() => {
         inputElement.value = this.query;
         inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 1000);
+    },
+    searchCodeBar() {
+      // console.log("Búsqueda:", this.query);
+      // const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+      //   "input"
+      // );
+      let inputElement = document.getElementById("txtBarcode");
+      inputElement.focus();
+
+      inputElement.value = this.queryCodeBar;
+      inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+      setTimeout(() => {
+        this.loadBarcode();
       }, 1000);
     },
     irtxtBarcode(event) {
@@ -965,11 +1024,11 @@ export default {
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
-
+      console.log(obj);
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
 
-      if (!obj.PreciosPorProducto || fPP.length === 4) {
+      if (obj.TienePresentacion == 0) {
         obj.estadoPxP = true;
         this.setProductoUni(obj);
         return;
