@@ -288,7 +288,7 @@
                         </productos-carrito>
                     </b-col>
                     
-                      <b-col cols="12" md="3" lg="3" >
+                      <!-- <b-col cols="12" md="3" lg="3" >
                                 <table class="table b-table border table-footer">
                                     <tbody>
                                         <tr>
@@ -358,8 +358,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </b-col>    
-                            <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" >
+                            </b-col>     -->
+                            <!-- <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" >
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
                                         <tr>
@@ -460,7 +460,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                              </b-col>
+                              </b-col> -->
                             <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm text-center ocularMovil"  >
                                     <tbody>
@@ -484,6 +484,17 @@
                                         <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
                                       </tr>
                                       <tr>
+                                        <td>
+                                              <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                                              <br>
+                                              <b-badge v-if="idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                                              <b-badge v-if="idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                                              <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                                              <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                                              <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus">
+                                              <slot name="metodopago"></slot>
+                                              </b-popover>
+                                        </td>
                                         <td><b>SubTotal</b></td>
                                         <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
                                       </tr>
@@ -498,6 +509,12 @@
                                         <td class="table-danger">{{ sumatoriaIgv }}</td>
                                       </tr>
                                       <tr>
+                                        <td>
+                                          <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
+                                          <b-popover target="popover-opciones" title="Opciones" triggers="focus" >
+                                            <slot name="operaciones"></slot>
+                                          </b-popover>  
+                                        </td>
                                         <td><b>TOTAL</b></td>
                                         <td class="table-danger">{{ sumatoriaTotal }}</td>
                                       </tr>

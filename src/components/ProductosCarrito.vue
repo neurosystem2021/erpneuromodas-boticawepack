@@ -374,6 +374,7 @@
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
+                
                 <td class="table-success">SubTotal</td>
                 <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
               </tr>
