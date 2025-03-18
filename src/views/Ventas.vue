@@ -268,7 +268,7 @@
                   </b-col>
                 </b-row>
                 <b-row>
-                    <b-col> 
+                    <b-col cols="12"> 
                         <productos-carrito 
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
@@ -284,7 +284,11 @@
                             :onSetProducto="onSetProducto"
                             :esDelivery="venta.EsDelivery">
 
-                            <template slot="operaciones">
+                            
+                        </productos-carrito>
+                    </b-col>
+                    
+                      <b-col cols="12" md="3" lg="3" >
                                 <table class="table b-table border table-footer">
                                     <tbody>
                                         <tr>
@@ -354,8 +358,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </template>    
-                            <template slot="metodopago" v-if="!venta.EsCredito" >
+                            </b-col>    
+                            <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" >
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
                                         <tr>
@@ -456,8 +460,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                              </b-col>
+                            <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm text-center ocularMovil"  >
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -466,9 +470,54 @@
                                         <tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
                                 </table>
-                            </template>
-                        </productos-carrito>
-                    </b-col>
+                              </b-col>
+
+                              <b-col cols="12" md="3" lg="3" >
+                                  <table class="table b-table border table-footer">
+                                    <tbody>
+                                      <tr v-if="sumatoriaDescuento > 0">
+                                        <td class="table-success">SubTotal</td>
+                                        <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
+                                      </tr>
+                                      <tr v-if="sumatoriaDescuento > 0">
+                                        <td class="table-danger">Descuento</td>
+                                        <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
+                                      </tr>
+                                      <tr>
+                                        <td><b>SubTotal</b></td>
+                                        <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+                                      </tr>
+                                      <tr v-if="productos.some(v=>v.FLETE >0)">
+                                        <td><b>Total Flete</b></td>
+                                        <td class="table-danger">{{ productos.reduce((sum,producto)=>{
+                                          return sum + parseFloat(producto.FLETE)
+                                        },0)  }}</td>
+                                      </tr>
+                                      <tr v-if="sumatoriaIgv > 0">
+                                        <td><b>IGV</b></td>
+                                        <td class="table-danger">{{ sumatoriaIgv }}</td>
+                                      </tr>
+                                      <tr>
+                                        <td><b>TOTAL</b></td>
+                                        <td class="table-danger">{{ sumatoriaTotal }}</td>
+                                      </tr>
+                                      <tr>
+                                        <td  colspan="2">
+                                          <label>pagó con:</label>
+                                          <b-form-input
+                                            type="text"
+                                            :disabled="bloquearInput?true:false"
+                                            placeholder="Pagó con"
+                                            v-model="pagocon"
+                                            @input="asignarVuelto"></b-form-input><br>
+                                          <label>Vuelto:</label>
+                                          <b>S/  {{ vuelto | redondear }}</b>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                            </b-col>
+                   
                 </b-row>
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
@@ -541,6 +590,8 @@ export default {
   },
   data() {
     return {
+      vuelto: 0,
+      pagocon: 0,
       fieldsDocRef: [
         { key: "idDocVenta" },
         { key: "IdProductos" },
@@ -650,6 +701,50 @@ export default {
       let precio = pManoObra ? pManoObra.precio : 0;
 
       return precio;
+    },
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
+      if (this.igvTotal) {
+        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
+        sumatoria = this.sumatoriaTotal / 1.18;
+      } else {
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
+          if (value.descuento) {
+            sumatoria -= value.descuento;
+          }
+        });
+      }
+      return this.$options.filters.redondear(sumatoria);
+    },
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
+    },
+    sumatoriaIgv() {
+      let sumatoria = 0;
+      if (this.igvTotal || this.gravadaflag) {
+        sumatoria = this.sumatoriaTotal;
+        //sumatoria = sumatoria * 0.18
+        sumatoria = sumatoria - sumatoria / 1.18;
+      } else {
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
+      }
+      return this.$options.filters.redondear(sumatoria);
+    },
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
@@ -658,8 +753,12 @@ export default {
       limpiarCart: "limpiarCarrito",
       obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
-      add: "agregarProducto"
+      add: "agregarProducto",
+      actualizarTotal: "actualizarTotalCart"
     }),
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
+    },
     cargarMonto(tipo) {
       if (this.venta.pago && this.venta.pago.hasOwnProperty(tipo)) {
         Object.keys(this.venta.pago).forEach(key => {
@@ -1717,7 +1816,7 @@ export default {
   }
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 920px) {
   /* For desktop: */
   .ocularMovil {
     display: none !important;
@@ -1738,11 +1837,11 @@ export default {
     display: inline !important;
   }
 }
-@media (max-width: 850px) {
+/* @media (max-width: 850px) {
   .ocularMovil {
     display: none !important;
   }
-}
+} */
 .clsProducto {
   min-width: 200px !important;
   white-space: normal;
