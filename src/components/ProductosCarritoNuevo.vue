@@ -48,7 +48,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==2 }"
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || idPerfil != 1"
+            :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
             step="0.000001"
@@ -65,7 +65,7 @@
           <input
             v-model="productos[data.index].precio"
             type="number"
-            :readonly="(type === 'mov') ? false : true && idPerfil != 1 || bloquearInput?true:false"
+            :readonly="(type === 'mov') ? true : false"
             min="0"
             style="width: 110px"
             step="0.00001"
@@ -78,7 +78,7 @@
             <input
               v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==1 }"
               v-model="productos[data.index].sutotal"
-              :disabled="bloquearInput?true:false || idPerfil != 1"
+              :disabled="bloquearInput?true:false"
               type="number"
               min="0"
               step="0.00001"
@@ -134,7 +134,7 @@
           <input
             v-bind:class="{ selectionProducto: productoSelectIndex==data.index && accionBoton==3 }"
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false || idPerfil != 1"
+            :disabled="bloquearInput?true:false"
             type="number"
             style="width: 110px"
             min="0"
