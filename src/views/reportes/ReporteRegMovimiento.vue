@@ -96,7 +96,7 @@
             </b-row>
         </b-col>
     </b-row>
-    <b-modal v-model="detalleMovimiento" no-close-on-backdrop no-close-on-esc>
+    <b-modal v-model="detalleMovimiento" no-close-on-backdrop no-close-on-esc hide-footer>
         <b-row>
           <b-col cols="6">
             <b-input-group>
@@ -141,6 +141,10 @@
                 </tr>
               </tbody>
             </table>
+          </b-col>
+          <b-col cols="12" style="text-align: end;">
+            <b-button variant="warning" @click="generarCodigoBarra()">Código de Barra</b-button>
+            <b-button variant="danger" @click="detalleMovimiento=!detalleMovimiento">Cerrar</b-button>
           </b-col>
         </b-row>
     </b-modal>
@@ -221,6 +225,12 @@ export default {
     imprimirMovimiento(reporte) {
       window.open(
         `/imprimir/index.php?hashMovimiento=${reporte.IdMovimiento}`,
+        "_blank"
+      );
+    },
+    generarCodigoBarra(reporte) {
+      window.open(
+        `/views/codigoBarra.php?hash=${this.IdMovimiento}`,
         "_blank"
       );
     },
@@ -321,6 +331,7 @@ export default {
       });
     },
     async abrirDedetalle(reporte) {
+      console.log(reporte);
       this.FechaPeriodoTributario = reporte.FechaPeriodoTributario;
       this.IdMovimiento = reporte.IdMovimiento;
       this.lstDetalle = [];
