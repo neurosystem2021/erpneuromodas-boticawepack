@@ -22,6 +22,7 @@
               <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
               </b-input-group>
               </b-form-group>
+              Busqueda avanzada (Producto, Modelo, Categoria)
         </b-col>
         <b-col cols="12" lg="6">
           <b-form-group>
