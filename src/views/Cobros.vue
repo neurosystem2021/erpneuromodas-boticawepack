@@ -147,7 +147,15 @@
                 </tr>
                 <tr v-if="productoSelect.EsCredito==0">
                   <td class="celda" style="font-weight:bold; width:35% !important;">Metodo de Pago</td>
-                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO':''}} {{ productoSelect.Visa>0?'TARJETA':''}} {{ productoSelect.Mastercard>0?'YAPE / PLIN':''}} {{ productoSelect.Transferencia>0?'TRANSFERENCIA':''}}</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Efectivo>0?'EFECTIVO (S/.' + productoSelect.Efectivo + ')':''}} <br> {{ productoSelect.Visa>0?'TARJETA (S/.' + productoSelect.Visa + ')':''}} {{ productoSelect.Mastercard>0?'YAPE / PLIN (S/.' + productoSelect.Mastercard + ')':''}} {{ productoSelect.Transferencia>0?'TRANSFERENCIA (S/.' + productoSelect.Transferencia + ')':''}}</td>
+                </tr>
+                <tr v-if="productoSelect.PorEntregar==0 && adelanto>0">
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Adelanto</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ adelanto | redondear }}</td>
+                </tr>
+                <tr v-if="productoSelect.PorEntregar==0 && adelanto>0">
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Pendiente</td>
+                  <td class="celda" style="text-transform: uppercase">: {{((productoSelect.Total) - (adelanto)).toFixed(2)}}</td>
                 </tr>
               </tbody>
             </table>
@@ -238,6 +246,7 @@ export default {
   },
   data() {
     return {
+      adelanto:0,
       API: config.API,
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filter: null,
@@ -300,28 +309,48 @@ export default {
           // this.$refs[ref].type = ""
           this.$refs[ref].handleDoubleClick()
       },
+      facturarVentaPedido(idDocVenta) {
+        let idAnterior = idDocVenta -1;
+          this.axios
+            .get(this.API + "ventas/pedido/adelantos", {
+              params: { IdDocVenta: idAnterior },
+            })
+            .then((res) => {
+              if (res.data && res.data.length > 0) {
+                let suma = res.data.reduce((acc, r) => acc + parseFloat(r.Importe || 0), 0);
+                this.adelanto = suma;
+              } else {
+                this.adelanto = 0;
+              }
+            })
+            .catch((error) => {
+              console.error("Error al obtener adelanto:", error);
+            });
+      },
       onCobrar(idDocVenta){
         let params = {IdDocVenta: idDocVenta}
         this.axios.get(this.API + 'venta/info', {params: params})
-        .then((response) => {
-          if(response.data){
-            if(response.data.Pagado==0){
-              this.productoSelect = response.data
-              this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
-              this.$refs.modalCobrar.show()
-              let descuentoTotal = 0
-              this.productoSelect.Detalle.map((det)=>{
-                descuentoTotal += det.Descuento
-              })
-              this.productoSelect.DescuentoTotal = descuentoTotal
-            }else{
-              this.$toasted.show('La venta fue cobrada anteriormente')
-              this.$refs.tablaVentas.refresh()
+          .then((response) => {
+            if(response.data){
+              if(response.data.Pagado==0){
+                this.productoSelect = response.data
+                this.titulo = this.productoSelect.Serie + " - "+ this.productoSelect.Numero
+                this.$refs.modalCobrar.show()
+                let descuentoTotal = 0
+                this.productoSelect.Detalle.map((det)=>{
+                  descuentoTotal += det.Descuento
+                })
+                this.productoSelect.DescuentoTotal = descuentoTotal
+                //Llamar a la función para obtener el adelanto
+                this.facturarVentaPedido(idDocVenta);
+              }else{
+                this.$toasted.show('La venta fue cobrada anteriormente')
+                this.$refs.tablaVentas.refresh()
+              }
             }
-          }
           
-        }).catch((err)=>{
-          console.log(err);
+          }).catch((err)=>{
+            console.log(err);
           this.$toasted.error('Error: Intente nuevamente') 
         })
         

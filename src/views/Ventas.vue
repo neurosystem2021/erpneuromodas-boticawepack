@@ -276,7 +276,7 @@
                             :igvTotal="tieneIgv"
                             :setPrecio="true"
                             ref="carrito" 
-                            :showButton="false" 
+                            :showButton="false"
                             :bloquearInput="bloquearInput"
                             :fields="carrito.fields"
                             :isVentas="true"
@@ -402,7 +402,11 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - 
+                                                    venta.pago.mastercard.monto -
+                                                    venta.pago.transferencia.monto -
+                                                    $event.target.value
+                                                    )"
                                                 />
                                             </td>
                                         </tr>
@@ -426,7 +430,10 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - 
+                                                    venta.pago.visa.monto -
+                                                    venta.pago.transferencia.monto -
+                                                    $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -437,6 +444,7 @@
                                                 <b-form-input
                                                     v-model="venta.pago.transferencia.descripcion"
                                                     :disabled="bloquearInput?true:false"
+                                                    :required="venta.pago.transferencia.monto > 0"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -450,7 +458,10 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - 
+                                                    venta.pago.mastercard.monto - 
+                                                    venta.pago.visa.monto -
+                                                    $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
