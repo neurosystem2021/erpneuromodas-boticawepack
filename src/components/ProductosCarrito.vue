@@ -129,7 +129,7 @@
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <input v-model="productos[data.index].cantidad" 
+          <input v-model="productos[data.index].cantidad"  :id="`cantidad${data.index}`"
           :disabled="productos[data.index].EsPresentacion  || bloquearInput
             ? true
             : false || esDelivery
@@ -1039,6 +1039,11 @@ export default {
       this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
         .recalcularTotalPorEmpresaFlag;
       this.index = null;
+      setTimeout(() => {
+        let primerElement = document.getElementById("cantidad0");
+        primerElement.focus();
+        primerElement.select();
+      }, 100);
     },
     setProductoCant(prod, index = null) {
       this.objProd.cantxPrecio = 1;
