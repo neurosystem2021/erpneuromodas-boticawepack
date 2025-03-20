@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Ver Cierres</b-button>
+        <b-button @click="show=true" variant="warning">Ver Cierres</b-button>
         
         <b-form >    
             <b-modal id="modalCierres" 

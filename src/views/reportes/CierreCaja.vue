@@ -1,154 +1,82 @@
 <template>
-  <div>
-    <br>
-    <b-container class="bv-example-row">
-      <div>
-          <div class="no-print">
-              <b-row align-h="end" class=" no-print">
-                  <!--  <label v-if="!this.$route.params.id" >Vendedor:</label>
-                <b-col cols="3" v-if="!this.$route.params.id">
-                    <b-form-group size="sm" >
-                        <autocomplete
-                            required="required"
-                            ref="inputVendedor"
-                            :url="API + 'usuarios'"
-                            anchor="NombreUsuario"
-                            label="writer"
-                            :on-select="setVendedor" 
-                            :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
-                    </b-form-group>
-                </b-col> -->
-                <b-col cols="7">
-                    <b-button-group size="sm" v-if="!this.$route.params.id">
-                        <b-form-select v-model="turno" :options="turnos" />
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <cierres-caja></cierres-caja>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
-                    </b-button-group>
-                </b-col>
-              </b-row>
-                     </div>
-      </div>
-      <br class="no-print" /><br class="no-print" />
+  <b-container fluid class="px-5 py-5">
+    <b-row class="no-print">  
+      <b-col cols="9" class="no-print">
+        
+        <b-card no-body>
+          <b-tabs content-class="mt-3 mx-3" card fill pills>
+            <b-tab title="Ventas" active >
+              <h5>Ventas Efectivo</h5><br>
+              <table class="table b-table table-sm">
+                <thead>
+                  <tr class="thDetalle">
+                      <th>Recibo</th><th>Fecha</th>
+                      <th v-if="$route.query.noDetalle">Cliente</th>
+                      <th v-else>Productos</th>
+                      <th>Estado</th><th style="width:90px">Pagado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td>{{ item.FechaDoc }}</td>
+                    <td>
+                    
+                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <thead>
+                          <tr>
+                            <th>Codigo</th>
+                            <th>Producto</th>
+                            <th>Descripcion</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Descuento</th>
+                            <th v-if="item.TieneIgv">Subtotal</th>
+                            <th v-if="item.TieneIgv">IGV</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(prod, index) in item.productos" :key="index">
+                            <td>{{ prod.CodigoBarra }}</td>
+                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td>{{ prod.Descripcion }}</td>
+                            <td>{{ prod.Cantidad }}</td>
+                            <td>{{ prod.Precio }}</td>
+                            <td>{{ prod.Descuento }}</td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                            </td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal * 0.18 | redondear}}
+                            </td>
+                            <td>{{ prod.Subtotal | redondear }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div><i><small>
+                      <b v-if="$route.query.noDetalle"></b>
+                      <b v-else>Cliente:</b>
+                      
+                      {{ item.Cliente }}</small></i></div>
 
-      <h2 class="text-center">Cierre de Caja</h2> 
-      <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-      <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-            <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-      <b-row>
-        <h5>Resumen Por Producto</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr class="thDetalle">
-              <th>ID</th>
-              <th>Producto</th>
-              <th>Cantidad Vendida</th>
-              <th>Monto</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
-               <td> {{ produtos.IdProducto }} </td>
-               <td> {{ produtos.Producto }} </td>
-               <td> {{ produtos.total }} </td>
-               <td> {{ produtos.Precio }} </td>
-               <!-- <td> {{ produtos }} </td> -->
-               <!--  -->
-            </tr>
-            
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ reportePorProveedor.reduce((total,prod)=>{
-                      return total + parseFloat(prod.Precio)
-                  },0) }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-        <h5>Ventas Efectivo</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
-                <th v-if="$route.query.noDetalle">Cliente</th>
-                <th v-else>Productos</th>
-                <th>Estado</th><th style="width:90px">Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-              
-                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
-                  <thead>
-                    <tr>
-                      <th>Codigo</th>
-                      <th>Producto</th>
-                      <th>Descripcion</th>
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                      <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Descripcion }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small>
-                <b v-if="$route.query.noDetalle"></b>
-                <b v-else>Cliente:</b>
-                
-                 {{ item.Cliente }}</small></i></div>
+                    </td>
+                    
+                    <td>{{ estadoVenta(item) }}</td>
+                    <td>S/. {{ item.Efectivo | redondear }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3"></td>
+                    <td class="total"><b>Total Efectivo</b></td>
+                    <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+                  </tr>
+                </tfoot>
+              </table>
 
-              </td>
-              <!--<td>{{ item.EfectivoDesc }}</td>-->
-              <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Efectivo | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-      </b-row>
-
-
-      <b-row>
-        <h5>Ventas Tarjeta</h5><br>
+              <h5>Ventas Tarjeta</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
@@ -215,11 +143,6 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-
-      
-
-      <b-row>
         <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -287,9 +210,6 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-
-      <b-row>
         <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -357,9 +277,6 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-
-      <b-row class="credito">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -427,10 +344,7 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>
-
-
-      <b-row>
+        <b-row>
         <b-col v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
@@ -538,7 +452,6 @@
           </table>
         </b-col>
       </b-row>
-
       <b-row>
           <b-col v-if="totalAdelantos">
             <h5>Descontar Adelantos</h5><br>
@@ -566,12 +479,126 @@
             </table>
           </b-col>
       </b-row>
+            </b-tab>
+            <b-tab title="Productos" >
+              <h5>Resumen Por Producto</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Cantidad Vendida</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+              
+            </tr>
+            
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0) }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+            </b-tab>
+          </b-tabs>
+        </b-card>
+      </b-col>
+      <b-col cols="3" class="card elevation-2">
+        <div class="alinear">
+          <center>
+          </center>
+          <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+          <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+          <div v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+        </div>
+        <h2 class="text-center">Mi Cierre de Caja</h2> 
+        <b-row  align-h="end" class=" no-print">
+        <b-col cols="12">
+           
+            <b-button-group>
+              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
+                Cerrar Caja</b-button>
+            </b-button-group>
+            <b-button-group>
+              <cierres-caja></cierres-caja>
+            </b-button-group>
+            <b-button-group>
+              <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
+            </b-button-group>
+          </b-col>
+        <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
+          Turno
+          
+          <b-form-select v-model="turno" :options="turnos" />
+          
+        </b-col>
+            <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
+              <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+              <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
+              <!-- <div v-if="cierre.UsuarioReg" style="font-size: 2em;">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> -->
+              
+            </b-col>
+      </b-row>
+      </b-col>
+      <b-col cols="12">
+
+        <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+      </b-col>
+    
+    </b-row>
+  </b-container>
+
+  <!-- <div>
+    <br>
+    <b-container class="bv-example-row">
+      <div>
+          <div class="no-print">
+              <b-row align-h="end" class=" no-print">
+                
+                <b-col cols="7">
+                    <b-button-group size="sm" v-if="!this.$route.params.id">
+                        <b-form-select v-model="turno" :options="turnos" />
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <cierres-caja></cierres-caja>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+                    </b-button-group>
+                </b-col>
+              </b-row>
+                     </div>
+      </div>
+      <br class="no-print" /><br class="no-print" />
+
+     
+
+
+      
+      
+     
+
+      
 
       <br>
 
-      <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
     </b-container>
-  </div>
+  </div> -->
 </template>
 <script>
 import config from "@/store/config.js";
