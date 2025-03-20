@@ -83,7 +83,9 @@
               <th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
-              <th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Detalle</th>
+<th>Estado</th>
+<th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +152,9 @@
                 <th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
-                <th>Detalle</th><th>Estado</th><th>Pagado</th>
+                <th>Detalle</th>
+<th>Estado</th>
+<th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -217,7 +221,9 @@
                 <th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
-                <th>Detalle</th><th>Estado</th><th>Pagado</th>
+                <th>Detalle</th>
+<th>Estado</th>
+<th>Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -504,10 +510,12 @@
           <tfoot>
             <tr>
               <td colspan="2"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ reportePorProveedor.reduce((total,prod)=>{
+              <td class="total"><b>Total Efectivos</b></td>
+              <td class="total"><b>S/. {{
+                parseFloat( reportePorProveedor.reduce((total,prod)=>{
                       return total + parseFloat(prod.Precio)
-                  },0) }}</b></td>
+                  },0)).toFixed(2)
+              }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -550,8 +558,67 @@
               <!-- <div v-if="cierre.UsuarioReg" style="font-size: 2em;">Empleado: <b>{{ cierre.UsuarioReg }}</b></div> -->
               
             </b-col>
+            <b-col cols="12">
+        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+          <tbody>
+            <tr>
+              <td>Gran Total S/.</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ totalSalidas | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Crédito S/.</td>
+              <td>{{ totalVentasCredito | redondear }} </td>
+            </tr>
+          
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Yape/Plin S/.</td>
+              <td>{{ totalVentasMastercard | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | redondear }} </td>
+            </tr>
+            
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+
+            <tr>
+              <td>Vales de Crédito S/.</td>
+              <td>{{ totalVentasValeCredito | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Canjes S/.</td>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
+      </b-col>
       </b-row>
       </b-col>
+      
       <b-col cols="12">
 
         <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
@@ -559,48 +626,526 @@
     
     </b-row>
 
-    
+    <b-row class="si-print">
+       <h1> <center>Cierre Caja</center></h1>
+       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
+       <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
+        
+        <table class="table table-sm" width="100%">
+          <thead>
+            <tr class="thDetalle">
+              <th width="5%">ID</th>
+              <th width="65%">Producto</th>
+              <th width="15%">Cantidad Vendida</th>
+              <th width="15%">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+              
+            </tr>
+            
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ parseFloat(reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0) ).toFixed(2)}}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+
+              <h5>Ventas Efectivo</h5><br>
+              <table class="table b-table table-sm">
+                <thead>
+                  <tr class="thDetalle">
+                      <th>Recibo</th><th>Fecha</th>
+                      <th v-if="$route.query.noDetalle">Cliente</th>
+                      <th v-else>Productos</th>
+                      <!-- <th>Estado</th> -->
+                      <th style="width:90px">Pagado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td>{{ item.FechaDoc }}</td>
+                    <td>
+                    
+                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <thead>
+                          <tr>
+                            <th>Producto</th>
+                            <th>Descripcion</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Descuento</th>
+                            <th v-if="item.TieneIgv">Subtotal</th>
+                            <th v-if="item.TieneIgv">IGV</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(prod, index) in item.productos" :key="index">
+                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td>{{ prod.Descripcion }}</td>
+                            <td>{{ prod.Cantidad }}</td>
+                            <td>{{ prod.Precio }}</td>
+                            <td>{{ prod.Descuento }}</td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                            </td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal * 0.18 | redondear}}
+                            </td>
+                            <td>{{ prod.Subtotal | redondear }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div><i><small>
+                      <b v-if="$route.query.noDetalle"></b>
+                      <b v-else>Cliente:</b>
+                      
+                      {{ item.Cliente }}</small></i></div>
+
+                    </td>
+                    
+                    <!-- <td>{{ estadoVenta(item) }}</td> -->
+                    <td>S/. {{ item.Efectivo | redondear }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2"></td>
+                    <td class="total"><b>Total Efectivo</b></td>
+                    <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <h5>Ventas Tarjeta</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+              <th>Recibo</th><th>Fecha</th>
+              <th v-if="$route.query.noDetalle">Cliente</th>
+              <th v-else>Productos</th>
+              <!-- <th>Detalle</th> -->
+              <!-- <th>Estado</th> -->
+              <th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+              
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <thead>
+                    <tr>
+                     
+                      <th>Producto</th>
+                      <th>Descripcion</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                     
+                      
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b>
+                {{ item.Cliente }}</small></i></div>
+
+              </td>
+              <!-- <td>{{ item.VisaDesc }}</td> -->
+              <!-- <td>{{ estadoVenta(item) }}</td> -->
+              <td>S/. {{ item.Visa | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Tarjeta</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+        <h5>Ventas Yape/Plin</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+                <th>Recibo</th><th>Fecha</th>
+                <th v-if="$route.query.noDetalle">Cliente</th>
+                <th v-else>Productos</th>
+                <!-- <th>Detalle</th> -->
+                <!-- <th>Estado</th> -->
+                <th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <thead>
+                    <tr>
+                     
+                      <th>Producto</th>
+                      <th>Descripcion</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                     
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <!-- <td>{{ item.MastercardDesc }}</td> -->
+              <!-- <td>{{ estadoVenta(item) }}</td> -->
+              <td>S/. {{ item.Mastercard | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Yape/Plin</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+        <h5>Ventas Transferencia</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+                <th>Recibo</th><th>Fecha</th>
+                <th v-if="$route.query.noDetalle">Cliente</th>
+                <th v-else>Productos</th>
+                <!-- <th>Detalle</th> -->
+<!-- <th>Estado</th> -->
+                <th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <thead>
+                    <tr>
+                   
+                      <th>Producto</th>
+                      <th>Descripcion</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                     
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <!-- <td>{{ item.TransferenciaDesc }}</td> -->
+              <!-- <td>{{ estadoVenta(item) }}</td> -->
+              <td>S/. {{ item.Mastercard | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Transferencia</b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+        <h5>Ventas a Credito</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+              <th>Recibo</th><th>Fecha</th>
+              <th v-if="$route.query.noDetalle">Cliente</th>
+              <th v-else>Productos</th>
+              <!-- <th>Estado</th> -->
+              <th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+                
+                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <thead>
+                    <tr>
+                     
+                      <th>Producto</th>
+                      <th>Descripcion</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                     
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
+
+
+              </td>
+              <!-- <td>{{ estadoVenta(item) }}</td> -->
+              <td>S/. {{ item.Total | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td><b>Total Credito</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+        <b-row>
+        <b-col v-if="totalIngresos">
+          <h5>Ingresos</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr class="thDetalle">
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresos" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+        <b-col v-if="totalSalidas">
+          <h5>Salidas</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr class="thDetalle">
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col v-if="totalIngresosTarjeta">
+          <h5>Ingresos de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr class="thDetalle">
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col v-if="totalSalidasTarjeta">
+          <h5>Salidas de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr class="thDetalle">
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      <b-row>
+          <b-col v-if="totalAdelantos">
+            <h5>Descontar Adelantos</h5><br>
+            <table class="table b-table table-sm adelantos">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in adelantos" :key="index">
+                  <td>{{ item.IdCajaBanco }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>{{ item.Concepto }} ({{ item.Serie }}-{{ item.Numero }})</td>
+                  <td>S/. {{ item.Importe | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="total"><b>Total Adelantos</b></td>
+                  <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+      </b-row>
+           
+    </b-row>
   </b-container>
 
-  <!-- <div>
-    <br>
-    <b-container class="bv-example-row">
-      <div>
-          <div class="no-print">
-              <b-row align-h="end" class=" no-print">
-                
-                <b-col cols="7">
-                    <b-button-group size="sm" v-if="!this.$route.params.id">
-                        <b-form-select v-model="turno" :options="turnos" />
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-success" @click="cerrarCaja" v-if="!this.$route.params.id">Cerrar Caja</b-button>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <cierres-caja></cierres-caja>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
-                    </b-button-group>
-                </b-col>
-              </b-row>
-                     </div>
-      </div>
-      <br class="no-print" /><br class="no-print" />
-
-     
-
-
-      
-      
-     
-
-      
-
-      <br>
-
-    </b-container>
-  </div> -->
 </template>
 <script>
 import config from "@/store/config.js";
@@ -1025,8 +1570,7 @@ th {
   background: #f9f9f9;
   padding: 10px;
 }
-.tabla-detalle {
-}
+
 .tabla-detalle th {
   background-color: #ffffff;
   font-weight: normal;
@@ -1041,15 +1585,6 @@ th {
 .adelantos {
   background-color: #ffe8c5;
 }
-@media print {
-  .no-print {
-    display: none;
-  }
-  .si-print {
-    display: block;
-  }
-}
-
 .tableResumen {
   width: 100%;
   font-weight: bold;
@@ -1057,5 +1592,26 @@ th {
 
 .thDetalle {
   color: white;
+}
+.si-print {
+  display: none;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
+  .si-print {
+    max-width: 350px;
+    display: block;
+  }
+  .table {
+    max-width: 350px;
+    font-size: 0.5em;
+  }
+  th {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff;
+  }
 }
 </style>

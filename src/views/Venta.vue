@@ -284,8 +284,8 @@
                 <b-col cols="4">
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
-                      <b-button class="mx-1 btnAction" block variant="primary" style="font-weight: bold; font-size: 1.2rem"  @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button class="mx-1 btnAction" block variant="success" style="font-weight: bold; font-size: 1.5rem"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
+                      <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                   </b-row>
                     </b-col>
 
@@ -2514,24 +2514,7 @@ export default {
 }
 </style>
 <style>
-/* .nav-tabs .nav-link.active,
-.nav-tabs .nav-item.show .nav-link {
-  background-color: #e6e6e6;
-  border-bottom: none;
-} */
-.btnAction {
-  margin: 2px 0;
-  border-radius: 25px !important;
-  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-}
-/* .btnAction:hover {
-  border: 1px solid #b71c1c !important;
-  color: #b71c1c !important;
-  background: #FFEBEE !important;
-  border-radius: 25px;
-} */
+
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
