@@ -16,6 +16,7 @@ import Venta2 from "@/views/Venta2.vue";
 import CategoriasNuevo from "@/views/CategoriasNuevo.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
+import Usuario from "@/views/Usuario.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -49,6 +50,11 @@ export default new Router({
       path: "/productos",
       name: "Productos",
       component: Productos
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: "/reimpresion",
