@@ -261,7 +261,8 @@
                   class="form-control"
                   placeholder="Descripción"
                   cols="12" rows="3"
-                  style="width: 100%"
+                  style="width: 100%" 
+                  id="txtDescripcion"
                   v-model="selectProducto.Descripcion"/>								
                 </b-col>
                 <b-col md="3">
@@ -846,6 +847,9 @@ export default {
 
       mywindow.document.getElementById("headerCamiones").className =
         "col-md-12";
+      mywindow.document.getElementById(
+        "txtDescripcion"
+      ).value = this.selectProducto.Descripcion;
       mywindow.document.getElementById("productosProduccion").className =
         "col-md-8";
 
