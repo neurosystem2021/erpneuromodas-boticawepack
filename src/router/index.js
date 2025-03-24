@@ -41,6 +41,7 @@ import ReporteProduccion from "@/views/reportes/ReporteProduccion.vue";
 import ReporteVentaDia from "@/views/reportes/ReporteVentaDia.vue";
 import PedidosRealizados from "@/views/reportes/PedidosRealizados.vue";
 import DeudasPorCobrar from "@/views/reportes/DeudasPorCobrar.vue";
+import PedidosAsigandos from "@/views/reportes/PedidosAsigandos.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -160,6 +161,11 @@ export default new Router({
       path: "/reportes/huespedes",
       name: "RegistroHuespedes",
       component: RegistroHuespedes
+    },
+    {
+      path: "/reportes/pedidosasigandos",
+      name: "PedidosAsigandos",
+      component: PedidosAsigandos
     },
     {
       path: "/reportes/articulosmovimientos",

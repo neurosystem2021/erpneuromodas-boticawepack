@@ -202,11 +202,15 @@ export default {
     this.desde = this.$moment().format("YYYY-MM-DD");
     this.hasta = this.$moment().format("YYYY-MM-DD");
 
-    this.obtenerRepartidor();
     // if (this.idPerfil != 1) {
-    this.IdRepartidor = sessionStorage.getItem("User");
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.IdRepartidor = sessionStorage.getItem("User");
+        this.obtenerListado();
+        this.obtenerRepartidor();
+      }, 100);
+    });
     // }
-    this.obtenerListado();
   },
   methods: {
     async obtenerListado() {
@@ -228,7 +232,7 @@ export default {
             // console.log(sum);
             return {
               ...item,
-              deuda: parseFloat(monto).toFixed(2) - parseFloat(sum).toFixed(2),
+              deuda: parseFloat(parseFloat(monto) - parseFloat(sum)).toFixed(2),
               metodospago: medotodospago
             };
           });
