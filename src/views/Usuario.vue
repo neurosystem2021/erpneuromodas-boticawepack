@@ -265,7 +265,6 @@
 
 <script>
 import config from "@/store/config.js";
-import DetalleDeudaCliente from "@/components/DetalleDeudaCliente.vue";
 export default {
   data() {
     return {
