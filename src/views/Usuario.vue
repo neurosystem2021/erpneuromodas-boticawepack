@@ -5,7 +5,7 @@
             <b-tabs content-class="mt-3 mx-3" fill card pills>
               <b-tab title="MODULOS" active>
                   <b-row>
-                    <b-button variant="success">
+                    <b-button variant="success" @click="abrirNuevoModulo()">
                       NUEVO
                     </b-button>
                     <b-table 
@@ -23,49 +23,7 @@
                     />
                   </b-row>
                   <!-- {{ lstModulos }} -->
-              </b-tab>
-                <b-tab title="USUARIOS"  class="py-0"> 
-                    <b-row>
-                        <b-col cols="12" class="my-1">
-                            <b-button  @click="abrirNuevoUsuario()" variant="success">Nuevo Usuario</b-button>
-                        </b-col>
-                        <b-col cols="12">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th >Perfil</th>
-                                        <th >Nombre Usuario</th>
-                                        <th >Usuario</th>
-                                        <th >Activo</th>
-                                        <th ></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(usuario,index) in lstUsuario" :key="index">
-                                        <th>{{usuario.UsuarioPerfil}}</th>
-                                        <th>{{usuario.NombreUsuario}}</th>
-                                        <th>{{usuario.Usuario}}</th>
-                                        <th>
-                                            <div class="badge bg-success px-3 py-3" style="color:#ffffff; font-weight: bold;"  v-if="usuario.Anulado==0" role="alert">
-                                                SI
-                                            </div>
-                                            <div class="badge bg-danger px-3 py-3"  style="color:#ffffff; font-weight: bold;" role="alert" v-else>
-                                                NO
-                                            </div>
-                                        </th>
-                                        <th>
-                                            <b-button variant="warning" @click="abrirEditarUsuario(usuario)">
-                                                <i class="fa fa-edit" aria-hidden="true"></i>
-                                            </b-button>
-                                            <b-button variant="danger" v-if="usuario.Anulado==0" @click="eliminarUsuario(usuario)">
-                                                <i class="fa fa-trash" aria-hidden="true"></i>
-                                            </b-button>
-                                        </th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </b-col>
-                    </b-row>
+                  
                 </b-tab>
                 <b-tab title="PERFILES">
                     <b-row>
@@ -108,6 +66,50 @@
                         </b-col>
                     </b-row>
                 </b-tab>
+                <b-tab title="USUARIOS"  class="py-0"> 
+                    <b-row>
+                        <b-col cols="12" class="my-1">
+                            <b-button  @click="abrirNuevoUsuario()" variant="success">Nuevo Usuario</b-button>
+                        </b-col>
+                        <b-col cols="12">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th >Perfil</th>
+                                        <th >Nombre Usuario</th>
+                                        <th >Usuario</th>
+                                        <th >Activo</th>
+                                        <th ></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(usuario,index) in lstUsuario" :key="index">
+                                        <td>{{usuario.UsuarioPerfil}}</td>
+                                        <td>{{usuario.NombreUsuario}}</td>
+                                        <td>{{usuario.Usuario}}</td>
+                                        <td>
+                                            <div class="badge bg-success px-3 py-3" style="color:#ffffff; font-weight: bold;"  v-if="usuario.Anulado==0" role="alert">
+                                                SI
+                                            </div>
+                                            <div class="badge bg-danger px-3 py-3"  style="color:#ffffff; font-weight: bold;" role="alert" v-else>
+                                                NO
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <b-button variant="warning" @click="abrirEditarUsuario(usuario)">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </b-button>
+                                            <b-button variant="danger" v-if="usuario.Anulado==0" @click="eliminarUsuario(usuario)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </b-button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </b-col>
+                    </b-row>
+                </b-tab>
+              
             </b-tabs>
         </b-col>
     </b-row>
@@ -253,7 +255,10 @@
      
     <b-modal v-model="nuevoModuloFlag" hide-footer title="Nuevo Módulo">
       Modulo
-      <input type="text" class="form-control">
+      <input type="text" class="form-control mb-3" v-model="modulo">
+      <b-button variant="success" @click="guardarModulo()">Guardar</b-button>
+      <b-button variant="danger" @click="nuevoModuloFlag=!nuevoModuloFlag">Cancelar</b-button>
+      <p v-if="errorModulo" style="color: red; text-align: center;" class="my-2">{{ errorModulo }}</p>
     </b-modal>
   </b-container>
 </template>
@@ -265,7 +270,7 @@ export default {
   data() {
     return {
       perPage: 10,
-      currentPage:1,
+      currentPage: 1,
       API: config.API,
       verclave: false,
       nuevoModuloFlag: false,
@@ -279,10 +284,10 @@ export default {
       lstPuntoVenta: [],
       lstModulos: [],
       lstModulosPerfil: [],
-       fields:[
-        { key:"IdUsuarioModulo", text:"Id"},
-        { key:"UsuarioModulo", text:"Módulo"},
-       ],
+      fields: [
+        { key: "IdUsuarioModulo", text: "Id" },
+        { key: "UsuarioModulo", text: "Módulo" }
+      ],
       items: [
         {
           text: "SEGURIDAD",
@@ -297,7 +302,9 @@ export default {
       editarUsuarioPerfilFlag: false,
       nuevoUsuarioFlag: false,
       errorUsuario: "",
-      IdUsuarioModulo: ""
+      IdUsuarioModulo: "",
+      modulo: "",
+      errorModulo: ""
     };
   },
   mounted() {
@@ -454,6 +461,28 @@ export default {
     },
     abrirNuevoModulo() {
       this.nuevoModuloFlag = true;
+    },
+    guardarModulo() {
+      this.errorModulo = "";
+
+      if (this.lstModulos.some(v => v.UsuarioModulo == this.modulo)) {
+        this.errorModulo = "El módulo ya se encuentra registrado.";
+        return false;
+      }
+
+      let data = {
+        modulo: this.modulo
+      };
+      this.axios.post(`${this.API}modulo/registro`, data).then(res => {
+        if (res.data) {
+          this.nuevoModuloFlag = false;
+          this.$swal({
+            icon: "success",
+            title: "Registro Correcto"
+          });
+          this.cargarModulos();
+        }
+      });
     }
   }
 };
