@@ -45,15 +45,17 @@
                             <th>Correlativo Doc</th>
                             <th>Cliente</th>
                             <th>Dirección</th>
+                            <th>Monto</th>
                             <th>Fecha / Hora Entrega</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(pedido, index) in lstPedidoAsignado" :key="index">
                             <td>{{ pedido.NombreUsuario }}</td>
-                            <td>{{ pedido.Serie }} {{ pedido.Numero }}</td>
+                            <td>{{ pedido.Serie }}-{{ pedido.Numero }}</td>
                             <td>{{ pedido.Cliente }}</td>
                             <td>{{ pedido.Direccion }}</td>
+                            <td>{{ pedido.Cantidad }}</td>
                             <td>{{ pedido.FechaEntrega }} {{ pedido.HoraEntrega }}</td>
                         </tr>
                     </tbody>
