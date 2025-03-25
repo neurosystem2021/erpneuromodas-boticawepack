@@ -32,8 +32,9 @@
                         </b-form-group>
                     </b-col>
                     <b-col cols="3">
-                        <b-button class="my-2" variant="success" @click="cargarPedidosAsignados()">Generar</b-button>
-                        <!-- <b-button class="my-2" variant="danger" @click="exportar()">Exportar</b-button> -->
+                        <b-button class="my-2" variant="info" @click="cargarPedidosAsignados()">Generar</b-button>
+                        <b-button class="my-2" variant="success" @click="exportar()"> <i class="fa fa-file-excel mx-2" aria-hidden="true"></i>Exportar Excel</b-button>
+                        <b-button class="my-2" variant="danger" @click="exportarpdf()"> <i class="fa fa-file-pdf mx-2" aria-hidden="true"></i>Exportar PDF</b-button>
                     </b-col>
                 </b-row>
             </b-col>
@@ -90,7 +91,7 @@ export default {
     };
   },
   mounted() {
-    this.desde = this.$moment().format("YYYY-MM-DD");
+    this.desde = this.$moment().startOf('month').format('YYYY-MM-DD');;
     this.hasta = this.$moment().format("YYYY-MM-DD");
     this.obtenerRepartidor();
     this.cargarPedidosAsignados();
@@ -117,6 +118,34 @@ export default {
             Usuario: "",
             NombreUsuario: "TODOS"
           });
+        }
+      });
+    },
+    async exportar() {
+      this.axios(`${this.API}reporte/pedidosasignados/exportarexcel`, {
+        params: {
+          IdRepartidor: this.IdRepartidor,
+          desde: this.desde,
+          hasta: this.hasta
+        }
+      }).then(res => {
+        console.log(res.data);
+        if (res.data) {
+          window.open(res.data.url, "_blank");
+        }
+      });
+    },
+    async exportarpdf() {
+      this.axios(`${this.API}reporte/pedidosasignados/exportarpdf`, {
+        params: {
+          IdRepartidor: this.IdRepartidor,
+          desde: this.desde,
+          hasta: this.hasta
+        }
+      }).then(res => {
+        console.log(res.data);
+        if (res.data) {
+          window.open(res.data.url, "_blank");
         }
       });
     }
