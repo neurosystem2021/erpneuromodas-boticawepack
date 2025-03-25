@@ -58,6 +58,17 @@
                             <td>{{ pedido.Cantidad }}</td>
                             <td>{{ pedido.FechaEntrega }} {{ pedido.HoraEntrega }}</td>
                         </tr>
+                        <tr style="background: #BBDEFB; color: #000000;">
+                          <th colspan="4">Total:</th>
+                          <th colspan="1">
+                            {{
+                                lstPedidoAsignado.reduce((sum, pedidos) => {
+                                  return sum + parseFloat(pedidos.Cantidad || 0);
+                                }, 0).toFixed(2)
+                              }}
+                          </th>
+                          <th></th>
+                        </tr>
                     </tbody>
                 </table>
             </b-col>
