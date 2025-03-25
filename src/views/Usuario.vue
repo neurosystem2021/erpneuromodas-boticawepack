@@ -3,7 +3,7 @@
     <b-row>
         <b-col cols="12">
             <b-tabs content-class="mt-3 mx-3" fill card pills>
-              <b-tab title="MODULOS" active>
+              <b-tab title="MODULOS" class="py-0">
                   <b-row>
                     <b-button variant="success" @click="abrirNuevoModulo()">
                       NUEVO
@@ -25,9 +25,11 @@
                   <!-- {{ lstModulos }} -->
                   
                 </b-tab>
-                <b-tab title="PERFILES">
+                <b-tab title="PERFILES" class="py-0">
                     <b-row>
-                        <b-col cols="12"></b-col>
+                        <b-col cols="12">
+                          <b-button variant="success" @click="abrirNuevoPerfil()">Nuevo Perfil</b-button>
+                        </b-col>
                         <b-col cols="12">
                             <table class="table table-sm">
                                 <thead>
@@ -56,7 +58,7 @@
                                             <b-button variant="warning" @click="abrirEditarPerfil(perfil)">
                                                 <i class="fa fa-edit" aria-hidden="true"></i>
                                             </b-button>
-                                            <b-button variant="danger">
+                                            <b-button variant="danger" v-if="perfil.Anulado==0" @click="eliminarPerfil(perfil)">
                                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                             </b-button>
                                         </td>
@@ -66,7 +68,7 @@
                         </b-col>
                     </b-row>
                 </b-tab>
-                <b-tab title="USUARIOS"  class="py-0"> 
+                <b-tab title="USUARIOS"  active class="py-0"> 
                     <b-row>
                         <b-col cols="12" class="my-1">
                             <b-button  @click="abrirNuevoUsuario()" variant="success">Nuevo Usuario</b-button>
@@ -210,6 +212,8 @@
     <b-modal v-model="editarUsuarioPerfilFlag" no-close-on-esc  no-close-on-backdrop size="lg" title="Editar Perfil" hide-footer>
       Perfil
       <input type="text" class="form-control" v-model="perfil.UsuarioPerfil">
+      <p style="text-align: center; color: red;"> {{ errorPerfil }}</p>
+      <b-form-checkbox class="my-3 d-block w-100" :value="1" :unchecked-value="0" v-model="perfil .Anulado"> Anulado</b-form-checkbox>
       Module
       <b-input-group class="my-3">
         
@@ -251,6 +255,61 @@
           </tr>
         </tbody>
       </table>
+      <div style="text-align: right;">
+          <b-button variant="success" @click="actualizarUsuarioPerfil()">Guardar</b-button>
+          <b-button variant="danger" @click="editarUsuarioPerfilFlag=!editarUsuarioPerfilFlag">Cancelar</b-button>
+        </div>
+    </b-modal>
+
+    <b-modal v-model="nuevoUsuarioPerfilFlag" no-close-on-esc  no-close-on-backdrop size="lg" title="Nuevo Perfil" hide-footer>
+      Perfil
+      <input type="text" class="form-control" v-model="perfil.UsuarioPerfil">
+      <p style="text-align: start; color: red;"> {{ errorPerfil }}</p>
+      Module
+      <b-input-group class="my-3">
+        
+          <b-select
+          :options="lstModulos"
+          v-model="IdUsuarioModulo" 
+          class="form-control" 
+          value-field="IdUsuarioModulo" 
+          text-field="UsuarioModulo"
+           @change="seleccionarModulo"
+          required>
+          </b-select>
+          <b-input-group-prepend>
+            <b-input-group-text class="btn btn-acepted" @click="anadirModule()">
+              ADD
+            </b-input-group-text>
+            <!-- <b-input-group-text class="btn btn-info" @click="abrirNuevoModulo()">
+              NUEVO
+            </b-input-group-text> -->
+          </b-input-group-prepend>
+      </b-input-group>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Módulo</th>
+            <th style="text-align: center;">Lectura</th>
+            <th style="text-align: center;">Escritura</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(modulo,index) in lstModulosPerfil" :key="index">
+            <td>{{modulo.UsuarioModulo  }}</td>
+            <td style="text-align: center;">
+              <b-form-checkbox class="mx-auto" :value="1" :unchecked-value="0" v-model="modulo.Lectura"> </b-form-checkbox>
+            </td>
+            <td style="text-align: center;"> 
+              <b-form-checkbox class="mx-auto" :value="1" :unchecked-value="0" v-model="modulo.Escritura"> </b-form-checkbox>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: right;">
+        <b-button variant="success" @click="guardarUsuarioPerfil()">Guardar</b-button>
+        <b-button variant="danger" @click="nuevoUsuarioPerfilFlag=!nuevoUsuarioPerfilFlag">Cancelar</b-button>
+      </div>
     </b-modal>
      
     <b-modal v-model="nuevoModuloFlag" hide-footer title="Nuevo Módulo">
@@ -273,6 +332,7 @@ export default {
       API: config.API,
       verclave: false,
       nuevoModuloFlag: false,
+      nuevoUsuarioPerfilFlag: false,
       IdModule: "",
       Module: {},
       usuario: {},
@@ -303,15 +363,16 @@ export default {
       errorUsuario: "",
       IdUsuarioModulo: "",
       modulo: "",
-      errorModulo: ""
+      errorModulo: "",
+      errorPerfil: ""
     };
   },
   mounted() {
-    this.cargarListadoUsuario();
+    this.cargarModulos();
     this.cargarListadoPerfil();
+    this.cargarListadoUsuario();
     this.cargarListadoAlmacen();
     this.cargarPuntoVenta();
-    this.cargarModulos();
   },
   methods: {
     async cargarListadoUsuario() {
@@ -409,8 +470,9 @@ export default {
       });
       //   console.log(users);
     },
-    async abrirEditarPerfil(perfil) {
-      console.log(perfil);
+    async abrirEditarPerfil(item) {
+      let perfil = { ...item };
+      this.IdUsuarioModulo = "";
       this.perfil = perfil;
       await this.axios(`${this.API}listarusuarioperfilmodulo`, {
         params: perfil
@@ -420,6 +482,11 @@ export default {
         }
       });
       this.editarUsuarioPerfilFlag = true;
+    },
+    abrirNuevoPerfil() {
+      this.perfil = {};
+      this.lstModulosPerfil = [];
+      this.nuevoUsuarioPerfilFlag = true;
     },
     async cargarModulos() {
       await this.axios(`${this.API}listarmodulos`).then(response => {
@@ -456,6 +523,7 @@ export default {
 
         // Agregar el objeto a la lista
         this.lstModulosPerfil.push({ ...this.Module });
+        this.IdUsuarioModulo = "";
       }
     },
     abrirNuevoModulo() {
@@ -463,6 +531,11 @@ export default {
     },
     guardarModulo() {
       this.errorModulo = "";
+
+      if (!this.modulo) {
+        this.errorModulo = "Dato Requerido.";
+        return false;
+      }
 
       if (this.lstModulos.some(v => v.UsuarioModulo == this.modulo)) {
         this.errorModulo = "El módulo ya se encuentra registrado.";
@@ -480,6 +553,64 @@ export default {
             title: "Registro Correcto"
           });
           this.cargarModulos();
+        }
+      });
+    },
+    guardarUsuarioPerfil() {
+      this.errorPerfil = "";
+      if (!this.perfil.UsuarioPerfil) {
+        this.errorPerfil = "Dato requerido";
+        return;
+      }
+      let data = {
+        UsuarioPerfil: this.perfil.UsuarioPerfil,
+        lstModulosPerfil: this.lstModulosPerfil
+      };
+
+      this.axios.post(`${this.API}usuarioperfil/registro`, data).then(res => {
+        if (res.data) {
+          this.cargarListadoPerfil();
+          this.nuevoUsuarioPerfilFlag = false;
+        }
+      });
+
+      console.log(data);
+    },
+    actualizarUsuarioPerfil() {
+      this.errorPerfil = "";
+      if (!this.perfil.UsuarioPerfil) {
+        this.errorPerfil = "Dato Requerido".return;
+      }
+
+      let data = {
+        ...this.perfil,
+        lstModulosPerfil: this.lstModulosPerfil
+      };
+
+      this.axios.post(`${this.API}usuarioperfil/actualizar`, data).then(res => {
+        if (res.data) {
+          this.cargarListadoPerfil();
+          this.editarUsuarioPerfilFlag = false;
+        }
+      });
+    },
+    eliminarPerfil(perfil) {
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        text: "Desea eliminar el Perfil",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar"
+      }).then(res => {
+        if (res.isConfirmed) {
+          this.axios
+            .post(`${this.API}usuarioperfil/eliminar`, perfil)
+            .then(res => {
+              if (res.data) {
+                this.cargarListadoPerfil();
+                // this.editarUsuarioPerfilFlag = false;
+              }
+            });
         }
       });
     }
