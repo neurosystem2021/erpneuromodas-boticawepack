@@ -239,7 +239,7 @@
       no-stacking
       container="body"  
       v-if="modalRegistro"
-      class="modalCajaBancos"
+      modal-class="modalCajaBancos"
       size="lg"
       >
         <b-row>
@@ -1019,8 +1019,9 @@ export default {
 </script>
 
 <style>
-.modalCajaBancos {
-  min-width: 90% !important;
+.modalCajaBancos .modal-dialog {
+  max-width: 90% !important;
+  width: 90% !important;
 }
 
 .clsCaja {

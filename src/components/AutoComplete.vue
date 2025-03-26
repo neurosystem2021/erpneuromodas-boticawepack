@@ -92,8 +92,8 @@ export default {
 <style>
 .txtText {
   position: relative; /* Define un contenedor relativo */
-  min-width: 82%;
-  max-width: 82%;
+  min-width: 70%;
+  max-width: 70%;
 }
 
 .trDetails {

@@ -72,6 +72,9 @@
                     <b-col cols="12">
                       <b-form-group v-if="ventas[index].verCliente">
                         <b-input-group class="mt-2">
+                            <b-input-group-append>
+                              <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
+                            </b-input-group-append>
                             <AutoComplete  
                             :value="ventas[index].cliente.Cliente"
                             @guardarCliente="setCliente"
