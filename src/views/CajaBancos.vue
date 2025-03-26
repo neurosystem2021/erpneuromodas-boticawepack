@@ -239,6 +239,8 @@
       no-stacking
       container="body"  
       v-if="modalRegistro"
+      class="modalCajaBancos"
+      size="lg"
       >
         <b-row>
           <b-col :cols="aplicarLetra?7:12">
@@ -1017,7 +1019,7 @@ export default {
 </script>
 
 <style>
-.modal-dialog {
+.modalCajaBancos {
   min-width: 90% !important;
 }
 
@@ -1036,10 +1038,10 @@ export default {
   box-shadow: 3px 3px #1a237e;
 }
 
-.modal-header {
+/* .modal-header {
   background: #1b5e20;
   color: #ffffff;
-}
+} */
 
 .close {
   color: #ffffff;

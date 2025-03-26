@@ -388,7 +388,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .modal-dialog {
   max-width: 60% !important;
   width: 60% !important;
