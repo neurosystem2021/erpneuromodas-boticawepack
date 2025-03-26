@@ -91,7 +91,9 @@ export default {
     };
   },
   mounted() {
-    this.desde = this.$moment().startOf('month').format('YYYY-MM-DD');;
+    this.desde = this.$moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
     this.hasta = this.$moment().format("YYYY-MM-DD");
     this.obtenerRepartidor();
     this.cargarPedidosAsignados();
@@ -143,9 +145,13 @@ export default {
           hasta: this.hasta
         }
       }).then(res => {
-        console.log(res.data);
-        if (res.data) {
-          window.open(res.data.url, "_blank");
+        if (res) {
+          let url = res.data;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          window.open(url, "_blank");
         }
       });
     }
