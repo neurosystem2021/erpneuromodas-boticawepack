@@ -1285,7 +1285,7 @@ export default {
           this.ventas.productos = [];
 
           response.data.forEach(element => {
-            this.setProducto(element);
+            this.setProducto(element, true);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
@@ -1731,7 +1731,7 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto) {
+    async setProducto(producto, esNota = false) {
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
@@ -1739,6 +1739,7 @@ export default {
         )[0].cantidad += 1;
         return false;
       }
+
       // console.log("producto", producto);
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
       // console.log("prod", prod.PreciosPorProducto);
@@ -1765,6 +1766,9 @@ export default {
       prod.esPresentacion = false;
       prod.pres = "";
       productos.unshift(prod);
+      if (esNota) {
+        prod.cantidad = producto.cantidad;
+      }
       this.$nextTick(() => {
         let input = document.getElementById("input0");
         input.focus();
