@@ -60,8 +60,11 @@
     </b-row>
 
     <!-- ddd -->
-    <b-modal v-model="finalizarFlag" hide-footer :title="`Finalizar Pedido ${item.Correlativo}`">
-            <table class="table">
+    <b-modal v-model="finalizarFlag" hide-footer :title="`Finalizar Pedido ${item.Correlativo}`" no-close-on-backdrop no-close-on-esc no-enforce-focus>
+      Nro Operación
+      <input type="text" class="form-control" v-model="nroOperacion">     
+      <p v-if="erroNroOperacion" style="text-align: center; color: red;">{{ erroNroOperacion }}</p> 
+      <table class="table">
                 <thead>
                     <tr>
                       <th width="35%">Metodo de Pago</th>
@@ -101,6 +104,8 @@ export default {
     return {
       API: config.API,
       finalizarFlag: false,
+      nroOperacion: "",
+      erroNroOperacion: "",
       perPage: 5,
       currentPage: 1,
       lstRepartos: [],
@@ -183,16 +188,16 @@ export default {
       }
     },
     async finalizar() {
+    
+      let montoPagado = parseFloat(
+        this.metodoPago.reduce((sum, metodo) => {
+          return sum + parseFloat(metodo.monto);
+        }, 0)
+      ).toFixed(2);
       if (this.acuentaflag == 0) {
         let montoPagar = parseFloat(
           this.item.detalle.reduce((sum, producto) => {
             return sum + parseFloat(producto.Cantidad * producto.Precio);
-          }, 0)
-        ).toFixed(2);
-
-        let montoPagado = parseFloat(
-          this.metodoPago.reduce((sum, metodo) => {
-            return sum + parseFloat(metodo.monto);
           }, 0)
         ).toFixed(2);
 
@@ -220,7 +225,9 @@ export default {
       let data = {
         IdDocVenta: this.item.idDocVenta,
         acuentaflag: this.acuentaflag,
-        MedoPago: this.metodoPago
+        MedoPago: this.metodoPago,
+        nroOperacion: this.nroOperacion,
+        montoPagado: montoPagado
       };
 
       await this.axios.post(`${this.API}finalizar_entregas`, data).then(res => {

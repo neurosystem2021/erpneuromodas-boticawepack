@@ -92,6 +92,19 @@
         <b-col cols="12">
           <h2>Detalle</h2>
             <b-table :items="lstReporte" :fields="headers" small>
+                <template slot="detalle" slot-scope="data">
+                    <tr v-if="data.item.detalle.length>0">
+                      <th>Nro Operación</th>
+                      <th>Monto Pago</th>
+                      <th>Fecha Reg.</th>
+                    </tr>
+                    <tr v-for="(op,index) in data.item.detalle" :key="index">
+                      <td>{{ op.NroOperacion }}</td>
+                      <td>{{ op.MontoPagado }}</td>
+                      <td>{{ op.FechaReg }}</td>
+                    </tr>
+                    <!-- {{ data }} -->
+                </template>
                 <template slot="acuentaflag" slot-scope="data">
                   {{ data.item.acuentaflag ==1 ? 'A Cuenta' : 'Completo' }}
                   </template>
@@ -120,6 +133,9 @@
         </b-col>
     </b-row>
     <b-modal v-model="pagarDeuda" :title="`Cobrar Deuda`"  hide-footer >
+      Nro Operación
+      <input type="text" class="form-control" v-model="nroOperacion">     
+      <p v-if="erroNroOperacion" style="text-align: center; color: red;">{{ erroNroOperacion }}</p> 
       <table class="table">
                 <thead>
                     <tr>
@@ -154,15 +170,18 @@ export default {
       lstReporte: [],
       repartidor: [],
       montoCobrado: 0,
+      nroOperacion: "",
+      erroNroOperacion: "",
       headers: [
-        { thStyle: { width: "10%" }, key: "Repartidor" },
+        { thStyle: { width: "5%" }, key: "Repartidor" },
         { thStyle: { width: "5%" }, key: "Correlativo" },
         { thStyle: { width: "10%" }, key: "DniRuc", label: "Doc." },
-        { thStyle: { width: "12%" }, key: "Cliente" },
-        { thStyle: { width: "15%" }, key: "Dirección" },
+        { thStyle: { width: "10%" }, key: "Cliente" },
+        { thStyle: { width: "10%" }, key: "Dirección" },
+        { thStyle: { width: "20%" }, key: "detalle", label: "Operaciones" },
         { thStyle: { width: "5%" }, key: "MontoPago", label: "Monto" },
         { thStyle: { width: "5%" }, key: "deuda", label: "Deuda" },
-        { thStyle: { width: "12%" }, key: "created_at", label: "Hora Entrega" },
+        { thStyle: { width: "5%" }, key: "created_at", label: "Hora Entrega" },
         {
           thStyle: { width: "5%" },
           key: "acuentaflag",
@@ -277,6 +296,13 @@ export default {
     },
     async guardarCobrarDeuda() {
       let preMetodo = this.item.metodospago;
+
+      let montoPagado = parseFloat(
+        preMetodo.reduce((sum, metodo) => {
+          return sum + parseFloat(metodo.monto);
+        }, 0)
+      ).toFixed(2);
+      console.log(montoPagado);
       let nuevoCobro = [];
       for (let index = 0; index < preMetodo.length; index++) {
         nuevoCobro.push({
@@ -288,7 +314,9 @@ export default {
       }
       let data = {
         ...this.item,
-        cobro: nuevoCobro
+        cobro: nuevoCobro,
+        nroOperacion: this.nroOperacion,
+        montoPagado: montoPagado
       };
       await this.axios
         .post(`${this.API}HistorialEntrega/actualizarcobro`, data)
