@@ -390,7 +390,7 @@
               <tr v-if="productos.some(v=>v.FLETE >0)">
                 <td><b>Total Flete</b></td>
                 <td class="table-danger">{{ productos.reduce((sum,producto)=>{
-                  return sum + parseFloat(producto.FLETE)
+                  return sum + parseFloat(producto.FLETE? producto.FLETE: 0)
                 },0)  }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
