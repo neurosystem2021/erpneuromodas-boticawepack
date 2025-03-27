@@ -200,7 +200,7 @@
             placeholder="Precio"
             @input="() => { setNuevoPrecioContado(data.index);}"
             />
-            <small>G: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+            <small>G: {{ (data.item.precio - data.item.PrecioCosto) * data.item.cantidad | redondear }}</small>
         </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
