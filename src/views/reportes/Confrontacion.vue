@@ -182,33 +182,35 @@ return false
       }*/
 
       this.axios.post(this.API + 'reporte/confrontacion', {
-        Productos: this.productos.map((p)=>({IdProducto:p.IdProducto,cantidad:(p.cantidad>0?p.cantidad:0)})),
-        IdProductos: this.productos.map(prod => prod.IdProducto),
-        IdAlmacen: this.almacen.IdAlmacen,
-      })
-      .then((response) => {
-        if (response.data.error) {
-          this.$toasted.show(response.data.error)
-        } else {
-          this.limpiar()
-          if(this.$refs.inputAlmacenOrigen){
-            this.$refs.inputAlmacenOrigen.setValue('')
-          }
-          this.almacen = {}
-          this.$toasted.success('Reporte de confrontacion generado',{duration:3000})   
-          document.open();
-          document.write(response.data);
-          document.close(); 
-          setTimeout(() => {
-              document.location.reload();
-          }, 1500);
+      Productos: this.productos.map(p => ({
+        IdProducto: p.IdProducto,
+        cantidad: p.cantidad > 0 ? p.cantidad : 0
+      })),
+      IdProductos: this.productos.map(prod => prod.IdProducto),
+      IdAlmacen: this.almacen.IdAlmacen,
+    })
+    .then((response) => {
+      if (response.data.error) {
+        this.$toasted.show(response.data.error);
+      } else {
+        this.limpiar();
+        if (this.$refs.inputAlmacenOrigen) {
+          this.$refs.inputAlmacenOrigen.setValue('');
         }
-        this.inProgress = false
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        this.inProgress = false
-      })
+        this.almacen = {};
+        this.$toasted.success('Reporte de confrontación generado', { duration: 3000 });
+
+        // Abrir el archivo en una nueva pestaña
+        if (response.data.file) {
+          window.open(response.data.file, "_blank");
+        }
+      }
+      this.inProgress = false;
+    })
+    .catch((error) => {
+      this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo');
+      this.inProgress = false;
+    });
     },
     preConfrontar(){
       this.inProgress = true
