@@ -36,11 +36,12 @@ import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import Usuario from "@/views/Usuario.vue";
 Vue.use(Router);
 
 export default new Router({
   // mode: 'history',
-  
+
   routes: [
     {
       path: "/",
@@ -51,6 +52,11 @@ export default new Router({
       path: "/Login",
       name: "Login",
       component: Login
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: "/productos",
