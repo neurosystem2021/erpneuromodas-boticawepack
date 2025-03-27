@@ -5,11 +5,10 @@
           <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
       </b-row>
-    <b-tabs content-class="mt-3 mx-3" fill card>
+    <b-tabs content-class="mt-3 mx-3" fill card pills>
       <b-tab title="Caja Bancos">
           <b-row>
             <b-col cols="12">
-        <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
         <b-col cols="3">
           <div class="clsCuenta">
@@ -240,6 +239,8 @@
       no-stacking
       container="body"  
       v-if="modalRegistro"
+      modal-class="modalCajaBancos"
+      size="lg"
       >
         <b-row>
           <b-col :cols="aplicarLetra?7:12">
@@ -1018,8 +1019,9 @@ export default {
 </script>
 
 <style>
-.modal-dialog {
-  min-width: 90% !important;
+.modalCajaBancos .modal-dialog {
+  max-width: 90% !important;
+  width: 90% !important;
 }
 
 .clsCaja {
@@ -1037,10 +1039,10 @@ export default {
   box-shadow: 3px 3px #1a237e;
 }
 
-.modal-header {
+/* .modal-header {
   background: #1b5e20;
   color: #ffffff;
-}
+} */
 
 .close {
   color: #ffffff;
