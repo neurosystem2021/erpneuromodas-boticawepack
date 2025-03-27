@@ -200,8 +200,7 @@
             placeholder="Precio"
             @input="() => { setNuevoPrecioContado(data.index);}"
             />
-           <small>G: {{ (data.item.nuevoPrecioContado - data.item.precio )*data.item.cantidad| redondear }}</small>
-           <!-- precioVenta <small>G: {{ data.item.nuevoPrecioContado }}</small> -->
+            <small>G: {{ (data.item.precio - data.item.PrecioCosto) * data.item.cantidad | redondear }}</small>
         </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
@@ -402,7 +401,6 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              
               <tr>
                 <td  colspan="2">
                   <label>pagó con:</label>
@@ -414,26 +412,6 @@
                     @input="asignarVuelto"></b-form-input><br>
                   <label>Vuelto:</label>
                   <b>S/  {{ vuelto | redondear }}</b>
-                </td>
-              </tr>
-              <tr v-if="!isVentas">
-                <td>
-                  <small>
-                    <b>
-                      G. T.
-                    </b>
-                  </small>
-                </td>
-                <td>
-                  <small>
-                  {{ 
-                    parseFloat(
-                      productos.reduce((sum,productos)=>{
-                        return sum + (productos.nuevoPrecioContado - productos.precio )*productos.cantidad
-                      },0) 
-                    ).toFixed(2)  
-                  }}
-                </small>
                 </td>
               </tr>
             </tbody>

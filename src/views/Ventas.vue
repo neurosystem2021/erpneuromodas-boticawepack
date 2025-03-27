@@ -561,6 +561,21 @@
                                           <b>S/  {{ vuelto | redondear }}</b>
                                         </td>
                                       </tr>
+                                      <tr>
+                                        <td>G. G</td>
+                                        <td>
+                                          {{ 
+                                            
+                                           parseFloat(
+                                            productos.reduce((sum,prod)=>{
+                                              return sum + (prod.precio - prod.PrecioCosto) * prod.cantidad 
+                                            },0)
+                                           ).toFixed(2)
+                                            
+                                            
+                                            }}
+                                        </td>
+                                      </tr>
                                     </tbody>
                                   </table>
                             </b-col>
