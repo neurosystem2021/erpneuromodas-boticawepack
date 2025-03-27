@@ -23,7 +23,7 @@
                     </b-form-group>
               </b-col>
               <b-col md="4" v-if="almacen.IdAlmacen">
-                <b-button variant="success" :href="'/api/index.php/reporte/confrontacion/total?idAlmacen=' + almacen.IdAlmacen" target="_blank">Confrontar Todo ({{almacen.Almacen}})</b-button>
+                <b-button variant="success" @click="confrontarTodo">Confrontar Todo ({{ almacen.Almacen }})</b-button>
                 <hr>
                 
               </b-col>
@@ -106,6 +106,24 @@ export default {
     afe (e) {
 return false
     },
+    async confrontarTodo() {
+    try {
+      const response = await this.axios.get(`${this.API}reporte/confrontacion/total`, {
+        params: { idAlmacen: this.almacen.IdAlmacen }
+      });
+
+      if (response.data && response.data.file) {
+        const fileUrl = window.location.origin + response.data.file;
+        window.open(fileUrl, "_blank");
+        console.log(response.data);
+      } else {
+        this.$toasted.show('No se pudo generar el reporte.');
+      }
+    } catch (error) {
+      this.$toasted.show('Error al generar el reporte.');
+      console.error(error);
+    }
+  },
     getCategorias(){
       this.categoriasSelect = []
       this.categoriasSelect.push({ value: 0, text: 'SELECCIONE' })
