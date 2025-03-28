@@ -4,6 +4,7 @@ import Router from "vue-router";
 import Movimiento from "@/views/Movimiento.vue";
 import Productos from "@/views/Productos.vue";
 import Almacen from "@/views/Almacen.vue";
+import Usuario from "@/views/Usuario.vue";
 import Ventas from "@/views/Ventas.vue";
 import VentaReimpresion from "@/views/VentaReimpresion.vue";
 import VentasFacturacion from "@/views/VentasFacturacion.vue";
@@ -42,6 +43,10 @@ export default new Router({
       path: "/",
       name: "Movimiento",
       component: Movimiento
+    }, {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: "/productos",
