@@ -240,7 +240,7 @@
 
   <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}"  >
     <b-modal v-model="show" class="modalProyecto" id="carrito" size="lg" no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
-
+     <!-- <div id="IdLogo">ssss</div> -->
       <div id="contentModal" >
           <div class="row">
           <div id="headerCamiones" class="col-md-12">
@@ -858,6 +858,8 @@ export default {
 
       mywindow.onload = function() {
         setTimeout(function() {
+          let IdLogo = document.getElementById("IdLogo");
+          console.log(IdLogo);
           mywindow.print();
           // mywindow.close();
         }, 500);
