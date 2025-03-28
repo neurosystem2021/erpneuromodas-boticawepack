@@ -205,7 +205,7 @@ export default {
   data() {
     return {
       API: config.API,
-      APINODE: "https://pedi2.pe:5000",
+      APINODE: "https://panel.pedi2.pe",
       mymap: null,
       show: false,
       pedidos:[],
