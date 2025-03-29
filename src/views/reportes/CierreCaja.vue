@@ -376,6 +376,7 @@
             </tfoot>
           </table>
         </b-col>
+
         <b-col v-if="totalSalidas">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
@@ -487,7 +488,9 @@
       </b-row>
             </b-tab>
             <b-tab title="Productos" >
-              <h5>Resumen Por Producto</h5><br>
+              <h5>Resumen Por Producto
+              <b-button variant="success" @click="imprimirResumen()">Imprimir Resumen</b-button>
+              </h5>
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
@@ -543,7 +546,7 @@
               <cierres-caja></cierres-caja>
             </b-button-group>
             <b-button-group>
-              <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
+              <b-button variant="primary" @click="imprimir()"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
             </b-button-group>
           </b-col>
         <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
@@ -598,7 +601,7 @@
             </tr>
             <tr>
               <td>Transferencia S/.</td>
-              <td>{{ totalVentasTransferencia | redondear }} </td>
+              <!-- <td>{{ totalVentasTransferencia | redondear }} </td> -->
             </tr>
             
             <tr>
@@ -607,11 +610,11 @@
 
             <tr>
               <td>Vales de Crédito S/.</td>
-              <td>{{ totalVentasValeCredito | redondear }} </td>
+              <!-- <td>{{ totalVentasValeCredito | redondear }} </td> -->
             </tr>
             <tr>
               <td>Canjes S/.</td>
-              <td>{{ totalVentasCanje | redondear }} </td>
+              <!-- <td>{{ totalVentasCanje | redondear }} </td> -->
             </tr>
           </tbody>
         </table>
@@ -626,7 +629,7 @@
     
     </b-row>
 
-    <b-row class="si-print">
+    <b-row class="si-print" v-if="imprimirCierre">
        <h1> <center>Cierre Caja</center></h1>
        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
@@ -1144,6 +1147,41 @@
       </b-row>
            
     </b-row>
+
+    <b-row class="printResumen" v-if="imprimirResumenProducto">
+      RESUMEN DE PEDIDOS:
+      <table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Cantidad Vendida</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+              
+            </tr>
+            
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Efectivos</b></td>
+              <td class="total"><b>S/. {{
+                parseFloat( reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0)).toFixed(2)
+              }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+    </b-row>
   </b-container>
 
 </template>
@@ -1170,6 +1208,8 @@ export default {
       salidasTarjeta: [],
       adelantos: [],
       turno: null,
+      imprimirResumenProducto: false,
+      imprimirCierre: false,
       turnos: [
         { value: null, text: "Seleccione un Turno" },
         { value: 1, text: "Mañana" },
@@ -1269,25 +1309,25 @@ export default {
     totalVentasMastercard() {
       let total = 0;
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard;
+        if (!venta.Anulado) total += venta.Yape;
       });
       return total;
     },
     ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0 && !venta.EsCredito;
+        return venta.Yape > 0 && !venta.EsCredito;
       });
     },
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia;
+        if (!venta.Anulado) total += venta.Mastercard;
       });
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0 && !venta.EsCredito;
+        return venta.Mastercard > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
@@ -1330,8 +1370,19 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
+    imprimirResumen() {
+      this.imprimirCierre = false;
+      this.imprimirResumenProducto = true;
+      this.$nextTick(() => {
+        window.print();
+      });
+    },
     imprimir() {
-      window.print();
+      this.imprimirCierre = true;
+      this.imprimirResumenProducto = false;
+      this.$nextTick(() => {
+        window.print();
+      });
     },
     async loadData() {
       await this.getVentas();
@@ -1487,8 +1538,9 @@ export default {
           params: params
         })
         .then(res => {
-          this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
-          this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
+          this.salidas = res.data.filter(sal => sal.Tipo == 1);
+          this.salidasTarjeta = res.data.filter(sal => sal.Tipo == 0);
+          console.log(this.salidas)
         })
         .catch(err => {
           console.log(err);
@@ -1596,7 +1648,14 @@ th {
 .si-print {
   display: none;
 }
+.printResumen {
+  display: none;
+}
 @media print {
+  .printResumen {
+    max-width: 350px;
+    display: block;
+  }
   .no-print {
     display: none;
   }
