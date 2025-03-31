@@ -660,8 +660,8 @@ export default {
       let sumatoriaContado = 0;
       prodDetalles.forEach(prod => {
         if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad;
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad;
+          sumatoriaCosto += (prod.Precio?prod.Precio :0) * (prod.Cantidad?prod.Cantidad :0);
+          sumatoriaContado += (prod.Precio?prod.Precio :0) * (prod.Cantidad?prod.Cantidad :0);
         }
       });
       sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto);

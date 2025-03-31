@@ -22,6 +22,7 @@
           <th>Id</th>
           <th>Producto</th>
           <th>Cantidad</th>
+          <th>Precio</th>
           <th class="text-center">Quitar</th>
         </tr>
       </thead>
@@ -30,6 +31,7 @@
           <td>{{ prod.IdProductoDet }}</td>
           <td>{{ prod.Producto }}</td>
           <td><input type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td><input type="number" class="form-control" v-model="prod.Precio" requiredv @input="emitUpdate" /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -92,6 +94,8 @@ export default {
           this.$toasted.show('No puede agregar un producto padre')
         } else {
           data.IdProductoDet = data.IdProducto
+          data.Cantidad = 1
+          data.Precio = data.PrecioContado
           this.productos.push(data)
           this.emitUpdate()
         }
