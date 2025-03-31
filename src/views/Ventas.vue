@@ -982,7 +982,12 @@ export default {
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
           // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          if(sessionStorage.getItem("User").toUpperCase() === "NIKO" || sessionStorage.getItem("User").toUpperCase() == "EDGAR") {
+            this.$refs.inputAlmacen.$refs.input.disabled = false;
+          } else {
+            this.$refs.inputAlmacen.$refs.input.disabled = true;
+          }
+          // this.$refs.inputAlmacen.$refs.input.disabled = true;
           this.$refs.inputPuntoVenta.$refs.input.disabled = true;
           //this.getNumeroVenta()
           this.getTipoDoc(response.data.IdTipoDoc);
