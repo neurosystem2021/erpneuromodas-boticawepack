@@ -46,7 +46,7 @@
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               </template>
               <template slot="Reimprimir" slot-scope="data">
-                <b-button variant="primary" @click="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></b-button>
+                <a class="fas fa-print btn btn-primary" href="#" @click.prevent="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></a>
               </template>
           </b-table>
             <b-row>
@@ -130,7 +130,21 @@ export default {
           return []
         })
       },
-      reimprimir(idDocVenta){
+      reimprimir(idDocVenta) {
+         const url = '/imprimir/index.php?IdDocVenta=' + idDocVenta + '&preview=1';
+         const iframe = document.createElement('iframe');
+         iframe.style.position = 'absolute';
+         iframe.style.width = '0px';
+         iframe.style.height = '0px';
+         iframe.style.border = 'none';
+         iframe.src = url;
+         iframe.onload = function () {
+           iframe.contentWindow.print();
+           setTimeout(() => document.body.removeChild(iframe), 1000);
+         };
+         document.body.appendChild(iframe);
+       },
+      /*reimprimir(idDocVenta){
           this.axios.get(this.API + 'ventas/reimpresion/rapida?idDocVenta=' + idDocVenta)
           .then((response) => {
             let venta = {
@@ -183,7 +197,7 @@ export default {
               console.log(error)
               this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
           })
-      },
+      },*/
   },
   components: {
   }
