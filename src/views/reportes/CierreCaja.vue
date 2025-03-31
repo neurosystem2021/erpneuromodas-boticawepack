@@ -1,9 +1,10 @@
 <template>
   <b-container fluid class="px-5 py-5">
     <b-row class="no-print">  
-      <b-col cols="9" class="no-print">
+      <b-col cols="12"  lg="9" xl="9" class="no-print" order="2" order-lg="1">
         
         <b-card no-body>
+          <center><h4>DETALLE CIERRE DE CAJA</h4></center>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Ventas" active >
               <div class="scrollVertical">
@@ -207,7 +208,7 @@
                     </td>
                     <td>{{ item.MastercardDesc }}</td>
                     <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Mastercard | redondear }}</td>
+                    <td>S/. {{ item.Yape | redondear }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -538,7 +539,7 @@
           </b-tabs>
         </b-card>
       </b-col>
-      <b-col cols="3" class="card elevation-2">
+      <b-col cols="12"  lg="3" xl="3" class="card elevation-2" order="1" order-lg="2">
         <div class="alinear">
           <center>
           </center>
@@ -634,7 +635,7 @@
       </b-row>
       </b-col>
       
-      <b-col cols="12">
+      <b-col cols="12" order="3">
 
         <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
       </b-col>
@@ -1671,8 +1672,9 @@ th {
   display: none;
 }
 .scrollVertical{
-  max-height: 900px;
+  max-height: 800px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 @media print {
   .printResumen {
