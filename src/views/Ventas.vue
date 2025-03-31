@@ -1767,7 +1767,11 @@ export default {
       prod.pres = "";
       productos.unshift(prod);
       if (esNota) {
+        if (producto.Producto == "TAPAJUNTA") {
+          console.log(prod);
+        }
         prod.cantidad = producto.cantidad;
+        prod.precio = producto.PrecioContado;
       }
       this.$nextTick(() => {
         let input = document.getElementById("input0");
