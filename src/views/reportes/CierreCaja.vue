@@ -376,6 +376,7 @@
             </tfoot>
           </table>
         </b-col>
+
         <b-col v-if="totalSalidas">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
@@ -600,21 +601,21 @@
             </tr>
             <tr>
               <td>Transferencia S/.</td>
-              <!-- <td>{{ totalVentasTransferencia | redondear }} </td> -->
+              <td>{{ totalVentasTransferencia | redondear }} </td>
             </tr>
             
             <tr>
               <td colspan="2"></td>
             </tr>
 
-            <tr>
+            <!-- <tr>
               <td>Vales de Crédito S/.</td>
-              <!-- <td>{{ totalVentasValeCredito | redondear }} </td> -->
-            </tr>
-            <tr>
+              <td>{{ totalVentasValeCredito | redondear }} </td>
+            </tr> -->
+            <!-- <tr>
               <td>Canjes S/.</td>
-              <!-- <td>{{ totalVentasCanje | redondear }} </td> -->
-            </tr>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr> -->
           </tbody>
         </table>
       </b-col>
@@ -1010,7 +1011,7 @@
           </tfoot>
         </table>
         <b-row>
-        <b-col v-if="totalIngresos">
+        <b-col cols="12" v-if="totalIngresos">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -1035,7 +1036,7 @@
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col cols="12" v-if="totalSalidas">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -1143,6 +1144,10 @@
               </tfoot>
             </table>
           </b-col>
+          <b-col cols="12">
+
+            <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
+          </b-col>
       </b-row>
            
     </b-row>
@@ -1226,10 +1231,12 @@ export default {
     },
     granTotal() {
       return (
-        this.totalVentasEfectivo +
-        this.totalIngresos -
-        this.totalSalidas -
-        this.totalAdelantosActivos
+        (this.totalIngresos ? this.totalIngresos : 0) +
+        (this.totalVentasEfectivo ? this.totalVentasEfectivo : 0) +
+        (this.totalVentasVisa ? this.totalVentasVisa : 0) +
+        (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
+        (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0) -
+        (this.totalSalidas ? this.totalSalidas : 0)
       );
     },
     granTotalSinPagoCliente() {
@@ -1332,9 +1339,9 @@ export default {
     totalVentasCredito() {
       let total = 0;
       this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total;
+        if (!venta.Anulado) total += parseFloat(venta.Total);
       });
-      return total;
+      return parseFloat(total).toFixed(2);
     },
     ventasCredito() {
       return this.ventas.filter(venta => {
@@ -1537,8 +1544,8 @@ export default {
           params: params
         })
         .then(res => {
-          this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
-          this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
+          this.salidas = res.data.filter(sal => sal.Tipo == 1);
+          this.salidasTarjeta = res.data.filter(sal => sal.Tipo == 0);
         })
         .catch(err => {
           console.log(err);
