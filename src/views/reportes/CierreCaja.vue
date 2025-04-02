@@ -549,6 +549,7 @@
         </div>
         <h2 class="text-center">Mi Cierre de Caja</h2> 
         <b-row  align-h="end" class=" no-print">
+        
         <b-col cols="12">
            
             <b-button-group>
@@ -567,6 +568,17 @@
           
           <b-form-select v-model="turno" :options="turnos" />
           
+        </b-col>
+        <b-col cols="12" v-if="!this.$route.params.id">
+          Vendedor:
+          <b-select 
+              :options="lstVendedor"
+              value-field="Usuario"
+              text-field="NombreUsuario"
+              @input="recargarCierre"
+              v-model="IdVendedor"
+              :disabled="bloquearVendedor"
+          ></b-select>
         </b-col>
             <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
               <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
@@ -1207,17 +1219,23 @@ import config from "@/store/config.js";
 import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
-  mounted() {
+  async mounted() {
+    await this.getListadoVendedor();
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id);
       this.loadData();
     } else {
-      this.getVendedor();
+      await this.getVendedor();
+      this.IdVendedor = sessionStorage.getItem("User");
+      let usuario = sessionStorage.getItem("User");
+      this.bloquearVendedor = usuario !== "admin";
     }
   },
   data() {
     return {
+      IdVendedor: "",
       API: config.API,
+      lstVendedor: [],
       ventas: [],
       ingresos: [],
       salidas: [],
@@ -1226,6 +1244,7 @@ export default {
       adelantos: [],
       turno: null,
       imprimirResumenProducto: false,
+      bloquearVendedor: false,
       imprimirCierre: false,
       turnos: [
         { value: null, text: "Seleccione un Turno" },
@@ -1373,9 +1392,21 @@ export default {
       //this.items[index].productos = detalles
       return detalles;
     },
-    getVendedor() {
+    recargarCierre(vendedor) {
+      let v = this.lstVendedor.filter(v => v.Usuario == vendedor)[0];
+      this.setVendedor(v);
+      this.loadData();
+    },
+    async getListadoVendedor() {
+      await this.axios(`${this.API}usuarios`).then(res => {
+        if (res.data) {
+          this.lstVendedor = res.data;
+        }
+      });
+    },
+    async getVendedor() {
       let usuario = sessionStorage.getItem("User");
-      this.axios
+      await this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
@@ -1451,17 +1482,18 @@ export default {
       // console.log(prod);
     },
     setVendedor(obj) {
+      console.log(obj);
       this.vendedor = obj;
       this.loadData();
     },
-    cerrarCaja() {
+    async cerrarCaja() {
       if (!this.turno) {
         this.$toasted.show("Seleccione un Turno");
         return;
       }
       let r = confirm("¿Está seguro de cerrar la caja?");
       if (r) {
-        this.axios
+        await this.axios
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
             user: sessionStorage.getItem("User"),
@@ -1566,11 +1598,11 @@ export default {
           console.log(err);
         });
     },
-    getAdelantos() {
+    async getAdelantos() {
       let params = {
         idDocVentas: this.ventas.map(v => v.idDocVenta)
       };
-      this.axios
+      await this.axios
         .get(this.API + "cierrecaja/ingresos/adelantos", {
           params: params
         })
@@ -1581,8 +1613,8 @@ export default {
           console.log(err);
         });
     },
-    getCierre(id) {
-      this.axios
+    async getCierre(id) {
+      await this.axios
         .get(this.API + "cierrecaja", {
           params: {
             idCierre: id
@@ -1671,7 +1703,7 @@ th {
 .printResumen {
   display: none;
 }
-.scrollVertical{
+.scrollVertical {
   max-height: 800px;
   overflow-y: auto;
   overflow-x: auto;

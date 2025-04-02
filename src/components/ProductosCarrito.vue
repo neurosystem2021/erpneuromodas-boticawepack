@@ -225,7 +225,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
+            :disabled="bloquearPrecio(productos[data.index])"
             type="number"
             style="width: 90px"
             min="0"
@@ -671,6 +671,22 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    bloquearPrecio(data) {
+      if (data.disabled) {
+        return true;
+      }
+      if (this.bloquearInput) {
+        return true;
+      }
+      if (this.esDelivery) {
+        return true;
+      }
+
+      if (this.isVentas && data.EsPadre) {
+        return true;
+      }
+      return false;
+    },
     abrirModal() {
       console.log("dddd");
       this.touchModal = true;

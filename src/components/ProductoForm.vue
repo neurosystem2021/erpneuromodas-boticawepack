@@ -305,7 +305,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              :disabled="(idPerfil == 1) ? false : true"
+               :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
               step="0.0001"
               type="number"
               class="form-control"
@@ -316,7 +316,7 @@
           <b-form-group>
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
-              :disabled="(idPerfil == 1) ? false : true"
+              :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
               type="number"
               step="0.0001"
               @input="actualizarPorcentajeUtilidad"
@@ -331,7 +331,7 @@
           <b-form-group>
             <label>Precio Convenio:</label>
             <input v-model="producto.precioConvenio"
-              :disabled="(idPerfil == 1) ? false : true"
+               :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
               type="number"
               step="0.0001"
               class="form-control"
@@ -349,6 +349,7 @@
               min="0"
               max="100"
               @input="(val)=>actualizarLiquidacion(val.target.value)"
+              :disabled="producto.EsPadre ==1"
               />
             </b-col>
             <b-col>
@@ -401,7 +402,7 @@
         </b-col>
       </b-row>
 
-      <hr />
+      <hr />  
       <b-row>
         <b-col>
           <producto-form-det 
@@ -660,8 +661,12 @@ export default {
       let sumatoriaContado = 0;
       prodDetalles.forEach(prod => {
         if (prod.Cantidad) {
-          sumatoriaCosto += (prod.Precio?prod.Precio :0) * (prod.Cantidad?prod.Cantidad :0);
-          sumatoriaContado += (prod.Precio?prod.Precio :0) * (prod.Cantidad?prod.Cantidad :0);
+          sumatoriaCosto +=
+            (prod.PrecioCosto ? prod.PrecioCosto : 0) *
+            (prod.Cantidad ? prod.Cantidad : 0);
+          sumatoriaContado +=
+            (prod.Precio ? prod.Precio : 0) *
+            (prod.Cantidad ? prod.Cantidad : 0);
         }
       });
       sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto);
@@ -868,6 +873,19 @@ export default {
 
       if (this.producto.IdOfertaCategoria == null) {
         this.producto.PosOferta = 10000;
+      }
+
+      if (this.producto.EsPadre == 1) {
+        let productosDet = this.producto.productosDet;
+        let val = this.producto.productosDet.some(
+          v => v.PrecioCosto > v.Precio
+        );
+        if (val) {
+          this.$toasted.error("No puede tener un precio menor que su costo.", {
+            duration: 3000
+          });
+          return;
+        }
       }
 
       this.axios
