@@ -1533,7 +1533,8 @@ export default {
         if (
           pro.CodigoBarra !== "COSTODELIVERY" &&
           pro.CodigoBarra !== "MANODEOBRA" &&
-          (pro.stock <= 0 || parseFloat(pro.cantidad) > pro.stock)
+          (pro.stock <= 0 || parseFloat(pro.cantidad) > pro.stock) &&
+          pro.EsPadre == 0
         ) {
           sinStock += 1;
         }

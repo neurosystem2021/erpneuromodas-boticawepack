@@ -36,6 +36,7 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
+import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 Vue.use(Router);
 
@@ -205,13 +206,18 @@ export default new Router({
     },
     {
       path: "/traslado",
-      name: "ReporteProyectos",
+      name: "Traslado",
       component: Traslado
     },
     {
       path: "/reporte_utlidad_bruta",
       name: "ReporteUtilidadBruta",
       component: ReporteUtilidadBruta
+    },
+    {
+      path: "/HistorialVentaKit",
+      name: "HistorialVentaKit",
+      component: HistorialVentaKit
     },
 
     {
