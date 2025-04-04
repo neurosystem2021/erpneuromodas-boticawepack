@@ -1608,12 +1608,21 @@ export default {
       this.venta.yapeMonto = this.venta.pago.yape.monto
         ? this.venta.pago.yape.monto
         : 0;
+      this.venta.yapeDescripcion = this.venta.pago.yape.descripcion
+        ? this.venta.pago.yape.descripcion
+        : "";
       this.venta.visaMonto = this.venta.pago.visa.monto
         ? this.venta.pago.visa.monto
         : 0;
+      this.venta.visaDescripcion = this.venta.pago.visa.descripcion
+        ? this.venta.pago.visa.descripcion
+        : "";
       this.venta.mastercardMonto = this.venta.pago.mastercard.monto
         ? this.venta.pago.mastercard.monto
         : 0;
+      this.venta.mastercardDescripcion = this.venta.pago.mastercard.descripcion
+        ? this.venta.pago.mastercard.descripcion
+        : "";
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
