@@ -112,6 +112,7 @@ export default {
       limpiarCarrito: "limpiarCarrito"
     }),
     selectProformas(proforma) {
+      this.$emit("guardarDatosProforma", proforma.IdProforma);
       this.axios
         .get(this.API + "proformas/detalle", {
           params: {

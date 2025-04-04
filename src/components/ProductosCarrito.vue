@@ -37,6 +37,8 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
+            
             <b-button @click="startRecognitionCodeBar" variant="info"><i class="fas fa-microphone"></i> </b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
@@ -47,7 +49,39 @@
       </b-form-group>
         </b-col>
       </b-row>
-      
+      <b-modal v-model="touchModal" size="sm" hide-footer class="ingDesc" title="Codigo Barra" hide-header-close>
+        <input readonly type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+        <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <!-- <td class="botones" @click="addPoint('.');">.</td> -->
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <b-button variant="success" @click="buscarCodigoBarra()">Buscar</b-button>
+                        <b-button variant="danger" @click="touchModal=!touchModal">Cerrar</b-button>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+      </b-modal>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
@@ -191,7 +225,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="productos[data.index].disabled || bloquearInput?true:false || esDelivery"
+            :disabled="bloquearPrecio(productos[data.index])"
             type="number"
             style="width: 90px"
             min="0"
@@ -444,6 +478,8 @@ export default {
 
   data() {
     return {
+      cantidadInput: "",
+      touchModal: false,
       vuelto: 0,
       readerSize: {
         width: 1600,
@@ -635,6 +671,26 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    bloquearPrecio(data) {
+      if (data.disabled) {
+        return true;
+      }
+      if (this.bloquearInput) {
+        return true;
+      }
+      if (this.esDelivery) {
+        return true;
+      }
+
+      if (this.isVentas && data.EsPadre) {
+        return true;
+      }
+      return false;
+    },
+    abrirModal() {
+      console.log("dddd");
+      this.touchModal = true;
+    },
     cambiarPrecioVenta(index) {
       let producto = { ...this.productos[index] };
       let flete = producto.FLETE
@@ -1040,10 +1096,11 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
+      console.log(obj)
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = obj.precio;
+      obj.precio = parseFloat(obj.precio).toFixed(1);
       obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
@@ -1074,7 +1131,6 @@ export default {
       });
     },
     setProductoCant(prod) {
-      console.log("prod", prod);
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1082,7 +1138,7 @@ export default {
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = prod.precio;
+      obj.precio = parseFloat(obj.precio).toFixed(1);
       obj.cantidad = prod.cantidad;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
@@ -1291,7 +1347,19 @@ export default {
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
     },
-
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
+    },
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    buscarCodigoBarra() {
+      this.loadCode = this.cantidadInput;
+      this.loadBarcode();
+      this.$nextTick(() => {
+        this.cantidadInput = "";
+      });
+    },
     formatFecha(fecha) {
       if (fecha) {
         return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
@@ -1351,6 +1419,24 @@ export default {
 canvas {
   width: 100%;
   height: 100%;
+}
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers .botones {
+  /* border: 1px solid #000000; */
+  cursor: pointer;
+  text-align: center;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+  border: 1px;
 }
 .cameraBarra {
   height: 50vh;
