@@ -588,13 +588,14 @@
                             <movimiento></movimiento>
                        
                             <pago-deuda></pago-deuda>
-                       
-                            <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                            <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"  @guardarDatosProforma="guardarDatosProforma"></proformas>
                        
                             <pre-orden-lista 
+
                                 v-show="!this.$route.query.idPreOrden"
                                 :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                                 @onPreOrden="selectPreOrden"
+                               
                                 :EsVenta="true"
                                 ></pre-orden-lista>
                       
@@ -668,7 +669,7 @@ export default {
       descuentoPuntos: {},
       descuentoGeneral: 0,
       tieneIgv: false,
-      venta: {},
+      venta: { IdProforma: null },
       bloquearInput: false,
       diasValidosProf: 1,
       adelantosPreOrden: [],
@@ -966,7 +967,7 @@ export default {
       }
     },
     selectPreOrden(orden) {
-      // console.log(orden)
+      console.log(orden);
       // this.venta.IdPreOrden = this.venta.IdPreOrden || []
       // if (Array.isArray(this.venta.IdPreOrden) ) {
       this.venta.IdPreOrden.push(orden);
@@ -1010,6 +1011,7 @@ export default {
     },
     initForm() {
       this.venta = {
+        IdProforma: null,
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -1349,6 +1351,10 @@ export default {
       // this.$refs.inputPuntoVenta.setValue('CAJA1')
       // this.$refs.inputVendedor.setValue('')
     },
+    guardarDatosProforma(IdProforma) {
+      this.venta.IdProforma = IdProforma;
+      // console.log("IdProforma", IdProforma);
+    },
     async guardarProforma() {
       this.inProgress = true;
 
@@ -1599,6 +1605,7 @@ export default {
       this.venta.IdPedido = this.$route.query.idPedido || null;
       this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
       this.venta.IdOferta = this.IdOferta;
+      this.venta.yapeMonto = this.venta.pago.yape.monto;
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
@@ -1608,7 +1615,7 @@ export default {
         let IdDocVentas = this.DocRefOfertas.map(v => v.idDocVenta);
         this.venta.IdDocVentas = IdDocVentas.join(",");
       }
-
+      
       await this.axios
         .post(this.API + "ventas", this.venta)
         .then(response => {

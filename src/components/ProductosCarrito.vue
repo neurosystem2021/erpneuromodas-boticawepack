@@ -1096,10 +1096,11 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
+      console.log(obj)
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = obj.precio;
+      obj.precio = parseFloat(obj.precio).toFixed(1);
       obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
@@ -1130,7 +1131,6 @@ export default {
       });
     },
     setProductoCant(prod) {
-      console.log("prod", prod);
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1138,7 +1138,7 @@ export default {
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = prod.precio;
+      obj.precio = parseFloat(obj.precio).toFixed(1);
       obj.cantidad = prod.cantidad;
       //obj.IdLote = 0
       //obj.TieneIgv = 0

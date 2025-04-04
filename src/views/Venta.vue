@@ -2086,7 +2086,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      await this.axios.post(this.API + "ventass", venta).then(response => {
         if (response.data.insertId) {
           let IdOfertas = this.generarOfertas();
           let IdOfertasString = IdOfertas.join(",");

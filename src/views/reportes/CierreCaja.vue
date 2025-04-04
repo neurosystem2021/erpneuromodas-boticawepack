@@ -14,7 +14,10 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Recibo</th>
+                      <th>Fecha</th>
+                      <th>U. Proforma</th>
+                      <th>U. Venta</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Estado</th><th style="width:90px">Pagado</th>
@@ -25,6 +28,9 @@
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
+                    
                     <td>
                     
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
@@ -85,17 +91,22 @@
                 <thead>
                   <tr class="thDetalle">
                     <th>Recibo</th><th>Fecha</th>
+                    <th>U. Proforma</th>
+                    <th>U. Venta</th>
                     <th v-if="$route.query.noDetalle">Cliente</th>
                     <th v-else>Productos</th>
                     <th>Detalle</th>
-      <th>Estado</th>
-      <th>Pagado</th>
+                    <th>Estado</th>
+                    <th>Pagado</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
+                    
                     <td>
                     
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
@@ -154,18 +165,23 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Recibo</th>
+                      <th>Fecha</th>
+                      <th>U. Proforma</th>
+                      <th>U. Venta</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Detalle</th>
-      <th>Estado</th>
-      <th>Pagado</th>
+                      <th>Estado</th>
+                      <th>Pagado</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
                     <td>
 
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
@@ -224,18 +240,23 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Recibo</th>
+                      <th>Fecha</th>
+                      <th>U. Proforma</th>
+                      <th>U. Venta</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Detalle</th>
-      <th>Estado</th>
-      <th>Pagado</th>
+                      <th>Estado</th>
+                      <th>Pagado</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
                     <td>
 
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
@@ -294,7 +315,10 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                    <th>Recibo</th><th>Fecha</th>
+                    <th>Recibo</th>
+                    <th>Fecha</th>
+                    <th>U. Proforma</th>
+                    <th>U. Venta</th>
                     <th v-if="$route.query.noDetalle">Cliente</th>
                     <th v-else>Productos</th>
                     <th>Estado</th><th>Pagado</th>
@@ -304,6 +328,8 @@
                   <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
                     <td>
                       
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
@@ -1217,6 +1243,7 @@
 <script>
 import config from "@/store/config.js";
 import CierresCaja from "@/components/CierresCaja.vue";
+import Proformas from "@/components/ProformaLista.vue";
 
 export default {
   async mounted() {
@@ -1501,7 +1528,8 @@ export default {
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
-            totalVentas: this.totalVentas
+            totalVentas: this.totalVentas,
+            granTotal: this.granTotal
           })
           .then(res => {
             this.loadData();

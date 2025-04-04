@@ -1,21 +1,41 @@
 <template>
   <div v-if="show">
-    <b-form-group>
-      <label>Agrega Subproductos:</label>
-      <b-input-group>
-        <autocomplete
-          :url="API + 'productos'"
-          ref="inputProducto"
-          anchor="Producto"
-          :onShouldRenderChild="renderChild"
-          label="writer"
-          placeholder="Seleccionar Producto"
-          :on-select="addProducto"
-          :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
-          :classes="{input: 'form-control upper'}">
-        </autocomplete>
-      </b-input-group>
-    </b-form-group>
+    <b-container fluid>
+        <b-row>{{  }}
+          <b-col cols="6">
+          <b-form-group>
+            <b-input-group>
+              <autocomplete
+                :url="API + 'productos'"
+                ref="inputProducto"
+                anchor="Producto"
+                :onShouldRenderChild="renderChild"
+                label="writer"
+                placeholder="Seleccionar Producto"
+                :on-select="addProducto"
+                :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+        <b-col cols="6">
+          <b-input-group-append>
+          <b-input-group>
+          
+          <input 
+                  id="txtBarcode"
+                  v-model="loadCode"
+                  @keydown.enter.prevent="loadBarcode"
+                  type="text"
+                  class="form-control"
+                  placeholder="Codigo de Barra" />
+                  <b-button variant="primary" @click="loadBarcode"><i class="fas fa-barcode"></i></b-button>
+            </b-input-group>
+          </b-input-group-append>
+        </b-col>
+      </b-row>
+    </b-container>
     <table class="table b-table table-sm">
       <thead>
         <tr>
@@ -31,13 +51,19 @@
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProductoDet }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td><input type="number" class="form-control" id="cantidad0" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
           <td><input type="number" class="form-control" v-model="prod.PrecioCosto" disabled requiredv /></td>
           <td><input type="number" class="form-control"  :class="{ 'input-error': prod.PrecioCosto  >  prod.Precio }" v-model="prod.Precio" requiredv @input="emitUpdate" /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
         <tr>
-          <td colspan="3" style="text-align: center;"><b>Total</b></td>
+          <td colspan="2" style="text-align: center;"><b>Total</b></td>
+          <td>
+            G. T.: 
+            {{ 
+              parseFloat(padre.PrecioContado*padre.PorcentajeUtilidad /100).toFixed(2)
+            }}
+          </td>
           <td> <b>
               {{ 
                 parseFloat(productos.reduce((sum,pro)=>{
@@ -71,10 +97,11 @@ export default {
     return {
       show: false,
       API: config.API,
-      productos: []
+      productos: [],
+      loadCode: ""
     };
   },
-  props: ["idProducto"],
+  props: ["idProducto", "padre"],
   methods: {
     emitUpdate() {
       this.$emit("onUpdateProductos", this.productos);
@@ -129,8 +156,13 @@ export default {
             data.IdProductoDet = data.IdProducto;
             data.Cantidad = 1;
             data.Precio = data.PrecioContado;
-            this.productos.push(data);
+            this.productos.unshift(data);
             this.emitUpdate();
+            let input = document.getElementById("cantidad0");
+            this.$nextTick(() => {
+              input.focus();
+              input.select();
+            });
           }
         });
 
@@ -149,8 +181,47 @@ export default {
       this.emitUpdate();
     },
     focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
+      this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
+    },
+    loadBarcode(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      let idProducto = this.loadCode;
+
+      if (idProducto) {
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              let data = response.data;
+              let index = this.productos.findIndex(
+                el => el.IdProductoDet == data.IdProducto
+              );
+
+              if (index >= 0) {
+                this.$toasted.show("El producto ya está agregado");
+                return;
+              }
+              data.IdProductoDet = data.IdProducto;
+              data.Cantidad = 1;
+              data.Precio = data.PrecioContado;
+              this.productos.unshift(data);
+              this.emitUpdate();
+              let input = document.getElementById("cantidad0");
+              this.$nextTick(() => {
+                input.focus();
+                input.select();
+              });
+              this.loadCode = "";
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
+      }
     }
   }
 };

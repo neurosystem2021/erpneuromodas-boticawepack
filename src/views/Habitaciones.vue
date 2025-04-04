@@ -255,6 +255,9 @@
             <div style="margin-bottom: 20px;">
               <label>Descripción de Proyecto:</label>
               <b-row>
+                <b-col cols="12">
+                  <b-button variant="info" class="mb-3" v-if="editarDescripcion" @click="startRecognition($event)"> <i class="fa fa-microphone" aria-hidden="true"></i> Dictado Por Voz</b-button>
+                </b-col>
                 <b-col md="9">
                   <textarea
                   :disabled="!editarDescripcion"
@@ -267,7 +270,8 @@
                 </b-col>
                 <b-col md="3">
                   <b-button v-if="!editarDescripcion" style="margin-top:5px" variant="primary" size="sm" @click="editarDescripcionFun()"><i class="fas fa-pencil-alt fa-sm"></i> Editar Descripcion</b-button>
-                  <b-button v-if="editarDescripcion" style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
+                  <b-button v-else style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
+                  <br> <b-button v-if="!editarDescripcion" @click="imprimirReciboServicio(selectProducto)"  style="margin-top:5px" variant="info" size="sm"><i class="fas fa-print fa-sm"></i> Imprimir Recibo Servicios </b-button>
                 </b-col>
                 <b-col md="3"  class="mt-2">
                   <b-input-group>
@@ -510,6 +514,58 @@ export default {
   methods: {
     abrirMdlNuevoProyecto() {
       this.mdlNuevoProyecto = true;
+    },
+    startRecognition(event) {
+      event.preventDefault(); // Evita el comportamiento por defecto
+      event.stopPropagation(); // Evita que el evento se propague y cierre el modal
+      this.busqueda = "";
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.busqueda = event.results[0][0].transcript;
+          document.getElementById("autocompleteProducto").focus();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        this.handleError(event.error);
+      };
+
+      this.recognition.onend = async () => {
+        const inputEvent = new Event("input", {
+          bubbles: true,
+          cancelable: true
+        });
+        let doc = document.getElementById("txtDescripcion");
+        // doc.value =  this.busqueda
+        this.selectProducto.Descripcion = this.busqueda;
+      };
+      this.recognition.start();
+    },
+    handleError(error) {
+      let errorMessage = "";
+      if (error === "no-speech") {
+        errorMessage =
+          "No se detectó ningún discurso. Por favor, inténtalo de nuevo.";
+      } else if (error === "audio-capture") {
+        errorMessage =
+          "No se pudo acceder al micrófono. Asegúrate de que esté correctamente conectado y de que el navegador tenga permisos para usarlo.";
+      } else if (error === "not-allowed") {
+        errorMessage =
+          "Permiso para usar el micrófono denegado. Por favor, habilita el acceso en la configuración de tu navegador.";
+      } else {
+        errorMessage =
+          "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+      }
+      alert(errorMessage);
     },
     mountedProforma(modal) {
       document.body.appendChild(modal);
@@ -958,6 +1014,10 @@ export default {
         .catch(error => {
           this.$toasted.show("No se guardo la descripcion, hubo un error");
         });
+    },
+    imprimirReciboServicio(selectProducto) {
+      console.log(selectProducto);
+      window.open("/imprimir/imprimirReciboServicio.php?IdProducto=" + selectProducto.IdProducto, "_blank");
     }
   },
   components: {

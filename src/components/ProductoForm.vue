@@ -135,7 +135,7 @@
             <b-form-textarea 
               ref="inputProductoDesc"
               rows="6"
-              v-model="producto._ProductoDesc"
+              v-model="producto.ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
               />
           </b-form-group>
@@ -409,6 +409,7 @@
             @onUpdateProductos="calcularPreciosPaquete"
             :id-producto="producto.IdProducto" 
             v-if="showProductoDet && show" 
+            :padre="producto"
             ref="productoDet"
             ></producto-form-det>
         </b-col>

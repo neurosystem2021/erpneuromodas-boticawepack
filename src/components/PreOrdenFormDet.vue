@@ -15,6 +15,18 @@
           :onFocus="focusAutocomplete.bind(null, 'inputProducto')"
           :classes="{input: 'form-control upper'}">
         </autocomplete>
+        <autocomplete
+          :url="API + 'productos/kits'"
+          ref="productoKit"
+          anchor="Producto"
+          :onShouldRenderChild="renderChild"
+          label="writer"
+          style="width:200px"
+          placeholder="Seleccionar Kit"
+          :on-select="addProductoKit"
+          :onFocus="focusAutocomplete.bind(null, 'productoKit')"
+          :classes="{input: 'form-control upper'}">
+        </autocomplete>
         <input v-model="loadCode"
         @keydown.enter.prevent="loadBarcode"
         type="text"
@@ -88,7 +100,8 @@ export default {
       API: config.API,
       productosACargar: [],
       productos: [],
-      loadCode: ""
+      loadCode: "",
+      IdsProductoKit: []
     };
   },
   props: ["idPreorden", "idProducto"],
@@ -182,6 +195,30 @@ export default {
           });
       }
     },
+
+    addProductoKit(data) {
+      // if (this.IdsProductoKit.some(v => v.IdProducto == data.IdProducto)) {
+      //   return false;
+      // }
+
+      this.IdsProductoKit.push(data);
+      let detalle = data.detalle;
+
+      detalle.forEach(element => {
+        if (this.productos.some(v => v.IdProducto == element.IdProducto)) {
+          this.$toasted.error("Producto ya se encuentra en la lista");
+          return false;
+        }
+        element.PrecioContado = element.PrecioContado;
+        element.cantidad = 1;
+        element.Cantidad = 1;
+
+        this.productos.unshift(element);
+        this.$toasted.success("Productos agregados");
+      });
+      this.emitUpdate();
+      // console.log(data);
+    },
     addProducto(data) {
       let index = this.productos.findIndex(
         el => el.IdProducto == data.IdProducto
@@ -213,7 +250,7 @@ export default {
       this.emitUpdate();
     },
     focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
+      this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
     },
     addManoDeObra(index, e) {
