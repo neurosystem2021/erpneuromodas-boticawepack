@@ -1605,9 +1605,15 @@ export default {
       this.venta.IdPedido = this.$route.query.idPedido || null;
       this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
       this.venta.IdOferta = this.IdOferta;
-      this.venta.yapeMonto = this.venta.pago.yape.monto;
-      this.venta.visaMonto = this.venta.pago.visa.monto;
-      this.venta.mastercardMonto = this.venta.pago.mastercard.monto;
+      this.venta.yapeMonto = this.venta.pago.yape.monto
+        ? this.venta.pago.yape.monto
+        : 0;
+      this.venta.visaMonto = this.venta.pago.visa.monto
+        ? this.venta.pago.visa.monto
+        : 0;
+      this.venta.mastercardMonto = this.venta.pago.mastercard.monto
+        ? this.venta.pago.mastercard.monto
+        : 0;
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
@@ -1617,7 +1623,7 @@ export default {
         let IdDocVentas = this.DocRefOfertas.map(v => v.idDocVenta);
         this.venta.IdDocVentas = IdDocVentas.join(",");
       }
-      
+
       await this.axios
         .post(this.API + "ventas", this.venta)
         .then(response => {
