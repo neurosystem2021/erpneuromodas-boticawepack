@@ -1077,7 +1077,7 @@ export default {
       this.loadCode = "";
       this.preciosProd = [];
       this.objProd = {};
-
+      obj.PrecioContado = parseFloat(obj.PrecioContado).toFixed(1);
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
@@ -1096,7 +1096,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log(obj)
+      console.log(obj);
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
