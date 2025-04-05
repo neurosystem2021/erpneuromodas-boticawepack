@@ -61,8 +61,15 @@
           <td>
             G. T.: 
             {{ 
-              parseFloat(padre.PrecioContado*padre.PorcentajeUtilidad /100).toFixed(2)
-            }}
+            parseFloat(productos.reduce((sum,pro)=>{
+                  return sum + parseFloat(pro.Precio*pro.Cantidad)
+                },0)).toFixed(2) -
+              parseFloat(productos.reduce((sum,pro)=>{
+                  return sum + parseFloat(pro.PrecioCosto*pro.Cantidad)
+                },0)).toFixed(2)
+
+                
+              }}
           </td>
           <td> <b>
               {{ 
