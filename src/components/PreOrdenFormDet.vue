@@ -210,8 +210,8 @@ export default {
           return false;
         }
         element.PrecioContado = element.PrecioContado;
-        element.cantidad = 1;
-        element.Cantidad = 1;
+        element.cantidad = element.Cantidad;
+        element.Cantidad = element.Cantidad;
 
         this.productos.unshift(element);
         this.$toasted.success("Productos agregados");
