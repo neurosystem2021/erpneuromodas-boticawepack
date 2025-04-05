@@ -328,7 +328,6 @@ export default {
           productos: this.productos,
           idAlmacen: this.almacenOrigen.IdAlmacen,
           user:       this.vendedor.Usuario,
-          usuario: usuario
         })
         .then(response => {
           if (response.data.error) {
