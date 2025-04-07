@@ -16,6 +16,7 @@ import AgenteGeneral from "@/views/AgenteGeneral.vue";
 import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
 import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -77,6 +78,11 @@ export default new Router({
       path: "/ventas",
       name: "Ventas",
       component: Ventas
+    },
+    {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
     },
     {
       path: "/reportes/ventas",
