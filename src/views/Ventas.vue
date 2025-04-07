@@ -622,6 +622,7 @@ export default {
             //this.venta.IdPreOrden.push(orden)
             // obtener total adelantos
             this.venta.idVentaPedido = data.idDocVenta
+            //console.log('id de venta a pedido: ',this.venta.idVentaPedido);
             this.venta.correlativoVentaPedido = data.Correlativo
             this.axios.get(this.API + 'ventas/pedido/adelantos', { 
                 params: { 
@@ -1283,6 +1284,13 @@ export default {
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 
+                if (response.data.insertId) {
+                    this.ultimaVenta = response.data.insertId; // Guardar el ID de la venta creada
+                } else {
+                    console.error("Error: No se obtuvo un ID de venta en la respuesta.");
+                }
+                this.ultimaVenta = response.data.insertId; 
+
                 if(response.data.errorUser){
                     this.$swal({
                         position: 'center',
@@ -1305,7 +1313,7 @@ export default {
                 //this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
                 this.tieneIgv = false
-                this.ultimaVenta = response.data.insertId
+                //this.ultimaVenta = response.data.insertId
                 this.initForm()
                 this.limpiarCart()
                 this.getVendedor()

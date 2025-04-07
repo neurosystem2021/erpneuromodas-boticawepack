@@ -128,7 +128,7 @@
         <br />
         <br />
         
-      <b-modal size="lg" ref="modalCobrar" hide-footer :title="'COBRAR VENTA: '+titulo">
+      <b-modal size="lg" ref="modalCobrar" hide-footer @hidden="limpiarModalCobrar" :title="'COBRAR VENTA: '+titulo">
         <b-row>
           <b-col md="6">
             <table>
@@ -276,6 +276,11 @@ export default {
     }
   },
   methods: {
+      limpiarModalCobrar() {
+        this.adelanto = 0;
+        this.productoSelect = {};
+        this.titulo = '';
+      },
       getVendedor () {
           let usuario = sessionStorage.getItem('User')
           this.axios.get(this.API + 'usuarios/' + usuario)
@@ -309,24 +314,7 @@ export default {
           // this.$refs[ref].type = ""
           this.$refs[ref].handleDoubleClick()
       },
-      facturarVentaPedido(idDocVenta) {
-        let idAnterior = idDocVenta -1;
-          this.axios
-            .get(this.API + "ventas/pedido/adelantos", {
-              params: { IdDocVenta: idAnterior },
-            })
-            .then((res) => {
-              if (res.data && res.data.length > 0) {
-                let suma = res.data.reduce((acc, r) => acc + parseFloat(r.Importe || 0), 0);
-                this.adelanto = suma;
-              } else {
-                this.adelanto = 0;
-              }
-            })
-            .catch((error) => {
-              console.error("Error al obtener adelanto:", error);
-            });
-      },
+
       onCobrar(idDocVenta){
         let params = {IdDocVenta: idDocVenta}
         this.axios.get(this.API + 'venta/info', {params: params})
@@ -341,8 +329,11 @@ export default {
                   descuentoTotal += det.Descuento
                 })
                 this.productoSelect.DescuentoTotal = descuentoTotal
-                //Llamar a la función para obtener el adelanto
-                this.facturarVentaPedido(idDocVenta);
+                // Llamar a la función para obtener el adelanto prueba con 5
+                let idVentaPedido = response.data.IdVentaPedido;
+                if(idVentaPedido>0){
+                this.obtenerAdelanto(idVentaPedido);}
+                
               }else{
                 this.$toasted.show('La venta fue cobrada anteriormente')
                 this.$refs.tablaVentas.refresh()
@@ -354,6 +345,21 @@ export default {
           this.$toasted.error('Error: Intente nuevamente') 
         })
         
+      },
+
+      obtenerAdelanto(idVentaPedido) {
+        this.axios.get(this.API + 'ventas/pedido/adelantoscobro', { params: { IdVentaPedido: idVentaPedido} })
+          .then((response) => {
+            if (response.data.length > 0) {
+              this.adelanto = response.data.reduce((total, item) => total + parseFloat(item.Importe), 0);
+            } else {
+              this.adelanto = 0; // Si no hay adelantos, se establece en 0
+            }
+          })
+          .catch((err) => {
+            console.log('el error es: ',err);
+            this.$toasted.error('Error al obtener el adelanto: Intente nuevamente');
+          });
       },
       actualizar(){
         this.$refs.tablaVentas.refresh()
