@@ -1738,7 +1738,7 @@ th {
 }
 @media print {
   .printResumen {
-    max-width: 350px;
+    max-width: 890px;
     font-size: 2em;
     display: block;
   }
@@ -1746,12 +1746,12 @@ th {
     display: none;
   }
   .si-print {
-    max-width: 350px;
+    max-width: 890px;
     display: block;
   }
   .table {
-    max-width: 350px;
-    font-size: 0.5em;
+    max-width: 890px;
+    /* font-size: 0.8em; */
   }
   th {
     background: #ffffff !important;
