@@ -67,7 +67,7 @@
                   <td :class="{'table-danger': prod.Estado == 1}">S/ {{ prod.Total | moneda }}</td>
                   <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
                   <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="info" v-if="prod.Estado == 0" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-warning" target="_blank" :href="'/views/reporteExcelOrdenPedidoPdf.php?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-pdf"></i> Pdf</a></td>
+                  <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
                   <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra/id?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
                   <td :class="{'table-danger': prod.Estado == 1}"><b-button  v-if="prod.Estado == 0" variant="danger" @click="anularOrden(prod)"><i class="fas fa-ban"></i> Anular</b-button></td>
                 </tr>
@@ -310,6 +310,24 @@ export default {
       add: "agregarProducto"
     }),
     cambioEstado() {},
+    async generarPdf(IdOrdenCompra) {
+      console.log("IdOrdenCompra", IdOrdenCompra);
+      await this.axios(`${this.API}reporte/ordencomprapdf`, {
+        params: {
+          id: IdOrdenCompra
+        }
+      }).then(res => {
+        if (res.data) {
+          console.log(res.data);
+          let url = res.data;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          window.open(url, "_blank");
+        }
+      });
+    },
     actualizarDet(e) {
       e.preventDefault();
       this.inProgress = true;

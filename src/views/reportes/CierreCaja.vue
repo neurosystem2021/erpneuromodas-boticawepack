@@ -1295,7 +1295,8 @@ export default {
         (this.totalVentasVisa ? this.totalVentasVisa : 0) +
         (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
         (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0) -
-        (this.totalSalidas ? this.totalSalidas : 0)
+        (this.totalSalidas ? this.totalSalidas : 0) -
+        (this.totalAdelantos ? this.totalAdelantos : 0)
       );
     },
     granTotalSinPagoCliente() {
