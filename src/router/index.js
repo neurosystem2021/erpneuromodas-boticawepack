@@ -16,6 +16,8 @@ import AgenteGeneral from "@/views/AgenteGeneral.vue";
 import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
 import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
+import Ordenes from "@/views/reportes/Ordenes.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
