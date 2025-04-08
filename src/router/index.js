@@ -14,7 +14,8 @@ import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Login from "@/views/Security/Login.vue";
-
+import Ordenes from "@/views/reportes/Ordenes.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
@@ -217,6 +218,16 @@ export default new Router({
       path: "/reporte/reporteregmovimiento",
       name: "ReporteRegMovimiento",
       component: ReporteRegMovimiento
+    },
+    {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
+    },
+    {
+      path: "/reportes/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
     }
   ]
 });
