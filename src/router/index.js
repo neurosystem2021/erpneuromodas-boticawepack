@@ -19,6 +19,7 @@ import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
 
 // Reportes
+import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
 import Comisionistas from "@/views/reportes/Comisionistas.vue";
@@ -88,6 +89,11 @@ export default new Router({
       path: "/reportes/ventas",
       name: "ReporteVentas",
       component: ReporteVentas
+    },
+    {
+      path: "/reportes/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
     },
     {
       path: "/reportes/cierrecaja",
