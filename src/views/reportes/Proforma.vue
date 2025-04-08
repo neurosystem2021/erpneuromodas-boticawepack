@@ -62,6 +62,10 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
               </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Descripción</td>
+                <td class="celda" style="text-transform: uppercase">: {{proforma.Descripcion}}</td>
+              </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
@@ -188,6 +192,8 @@ export default {
   methods: {
     getProforma() {
       this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
+        let response = res.data;
+        console.log(response);
         this.proforma = res.data;
         this.fechaHasta = this.calcularFechaHasta(
           this.proforma.FechaReg.substring(0, 10),

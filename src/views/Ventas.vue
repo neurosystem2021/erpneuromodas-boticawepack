@@ -1,7 +1,6 @@
 <template>
     <div>
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
-
         <Menu v-if="false"></Menu>
         <b-row v-if="pagosPendientes>0">
             <b-col class="holder">
@@ -299,10 +298,21 @@
                           <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocularMovil">
                                 <table class="table b-table border table-footer table-sm text-center "  >
                                     <tbody>
-                                        <tr><td>Mano de obra bruta</td></tr>
-                                        <tr><td><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
-                                        <tr><td>Mano de obra neta</td></tr>
-                                        <tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                        <tr>
+                                          <td>Descripción:</td>
+                                          <td>
+                                            <b-form-textarea
+                                              placeholder="Descripción"
+                                              rows="3"
+                                              max-rows="6"
+                                              v-model="venta.descripcion"
+                                            ></b-form-textarea>
+                                          </td>
+                                        </tr>
+                                        <tr><td colspan="2">Mano de obra bruta</td></tr>
+                                        <tr><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+                                        <tr><td colspan="2">Mano de obra neta</td></tr>
+                                        <tr><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
                                 </table>
                               </b-col>
@@ -669,7 +679,7 @@ export default {
       descuentoPuntos: {},
       descuentoGeneral: 0,
       tieneIgv: false,
-      venta: { IdProforma: null },
+      venta: { IdProforma: null, descripcion: "" },
       bloquearInput: false,
       diasValidosProf: 1,
       adelantosPreOrden: [],
@@ -1011,6 +1021,7 @@ export default {
     },
     initForm() {
       this.venta = {
+        descripcion: "",
         IdProforma: null,
         EsCredito: 0,
         Serie: "",
