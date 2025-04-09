@@ -731,6 +731,13 @@ export default {
         }
     },
     setProducto (obj) {
+      let val = this.productos.some(prod =>
+        prod.IdProducto === obj.IdProducto
+      )
+      if (val) {
+        this.$toasted.show('Producto ya se encuentra en el listado')
+        return;
+      }
       this.precioCont = obj.PrecioContado
       obj.estadoPxP = false
       this.loadCode = ''
