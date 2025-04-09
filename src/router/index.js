@@ -17,8 +17,10 @@ import CategoriasNuevo from "@/views/CategoriasNuevo.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Usuario from "@/views/Usuario.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
 
 // Reportes
+import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
 import Comisionistas from "@/views/reportes/Comisionistas.vue";
@@ -90,6 +92,16 @@ export default new Router({
       path: "/reportes/cierrecaja",
       name: "CierreCaja",
       component: CierreCaja
+    },
+    {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
+    },
+    {
+      path: "/reportes/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
     },
     {
       path: "/cajabancos",
