@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" style="min-width: 100%;" class="btnAction" variant="danger" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -55,18 +55,18 @@
                                                         <td class="text-center font-weight-bold">{{motorizado.Motorizado}}</td>
 
                                                         <td v-if="motorizado.ContadorViajes>0">
-                                                            <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="primary" class="text-center">EN ESTE VIAJE</b-badge>
+                                                            <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="danger" class="text-center">EN ESTE VIAJE</b-badge>
                                                             <b-badge v-else variant="warning" class="text-center">EN OTRO VIAJE</b-badge>
                                                         </td>
 
                                                         <td v-else>
-                                                            <b-badge variant="info" class="text-center">DISPONIBLE</b-badge>       
+                                                            <b-badge variant="success" class="text-center">LIBRE</b-badge>     
                                                         </td>
 
                                                         <td v-if="motorizado.online" class="text-center"><b-badge variant="success">online</b-badge></td>
                                                         <td v-else><b-badge variant="secondary" class="text-center">offline</b-badge></td>
 
-                                                        <td v-if="motorizado.ContadorViajes>0" class="text-center"> 
+                                                        <td v-if="motorizado.IdMotorizado==pedido.IdMotorizado" class="text-center">
                                                             <label>-------</label>
                                                         </td>
                                                         <td v-else>
@@ -177,6 +177,7 @@
 import config from "@/store/config.js";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import sound from "../../static/nuevassoli.mp3";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -190,7 +191,6 @@ export default {
     this.escucharCoordsMotorizado();
     this.escucharEstadoPedido();
     this.getEmpresaDatos();
-    console.log("hola");
   },
   beforeDestroy() {
     this.sockets.unsubscribe("lista-on-motorizado");
@@ -205,8 +205,7 @@ export default {
   data() {
     return {
       API: config.API,
-    //   APINODE: "http://198.211.103.92:5000",
-      APINODE: "https://pedi2.pe:5000",
+      APINODE: "https://panel.pedi2.pe",
       mymap: null,
       show: false,
       pedidos: [],
@@ -246,7 +245,8 @@ export default {
       pedidoIdMapa: null,
       usuario: sessionStorage.getItem("User"),
       showPopover: false,
-      title: "Punto de Venta"
+      title: "Punto de Venta",
+      audio: new Audio(sound)
     };
   },
   watch: {
@@ -274,7 +274,6 @@ export default {
     },
     connect() {
       console.log("connected"),
-        // this.$socket.emit('conectar', {tipo: 'PLATAFORMA', objeto:{iddb:this.empresa.IdEmpresa, urlplat:this.empresa.FacturaUrl,idalmacen:this.empresa.IdAlmacen}},(resp)=>{
         this.$socket.emit(
           "conectar",
           {
@@ -294,7 +293,6 @@ export default {
   },
   methods: {
     loadMapa() {
-      this.idEmpresa = 3;
       if (this.idEmpresa != null) {
         this.mymap = new L.map("mapid", {
           touchZoom: false,
@@ -304,12 +302,12 @@ export default {
           closePopupOnClick: false
         }).setView([this.empresa.Latitud, this.empresa.Longitud], 13);
         L.tileLayer(
-          "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+          "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g",
           {
             maxZoom: 22,
             id: "mapbox/streets-v11",
             accessToken:
-              "pk.eyJ1IjoicmVuem85MjIxIiwiYSI6ImNraDRhZ2NxbzA5eHEycW92d2Y1cGhldWUifQ.1zWCqGLtZfq_VSSWJx23Pg"
+              "sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g"
           }
         ).addTo(this.mymap);
         this.clienteLayer = L.layerGroup().addTo(this.mymap);
@@ -323,10 +321,8 @@ export default {
       }
     },
     getEmpresaDatos() {
-      //   let hostUrl = sessionStorage.getItem("HostUrl");
-      let hostUrl = "https://nsp.factura.vip";
-      //   let idAlmacen = sessionStorage.getItem("IdAlmacen");
-      let idAlmacen = 1;
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      let idAlmacen = sessionStorage.getItem("IdAlmacen");
       if (hostUrl != null && idAlmacen != null) {
         this.axios
           .get(this.APINODE + "/api/plataforma/empresa", {
@@ -336,7 +332,6 @@ export default {
             }
           })
           .then(res => {
-            console.log(res);
             if (res.data.success == true) {
               this.idEmpresa = res.data.data.IdEmpresa;
               this.empresa = res.data.data;
@@ -369,6 +364,8 @@ export default {
     },
     getPedidos() {
       if (this.idEmpresa != null) {
+        this.pedidos = [];
+        this.audio.loop = true;
         this.axios
           .get(this.APINODE + "/api/plataforma/pedidos", {
             params: {
@@ -378,6 +375,11 @@ export default {
           .then(res => {
             if (res.data.success == true) {
               this.pedidos = res.data.data;
+              if (this.pedidos.filter(p => p.Estado == "E").length > 0) {
+                this.audio.play();
+              } else {
+                this.audio.pause();
+              }
               this.title = "(" + this.pedidos.length + ") Pedidos de Delivery";
               this.pedidos.map(p => {
                 p.showPopover = false;
@@ -397,12 +399,14 @@ export default {
                 }
               }
             } else if (res.data.success == false) {
+              this.audio.pause();
               this.pedidos = [];
               this.title = "Punto de Venta";
               if (this.mymap) {
                 this.emitirConsultaMotorizado();
               }
             } else {
+              this.audio.pause();
               this.pedidos = [];
               if (this.mymap) {
                 this.emitirConsultaMotorizado();
@@ -411,10 +415,12 @@ export default {
           })
           .catch(err => {
             this.pedidos = [];
+            this.audio.pause();
             console.log(err);
             this.title = "Sin Delivery, Actualice";
           });
       } else {
+        this.audio.pause();
         this.title = "Sin Delivery, Actualice";
         this.$toasted.show(
           "Servicio de delivery no disponible, porfavor actualice la pagina"
@@ -588,6 +594,11 @@ export default {
                 this.$emit("onPagarDelivery", pedido);
                 this.show = false;
               }
+              setTimeout(() => {
+                if (this.pedidos.filter(p => p.Estado == "E").length == 0) {
+                  this.audio.pause();
+                }
+              }, 1000);
             }
           } else if (res.data.success == false) {
             this.getPedidos();
@@ -946,7 +957,7 @@ export default {
   font-family: monospace;
 }
 .popover {
-  max-width: 420px !important;
+  max-width: 450px !important;
 }
 #modalPedidos .modal-dialog {
   max-width: 95% !important;
