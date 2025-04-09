@@ -2449,7 +2449,137 @@ export default {
         window.parent.document.getElementById("NavegadorParent").style.display =
           "block";
       }
+    },
+    onPagarDelivery(obj) {
+      this.$route.query.idPedido = obj.IdPedido;
+      if (this.$route.query.idPedido) {
+        console.log(obj);
+        this.infoDelivery = obj;
+        this.venta.EsDelivery = true;
+        this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
+        //cargar costo de delivery
+        let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
+        if (costoDelivery > 0) {
+          this.axios
+            .get(this.API + "costo/delivery")
+            .then(response => {
+              if (response.data) {
+                let costoDeliverObj = response.data;
+                costoDeliverObj.precio = costoDelivery;
+                costoDeliverObj.cantidad = 1;
+                costoDeliverObj.EsCostoDelivery = 1;
+                costoDeliverObj.IdImpresora = 0;
+                costoDeliverObj.descuento = 0;
+                costoDeliverObj.indicacion = "";
+                this.add([
+                  response.data,
+                  () => {
+                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+                  },
+                  { setPrecioCosto: false },
+                  false,
+                  false
+                ]);
+                //Cargar Productos Delivery
+                let productos = JSON.parse(obj.Productos);
+                console.log(productos);
+                productos.map(item => {
+                  this.add([
+                    item.IdProducto,
+                    () => {
+                      this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+                    },
+                    {
+                      cantidad: item.Cantidad,
+                      precio: item.Precio,
+                      indicacion: item.Indicacion
+                    },
+                    false
+                  ]);
+                });
+                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                this.venta.DireccionEntrega = obj.Direccion;
+                this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
+              } else {
+                this.$toasted.show(
+                  "PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'"
+                );
+                this.anularPagoDelivery();
+              }
+            })
+            .catch(error => {
+              this.$toasted.show("HUBO UN ERROR");
+            });
+        } else {
+          //Cargar Productos Delivery
+          let productos = JSON.parse(obj.Productos);
+          productos.map(item => {
+            this.add([
+              item.IdProducto,
+              () => {
+                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+              },
+              {
+                cantidad: item.Cantidad,
+                precio: item.Precio,
+                indicacion: item.Indicacion,
+                isDelivery: true
+              },
+              false
+            ]);
+          });
+          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.venta.DireccionEntrega = obj.Direccion;
+        }
+      }
+    },
+    anularPagoDelivery() {
+      this.limpiarCart();
+      this.venta.EsDelivery = false;
+      this.infoDelivery = {};
+      this.$refs.carrito.pagocon = "";
+      this.loadClienteVarios();
+      this.loadComisionista();
+      this.venta.nombreLlevar = "";
+      this.venta.selectOpcionVenta = 0;
+      this.venta.nombreLlevar = "";
+      this.venta.DireccionEntrega = "";
+      this.$router.replace("/ventas");
+    },
+    //Sockets
+    escucharPedidos() {
+      this.sockets.subscribe("nuevo-pedido", data => {
+        if (this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          this.$refs.deliveryModal.getPedidos();
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              this.$refs.deliveryModal.show = true;
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      });
     }
+    //Fin Sockets
   }
 };
 </script>
