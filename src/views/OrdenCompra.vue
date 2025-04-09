@@ -81,204 +81,221 @@
     </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
-import config from '@/store/config.js'
-import ProductosCarrito from '@/components/ProductosCarrito'
-
-
+import { mapActions, mapState } from "vuex";
+import config from "@/store/config.js";
+import ProductosCarrito from "@/components/ProductosCarrito";
 
 export default {
-    beforeMount () {
-        //this.initForm()
-    },
-    mounted () {
-
-    },
-    data () {
-        return {
-            inProgress: false,
-            newRuc: '',
-            API: config.API,
-            ultimoMovimiento: '',
-            movimiento: this.initMovimiento(),
-            carrito: {
-                fields: [
-                    { key: 'CodigoBarra', label: 'Código' },
-                    { key: 'Producto' },
-                    { key: 'ProductoMarca', label: 'Marca' },
-                    { key: 'ProductoFormaFarmaceutica', label: 'Lab.' },
-                    { key: 'ProductoMedicion', label: 'Med.' },
-                    { key: 'StockMinimo', label: 'Stock Min.', variant: 'warning', class:'text-center fontsize ' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class:'text-center fontsize ' },
-                    { key: 'cantidad' },
-                    { key: 'precio', label: 'Precio Compra' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center fontsize' },
-                    { key: 'acciones', label: ''}
-                ]
-            },
-            idPerfil: sessionStorage.getItem('IdPerfil')
-        }
-    },
-    computed: {
-        ...mapState({
-            productos: state => state.cart.productos,
-            totalCart: state => state.cart.totalCart
+  beforeMount() {
+    //this.initForm()
+  },
+  mounted() {},
+  data() {
+    return {
+      inProgress: false,
+      newRuc: "",
+      API: config.API,
+      ultimoMovimiento: "",
+      movimiento: this.initMovimiento(),
+      carrito: {
+        fields: [
+          { key: "CodigoBarra", label: "Código" },
+          { key: "Producto" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoFormaFarmaceutica", label: "Lab." },
+          { key: "ProductoMedicion", label: "Med." },
+          {
+            key: "StockMinimo",
+            label: "Stock Min.",
+            variant: "warning",
+            class: "text-center fontsize "
+          },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center fontsize "
+          },
+          { key: "cantidad" },
+          { key: "precio", label: "Precio Compra" },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center fontsize"
+          },
+          { key: "acciones", label: "" }
+        ]
+      },
+      idPerfil: sessionStorage.getItem("IdPerfil")
+    };
+  },
+  computed: {
+    ...mapState({
+      productos: state => state.cart.productos,
+      totalCart: state => state.cart.totalCart
+    })
+  },
+  methods: {
+    ...mapActions({
+      aplicarDescuento: "aplicarDescuentoGeneral",
+      limpiarCart: "limpiarCarrito",
+      obtenerStok: "obtenerStock",
+      add: "agregarProducto"
+    }),
+    cargarProducto() {
+      this.axios
+        .get(this.API + "productos/proveedor", {
+          params: {
+            IdProveedor: this.movimiento.proveedor.IdProveedor,
+            IdAlmacen: this.movimiento.almacen.IdAlmacen
+          }
         })
+        .then(response => {
+          this.limpiarCart();
+          response.data.map(item => {
+            this.add([item, () => {}, false, true]);
+          });
+
+          this.obtenerStok({
+            IdAlmacen: this.movimiento.almacen.IdAlmacen,
+            CalculoCantidad: 1
+          });
+        });
     },
-    methods: {
-        ...mapActions({
-            aplicarDescuento: 'aplicarDescuentoGeneral',
-            limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock',
-            add:'agregarProducto'
-        }),
-        cargarProducto () {
-            this.axios.get(this.API + 'productos/proveedor', {
-                params: {
-                    IdProveedor: this.movimiento.proveedor.IdProveedor,
-                    IdAlmacen: this.movimiento.almacen.IdAlmacen,
-                }
-            }).then((response) => {
-                    this.limpiarCart()
-                    response.data.map((item) => {
-                    this.add([item, () => {
-                    }, false, true ])
-                })     
+    setProveedor(obj) {
+      this.movimiento.proveedor = obj;
+      this.$store.state.cart.productos = [];
+    },
+    initMovimiento() {
+      let currentMonth = this.$moment().month() + 1;
+      currentMonth = currentMonth < 10 ? "0" + currentMonth : currentMonth;
+      return {
+        MovimientoFecha:
+          this.$browser.name == "chrome"
+            ? this.$moment().format("YYYY-MM-DDThh:mm:ss")
+            : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
+        proveedor: { IdProveedor: 0 },
+        movimientoTipo: {},
+        almacen: { IdAlmacen: 0 },
+        user: sessionStorage.getItem("User")
+      };
+    },
+    onSetProducto(obj) {
+      obj.cantidad = 0;
+      obj.precio = obj.PrecioCosto || 0;
+      return obj;
+    },
+    onAddProducto(obj) {
+      if (this.movimiento.almacen.IdAlmacen > 0) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacen.IdAlmacen,
+          CalculoCantidad: 1
+        });
+      }
+    },
+    setAlmacen(obj) {
+      this.movimiento.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      if (this.productos.length) {
+        this.obtenerStok({
+          IdAlmacen: this.movimiento.almacen.IdAlmacen,
+          CalculoCantidad: 1
+        });
+      }
+    },
+    guardarMovimiento(evt) {
+      evt.preventDefault();
+      this.inProgress = true;
 
-                this.obtenerStok({ IdAlmacen: this.movimiento.almacen.IdAlmacen, CalculoCantidad: 1 })                
-            })
-        },
-        setProveedor (obj) {
-            this.movimiento.proveedor = obj
-        },
-        initMovimiento () {
-            let currentMonth = this.$moment().month() + 1
-            currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
-            return {
-                MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
-                proveedor: { IdProveedor: 0 },
-                movimientoTipo: {},
-                almacen:{ IdAlmacen: 0 },
-                user: sessionStorage.getItem("User"),
-            }
-        },
-        onSetProducto (obj) {
-            obj.cantidad = 0
-            obj.precio = obj.PrecioCosto || 0
-            return obj
-        },    
-        onAddProducto (obj) {
-            if(this.movimiento.almacen.IdAlmacen>0){
-                this.obtenerStok({
-                    IdAlmacen: this.movimiento.almacen.IdAlmacen,
-                    CalculoCantidad: 1
-                })
-            }
-        },
-        setAlmacen (obj) {
-            this.movimiento.almacen = obj
-            this.$refs.inputAlmacen.setValue(obj.Almacen)
-            if(this.productos.length){
-                this.obtenerStok({
-                    IdAlmacen: this.movimiento.almacen.IdAlmacen,
-                    CalculoCantidad: 1
-                })
-            }
-            
-        },
-        guardarMovimiento (evt) {
-            evt.preventDefault();
-            this.inProgress = true
-            
-            if (!this.movimiento.proveedor.IdProveedor) {
-                this.$toasted.show('Por favor seleccione un proveedor')        
-                this.inProgress = false            
-                return
-            }
+      if (!this.movimiento.proveedor.IdProveedor) {
+        this.$toasted.show("Por favor seleccione un proveedor");
+        this.inProgress = false;
+        return;
+      }
 
-            if(!(this.movimiento.almacen.IdAlmacen>0)){
-                this.$toasted.show('Por favor seleccione un almacen')        
-                this.inProgress = false            
-                return
-            }
+      if (!(this.movimiento.almacen.IdAlmacen > 0)) {
+        this.$toasted.show("Por favor seleccione un almacen");
+        this.inProgress = false;
+        return;
+      }
 
-            if(!this.productos.length) {
-                this.$toasted.show('No ha seleccionado ningun producto')
-                this.inProgress = false            
-                return          
-            }
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
+        return;
+      }
 
-            let faltaLlenar = false
-            let faltaCantidad = false
-            this.productos.forEach((prod, index) => {
-
-                if (prod.total <= 0) {
-                faltaLlenar = true
-                }
-
-                if(!(prod.cantidad > 0)){
-                faltaCantidad = true
-                }
-            })
-
-            if (faltaCantidad) {
-                this.$toasted.show('Complete la cantidad de los productos ingresados')
-                this.inProgress = false
-                return;
-            }
-
-            if (faltaLlenar) {
-                this.$toasted.show('Falta llenar cantidad / precio')
-                this.inProgress = false
-                return;
-            }
-
-
-            this.axios.post(this.API + 'ordencompra', {
-                movimiento: this.movimiento,
-                productos: this.productos,
-                IdAlmacen: this.movimiento.almacen.IdAlmacen
-            })
-            .then((response) => {
-                if(response.data.insertId){
-                    this.movimiento = this.initMovimiento()
-                    this.$refs.inputProveedor.setValue('')
-                    this.$refs.inputAlmacen.setValue('')
-                    this.limpiarCart()
-                    this.$toasted.success('Orden de compra guardada correctamente')     
-                }else{
-                    this.$toasted.error('Ha ocurrido un error')     
-                }
-     
-                this.inProgress = false
-            })
-            .catch((error) => {
-                console.log(error);
-                this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                this.inProgress = false
-            })
-        },
-        focusAutocomplete (ref) {
-            //this.$refs[ref].type = ""
-            this.$refs[ref].handleDoubleClick()
+      let faltaLlenar = false;
+      let faltaCantidad = false;
+      this.productos.forEach((prod, index) => {
+        if (prod.total <= 0) {
+          faltaLlenar = true;
         }
+
+        if (!(prod.cantidad > 0)) {
+          faltaCantidad = true;
+        }
+      });
+
+      if (faltaCantidad) {
+        this.$toasted.show("Complete la cantidad de los productos ingresados");
+        this.inProgress = false;
+        return;
+      }
+
+      if (faltaLlenar) {
+        this.$toasted.show("Falta llenar cantidad / precio");
+        this.inProgress = false;
+        return;
+      }
+
+      this.axios
+        .post(this.API + "ordencompra", {
+          movimiento: this.movimiento,
+          productos: this.productos,
+          IdAlmacen: this.movimiento.almacen.IdAlmacen
+        })
+        .then(response => {
+          if (response.data.insertId) {
+            this.movimiento = this.initMovimiento();
+            this.$refs.inputProveedor.setValue("");
+            this.$refs.inputAlmacen.setValue("");
+            this.limpiarCart();
+            this.$toasted.success("Orden de compra guardada correctamente");
+          } else {
+            this.$toasted.error("Ha ocurrido un error");
+          }
+
+          this.inProgress = false;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    components: {
-        ProductosCarrito
+    focusAutocomplete(ref) {
+      //this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
     }
-}
+  },
+  components: {
+    ProductosCarrito
+  }
+};
 </script>
 <style>
 .puntos {
-    font-size: 52px;
+  font-size: 52px;
 }
 .big-text {
-    font-size: 30px;
+  font-size: 30px;
 }
-td.fontsize{
-      font-size: 0.9rem !important;
-      font-weight: bold;
-      text-align: center; 
-      vertical-align: middle !important;
-    }
+td.fontsize {
+  font-size: 0.9rem !important;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle !important;
+}
 </style>
