@@ -948,7 +948,7 @@ import DeliveryModal from "@/components/DeliveryModal.vue";
 import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
-// import Movimiento from "@/components/Movimiento";
+import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
 import { Bar } from "vue-chartjs";
 export default {
@@ -956,7 +956,7 @@ export default {
     ClientesForm,
     Proformas,
     PagoDeuda,
-    // Movimiento,
+    Movimiento,
     PreOrdenLista,
     DeliveryModal,
     ConfigVenta,
