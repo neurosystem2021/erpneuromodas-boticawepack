@@ -102,8 +102,8 @@ export default {
           { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoFormaFarmaceutica", label: "Lab." },
-          { key: "ProductoMedicion", label: "Med." },
+          { key: "ProductoFormaFarmaceutica", label: "Modelo" },
+          { key: "ProductoMedicion", label: "U. Med." },
           {
             key: "StockMinimo",
             label: "Stock Min.",
