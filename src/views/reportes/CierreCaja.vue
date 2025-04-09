@@ -232,6 +232,68 @@
         </table>
       </b-row>
 
+      <b-row>
+        <h5>Ventas Yape/Plin</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasYape" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><small><b>Cliente:</b> {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <td>{{ item.YapeDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Yape</b></td>
+              <td class="total"><b>S/. {{ totalVentasYape | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
       <b-row class="credito">
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
@@ -478,10 +540,10 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosEfectivo - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasYape + this.totalIngresosEfectivo - this.totalSalidas - this.totalAdelantosEfectivo - this.totalAdelantosDeposito
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasYape - this.totalSalidas
     },
     totalSalidas () {
       let total = 0
@@ -552,6 +614,18 @@ export default {
     ventasMastercard () {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0  && !venta.EsCredito
+      })
+    },
+    totalVentasYape () {
+      let total = 0
+      this.ventasYape.forEach(venta => {
+        if (!venta.Anulado) total += venta.Yape
+      });
+      return total
+    },
+    ventasYape () {
+      return this.ventas.filter(venta => {
+        return venta.Yape > 0  && !venta.EsCredito
       })
     },
     totalVentasCredito () {
