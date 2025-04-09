@@ -289,6 +289,7 @@
                     <b-row class="centrado d-flex justify-content-center my-1" >
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                   </b-row>
                     </b-col>
 
@@ -942,6 +943,7 @@ import ProductosCarritoNuevo from "@/components/ProductosCarritoNuevo";
 import AutoComplete from "@/components/AutoComplete.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import Movimiento from "@/components/Movimiento";
+import DeliveryModal from "@/components/DeliveryModal";
 
 import Swal from "sweetalert2";
 export default {
@@ -952,6 +954,7 @@ export default {
     AutoComplete,
     PagoDeuda,
     Movimiento,
+    DeliveryModal,
     ProductoForm
   },
   data() {
