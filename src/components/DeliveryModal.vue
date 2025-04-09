@@ -1,7 +1,6 @@
 <template>
     <div>
-        <!-- <b-button block @click="show=true" class="btnAction" style="background: #EF5350;" variant="info" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button> -->
-        <b-button block @click="show=true" class="btnAction" style="background-color: #EF5350; color:white; font-weight: bold;" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
