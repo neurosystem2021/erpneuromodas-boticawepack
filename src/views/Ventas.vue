@@ -27,7 +27,7 @@
                       :id="`inputTipoVenta${index}`"
                       :url="API + 'ventas/tipos'"
                       anchor="TipoDoc"
-                      initValue="BOLETA ELEC."
+                      initValue="NOTA DE VENTA."
                       class="font-weight-bold"
                       label="writer"
                       placeholder=""
