@@ -1153,9 +1153,11 @@ export default {
     this.getNumeroVenta();
     this.loadClienteVarios();
     this.$nextTick(() => {
-      let inputElement = `autocompleteProducto${this.ventaActiva}`;
-      let autocompleteInput = document.getElementById(inputElement);
-      autocompleteInput.focus();
+      setTimeout(() => {
+        let inputElement = `autocompleteProducto${this.ventaActiva}`;
+        let autocompleteInput = document.getElementById(inputElement);
+        autocompleteInput.focus();
+      }, 500);
     });
   },
   methods: {
