@@ -19,6 +19,7 @@ import CajaBancos from "@/views/CajaBancos.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
@@ -43,7 +44,8 @@ export default new Router({
       path: "/",
       name: "Movimiento",
       component: Movimiento
-    }, {
+    },
+    {
       path: "/usuario",
       name: "Usuario",
       component: Usuario
@@ -197,6 +199,11 @@ export default new Router({
       path: "/reporte/reporteregmovimiento",
       name: "ReporteRegMovimiento",
       component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
     }
   ]
 });
