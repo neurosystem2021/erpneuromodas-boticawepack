@@ -31,7 +31,9 @@ import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrut
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
 import ReporteRankingCliente from "@/views/reportes/ReporteRankingCliente.vue";
 import Formato from "@/views/reportes/Formato.vue";
-
+import Usuario from "@/views/Usuario.vue";
+import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -66,6 +68,11 @@ export default new Router({
       path: "/ventas",
       name: "Ventas",
       component: Ventas
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: "/reportes/ventas",
@@ -172,6 +179,16 @@ export default new Router({
       path: "/reportes/Ordenes",
       name: "Ordenes",
       component: Ordenes
+    },
+    {
+      path: "/reporte/reporteutilidadbruta",
+      name: "ReporteUtilidadBruta",
+      component: ReporteUtilidadBruta
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
     }
   ]
 });
