@@ -156,8 +156,12 @@ export default {
       await this.axios(`${this.API}reporte/utilidadbruta/excel`, {
         params: params
       }).then(res => {
-        console.log(res.data);
-        window.open(res.data, "_blank");
+        let url = res.data;
+        url = url.replace(/\\/g, "");
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          url = "http://" + url; // O "https://" si es necesario
+        }
+        window.open(url, "_blank");
       });
     },
     async generarReporte() {

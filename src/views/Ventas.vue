@@ -1,5 +1,5 @@
 <template>
-    <b-container fluid>
+    <b-container fluid class="ancho"  id="conten">
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
@@ -120,10 +120,10 @@
                         <b-form-group >
                           <b-input-group class="py-0">
                           <b-input-group-prepend>
+                            <!-- @dniRuc="setNewDniRuc" -->
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
-                              @dniRuc="setNewDniRuc"
                             />
                           </b-input-group-prepend>
                           <b-input-group-append>
@@ -211,7 +211,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
-                                :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
                                 label="writer"
@@ -1459,6 +1459,7 @@ export default {
       this.axios
         .get(this.API + "/usuarios/" + usuario)
         .then(response => {
+          console.log(response.data);
           this.setVendedor(response.data);
           let almacen = {
             IdAlmacen: response.data.IdAlmacen,
@@ -1605,6 +1606,7 @@ export default {
       this.loadCode = "";
     },
     setPuntoVenta(obj) {
+      console.log("setPuntoVenta", obj);
       this.ventas[this.ventaActiva].puntoVenta = obj;
       this.getNumeroVenta();
     },
@@ -1714,7 +1716,9 @@ export default {
           .get(this.API + "ventas/numero", {
             params: {
               idPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-                .IdDocVentaPuntoVenta,
+                .IdDocVentaPuntoVenta
+                ? this.ventas[this.ventaActiva].puntoVenta.IdDocVentaPuntoVenta
+                : 1,
               idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
             }
           })
@@ -1834,6 +1838,8 @@ export default {
         params: {
           idProductos: [IdProducto],
           idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
+            ? this.ventas[this.ventaActiva].almacen.IdAlmacen
+            : 1
         }
       }).then(response => {
         res = response.data[0];
@@ -2107,25 +2113,6 @@ export default {
 
         return;
       }
-      // console.log(productos);
-      // if (
-      //   productos.some(
-      //     v =>
-      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-      //       v.stock
-      //   )
-      // ) {
-      //   this.$swal({
-      //     position: "center",
-      //     icon: "info",
-      //     title: "No se puede vender un producto sin stock",
-      //     showConfirmButton: true,
-      //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
-      //     confirmButtonColor: "#0275d8"
-      //   });
-      //   return;
-      // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
