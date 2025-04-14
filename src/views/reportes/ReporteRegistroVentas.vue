@@ -177,6 +177,7 @@ export default {
       this.dialogDetalle = true;
     },
     eliminarReg(item) {
+      console.log(item.idDocVenta);
       this.$swal({
         icon: "question",
         title: "",
@@ -194,7 +195,7 @@ export default {
             idDocVenta: item.idDocVenta
           };
           await this.axios
-            .put(`${this.API}/reporte/ListarRegVenta/anular`)
+            .put(`${this.API}reporte/ListarRegVenta/anular`, data)
             .then(res => {
               console.log(res);
               this.generarReporte();
