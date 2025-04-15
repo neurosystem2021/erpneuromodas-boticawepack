@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid>
         <b-row>
           <b-col md="5" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
