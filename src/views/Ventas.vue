@@ -121,6 +121,7 @@
                           <b-input-group class="py-0">
                           <b-input-group-prepend>
                             <!-- @dniRuc="setNewDniRuc" -->
+                            <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
