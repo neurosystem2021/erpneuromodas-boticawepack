@@ -1252,10 +1252,10 @@ export default {
       this.getCierre(this.$route.params.id);
       this.loadData();
     } else {
-      await this.getVendedor();
-      this.IdVendedor = sessionStorage.getItem("User");
+      this.IdVendedor = sessionStorage.getItem("User").toLocaleLowerCase();
       let usuario = sessionStorage.getItem("User");
       this.bloquearVendedor = usuario !== "admin";
+      await this.getVendedor();
     }
   },
   data() {
@@ -1422,8 +1422,10 @@ export default {
     },
     recargarCierre(vendedor) {
       let v = this.lstVendedor.filter(v => v.Usuario == vendedor)[0];
-      this.setVendedor(v);
-      this.loadData();
+      if (v) {
+        this.setVendedor(v);
+        this.loadData();
+      }
     },
     async getListadoVendedor() {
       await this.axios(`${this.API}usuarios`).then(res => {
@@ -1433,7 +1435,7 @@ export default {
       });
     },
     async getVendedor() {
-      let usuario = sessionStorage.getItem("User");
+      let usuario = sessionStorage.getItem("User").toLocaleLowerCase();
       await this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
@@ -1510,6 +1512,7 @@ export default {
       // console.log(prod);
     },
     setVendedor(obj) {
+      obj.Usuario = obj.Usuario.toLowerCase();
       console.log(obj);
       this.vendedor = obj;
       this.loadData();
