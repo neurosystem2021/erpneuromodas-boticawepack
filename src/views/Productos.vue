@@ -49,7 +49,11 @@
                 </b-col>
             </b-row>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+        <producto-form 
+          ref="productoForm" 
+          :producto-update="productoSelect" 
+          :cbGuardar="actualizarTabla"
+        ></producto-form>
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">

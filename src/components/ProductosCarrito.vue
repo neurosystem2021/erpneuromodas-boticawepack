@@ -31,7 +31,12 @@
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id) => agregarObj(id)" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+            <producto-form
+              :showButton="showButton" 
+              :cbGuardar="(id) => agregarObj(id)" 
+              ref="productoFormEdit" 
+              :producto-update="productoSelect"
+            ></producto-form>
             <!--<producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}"  :producto-update="productoSelect" ></producto-form>-->
           </b-input-group-append>
         </b-input-group>
@@ -617,7 +622,7 @@ export default {
     editarProducto(datos) {
       this.productoSelect = datos;
       this.$refs.productoFormEdit.show = true;
-      this.$refs.productoFormEditAnt.show = true;
+      // this.$refs.productoFormEditAnt.show = true;
     },
     setProducto(obj) {
       this.$refs.autocompleteProducto.setValue("");

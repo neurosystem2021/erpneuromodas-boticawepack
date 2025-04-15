@@ -240,7 +240,7 @@
               type="number"
               class="form-control"
               step="0.001"
-              @input="actualizarLiquidacion"
+              @input="actualizarLiquidacion(); actualizarPorcentajeUtilidad()"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -315,77 +315,75 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CategoriaForm from '@/components/CategoriaForm'
-import MarcaForm from '@/components/MarcaForm'
-import ProductoFormDet from '@/components/ProductoFormDet'
+import config from "@/store/config.js";
+import CategoriaForm from "@/components/CategoriaForm";
+import MarcaForm from "@/components/MarcaForm";
+import ProductoFormDet from "@/components/ProductoFormDet";
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
-  data () {
+  data() {
     return {
-      mensajeBtn: 'Crear',
-      showNew:false,
+      mensajeBtn: "Crear",
+      showNew: false,
       showProductoDet: false,
       cantidadCodigoBarra: 1,
-      title: 'Nuevo Producto',
+      title: "Nuevo Producto",
       API: config.API,
-      show: false, 
-      generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
+      show: false,
+      generos: ["VARON", "DAMA", "NIÑO", "NIÑA", "UNISEX", "JUNIOR"],
       producto: {},
       productosDet: [],
       precioLiquidacion: 0,
-      file: ''
-    }
+      file: ""
+    };
   },
-  beforeMount () {
-    this.initForm()
+  beforeMount() {
+    this.initForm();
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
-    show (val) {
+    show(val) {
       if (val) {
-        
-      }
-      else {
+      } else {
         this.producto.IdProducto;
       }
     },
-    productoUpdate (newVal) {
+    productoUpdate(newVal) {
       if (newVal.IdProducto) {
-        this.mensajeBtn='Guardar'
+        this.mensajeBtn = "Guardar";
         this.showNew = true;
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >> '
+        this.title = "Editar Producto << " + newVal.CodigoBarra + " >> ";
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
           ProductoCategoria: newVal.ProductoCategoria
-        }
+        };
         this.producto.marca = {
           IdProductoMarca: newVal.IdProductoMarca,
           ProductoMarca: newVal.ProductoMarca
-        }
+        };
         this.producto.medicion = {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
-        }
-       
-       // this.$refs.inputCategoria.setValue('')
-        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
-       // this.$refs.inputMarca.setValue('')
-        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
+        };
 
-       // this.$refs.inputMedicion.setValue('')
-        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
-        
+        // this.$refs.inputCategoria.setValue('')
+        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria);
+
+        // this.$refs.inputMarca.setValue('')
+        this.$refs.inputMarca.setValue(newVal.ProductoMarca);
+
+        // this.$refs.inputMedicion.setValue('')
+        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion);
+
         // this.$refs.inputModelo.setValue('')
-        this.$refs.inputModelo.setValue(newVal.ProductoModelo)
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo);
 
-        this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        
-        this.$refs.inputColor.setValue(newVal.Color)
+        this.$refs.inputTalla.setValue(newVal.ProductoTalla);
+
+        this.$refs.inputColor.setValue(newVal.Color);
         //this.$refs.inputBotapie.setValue(newVal.Botapie)
-        
+
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
@@ -393,102 +391,128 @@ export default {
         this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
-        }
-        this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.IdProducto = newVal.IdProducto
-        this.producto.Genero = newVal.Genero
+        };
+        this.producto.Producto = newVal.Producto.split("-")
+          .slice(0, -1)
+          .join();
+        this.producto.IdProducto = newVal.IdProducto;
+        this.producto.Genero = newVal.Genero;
         //this.producto.Botapie = newVal.Botapie
-        this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-        this.producto.StockMinimo = newVal.StockMinimo
-        this.producto.CodigoBarra = newVal.CodigoBarra
-        this.producto.ProductoModelo = newVal.ProductoModelo
-        this.producto.PrecioCosto = newVal.PrecioCosto
-        this.producto.PrecioContado = newVal.PrecioContado
-        this.producto.Imagen = newVal.Imagen
-        this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion
-        this.actualizarLiquidacion()
-
+        this.producto.Color = newVal.Color;
+        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
+        this.producto.StockMinimo = newVal.StockMinimo;
+        this.producto.CodigoBarra = newVal.CodigoBarra;
+        this.producto.ProductoModelo = newVal.ProductoModelo;
+        this.producto.PrecioCosto = newVal.PrecioCosto;
+        this.producto.PrecioContado = newVal.PrecioContado;
+        this.producto.Imagen = newVal.Imagen;
+        this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion;
+        this.actualizarLiquidacion();
       } else {
-        this.precioLiquidacion = 0
-        this.title = 'Nuevo Producto'
+        this.precioLiquidacion = 0;
+        this.title = "Nuevo Producto";
         this.showNew = false;
-        this.mensajeBtn = 'Crear';
-        this.clearForm()
+        this.mensajeBtn = "Crear";
+        this.clearForm();
       }
     }
   },
   methods: {
-    eliminarProducto (producto) {
+    eliminarProducto(producto) {
       // NO eliminar porque no distinque movimientos ni ventas
-      let r = confirm('¿Esta seguro de Anular este producto?')
+      let r = confirm("¿Esta seguro de Anular este producto?");
       if (r) {
-        this.axios.post(this.API + 'productos/delete', {
-          id: producto.IdProducto
-        }).then(res => {
-          if (res.data.updated) {
-            this.$toasted.success('El producto con código ' + res.data.IdProducto + ' ha sido anulado')
-            if (this.cbGuardar) {
-              this.cbGuardar()
+        this.axios
+          .post(this.API + "productos/delete", {
+            id: producto.IdProducto
+          })
+          .then(res => {
+            if (res.data.updated) {
+              this.$toasted.success(
+                "El producto con código " +
+                  res.data.IdProducto +
+                  " ha sido anulado"
+              );
+              if (this.cbGuardar) {
+                this.cbGuardar();
+              }
+              this.$refs.productoForm.hide();
             }
-            this.$refs.productoForm.hide()
-          }
-        })
+          });
       }
     },
     handleFileUpload() {
-      this.file = this.$refs.file.files[0]
+      this.file = this.$refs.file.files[0];
     },
-    eliminaId(){
+    eliminaId() {
       delete this.producto.IdProducto;
-      this.mensajeBtn = 'Crear';
+      this.mensajeBtn = "Crear";
       this.showNew = false;
-      this.$refs.inputCodigoBarra.setValue('');
+      this.$refs.inputCodigoBarra.setValue("");
       //console.log(this.producto,"asdasd");
     },
-    actualizarLiquidacion(){
-      this.precioLiquidacion = this.producto.PrecioContado -  Math.round(((this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0)*(this.producto.PrecioContado>0?this.producto.PrecioContado:0)/100)* 10) / 10;
+    actualizarLiquidacion() {
+      this.precioLiquidacion =
+        this.producto.PrecioContado -
+        Math.round(
+          (((this.producto.PorcentajeLiquidacion > 0
+            ? this.producto.PorcentajeLiquidacion
+            : 0) *
+            (this.producto.PrecioContado > 0
+              ? this.producto.PrecioContado
+              : 0)) /
+            100) *
+            10
+        ) /
+          10;
     },
-    actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
-      var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
+    actualizarPorcentajeUtilidad() {
+      this.producto.PorcentajeUtilidad =
+        100 *
+        ((this.producto.PrecioContado - this.producto.PrecioCosto) /
+          this.producto.PrecioCosto);
+    },
+    actualizarPrecioContado() {
+      var precioCosto = this.producto.PrecioCosto;
+      var utilidad = this.producto.PorcentajeUtilidad;
+      var nuevoPrecioContado = precioCosto + precioCosto * (utilidad / 100);
 
-      this.producto.precioContadoNormal = nuevoPrecioContado
-      this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
-
+      this.producto.precioContadoNormal = nuevoPrecioContado;
+      this.producto.PrecioContado = this.$options.filters.redondeoMayor(
+        nuevoPrecioContado
+      );
     },
-    setCategoria (obj) {
-      this.producto.categoria = obj
-      this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
+    setCategoria(obj) {
+      this.producto.categoria = obj;
+      this.$refs.inputCategoria.setValue(obj.ProductoCategoria);
     },
-    setMedicion (obj) {
-      this.producto.medicion = obj
+    setMedicion(obj) {
+      this.producto.medicion = obj;
     },
-    setMarca (obj) {
-      this.producto.marca = obj
-      this.$refs.inputMarca.setValue(obj.ProductoMarca)
+    setMarca(obj) {
+      this.producto.marca = obj;
+      this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
     /* setModelo (obj) {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
     }, */
-    setTalla (obj) {
-      this.producto.talla = obj
-      this.$refs.inputTalla.setValue(obj.ProductoTalla)
+    setTalla(obj) {
+      this.producto.talla = obj;
+      this.$refs.inputTalla.setValue(obj.ProductoTalla);
     },
-    clearForm () {
-      this.$refs.inputCategoria.setValue('')
-      this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('UNIDAD')
-      this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue('')
-      this.$refs.inputColor.setValue('')
+    clearForm() {
+      this.$refs.inputCategoria.setValue("");
+      this.$refs.inputMarca.setValue("");
+      this.$refs.inputMedicion.setValue("UNIDAD");
+      this.$refs.inputTalla.setValue("");
+      this.$refs.inputModelo.setValue("");
+      this.$refs.inputColor.setValue("");
       //this.$refs.inputBotapie.setValue('')
 
-      this.initForm()
+      this.initForm();
     },
-    initForm () {
+    initForm() {
       this.producto = {
         Anulado: 0,
         IdProductoMarca: null,
@@ -496,15 +520,15 @@ export default {
         IdProductoCategoria: null,
         // IdProductoModelo: null,
         IdProductoBotapie: null,
-        IdProductoTalla: '',
-        Producto: '',
-        CodigoBarra: '',
-        Color: '',
-        PorcentajeUtilidad: '',
+        IdProductoTalla: "",
+        Producto: "",
+        CodigoBarra: "",
+        Color: "",
+        PorcentajeUtilidad: "",
         StockMinimo: 0,
-        PrecioContado: '',
-        Botapie: '',
-        Genero: '',
+        PrecioContado: "",
+        Botapie: "",
+        Genero: "",
         PrecioContado: 0,
         PorcentajeLiquidacion: 0,
         PrecioCosto: 0,
@@ -514,143 +538,157 @@ export default {
         // modelo: {},
         talla: {},
         medicion: {
-          IdProductoMedicion:6,
-          ProductoMedicion:"UNIDAD"
+          IdProductoMedicion: 6,
+          ProductoMedicion: "UNIDAD"
         }
-      }
+      };
     },
     guardarProducto(e) {
       e.preventDefault();
 
       // filtro si esta ingresado correctamente
-      if (this.$refs.inputCategoria.$refs.input.value.toLowerCase() != this.producto.categoria.ProductoCategoria.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Categoría.')
+      if (
+        this.$refs.inputCategoria.$refs.input.value.toLowerCase() !=
+        this.producto.categoria.ProductoCategoria.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Categoría.");
         return;
       }
 
-      if (this.$refs.inputMarca.$refs.input.value.toLowerCase() != this.producto.marca.ProductoMarca.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Marca.')
+      if (
+        this.$refs.inputMarca.$refs.input.value.toLowerCase() !=
+        this.producto.marca.ProductoMarca.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Marca.");
         return;
       }
 
-      if (this.$refs.inputTalla.$refs.input.value.toLowerCase() != this.producto.talla.ProductoTalla.toLowerCase()) {
-        this.$toasted.show('Falta seleccionar o guardar la Talla.')
+      if (
+        this.$refs.inputTalla.$refs.input.value.toLowerCase() !=
+        this.producto.talla.ProductoTalla.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Talla.");
         return;
       }
 
-      this.producto.PorcentajeLiquidacion = (this.producto.PorcentajeLiquidacion>0?this.producto.PorcentajeLiquidacion:0);
-      this.producto.CodigoBarra = (''+this.producto.CodigoBarra).trim();
+      this.producto.PorcentajeLiquidacion =
+        this.producto.PorcentajeLiquidacion > 0
+          ? this.producto.PorcentajeLiquidacion
+          : 0;
+      this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
 
       // Agregar producto DET
       if (this.showProductoDet) {
-        this.producto.productosDet = this.$refs.productoDet.productos
+        this.producto.productosDet = this.$refs.productoDet.productos;
       }
 
-      this.axios.post(this.API + 'productos', this.producto)
-      .then((response) => {
-        if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
-        }
-        if (response.data.error) {
-          this.$toasted.show(response.data.error)
-        } else {
-          this.$toasted.success('Producto guardado correctamente')
-          // this.initForm()
-          //this.producto.talla = {}
-          //this.$refs.inputTalla.setValue('')
-          this.$refs.productoForm.hide()
-        }
+      this.axios
+        .post(this.API + "productos", this.producto)
+        .then(response => {
+          if (this.cbGuardar) {
+            this.cbGuardar(response.data.insertId);
+          }
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.$toasted.success("Producto guardado correctamente");
+            // this.initForm()
+            //this.producto.talla = {}
+            //this.$refs.inputTalla.setValue('')
+            this.$refs.productoForm.hide();
+          }
 
-        //INSERTANDO IMAGEN
-        let formData = new FormData();
-        formData.append('imagen', this.file);
-        this.axios({
-            method    : 'post',
-            url       : this.API + 'producto/imagen/' + response.data.insertId,
-            data      : formData,
-            headers   : { 'Content-Type': 'multipart/form-data' }
-          })
-          .then((res) => {
+          //INSERTANDO IMAGEN
+          let formData = new FormData();
+          formData.append("imagen", this.file);
+          this.axios({
+            method: "post",
+            url: this.API + "producto/imagen/" + response.data.insertId,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" }
+          }).then(res => {
             // console.log(res);
-          })
+          });
 
-        this.$refs.productoForm.hide()
-      })
-      .catch((error) => {
-        console.log(error)
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+          this.$refs.productoForm.hide();
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    crearCategoria () {
+    crearCategoria() {
       if (this.$refs.inputCategoria.type) {
-        let categoria = {}
-        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase()
+        let categoria = {};
+        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase();
 
-        this.axios.post(this.API + 'categorias', categoria)
-        .then((response) => {
-          this.$toasted.show('Categoría guardada correctamente')
-          this.setCategoria({
-            IdProductoCategoria: response.data.insertId,
-            ProductoCategoria: response.data.ProductoCategoria
+        this.axios
+          .post(this.API + "categorias", categoria)
+          .then(response => {
+            this.$toasted.show("Categoría guardada correctamente");
+            this.setCategoria({
+              IdProductoCategoria: response.data.insertId,
+              ProductoCategoria: response.data.ProductoCategoria
+            });
           })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
       }
-      
     },
-    crearMarca () {
+    crearMarca() {
       if (this.$refs.inputMarca.type) {
-        let marca = {}
-        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase()
-  
-        this.axios.post(this.API + 'marcas', marca)
-        .then((response) => {
-          this.$toasted.show('Marca guardada correctamente')
-          this.setMarca({
-            IdProductoMarca: response.data.insertId,
-            ProductoMarca: response.data.ProductoMarca
+        let marca = {};
+        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "marcas", marca)
+          .then(response => {
+            this.$toasted.show("Marca guardada correctamente");
+            this.setMarca({
+              IdProductoMarca: response.data.insertId,
+              ProductoMarca: response.data.ProductoMarca
+            });
           })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
       }
     },
-    crearTalla () {
+    crearTalla() {
       if (this.$refs.inputTalla.type) {
-        let talla = {}
-        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
-  
-        this.axios.post(this.API + 'tallas', talla)
-        .then((response) => {
-          this.$toasted.show('Talla guardada correctamente')
-          this.setTalla({
-            IdProductoTalla: response.data.insertId,
-            ProductoTalla: response.data.ProductoTalla
+        let talla = {};
+        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "tallas", talla)
+          .then(response => {
+            this.$toasted.show("Talla guardada correctamente");
+            this.setTalla({
+              IdProductoTalla: response.data.insertId,
+              ProductoTalla: response.data.ProductoTalla
+            });
           })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
       }
     }
   },
-  computed : {
-  },
+  computed: {},
   components: {
-    CategoriaForm, MarcaForm, ProductoFormDet
+    CategoriaForm,
+    MarcaForm,
+    ProductoFormDet
   }
-}
+};
 </script>
 <style>
-
 </style>
