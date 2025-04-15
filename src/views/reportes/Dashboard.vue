@@ -154,7 +154,7 @@ export default {
     },
     getMovimientos(anio, mes, dias, idAlmacen) {
       this.axios
-        .get(this.API + "reporte/movimientos", {
+        .get(this.API + "reporte/movimientos/dashboard", {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
