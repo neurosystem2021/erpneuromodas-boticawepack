@@ -17,6 +17,7 @@ import GLP from "@/views/GLP.vue";
 import Alta from "@/views/Alta.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
+import KardexValorizado from "@/views/KardexValorizado.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
@@ -74,6 +75,11 @@ export default new Router({
       path: "/ventas",
       name: "Ventas",
       component: Ventas
+    },
+    {
+      path: "/KardexValorizado",
+      name: "KardexValorizado",
+      component: KardexValorizado
     },
     {
       path: "/cajabancos",
