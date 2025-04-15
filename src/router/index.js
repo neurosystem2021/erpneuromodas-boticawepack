@@ -35,6 +35,7 @@ import Usuario from "@/views/Usuario.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -195,6 +196,11 @@ export default new Router({
       path: "/cajabancos",
       name: "CajaBancos",
       component: CajaBancos
+    },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
     }
   ]
 });

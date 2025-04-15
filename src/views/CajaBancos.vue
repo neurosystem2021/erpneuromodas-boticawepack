@@ -333,7 +333,7 @@
                         <td>{{deuda.Aplicado}}</td>
                         <td>{{deuda.Saldo}}</td>
                         <td>
-                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'|| deuda.Aplicado=='VE'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
                           <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
                           <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
                           <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
@@ -717,10 +717,10 @@ export default {
         val = false;
         this.errorLetras = "Defina correctamente el monto en cada Letra.";
       }
-
+      this.guardarNuevaLetras();
       this.$forceUpdate();
     },
-    async guardarLetras() {
+    async guardarNuevaLetras() {
       let data = {
         Letras: this.letras,
         Tipo: this.Tipo
@@ -728,7 +728,12 @@ export default {
       await this.axios.post(`${this.API}letras/generar`, data).then(res => {
         if (res.data) {
           this.aplicarLetra = false;
-          this.getProveedorDeudas();
+          if (this.Cliente && Object.keys(this.Cliente).length > 0) {
+            this.getClienteDeudas();
+          }
+          if (this.Proveedor && Object.keys(this.Proveedor).length > 0) {
+            this.getProveedorDeudas();
+          }
         }
       });
     },
