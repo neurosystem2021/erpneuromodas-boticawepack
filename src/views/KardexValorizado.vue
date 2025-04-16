@@ -39,16 +39,26 @@
                     </select>
                     <!-- {{ mounth }} -->
                 </b-col>
-                <b-col cols="3">
-                    <b-button @click="obtenerListado()" variant="success"> Generar </b-button>  | btn pdf  | btn excel
+                <b-col cols="3" class="py-3">
+                    <b-button @click="obtenerListado()" variant="info">
+                      <i class="fa fa-search" aria-hidden="true"></i> Generar
+                    </b-button> 
+                    
+                    <b-button @click="exportPDF()" variant="danger" :disabled="disableEXCEL">
+                      <i class="fa fa-file-pdf" aria-hidden="true"></i> Generar PDF
+                    </b-button> 
+
+                    <b-button @click="exportEXCEL()" variant="success" :disabled="disableEXCEL">
+                      <i class="fa fa-file-excel" aria-hidden="true"></i> Generar EXCEL
+                    </b-button> 
                 </b-col>
             </b-row>
            
         </b-col>
-        <b-col cols="12">
+        <b-col cols="12" class="my-3">
             <table width="100%" class="table table-hover">
                 <tbody>
-                    <tr v-for="(lst,index) in lstReporte.filter(v=> v.d1!=' ')" :key="index">
+                    <tr v-for="(lst,index) in lstReporte.filter(v=> v.d1!=' ')" :key="index" :class="getClass(lst)"> 
                         <td>{{ lst.d1 }}</td>
                         <td>{{ retornarDecimal(lst.d2) }}</td>
                         <td>{{ retornarDecimal(lst.d3) }}</td>
@@ -116,7 +126,10 @@ export default {
       this.$refs[ref].handleDoubleClick();
     },
     async obtenerListado() {
-      console.log(this.producto);
+      if (!Object.keys(this.producto).length > 0) {
+        this.$toasted.show("Seleccione un producto.");
+        return;
+      }
       await this.axios(`${this.API}producto/listarstockvalorizado`, {
         params: {
           producto: this.producto.Producto,
@@ -126,33 +139,156 @@ export default {
           Tipo: this.Tipo
         }
       }).then(response => {
-        this.lstReporte = response.data;
-        if (this.mes) {
-          this.generarListado();
-          return;
-        }
-        console.log(response.data);
+        this.generarListado(response.data);
       });
     },
-    generarListado() {},
-    retornarDecimal(valor) {
-      const numero = parseFloat(valor);
+    generarListado(datos) {
+      const excluirValores = [
+        "KARDEX VALORIZADO",
+        "PRODUCTO",
+        "AÑO",
+        "DESDE",
+        "HASTA"
+      ];
 
-      if (!isNaN(numero) && isFinite(numero)) {
+      const datosFiltrados = datos.filter(item => {
+        const valor = (item.d1 || "").trim();
+        return valor !== "" && !excluirValores.includes(valor);
+      });
+
+      let header = datosFiltrados[0];
+
+      datosFiltrados.shift();
+
+      let datosFinales = datosFiltrados;
+      console.log("this.Mes", this.Mes);
+      if (this.Mes) {
+        datosFinales = [];
+        datosFiltrados.forEach(element => {
+          if (this.$moment(element.d1).format("MM") == this.Mes) {
+            datosFinales.push(element);
+          }
+        });
+      }
+      datosFinales.unshift(header);
+      this.lstReporte = datosFinales;
+    },
+    retornarDecimal(valor) {
+      if (typeof valor === "number") {
+        return parseFloat(valor.toFixed(2));
+      }
+
+      if (typeof valor === "string" && /^-?\d+(\.\d+)?$/.test(valor.trim())) {
+        const numero = parseFloat(valor);
         return parseFloat(numero.toFixed(2));
       }
 
       return valor;
+    },
+    getClass(item) {
+      let clasName = "";
+      let value = item.d1.trim();
+      switch (value) {
+        case "KARDEX VALORIZADO":
+          clasName = "clsTitle";
+          break;
+        case "PRODUCTO":
+          clasName = "clsProducto";
+          break;
+        case "AÑO":
+          clasName = "clsAnno";
+          break;
+        case "DESDE":
+          console.log(item.d1);
+          clasName = "clsDesde";
+          break;
+        case "HASTA":
+          console.log(item.d1);
+          clasName = "clsHasta";
+          break;
+        case "FECHA":
+          clasName = "clsFecha";
+          break;
+
+        default:
+          clasName = "";
+          break;
+      }
+      return clasName;
+    },
+    async exportEXCEL() {
+      let data = {
+        data: this.lstReporte
+      };
+      await this.axios
+        .post(`${this.API}producto/listarstockvalorizado/excel`, data)
+        .then(res => {
+          let url = res.data;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          window.open(url, "_blank");
+        });
+    },
+    async exportPDF() {
+      await this.axios(`${this.API}reporte/kardexvalorizadopdf`, {
+        params: {
+          producto: this.producto.Producto,
+          stock: this.stock,
+          precio: this.precio,
+          anno: this.anno,
+          Tipo: this.Tipo
+        }
+      }).then(res => {
+        if (res.data) {
+          let url = res.data.url;
+          url = url.replace(/\\/g, "");
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url; // O "https://" si es necesario
+          }
+          console.log(url);
+          window.open(url, "_blank");
+        }
+      });
     }
   },
 
   computed: {
     APIProductos() {
       return this.API + "producto/inv";
+    },
+    disableEXCEL() {
+      if (this.lstReporte.length == 0) {
+        return true;
+      }
+      return false;
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
+.clsTitle {
+  background: #5c6bc0;
+  font-weight: bold;
+  color: white;
+}
+.clsProducto {
+  background: #7986cb;
+}
+.clsAnno {
+  background: #9fa8da;
+}
+.clsDesde {
+  background: #c5cae9;
+}
+.clsHasta {
+  background: #c5cae9;
+}
+.clsFecha {
+  background: #5c6bc0;
+  font-weight: bold;
+  color: white;
+}
 </style>
