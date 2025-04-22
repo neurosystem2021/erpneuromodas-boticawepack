@@ -37,6 +37,7 @@ import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
+import KardexValorizado from "@/views/KardexValorizado.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -207,6 +208,11 @@ export default new Router({
       path: "/reporte/dashboard",
       name: "Dashboard",
       component: Dashboard
+    },
+    {
+      path: "/KardexValorizado",
+      name: "KardexValorizado",
+      component: KardexValorizado
     }
   ]
 });
