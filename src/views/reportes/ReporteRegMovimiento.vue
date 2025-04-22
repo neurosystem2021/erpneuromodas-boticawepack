@@ -136,8 +136,8 @@
                   <td>{{ detalle.ProductoMedicion }}</td>
                   <td>{{ detalle.Cantidad }}</td>
                   <td>{{ detalle.Precio }}</td>
-                  <td>{{ parseFloat(detalle.Cantidad * detalle.Precio * 0.18).toFixed(2)}}</td>
-                  <td>{{ parseFloat(parseFloat(detalle.Cantidad * detalle.Precio)+ parseFloat(detalle.Cantidad * detalle.Precio * 0.18)).toFixed(2)}}</td>
+                  <td>{{ montoIGV(detalle)}}</td>
+                  <td>{{ montoTotal(detalle)}}</td>
                 </tr>
               </tbody>
             </table>
@@ -229,10 +229,7 @@ export default {
       );
     },
     generarCodigoBarra(reporte) {
-      window.open(
-        `/views/codigoBarra.php?hash=${this.IdMovimiento}`,
-        "_blank"
-      );
+      window.open(`/views/codigoBarra.php?hash=${this.IdMovimiento}`, "_blank");
     },
     async exportarXls() {
       const table = this.$refs.miTabla; // Obtener la referencia de la tabla
@@ -375,6 +372,22 @@ export default {
           }
         });
       // this.detalleMovimiento = false;
+    },
+    montoIGV(item) {
+      let monto = 0;
+      if (item.TieneIgv == 1) {
+        monto = item.Cantidad * item.Precio * 0.18;
+      }
+      return parseFloat(monto).toFixed(2);
+    },
+    montoTotal(item) {
+      let igv = 0;
+      let monto = 0;
+      if (item.TieneIgv == 1) {
+        igv = item.Cantidad * item.Precio * 0.18;
+      }
+      monto = item.Cantidad * item.Precio + igv;
+      return parseFloat(monto).toFixed(2);
     }
   },
   computed: {
@@ -388,7 +401,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .modal-dialog {
   max-width: 60% !important;
   width: 60% !important;
