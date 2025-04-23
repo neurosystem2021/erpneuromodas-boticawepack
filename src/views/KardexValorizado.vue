@@ -130,15 +130,6 @@ export default {
         this.$toasted.show("Seleccione un producto.");
         return;
       }
-      this.$swal({
-        title: "Generando reporte...",
-        text: "Un momento por favor",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
       await this.axios(`${this.API}producto/listarstockvalorizado`, {
         params: {
           producto: this.producto.Producto,
@@ -150,7 +141,6 @@ export default {
       }).then(response => {
         this.generarListado(response.data);
       });
-      this.$swal.close();
     },
     generarListado(datos) {
       const excluirValores = [

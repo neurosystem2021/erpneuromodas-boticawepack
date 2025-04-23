@@ -147,7 +147,15 @@ export default {
     },
     async exportarReporte() {
       // http://localhost/api/index.php/reporte/utilidadbruta/excel?fechaInicio=2024-01-01&fechaFin=2026-01-01&almacen=0
-
+      this.$swal({
+        title: "Generando Excel",
+        text: "Un momento por favor...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
@@ -163,8 +171,18 @@ export default {
         }
         window.open(url, "_blank");
       });
+      this.$swal.close();
     },
     async generarReporte() {
+      this.$swal({
+        title: "Generando reporte...",
+        text: "Un momento por favor",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
@@ -204,6 +222,7 @@ export default {
           };
         }
       });
+      this.$swal.close();
     }
   }
 };
