@@ -32,8 +32,13 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
-
-
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+// import Usuario from "@/views/Usuario.vue";
+import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import KardexValorizado from "@/views/KardexValorizado.vue";
+import Ordenes from "@/views/reportes/Ordenes.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -188,6 +193,36 @@ export default new Router({
       path: "/reporte/dashboard",
       name: "Dashboard",
       component: Dashboard
+    },
+    {
+      path: "/reporte/reporteutilidadbruta",
+      name: "ReporteUtilidadBruta",
+      component: ReporteUtilidadBruta
+    },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
+    },
+    {
+      path: "/reportes/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
+    {
+      path: "/KardexValorizado",
+      name: "KardexValorizado",
+      component: KardexValorizado
     }
   ]
 });
