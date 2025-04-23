@@ -56,11 +56,11 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
+                <td class="celda" style="text-transform: uppercase">: CONTADO O TRANSFERENCIA</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DescripcionProforma }}</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -75,21 +75,30 @@
           <tr>
             <th class="no">#</th>
             <th></th>
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="qty">CANT.</th>
-            <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
+            <th width="40%" class="desc">DESCRIPCIÓN</th>
+            <th width="10%" class="qty">CANT.</th>
+            <th width="20%" class="unit">PRECIO U.</th>
+            <th width="20%" class="unit">IGV.</th>
+            <th width="20%" class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
+            <td><img style="max-width: 85px; max-height: 85px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3> ({{ prod.Descripcion }})</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:1.1rem">
-              <div v-if="prod.DisabledTotal === 0">
+            <td v-if="proforma.EsIgv == 0" class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
+            <td v-if="proforma.EsIgv == 0" class="unit" style="font-size:1.1rem">-</td>
+            <td v-if="proforma.EsIgv == 0" class="total" style="font-size:1.1rem">
+              <div >
+                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+                <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+              </div>
+            </td>
+            <td v-if="proforma.EsIgv == 1" class="unit" style="font-size:1.1rem">S/. {{ (prod.Precio / 1.18) | moneda }}</td>
+            <td v-if="proforma.EsIgv == 1" class="unit" style="font-size:1.1rem">S/. {{ (prod.Precio * 18 / 118) | moneda }}</td>
+            <td v-if="proforma.EsIgv == 1" class="total" style="font-size:1.1rem"><div >
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
@@ -97,9 +106,19 @@
           </tr>
         </tbody>
         <tfoot>
-          <tr>
+          <tr v-if="proforma.EsIgv == 1">
             <td colspan="3"></td>
-            <td colspan="2">SUBTOTAL</td>
+            <td colspan="3">SUBTOTAL</td>
+            <td>S/. {{ subTotalIgvBase | redondear }}</td>
+          </tr>
+          <tr v-if="proforma.EsIgv == 1">
+            <td colspan="3"></td>
+            <td colspan="3">IGV</td>
+            <td>S/. {{ subTotalIgv | redondear }}</td>
+          </tr>
+          <tr v-if="proforma.EsIgv == 0">
+            <td colspan="3"></td>
+            <td colspan="3">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
           <!--<tr>
@@ -109,8 +128,8 @@
           </tr>-->
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="3" style="background:#57B223">TOTAL</td>
+            <td style="background:#57B223">S/. {{ Total | redondear }}</td>
           </tr>
         </tfoot>
       </table>
@@ -120,8 +139,10 @@
       <br>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS PREVIA COORDINACION, DOMICILIO O EN EL LOCAL COMERCIAL</div>
+        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE 7 - 10 DIAS.</div>
+        <div class="notice">NUMERO DE CONTACTO: 967151582</div>
+        <div class="notice" style="font-weight: bold;">PRODUCTOS SIN IGV</div>
       </div>
       <div>
         <br>
@@ -162,8 +183,35 @@ export default {
 		}
 	},
 	computed: {
-		subTotal () {
-			let sumatoria = 0
+    subTotalIgvBase() {
+      let sumatoria = 0
+      const igv = 0.18
+      this.proforma.productos.forEach(prod => {
+        const totalConIGV = (prod.Cantidad * prod.Precio) - prod.Descuento
+        const baseSinIGV = parseFloat((totalConIGV / (1 + igv)).toFixed(2))
+        sumatoria += baseSinIGV
+      })
+      return parseFloat(sumatoria.toFixed(2))
+    },
+    subTotalIgv () {
+      let sumatoria = 0
+      this.proforma.productos.forEach(prod => {
+        const totalConIgv = (prod.Cantidad * prod.Precio) - prod.Descuento
+        const igvPorProducto = parseFloat((prod.Precio * 18 / 118).toFixed(2))
+        const igvTotal = igvPorProducto * prod.Cantidad
+        sumatoria += igvTotal
+      })
+      return parseFloat(sumatoria.toFixed(2))
+    },
+    subTotal () {
+      let sumatoria = 0
+			this.proforma.productos.forEach(prod => {
+				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
+			})
+      return sumatoria
+		},
+    Total () {
+      let sumatoria = 0
 			this.proforma.productos.forEach(prod => {
 				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
 			})
@@ -180,7 +228,7 @@ export default {
     },
     calcularFechaHasta(actual,dias){
     var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
+    date.setDate(date.getDate() + (dias));
     return date;
     },
     getEmpresa () {

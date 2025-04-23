@@ -43,13 +43,14 @@
   #logo {
     float: left;
     margin-top: 8px;
-    text-align: center;
-    width: 100%;
+    text-align: right;
+    width: 80%;
   }
   
   #logo img {
-    max-width: 100%;
+    max-width: 90%;
     height: auto;
+    text-align: right;
   }
   
   #company {

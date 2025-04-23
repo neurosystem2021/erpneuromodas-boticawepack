@@ -233,6 +233,66 @@
                                                 </b-form-input>
                                             </td>
                                         </tr>
+                                        <tr>
+                                             <td  class="text-center">Proforma</td>
+                                         </tr>
+                                         <tr>
+                                           <td>
+                                             <b-input-group>
+                                               <b-form-checkbox 
+                                               :disabled="bloquearInput?true:false"
+                                               v-model="venta.EsIgv"
+                                               :value="1"
+                                               :unchecked-value="0">
+                                                 Es IGV
+                                               </b-form-checkbox>
+                                             </b-input-group>
+                                           </td>
+                                         </tr>
+                                         <tr>
+                                           <td>
+                                             <b-input-group>
+                                               <b-form-checkbox 
+                                               :disabled="bloquearInput?true:false"
+                                               v-model="venta.EsCreditoProforma"
+                                               :value="1"
+                                               :unchecked-value="0">
+                                                 Fecha de Validez
+                                               </b-form-checkbox>
+                                               <div v-if="venta.EsCreditoProforma">
+                                                 <div class="mb-3">
+                                                   <input v-model="venta.FechaCreditoProforma"
+                                                     type="date"
+                                                     class="form-control"
+                                                     required
+                                                     placeholder="Fecha Crédito"/>
+                                                 </div>
+                                               </div>
+                                             </b-input-group>
+                                           </td>
+                                         </tr>
+                                         <tr>
+                                           <td>
+                                             <b-input-group>
+                                               <b-form-checkbox 
+                                               :disabled="bloquearInput?true:false"
+                                               v-model="venta.EsDescripcion"
+                                               :value="1"
+                                               :unchecked-value="0">
+                                                 Nota
+                                               </b-form-checkbox>
+                                               <div v-if="venta.EsDescripcion">
+                                                 <div class="mb-3">
+                                                   <input v-model="venta.DescripcionProforma"
+                                                     type="text"
+                                                     class="form-control"
+                                                     required
+                                                     placeholder="Plazo de Entrega"/>
+                                                 </div>
+                                               </div>
+                                             </b-input-group>
+                                           </td>
+                                         </tr>
                                     </tbody>
                                 </table>
                             </template>    
@@ -488,6 +548,11 @@ export default {
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 }
                 },
+                EsCreditoProforma: 0,
+                EsIgv: 0,
+                FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
+                EsDescripcion: 0,
+                DescripcionProforma: '',
                 CampoDireccion: 'Direccion',
                 NroComprobanteModifica: '',
                 CodSunatModifica: '',
@@ -911,6 +976,8 @@ export default {
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
             this.venta.PagoCon = this.$refs.carrito.pagocon
+            this.venta.FechaCreditoProforma = this.$moment().format("YYYY-MM-DDTH:mm:ss")
+            this.venta.DescripcionProforma = (''+this.venta.DescripcionProforma).trim()
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
                 this.$toasted.success('Venta realizada con exito')
