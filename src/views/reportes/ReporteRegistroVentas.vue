@@ -316,7 +316,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .modalRegVentaDetalle .modal-dialog {
   max-width: 90% !important;
   width: 90% !important;

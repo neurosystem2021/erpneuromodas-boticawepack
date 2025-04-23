@@ -1027,16 +1027,16 @@ export default {
 .clsCaja {
   padding: 15px;
   margin: 5px 0px;
-  border: 2px solid #1a237e;
+  border: 2px solid #1a237e !important;
   border-radius: 25px;
-  box-shadow: 3px 3px #1a237e;
+  box-shadow: 3px 3px #1a237e !important;
 }
 .clsCuenta {
   padding: 15px;
   margin: 5px 0px;
-  border: 2px solid #1a237e;
+  border: 2px solid #1a237e !important;
   border-radius: 25px;
-  box-shadow: 3px 3px #1a237e;
+  box-shadow: 3px 3px #1a237e !important;
 }
 
 /* .modal-header {
