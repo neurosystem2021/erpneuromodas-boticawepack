@@ -48,6 +48,11 @@
                                     <b-button variant="success" :disabled="movimiento.almacen.IdAlmacen==0 || movimiento.proveedor.IdProveedor==0" @click="cargarProducto">Buscar Productos</b-button>
                             </b-form-group>
                             </b-col>
+                            <b-col cols="12">
+                              <b-alert show variant="warning">
+                                Solo se consideran productos activos, que controlan stock y tienen un stock mínimo mayor a cero.
+                              </b-alert>
+                            </b-col>
                         </b-row>
                     </b-col>
                 </b-row>

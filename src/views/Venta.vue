@@ -1,8 +1,8 @@
 <template>
-  <b-container fluid>
+  <b-container fluid class="mb-2">
     <b-row id="header">
       <b-col cols="7" class="px-0 py-0 mx-0 ">
-        <b-card no-body >
+        <b-card no-body>
         <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
           <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" @click="cambiarTab(index)" class="pt-0">
             <b-container  class="px-0 mx-0" style="min-width: 100% !important;">
@@ -121,11 +121,10 @@
                     </h1>
                   </center>
                   </b-col>
-
               </b-row>
               
-              <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
-              <b-row style="position: relative;max-height: 40vh;">
+              <div style="min-height: 60vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
+              <b-row style="position: relative;max-height: 80vh;">
                 <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
@@ -135,7 +134,8 @@
                   </template>
                   <template slot="Producto" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
-                      {{ data.item.Producto }}
+                      <p>{{ data.item.Producto }}</p>
+                      <p v-if="data.item.TieneKilage ==1"> {{ parseFloat(data.item.kilage * (data.item.cantidad ? data.item.cantidad : 0 )).toFixed() }} kg.</p>
 
                     </span>
                   </template>
@@ -168,7 +168,7 @@
                     <input
                       v-model="data.item.cantidad"
                       type="number"
-                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
+                      style="text-align:center; font-weight:bold; width: 90px;font-size: 0.8rem"
                       autocomplete="false"
                       :id="`input${data.index}`"
                       @input="metodoPagoCambio(1)"
@@ -285,6 +285,11 @@
                   </b-row>
                 </b-col>
                 <b-col cols="4">
+                  <b-col md="12" class="text-left mt-3">
+                    <h3>
+                      <p><b>Total Kilage:</b> {{ totalKilage}} kg</p>
+                    </h3>
+                    </b-col>
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
@@ -294,8 +299,8 @@
                   </b-row>
                     </b-col>
 
-                  <b-col md="12" class="text-left">
-                    <b-form-radio-group 
+                    <b-col md="12" class="text-left">
+                      <b-form-radio-group 
                       :id="`radios1${ventaActiva}`"
                       v-model="ventas[ventaActiva].selectOpcionVenta"
                       @change="setOpcionVenta"
@@ -303,6 +308,7 @@
                       :name="`radioOptions${ventaActiva}`">
                     </b-form-radio-group>
                   </b-col>
+                  
                   <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                     <b-form-group>
                       <label style="font-weight:bold">Nombre:</label>
@@ -995,14 +1001,14 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "Producto", thStyle: { width: "43%" } },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
           label: "Pres.",
           thStyle: { width: "5%" }
         },
-        { key: "cantidad", label: "Cant.", thStyle: { width: "7%" } },
+        { key: "cantidad", label: "Cant.", thStyle: { width: "10%" } },
         { key: "precio", label: "Precio", thStyle: { width: "5%" } },
         {
           key: "subtotal",
@@ -1019,7 +1025,7 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "acciones", label: "", thStyle: { width: "5%" } }
+        { key: "acciones", label: "", thStyle: { width: "10%" } }
       ],
       busqueda: "",
       loadCode: "",
@@ -2580,6 +2586,24 @@ export default {
       });
     }
     //Fin Sockets
+  },
+  computed: {
+    totalKilage() {
+      let productos = [...this.ventas[this.ventaActiva].productos];
+      let total = 0;
+      if (productos.some(v => v.TieneKilage == 1)) {
+        total = productos.reduce((sum, producto) => {
+          return (
+            sum +
+            parseFloat(
+              producto.kilage * (producto.cantidad ? producto.cantidad : 0)
+            )
+          );
+        }, 0);
+        // console.log("monto", monto);
+      }
+      return parseFloat(total).toFixed(2);
+    }
   }
 };
 </script>
@@ -2651,6 +2675,11 @@ export default {
 }
 </style>
 <style>
+html,
+body {
+  height: auto !important;
+  overflow-y: auto;
+}
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
