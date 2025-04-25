@@ -135,7 +135,7 @@
                   <template slot="Producto" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
                       <p>{{ data.item.Producto }}</p>
-                      <p v-if="data.item.TieneKilage ==1"> {{ parseFloat(data.item.kilage * (data.item.cantidad ? data.item.cantidad : 0 )).toFixed() }} kg.</p>
+                      <p v-if="data.item.TieneKilage ==1"> {{ parseFloat(data.item.kilageProducto * (data.item.cantidad ? data.item.cantidad : 0 )).toFixed() }} kg.</p>
 
                     </span>
                   </template>
@@ -295,10 +295,10 @@
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <b-button type="button" block @click="abrirModalScamich" class="btnAction" variant="primary"><i class="fa fa-outdent" aria-hidden="true"></i> Buscar Ventas Scamich</b-button>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
                     </b-col>
-
                     <b-col md="12" class="text-left">
                       <b-form-radio-group 
                       :id="`radios1${ventaActiva}`"
@@ -936,6 +936,55 @@
         </b-modal>
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
+
+        <b-modal v-model="modalVentaScamich" size="lg" no-close-on-backdrop title="Busqueda Ventas Scamich">
+          <b-row>
+            <b-col cols="4">
+              Buscar: 
+              <input type="text" class="form-control" v-model="searchScamich">
+            </b-col>
+            <b-col cols="4"></b-col>
+            <b-col cols="12">
+              <table class="table" width="100%">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Serie</th>
+                    <th>Correlativo</th>
+                    <th>F. Registro</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                   <tr v-for="(venta,index) in lstVentasScamich" :key="index">
+                      <td> {{ venta.Cliente }}</td>
+                      <td> {{ venta.Serie }}</td>
+                      <td> {{ venta.Numero }}</td>
+                      <td> {{ venta.FechaReg }}</td>
+                      <td> <b-button variant="success" @click="anadirCarritoScamich(venta)">
+                        <i class="fa fa-cart-plus" aria-hidden="true"></i>
+
+                      </b-button> </td>
+                   </tr>
+                </tbody>
+                <!-- <tbody v-else>
+                  <b-spinner label="Loading..."></b-spinner>
+                </tbody> -->
+              </table>
+
+              <b-pagination
+                v-if="!buscando"
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                first-text="First"
+                prev-text="Prev"
+                next-text="Next"
+                last-text="Last"
+              ></b-pagination>
+            </b-col>
+          </b-row>
+        </b-modal>
   </b-container>
 </template>
 <script>
@@ -966,6 +1015,13 @@ export default {
   },
   data() {
     return {
+      lstVentasScamich: [],
+      searchScamich: "",
+      buscando: false,
+      totalRows: 1,
+      currentPage: 1,
+      perPage: 10,
+      modalVentaScamich: false,
       productoSelect: {},
       indexPos: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -1174,8 +1230,14 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
+    // this.loadVentaScamich();
   },
   methods: {
+    abrirModalScamich() {
+      this.searchScamich = "";
+      this.loadVentaScamich();
+      this.modalVentaScamich = true;
+    },
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1297,6 +1359,24 @@ export default {
           this.setCliente(res.data);
         }
       });
+    },
+    async loadVentaScamich() {
+      this.buscando = true;
+      await this.axios
+        .get(this.API + "listado/ventas/scamich", {
+          params: {
+            offset: this.currentPage,
+            q: this.searchScamich
+          }
+        })
+        .then(res => {
+          if (res.data) {
+            console.log(typeof Number(res.data.totalPage.totalPage));
+            this.lstVentasScamich = res.data.data;
+            this.totalRows = Number(res.data.totalPage.totalPage);
+          }
+        });
+      this.buscando = false;
     },
     getVendedorInfo() {
       let usuario = sessionStorage.getItem("User");
@@ -1626,13 +1706,15 @@ export default {
         let newPres = JSON.parse(prod.PreciosPorProducto);
         pres = newPres.filter(v => v.cantidad > 0);
       }
+
       prod.PreciosPorProducto = pres;
       prod.Descripcion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
+      prod.kilageProducto = prod.kilage;
+      // prod.kilageProducto = prod.ProductoPresentacion
+      //   ? prod.kilage
+      //   : prod.kilage;
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
@@ -1787,6 +1869,19 @@ export default {
       await this.axios(this.API + "productos/puntoventa/stock", {
         params: {
           idProductos: [IdProducto],
+          idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
+        }
+      }).then(response => {
+        res = response.data[0];
+        // return response.data;
+      });
+      return res;
+    },
+    async obtenerStockBuscadorPorBarCode(CodigoBarra) {
+      let res = {};
+      await this.axios(this.API + "productos/puntoventa/stockxbarcode", {
+        params: {
+          CodigoBarras: [CodigoBarra],
           idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
         }
       }).then(response => {
@@ -2398,8 +2493,10 @@ export default {
       this.modalPresentacion = true;
     },
     cambiarPresentacion(obj, esPresentacion) {
+      console.log(obj);
       let producto = { ...this.producto };
       if (esPresentacion) {
+        producto.kilageProducto = obj.kilage;
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
@@ -2407,12 +2504,15 @@ export default {
         producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.Descripcion = obj.ProductoPresentacion;
+        producto.kilageProducto = producto.kilage;
+        producto.Descripcion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = false;
         producto.precio = producto.PrecioContado;
-        producto.presentacion = null;
+        producto.presentacion = "null";
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
@@ -2584,6 +2684,76 @@ export default {
           });
         }
       });
+    },
+    async anadirCarritoScamich(item) {
+      let productos = [];
+      let venta = { ...this.venta };
+
+      this.initValueCliente = "00000000 CLIENTE VARIOS";
+      await this.axios
+        .get(this.API + "ventas/detalle/scamich", {
+          params: {
+            idDocVentas: [item.idDocVenta]
+          }
+        })
+        .then(res => {
+          if (res.data) {
+            res.data.forEach(async producto => {
+              console.log("producto", producto);
+              let prod = await this.obtenerStockBuscadorPorBarCode(
+                producto.CodigoBarra
+              );
+              let pres = [];
+              if (prod.PreciosPorProducto) {
+                let newPres = JSON.parse(prod.PreciosPorProducto);
+                pres = newPres.filter(v => v.cantidad > 0);
+              }
+              prod.kilageProducto = producto.kilage;
+              console.log("prod", prod);
+              prod.PreciosPorProducto = pres;
+              prod.Descripcion = producto.ProductoPresentacion
+                ? prod.ProductoPresentacion
+                : "UNIDAD";
+              prod.ProductoPresentacion = producto.ProductoPresentacion
+                ? prod.ProductoPresentacion
+                : "UNIDAD";
+              prod.cantidad = 1;
+              prod.precio = producto.PrecioContado;
+              prod.descuento = 0;
+              prod.tienePresentacion = prod.PreciosPorProducto.some(
+                v => v.cantidad > 0
+              );
+              prod.bloquearInputPrecio = false;
+              prod.CantidadPresentacion = null;
+              prod.ProductoPresentacion = producto.Descripcion;
+              prod.Descripcion = producto.Descripcion;
+              prod.cantidad = producto.Cantidad;
+              prod.precio = producto.Precio;
+              prod.descuento = producto.Descuento ? producto.Descuento : 0;
+              prod.stock = prod.stock;
+              productos.push(prod);
+            });
+          }
+        });
+      venta.productos = productos;
+      this.ventas.push(venta);
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventas.length - 1;
+        this.getNumeroVenta();
+        this.getVendedorInfo();
+        this.loadClienteVarios();
+      });
+      let header = document.getElementById("header");
+      header.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+      this.$toasted.success("Se añadió una opción más de venta");
+      this.$forceUpdate();
+      this.$nextTick(() => {
+        this.irTxtLoadBarcode();
+      });
+      this.modalVentaScamich = false;
     }
     //Fin Sockets
   },
@@ -2596,13 +2766,22 @@ export default {
           return (
             sum +
             parseFloat(
-              producto.kilage * (producto.cantidad ? producto.cantidad : 0)
+              producto.kilageProducto *
+                (producto.cantidad ? producto.cantidad : 0)
             )
           );
         }, 0);
         // console.log("monto", monto);
       }
       return parseFloat(total).toFixed(2);
+    }
+  },
+  watch: {
+    currentPage() {
+      this.loadVentaScamich();
+    },
+    searchScamich() {
+      this.loadVentaScamich();
     }
   }
 };

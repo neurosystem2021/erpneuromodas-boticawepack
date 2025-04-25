@@ -389,6 +389,15 @@
                 step="0.00001"
                 />
             </b-form-group>
+            <b-form-group class="text-left">
+              <label>Kilage:</label>
+              <input 
+                v-model="producto.precios[i-1].kilage"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
           </b-card>
         </b-col>
       </b-row>
@@ -607,10 +616,34 @@ export default {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
             } else {
               this.producto.precios = [
-                { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0 }
+                {
+                  nombre: "NOMBRE 1",
+                  cantidad: 0,
+                  precioc: 0,
+                  precio: 0,
+                  kilage: 0
+                },
+                {
+                  nombre: "NOMBRE 2",
+                  cantidad: 0,
+                  precioc: 0,
+                  precio: 0,
+                  kilage: 0
+                },
+                {
+                  nombre: "NOMBRE 3",
+                  cantidad: 0,
+                  precioc: 0,
+                  precio: 0,
+                  kilage: 0
+                },
+                {
+                  nombre: "NOMBRE 4",
+                  cantidad: 0,
+                  precioc: 0,
+                  precio: 0,
+                  kilage: 0
+                }
               ];
             }
             this.$refs.file.value = null;
@@ -911,13 +944,20 @@ export default {
       }
       // console.log(JSON.stringify(this.producto))
       this.producto.precios.map(pre => {
+        if (!pre.kilage) {
+          pre.kilage = 0;
+        }
         if (pre.cantidad == "") {
           pre.cantidad = 0;
         }
         if (pre.precio == "") {
           pre.precio = 0;
         }
+        if (pre.kilage == "") {
+          pre.kilage = 0;
+        }
       });
+      console.log(this.producto.precios);
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
       this.axios
         .post(this.API + "productos", {
