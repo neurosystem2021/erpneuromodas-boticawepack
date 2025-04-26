@@ -295,7 +295,7 @@
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      <b-button type="button" block @click="abrirModalScamich" class="btnAction" variant="primary"><i class="fa fa-outdent" aria-hidden="true"></i> Buscar Ventas JMScamich</b-button>
+                      <!-- <b-button type="button" block @click="abrirModalScamich" class="btnAction" variant="primary"><i class="fa fa-outdent" aria-hidden="true"></i> Buscar Ventas Scamich</b-button> -->
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
                     </b-col>
@@ -2032,45 +2032,45 @@ export default {
       console.log("a");
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "El RUC debe ser numérico, editar cliente.",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title:
+        //     "Una factura debe ser emitida para una empresa, no a un usuario común",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "Una boleta no debe ser emitida para una empresa",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
@@ -2079,30 +2079,30 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Documento de Referencia...",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show('Debe seleccionar un Motivo')
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Motivo",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
