@@ -295,7 +295,7 @@
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      <!-- <b-button type="button" block @click="abrirModalScamich" class="btnAction" variant="primary"><i class="fa fa-outdent" aria-hidden="true"></i> Buscar Ventas Scamich</b-button> -->
+                      <b-button type="button" block @click="abrirModalScamich" class="btnAction" variant="primary"><i class="fa fa-outdent" aria-hidden="true"></i> Buscar Ventas JMScamich</b-button>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
                     </b-col>
@@ -945,37 +945,21 @@
             </b-col>
             <b-col cols="4"></b-col>
             <b-col cols="12">
-              <table class="table" width="100%">
-                <thead>
-                  <tr>
-                    <th>Cliente</th>
-                    <th>Serie</th>
-                    <th>Correlativo</th>
-                    <th>F. Registro</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                   <tr v-for="(venta,index) in lstVentasScamich" :key="index">
-                      <td> {{ venta.Cliente }}</td>
-                      <td> {{ venta.Serie }}</td>
-                      <td> {{ venta.Numero }}</td>
-                      <td> {{ venta.FechaReg }}</td>
-                      <td> <b-button variant="success" @click="anadirCarritoScamich(venta)">
+              <b-table :items="lstVentasScamich" :fields="headers"
+                :per-page="perPage"
+                :current-page="currentPage"
+              >
+                <template slot="action" slot-scope="data">
+                  <b-button variant="success" @click="anadirCarritoScamich(data.item)">
                         <i class="fa fa-cart-plus" aria-hidden="true"></i>
 
-                      </b-button> </td>
-                   </tr>
-                </tbody>
-                <!-- <tbody v-else>
-                  <b-spinner label="Loading..."></b-spinner>
-                </tbody> -->
-              </table>
-
+                      </b-button>
+                </template>
+              </b-table>
+              
               <b-pagination
-                v-if="!buscando"
                 v-model="currentPage"
-                :total-rows="totalRows"
+                :total-rows="lstVentasScamich.length"
                 :per-page="perPage"
                 first-text="First"
                 prev-text="Prev"
@@ -1016,6 +1000,13 @@ export default {
   data() {
     return {
       lstVentasScamich: [],
+      headers:[
+        {key:'Correlativo',label:'Correlativo'},
+        {key:'DniRuc',label:'Doc.'},
+        {key:'Cliente',label:'Cliente'},
+        {key:'FechaReg',label:'F. Reg'},
+        {key:'action',label:''},
+      ],
       searchScamich: "",
       buscando: false,
       totalRows: 1,
@@ -2032,7 +2023,7 @@ export default {
       console.log("a");
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
         // this.$swal({
         //   position: "center",
         //   icon: "info",
@@ -2047,7 +2038,9 @@ export default {
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
         // this.$swal({
         //   position: "center",
         //   icon: "info",
@@ -2061,7 +2054,7 @@ export default {
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
         // this.$swal({
         //   position: "center",
         //   icon: "info",
@@ -2079,7 +2072,7 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          this.$toasted.show('Debe seleccionar un Documento de Referencia...')
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
           // this.$swal({
           //   position: "center",
           //   icon: "info",
@@ -2093,7 +2086,7 @@ export default {
           return;
         }
         if (!venta.NotaIdMotivo) {
-          this.$toasted.show('Debe seleccionar un Motivo')
+          this.$toasted.show("Debe seleccionar un Motivo");
           // this.$swal({
           //   position: "center",
           //   icon: "info",
