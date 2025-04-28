@@ -1150,6 +1150,7 @@ export default {
   },
   mounted() {
     this.getVendedorInfo();
+    console.log(this.IdAlmacen);
     this.getNumeroVenta();
     this.loadClienteVarios();
     this.$root.$on("bv::hide::popover", id => {
@@ -1376,7 +1377,8 @@ export default {
       this.axios
         .get(this.API + "productos/categoria", {
           params: {
-            q: val
+            q: val,
+            idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
           }
         })
         .then(response => {
@@ -1469,7 +1471,7 @@ export default {
           .get(this.API + "productos/categoria", {
             params: {
               IdProductoCategoria: idProductoCategoria,
-              idAlmacen: this.venta.almacen.IdAlmacen,
+              idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
               MasMovido: idProductoCategoria == 0 ? 1 : 0
             }
           })
