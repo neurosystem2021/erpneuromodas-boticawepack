@@ -239,7 +239,7 @@ export default {
           variant: "info",
           class: "text-center"
         },
-        { key: "CodigoBarra", label: "Código" },
+        { key: "CodigoProducto", label: "Codigo Producto" },
         { key: "Producto", label: "Artículo" },
         { key: "Descripcion", label: "Descripción" },
         { key: "ProductoMarca", label: "Marca" },

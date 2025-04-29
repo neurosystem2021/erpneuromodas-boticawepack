@@ -19,6 +19,21 @@
                 Dejar en blanco para autogenerar
               </b-form-text>
           </b-form-group>
+          
+          <b-form-group>
+          <label>Código producto:</label>
+            <b-form-input 
+              ref="inputCodigoProducto"
+              v-model="producto.CodigoProducto"
+              @input="(val) => producto.CodigoProducto = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+              <!-- <b-form-text id="input-formatter-help">
+                Dejar en blanco para autogenerar
+              </b-form-text> -->
+          </b-form-group>
+
           <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
@@ -489,6 +504,7 @@ export default {
             this.producto.ControlaStockMinimo = newVal.ControlaStockMinimo;
             this.producto.StockMinimo = newVal.StockMinimo;
             this.producto.CodigoBarra = newVal.CodigoBarra;
+            this.producto.CodigoProducto = newVal.CodigoProducto
             this.producto.ProductoModelo = newVal.ProductoModelo;
             this.producto.ProductoDesc = newVal.ProductoDesc;
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
@@ -653,6 +669,7 @@ export default {
         _ProductoDesc2: "",
         _ProductoDesc3: "",
         CodigoBarra: "",
+        CodigoProducto: "",
         // Color: '',
         PorcentajeUtilidad: 0,
         ControlaStock: 1,
@@ -698,6 +715,7 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.producto.CodigoProducto=(''+this.producto.CodigoProducto).trim();
       this.axios
         .post(this.API + "productos", {
           ...this.producto,

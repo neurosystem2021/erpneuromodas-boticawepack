@@ -993,8 +993,9 @@ export default {
       tieneIgv: [],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
-        { key: "CodigoBarra" },
+        { key: "CodigoProducto",label: "Codigo Producto" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
@@ -1553,9 +1554,9 @@ export default {
               : data.stock
         }</b></td>
                 <td style="width: 200px"><b>${data.Producto} - ${
-          data.CodigoBarra
+          data.CodigoProducto
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
