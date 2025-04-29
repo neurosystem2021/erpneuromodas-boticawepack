@@ -1000,12 +1000,12 @@ export default {
   data() {
     return {
       lstVentasScamich: [],
-      headers:[
-        {key:'Correlativo',label:'Correlativo'},
-        {key:'DniRuc',label:'Doc.'},
-        {key:'Cliente',label:'Cliente'},
-        {key:'FechaReg',label:'F. Reg'},
-        {key:'action',label:''},
+      headers: [
+        { key: "Correlativo", label: "Correlativo" },
+        { key: "DniRuc", label: "Doc." },
+        { key: "Cliente", label: "Cliente" },
+        { key: "FechaReg", label: "F. Reg" },
+        { key: "action", label: "" }
       ],
       searchScamich: "",
       buscando: false,
@@ -2186,7 +2186,9 @@ export default {
             "noopener"
           );
         }
-
+        if (venta.FaturarFlag) {
+          this.axios.put(this.API + "facturarjmscamich", venta);
+        }
         if (this.ventas.length == 1) {
           window.location.reload();
         } else {
@@ -2689,7 +2691,8 @@ export default {
     async anadirCarritoScamich(item) {
       let productos = [];
       let venta = { ...this.venta };
-
+      venta.FaturarFlag = true;
+      venta.idDocVentaRef = item.idDocVenta;
       this.initValueCliente = "00000000 CLIENTE VARIOS";
       await this.axios
         .get(this.API + "ventas/detalle/scamich", {
