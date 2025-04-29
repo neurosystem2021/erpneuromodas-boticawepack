@@ -289,7 +289,7 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
+              <b-col cols="6">
                 <b-row>
                   <b-col cols="12">
                     Fecha Operacion: 
@@ -410,7 +410,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button variant="success" @click="GuardarMovimiento()">Guardar</b-button>
                     <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
@@ -985,7 +985,7 @@ export default {
   },
   computed: {
     mostrarProveedor() {
-      if (this.IdTipoCajaBanco) {
+      if (this.IdTipoCajaBanco == 1) {
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
         );
@@ -993,7 +993,7 @@ export default {
       return false;
     },
     mostrarCliente() {
-      if (this.IdTipoCajaBanco) {
+      if (this.IdTipoCajaBanco == 2) {
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
         );
