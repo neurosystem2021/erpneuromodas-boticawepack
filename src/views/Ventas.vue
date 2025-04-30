@@ -404,1079 +404,1254 @@
     </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
-import config from '@/store/config.js'
-import ProductosCarrito from '@/components/ProductosCarrito'
-import ClientesForm from '@/components/ClientesForm'
-import ConfigVenta from '@/components/ConfigVenta'
-import PagoDeuda from '@/components/PagoDeuda'
-import PreOrdenLista from '@/components/PreOrdenLista.vue'
-import Proformas from '@/components/ProformaLista.vue'
-import DeliveryModal from '@/components/DeliveryModal.vue'
-import Swal from 'sweetalert2'
+import { mapActions, mapState } from "vuex";
+import config from "@/store/config.js";
+import ProductosCarrito from "@/components/ProductosCarrito";
+import ClientesForm from "@/components/ClientesForm";
+import ConfigVenta from "@/components/ConfigVenta";
+import PagoDeuda from "@/components/PagoDeuda";
+import PreOrdenLista from "@/components/PreOrdenLista.vue";
+import Proformas from "@/components/ProformaLista.vue";
+import DeliveryModal from "@/components/DeliveryModal.vue";
+import Swal from "sweetalert2";
 export default {
-    beforeMount() {
-        this.initForm()
+  beforeMount() {
+    this.initForm();
+  },
+  mounted() {
+    // this.getNumeroVenta()
+    this.getVendedor();
+    //setInterval(this.updateTime, 1000)
+    this.loadClienteVarios();
+    this.escucharPedidos();
+    this.configStock();
+  },
+  data() {
+    return {
+      tipoUtilidad: "Publico",
+      tipoUtilidadAnterior: "Publico",
+      show: false,
+      isNota: false,
+      dni: "",
+      adelanto: 0,
+      gasto: 0,
+      newDniRuc: "",
+      ultimaVenta: "",
+      inProgress: false,
+      API: config.API,
+      puntosAplicados: 0,
+      descuentoPuntos: {},
+      descuentoGeneral: 0,
+      tieneIgv: false,
+      venta: {},
+      bloquearInput: false,
+      diasValidosProf: 1,
+      adelantosPreOrden: [],
+      itemsMotivoNota: [
+        { value: null, text: "-- SELECCIONE EL MOTIVO --" },
+        { value: "01", text: "ANULACION DE LA OPERACION" },
+        { value: "02", text: "ANULACION POR ERROR EN EL RUC" },
+        { value: "03", text: "CORRECION POR ERROR EN LA DESCRIPCION" },
+        { value: "04", text: "DESCUENTO GLOBAL" },
+        { value: "05", text: "DESCUENTO POR ITEM" },
+        { value: "06", text: "DEVOLUCION TOTAL" },
+        { value: "07", text: "DEVOLUCION POR ITEM" },
+        { value: "08", text: "BONIFICACION" },
+        { value: "09", text: "DISMINUCION EN EL VALOR" },
+        { value: "10", text: "OTROS CONCEPTOS" }
+      ],
+      carrito: {
+        fields: [
+          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+          { key: "itemNum", label: "#", class: "text-center thclass tdcenter" },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center tdcenter"
+          },
+          { key: "CodigoBarra", label: "Codigo", class: "tdcenter" },
+          { key: "VentaEstrategica", label: "", class: "tdcenter" },
+          { key: "Producto", class: "tdcenter" },
+          { key: "ProductoModelo", label: "Modelo", class: "tdcenter" },
+          { key: "ProductoMarca", label: "Marca", class: "tdcenter" },
+          { key: "Anaquel", label: "Anaquel", class: "tdcenter" },
+          //{ key: 'Descripcion', label: 'Descripción'},
+          { key: "eventPres", label: "", class: "tdcenter" },
+          { key: "cantxPrecio", variant: "warning" },
+          // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
+          // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
+          { key: "cantidad", class: "tdcenter" },
+          { key: "precio", label: "Precio", class: "tdcenter" },
+          //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
+          {
+            key: "subtotal",
+            label: "SubTotal",
+            variant: "success",
+            class: "text-center tdcenter"
+          },
+          { key: "descuento", label: "Desc.", class: "tdcenter" },
+          {
+            key: "total",
+            label: "Total",
+            variant: "danger",
+            class: "text-center tdcenter"
+          },
+          { key: "acciones", label: "", class: "tdcenter" }
+        ]
+      },
+      ventaSinStock: 0
+    };
+  },
+  watch: {
+    totalCart(newVal) {
+      this.venta.pago.efectivo.monto = parseFloat(
+        newVal -
+          (parseFloat(this.venta.pago.visa.monto) +
+            parseFloat(this.venta.pago.mastercard.monto) +
+            parseFloat(this.venta.pago.transferencia.monto))
+      ).toFixed(2);
+    }
+    // selectedtv(newVal, oldVal) {
+    //   this.cambioTipoVenta(newVal, oldVal);
+    //}
+  },
+  computed: {
+    ...mapState({
+      productos: state => state.cart.productos,
+      totalCart: state => state.cart.totalCart
+    }),
+    manoDeObraBruta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+      return precio;
     },
-    mounted() {
-        // this.getNumeroVenta()
-        this.getVendedor()
-        //setInterval(this.updateTime, 1000)
-        this.loadClienteVarios()
-        this.escucharPedidos()
-        this.configStock()
+    manoDeObraNeta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precio : 0;
+
+      return precio;
+    }
+  },
+  methods: {
+    ...mapActions({
+      aplicarDescuento: "aplicarDescuentoGeneral",
+      limpiarCart: "limpiarCarrito",
+      obtenerStok: "obtenerStock",
+      actualizarPrecioConvenio: "actualizarPrecioConvenio",
+      add: "agregarProducto"
+    }),
+    configStock() {
+      this.axios
+        .get(this.API + "config/stock")
+        .then(res => {
+          this.ventaSinStock = res.data;
+        })
+        .catch(err => {
+          this.ventaSinStock = 0;
+        });
     },
-    data() {
-        return {
-            tipoUtilidad: 'Publico',
-            tipoUtilidadAnterior: 'Publico',
-            show: false,
-            isNota: false,
-            dni: '',
-            adelanto: 0,
-            gasto: 0,
-            newDniRuc: '',
-            ultimaVenta: '',
-            inProgress: false,
-            API: config.API,
-            puntosAplicados: 0,
-            descuentoPuntos: {},
-            descuentoGeneral: 0,
-            tieneIgv: false,
-            venta: {},
-            bloquearInput: false,
-            diasValidosProf: 1,
-            adelantosPreOrden: [],
-            itemsMotivoNota: [
-                { value: null, text: '-- SELECCIONE EL MOTIVO --' },
-                { value: '01', text: 'ANULACION DE LA OPERACION' },
-                { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
-                { value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
-                { value: '04', text: 'DESCUENTO GLOBAL' },
-                { value: '05', text: 'DESCUENTO POR ITEM' },
-                { value: '06', text: 'DEVOLUCION TOTAL' },
-                { value: '07', text: 'DEVOLUCION POR ITEM' },
-                { value: '08', text: 'BONIFICACION' },
-                { value: '09', text: 'DISMINUCION EN EL VALOR' },
-                { value: '10', text: 'OTROS CONCEPTOS' }
-            ],
-            carrito: {
-                fields: [
-                    //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-                    { key: 'itemNum', label: '#', class: 'text-center thclass tdcenter' },
-                    { key: 'stock', label: 'Stock', variant: 'info', class: 'text-center tdcenter' },
-                    { key: 'CodigoBarra', label: 'Codigo', class: 'tdcenter' },
-                    { key: 'VentaEstrategica', label: '', class: 'tdcenter' },
-                    { key: 'Producto', class: 'tdcenter' },
-                    { key: 'ProductoModelo', label: 'Modelo', class: 'tdcenter' },
-                    { key: 'ProductoMarca', label: 'Marca', class: 'tdcenter' },
-                    { key: 'Anaquel', label: 'Anaquel', class: 'tdcenter' },
-                    //{ key: 'Descripcion', label: 'Descripción'},
-                    { key: 'eventPres', label: '', class: 'tdcenter' },
-                    { key: 'cantxPrecio', variant: 'warning' },
-                    // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    { key: 'cantidad', class: 'tdcenter' },
-                    { key: 'precio', label: 'Precio', class: 'tdcenter' },
-                    //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
-                    { key: 'subtotal', label: 'SubTotal', variant: 'success', class: 'text-center tdcenter' },
-                    { key: 'descuento', label: 'Desc.', class: 'tdcenter' },
-                    { key: 'total', label: 'Total', variant: 'danger', class: 'text-center tdcenter' },
-                    { key: 'acciones', label: '', class: 'tdcenter' }
-                ]
-            },
-            ventaSinStock: 0
+
+    loadClienteVarios() {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
+        if (res.data.IdCliente) {
+          this.setCliente(res.data);
         }
+      });
     },
-    watch: {
-        totalCart(newVal) {
-            this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))).toFixed(2);
-        },
-        // selectedtv(newVal, oldVal) {
-        //   this.cambioTipoVenta(newVal, oldVal);
-        //}
+    prevent(evt) {
+      if (evt.target.tagName !== "TEXTAREA") {
+        evt.preventDefault();
+      }
     },
-    computed: {
-        ...mapState({
-            productos: state => state.cart.productos,
-            totalCart: state => state.cart.totalCart
-        }),
-        manoDeObraBruta() {
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precioBruta : 0;
+    selectPreOrden(orden) {
+      // console.log(orden)
+      // this.venta.IdPreOrden = this.venta.IdPreOrden || []
+      // if (Array.isArray(this.venta.IdPreOrden) ) {
+      this.venta.IdPreOrden.push(orden);
+      //}
 
-            return precio
-        },
-        manoDeObraNeta() {
-            let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
-            let precio = pManoObra ? pManoObra.precio : 0;
-
-            return precio
-        }
+      // obtener total adelantos
+      this.axios
+        .get(this.API + "preorden/cajaybanco", {
+          params: {
+            IdPreOrden: orden.IdPreOrden,
+            TipoCajaBanco: 0
+          }
+        })
+        .then(res => {
+          this.adelantosPreOrden = res.data;
+          let suma = 0;
+          res.data.map(ad => {
+            if (ad.Tipo == 0) {
+              suma += ad.Importe;
+            }
+          });
+          this.adelanto = suma;
+        });
     },
-    methods: {
-        ...mapActions({
-            aplicarDescuento: 'aplicarDescuentoGeneral',
-            limpiarCart: 'limpiarCarrito',
-            obtenerStok: 'obtenerStock',
-            actualizarPrecioConvenio: 'actualizarPrecioConvenio',
-            add: 'agregarProducto'
-        }),
-        configStock() {
-            this.axios.get(this.API + 'config/stock')
-                .then(res => {
-                    this.ventaSinStock = res.data
-                })
-                .catch((err) => {
-                    this.ventaSinStock = 0
-                })
-        },
+    loadFirstAlmacen() {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.venta.almacen = res.data;
+      });
+    },
+    loadClienteBarcode(e) {
+      e.preventDefault();
+      let dni = this.dni;
 
-        loadClienteVarios() {
-            this.axios.get(this.API + 'clientes/00000000')
-                .then(res => {
-                    if (res.data.IdCliente) {
-                        this.setCliente(res.data)
-                    }
-                })
+      if (dni) {
+        this.setCliente(false, dni);
+      }
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    initForm() {
+      this.venta = {
+        EsCredito: 0,
+        Serie: "",
+        Numero: "",
+        Placa: "",
+        cliente: {},
+        comisionista: {},
+        tipoVenta: {
+          IdTipoDoc: 3,
+          TipoDoc: "NOTA DE VENTA",
+          LimitItems: 0,
+          CodSunat: "12"
         },
-        prevent(evt) {
-            if (evt.target.tagName !== 'TEXTAREA') {
-                evt.preventDefault();
-            }
+        almacen: {
+          IdAlmacen: 1,
+          Almacen: "PRINCIPAL"
         },
-        selectPreOrden(orden) {
-            // console.log(orden)
-            // this.venta.IdPreOrden = this.venta.IdPreOrden || []
-            // if (Array.isArray(this.venta.IdPreOrden) ) {
-            this.venta.IdPreOrden.push(orden)
-            //}
+        puntoVenta: {
+          IdDocVentaPuntoVenta: 1,
+          PuntoVenta: "PRINCIPAL"
+        },
+        vendedor: {},
+        adelantosPreOrden: [],
+        //FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        // Incrementar un dia mas a la fecha actual
+        FechaCredito: this.$moment()
+          .add(1, "day")
+          .format("YYYY-MM-DD"),
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+        pago: {
+          efectivo: { IdMetodoPago: 1, monto: 0 },
+          visa: { IdMetodoPago: 2, monto: 0 },
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          transferencia: { IdMetodoPago: 4, monto: 0 }
+        },
+        IdPreOrden: [],
+        CampoDireccion: "Direccion",
+        EsOrganizacion: 0,
+        NombreOrganizacion: "",
+        NroComprobanteModifica: "",
+        CodSunatModifica: "",
+        NotaIdMotivo: "",
+        NotaDescMotivo: "",
+        EsDelivery: false,
+        nombreLlevar: "",
+        DireccionEntrega: "",
+        diasValidosProf: 1,
+        idProforma: 0,
+        anioNumeroProforma: ""
+      };
+      this.isNota = false;
+      this.bloquearInput = false;
+      this.adelantosPreOrden = [];
+      this.adelanto = 0;
+      this.infoDelivery = {};
+      this.descuentoGeneral = 0;
+      this.puntosAplicados = 0;
+    },
+    setTipoVenta(obj) {
+      this.isNota = false;
+      (this.bloquearInput = false), (this.venta.NroComprobanteModifica = "");
+      this.venta.CodSunatModifica = "";
+      this.venta.NotaIdMotivo = "";
+      this.venta.NotaDescMotivo = "";
+      this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
+      if (obj.CodSunat == "07" || obj.CodSunat == "08") {
+        // 07 - nota de credito, 08 - Nota de debito
+        this.isNota = true;
+      }
 
-            // obtener total adelantos
-            this.axios.get(this.API + 'preorden/cajaybanco', {
-                params: {
-                    IdPreOrden: orden.IdPreOrden,
-                    TipoCajaBanco: 0
-                }
+      if (obj.TieneIgv) {
+        this.tieneIgv = true;
+      } else {
+        this.tieneIgv = false;
+      }
+      this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
+      this.venta.tipoVenta = obj;
+      this.getNumeroVenta();
+    },
+    setDocRef(obj) {
+      this.venta.CodSunatModifica = obj.CodSunat;
+      this.venta.NroComprobanteModifica = obj.NroComprobante;
+      if (
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
+      ) {
+        this.venta.Serie = this.venta.Serie.replace(
+          /^./,
+          obj.NroComprobante[0]
+        );
+      }
+      this.axios
+        .get(this.API + "ventas/solonumero", {
+          params: {
+            serie: this.venta.Serie,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.venta.Numero = response.data.numero;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+      //Cargar producto del documento afectado nota credito
+      this.axios
+        .get(this.API + "venta/detalle/comprobante", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta,
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+          }
+        })
+        .then(response => {
+          this.venta.Placa = response.data[0].Placa;
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
+                idCliente: response.data[0].IdCliente
+              }
             })
-                .then(res => {
-                    this.adelantosPreOrden = res.data
-                    let suma = 0
-                    res.data.map(ad => {
-                        if (ad.Tipo == 0) {
-                            suma += ad.Importe
-                        }
-                    })
-                    this.adelanto = suma
-                })
-        },
-        loadFirstAlmacen() {
-            this.axios.get(this.API + 'almacenes/primero')
-                .then(res => {
-                    this.$refs.inputAlmacen.setValue(res.data.Almacen)
-                    this.venta.almacen = res.data
-                })
-        },
-        loadClienteBarcode(e) {
-            e.preventDefault()
-            let dni = this.dni;
-
-            if (dni) {
-                this.setCliente(false, dni)
-            }
-        },
-        focusAutocomplete(ref) {
-            // this.$refs[ref].type = ""
-            this.$refs[ref].handleDoubleClick()
-        },
-        initForm() {
-            this.venta = {
-                EsCredito: 0,
-                Serie: '',
-                Numero: '',
-                Placa: '',
-                cliente: {},
-                comisionista: {},
-                tipoVenta: {
-                    IdTipoDoc: 3,
-                    TipoDoc: 'NOTA DE VENTA',
-                    LimitItems: 0,
-                    CodSunat: '12'
-                },
-                almacen: {
-                    IdAlmacen: 1,
-                    Almacen: 'PRINCIPAL'
-                },
-                puntoVenta: {
-                    IdDocVentaPuntoVenta: 1,
-                    PuntoVenta: 'PRINCIPAL'
-                },
-                vendedor: {},
-                adelantosPreOrden: [],
-                //FechaCredito: this.$moment().format("YYYY-MM-DD"),
-                // Incrementar un dia mas a la fecha actual
-                FechaCredito: this.$moment().add(1, 'day').format("YYYY-MM-DD"),
-                FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
-                pago: {
-                    efectivo: { IdMetodoPago: 1, monto: 0 },
-                    visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 },
-                    transferencia: { IdMetodoPago: 4, monto: 0 }
-                },
-                IdPreOrden: [],
-                CampoDireccion: 'Direccion',
-                EsOrganizacion: 0,
-                NombreOrganizacion: '',
-                NroComprobanteModifica: '',
-                CodSunatModifica: '',
-                NotaIdMotivo: '',
-                NotaDescMotivo: '',
-                EsDelivery: false,
-                nombreLlevar: '',
-                DireccionEntrega: '',
-                diasValidosProf: 1,
-                idProforma: 0,
-                anioNumeroProforma: ""
-            }
-            this.isNota = false
-            this.bloquearInput = false
-            this.adelantosPreOrden = []
-            this.adelanto = 0
-            this.infoDelivery = {}
-            this.descuentoGeneral = 0
-            this.puntosAplicados = 0
-        },
-        setTipoVenta(obj) {
-            this.isNota = false
-            this.bloquearInput = false,
-                this.venta.NroComprobanteModifica = ''
-            this.venta.CodSunatModifica = ''
-            this.venta.NotaIdMotivo = ''
-            this.venta.NotaDescMotivo = ''
-            this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
-            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
-                this.isNota = true
-            }
-
-            if (obj.TieneIgv) {
-                this.tieneIgv = true
-            } else {
-                this.tieneIgv = false
-            }
-            this.$refs.inputTipoVenta.setValue(obj.TipoDoc)
-            this.venta.tipoVenta = obj
-            this.getNumeroVenta()
-        },
-        setDocRef(obj) {
-            this.venta.CodSunatModifica = obj.CodSunat
-            this.venta.NroComprobanteModifica = obj.NroComprobante
-            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
-                this.venta.Serie = this.venta.Serie.replace(/^./, obj.NroComprobante[0])
-            }
-            this.axios.get(this.API + 'ventas/solonumero', {
-                params: {
-                    serie: this.venta.Serie,
-                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
-                }
+            .then(response => {
+              if (response.data) {
+                this.$refs.inputCliente.setValue(response.data.Cliente);
+                this.venta.cliente = response.data;
+                this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
             })
-                .then((response) => {
-                    this.venta.Numero = response.data.numero
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            //Cargar producto del documento afectado nota credito
-            this.axios.get(this.API + 'venta/detalle/comprobante', {
-                params: {
-                    NroComprobante: obj.NroComprobante,
-                    idDocVenta: obj.IdDocVenta,
-                    IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
-                }
-            }).then((response) => {
-                this.venta.Placa = response.data[0].Placa
-                this.axios.get(this.API + 'cliente', {
-                    params: {
-                        idCliente: response.data[0].IdCliente
-                    }
-                })
-                    .then((response) => {
-                        if (response.data) {
-                            this.$refs.inputCliente.setValue(response.data.Cliente)
-                            this.venta.cliente = response.data
-                            this.venta.CampoDireccion = this.venta.cliente.Direccion
-                        } else {
-                            this.$toasted.show('No se encontro al cliente')
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    })
-                this.limpiarCart()
-                response.data.map((item) => {
-                    console.log(item)
-                    item.estadoPxP = false
-                    let prod = { ...item }
-                    if (prod.presentacion) {
-                        item.EsPresentacion = true
-                        item.cantidad = prod.CantidadPres
-                        item.cantxPrecio = prod.cantidad
-                        item.cantidadPres = JSON.parse(prod.presentacion).cantidad
-                        item.TienePresentacion = 1
-                        item.descripcionPresentacion = prod.presentacion
-                        item.presentacion = JSON.parse(prod.PreciosPorProducto || '[]')
-                    }
-
-                    let preciosProd = []
-                    item.precioCont = item.PrecioContado
-                    item.precio = item.PrecioCosto
-                    item.nuevoPrecioContado = item.PrecioCosto
-                    preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                    let fPP = preciosProd.filter(p => p.cantidad === 0)
-
-                    if (!item.PreciosPorProducto || fPP.length === 4) {
-                        item.estadoPxP = true
-                    }
-                    this.add([item, () => {
-                    }, false])
-                })
-                this.venta.NotaIdMotivo = null
-                this.bloquearInput = true
-                this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
-            })
-        },
-        setMotivo(ev) {
-            if (ev == '01' || ev == '02' || ev == '06' || ev == null) {
-                this.bloquearInput = true;
-            } else {
-                this.bloquearInput = false;
+            .catch(error => {
+              console.log(error);
+            });
+          this.limpiarCart();
+          response.data.map(item => {
+            console.log(item);
+            item.estadoPxP = false;
+            let prod = { ...item };
+            if (prod.presentacion) {
+              item.EsPresentacion = true;
+              item.cantidad = prod.CantidadPres;
+              item.cantxPrecio = prod.cantidad;
+              item.cantidadPres = JSON.parse(prod.presentacion).cantidad;
+              item.TienePresentacion = 1;
+              item.descripcionPresentacion = prod.presentacion;
+              item.presentacion = JSON.parse(prod.PreciosPorProducto || "[]");
             }
-        },
-        loadAlmacen(id) {
-            this.axios.get(this.API + 'almacenes/id/' + id)
-                .then(res => {
-                    this.setAlmacen(res.data)
-                })
-        },
-        setAlmacen(obj) {
-            this.venta.almacen = obj
-            this.$refs.inputAlmacen.setValue(obj.Almacen)
-            this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
-        },
-        loadPuntoVenta(id) {
-            this.axios.get(this.API + 'puntoventa/id/' + id)
-                .then(res => {
-                    this.setPuntoVenta(res.data)
-                    this.getNumeroVenta()
-                })
-        },
-        getTipoDoc(id) {
-            this.axios.get(this.API + 'tipodoc/' + id)
-                .then(response => {
-                    if (response.data) this.setTipoVenta(response.data)
-                })
-        },
-        setPuntoVenta(obj) {
-            this.venta.puntoVenta = obj
-            this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
-            this.getNumeroVenta()
-        },
-        cambioTipoVenta() {
-            this.$nextTick(() => {
-                // Verificar si estamos cambiando a Corporativo o Taller
-                if (this.tipoUtilidad === 'Corporativo' || this.tipoUtilidad === 'Taller') {
-                    // Mostrar SweetAlert2 para pedir la contraseña
-                    this.$swal({
-                        title: 'Escriba la contraseña del administrador',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Aceptar',
-                        cancelButtonText: 'Atrás',
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
 
-                        html: `
+            let preciosProd = [];
+            item.precioCont = item.PrecioContado;
+            item.precio = item.PrecioCosto;
+            item.nuevoPrecioContado = item.PrecioCosto;
+            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+            let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+            if (!item.PreciosPorProducto || fPP.length === 4) {
+              item.estadoPxP = true;
+            }
+            this.add([item, () => {}, false]);
+          });
+          this.venta.NotaIdMotivo = null;
+          this.bloquearInput = true;
+          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+        });
+    },
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
+    },
+    loadAlmacen(id) {
+      this.axios.get(this.API + "almacenes/id/" + id).then(res => {
+        this.setAlmacen(res.data);
+      });
+    },
+    setAlmacen(obj) {
+      this.venta.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+    },
+    loadPuntoVenta(id) {
+      this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
+        this.setPuntoVenta(res.data);
+        this.getNumeroVenta();
+      });
+    },
+    getTipoDoc(id) {
+      this.axios.get(this.API + "tipodoc/" + id).then(response => {
+        if (response.data) this.setTipoVenta(response.data);
+      });
+    },
+    setPuntoVenta(obj) {
+      this.venta.puntoVenta = obj;
+      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
+      this.getNumeroVenta();
+    },
+    cambioTipoVenta() {
+      this.$nextTick(() => {
+        // Verificar si estamos cambiando a Corporativo o Taller
+        if (
+          this.tipoUtilidad === "Corporativo" ||
+          this.tipoUtilidad === "Taller"
+        ) {
+          // Mostrar SweetAlert2 para pedir la contraseña
+          this.$swal({
+            title: "Escriba la contraseña del administrador",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Aceptar",
+            cancelButtonText: "Atrás",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+
+            html: `
                     <input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
                     <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>
                     `,
-                        preConfirm: () => {
-                            return {
-                                usuario: document.getElementById('usuario').value,
-                                password: document.getElementById('password').value
-                            };
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let password = result.value.password;
-                            let usuario = result.value.usuario;
+            preConfirm: () => {
+              return {
+                usuario: document.getElementById("usuario").value,
+                password: document.getElementById("password").value
+              };
+            }
+          })
+            .then(result => {
+              if (result.isConfirmed) {
+                let password = result.value.password;
+                let usuario = result.value.usuario;
 
-                            // Enviar la contraseña a la API para validación
-                            this.axios.post(this.API + 'login', {
-                                user: usuario,
-                                password: password
-                            }).then(response => {
-                                if (response.data && response.data.IdUsuarioPerfil == 1) {
-                                    // Contraseña correcta, actualizar tipo de utilidad
-                                    this.show = true; // Acceso autorizado
-                                    this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior
-                                } else {
-                                    // Contraseña incorrecta, revertir al valor anterior
-                                    this.$swal({
-                                        title: 'Error',
-                                        text: 'No autorizado.',
-                                        icon: 'error'
-                                    }).then(() => {
-                                        this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
-                                    });
-                                }
-                            }).catch(error => {
-                                // Error en la solicitud
-                                console.error('Error en la solicitud:', error);
-                                this.$swal({
-                                    title: 'Error',
-                                    text: 'Ha ocurrido un error, vuelva a intentarlo.',
-                                    icon: 'error'
-                                }).then(() => {
-                                    this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
-                                });
-                            });
-                        } else {
-                            // Si el modal se cierra sin confirmar
-                            this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
-                        }
-                    }).catch(error => {
-                        // Manejo de cualquier otro error
-                        if (error) {
-                            this.$swal({
-                                title: 'Advertencia',
-                                text: error,
-                                icon: 'warning'
-                            });
-                        }
+                // Enviar la contraseña a la API para validación
+                this.axios
+                  .post(this.API + "login", {
+                    user: usuario,
+                    password: password
+                  })
+                  .then(response => {
+                    if (response.data && response.data.IdUsuarioPerfil == 1) {
+                      // Contraseña correcta, actualizar tipo de utilidad
+                      this.show = true; // Acceso autorizado
+                      this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior
+                    } else {
+                      // Contraseña incorrecta, revertir al valor anterior
+                      this.$swal({
+                        title: "Error",
+                        text: "No autorizado.",
+                        icon: "error"
+                      }).then(() => {
+                        this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
+                      });
+                    }
+                  })
+                  .catch(error => {
+                    // Error en la solicitud
+                    console.error("Error en la solicitud:", error);
+                    this.$swal({
+                      title: "Error",
+                      text: "Ha ocurrido un error, vuelva a intentarlo.",
+                      icon: "error"
+                    }).then(() => {
+                      this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
                     });
-                } else {
-                    // Si selecciona 'Público', actualizar directamente sin pedir contraseña
-                    this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior sin pedir contraseña
-                }
+                  });
+              } else {
+                // Si el modal se cierra sin confirmar
+                this.tipoUtilidad = this.tipoUtilidadAnterior; // Revertir al valor anterior
+              }
+            })
+            .catch(error => {
+              // Manejo de cualquier otro error
+              if (error) {
+                this.$swal({
+                  title: "Advertencia",
+                  text: error,
+                  icon: "warning"
+                });
+              }
             });
-        },
-        getVendedor() {
-            let usuario = sessionStorage.getItem('User')
-            this.axios.get(this.API + 'usuarios/' + usuario)
-                .then((response) => {
-                    this.setVendedor(response.data)
-                    this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                    this.$refs.inputVendedor.$refs.input.disabled = true
-                    this.loadAlmacen(response.data.IdAlmacen)
-                    this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-                    // bloquear ambos inputs
-                    this.$refs.inputAlmacen.$refs.input.disabled = true
-                    this.$refs.inputPuntoVenta.$refs.input.disabled = true
-                    //this.getNumeroVenta()
-                    this.getTipoDoc(response.data.IdTipoDoc)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-        },
-        setVendedor(obj) {
-            // console.log(obj)
-            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
-
-            this.venta.vendedor = obj
-        },
-        setComisionista(obj) {
-            if (typeof obj === 'object') {
-                this.$refs.inputComisionista.setValue(obj.Cliente)
-                this.venta.comisionista = obj
-            } else {
-                this.venta.comisionista = {}
-            }
-        },
-        setCliente(obj, dni = false) {
-            let params = {}
-            if (dni) {
-                params = {
-                    dni: dni
-                }
-            } else {
-                params = {
-                    idCliente: obj.IdCliente || obj
-                }
-            }
-
-            if (typeof obj === "object") {
-             if (obj.IdProforma > 0) {
-                this.venta.idProforma = obj.IdProforma;
-                //this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
-                this.venta.anioNumeroProforma ="Proforma Nro: "+obj.Numero;
-                //this.getVendedor(obj.UsuarioReg);
-                delete obj.productos;
-                
-                //console.log(response.data);
-                this.$refs.inputCliente.setValue(obj.Cliente);
-                this.venta.cliente = obj;
-                this.venta.CampoDireccion = this.venta.cliente.Direccion;
-                
-            } else {
-                this.$refs.inputCliente.setValue(obj.Cliente);
-                this.venta.cliente = obj;
-                this.venta.CampoDireccion = this.venta.cliente.Direccion;
-                if (this.venta.cliente.DniRuc == "00000000") {
-                    this.venta.EsOrganizacion = 0;
-                    this.venta.NombreOrganizacion = "";
-                }
-            }
         } else {
-                this.axios.get(this.API + 'cliente', {
-                    params: params
-                })
-                    .then((response) => {
-                        if (response.data) {
-                            this.$refs.inputCliente.setValue(response.data.Cliente)
-                            this.venta.cliente = response.data
-                            this.venta.CampoDireccion = this.venta.cliente.Direccion
-                            if (this.venta.cliente.DniRuc == '00000000') {
-                                this.venta.EsOrganizacion = 0
-                                this.venta.NombreOrganizacion = ''
-                            }
-                        } else {
-                            this.$toasted.show('No se encontro al cliente')
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    })
+          // Si selecciona 'Público', actualizar directamente sin pedir contraseña
+          this.tipoUtilidadAnterior = this.tipoUtilidad; // Actualizamos el valor anterior sin pedir contraseña
+        }
+      });
+    },
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          this.$refs.inputVendedor.$refs.input.disabled = true;
+          this.loadAlmacen(response.data.IdAlmacen);
+          this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
+          // bloquear ambos inputs
+          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          //this.getNumeroVenta()
+          this.getTipoDoc(response.data.IdTipoDoc);
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    setVendedor(obj) {
+      // console.log(obj)
+      if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+
+      this.venta.vendedor = obj;
+    },
+    setComisionista(obj) {
+      if (typeof obj === "object") {
+        this.$refs.inputComisionista.setValue(obj.Cliente);
+        this.venta.comisionista = obj;
+      } else {
+        this.venta.comisionista = {};
+      }
+    },
+    setCliente(obj, dni = false) {
+      let params = {};
+      if (dni) {
+        params = {
+          dni: dni
+        };
+      } else {
+        params = {
+          idCliente: obj.IdCliente || obj
+        };
+      }
+
+      if (typeof obj === "object") {
+        if (obj.IdProforma > 0) {
+          this.venta.idProforma = obj.IdProforma;
+          //this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
+          this.venta.anioNumeroProforma = "Proforma Nro: " + obj.Numero;
+          //this.getVendedor(obj.UsuarioReg);
+          delete obj.productos;
+
+          //console.log(response.data);
+          this.$refs.inputCliente.setValue(obj.Cliente);
+          this.venta.cliente = obj;
+          this.venta.CampoDireccion = this.venta.cliente.Direccion;
+        } else {
+          this.$refs.inputCliente.setValue(obj.Cliente);
+          this.venta.cliente = obj;
+          this.venta.CampoDireccion = this.venta.cliente.Direccion;
+          if (this.venta.cliente.DniRuc == "00000000") {
+            this.venta.EsOrganizacion = 0;
+            this.venta.NombreOrganizacion = "";
+          }
+        }
+      } else {
+        this.axios
+          .get(this.API + "cliente", {
+            params: params
+          })
+          .then(response => {
+            if (response.data) {
+              this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              if (this.venta.cliente.DniRuc == "00000000") {
+                this.venta.EsOrganizacion = 0;
+                this.venta.NombreOrganizacion = "";
+              }
+            } else {
+              this.$toasted.show("No se encontro al cliente");
             }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
 
-            //this.actualizarPrecioConvenio(obj)
-            // Actualizar DisabledTotal
-        },
-        limpiarProforma() {
-            this.venta.idProforma = 0;
-            this.venta.anioNumeroProforma = "";
-            //this.limpiarCart()
-            //this.loadClienteVarios()
-        },
-        onSetProducto(obj, cant, precio) {
-            if (cant) {
-                obj.cantidad = cant
-                let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find((e) => e.cantidad === cant)
-                obj.precio = preciosPorProducto.precio || 0
-                return obj
-            }
-            obj.cantidad = 1
-            obj.precio = precio || 0
-            return obj
-        },
-        onAddProducto(obj) {
-            this.venta.pago.visa.monto = 0
-            this.actualizarDescuento()
-            this.obtenerStok({
-                IdAlmacen: this.venta.almacen.IdAlmacen
-            })
-        },
-        actualizarDescuento() {
-            this.venta.pago.visa.monto = 0
-            if (this.puntosAplicados > 0) {
-                this.aplicarPuntos(this.puntosAplicados)
-            }
+      //this.actualizarPrecioConvenio(obj)
+      // Actualizar DisabledTotal
+    },
+    limpiarProforma() {
+      this.venta.idProforma = 0;
+      this.venta.anioNumeroProforma = "";
+      //this.limpiarCart()
+      //this.loadClienteVarios()
+    },
+    onSetProducto(obj, cant, precio) {
+      if (cant) {
+        obj.cantidad = cant;
+        let preciosPorProducto = JSON.parse(obj.PreciosPorProducto).find(
+          e => e.cantidad === cant
+        );
+        obj.precio = preciosPorProducto.precio || 0;
+        return obj;
+      }
+      obj.cantidad = 1;
+      obj.precio = precio || 0;
+      return obj;
+    },
+    onAddProducto(obj) {
+      this.venta.pago.visa.monto = 0;
+      this.actualizarDescuento();
+      this.obtenerStok({
+        IdAlmacen: this.venta.almacen.IdAlmacen
+      });
+    },
+    actualizarDescuento() {
+      this.venta.pago.visa.monto = 0;
+      if (this.puntosAplicados > 0) {
+        this.aplicarPuntos(this.puntosAplicados);
+      }
 
-            if (this.descuentoGeneral > 0) {
-                this.aplicarDescuentoGeneral(this.descuentoGeneral)
-            }
-        },
-        aplicarPuntos(val) {
-            if (parseFloat(val) > this.venta.cliente.Puntos) {
-                this.puntosAplicados = this.venta.cliente.Puntos
-            }
+      if (this.descuentoGeneral > 0) {
+        this.aplicarDescuentoGeneral(this.descuentoGeneral);
+      }
+    },
+    aplicarPuntos(val) {
+      if (parseFloat(val) > this.venta.cliente.Puntos) {
+        this.puntosAplicados = this.venta.cliente.Puntos;
+      }
 
-            this.axios.get(this.API + 'ventas/descuento/' + this.puntosAplicados)
-                .then((response) => {
-                    this.descuentoPuntos = response.data
-                    this.aplicarDescuento(response.data.descuento)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-        },
-        aplicarDescuentoGeneral(val) {
-            this.puntosAplicados = 0
-            this.aplicarDescuento(val)
-        },
-        getNumeroVenta() {
-            this.axios.get(this.API + 'ventas/numero', {
-                params: {
-                    idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-                    idTipoDoc: this.venta.tipoVenta.IdTipoDoc
-                }
-            })
-                .then((response) => {
-                    this.venta.Serie = response.data.serie
-                    this.venta.Numero = response.data.numero
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-        },
-        updateTime() {
-            this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
-        },
-        limpiarDespuesVenta() {
-            this.inProgress = false
-            this.tieneIgv = false
-            this.initForm()
-            this.limpiarCart()
-            this.getVendedor()
-            this.$refs.inputCliente.setValue('')
-            // this.getNumeroVenta()
-            // this.$refs.inputTipoVenta.setValue('TICKET')
-            // this.$refs.inputAlmacen.setValue('VENTA')
-            // this.$refs.inputPuntoVenta.setValue('CAJA1')
-            // this.$refs.inputVendedor.setValue('')
-        },
-        guardarProforma() {
-            this.inProgress = true
-            //console.log('prueba',this.productos)
+      this.axios
+        .get(this.API + "ventas/descuento/" + this.puntosAplicados)
+        .then(response => {
+          this.descuentoPuntos = response.data;
+          this.aplicarDescuento(response.data.descuento);
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    aplicarDescuentoGeneral(val) {
+      this.puntosAplicados = 0;
+      this.aplicarDescuento(val);
+    },
+    getNumeroVenta() {
+      this.axios
+        .get(this.API + "ventas/numero", {
+          params: {
+            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+          }
+        })
+        .then(response => {
+          this.venta.Serie = response.data.serie;
+          this.venta.Numero = response.data.numero;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    updateTime() {
+      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
+    },
+    limpiarDespuesVenta() {
+      this.inProgress = false;
+      this.tieneIgv = false;
+      this.initForm();
+      this.limpiarCart();
+      this.getVendedor();
+      this.$refs.inputCliente.setValue("");
+      // this.getNumeroVenta()
+      // this.$refs.inputTipoVenta.setValue('TICKET')
+      // this.$refs.inputAlmacen.setValue('VENTA')
+      // this.$refs.inputPuntoVenta.setValue('CAJA1')
+      // this.$refs.inputVendedor.setValue('')
+    },
+    guardarProforma() {
+      this.inProgress = true;
+      //console.log('prueba',this.productos)
 
-            for (let producto of this.productos) {
-                if (producto.PorcentajeDesc > producto.PorcentajeDescMax) {
-                    this.$toasted.show(`El descuento del producto no puede exceder ${producto.PorcentajeDescMax}%`);
-                    this.inProgress = false;
-                    return;
-                }
-            }
+      for (let producto of this.productos) {
+        if (producto.PorcentajeDesc > producto.PorcentajeDescMax) {
+          this.$toasted.show(
+            `El descuento del producto no puede exceder ${
+              producto.PorcentajeDescMax
+            }%`
+          );
+          this.inProgress = false;
+          return;
+        }
+      }
 
-            if (!this.productos.length) {
-                this.$toasted.show('No hay productos para crear la proforma')
-                this.inProgress = false
-                return
-            }
+      if (!this.productos.length) {
+        this.$toasted.show("No hay productos para crear la proforma");
+        this.inProgress = false;
+        return;
+      }
 
-            if (this.diasValidosProf == 0 || this.diasValidosProf == '') {
-                this.$toasted.show('Debe ingresar los días de validez de la proforma')
-                this.inProgress = false
-                return
-            }
+      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
+        this.$toasted.show("Debe ingresar los días de validez de la proforma");
+        this.inProgress = false;
+        return;
+      }
 
-            if (!this.venta.cliente.IdCliente) {
-                this.$toasted.show('Debe seleccionar un cliente')
-                this.inProgress = false
-                return
-            }
+      if (!this.venta.cliente.IdCliente) {
+        this.$toasted.show("Debe seleccionar un cliente");
+        this.inProgress = false;
+        return;
+      }
 
-            if (!this.venta.vendedor.Usuario) {
-                this.$toasted.show('Debe seleccionar un vendedor')
-                this.inProgress = false
-                return
-            }
+      if (!this.venta.vendedor.Usuario) {
+        this.$toasted.show("Debe seleccionar un vendedor");
+        this.inProgress = false;
+        return;
+      }
 
-            let productos = [];
-            this.productos.forEach(prod => {
-                let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
+      let productos = [];
+      this.productos.forEach(prod => {
+        let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
 
-                prod.descuento = parseFloat((cantidad * prod.precio * prod.PorcentajeDesc) / 100).toFixed(0);
-                productos.push(prod);
-            });
+        prod.descuento = parseFloat(
+          (cantidad * prod.precio * prod.PorcentajeDesc) / 100
+        ).toFixed(0);
+        productos.push(prod);
+      });
 
-            this.venta.productos = productos
-            this.venta.diasValidosProf = this.diasValidosProf
-            this.axios.post(this.API + 'proformas', this.venta)
-                .then((response) => {
-                    this.$toasted.info('Proforma Guardada con exito')
-                    this.limpiarDespuesVenta()
-                    this.loadClienteVarios()
-                    this.diasValidosProf = 1;
-                    this.getVendedor()
-                    window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId, '_blank');
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                    this.inProgress = false
-                })
-        },
-        guardarVenta(evt) {
-            evt.preventDefault();
+      this.venta.productos = productos;
+      this.venta.diasValidosProf = this.diasValidosProf;
+      this.axios
+        .post(this.API + "proformas", this.venta)
+        .then(response => {
+          this.$toasted.info("Proforma Guardada con exito");
+          this.limpiarDespuesVenta();
+          this.loadClienteVarios();
+          this.diasValidosProf = 1;
+          this.getVendedor();
+          window.open(
+            "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
+            "_blank"
+          );
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
+    },
+    guardarVenta(evt) {
+      evt.preventDefault();
 
-            this.inProgress = true
-            let totalPagos = 0
-            totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto)) ? 0 : parseFloat(this.venta.pago.efectivo.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto)) ? 0 : parseFloat(this.venta.pago.visa.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto)) ? 0 : parseFloat(this.venta.pago.mastercard.monto)
-            totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto)) ? 0 : parseFloat(this.venta.pago.transferencia.monto)
-            if ((isNaN(parseFloat(this.venta.pago.efectivo.monto)) ? 0 : parseFloat(this.venta.pago.efectivo.monto)).toFixed(2) < 0) {
-                this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
-                this.inProgress = false
-                return
-            }
-            if ((isNaN(parseFloat(this.venta.pago.visa.monto)) ? 0 : parseFloat(this.venta.pago.visa.monto)).toFixed(2) < 0) {
-                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
-                this.inProgress = false
-                return
-            }
-            if ((isNaN(parseFloat(this.venta.pago.mastercard.monto)) ? 0 : parseFloat(this.venta.pago.mastercard.monto)).toFixed(2) < 0) {
-                this.$toasted.show('El metodo de pago Yape o Plin no puede ser negativo')
-                this.inProgress = false
-                return
-            }
+      this.inProgress = true;
+      let totalPagos = 0;
+      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+        ? 0
+        : parseFloat(this.venta.pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+        ? 0
+        : parseFloat(this.venta.pago.visa.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        ? 0
+        : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
+        ? 0
+        : parseFloat(this.venta.pago.transferencia.monto);
+      if (
+        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+          ? 0
+          : parseFloat(this.venta.pago.efectivo.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.visa.monto))
+          ? 0
+          : parseFloat(this.venta.pago.visa.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+          ? 0
+          : parseFloat(this.venta.pago.mastercard.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            if ((isNaN(parseFloat(this.venta.pago.transferencia.monto)) ? 0 : parseFloat(this.venta.pago.transferencia.monto)).toFixed(2) < 0) {
-                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
-                this.inProgress = false
-                return
-            }
+      if (
+        (isNaN(parseFloat(this.venta.pago.transferencia.monto))
+          ? 0
+          : parseFloat(this.venta.pago.transferencia.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago Transferencia no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            if (!this.venta.EsCredito) {
-                if (parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
-                    this.$toasted.show('Los pagos no coinciden con la venta')
-                    this.inProgress = false
-                    return
-                }
-            }
+      if (!this.venta.EsCredito) {
+        if (
+          parseFloat(this.totalCart).toFixed(2) !=
+          parseFloat(totalPagos).toFixed(2)
+        ) {
+          this.$toasted.show("Los pagos no coinciden con la venta");
+          this.inProgress = false;
+          return;
+        }
+      }
 
-            if (!this.venta.cliente.DniRuc) {
-                this.$toasted.show('Debe seleccionar un cliente.')
-                this.inProgress = false
-                return
-            }
+      if (!this.venta.cliente.DniRuc) {
+        this.$toasted.show("Debe seleccionar un cliente.");
+        this.inProgress = false;
+        return;
+      }
 
-            var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
-            if (!esNumerico) {
-                this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-                this.inProgress = false
-                return
-            }
+      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
+      if (!esNumerico) {
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+        this.inProgress = false;
+        return;
+      }
 
-            var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false
-            if (!esEmpresa && this.venta.tipoVenta.CodSunat == '01') {
-                this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-                this.inProgress = false
-                return
-            }
+      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            //Nota de Creadito
-            if (this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
-                if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
-                    this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-                    this.$refs.inputDocRef.setValue('')
-                    this.inProgress = false
-                    return
-                }
-                if (!this.venta.NotaIdMotivo) {
-                    this.$toasted.show('Debe seleccionar un Motivo')
-                    this.inProgress = false
-                    return
-                }
-                if (this.venta.NroComprobanteModifica == '') {
-                    this.$toasted.show('Debe seleccionar un Documento de Referencia')
-                    this.$refs.inputDocRef.setValue('')
-                    this.inProgress = false
-                    return
-                }
-                if (this.venta.NotaIdMotivo == '03' && parseFloat(this.totalCart) != 0) {
-                    this.$toasted.show('En el motivo CORRECION POR ERROR EN LA DESCRIPCION, los montos deben ser 0')
-                    this.inProgress = false
-                    return
-                }
-                this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
-            }
+      //Nota de Creadito
+      if (
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
+      ) {
+        if (
+          !this.venta.CodSunatModifica ||
+          !this.venta.NroComprobanteModifica
+        ) {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+          this.$refs.inputDocRef.setValue("");
+          this.inProgress = false;
+          return;
+        }
+        if (!this.venta.NotaIdMotivo) {
+          this.$toasted.show("Debe seleccionar un Motivo");
+          this.inProgress = false;
+          return;
+        }
+        if (this.venta.NroComprobanteModifica == "") {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia");
+          this.$refs.inputDocRef.setValue("");
+          this.inProgress = false;
+          return;
+        }
+        if (
+          this.venta.NotaIdMotivo == "03" &&
+          parseFloat(this.totalCart) != 0
+        ) {
+          this.$toasted.show(
+            "En el motivo CORRECION POR ERROR EN LA DESCRIPCION, los montos deben ser 0"
+          );
+          this.inProgress = false;
+          return;
+        }
+        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.venta.NotaIdMotivo
+        )[0].text;
+      }
 
-            if (!this.productos.length) {
-                this.$toasted.show('No hay productos para vender')
-                this.inProgress = false
-                return
-            }
+      if (!this.productos.length) {
+        this.$toasted.show("No hay productos para vender");
+        this.inProgress = false;
+        return;
+      }
 
-            // NO PERMITE CANTIDAD Y PRECIOS 0
-            let sinStock = 0
-            let totalCero = 0
-            let menosUtilidad = 0
-            let proTieneVe = 0
-            this.productos.forEach(pro => {
-                if ((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock) || pro.stock == undefined)) {
-                    sinStock += 1
-                }
+      // NO PERMITE CANTIDAD Y PRECIOS 0
+      let sinStock = 0;
+      let totalCero = 0;
+      let menosUtilidad = 0;
+      let proTieneVe = 0;
+      this.productos.forEach(pro => {
+        if (
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA" &&
+          (pro.stock <= 0 ||
+            parseFloat(pro.cantidad) > pro.stock ||
+            pro.stock == undefined)
+        ) {
+          sinStock += 1;
+        }
 
-                if (parseFloat(pro.total) <= 0) {
-                    totalCero += 1
-                }
+        if (parseFloat(pro.total) <= 0) {
+          totalCero += 1;
+        }
 
-                if (pro.VentaEstrategica == 1 && this.venta.tipoVenta.CodSunat != '12' && this.venta.tipoVenta.CodSunat != '07') {
-                    this.$toasted.error('El producto ' + pro.Producto + ' tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta', { duration: 4000 });
-                    proTieneVe += 1
-                }
-                /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
+        if (
+          pro.VentaEstrategica == 1 &&
+          this.venta.tipoVenta.CodSunat != "12" &&
+          this.venta.tipoVenta.CodSunat != "07"
+        ) {
+          this.$toasted.error(
+            "El producto " +
+              pro.Producto +
+              " tiene venta estrategica, solo puede usar NOTA DE VENTA para su venta",
+            { duration: 4000 }
+          );
+          proTieneVe += 1;
+        }
+        /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
                    menosUtilidad += 1
                }*/
-                if ((parseFloat(pro.precio) - pro.PrecioCosto < 0) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
-                    menosUtilidad += 1
-                }
-            });
+        if (
+          parseFloat(pro.precio) - pro.PrecioCosto < 0 &&
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA"
+        ) {
+          menosUtilidad += 1;
+        }
+      });
 
-            if (proTieneVe >= 1) {
-                this.inProgress = false
-                return;
-            }
+      if (proTieneVe >= 1) {
+        this.inProgress = false;
+        return;
+      }
 
-            if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != '07') {
-                this.$toasted.error('No se puede vender un producto con ganancia negativa');
-                this.inProgress = false
-                return;
-            }
+      if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+        this.$toasted.error(
+          "No se puede vender un producto con ganancia negativa"
+        );
+        this.inProgress = false;
+        return;
+      }
 
-            if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07' && this.ventaSinStock != 1) {
-                this.$toasted.error('No se puede vender un producto sin stock');
-                this.inProgress = false
-                return;
-            }
+      if (
+        sinStock >= 1 &&
+        this.venta.tipoVenta.CodSunat != "07" &&
+        this.ventaSinStock != 1
+      ) {
+        this.$toasted.error("No se puede vender un producto sin stock");
+        this.inProgress = false;
+        return;
+      }
 
-            if (totalCero >= 1 && (this.venta.tipoVenta.CodSunat != '07' && this.venta.NotaIdMotivo != '03')) {
-                this.$toasted.error('No se puede enviar un producto en S/. 0.00');
-                this.inProgress = false
-                return;
-            }
+      if (
+        totalCero >= 1 &&
+        (this.venta.tipoVenta.CodSunat != "07" &&
+          this.venta.NotaIdMotivo != "03")
+      ) {
+        this.$toasted.error("No se puede enviar un producto en S/. 0.00");
+        this.inProgress = false;
+        return;
+      }
 
-            if (this.totalCart <= 0 && (this.venta.tipoVenta.CodSunat != '07' && this.venta.NotaIdMotivo != '03')) {
-                this.$toasted.show('La venta en S/. 0.00 no está permitido')
-                this.inProgress = false
-                return
-            }
+      if (
+        this.totalCart <= 0 &&
+        (this.venta.tipoVenta.CodSunat != "07" &&
+          this.venta.NotaIdMotivo != "03")
+      ) {
+        this.$toasted.show("La venta en S/. 0.00 no está permitido");
+        this.inProgress = false;
+        return;
+      }
 
-            let productos = [];
-            this.productos.forEach(prod => {
-                let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
+      let productos = [];
+      this.productos.forEach(prod => {
+        let cantidad = prod.EsPresentacion ? prod.cantxPrecio : prod.cantidad;
 
-                prod.descuento = parseFloat((cantidad * prod.precio * prod.PorcentajeDesc) / 100).toFixed(0);
-                productos.push(prod);
-            });
-            //console.log("prod", productos)
-            this.venta.productos = productos
-            this.venta.puntosAplicados = this.puntosAplicados || 0
-            this.venta.totalCart = this.totalCart || 0
-            this.venta.PagoCon = this.$refs.carrito.pagocon
-            this.venta.NombreOrganizacion = ('' + this.venta.NombreOrganizacion).trim().toUpperCase()
-            this.venta.Placa = ('' + this.venta.Placa).toUpperCase()
-            this.venta.adelantosPreOrden = this.adelantosPreOrden
-            this.venta.IdPedido = this.$route.query.idPedido || null
-            this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
-            this.venta.DireccionEntrega = this.venta.EsDelivery ? (this.infoDelivery.Direccion || '') : '';
-            this.axios.post(this.API + 'ventas', this.venta)
-                .then((response) => {
-
-                    // limpiar preorden seleccionado
-                    // this.$router.replace('/ventas')
-                    // window.location.reload()
-                    this.$toasted.success('Venta realizada con exito')
-                    this.inProgress = false
-                    this.tieneIgv = false
-                    this.ultimaVenta = response.data.insertId
-                    this.initForm()
-                    this.limpiarCart()
-                    this.getVendedor()
-                    this.getNumeroVenta()
-                    this.loadClienteVarios()
-                    this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
-                    this.$refs.inputAlmacen.setValue('VENTA')
-                    this.$refs.inputPuntoVenta.setValue('CAJA1')
-                    this.$refs.inputCliente.setValue('')
-                    this.$refs.inputVendedor.setValue('')
-                    //this.$refs.inputComisionista.setValue('')
-                    this.$refs.carrito.pagocon = 0
-                    window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId, '_blank', 'noopener');
-                    this.emitirauto(response.data.insertId)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                    this.inProgress = false
-                })
-        },
-        emitirauto(idDocVenta) {
-            this.axios.post(this.API + 'emitirauto', { IdDocVenta: idDocVenta })
-                .then((response) => {
-                    if (response.data.success) {
-                        if (response.data.Estado == 1) {
-                            this.$toasted.error("SUNAT: " + response.data.msj_sunat)
-                        } else {
-                            this.$toasted.info("SUNAT: " + response.data.msj_sunat)
-                        }
-                    }
-                })
-                .catch((error) => {
-                    this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
-                })
-        },
-        eliminarCliente() {
-            this.$refs.inputCliente.setValue('')
-            this.venta.cliente = {}
-        },
-        eliminarComisionista() {
-            this.$refs.inputComisionista.setValue('')
-            this.venta.comisionista = {}
-        },
-        onPagarDelivery(obj) {
-            this.$route.query.idPedido = obj.IdPedido
-            if (this.$route.query.idPedido) {
-                console.log(obj);
-                this.infoDelivery = obj
-                this.venta.EsDelivery = true
-                this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
-                //cargar costo de delivery
-                let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2)
-                if (costoDelivery > 0) {
-                    this.axios.get(this.API + 'costo/delivery')
-                        .then((response) => {
-                            if (response.data) {
-                                let costoDeliverObj = response.data
-                                costoDeliverObj.precio = costoDelivery
-                                costoDeliverObj.cantidad = 1
-                                costoDeliverObj.EsCostoDelivery = 1
-                                costoDeliverObj.IdImpresora = 0
-                                costoDeliverObj.descuento = 0
-                                costoDeliverObj.indicacion = ''
-                                this.add([response.data, () => {
-                                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
-                                }, { setPrecioCosto: false }, false, false])
-                                //Cargar Productos Delivery
-                                let productos = JSON.parse(obj.Productos)
-                                console.log(productos);
-                                productos.map((item) => {
-                                    this.add([item.IdProducto, () => {
-                                        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                                    }, { cantidad: item.Cantidad, precio: item.Precio, indicacion: item.Indicacion }, false])
-                                })
-                                this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
-                                this.venta.DireccionEntrega = obj.Direccion
-                                this.$toasted.success('PRODUCTOS DEL DELIVERY AGREGADOS')
-                            } else {
-                                this.$toasted.show("PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'")
-                                this.anularPagoDelivery()
-                            }
-                        }).catch(error => {
-                            this.$toasted.show('HUBO UN ERROR')
-                        })
-                } else {
-                    //Cargar Productos Delivery
-                    let productos = JSON.parse(obj.Productos)
-                    productos.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                        }, { cantidad: item.Cantidad, precio: item.Precio, indicacion: item.Indicacion, isDelivery: true }, false])
-                    })
-                    this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
-                    this.venta.DireccionEntrega = obj.Direccion
-                }
-
-            }
-        },
-        anularPagoDelivery() {
-            this.limpiarCart()
-            this.venta.EsDelivery = false
-            this.infoDelivery = {}
-            this.$refs.carrito.pagocon = ''
-            this.loadClienteVarios()
-            this.venta.nombreLlevar = ''
-            this.venta.selectOpcionVenta = 0
-            this.venta.nombreLlevar = ''
-            this.venta.DireccionEntrega = ''
-            this.$router.replace('/ventas')
-        },
-        //Sockets
-        escucharPedidos() {
-            this.sockets.subscribe('nuevo-pedido', (data) => {
-                if (this.$refs.deliveryModal.show) {
-                    this.$toasted.success('Nuevo Pedido de' + "<strong>" + data.nombre + "</strong>");
-                    this.$refs.deliveryModal.getPedidos();
-                } else {
-                    this.$refs.deliveryModal.getPedidos();
-                    this.$swal({
-                        position: 'top-end',
-                        icon: 'info',
-                        target: document.getElementById('conten'),
-                        title: 'Pedido de Delivery de: <br> ' + "<strong>" + data.nombre + "</strong>",
-                        showConfirmButton: true,
-                        confirmButtonText: 'Mostrar Pedidos',
-                        confirmButtonColor: '#3880ff'
-                    }).then((result) => {
-                        /* Read more about isConfirmed, isDenied below */
-                        if (result.isConfirmed) {
-                            this.$refs.deliveryModal.show = true;
-                        } else if (result.isDenied) {
-                            console.log("Denegado");
-                        }
-                    })
-                }
-            });
-        },
-        //Fin Sockets
+        prod.descuento = parseFloat(
+          (cantidad * prod.precio * prod.PorcentajeDesc) / 100
+        ).toFixed(0);
+        productos.push(prod);
+      });
+      //console.log("prod", productos)
+      this.venta.productos = productos;
+      this.venta.puntosAplicados = this.puntosAplicados || 0;
+      this.venta.totalCart = this.totalCart || 0;
+      this.venta.PagoCon = this.$refs.carrito.pagocon;
+      this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
+        .trim()
+        .toUpperCase();
+      this.venta.Placa = ("" + this.venta.Placa).toUpperCase();
+      this.venta.adelantosPreOrden = this.adelantosPreOrden;
+      this.venta.IdPedido = this.$route.query.idPedido || null;
+      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
+      this.venta.DireccionEntrega = this.venta.EsDelivery
+        ? this.infoDelivery.Direccion || ""
+        : "";
+      this.axios
+        .post(this.API + "ventas", this.venta)
+        .then(response => {
+          // limpiar preorden seleccionado
+          // this.$router.replace('/ventas')
+          // window.location.reload()
+          this.$toasted.success("Venta realizada con exito");
+          this.inProgress = false;
+          this.tieneIgv = false;
+          this.ultimaVenta = response.data.insertId;
+          this.initForm();
+          this.limpiarCart();
+          this.getVendedor();
+          this.getNumeroVenta();
+          this.loadClienteVarios();
+          this.$refs.inputTipoVenta.setValue("NOTA DE VENTA");
+          this.$refs.inputAlmacen.setValue("VENTA");
+          this.$refs.inputPuntoVenta.setValue("CAJA1");
+          this.$refs.inputCliente.setValue("");
+          this.$refs.inputVendedor.setValue("");
+          //this.$refs.inputComisionista.setValue('')
+          this.$refs.carrito.pagocon = 0;
+          window.open(
+            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+            "_blank",
+            "noopener"
+          );
+          this.emitirauto(response.data.insertId);
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    components: {
-        ProductosCarrito,
-        ClientesForm,
-        ConfigVenta,
-        PagoDeuda,
-        PreOrdenLista,
-        Proformas,
-        DeliveryModal,
+    emitirauto(idDocVenta) {
+      this.axios
+        .post(this.API + "emitirauto", { IdDocVenta: idDocVenta })
+        .then(response => {
+          if (response.data.success) {
+            if (response.data.Estado == 1) {
+              this.$toasted.error("SUNAT: " + response.data.msj_sunat);
+            } else {
+              this.$toasted.info("SUNAT: " + response.data.msj_sunat);
+            }
+          }
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, en la emision a sunat");
+        });
+    },
+    eliminarCliente() {
+      this.$refs.inputCliente.setValue("");
+      this.venta.cliente = {};
+    },
+    eliminarComisionista() {
+      this.$refs.inputComisionista.setValue("");
+      this.venta.comisionista = {};
+    },
+    onPagarDelivery(obj) {
+      this.$route.query.idPedido = obj.IdPedido;
+      if (this.$route.query.idPedido) {
+        console.log(obj);
+        this.infoDelivery = obj;
+        this.venta.EsDelivery = true;
+        this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
+        //cargar costo de delivery
+        let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
+        if (costoDelivery > 0) {
+          this.axios
+            .get(this.API + "costo/delivery")
+            .then(response => {
+              if (response.data) {
+                let costoDeliverObj = response.data;
+                costoDeliverObj.precio = costoDelivery;
+                costoDeliverObj.cantidad = 1;
+                costoDeliverObj.EsCostoDelivery = 1;
+                costoDeliverObj.IdImpresora = 0;
+                costoDeliverObj.descuento = 0;
+                costoDeliverObj.indicacion = "";
+                this.add([
+                  response.data,
+                  () => {
+                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+                  },
+                  { setPrecioCosto: false },
+                  false,
+                  false
+                ]);
+                //Cargar Productos Delivery
+                let productos = JSON.parse(obj.Productos);
+                console.log(productos);
+                productos.map(item => {
+                  this.add([
+                    item.IdProducto,
+                    () => {
+                      this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+                    },
+                    {
+                      cantidad: item.Cantidad,
+                      precio: item.Precio,
+                      indicacion: item.Indicacion
+                    },
+                    false
+                  ]);
+                });
+                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                this.venta.DireccionEntrega = obj.Direccion;
+                this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
+              } else {
+                this.$toasted.show(
+                  "PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'"
+                );
+                this.anularPagoDelivery();
+              }
+            })
+            .catch(error => {
+              this.$toasted.show("HUBO UN ERROR");
+            });
+        } else {
+          //Cargar Productos Delivery
+          let productos = JSON.parse(obj.Productos);
+          productos.map(item => {
+            this.add([
+              item.IdProducto,
+              () => {
+                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+              },
+              {
+                cantidad: item.Cantidad,
+                precio: item.Precio,
+                indicacion: item.Indicacion,
+                isDelivery: true
+              },
+              false
+            ]);
+          });
+          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.venta.DireccionEntrega = obj.Direccion;
+        }
+      }
+    },
+    anularPagoDelivery() {
+      this.limpiarCart();
+      this.venta.EsDelivery = false;
+      this.infoDelivery = {};
+      this.$refs.carrito.pagocon = "";
+      this.loadClienteVarios();
+      this.venta.nombreLlevar = "";
+      this.venta.selectOpcionVenta = 0;
+      this.venta.nombreLlevar = "";
+      this.venta.DireccionEntrega = "";
+      this.$router.replace("/ventas");
+    },
+    //Sockets
+    escucharPedidos() {
+      this.sockets.subscribe("nuevo-pedido", data => {
+        if (this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          this.$refs.deliveryModal.getPedidos();
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              this.$refs.deliveryModal.show = true;
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      });
     }
-}
+    //Fin Sockets
+  },
+  components: {
+    ProductosCarrito,
+    ClientesForm,
+    ConfigVenta,
+    PagoDeuda,
+    PreOrdenLista,
+    Proformas,
+    DeliveryModal
+  }
+};
 </script>
 <style scoped>
 .alert {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .puntos {
-    font-size: 52px;
+  font-size: 52px;
 }
 
 .big-text {
-    font-size: 30px;
+  font-size: 30px;
 }
 
 .tablaMetodo {
-    display: none !important;
+  display: none !important;
 }
 
 @media only screen and (max-width: 700px) {
-
-    /* For desktop: */
-    .ocularMovil {
-        display: none;
-    }
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
+  }
 }
 
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
-
-    /* For desktop: */
-    .ancho {
-        width: calc(100% - 350px)
-    }
+  /* For desktop: */
+  .ancho {
+    width: calc(100% - 350px);
+  }
 }
 
 @media only screen and (max-width: 750px) {
+  /* For desktop: */
+  .ocularMovil2 {
+    display: none;
+  }
 
-    /* For desktop: */
-    .ocularMovil2 {
-        display: none;
-    }
-
-    .mostrarSerie {
-        display: inline !important;
-    }
+  .mostrarSerie {
+    display: inline !important;
+  }
 }
 
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
-
-    /* For desktop: */
-    .ancho {
-        width: calc(100% - 250px)
-    }
+  /* For desktop: */
+  .ancho {
+    width: calc(100% - 250px);
+  }
 }
 </style>
