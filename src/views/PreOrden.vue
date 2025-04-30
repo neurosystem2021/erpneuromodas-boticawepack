@@ -1,7 +1,7 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
-        <b-col cols="4"> 
+      <b-col cols="12" lg="4" xl="4"> 
             Almacén
             <b-form-select v-model="idAlmacen" 
                  value-field="IdAlmacen"
@@ -9,12 +9,12 @@
                  disabled
                 :options="lstAlmances"></b-form-select>
         </b-col>
-        <b-col cols="4"> 
+        <b-col cols="12" lg="4" xl="4"> 
             Fecha:
             <input type="date" v-model="fecha" class="form-control" disabled>
         </b-col>
         <b-col>
-            <b-button @click="guardar()" variant="success" :disabled="distabledBtnGuardar" class="mt-4">Guardar</b-button>
+            <b-button @click="guardar()"  variant="success" :disabled="distabledBtnGuardar" class="mt-4 btnGuardar">Guardar</b-button>
         </b-col>
         <b-col cols="12" class="mt-2"> 
             <autocomplete
@@ -31,7 +31,8 @@
                 :classes="{input: 'form-control'}">
             </autocomplete>
         </b-col>
-        <b-col cols="7" v-if="idAlmacen" class="mt-2"> 
+        <b-col cols="12" lg="7" xl="7" v-if="idAlmacen" class="mt-2 mx-0"> 
+          <b-input-group class="mt-2 mb-2">
             <autocomplete
                 ref="autocompleteProducto"
                 :url="APIProductos"
@@ -44,21 +45,36 @@
                 :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
                 :classes="{input: 'form-control'}">
             </autocomplete>
+            <b-input-group-append>
+                <b-button variant="info" @click="startRecognition">
+                  <i class="fas fa-microphone"></i>
+                </b-button
+                >
+            </b-input-group-append>
+          </b-input-group>
         </b-col>
-        <b-col cols="5" v-if="idAlmacen" class="mt-2">
+        <b-col cols="12" lg="5" xl="5" v-if="idAlmacen" class="mt-2 mx-0">
+          <b-input-group class="mt-2 mb-2">
+
             <input v-model="loadCode"
-                  @keydown.enter.prevent="loadBarcode"
-                   ref="barcodeInput"
-                  type="text"
-                  class="form-control"
-                  placeholder="Codigo de Barra" />
+            @keydown.enter.prevent="loadBarcode"
+            ref="barcodeInput"
+            type="text"
+            class="form-control"
+            placeholder="Codigo de Barra" />
+            <b-input-group-append>
+                <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+              </b-input-group-append>
+          </b-input-group>
         </b-col>
         <b-col cols="12">
-          <b-table striped hover :fields="headerTable"  :items="productos" width="100%"> 
+          <div class="clsTblProductos mt-3">
+
+          
+          <b-table striped hover responsive="false" :fields="headerTable" class="tblPRoductos" :items="productos"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
                       {{ data.item.stock }}
-
                     </span>
                   </template>
                   <template slot="Producto" slot-scope="data">
@@ -162,7 +178,7 @@
                      <i class="fas fa-times fa-lg"></i>
                     </b-button>
 
-                    <!-- @click="quitarProducto(data.index)"> -->
+                  
                     <b-button 
                     class="mx-auto mt-1"
                       variant="info"
@@ -176,10 +192,10 @@
                      
                   </template>
 
-                </b-table>
-  
+          </b-table>
+        </div>
         </b-col>
-        <b-col cols="4" class="mt-5">
+        <b-col cols="12" lg="4" xl="4" class="mt-5">
             <table class="table">
                 <tr>
                     <td style="background: #1A237E; color: white; font-weight: bold;">Total</td>
@@ -249,23 +265,6 @@
                 </b-row>
                 </b-card>
             </b-col>
-
-            <!-- <b-col md="6" v-for="(pres,index) in producto.PreciosPorProducto" :key="index" class="nomCart">
-              
-              <div>
-                <b-row class="nomCart2">
-                  <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
-                </b-row>
-                  Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ 
-                  parseFloat(producto.stock/pres.cantidad).toFixed(2)
-                  }} </span>
-              </div>
-            </b-col>
-            <b-col md="6" class="text-left">
-            <h5>x1</h5>
-            <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
-            <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
-        </b-col> -->
       </b-row>
     </b-modal>
   </b-container>
@@ -328,6 +327,59 @@ export default {
     this.obtenerAlmance();
   },
   methods: {
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        console.log("Speech recognition service disconnected");
+        console.log("query", this.query);
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+        "input"
+      );
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        const event = new Event("input", { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }, 100);
+    },
     async obtenerAlmance() {
       await this.axios(`${this.API}almacenes`).then(res => {
         if (res.data) {
@@ -539,5 +591,28 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.clsTblProductos {
+  /* border: 1px solid red; */
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.tblPRoductos {
+  width: 100%;
+  display: block;
+  /* border: 1px solid blue; */
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+@media (max-width: 918px) {
+  .btnGuardar {
+    display: block;
+    width: 100%;
+  }
+}
 </style>
