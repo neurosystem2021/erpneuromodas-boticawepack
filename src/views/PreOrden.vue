@@ -6,6 +6,7 @@
             <b-form-select v-model="idAlmacen" 
                  value-field="IdAlmacen"
                  text-field="Almacen"
+                 disabled
                 :options="lstAlmances"></b-form-select>
         </b-col>
         <b-col cols="4"> 
@@ -53,45 +54,130 @@
                   placeholder="Codigo de Barra" />
         </b-col>
         <b-col cols="12">
-            <table class="table mt-2" width="100%">
-                <thead>
-                    <tr>
-                        <th>Producto </th>
-                        <th>Cantidad </th>
-                        <th>Precio </th>
-                        <th>Tot. </th>
-                        <th>Lote. </th>
-                        <th>FechaVencimiento. </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(producto,index) in productos" :key="index">
-                        <td> {{ producto.Producto }}</td>
-                        <td> 
-                            <input
-                                :id="`Cantidad${index}`"
-                                type="number"
-                                style="width: 90px"
-                                min="0"
-                                v-model="producto.Cantidad"
-                                placeholder="Cantidad"
-                                class="form-control"
-                            >
-                        </td>
-                        <td> {{ producto.PrecioContado }}  </td>
-                        <td>
-                            {{ parseFloat(producto.Cantidad*producto.PrecioContado).toFixed(2) }}
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <b-button variant="danger" @click="eliminarProducto(index)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                        </td>
+          <b-table striped hover :fields="headerTable"  :items="productos" width="100%"> 
+                  <template slot="stock" slot-scope="data">
+                    <span style="font-weight: bold; font-size: 0.75rem">
+                      {{ data.item.stock }}
 
-                    </tr>
-                </tbody>
-            </table>
+                    </span>
+                  </template>
+                  <template slot="Producto" slot-scope="data">
+                    <span style="font-weight: bold; font-size: 0.75rem">
+                      {{ data.item.Producto }}
+                    </span>
+                  </template>
+                  <template slot="pres" slot-scope="data">
+                    <b-button   
+                      v-if="data.item.tienePresentacion"
+                      size="sm"
+                      variant="info"
+                      @click="showPresentacion(data.item,data.index)" 
+                      style="margin-top:2px;font-size: 0.75rem"
+                      >
+                      <i class="fas fa-list"></i>
+                    </b-button>
+      
+                     
+                     
+                  </template>
+                  <template slot="img" slot-scope="data">
+                    <b-img
+                  style="border-radius: 10px"
+                  fluid
+                  :src="'/resources/images/productos/' + data.item.Imagen"
+                  @error="setAltImg"
+                  alt=""
+                ></b-img>
+                </template>
+                  <template slot="presentacion" slot-scope="data">
+                    <b-form-input
+                      v-model="data.item.Descripcion"
+                      type="text"
+                      style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
+                      autocomplete="false"
+                      disabled
+                      ></b-form-input>
+                     
+                     
+                  </template>
+                  <template slot="cantidad" slot-scope="data">
+                    <input
+                      v-model="data.item.Cantidad"
+                      type="number"
+                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
+                      autocomplete="false"
+                      :id="`Cantidad${data.index}`"
+                      class="form-control"
+                      />
+                      <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
+                      v-if="data.item.CantidadPresentacion">
+                        {{ data.item.CantidadPresentacion }} unid.
+                      </p>
+                  </template>
+                  <template slot="precio" slot-scope="data">
+                    <input
+                      :disabled="data.item.bloquearInputPrecio"
+                      v-model="data.item.precio"
+                      min="0"
+                      step="0.00001"
+                      type="number"
+                      @focus="abrirModalTouch(data.index,2)"
+                      style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
+                      autocomplete="false"  @input="metodoPagoCambio(1)"
+                      class="form-control"
+                      />
+                     
+                  </template>
+                  <template slot="descuento" slot-scope="data">
+                    <input
+                      v-model="data.item.descuento"
+                      type="number"
+                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
+                      autocomplete="false"
+                      @focus="abrirModalTouch(data.index,3)"
+                      class="form-control"
+                      />
+                     
+                  </template>
+                  <template slot="subtotal" slot-scope="data">
+                    <span style="font-size: 0.8rem">
+                      {{ parseFloat(getSubTotalDetalle(data.item)).toFixed(2) }}
+
+                    </span>
+                     
+                  </template>
+                  <template slot="total" slot-scope="data">
+                 <span style="font-size: 0.8rem">
+                   {{ parseFloat( getTotalDetalle(data.item)).toFixed(2) }}
+
+                 </span>
+                     
+                  </template>
+                  <template slot="acciones" slot-scope="data">
+                    <b-button 
+                      class="mx-auto mt-1"
+                      variant="danger"
+                      size="sm" 
+                      @click="quitarProducto(data.index)">
+                     <i class="fas fa-times fa-lg"></i>
+                    </b-button>
+
+                    <!-- @click="quitarProducto(data.index)"> -->
+                    <b-button 
+                    class="mx-auto mt-1"
+                      variant="info"
+                      size="sm"
+                      v-if="mostrarEditarProducto()"
+                      @click="editarProducto(data.item,data.index)"
+                      >
+                     <i class="fas fa-pencil-alt fa-sm"></i>
+                    </b-button>
+          
+                     
+                  </template>
+
+                </b-table>
+  
         </b-col>
         <b-col cols="4" class="mt-5">
             <table class="table">
@@ -102,6 +188,86 @@
             </table>
         </b-col>
     </b-row>
+    <b-modal v-model="modalPresentacion" size="lg" hide-footer no-close-on-esc>
+      <center>
+        <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
+      </center>
+      <b-row>
+          <b-col cols="6">
+                <b-card
+                align="center"
+                class="mb-3 contentCard"
+                @click="cambiarPresentacion(
+                  producto,
+                  false
+                )"
+                >
+                <b-row>
+                    <b-col md="6" class="nomCart">
+                      <div>
+                          <b-row class="nomCart2">
+                            <center> <h6 class="text-uppercase"> {{producto.ProductoPresentacion}} </h6> </center>
+                            </b-row>
+                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ producto.stock }} </span>
+                      </div>
+                      </b-col>
+                      <b-col md="6" class="text-left">
+                      <h5>x1</h5>
+                      <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                      <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
+                    </b-col>
+                </b-row>
+                </b-card>
+            </b-col>
+
+            
+          <b-col cols="6"  v-for="(pres,index) in producto.PreciosPorProducto" :key="index">
+                <b-card
+                align="center"
+                class="mb-3 contentCard"
+                @click="cambiarPresentacion(
+                  pres,
+                  true
+                )"
+                >
+                <b-row>
+                    <b-col md="6" class="nomCart">
+                      <div>
+                          <b-row class="nomCart2">
+                            <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
+                            </b-row>
+                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff">
+                            {{  parseFloat(producto.stock/pres.cantidad).toFixed(2) }}
+                            </span>
+                      </div>
+                      </b-col>
+                      <b-col md="6" class="text-left">
+                      <h5>x{{ pres.Cantidad }}</h5>
+                      <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                      <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
+                    </b-col>
+                </b-row>
+                </b-card>
+            </b-col>
+
+            <!-- <b-col md="6" v-for="(pres,index) in producto.PreciosPorProducto" :key="index" class="nomCart">
+              
+              <div>
+                <b-row class="nomCart2">
+                  <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
+                </b-row>
+                  Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ 
+                  parseFloat(producto.stock/pres.cantidad).toFixed(2)
+                  }} </span>
+              </div>
+            </b-col>
+            <b-col md="6" class="text-left">
+            <h5>x1</h5>
+            <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+            <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
+        </b-col> -->
+      </b-row>
+    </b-modal>
   </b-container>
 </template>
 
@@ -112,11 +278,49 @@ export default {
     return {
       API: config.API,
       idAlmacen: "",
+      modalPresentacion: false,
       lstAlmances: [],
+      producto: {},
       fecha: "",
       cliente: {},
       productos: [],
-      loadCode: ""
+      loadCode: "",
+      index: 0,
+      headerTable: [
+        {
+          key: "stock",
+          label: "Stock",
+          variant: "info",
+          class: "text-center",
+          thStyle: { width: "5%" }
+        },
+        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "img", label: "Imagen" },
+        { key: "pres", label: "", thStyle: { width: "5%" } },
+        {
+          key: "presentacion",
+          label: "Pres.",
+          thStyle: { width: "5%" }
+        },
+        { key: "cantidad", label: "Cant.", thStyle: { width: "7%" } },
+        { key: "precio", label: "Precio", thStyle: { width: "5%" } },
+        {
+          key: "subtotal",
+          label: "Sub Total",
+          variant: "success",
+          class: "text-center",
+          thStyle: { width: "5%" }
+        },
+        { key: "descuento", label: "Desc.", thStyle: { width: "5%" } },
+        {
+          key: "total",
+          label: "Total",
+          variant: "danger",
+          class: "text-center",
+          thStyle: { width: "5%" }
+        },
+        { key: "acciones", label: "", thStyle: { width: "5%" } }
+      ]
     };
   },
   mounted() {
@@ -130,6 +334,7 @@ export default {
           this.lstAlmances = res.data;
         }
       });
+      this.idAlmacen = sessionStorage.getItem("IdAlmacen");
     },
     focusAutocomplete(ref) {
       this.$refs[ref].type = "";
@@ -139,12 +344,30 @@ export default {
       console.log(obj);
       this.cliente = obj;
     },
-    setProducto(obj) {
+    async setProducto(obj) {
       if (this.productos.some(v => v.IdProducto == obj.IdProducto)) {
         this.$toasted.error("El producto ya se encuentra en la lista");
         return false;
       }
+
+      let prod = await this.obtenerStockBuscador(obj.IdProducto);
+      let pres = [];
+
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+      obj.PreciosPorProducto = pres;
       obj.Cantidad = 1;
+      obj.descuento = 0;
+      obj.precio = obj.PrecioContado;
+      obj.Descripcion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
+      obj.ProductoPresentacion = prod.ProductoPresentacion
+        ? prod.ProductoPresentacion
+        : "UNIDAD";
+      obj.tienePresentacion = pres.some(v => v.cantidad > 0);
       this.productos.unshift(obj);
       this.$nextTick(() => {
         let element = document.getElementById("Cantidad0");
@@ -219,6 +442,68 @@ export default {
           }, 100);
         }
       });
+    },
+    getSubTotalDetalle(prod) {
+      let subtotal = prod.Cantidad * prod.precio;
+      return subtotal;
+    },
+    getTotalDetalle(prod) {
+      let total =
+        prod.Cantidad * prod.precio - (prod.descuento ? prod.descuento : 0);
+      return total;
+    },
+    mostrarEditarProducto() {
+      if (this.idPerfil != 1) {
+        return false;
+      }
+      if (this.ventas.length > 1) {
+        return false;
+      }
+      return true;
+    },
+    async obtenerStockBuscador(IdProducto) {
+      let res = {};
+      await this.axios(this.API + "productos/puntoventa/stock", {
+        params: {
+          idProductos: [IdProducto],
+          idAlmacen: this.idAlmacen
+        }
+      }).then(response => {
+        res = response.data[0];
+        // return response.data;
+      });
+      return res;
+    },
+    showPresentacion(prod, index) {
+      this.producto = { ...prod };
+      this.index = index;
+      this.modalPresentacion = true;
+    },
+    cambiarPresentacion(obj, esPresentacion) {
+      let producto = { ...this.producto };
+      if (esPresentacion) {
+        producto.Descripcion = obj.nombre;
+        producto.CantidadPresentacion = obj.cantidad;
+        producto.Cantidad = 1;
+        producto.descuento = 0;
+        producto.bloquearInputPrecio = true;
+        producto.precio = obj.precio;
+        producto.presentacion = JSON.stringify(obj);
+      } else {
+        producto.Descripcion = obj.ProductoPresentacion;
+        producto.CantidadPresentacion = null;
+        producto.Cantidad = 1;
+        producto.descuento = 0;
+        producto.bloquearInputPrecio = false;
+        producto.precio = producto.PrecioContado;
+        producto.presentacion = null;
+      }
+
+      Vue.set(this.productos, this.index, producto);
+      this.modalPresentacion = false;
+    },
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     }
   },
   computed: {
@@ -233,7 +518,7 @@ export default {
       let monto = 0;
       if (this.productos.length > 0) {
         monto = this.productos.reduce((sum, producto) => {
-          return sum + parseFloat(producto.Cantidad * producto.PrecioContado);
+          return sum + parseFloat(producto.Cantidad * producto.precio);
         }, 0);
       }
       return parseFloat(monto).toFixed(2);

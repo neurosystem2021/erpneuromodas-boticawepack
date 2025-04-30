@@ -290,6 +290,7 @@
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <b-button class="mx-1 btnAction" block style="background: #BF360C; color:#ffffff"  @click="modalPreOrden= true"> Pre Orden </b-button>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
                     </b-col>
@@ -824,7 +825,7 @@
         </b-col> -->
       </b-row>
     </b-modal>
-    <!-- MODAL TOUCH -->
+   
      <!-- MODALS TOUCH -->
 
      <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
@@ -930,6 +931,17 @@
         </b-modal>
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
+
+        <b-modal v-model="modalPreOrden" size="lg">
+          <b-table :items="lstPreOrden" :fields="headerPreOrden">
+            <template slot="action" slot-scope="data">
+              <b-button @click="anadirPreOrden(data.item)" variant="danger"> 
+                <i class="fas fa-shopping-cart"></i>
+              </b-button>
+            </template>
+          </b-table>
+        
+        </b-modal>
   </b-container>
 </template>
 <script>
@@ -960,6 +972,7 @@ export default {
   },
   data() {
     return {
+      modalPreOrden: false,
       productoSelect: {},
       indexPos: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -972,6 +985,14 @@ export default {
       API: config.API,
       categorias: [],
       productosCategoria: [],
+      lstPreOrden: [],
+      headerPreOrden: [
+        { key: "Correlativo", label: "Correlativo" },
+        { key: "DniRuc", label: "Documento" },
+        { key: "Cliente", label: "Cliente" },
+        { key: "FechaReg", label: "F. Registro" },
+        { key: "action", label: "" }
+      ],
       isNota: [],
       tieneIgv: [],
       itemsMotivoNota: [
@@ -1152,6 +1173,7 @@ export default {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
+    this.getPreOrdenes();
     this.$root.$on("bv::hide::popover", id => {
       const metodoPagoIndex = id.replace("popover-metodopago", "");
       const opcionesIndex = id.replace("popover-opciones", "");
@@ -1170,6 +1192,63 @@ export default {
     });
   },
   methods: {
+    async anadirPreOrden(item) {
+      let venta = { ...this.venta };
+      venta.cliente = item;
+      let productos = [];
+      let productosPreOrden = await this.axios(`${this.API}preorden/detalles`, {
+        params: item
+      }).then(res => {
+        if (res.data) {
+          return res.data;
+        }
+        return [];
+      });
+      productosPreOrden.forEach(async producto => {
+        let prod = await this.obtenerStockBuscador(producto.IdProducto);
+        let pres = [];
+        if (prod.PreciosPorProducto) {
+          let newPres = JSON.parse(prod.PreciosPorProducto);
+          pres = newPres.filter(v => v.cantidad > 0);
+        }
+        prod.PreciosPorProducto = pres;
+        prod.Descripcion = producto.Descripcion ? prod.Descripcion : "UNIDAD";
+        prod.ProductoPresentacion = producto.Descripcion
+          ? prod.Descripcion
+          : "UNIDAD";
+        prod.cantidad = 1;
+        prod.precio = producto.PrecioContado;
+        prod.descuento = 0;
+        prod.tienePresentacion = prod.PreciosPorProducto.some(
+          v => v.cantidad > 0
+        );
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = null;
+        prod.ProductoPresentacion = producto.Descripcion;
+        prod.Descripcion = producto.Descripcion;
+        prod.cantidad = producto.Cantidad;
+        prod.precio = producto.Precio;
+        prod.descuento = producto.Descuento ? producto.Descuento : 0;
+        prod.stock = prod.stock;
+        productos.push(prod);
+      });
+      venta.productos = productos;
+      this.ventas.push(venta);
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventas.length - 1;
+        this.getNumeroVenta();
+        this.getVendedorInfo();
+        // this.loadClienteVarios();
+      });
+      this.ventas[this.ventaActiva].cliente = item;
+      await this.$nextTick(() => {
+        setTimeout(() => {
+          console.log("llegó");
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
+      this.modalPreOrden = false;
+    },
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1357,6 +1436,16 @@ export default {
               this.getProductosCategoria(primerCategoria);
             }, 300);
           }
+        })
+        .catch(error => {
+          this.$toasted.show("Hubo un error, no hay conexion");
+        });
+    },
+    getPreOrdenes() {
+      this.axios
+        .get(this.API + "preorden/listado")
+        .then(response => {
+          this.lstPreOrden = response.data;
         })
         .catch(error => {
           this.$toasted.show("Hubo un error, no hay conexion");
