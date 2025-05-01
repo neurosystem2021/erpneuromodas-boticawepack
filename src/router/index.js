@@ -42,6 +42,7 @@ import ReporteVentaDia from "@/views/reportes/ReporteVentaDia.vue";
 import PedidosRealizados from "@/views/reportes/PedidosRealizados.vue";
 import DeudasPorCobrar from "@/views/reportes/DeudasPorCobrar.vue";
 import PedidosAsigandos from "@/views/reportes/PedidosAsigandos.vue";
+import PreOrden from "@/views/PreOrden.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -241,6 +242,11 @@ export default new Router({
       path: "/reportes/deudasporcobrar",
       name: "DeudasPorCobrar",
       component: DeudasPorCobrar
+    },
+    {
+      path: "/PreOrden",
+      name: "PreOrden",
+      component: PreOrden
     },
   ]
 });
