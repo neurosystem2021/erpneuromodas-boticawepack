@@ -1342,12 +1342,22 @@ export default {
     },
     generarReporte() {
       let productos = [];
-      this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
-        venta.productos.forEach(producto => {
-          productos.push(producto);
+      
+      this.ventas
+        .filter(
+          ventas =>
+            !ventas.Anulado &&
+            (ventas.Efectivo > 0 ||
+              ventas.Visa > 0 ||
+              ventas.Mastercard > 0 ||
+              ventas.Transferencia > 0)
+        )
+        .forEach(venta => {
+          venta.productos.forEach(producto => {
+            productos.push(producto);
+          });
         });
-      });
-
+      console.log(productos);
       const productosUnicos = Array.from(
         new Set(productos.map(item => item.IdProducto))
       ).map(producto => {

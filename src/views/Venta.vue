@@ -1150,7 +1150,6 @@ export default {
   },
   mounted() {
     this.getVendedorInfo();
-    console.log(this.IdAlmacen);
     this.getNumeroVenta();
     this.loadClienteVarios();
     this.$root.$on("bv::hide::popover", id => {
