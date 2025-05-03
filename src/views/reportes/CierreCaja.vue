@@ -1,11 +1,14 @@
 <template>
-  <b-container fluid class="px-5 py-5">
+  <b-container fluid class="px-5 py-0">
     <b-row class="no-print">  
       <b-col cols="9" class="no-print">
         
         <b-card no-body>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Ventas" active >
+              <div class="clsScroll">
+
+              
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -64,7 +67,7 @@
                     </td>
                     
                     <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Efectivo | redondear }}</td>
+                    <td>S/. {{ item.Efectivo  | redondear }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -485,7 +488,8 @@
             </table>
           </b-col>
       </b-row>
-            </b-tab>
+    </div> 
+  </b-tab>
             <b-tab title="Productos" >
               <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
@@ -1342,7 +1346,7 @@ export default {
     },
     generarReporte() {
       let productos = [];
-      
+
       this.ventas
         .filter(
           ventas =>
@@ -1537,6 +1541,10 @@ export default {
 };
 </script>
 <style scoped>
+.clsScroll {
+  max-height: 880px;
+  overflow-y: auto;
+}
 /*th {
   background-color: #f1f1f1;
 }

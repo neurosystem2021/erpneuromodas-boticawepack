@@ -1602,12 +1602,14 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
+      console.log("a");
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
         )[0].cantidad += 1;
         this.$nextTick(() => {
+          this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
         });
 
@@ -1638,9 +1640,10 @@ export default {
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
       productos.unshift(prod);
-      this.$nextTick(() => {
-        this.irTxtLoadBarcode();
-      });
+
+      // this.$nextTick(() => {
+      //   this.irTxtLoadBarcode();
+      // });
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
@@ -1850,15 +1853,18 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-      const ventaActual = this.ventas[this.ventaActiva].pago;
-      metodos.forEach(metodo => {
-        ventaActual[metodo].descripcion = null;
-        ventaActual[metodo].monto = 0;
+      console.log("top", tipo);
+      this.$nextTick(() => {
+        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const ventaActual = this.ventas[this.ventaActiva].pago;
+        metodos.forEach(metodo => {
+          ventaActual[metodo].descripcion = null;
+          ventaActual[metodo].monto = 0;
+        });
+        if (tipo && metodos[tipo - 1]) {
+          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        }
       });
-      if (tipo && metodos[tipo - 1]) {
-        ventaActual[metodos[tipo - 1]].monto = this.getTotal();
-      }
     },
     // recalcularMontos(tipo, monto) {
     //   const metodos = ["efectivo", "visa", "mastercard", "delivery"];
