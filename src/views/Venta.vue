@@ -1698,7 +1698,7 @@ export default {
         this.$nextTick(() => {
           this.irTxtLoadBarcode();
         });
-
+        this.metodoPagoCambio(1);
         return false;
       }
       // console.log("producto", producto);
