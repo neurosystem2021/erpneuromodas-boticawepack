@@ -41,6 +41,7 @@ import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
+import Confrontacion from '@/views/reportes/Confrontacion.vue'
 Vue.use(Router);
 
 export default new Router({
@@ -240,6 +241,11 @@ export default new Router({
       path: "/PreOrden",
       name: "PreOrden",
       component: PreOrden
-    }
+    },
+        {
+          path: '/reporte/confrontacion',
+          name: 'Confrontacion',
+          component: Confrontacion
+        }
   ]
 });
