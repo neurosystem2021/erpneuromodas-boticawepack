@@ -1967,6 +1967,16 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
+      // this.$swal({
+      //   title: "Procesando...",
+      //   text: "Por favor espera",
+      //   allowOutsideClick: false,
+      //   showConfirmButton: false,
+      //   didOpen: () => {
+      //     this.$swal.showLoading();
+      //   }
+      // });
+
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2186,6 +2196,7 @@ export default {
         //   return;
         // }
       });
+      this.$swal.close();
     },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
