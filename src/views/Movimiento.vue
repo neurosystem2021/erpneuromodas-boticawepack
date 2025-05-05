@@ -73,6 +73,16 @@
                 </b-form-group>
               </b-col>
             </b-row>
+            <b-row>
+            <b-col>
+            <b-input-group v-if="movimiento.movimientoTipo.Tipo == 1 && movimiento.movimientoTipo.CodSunat == 99">
+                    <input type="text"
+                     v-model="movimiento.Descripcion"
+                     class="form-control" required
+                     placeholder="Descripción" />
+             </b-input-group>
+            </b-col>
+            </b-row>
 
             <b-row>
               <b-col md="6">
@@ -180,6 +190,7 @@ export default {
   },
   data() {
     return {
+      Descripcion: '',
       editarPrecioBloque: 0,
       inProgress: false,
       newRuc: '',
@@ -282,6 +293,7 @@ export default {
       let currentMonth = this.$moment().month() + 1
       currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
       return {
+        Descripcion: '',
         EsCredito: 0,
         alterarProductos: 1,
         FechaVenCredito: '',

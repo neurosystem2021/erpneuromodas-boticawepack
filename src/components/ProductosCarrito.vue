@@ -265,8 +265,10 @@
           <input :disabled="productos[data.index].editarPrecio !== 1 && editarPrecioBloque !== 1"
             v-model="productos[data.index].precio" type="number" style="width: 100px" min="0" step="0.00001"
             class="form-control" placeholder="Precio" @input="setNuevoPrecioContado(data.index)" />
+
           <div v-if="isVentas" class="text-center" style="font-size:0.8rem"><b>{{ productos[data.index].PrecioCosto |
             moneda }}</b></div>
+            
           <b-form-checkbox v-model=productos[data.index].editarPrecio :value="1" :unchecked-value="0"
             @change="actualizarEditarPrecio(data.index)">
             <b style="color:#17a2b8; font-size:0.6rem" class="text-left">Editar precio</b>
@@ -319,7 +321,7 @@
           <!-- {{ productos[data.index] }} -->
           <!-- <input :disabled="bloquearInput ? true : false" style="width:105px" -->
           <input disabled style="width:105px" v-model="productos[data.index].nuevoPrecioContado" type="number" min="0"
-            step="0.01" class="form-control" placeholder="Precio Venta" />
+            step="0.01" class="form-control" placeholder="Precio Venta" @input="setNuevoPrecioContado(data.index)"/>
 
           <!-- <b-form-text>
               <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -948,8 +950,13 @@ export default {
           obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(0)).toFixed(2)
           break;
         case 'Publico':
+          if(obj.OldPrecioCosto < 1){
+          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2) : '';
+          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2)
+          }else{
           this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2) : '';
           obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2)
+          }
           break;
         case 'Taller':
 
@@ -1016,16 +1023,22 @@ export default {
             prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
             break;
           case 'Publico':
-
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
+            if(prod.OldPrecioCosto < 1){
+              this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
-
+            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
+          }else{
+            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
             prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
+            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
+          }
+
             break;
           case 'Taller':
 
             this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2) : '';
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2);
+            
             prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
             break;
 

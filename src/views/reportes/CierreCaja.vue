@@ -110,6 +110,7 @@
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
+                      <th>%.Desc</th>
                       <th v-if="item.TieneIgv">Subtotal</th>
                       <th v-if="item.TieneIgv">IGV</th>
                       <th>Total</th>
@@ -126,6 +127,7 @@
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
+                      <td>{{ prod.PorcentajeDesc }}</td>
                       <td v-if="item.TieneIgv">
                         {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
                       </td>

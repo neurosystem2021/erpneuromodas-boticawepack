@@ -549,7 +549,12 @@ export default {
     },
     recalcularMontos() {
       let prod = { ...this.producto }
-      prod.PrecioContado = parseFloat(parseFloat(parseFloat(prod.PrecioCosto * (1 + prod.UPublico / 100)).toFixed(0)).toFixed(2));
+      if(prod.PrecioCosto < 1){
+        prod.PrecioContado = parseFloat(parseFloat(parseFloat(prod.PrecioCosto * (1 + prod.UPublico / 100)).toFixed(2)).toFixed(2));  
+      }else{
+        prod.PrecioContado = parseFloat(parseFloat(parseFloat(prod.PrecioCosto * (1 + prod.UPublico / 100)).toFixed(0)).toFixed(2));
+      }
+      
       this.producto = prod
     },
     cargarAlmacenes() {
