@@ -40,6 +40,7 @@ import Usuario from "@/views/Usuario.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -240,6 +241,11 @@ export default new Router({
       path: "/KardexValorizado",
       name: "KardexValorizado",
       component: KardexValorizado
+    },
+    {
+      path: "/reporte/confrontacion",
+      name: "Confrontacion",
+      component: Confrontacion
     }
   ]
 });
