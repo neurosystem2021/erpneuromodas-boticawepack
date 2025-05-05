@@ -1192,6 +1192,9 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia +
         this.totalIngresos -
         this.totalSalidas -
         this.totalAdelantosActivos
@@ -1542,7 +1545,7 @@ export default {
 </script>
 <style scoped>
 .clsScroll {
-  max-height: 880px;
+  max-height: 820px;
   overflow-y: auto;
 }
 /*th {
