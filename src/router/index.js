@@ -43,6 +43,7 @@ import PedidosRealizados from "@/views/reportes/PedidosRealizados.vue";
 import DeudasPorCobrar from "@/views/reportes/DeudasPorCobrar.vue";
 import PedidosAsigandos from "@/views/reportes/PedidosAsigandos.vue";
 import PreOrden from "@/views/PreOrden.vue";
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -248,5 +249,10 @@ export default new Router({
       name: "PreOrden",
       component: PreOrden
     },
+    {
+      path: "/reporte/confrontacion",
+      name: "Confrontacion",
+      component: Confrontacion
+    }
   ]
 });
