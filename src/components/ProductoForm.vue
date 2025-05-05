@@ -715,7 +715,7 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
-      this.producto.CodigoProducto=(''+this.producto.CodigoProducto).trim();
+      this.producto.CodigoProducto=(""+this.producto.CodigoProducto).trim();
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
