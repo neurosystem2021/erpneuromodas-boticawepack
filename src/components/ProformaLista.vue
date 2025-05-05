@@ -40,9 +40,18 @@
                     </template>
 
                     <template slot="Eliminar" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i
-                                class="fas fa-trash"></i></b-button>
+                    <div v-if="idPerfil == 1">
+                        <b-button @click="eliminarProf(data.item)" variant="danger">
+                        <i class="fas fa-trash"></i>
+                        </b-button>
+                    </div>
+                    <div v-else>
+                        <b-button variant="danger" disabled>
+                        <i class="fas fa-trash"></i>
+                        </b-button>
+                    </div>
                     </template>
+
 
                 </b-table>
                 <b-row>
@@ -81,6 +90,7 @@ export default {
     data() {
         return {
             API: config.API,
+            idPerfil: sessionStorage.getItem('IdPerfil'),
             show: false,
             filter: '',
             items: [],
