@@ -169,11 +169,34 @@ const actions = {
   actualizarTotalCart({ commit }, total) {
     commit("ACTUALIZAR_TOTAL", total);
   },
-  obtenerStock({ commit, state }, obj) {
+  async obtenerStock({ commit, state }, obj) {
     if (state.productos.length) {
-      axios
+      await axios
         .get(API + "productos/puntoventa/stock", {
           params: {
+            idProductos: state.productos.map(prod => prod.IdProducto),
+            idAlmacen: obj.IdAlmacen,
+            noLimit: 1
+          }
+        })
+        .then(response => {
+          commit("OBTENER_STOCK", response.data);
+          setTimeout(() => {
+            if (obj.CalculoCantidad == 1) {
+              commit("OBTENER_CANTIDAD", { opc: 0, stock: 0 });
+            }
+          }, 150);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  },
+  async obtenerStockPost({ commit, state }, obj) {
+    if (state.productos.length) {
+      await axios
+        .post(API + "productos/puntoventa/stock/" + obj.IdAlmacen, {
+          data: {
             idProductos: state.productos.map(prod => prod.IdProducto),
             idAlmacen: obj.IdAlmacen,
             noLimit: 1
