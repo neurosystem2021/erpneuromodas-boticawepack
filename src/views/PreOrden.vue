@@ -327,6 +327,9 @@ export default {
     this.obtenerAlmance();
   },
   methods: {
+    quitarProducto(index) {
+      this.productos.splice(index, 1);
+    },
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
