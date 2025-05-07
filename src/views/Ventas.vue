@@ -1740,7 +1740,8 @@ export default {
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += 1;
+        )[0].cantidad += parseFloat(1);
+        this.metodoPagoCambio(1);
         return false;
       }
 

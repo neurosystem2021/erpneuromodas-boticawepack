@@ -1338,14 +1338,14 @@ export default {
       await this.getVentas();
       await this.getIngresos();
       await this.getSalidas();
-      
+
       await this.generarReporte();
       // console.log(this.ventas);
     },
     generarReporte() {
       let productos = [];
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
-        console.log(venta)
+        console.log(venta);
         if (venta.productos) {
           venta.productos.forEach(producto => {
             productos.push(producto);
@@ -1561,6 +1561,7 @@ th {
 }
 .total {
   background-color: #e4ff95;
+  color: #000000;
 }
 .total-salida {
   background-color: #ffd4d3;
