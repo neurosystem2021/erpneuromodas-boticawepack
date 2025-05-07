@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="px-5 py-5">
+  <b-container fluid class="px-5 pb-5">
     <b-row class="no-print">  
       <b-col cols="9" class="no-print">
         
@@ -1558,6 +1558,7 @@ th {
 }
 .total {
   background-color: #e4ff95;
+  color: #000000;
 }
 .total-salida {
   background-color: #ffd4d3;
