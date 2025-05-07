@@ -102,8 +102,8 @@ export default {
           { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoFormaFarmaceutica", label: "Modelo" },
-          { key: "ProductoMedicion", label: "U. Med." },
+          { key: "ProductoFormaFarmaceutica", label: "Lab." },
+          { key: "ProductoMedicion", label: "Med." },
           {
             key: "StockMinimo",
             label: "Stock Min.",
@@ -116,6 +116,7 @@ export default {
             variant: "info",
             class: "text-center fontsize "
           },
+          { key: "cantidadPedida", label: "Cantidad Pre Pedida" },
           { key: "cantidad" },
           { key: "precio", label: "Precio Compra" },
           {
@@ -128,6 +129,7 @@ export default {
         ]
       },
       idPerfil: sessionStorage.getItem("IdPerfil")
+      // productos: []
     };
   },
   computed: {
@@ -140,32 +142,56 @@ export default {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
-      obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStockPost",
       add: "agregarProducto"
     }),
-    cargarProducto() {
-      this.axios
+    async cargarProducto() {
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
+      await this.axios
         .get(this.API + "productos/proveedor", {
           params: {
             IdProveedor: this.movimiento.proveedor.IdProveedor,
             IdAlmacen: this.movimiento.almacen.IdAlmacen
           }
         })
-        .then(response => {
+        .then(async response => {
           this.limpiarCart();
           response.data.map(item => {
             this.add([item, () => {}, false, true]);
           });
 
-          this.obtenerStok({
-            IdAlmacen: this.movimiento.almacen.IdAlmacen,
-            CalculoCantidad: 1
-          });
+          // await this.obtenerStok({
+          //   IdAlmacen: this.movimiento.almacen.IdAlmacen,
+          //   CalculoCantidad: 1
+          // });
         });
+      await this.eliminarProductosStock();
+      this.$swal.close();
+    },
+    eliminarProductosStock() {
+      let pro = [...this.$store.state.cart.productos];
+      for (let i = pro.length - 1; i >= 0; i--) {
+        pro[i].cantidad =
+          (pro[i].cantidadPedida ? pro[i].cantidadPedida : 0) -
+          (pro[i].stock ? pro[i].stock : 0);
+        if (pro[i].stock > pro[i].StockMinimo) {
+          pro.splice(i, 1);
+        }
+      }
+      this.$store.state.cart.productos = pro;
+      // console.log(this.$store.state.cart.productos);
     },
     setProveedor(obj) {
       this.movimiento.proveedor = obj;
-      this.$store.state.cart.productos = [];
     },
     initMovimiento() {
       let currentMonth = this.$moment().month() + 1;
