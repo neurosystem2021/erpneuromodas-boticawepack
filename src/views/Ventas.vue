@@ -1553,7 +1553,7 @@ export default {
             : data.stock
               ? Number.isInteger(data.stock)
                 ? data.stock
-                : data.stock.toFixed(2)
+                : parseFloat(data.stock).toFixed(2)
               : data.stock
         }</b></td>
                 <td style="width: 200px"><b>${data.Producto} - ${
