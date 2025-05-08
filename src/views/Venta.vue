@@ -616,7 +616,7 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="filtrarProductos"
+                @input="getProductosCategoria"
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -1370,29 +1370,7 @@ export default {
         return this.categorias.slice(0, 10);
       }
     },
-    filtrarProductos(val) {
-      this.productosCategoria = [];
-      this.cargandoProductos = true;
-      this.axios
-        .get(this.API + "productos/categoria", {
-          params: {
-            q: val,
-            idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
-          }
-        })
-        .then(response => {
-          this.cargandoProductos = false;
-          this.productosCategoria = response.data;
-          // this.$refs.barcodeInput.focus();
-          // this.$refs.inputSearchProducto.focus();
-        })
-        .catch(error => {
-          console.log(error);
-          this.cargandoProductos = true;
-          this.productosCategoria = [];
-          this.$toasted.show("Hubo un error, no hay conexion");
-        });
-    },
+   
     async loadBarcode(e) {
       if (e) {
         e.preventDefault();
@@ -1452,7 +1430,7 @@ export default {
       }
     },
     search() {
-      this.filtrarProductos(this.busqueda);
+      this.getProductosCategoria(this.busqueda);
     },
     irTxtLoadBarcode(event) {
       if (event) {
@@ -1460,8 +1438,11 @@ export default {
       }
       document.getElementById("txtLoadBarcode").focus();
     },
-
+    f(d) {
+      console.log(d);
+    },
     getProductosCategoria(idProductoCategoria) {
+console.log(idProductoCategoria)
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1469,7 +1450,7 @@ export default {
         this.axios
           .get(this.API + "productos/categoria", {
             params: {
-              IdProductoCategoria: idProductoCategoria,
+              q: idProductoCategoria,
               idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
               MasMovido: idProductoCategoria == 0 ? 1 : 0
             }
