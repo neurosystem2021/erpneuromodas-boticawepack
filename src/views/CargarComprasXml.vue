@@ -11,17 +11,30 @@
                 {{ rucProveedor }} - {{ nameProveedor }}
             </b-col>
             <b-col cols="12" width="100%">
-               <table>
+               <table width="100%">
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>Existe</th>
+                        <th>Cod. Barra</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Total</th>
                     </tr>
                 </thead>
+                <tbody>
+                  <tr v-for="(producto,index) in lstProductos" :key="index">
+                    <td>{{ producto.IdProducto }}</td>
+                    <td>{{ producto.CodigoBarra }}</td>
+                    <td>{{ producto.Producto }}</td>
+                    <td>{{ producto.PrecioCosto }}</td>
+                  </tr>
+                </tbody>
                </table>
+            </b-col>
+            <b-col cols="12" v-if="mostrarAdvertencia">
+              <b-alert show variant="warning">
+                Aquellos productos que no cuenten con un código de barras serán incorporados al sistema mediante un registro automático, durante el cual se les asignará un código.
+              </b-alert>
             </b-col>
         </b-row>
         
@@ -30,12 +43,15 @@
   </template>
   
   <script>
+import config from "@/store/config.js";
 export default {
   data() {
     return {
+      API: config.API,
       rucProveedor: "",
       nameProveedor: "",
-      productos: []
+      productos: [],
+      lstProductos: []
     };
   },
   methods: {
@@ -112,21 +128,49 @@ export default {
             precioUnitario: precioUnitario
           };
         });
-        this.productos = productos
-        console.log("RUC Proveedor:", this.rucProveedor);
-        console.log("Nombre Proveedor:", this.nombreProveedor);
+        this.productos = productos;
         console.log("Productos:", productos);
-
+        this.validarExisteProductos();
         // Enviar al backend si es necesario
         // this.registrarIngreso({ rucProveedor, productos });
       };
 
       reader.readAsText(file);
     },
+    validarExisteProductos() {
+      console.log("llegó validar existw");
+      this.productos.forEach(async element => {
+        console.log(element.descripcion);
+        element.IdProducto = "";
+        element.CodigoBarra = "";
+        element.Producto = element.descripcion;
+        element.PrecioCosto = element.precioUnitario;
+        let res = await this.axios
+          .get(`${this.API}buscarproductos/nombrexml`, {
+            params: {
+              Producto: element.descripcion
+            }
+          })
+          .then(res => {
+            return res.data;
+          });
+        if (res) {
+          element.IdProducto = res.IdProducto;
+          element.CodigoBarra = res.CodigoBarra;
+        }
+        this.lstProductos.push(element);
+      });
+    },
     registrarIngreso(data) {
       // Usa axios o fetch para enviar al backend Laravel
       // axios.post('/api/ingresos', data)
       console.log("Registrando ingreso...", data);
+    }
+  },
+  computed: {
+    mostrarAdvertencia() {
+      let val = this.lstProductos.some(v => !v.CodigoBarra);
+      return val;
     }
   }
 };
