@@ -1,37 +1,44 @@
 <template>
     <b-container>
         <b-row>
-            <b-col cols="12">
+            <b-col cols="12" class="mb-3">
                 <b-form-file @change="leerXML" accept=".xml" > </b-form-file>
             </b-col>
-            <b-col cols="4">
+            <b-col cols="2">
                 Proveedor:
             </b-col>
-            <b-col cols="4">
-                {{ rucProveedor }} - {{ nameProveedor }}
+            <b-col cols="5">
+              {{ rucProveedor }} - {{ nameProveedor }}
             </b-col>
+            <b-col cols="5">
+              <b-alert show variant="info">
+                Si el proveedor no se encuentra registrado, se incorporará al sistema.
+              </b-alert>
+            </b-col>
+
             <b-col cols="12" width="100%">
                <table width="100%">
                 <thead>
                     <tr>
-                        <th>Producto</th>
                         <th>Cod. Barra</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Total</th>
+                        <th>Producto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: center;">Precio</th>
+                        <th style="text-align: center;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(producto,index) in lstProductos" :key="index">
-                    <td>{{ producto.IdProducto }}</td>
-                    <td>{{ producto.CodigoBarra }}</td>
-                    <td>{{ producto.Producto }}</td>
-                    <td>{{ producto.PrecioCosto }}</td>
+                    <td class="px-2" width="20%" > <input type="text" class="form-control" v-model="producto.CodigoBarra"> </td>
+                    <td class="px-2" width="50%" >{{ producto.Producto }}</td>
+                    <td class="px-2" width="10%" style="text-align: center;">{{ producto.cantidad }}</td>
+                    <td class="px-2" width="10%" style="text-align: center;">{{ producto.PrecioCosto }}</td>
+                    <td class="px-2" width="10%" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.PrecioCosto).toFixed(2) }}</td>
                   </tr>
                 </tbody>
                </table>
             </b-col>
-            <b-col cols="12" v-if="mostrarAdvertencia">
+            <b-col cols="12" v-if="mostrarAdvertencia" class="mt-2">
               <b-alert show variant="warning">
                 Aquellos productos que no cuenten con un código de barras serán incorporados al sistema mediante un registro automático, durante el cual se les asignará un código.
               </b-alert>
@@ -56,6 +63,7 @@ export default {
   },
   methods: {
     leerXML(e) {
+      this.lstProductos = [];
       const file = e.target.files[0];
       if (!file) return;
 
@@ -138,7 +146,6 @@ export default {
       reader.readAsText(file);
     },
     validarExisteProductos() {
-      console.log("llegó validar existw");
       this.productos.forEach(async element => {
         console.log(element.descripcion);
         element.IdProducto = "";
