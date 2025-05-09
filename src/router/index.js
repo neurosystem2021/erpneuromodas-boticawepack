@@ -40,6 +40,7 @@ import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -232,6 +233,16 @@ export default new Router({
       component: HistorialVentaKit
     },
 
+    {
+      path: "/oferta",
+      name: "ConfigurarOferta",
+      component: ConfigurarOferta
+    },
+    {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
+    },
     {
       path: "/oferta",
       name: "ConfigurarOferta",
