@@ -203,6 +203,7 @@
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
+                      @input="metodoPagoCambio(1)"
                       class="form-control"
                       />
                      
@@ -1370,7 +1371,7 @@ export default {
         return this.categorias.slice(0, 10);
       }
     },
-   
+
     async loadBarcode(e) {
       if (e) {
         e.preventDefault();
@@ -1442,7 +1443,7 @@ export default {
       console.log(d);
     },
     getProductosCategoria(idProductoCategoria) {
-console.log(idProductoCategoria)
+      console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1583,12 +1584,11 @@ console.log(idProductoCategoria)
       // }, 1000);
     },
     async setProducto(producto) {
-      console.log("a");
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += 1;
+        )[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
@@ -1639,6 +1639,9 @@ console.log(idProductoCategoria)
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -1810,10 +1813,9 @@ console.log(idProductoCategoria)
         return 0;
       } else {
         let subtotal = prod.reduce((total, prod) => {
+          // console.log(prod);
           return (
-            total +
-            parseFloat(prod.cantidad * prod.precio) -
-            parseFloat(prod.descuento)
+            total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
           );
         }, 0);
         return parseFloat(subtotal).toFixed(2);
