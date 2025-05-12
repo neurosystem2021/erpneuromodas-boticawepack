@@ -14,7 +14,7 @@
                     :id="`inputTipoVenta${index}`"
                     :url="API + 'ventas/tipos'"
                     anchor="TipoDoc"
-                    initValue="NOTA DE VENTA"
+                    initValue="BOLETA ELEC."
                     class="font-weight-bold"
                     label="writer"
                     placeholder=""
@@ -203,6 +203,7 @@
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
+                      @input="metodoPagoCambio(1)"
                       class="form-control"
                       />
                      
@@ -290,7 +291,6 @@
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      <b-button class="mx-1 btnAction" block style="background: #BF360C; color:#ffffff"  @click="modalPreOrden= true"> Pre Orden </b-button>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
                     </b-col>
@@ -617,7 +617,7 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="filtrarProductos"
+                @input="getProductosCategoria"
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -825,7 +825,7 @@
         </b-col> -->
       </b-row>
     </b-modal>
-   
+    <!-- MODAL TOUCH -->
      <!-- MODALS TOUCH -->
 
      <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
@@ -931,17 +931,6 @@
         </b-modal>
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
-
-        <b-modal v-model="modalPreOrden" size="lg">
-          <b-table :items="lstPreOrden" :fields="headerPreOrden">
-            <template slot="action" slot-scope="data">
-              <b-button @click="anadirPreOrden(data.item)" variant="danger"> 
-                <i class="fas fa-shopping-cart"></i>
-              </b-button>
-            </template>
-          </b-table>
-        
-        </b-modal>
   </b-container>
 </template>
 <script>
@@ -972,7 +961,6 @@ export default {
   },
   data() {
     return {
-      modalPreOrden: false,
       productoSelect: {},
       indexPos: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -985,14 +973,6 @@ export default {
       API: config.API,
       categorias: [],
       productosCategoria: [],
-      lstPreOrden: [],
-      headerPreOrden: [
-        { key: "Correlativo", label: "Correlativo" },
-        { key: "DniRuc", label: "Documento" },
-        { key: "Cliente", label: "Cliente" },
-        { key: "FechaReg", label: "F. Registro" },
-        { key: "action", label: "" }
-      ],
       isNota: [],
       tieneIgv: [],
       itemsMotivoNota: [
@@ -1173,7 +1153,6 @@ export default {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
-    this.getPreOrdenes();
     this.$root.$on("bv::hide::popover", id => {
       const metodoPagoIndex = id.replace("popover-metodopago", "");
       const opcionesIndex = id.replace("popover-opciones", "");
@@ -1192,63 +1171,6 @@ export default {
     });
   },
   methods: {
-    async anadirPreOrden(item) {
-      let venta = { ...this.venta };
-      venta.cliente = item;
-      let productos = [];
-      let productosPreOrden = await this.axios(`${this.API}preorden/detalles`, {
-        params: item
-      }).then(res => {
-        if (res.data) {
-          return res.data;
-        }
-        return [];
-      });
-      productosPreOrden.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
-        }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.Descripcion ? prod.Descripcion : "UNIDAD";
-        prod.ProductoPresentacion = producto.Descripcion
-          ? prod.Descripcion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
-      });
-      venta.productos = productos;
-      this.ventas.push(venta);
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
-        // this.loadClienteVarios();
-      });
-      this.ventas[this.ventaActiva].cliente = item;
-      await this.$nextTick(() => {
-        setTimeout(() => {
-          console.log("llegó");
-          this.metodoPagoCambio(1);
-        }, 1000);
-      });
-      this.modalPreOrden = false;
-    },
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1441,16 +1363,6 @@ export default {
           this.$toasted.show("Hubo un error, no hay conexion");
         });
     },
-    getPreOrdenes() {
-      this.axios
-        .get(this.API + "preorden/listado")
-        .then(response => {
-          this.lstPreOrden = response.data;
-        })
-        .catch(error => {
-          this.$toasted.show("Hubo un error, no hay conexion");
-        });
-    },
     listCategoria() {
       let categorias = [...this.categorias];
       if (this.vermas) {
@@ -1459,28 +1371,7 @@ export default {
         return this.categorias.slice(0, 10);
       }
     },
-    filtrarProductos(val) {
-      this.productosCategoria = [];
-      this.cargandoProductos = true;
-      this.axios
-        .get(this.API + "productos/categoria", {
-          params: {
-            q: val
-          }
-        })
-        .then(response => {
-          this.cargandoProductos = false;
-          this.productosCategoria = response.data;
-          // this.$refs.barcodeInput.focus();
-          // this.$refs.inputSearchProducto.focus();
-        })
-        .catch(error => {
-          console.log(error);
-          this.cargandoProductos = true;
-          this.productosCategoria = [];
-          this.$toasted.show("Hubo un error, no hay conexion");
-        });
-    },
+
     async loadBarcode(e) {
       if (e) {
         e.preventDefault();
@@ -1540,7 +1431,7 @@ export default {
       }
     },
     search() {
-      this.filtrarProductos(this.busqueda);
+      this.getProductosCategoria(this.busqueda);
     },
     irTxtLoadBarcode(event) {
       if (event) {
@@ -1548,8 +1439,11 @@ export default {
       }
       document.getElementById("txtLoadBarcode").focus();
     },
-
+    f(d) {
+      console.log(d);
+    },
     getProductosCategoria(idProductoCategoria) {
+      console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1557,8 +1451,8 @@ export default {
         this.axios
           .get(this.API + "productos/categoria", {
             params: {
-              IdProductoCategoria: idProductoCategoria,
-              idAlmacen: this.venta.almacen.IdAlmacen,
+              q: idProductoCategoria,
+              idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
               MasMovido: idProductoCategoria == 0 ? 1 : 0
             }
           })
@@ -1694,11 +1588,12 @@ export default {
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += 1;
+        )[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
+          this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
         });
-        this.metodoPagoCambio(1);
+
         return false;
       }
       // console.log("producto", producto);
@@ -1726,9 +1621,10 @@ export default {
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
       productos.unshift(prod);
-      this.$nextTick(() => {
-        this.irTxtLoadBarcode();
-      });
+
+      // this.$nextTick(() => {
+      //   this.irTxtLoadBarcode();
+      // });
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
@@ -1743,6 +1639,9 @@ export default {
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -1914,10 +1813,9 @@ export default {
         return 0;
       } else {
         let subtotal = prod.reduce((total, prod) => {
+          // console.log(prod);
           return (
-            total +
-            parseFloat(prod.cantidad * prod.precio) -
-            parseFloat(prod.descuento)
+            total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
           );
         }, 0);
         return parseFloat(subtotal).toFixed(2);
@@ -1938,15 +1836,18 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-      const ventaActual = this.ventas[this.ventaActiva].pago;
-      metodos.forEach(metodo => {
-        ventaActual[metodo].descripcion = null;
-        ventaActual[metodo].monto = 0;
+      console.log("top", tipo);
+      this.$nextTick(() => {
+        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const ventaActual = this.ventas[this.ventaActiva].pago;
+        metodos.forEach(metodo => {
+          ventaActual[metodo].descripcion = null;
+          ventaActual[metodo].monto = 0;
+        });
+        if (tipo && metodos[tipo - 1]) {
+          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        }
       });
-      if (tipo && metodos[tipo - 1]) {
-        ventaActual[metodos[tipo - 1]].monto = this.getTotal();
-      }
     },
     // recalcularMontos(tipo, monto) {
     //   const metodos = ["efectivo", "visa", "mastercard", "delivery"];
@@ -1967,15 +1868,15 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-      // this.$swal({
-      //   title: "Procesando...",
-      //   text: "Por favor espera",
-      //   allowOutsideClick: false,
-      //   showConfirmButton: false,
-      //   didOpen: () => {
-      //     this.$swal.showLoading();
-      //   }
-      // });
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
