@@ -3,13 +3,16 @@
         <b-button @click="show=true" variant="primary" size="sm" class="btnAction">Ver Proformas</b-button>
         
         <b-form ref="formProformaModal" >    
+        
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">           
+                body-text-variant="dark">     
+                <b-tabs pills card>
+                  <b-tab title="Proformas" active>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
                         v-if="show"
@@ -23,6 +26,10 @@
                         :per-page="perPage"
                         :current-page="currentPage">
 
+                      <template slot="EsFavoritoFlag" slot-scope="data">
+                        <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
+                        <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
+                      </template>
                       <template slot="update" slot-scope="data">
                         <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
@@ -57,6 +64,59 @@
                         Cerrar
                     </b-btn>
                 </div>
+                  </b-tab>
+
+                  <b-tab title="Proformas Favoritas">
+                    <b-input-group prepend="Buscar..." class="mt-2">
+                      <input class="form-control" v-model="search" />
+                      </b-input-group>
+                    <b-form-group>
+                    </b-form-group>
+                     <b-table 
+                        v-if="show"
+                        id="table-proformas" 
+                        ref="tableProformas"
+                       :filter="filter"
+                        :items="filteredItems" 
+                        :fields="fieldsFavoritas"
+                        :per-page="5"
+                        :current-page="currentPageFav"
+                       >
+                       <!-- <template slot="EsFavoritoFlag" slot-scope="data">
+                        <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
+                        <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
+                      </template> -->
+                      <template slot="update" slot-scope="data">
+                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                      </template>
+
+                      <template slot="ver" slot-scope="data">
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                      </template>
+
+                      <template slot="Total" slot-scope="data">
+                        <b>{{ data.item.Total | moneda }}</b>
+                      </template>
+
+                      <template slot="Anular" slot-scope="data">
+                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
+                      </template>
+
+                      <template slot="verTicket" slot-scope="data">
+                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                      </template>
+
+                    </b-table>
+
+                    <b-pagination
+                      v-model="currentPageFav"
+                      :total-rows="filteredItems.length"
+                      :per-page="5"
+                      aria-controls="my-table"
+                    ></b-pagination>
+                  </b-tab>
+                </b-tabs>      
+                    
             
             </b-modal>
         </b-form>
@@ -75,16 +135,24 @@ export default {
       this.axios.get(this.API + "proformas/count").then(response => {
         this.totalRows = response.data.total;
       });
+    },
+    show() {
+      if (this.show) {
+        this.cargarFavoritas();
+      }
     }
   },
   data() {
     return {
       API: config.API,
       show: false,
+      search: "",
+      lstProformasFavoritas: [],
       filter: "",
       items: [],
       isBusy: false,
       fields: [
+        { key: "EsFavoritoFlag", label: "Favorito" },
         { key: "IdProforma", label: "Id" },
         { key: "Anio", label: "Año" },
         "Numero",
@@ -99,6 +167,24 @@ export default {
         ,
         "Anular"
       ],
+      fieldsFavoritas: [
+        // { key: "EsFavoritoFlag", label: "Favorito" },
+        { key: "IdProforma", label: "Id" },
+        { key: "Descripcion" },
+        { key: "Anio", label: "Año" },
+        "Numero",
+        "Cliente",
+        { key: "DniRuc", label: "Documento" },
+        "FechaReg",
+        { key: "UsuarioReg", label: "Empleado" },
+        { key: "Total", label: "Total" },
+        "update",
+        "ver",
+        "verTicket",
+        ,
+        "Anular"
+      ],
+      currentPageFav:1,
       totalRows: 50,
       perPage: 5,
       currentPage: 1
@@ -111,6 +197,22 @@ export default {
       obtenerStok: "obtenerStock",
       limpiarCarrito: "limpiarCarrito"
     }),
+    cargarFavoritas() {
+      this.lstProformasFavoritas = [];
+      this.axios(`${this.API}proformas/favoritas`).then(response => {
+        if (response.data) {
+          this.lstProformasFavoritas = response.data;
+        }
+      });
+    },
+    async cambiarFavorito(item, EsFavoritoFlag) {
+      item.EsFavoritoFlag = EsFavoritoFlag;
+      console.log(item);
+      await this.axios.put(`${this.API}proforma/cambiarfavorito`, item);
+      console.log(EsFavoritoFlag);
+      this.cargarFavoritas();
+
+    },
     selectProformas(proforma) {
       this.$emit("guardarDatosProforma", proforma.IdProforma);
       this.axios
@@ -206,6 +308,21 @@ export default {
               this.$toasted.error("Ha ocurrido un error");
             });
         }
+      });
+    }
+  },
+  computed: {
+    filteredItems() {
+      const searchTextLower = this.search.toLowerCase();
+      return this.lstProformasFavoritas.filter(item => {
+        return Object.values(item).some(value => {
+          if (typeof value === "string") {
+            return value.toLowerCase().includes(searchTextLower);
+          } else if (typeof value === "number") {
+            return value.toString().includes(searchTextLower);
+          }
+          return false;
+        });
       });
     }
   }
