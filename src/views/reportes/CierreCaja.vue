@@ -92,7 +92,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
+                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th><th style="width:90px">Pago con</th>
             </tr>
           </thead>
           <tbody>
@@ -137,6 +137,7 @@
               <!--<td>{{ item.EfectivoDesc }}</td>-->
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Efectivo | redondear }}</td>
+              <td>S/. {{ item.PagoCon }}</td>
             </tr>
           </tbody>
           <tfoot>
