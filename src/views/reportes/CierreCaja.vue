@@ -623,6 +623,13 @@
               <td colspan="2"></td>
             </tr>
             <tr>
+              <td>Total  S/.</td>
+              <td>{{ totalV | redondear }}</td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
               <td>Ingresos S/.</td>
               <td>{{ totalIngresos | redondear }} </td>
             </tr>
@@ -1288,15 +1295,25 @@ export default {
     getFechaCierre() {
       //return this.$route.params.id ?
     },
+    totalV() {
+      return (
+        (this.totalIngresos ? this.totalIngresos : 0) +
+        (this.totalVentasEfectivo ? this.totalVentasEfectivo : 0) +
+        (this.totalVentasVisa ? this.totalVentasVisa : 0) +
+        (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
+        (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0)
+      );
+    },
     granTotal() {
+      console.log(this.totalAdelantos);
       return (
         (this.totalIngresos ? this.totalIngresos : 0) +
         (this.totalVentasEfectivo ? this.totalVentasEfectivo : 0) +
         (this.totalVentasVisa ? this.totalVentasVisa : 0) +
         (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
         (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0) -
-        (this.totalSalidas ? this.totalSalidas : 0) -
-        (this.totalAdelantos ? this.totalAdelantos : 0)
+        ((this.totalSalidas ? this.totalSalidas : 0) +
+          (this.totalAdelantos ? this.totalAdelantos : 0))
       );
     },
     granTotalSinPagoCliente() {
@@ -1399,8 +1416,6 @@ export default {
     totalVentasCredito() {
       let total = 0;
       this.ventasCredito.forEach(venta => {
-        console.log(venta.Total);
-
         if (!venta.Anulado) total += venta.Total;
       });
       return parseFloat(total).toFixed(2);
@@ -1513,7 +1528,7 @@ export default {
     },
     setVendedor(obj) {
       obj.Usuario = obj.Usuario.toLowerCase();
-      console.log(obj);
+
       this.vendedor = obj;
       this.loadData();
     },

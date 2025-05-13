@@ -799,6 +799,11 @@ export default {
       }
     },
     async nuevoProyecto() {
+      console.log("selectCliente", this.selectCliente);
+      if (!this.selectCliente.IdCliente) {
+        this.$toasted.error("Seleccione un cliente.");
+        return false;
+      }
       let data = {
         // IdProducto: hab.IdProducto,
         IdCliente: this.selectCliente.IdCliente,
@@ -1019,7 +1024,11 @@ export default {
     },
     imprimirReciboServicio(selectProducto) {
       console.log(selectProducto);
-      window.open("/imprimir/imprimirReciboServicio.php?IdProducto=" + selectProducto.IdProducto, "_blank");
+      window.open(
+        "/imprimir/imprimirReciboServicio.php?IdProducto=" +
+          selectProducto.IdProducto,
+        "_blank"
+      );
     }
   },
   components: {
