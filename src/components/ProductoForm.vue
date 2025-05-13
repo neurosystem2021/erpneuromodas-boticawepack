@@ -182,6 +182,11 @@
                 Tiene Presentacion
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox v-model="producto.ConsiderarDecimalFlag" :value="1" :unchecked-value="0">
+                Considerar Decimal
+              </b-form-checkbox>
+            </b-form-group>
             <b-form-group v-show="false">
               <label>Activar Proyecto:</label>
               <b-form-checkbox v-model="producto.EsHabitacion" :value="1" :unchecked-value="0">
@@ -482,6 +487,7 @@ export default {
           this.producto.IdOfertaCategoria = newVal.IdOfertaCategoria
           this.producto.VentaEstrategica = newVal.VentaEstrategica
           this.producto.TienePresentacion = newVal.TienePresentacion
+          this.producto.ConsiderarDecimalFlag = newVal.ConsiderarDecimalFlag
           this.producto.PalabraClave = newVal.PalabraClave
           this.producto.UCorporativo = newVal.UCorporativo
           this.producto.UPublico = newVal.UPublico
@@ -691,6 +697,7 @@ export default {
         ControlaStockMinimo: 0,
         StockMinimo: 0,
         TienePresentacion: 0,
+        ConsiderarDecimalFlag: 0,
         PalabraClave: '',
         PrecioCosto: 0,
         PrecioContado: 0,

@@ -473,14 +473,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
-import sound from '../../static/beep.mp3'
-import Vue from "vue"
-import VueQuagga from "vue-quaggajs"
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
+import sound from "../../static/beep.mp3";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
 
-Vue.use(VueQuagga)
+Vue.use(VueQuagga);
 
 export default {
   mounted() {
@@ -492,7 +492,7 @@ export default {
       verTableCarrito: true,
       readerSize: {
         width: 1600,
-        height: 1080,
+        height: 1080
       },
 
       detecteds: [
@@ -511,7 +511,7 @@ export default {
       result: "",
       format: "",
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
@@ -523,15 +523,15 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
-      medicionPro: 'UNIDAD',
+      medicionPro: "UNIDAD",
       productoSelect: {},
       productoPresentacion: [],
-      idPerfil: sessionStorage.getItem('IdPerfil'),
-      productoNombre: '',
-      productoUrl: '',
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      productoNombre: "",
+      productoUrl: "",
       modalAbiertCode: false,
       editarPrecio: 0
-    }
+    };
   },
   created() {
     // Add barcode scan listener and pass the callback function
@@ -542,30 +542,25 @@ export default {
     this.$barcodeScanner.destroy();
   },
   watch: {
-
     recalcularTipoDeUtilidadFlag() {
-
-      this.changeTipoUtilidad()
-
+      this.changeTipoUtilidad();
     },
     tipoUtilidad() {
-      this.changeTipoUtilidad()
+      this.changeTipoUtilidad();
     },
     sumatoriaTotal(sum) {
-      this.asignarVuelto()
+      this.asignarVuelto();
     },
     productos(prods) {
-
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
-        this.productos[pi].precioBruta = this.productos[pi].precio
+        this.productos[pi].precioBruta = this.productos[pi].precio;
       }
       // this.changeTipoUtilidad()
     }
   },
   props: {
-
     tipoVenta: Number,
     editarPrecioBloque: Number,
     tipoUtilidad: String,
@@ -581,7 +576,7 @@ export default {
     onSetProducto: {
       type: Function,
       default(obj) {
-        return obj
+        return obj;
       }
     },
     showButton: {
@@ -591,28 +586,33 @@ export default {
     fields: {
       default() {
         return [
-          { key: 'itemNum', label: '#', class: 'text-center thclass' },
-          { key: 'stock', label: 'Stock', variant: 'info', class: 'text-center' },
-          { key: 'CodigoBarra', label: 'Código' },
+          { key: "itemNum", label: "#", class: "text-center thclass" },
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "CodigoBarra", label: "Código" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' },
+          { key: "Producto", label: "Artículo" },
           //{ key: 'Descripcion', label: 'Descripción'},
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoModelo', label: 'Modelo/Color' },
-          { key: 'obsequio', label: 'Obsequio', class: 'thcenter' },
-          { key: 'eventPres', label: '' },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoModelo", label: "Modelo/Color" },
+          { key: "obsequio", label: "Obsequio", class: "thcenter" },
+          { key: "eventPres", label: "" },
           //{ key: 'cantxPrecio', variant: 'warning' },
           // { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: '' }
-        ]
+          { key: "precioVenta", label: "Precio venta (S/)" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     }
@@ -621,107 +621,112 @@ export default {
     ...mapState({
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados,
-      recalcularTipoDeUtilidadFlag: state => state.cart.recalcularTipoDeUtilidadFlag
+      recalcularTipoDeUtilidadFlag: state =>
+        state.cart.recalcularTipoDeUtilidadFlag
     }),
     calcularDescuento() {
-      return (index) => {
-        let porcentajeDesc = parseFloat(this.productos[index].PorcentajeDesc) || 0;
+      return index => {
+        let porcentajeDesc =
+          parseFloat(this.productos[index].PorcentajeDesc) || 0;
         let subtotal = this.getSubtotal(index);
-        let descuento = parseFloat((subtotal * porcentajeDesc / 100).toFixed(0));
+        let descuento = parseFloat(
+          ((subtotal * porcentajeDesc) / 100).toFixed(0)
+        );
         return descuento;
       };
     },
 
     APIProductos() {
       if (this.idAlmacen) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       } else {
-        return this.API + 'productos'
+        return this.API + "productos";
       }
     },
     sumatoriaSubTotal() {
-      let sumatoria = 0
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
     sumatoriaTotal() {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
 
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
     sumatoriaIgv() {
-      let sumatoria = 0
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria / 1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
     sumatoriaDescuento() {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd: 'actualizarProducto',
-      obtenerStok: 'obtenerStock',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock"
     }),
     actualizarDescuento(index) {
       this.productos[index].descuento = this.calcularDescuento(index);
     },
     abrirFormularioNuevoProducto() {
-
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = true;
     },
     obtenerAnaquel(data) {
-      if (data.Anaqueles && data.Anaqueles != 'null' && this.idAlmacen > 0) {
-        let obj = JSON.parse(data.Anaqueles)
-        let anaquel = obj.find((d) => d.id == this.idAlmacen)
-        return anaquel ? anaquel.nombre : ''
+      if (data.Anaqueles && data.Anaqueles != "null" && this.idAlmacen > 0) {
+        let obj = JSON.parse(data.Anaqueles);
+        let anaquel = obj.find(d => d.id == this.idAlmacen);
+        return anaquel ? anaquel.nombre : "";
       }
-      return ''
-
+      return "";
     },
     setSubtotal(index, val, prod) {
-      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
-      Vue.set(this.productos[index], 'precio', precio)
-      this.actualizarProd({ Producto: prod, Pos: index })
+      let precio = this.$options.filters.redondear(
+        val / this.productos[index].cantidad,
+        3
+      );
+      Vue.set(this.productos[index], "precio", precio);
+      this.actualizarProd({ Producto: prod, Pos: index });
     },
     abrirImagen(producto, url) {
-      this.productoNombre = producto
-      this.productoUrl = url
-      this.$refs['modalImagen'].show()
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
     },
     abrirCodigoBarra() {
-      this.$refs['modalCodigoBarra'].show()
+      this.$refs["modalCodigoBarra"].show();
       this.modalAbiertCode = true;
       this.result = "";
     },
@@ -729,12 +734,12 @@ export default {
       if (this.modalAbiertCode) {
         this.result = barcode.codeResult.code;
         this.format = barcode.codeResult.format;
-        const audio = new Audio(sound)
-        audio.play()
+        const audio = new Audio(sound);
+        audio.play();
         if (this.result.length > 0) {
           this.loadCode = this.result;
           this.loadBarcode();
-          this.$refs['modalCodigoBarra'].hide()
+          this.$refs["modalCodigoBarra"].hide();
           this.modalAbiertCode = false;
         }
       }
@@ -742,75 +747,84 @@ export default {
       // do something...
     },
     setAltImg(event) {
-      event.target.src = "static/no-photo.png"
+      event.target.src = "static/no-photo.png";
     },
     changeCant(val, prod, index) {
       if (val > 0) {
         if (prod.EsPresentacion) {
-
-          prod.cantidad = prod.cantxPrecio * prod.cantidadPres
+          prod.cantidad = prod.cantxPrecio * prod.cantidadPres;
         }
         //prod.cantidad *= Number(prod.cantidad)
         //prod.cantidad = Number(prod.cantidadPres)
         //prod.cantidad = Number(val)
       }
-      prod.subt = ''
+      prod.subt = "";
       this.$nextTick(() => {
-        this.actualizarProd({ Producto: prod, Pos: index })
-      })
+        this.actualizarProd({ Producto: prod, Pos: index });
+      });
     },
 
     cambiarPrecio(index, prod) {
-      var utilidad = this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+      var utilidad =
+        this.productos[index].PrecioCosto *
+        (this.productos[index].PorcentajeUtilidad / 100);
+      this.productos[index].precio = Math.ceil(
+        this.productos[index].PrecioCosto + utilidad
+      );
     },
 
     addManoDeObra(index, e) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi < 0) {
-        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
+        this.$toasted.error("Primero seleccione el producto MANODEOBRA");
 
-        this.productos[index].EsManoDeObra = 0
+        this.productos[index].EsManoDeObra = 0;
         return;
       }
 
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = true
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) -
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = true;
       } else {
-        e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].precio = 0
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = false
+        e.target.parentNode.parentNode.removeAttribute("style");
+        this.productos[pi].precio = 0;
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) +
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = false;
       }
     },
 
     updateManoDeObraNeta(index) {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-        precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
-      })
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
 
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
-        this.productos[pi].precio = precio
+        this.productos[pi].precio = precio;
       }
     },
 
     asignarDisabledProf(index, e) {
       if (e.target.checked === true) {
-        this.productos[index].disabledProf = 1
-        return
+        this.productos[index].disabledProf = 1;
+        return;
       }
-      this.productos[index].disabledProf = 0
+      this.productos[index].disabledProf = 0;
     },
 
     asignarVuelto() {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     // loadBarcode (e) {
     //   e.preventDefault()
@@ -831,21 +845,22 @@ export default {
 
     loadBarcode(e) {
       if (e) {
-        e.preventDefault()
+        e.preventDefault();
       }
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = { codigoBarra: idProducto }
-        this.axios.get(this.API + 'productos/id/' + idProducto, { params: params })
-          .then((response) => {
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
             if (response.data.IdProducto) {
-              this.setProducto(response.data)
+              this.setProducto(response.data);
             } else {
-              this.loadCode = ''
-              this.$toasted.show('No se encontró ningun producto')
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
             }
-          })
+          });
       }
     },
 
@@ -878,21 +893,22 @@ export default {
       }
     },*/
     setObsequio(index) {
-      this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+      this.productos[index].precio = 0;
+      this.productos[index].nuevoPrecioContado = 0;
     },
     focusAutocomplete(ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
     editarProducto(Pro) {
       // console.log(Pro)
       //this.$store.state.cart.precio_venta = 55
-      this.productoSelect = Pro
+      this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
-      this.$store.state.cart.precio_venta =
-        this.isVentas ? Pro.precio : Pro.nuevoPrecioContado;
+      this.$store.state.cart.precio_venta = this.isVentas
+        ? Pro.precio
+        : Pro.nuevoPrecioContado;
     },
     async agregarGuardar(id, pxp, obj) {
       // console.log('obj', obj)
@@ -902,70 +918,112 @@ export default {
         this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
       }, 200);
 
-
-      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
       if (fPP.length != 4) {
-        obj.ProductoMedicion = obj.medicion.ProductoMedicion
-        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-        obj.IdProductoMarca = obj.marca.IdProductoMarca
-        obj.ProductoMarca = obj.marca.ProductoMarca
-        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-        obj.ProductoCategoria = obj.categoria.ProductoCategoria
+        obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+        obj.IdProductoMarca = obj.marca.IdProductoMarca;
+        obj.ProductoMarca = obj.marca.ProductoMarca;
+        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+        obj.ProductoCategoria = obj.categoria.ProductoCategoria;
 
-        this.productoSelect = obj
-        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-        this.showPresentacion(this.productoSelect)
+        this.productoSelect = obj;
+        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+        this.showPresentacion(this.productoSelect);
       }
       setTimeout(() => {
-        this.changeTipoUtilidad()
+        this.changeTipoUtilidad();
       }, 1000);
     },
     async setProducto(obj) {
-      let val = this.productos.some(prod =>
-        prod.IdProducto === obj.IdProducto
-      )
+      let val = this.productos.some(prod => prod.IdProducto === obj.IdProducto);
       if (val) {
-        this.$toasted.show('Producto ya se encuentra en el listado')
+        this.$toasted.show("Producto ya se encuentra en el listado");
         return;
       }
 
-      this.precioCont = obj.PrecioContado
+      this.precioCont = obj.PrecioContado;
       obj.estadoPxP = obj.TienePresentacion == 1 ? false : true;
-      this.loadCode = ''
-      this.preciosProd = []
-      this.objProd = {}
-      obj.EsObsequio = 0
-      obj.EsVenta = this.isVentas
+      this.loadCode = "";
+      this.preciosProd = [];
+      this.objProd = {};
+      obj.EsObsequio = 0;
+      obj.EsVenta = this.isVentas;
       obj.EsVentaNew = true;
-      obj.OldPrecioCosto = obj.PrecioCosto
-      obj.PorcentajeDesc = 0
+      obj.OldPrecioCosto = obj.PrecioCosto;
+      obj.PorcentajeDesc = 0;
       if (obj.TienePresentacion == 1) {
-        let presentacion = JSON.parse(obj.PreciosPorProducto)
-        obj.presentacion = presentacion.filter(v => v.cantidad > 0)
-
+        let presentacion = JSON.parse(obj.PreciosPorProducto);
+        obj.presentacion = presentacion.filter(v => v.cantidad > 0);
       }
       switch (this.tipoUtilidad) {
-        case 'Corporativo':
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UCorporativo) / 100).toFixed(0)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100).toFixed(0)).toFixed(2)
+        case "Corporativo":
+          this.isVentas
+            ? (obj.precio = parseFloat(
+                parseFloat(
+                  obj.OldPrecioCosto +
+                    (obj.OldPrecioCosto * obj.UCorporativo) / 100
+                ).toFixed(0)
+              ).toFixed(2))
+            : "";
+          obj.nuevoPrecioContado = parseFloat(
+            parseFloat(
+              obj.PrecioCosto + (obj.PrecioCosto * obj.UCorporativo) / 100
+            ).toFixed(0)
+          ).toFixed(2);
           break;
-        case 'Publico':
-          if(obj.OldPrecioCosto < 1){
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(1)).toFixed(2)
-          }else{
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100).toFixed(0)).toFixed(2)
+        case "Publico":
+          if (obj.OldPrecioCosto < 1) {
+            this.isVentas
+              ? (obj.precio = parseFloat(
+                  parseFloat(
+                    obj.OldPrecioCosto +
+                      (obj.OldPrecioCosto * obj.UPublico) / 100
+                  ).toFixed(1)
+                ).toFixed(2))
+              : "";
+            obj.nuevoPrecioContado = parseFloat(
+              parseFloat(
+                obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100
+              ).toFixed(1)
+            ).toFixed(2);
+          } else {
+            this.isVentas
+              ? (obj.precio = parseFloat(
+                  parseFloat(
+                    obj.OldPrecioCosto +
+                      (obj.OldPrecioCosto * obj.UPublico) / 100
+                  ).toFixed(0)
+                ).toFixed(2))
+              : "";
+            obj.nuevoPrecioContado = parseFloat(
+              parseFloat(
+                obj.PrecioCosto + (obj.PrecioCosto * obj.UPublico) / 100
+              ).toFixed(0)
+            ).toFixed(2);
           }
           break;
-        case 'Taller':
-
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100).toFixed(0)).toFixed(2) : '';
-          obj.nuevoPrecioContado = parseFloat(parseFloat(obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100).toFixed(0)).toFixed(2)
+        case "Taller":
+          this.isVentas
+            ? (obj.precio = parseFloat(
+                parseFloat(
+                  obj.OldPrecioCosto + (obj.OldPrecioCosto * obj.UTaller) / 100
+                ).toFixed(0)
+              ).toFixed(2))
+            : "";
+          obj.nuevoPrecioContado = parseFloat(
+            parseFloat(
+              obj.PrecioCosto + (obj.PrecioCosto * obj.UTaller) / 100
+            ).toFixed(0)
+          ).toFixed(2);
           break;
 
         default:
-          this.isVentas ? obj.precio = parseFloat(parseFloat(obj.OldPrecioCosto).toFixed(0)).toFixed(2) : '';
+          this.isVentas
+            ? (obj.precio = parseFloat(
+                parseFloat(obj.OldPrecioCosto).toFixed(0)
+              ).toFixed(2))
+            : "";
           // console.log(obj.precio)
           break;
       }
@@ -986,136 +1044,260 @@ export default {
       this.objProd = obj*/
 
       if (!this.isVentas) {
-        obj.PreciosPorProducto = ''
-        this.setProductoUni(obj)
-        return
+        obj.PreciosPorProducto = "";
+        this.setProductoUni(obj);
+        return;
       }
-      this.preciosProd.push({ nombre: "P. Pub.", cantidad: 1, precio: obj.PrecioContado })
+      this.preciosProd.push({
+        nombre: "P. Pub.",
+        cantidad: 1,
+        precio: obj.PrecioContado
+      });
       if (obj.precioConvenio) {
-        this.preciosProd.push({ nombre: "P. Dis.", cantidad: 1, precio: obj.precioConvenio })
+        this.preciosProd.push({
+          nombre: "P. Dis.",
+          cantidad: 1,
+          precio: obj.precioConvenio
+        });
       }
       if (obj.PrecioEspecial) {
-        this.preciosProd.push({ nombre: "P. Esp.", cantidad: 1, precio: obj.PrecioEspecial })
+        this.preciosProd.push({
+          nombre: "P. Esp.",
+          cantidad: 1,
+          precio: obj.PrecioEspecial
+        });
       }
-      this.objProd = {}
-      this.objProd = obj
+      this.objProd = {};
+      this.objProd = obj;
       if (this.preciosProd.length == 1) {
-        this.setProductoUni(obj, obj.PrecioContado)
+        this.setProductoUni(obj, obj.PrecioContado);
       } else {
-        this.modalCantFlag = true
+        this.modalCantFlag = true;
       }
       if (this.isVentas) {
-        this.changeTipoUtilidad()
+        this.changeTipoUtilidad();
       }
       this.$forceUpdate();
     },
     changeTipoUtilidad() {
-
-      this.verTableCarrito = !this.verTableCarrito
-      let productos = [...this.productos]
+      this.verTableCarrito = !this.verTableCarrito;
+      let productos = [...this.productos];
       productos.forEach(prod => {
-        prod.OldPrecioCosto = prod.PrecioCosto
+        prod.OldPrecioCosto = prod.PrecioCosto;
+
         switch (this.tipoUtilidad) {
-          case 'Corporativo':
-
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2) : '';
+          case "Corporativo":
+            this.isVentas
+              ? (prod.precio =
+                  prod.ConsiderarDecimalFlag == 1
+                    ? parseFloat(
+                        prod.OldPrecioCosto +
+                          (prod.OldPrecioCosto * prod.UCorporativo) / 100
+                      ).toFixed(2)
+                    : parseFloat(
+                        parseFloat(
+                          prod.OldPrecioCosto +
+                            (prod.OldPrecioCosto * prod.UCorporativo) / 100
+                        ).toFixed(0)
+                      ).toFixed(2))
+              : "";
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2);
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
+            prod.nuevoPrecioContado =
+              prod.ConsiderarDecimalFlag == 1
+                ? parseFloat(
+                    prod.PrecioCosto +
+                      (prod.PrecioCosto * prod.UCorporativo) / 100
+                  ).toFixed(2)
+                : parseFloat(
+                    parseFloat(
+                      prod.PrecioCosto +
+                        (prod.PrecioCosto * prod.UCorporativo) / 100
+                    ).toFixed(0)
+                  ).toFixed(2);
             break;
-          case 'Publico':
-            if(prod.OldPrecioCosto < 1){
-              this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2) : '';
-            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(1)).toFixed(2)
-          }else{
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2) : '';
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
-            // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
-          }
+          case "Publico":
+            if (prod.OldPrecioCosto < 1) {
+              this.isVentas
+                ? (prod.precio = parseFloat(
+                    parseFloat(
+                      prod.OldPrecioCosto +
+                        (prod.OldPrecioCosto * prod.UPublico) / 100
+                    ).toFixed(1)
+                  ).toFixed(2))
+                : "";
+              // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
+              prod.nuevoPrecioContado = parseFloat(
+                parseFloat(
+                  prod.PrecioCosto + (prod.PrecioCosto * prod.UPublico) / 100
+                ).toFixed(1)
+              ).toFixed(2);
+            } else {
+              this.isVentas
+                ? (prod.precio =
+                    prod.ConsiderarDecimalFlag == 1
+                      ? parseFloat(
+                          prod.OldPrecioCosto +
+                            (prod.OldPrecioCosto * prod.UPublico) / 100
+                        ).toFixed(2)
+                      : parseFloat(
+                          parseFloat(
+                            prod.OldPrecioCosto +
+                              (prod.OldPrecioCosto * prod.UPublico) / 100
+                          ).toFixed(0)
+                        ).toFixed(2))
+                : "";
+              prod.nuevoPrecioContado =
+                prod.ConsiderarDecimalFlag == 1
+                  ? parseFloat(
+                      prod.PrecioCosto +
+                        (prod.PrecioCosto * prod.UPublico) / 100
+                    ).toFixed(2)
+                  : parseFloat(
+                      parseFloat(
+                        prod.PrecioCosto +
+                          (prod.PrecioCosto * prod.UPublico) / 100
+                      ).toFixed(0)
+                    ).toFixed(2);
+              // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2);
+            }
 
             break;
-          case 'Taller':
-
-            this.isVentas ? prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2) : '';
+          case "Taller":
+            this.isVentas
+              ? (prod.precio =
+                  prod.ConsiderarDecimalFlag == 1
+                    ? parseFloat(
+                        prod.OldPrecioCosto +
+                          (prod.OldPrecioCosto * prod.UTaller) / 100
+                      ).toFixed(2)
+                    : parseFloat(
+                        parseFloat(
+                          prod.OldPrecioCosto +
+                            (prod.OldPrecioCosto * prod.UTaller) / 100
+                        ).toFixed(0)
+                      ).toFixed(2))
+              : "";
             // prod.nuevoPrecioContado = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2);
-            
-            prod.nuevoPrecioContado = parseFloat(parseFloat(prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
+
+            prod.nuevoPrecioContado =
+              prod.ConsiderarDecimalFlag == 1
+                ? parseFloat(
+                    prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100
+                  ).toFixed(2)
+                : parseFloat(
+                    parseFloat(
+                      prod.PrecioCosto + (prod.PrecioCosto * prod.UTaller) / 100
+                    ).toFixed(0)
+                  ).toFixed(2);
             break;
 
           default:
-            this.isVentas ? prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2) : '';
-            prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(2)
+            this.isVentas
+              ? (prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2))
+              : "";
+            prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(
+              2
+            );
             break;
         }
-
       });
 
       // console.log('PrecioContado ', productos)
-      this.$store.state.cart.productos = productos
+      this.$store.state.cart.productos = productos;
       setTimeout(() => {
-
-        this.verTableCarrito = !this.verTableCarrito
+        this.verTableCarrito = !this.verTableCarrito;
       }, 10);
     },
     recalcularPU(index) {
-      console.log(index)
+      console.log(index);
     },
 
     setProductoUnd(obj, precio = false) {
-      let prod = { ...obj }
-      prod.cantxPrecio = 1
-      prod.cantidad = 1
-      prod.EsPresentacion = false
+      let prod = { ...obj };
+      prod.cantxPrecio = 1;
+      prod.cantidad = 1;
+      prod.EsPresentacion = false;
       prod.descripcionPresentacion = null;
       switch (this.tipoUtilidad) {
-        case 'Corporativo':
-
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UCorporativo) / 100).toFixed(0)).toFixed(2)
+        case "Corporativo":
+          prod.precio =
+            prod.ConsiderarDecimalFlag == 1
+              ? parseFloat(
+                  prod.OldPrecioCosto +
+                    (prod.OldPrecioCosto * prod.UCorporativo) / 100
+                ).toFixed(2)
+              : parseFloat(
+                  parseFloat(
+                    prod.OldPrecioCosto +
+                      (prod.OldPrecioCosto * prod.UCorporativo) / 100
+                  ).toFixed(0)
+                ).toFixed(2);
 
           break;
-        case 'Publico':
-
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UPublico) / 100).toFixed(0)).toFixed(2)
+        case "Publico":
+          prod.precio =
+            prod.ConsiderarDecimalFlag == 1
+              ? parseFloat(
+                  prod.OldPrecioCosto +
+                    (prod.OldPrecioCosto * prod.UPublico) / 100
+                ).toFixed(2)
+              : parseFloat(
+                  parseFloat(
+                    prod.OldPrecioCosto +
+                      (prod.OldPrecioCosto * prod.UPublico) / 100
+                  ).toFixed(0)
+                ).toFixed(2);
 
           break;
-        case 'Taller':
-
-          prod.precio = parseFloat(parseFloat(prod.OldPrecioCosto + (prod.OldPrecioCosto * prod.UTaller) / 100).toFixed(0)).toFixed(2)
+        case "Taller":
+          prod.precio =
+            prod.ConsiderarDecimalFlag == 1
+              ? parseFloat(
+                  prod.OldPrecioCosto +
+                    (prod.OldPrecioCosto * prod.UTaller) / 100
+                ).toFixed(2)
+              : parseFloat(
+                  parseFloat(
+                    prod.OldPrecioCosto +
+                      (prod.OldPrecioCosto * prod.UTaller) / 100
+                  ).toFixed(0)
+                ).toFixed(2);
 
           break;
 
         default:
-          prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2)
-          prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(2)
+          prod.precio = parseFloat(prod.OldPrecioContado).toFixed(2);
+          prod.nuevoPrecioContado = parseFloat(prod.OldPrecioContado).toFixed(
+            2
+          );
           break;
       }
 
       // console.log('indexProdSelect',this.indexProdSelect)
       this.actualizarProd({ Producto: prod, Pos: this.indexProdSelect });
-      this.modalCantFlag = false
+      this.modalCantFlag = false;
     },
 
     setProductoUni(obj, precio = false) {
-
-      this.objProd.cantxPrecio = 1
+      this.objProd.cantxPrecio = 1;
       //this.$refs.autocompleteProducto.setValue('')
-      obj.subt = ''
+      obj.subt = "";
       //obj.FLETE = 0
-      obj.precio = obj.PrecioContado
-      obj.cantidad = 0
+      obj.precio = obj.PrecioContado;
+      obj.cantidad = 0;
       obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
+      obj.descuento = 0;
 
       // obj.nuevoPrecioContado = 0
 
-      obj = this.onSetProducto(obj, false, precio)
+      obj = this.onSetProducto(obj, false, precio);
 
-      obj.cantidadPres = obj.cantidad
+      obj.cantidadPres = obj.cantidad;
 
-      this.$store.state.cart.productos.push(obj)
-      this.$toasted.success('Producto añadido correctamente')
+      this.$store.state.cart.productos.push(obj);
+      this.$toasted.success("Producto añadido correctamente");
       this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
       // this.add([obj, () => {
       //   console.log('objq', obj.nuevoPrecioContado)
@@ -1127,52 +1309,55 @@ export default {
       //   },
       //   false, false])
 
-      this.loadCode = ''
+      this.loadCode = "";
 
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.modalCantFlag = false
-      this.$refs.barcodeInput.focus()
+      this.modalCantFlag = false;
+      this.$refs.barcodeInput.focus();
       //this.actualizarProd(obj)
     },
 
-
     setProductoCant(prod) {
-      this.objProd.cantxPrecio = 1
-      this.cant = prod.cantidad
-      let obj = this.objProd
-      obj.EsPresentacion = true
+      this.objProd.cantxPrecio = 1;
+      this.cant = prod.cantidad;
+      let obj = this.objProd;
+      obj.EsPresentacion = true;
       //this.$refs.autocompleteProducto.setValue('')
-      obj.subt = ''
+      obj.subt = "";
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = prod.precio
-      obj.cantidad = 1
+      obj.precio = prod.precio;
+      obj.cantidad = 1;
       obj.EsVentaNew = true;
       obj.descripcionPresentacion = JSON.stringify(prod);
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj.cantidadPres = this.cant
-      obj = this.onSetProducto(obj, prod.cantidad, prod.precio)
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.cantidadPres = this.cant;
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
       if (this.indexProdSelect == null) {
-        this.add([obj, () => {
-          this.$emit('onAddProducto', obj)
-          this.$toasted.success('Producto añadido correctamente')
-          //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-        }, false, false])
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+            //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+          },
+          false,
+          false
+        ]);
       } else {
-
         this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
-        this.indexProdSelect = null
+        this.indexProdSelect = null;
       }
 
-      this.modalCantFlag = false
-      this.$refs.barcodeInput.focus()
+      this.modalCantFlag = false;
+      this.$refs.barcodeInput.focus();
       //this.actualizarProd(obj)
-      console.log(obj)
+      console.log(obj);
     },
     showPresentacion(obj, index) {
       /*if (!obj.PreciosPorProducto !== '') {
@@ -1186,34 +1371,46 @@ export default {
       if (this.isVentas) {
         if (obj.TienePresentacion == 1) {
           // let presentacion = JSON.parse(obj.PreciosPorProducto)
-          this.productoPresentacion = obj.presentacion
+          this.productoPresentacion = obj.presentacion;
         }
-        this.preciosProd = []
-        this.preciosProd.push({ nombre: "P. Pub.", cantidad: 1, precio: obj.PrecioContado })
+        this.preciosProd = [];
+        this.preciosProd.push({
+          nombre: "P. Pub.",
+          cantidad: 1,
+          precio: obj.PrecioContado
+        });
         if (obj.precioConvenio) {
-          this.preciosProd.push({ nombre: "P. Dis.", cantidad: 1, precio: obj.precioConvenio })
+          this.preciosProd.push({
+            nombre: "P. Dis.",
+            cantidad: 1,
+            precio: obj.precioConvenio
+          });
         }
         if (obj.PrecioEspecial) {
-          this.preciosProd.push({ nombre: "P. Esp.", cantidad: 1, precio: obj.PrecioEspecial })
+          this.preciosProd.push({
+            nombre: "P. Esp.",
+            cantidad: 1,
+            precio: obj.PrecioEspecial
+          });
         }
         obj.EsVentaNew = true;
-        this.objProd = obj
-        this.indexProdSelect = index
-        this.modalCantFlag = true
-        return
+        this.objProd = obj;
+        this.indexProdSelect = index;
+        this.modalCantFlag = true;
+        return;
       }
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let styleStock = ''
+        let styleStock = "";
         if (data.stock <= 0) {
-          styleStock = 'table-danger'
+          styleStock = "table-danger";
         } else {
-          styleStock = 'table-success'
+          styleStock = "table-success";
         }
 
         if (data.EsPadre == 1) {
-          styleStock = ''
+          styleStock = "";
         }
 
         return `
@@ -1242,44 +1439,65 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre == 1 ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />' : (data.stock ? Number.isInteger(data.stock) ? data.stock : data.stock.toFixed(2) : data.stock)}</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${
+          data.EsPadre == 1
+            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+            : data.stock
+              ? Number.isInteger(data.stock)
+                ? data.stock
+                : data.stock.toFixed(2)
+              : data.stock
+        }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
                 <td style="width: 5%">
-                  <img src="${data.Imagen == null || data.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.Imagen}" class="imagen">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica == 1 ? '<i class="fas fa-star" style="color:yellow !important" ></i>' : ''}</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
               </tr>
             </tbody>
           </table>   
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoModelo} / ${data.ProductoCategoria} / ${data.ProductoMarca}  
-      `
+        <b>${data.Producto}</b> / ${data.ProductoModelo} / ${
+        data.ProductoCategoria
+      } / ${data.ProductoMarca}  
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
     setNuevoPrecioContado(index) {
-
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
+      let precio = parseFloat(this.productos[index].precio);
       if (this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
-
+        precio += precio * 0.18;
       }
-      let precioFinal = 0
+      let precioFinal = 0;
       //if(this.isVentas){
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-      // let precioFinal = 
+      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      // let precioFinal =
       // }else{
-      precioFinal = precio * this.productos[index].PorcentajeUtilidad / 100 + precio
+      precioFinal =
+        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
       if (this.isVentas) {
-        Vue.set(this.productos[index], 'subt', '')
+        Vue.set(this.productos[index], "subt", "");
       }
       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
@@ -1288,53 +1506,53 @@ export default {
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
-
-      let normalPrecio = this.$options.filters.redondear(precioFinal)
+      let normalPrecio = this.$options.filters.redondear(precioFinal);
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1)
+      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
 
       if (this.tipoCambio > 0) {
-        normalPrecio *= this.tipoCambio
-        nuevoPrecio *= this.tipoCambio
+        normalPrecio *= this.tipoCambio;
+        nuevoPrecio *= this.tipoCambio;
       }
 
       // Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
       // Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
-      this.getSubtotal(index)
+      this.getSubtotal(index);
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
-      this.updateManoDeObraNeta(index)
+      // return nuevoPrecio
+      this.updateManoDeObraNeta(index);
     },
     actualizarDescu(index) {
       this.$nextTick(() => {
         //console.log('holi')
         let obj = this.productos[index];
-        this.actualizarProd({ Producto: obj, Pos: index })
-      })
+        this.actualizarProd({ Producto: obj, Pos: index });
+      });
     },
     getSubtotal(index) {
-
       let subtotal = this.$options.filters.redondear(
-        (this.productos[index].EsPresentacion ? this.productos[index].cantxPrecio : this.productos[index].cantidad) * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+        (this.productos[index].EsPresentacion
+          ? this.productos[index].cantxPrecio
+          : this.productos[index].cantidad) * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
-
+      return subtotal;
     },
     getIgv(index) {
-
-      let igv = 0
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
-
+      return igv;
     },
-     getTotal(index) {
+    getTotal(index) {
       let subtotal = parseFloat(this.productos[index].subtotal) || 0;
       //subtotal = subtotal.toFixed(0);
       let flete = parseFloat(this.productos[index].FLETE) || 0;
@@ -1349,38 +1567,47 @@ export default {
       if (this.productos[index].TieneIgv) {
         total += igv;
       }
-     
+
       total -= parseFloat((subtotal * descuento) / 100).toFixed(0);
-      
+
       //total = parseFloat(total.toFixed(0)); Cambio para ingreso de productos con 2 decimales
       total = parseFloat(total.toFixed(2));
 
       // Establece el valor en el objeto y asegura el formato de dos decimales
-      Vue.set(this.productos[index], 'total', total.toFixed(2));
+      Vue.set(this.productos[index], "total", total.toFixed(2));
 
       return total.toFixed(2);
     },
 
     getData(value) {
-      this.buscar(value)
+      this.buscar(value);
     },
     recalcularDescuento() {
       //this.$nextTick(() => {
-       // console.log('dddd')
-        let des = this.productos.reduce((total, prod) => {
-          return parseFloat((total + prod.subtotal * prod.PorcentajeDesc / 100).toFixed(0));
-        }, 0)
+      // console.log('dddd')
+      let des = this.productos.reduce((total, prod) => {
+        return parseFloat(
+          (total + (prod.subtotal * prod.PorcentajeDesc) / 100).toFixed(0)
+        );
+      }, 0);
 
-        return parseFloat(des).toFixed(2)
+      return parseFloat(des).toFixed(2);
       //})
     },
     recalcularSubTotal() {
       let des = this.productos.reduce((total, prod) => {
-        return total + parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0) / 100).toFixed(0)
+        return (
+          total +
+          parseFloat(prod.subtotal) -
+          parseFloat(
+            (prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0)) /
+              100
+          ).toFixed(0)
+        );
         // return parseFloat((total + parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc || 0) / 100)).toFixed(2));
-      }, 0)
+      }, 0);
 
-      return parseFloat(des).toFixed(2)
+      return parseFloat(des).toFixed(2);
     },
     recalcularTotal() {
       /*
@@ -1392,34 +1619,38 @@ export default {
       return parseFloat(des).toFixed(2) 
       */
       let total = this.productos.reduce((total, prod) => {
-            // Subtotal con descuento aplicado
-            let subtotalConDescuento = parseFloat(prod.subtotal) - parseFloat(prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0) / 100).toFixed(0);
+        // Subtotal con descuento aplicado
+        let subtotalConDescuento =
+          parseFloat(prod.subtotal) -
+          parseFloat(
+            (prod.subtotal * (prod.PorcentajeDesc ? prod.PorcentajeDesc : 0)) /
+              100
+          ).toFixed(0);
 
-            // Sumar el subtotal con descuento
-            total += subtotalConDescuento;
+        // Sumar el subtotal con descuento
+        total += subtotalConDescuento;
 
-            // Agregar IGV si el producto lo tiene
-            if (prod.TieneIgv) {
-              total += parseFloat(parseFloat(prod.igv).toFixed(2)) || 0;
-            }
+        // Agregar IGV si el producto lo tiene
+        if (prod.TieneIgv) {
+          total += parseFloat(parseFloat(prod.igv).toFixed(2)) || 0;
+        }
 
-            return total;
-          }, 0);
+        return total;
+      }, 0);
 
-          return parseFloat(total).toFixed(2);
-
+      return parseFloat(total).toFixed(2);
     },
     quitarProducto(index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     },
 
     formatFecha(fecha) {
       if (fecha) {
-        return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+        return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
       } else {
-        return ''
+        return "";
       }
     },
 
@@ -1434,76 +1665,81 @@ export default {
       }
 
       this.$swal({
-        title: 'Escriba la contraseña del administrador',
-        icon: 'question',
+        title: "Escriba la contraseña del administrador",
+        icon: "question",
         showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Atrás',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Atrás",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
         allowOutsideClick: false,
         allowEscapeKey: false,
         html: `<input type="text" id="usuario" class="swal2-input" placeholder="Usuario"/>
                <input type="password" id="password" class="swal2-input" placeholder="Contraseña"/>
         `,
         preConfirm: () => {
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             resolve({
-              usuario: document.getElementById('usuario').value,
-              password: document.getElementById('password').value
+              usuario: document.getElementById("usuario").value,
+              password: document.getElementById("password").value
             });
           });
         }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let password = result.value.password;
-          let usuario = result.value.usuario;
-          this.axios.post(this.API + 'login', {
-            user: usuario,
-            password: password
-          }).then(response => {
-            // Respuesta de la API
-            if (response.data && response.data.IdUsuarioPerfil == 1) {
-              producto.editarPrecio = 1;
-            } else {
-              this.$swal({
-                title: 'Error',
-                text: 'Contraseña incorrecta',
-                icon: 'error',
-              }).then(() => {
-                // Si la contraseña es incorrecta, desmarca el checkbox
-                //this.checkboxValue = 0;
-                producto.editarPrecio = 0;
+      })
+        .then(result => {
+          if (result.isConfirmed) {
+            let password = result.value.password;
+            let usuario = result.value.usuario;
+            this.axios
+              .post(this.API + "login", {
+                user: usuario,
+                password: password
+              })
+              .then(response => {
+                // Respuesta de la API
+                if (response.data && response.data.IdUsuarioPerfil == 1) {
+                  producto.editarPrecio = 1;
+                } else {
+                  this.$swal({
+                    title: "Error",
+                    text: "Contraseña incorrecta",
+                    icon: "error"
+                  }).then(() => {
+                    // Si la contraseña es incorrecta, desmarca el checkbox
+                    //this.checkboxValue = 0;
+                    producto.editarPrecio = 0;
+                  });
+                }
+              })
+              .catch(error => {
+                // Error en la solicitud
+                this.$swal({
+                  title: "Error",
+                  text: "Hubo un problema con la solicitud",
+                  icon: "error"
+                });
               });
-            }
-          }).catch(error => {
-            // Error en la solicitud
+          } else {
+            // Si el modal se cierra sin confirmar
+            //this.checkboxValue = 0;
+            producto.editarPrecio = 0;
+          }
+        })
+        .catch(error => {
+          if (error) {
             this.$swal({
-              title: 'Error',
-              text: 'Hubo un problema con la solicitud',
-              icon: 'error',
+              title: "Advertencia",
+              text: error,
+              icon: "warning"
             });
-          });
-        } else {
-          // Si el modal se cierra sin confirmar
-          //this.checkboxValue = 0;
-          producto.editarPrecio = 0;
-        }
-      }).catch(error => {
-        if (error) {
-          this.$swal({
-            title: 'Advertencia',
-            text: error,
-            icon: 'warning',
-          });
-        }
-      });
+          }
+        });
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style scoped>
@@ -1512,7 +1748,7 @@ export default {
 }
 
 .disabledMouse {
-  background: #CECECE;
+  background: #cecece;
   cursor: inherit;
 }
 
