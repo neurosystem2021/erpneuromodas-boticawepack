@@ -255,6 +255,7 @@ export default {
       API: config.API,
       rucProveedor: "",
       nameProveedor: "",
+      direccionProveedor: "",
       productos: [],
       lstProductos: [],
       lstPreProductos: [],
@@ -323,6 +324,52 @@ export default {
           console.warn("No se pudo obtener el Nombre del proveedor:", error);
         }
 
+        this.direccionProveedor = "";
+        try {
+          const accountingSupplier = xmlDoc.getElementsByTagName(
+            "cac:AccountingSupplierParty"
+          )[0];
+          if (!accountingSupplier)
+            throw new Error("No se encontró AccountingSupplierParty");
+
+          const party = accountingSupplier.getElementsByTagName("cac:Party")[0];
+          if (!party) throw new Error("No se encontró Party");
+
+          const legalEntity = party.getElementsByTagName(
+            "cac:PartyLegalEntity"
+          )[0];
+          if (!legalEntity) throw new Error("No se encontró PartyLegalEntity");
+
+          const regAddress = legalEntity.getElementsByTagName(
+            "cac:RegistrationAddress"
+          )[0];
+          if (!regAddress)
+            throw new Error("No se encontró RegistrationAddress");
+
+          // Extraer los campos por separado
+          const line = regAddress.getElementsByTagName("cbc:Line")[0];
+          const district = regAddress.getElementsByTagName("cbc:District")[0];
+          const city = regAddress.getElementsByTagName("cbc:CityName")[0];
+          const subentity = regAddress.getElementsByTagName(
+            "cbc:CountrySubentity"
+          )[0];
+
+          // Concatenar la dirección
+          const direccion =
+            (line ? line.textContent.trim() + ", " : "") +
+            (district ? district.textContent.trim() + ", " : "") +
+            (city ? city.textContent.trim() + ", " : "") +
+            (subentity ? subentity.textContent.trim() : "");
+
+          this.direccionProveedor = direccion;
+          this.movimiento.direccionProveedor = direccion;
+        } catch (error) {
+          console.warn(
+            "No se pudo obtener la dirección del proveedor:",
+            error.message
+          );
+        }
+
         const invoiceLines = xmlDoc.getElementsByTagName("cac:InvoiceLine");
         const productos = Array.from(invoiceLines).map(item => {
           const descripcionTags = item.getElementsByTagName("cbc:Description");
@@ -363,8 +410,18 @@ export default {
     async enerarDatos() {
       this.lstPreProductos = [];
       this.lstProductos = [];
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
       await this.validarExisteProductos();
       await this.obtenerStock();
+      this.$swal.close();
     },
     async validarExisteProductos() {
       for (const element of this.productos) {
@@ -409,8 +466,10 @@ export default {
     clearFileInput() {
       this.$refs.fileInput.reset();
     },
-    obtenerStock() {
+    async obtenerStock() {
+      let productos = [];
       let IdAlmacen = "";
+
       if (this.isSalida) {
         IdAlmacen =
           this.movimiento.almacenOrigen.IdAlmacen > 0
@@ -425,27 +484,31 @@ export default {
             ? this.movimiento.almacenOrigen.IdAlmacen
             : 1;
       }
-      this.lstPreProductos.forEach(producto => {
+
+      const promesas = this.lstPreProductos.map(async producto => {
         producto.stock = 0;
         producto.existe = false;
         if (producto.IdProducto) {
-          console.log("sssss", producto);
-          this.axios(`${this.API}productos/stock`, {
+          const response = await this.axios(`${this.API}productos/stock`, {
             params: {
               idAlmacen: IdAlmacen,
               idProductos: [producto.IdProducto]
             }
-          }).then(response => {
-            let res = response.data[0];
-            producto.stock = res.stock;
-            producto.existe = true;
-            producto.ProductoMarca = res.ProductoMarca;
-
-            this.lstProductos.push(producto);
           });
-        } else {
-          this.lstProductos.push(producto);
+          const res = response.data[0];
+          producto.stock = res.stock;
+          producto.existe = true;
+          producto.ProductoMarca = res.ProductoMarca;
         }
+        return producto;
+      });
+
+      productos = await Promise.all(promesas);
+
+      this.lstProductos = productos.sort((a, b) => {
+        if (a.background < b.background) return -1;
+        if (a.background > b.background) return 1;
+        return 0;
       });
     },
     eliminar(index) {
@@ -653,11 +716,25 @@ export default {
           this.$swal.showLoading();
         }
       });
+      this.movimiento.productos = this.lstProductos;
+      this.axios
+        .post(`${this.API}/movimientoxml`, this.movimiento)
+        .then(res => {
+          if (res.data) {
+            this.$swal({
+              icon: "success",
+              title: "Registro Correcto",
+              text: "Por favor espera",
+              allowOutsideClick: false,
+              allowEscapeKey: false
+            }).then(respuesta => {
+              if (respuesta.isConfirmed) {
+                window.location.reload();
+              }
+            });
+          }
+        });
 
-      this.axios.post(`${this.API}/movimientoxml`, this.movimiento);
-      setTimeout(() => {
-        this.$swal.close();
-      }, 1000);
       console.log("Registrando ingreso...", data);
     },
     renderChild(data) {

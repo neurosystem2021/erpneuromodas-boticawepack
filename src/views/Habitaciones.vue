@@ -240,7 +240,7 @@
 
   <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}"  >
     <b-modal v-model="show" class="modalProyecto" id="carrito" size="lg" no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
-
+     <!-- <div id="IdLogo">ssss</div> -->
       <div id="contentModal" >
           <div class="row">
           <div id="headerCamiones" class="col-md-12">
@@ -799,6 +799,11 @@ export default {
       }
     },
     async nuevoProyecto() {
+     
+      if (!this.selectCliente.IdCliente) {
+        this.$toasted.error("Seleccione un cliente.");
+        return false;
+      }
       let data = {
         // IdProducto: hab.IdProducto,
         IdCliente: this.selectCliente.IdCliente,
@@ -914,6 +919,8 @@ export default {
 
       mywindow.onload = function() {
         setTimeout(function() {
+          let IdLogo = document.getElementById("IdLogo");
+          console.log(IdLogo);
           mywindow.print();
           // mywindow.close();
         }, 500);
@@ -1017,7 +1024,11 @@ export default {
     },
     imprimirReciboServicio(selectProducto) {
       console.log(selectProducto);
-      window.open("/imprimir/imprimirReciboServicio.php?IdProducto=" + selectProducto.IdProducto, "_blank");
+      window.open(
+        "/imprimir/imprimirReciboServicio.php?IdProducto=" +
+          selectProducto.IdProducto,
+        "_blank"
+      );
     }
   },
   components: {
