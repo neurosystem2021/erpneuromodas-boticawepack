@@ -298,11 +298,11 @@
         </b-col>
       </b-row>
 
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr v-if="producto.IdProducto || producto.EsPadre || manterproducto" />
+      <b-row v-if="producto.IdProducto || producto.EsPadre || manterproducto">
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Costo:</label>
+            <label>Precio de Costo:</label> 
             <input
               v-model="producto.PrecioCosto"
                :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
@@ -462,12 +462,17 @@ export default {
       show: false,
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
+      preproducto: {},
       productosDet: [],
       file: "",
       idPerfil: sessionStorage.getItem("IdPerfil"),
       categoriaItems: [],
       itemsPosOferta: [],
-      precioLiquidacion: 0
+      precioLiquidacion: 0,
+      manterproducto: {
+        default: false,
+        type: Boolean
+      }
     };
   },
   beforeMount() {
@@ -475,7 +480,8 @@ export default {
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
-    show(val) {
+    async show(val) {
+      this.preproducto = { ...this.productoUpdate };
       if (val) {
         this.cargarCatOferta();
         this.itemsPosOferta = [];
@@ -489,7 +495,7 @@ export default {
 
         let newVal = this.productoUpdate || {};
         if (newVal.IdProducto && !this.nuevo) {
-          this.axios
+          await this.axios
             .get(this.API + "productos/id/" + newVal.IdProducto)
             .then(response => {
               newVal = response.data;
@@ -616,6 +622,14 @@ export default {
           this.file = "";
           this.$refs.inputCodigoBarra.$el.disabled = false;
         }
+        this.$nextTick(() => {
+          if (this.manterproducto) {
+            this.producto.Producto = this.preproducto.Producto;
+            this.producto.PrecioCosto = this.preproducto.PrecioCosto;
+         
+            this.$forceUpdate();
+          }
+        });
       }
     }
   },
@@ -934,6 +948,7 @@ export default {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
+      this.$emit("productoactualizado");
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
