@@ -205,11 +205,11 @@
                     <td class="px-2" > {{producto.CodigoBarra}} </td>
                     <td class="px-2" >{{ producto.Producto }}</td>
                     <td class="px-2" >
-                      <span v-if="producto.existe">
+                      <span >
                         {{ producto.ProductoMarca }}
                       </span>
 
-                      <autocomplete v-else
+                      <!-- <autocomplete v-else
                         required="required"
                         :url="API + 'marcas'"
                         :ref="`inputMarca${index}`"
@@ -219,7 +219,7 @@
                         :on-select="(val) => setMarca(val, index)"
                         :onFocus="focusAutocomplete.bind(null, `inputMarca${index}`)"                
                         :classes="{input: 'form-control upper'}">
-                      </autocomplete>
+                      </autocomplete> -->
 
                     </td>
                     <td> 
@@ -236,12 +236,18 @@
                     <td class="px-2" style="text-align: center;"> {{ producto.precioUnitario }}</td>
                     <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
                     <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad).toFixed(2) }}</td>
-                    <td><i @click="eliminar(index)" class="fa fa-trash" aria-hidden="true" style="color: red; cursor: pointer;"></i></td>
+                    <td>
+                      <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
+                      <b-button variant="success" v-else @click="nuevoProducto(producto)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                      <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
+                    </td>
                   </tr>
                 </tbody>
                </table>
             </b-col>
 
+            <producto-form @productoactualizado="productoactualizado" :showButton="false" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+                      
 
             <b-col cols="12" md="4">
               <table width="100%" class="table"> 
@@ -320,7 +326,11 @@
   <script>
 import config from "@/store/config.js";
 import { mapState, mapActions } from "vuex";
+import ProductoForm from "./../components/ProductoForm";
 export default {
+  components: {
+    ProductoForm
+  },
   data() {
     return {
       modalPresentacion: false,
@@ -337,7 +347,12 @@ export default {
       loadCode: "",
       producto: {},
       index: "",
-      totalFacturaXML: 0
+      totalFacturaXML: 0,
+      productoSelect: {},
+      showButton: {
+        default: false,
+        type: Boolean
+      }
     };
   },
   methods: {
@@ -347,6 +362,38 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    async productoactualizado() {
+      this.lstPreProductos = [];
+      this.lstProductos = [];
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+      this.$nextTick(async () => {
+        setTimeout(async () => {
+          await this.validarExisteProductos();
+          await this.obtenerStock();
+        }, 100);
+      });
+      this.$swal.close();
+    },
+    editarProducto(Pro) {
+      this.productoSelect = Pro;
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+      this.$refs.productoFormEdit.manterproducto = false;
+    },
+    nuevoProducto(Pro) {
+      this.productoSelect = Pro;
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = true;
+      this.$refs.productoFormEdit.manterproducto = true;
+    },
     setMarca(val, index) {
       let prod = { ...this.lstProductos[index] };
       prod.IdProductoMarca = val.IdProductoMarca;
@@ -488,7 +535,8 @@ export default {
               descripcionTags.length > 0 ? descripcionTags[0].textContent : "",
             cantidad:
               cantidadTags.length > 0 ? cantidadTags[0].textContent : "",
-            precioUnitario: precioUnitario
+            precioUnitario: precioUnitario,
+            PrecioCosto: precioUnitario
           };
         });
         this.productos = productos;
@@ -783,7 +831,9 @@ export default {
 
       return hexColor;
     },
-    registrarIngreso(data) {
+    async registrarIngreso(data) {
+
+      
       if (!this.movimiento.Serie) {
         this.$toasted.error("Es importante la Serie");
         this.$refs.txtcargarNumero.focus();
@@ -810,9 +860,9 @@ export default {
           return false;
         }
       }
-      if (this.lstProductos.some(v => !v.IdProductoMarca)) {
+      if (this.lstProductos.some(v => !v.IdProducto)) {
         this.$toasted.error(
-          "Es importante que todos los productos tengan marca"
+          "Existe un producto sin registrar. Por favor. Registar El producto."
         );
         return false;
       }
@@ -833,7 +883,7 @@ export default {
         }
       });
       this.movimiento.productos = this.lstProductos;
-      this.axios
+      await this.axios
         .post(`${this.API}/movimientoxml`, this.movimiento)
         .then(res => {
           if (res.data) {
@@ -1013,9 +1063,9 @@ export default {
       return parseFloat(total).toFixed(1);
     },
     mostrarAnadirProductos() {
-      if (this.lstProductos.length > 0) {
-        return true;
-      }
+      // if (this.lstProductos.length > 0) {
+      //   return true;
+      // }
       return false;
     }
   },
@@ -1034,3 +1084,4 @@ export default {
   border-right: 2px solid black;
 }
 </style>
+
