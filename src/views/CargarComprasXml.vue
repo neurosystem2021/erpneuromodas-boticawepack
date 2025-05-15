@@ -76,7 +76,7 @@
 
             <b-col cols="12" class="mb-3" v-if="activarCargarXML">
               
-                <b-form-file ref="fileInput" @change="leerXML" accept=".xml" > </b-form-file>
+                <b-form-file ref="fileInput" @change="leerXML" accept=".xml" browse-text="Cargar Archivo xml"> </b-form-file>
             </b-col>
             
             
@@ -186,10 +186,13 @@
                         <th>Cod. Barra</th>
                         <th>Artículo</th>
                         <th>Marca</th>
+                        <th></th>
                         <th>Presentación</th>
                         
+                        <th style="text-align: center;">Cantidad x Pres</th>
                         <th style="text-align: center;">Cantidad</th>
                         <th style="text-align: center;">P/ U</th>
+                       
                         <th style="text-align: center;">Precio Venta </th>
                         <th style="text-align: center;">Total</th>
                         <th></th>
@@ -218,12 +221,21 @@
                       </autocomplete>
 
                     </td>
-                    <td></td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.cantidad" class="form-control" style="width: 120px;"> </td>
-                    <td class="px-2" style="text-align: center;">{{ producto.PrecioCosto }}</td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 120px;"> </td>
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.PrecioCosto).toFixed(2) }}</td>
-                    <i @click="eliminar(index)" class="fa fa-trash" aria-hidden="true" style="color: red; cursor: pointer;"></i>
+                    <td> 
+                      <b-button variant="info" v-if="producto.TienePresentacion" @click="abrirModalPresentacion(producto,index)">
+                        <i class="fas fa-list" ></i>
+                      </b-button>
+                      </td>
+                      <td> 
+                      <input type="text" v-model="producto.ProductoMedicion" class="form-control" style="width: 120px;" disabled>
+                    </td>
+                    <td class="px-2" style="text-align: center;"> <input type="number" v-if="producto.esPresentacion" v-model="producto.precantidad" class="form-control" style="width: 90px;"> </td>
+                    <td class="px-2" style="text-align: center;"> <input type="number"  v-if="!producto.esPresentacion" v-model="producto.cantidad" class="form-control" style="width: 90px;"> </td>
+                    <!-- <td class="px-2" style="text-align: center;"> PrecioCosto - {{ producto.PrecioCosto }}</td> -->
+                    <td class="px-2" style="text-align: center;"> {{ producto.precioUnitario }}</td>
+                    <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
+                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad).toFixed(2) }}</td>
+                    <td><i @click="eliminar(index)" class="fa fa-trash" aria-hidden="true" style="color: red; cursor: pointer;"></i></td>
                   </tr>
                 </tbody>
                </table>
@@ -243,6 +255,48 @@
                 <b-button variant="success" @click="registrarIngreso"> Guardar </b-button>
             </b-col>
             </b-row>
+            <b-modal v-model="modalPresentacion" size="lg" hide-footer hide-heade>
+              <div class="d-block text-center">
+                <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
+                <h5>Presentaciones</h5>
+              </div>
+              <b-row>
+                <b-col cols="6">
+                   <b-card
+                      align="center"
+                      class="mb-3 contentCard"
+                      @click="cambiarPresentacion(null,'UNIDAD')"
+                   >
+                   <b-row>
+                      <b-col cols="6" class="nomCart">
+                        UNIDAD
+                      </b-col>
+                      <b-col cols="6">
+                        <b>Cant.</b> 1
+                        <b>Precio.</b> {{ producto.PrecioContado }}
+                      </b-col>
+                    </b-row>
+                  </b-card>
+                </b-col>
+                <b-col cols="6" v-for="(pres,index) in producto.presentacion" :key="index">
+                   <b-card
+                     align="center"
+                      class="mb-3 contentCard"
+                      @click="cambiarPresentacion(pres,'PRESENTACION')"
+                   >
+                   <b-row>
+                      <b-col cols="6" class="nomCart">
+                        {{pres.nombre}}
+                      </b-col>
+                      <b-col cols="6">
+                        <b>Cant.</b> {{pres.cantidad}}
+                        <b>Precio.</b> {{ pres.precio }}
+                      </b-col>
+                    </b-row>
+                  </b-card>
+                </b-col>
+              </b-row>
+            </b-modal>
     </b-container>
   </template>
   
@@ -252,6 +306,7 @@ import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
+      modalPresentacion: false,
       API: config.API,
       rucProveedor: "",
       nameProveedor: "",
@@ -262,7 +317,9 @@ export default {
       movimiento: this.initMovimiento(),
       lstMarcas: [],
       isVentas: false,
-      loadCode: ""
+      loadCode: "",
+      producto: {},
+      index: ""
     };
   },
   methods: {
@@ -400,14 +457,12 @@ export default {
         });
         this.productos = productos;
 
-        this.enerarDatos();
-        // Enviar al backend si es necesario
-        // this.registrarIngreso({ rucProveedor, productos });
+        this.generarDatos();
       };
 
       reader.readAsText(file);
     },
-    async enerarDatos() {
+    async generarDatos() {
       this.lstPreProductos = [];
       this.lstProductos = [];
       this.$swal({
@@ -486,8 +541,14 @@ export default {
       }
 
       const promesas = this.lstPreProductos.map(async producto => {
+        producto.precioUnitario = producto.PrecioCosto;
+        producto.esPresentacion = false;
+        producto.precantidad = producto.cantidad;
         producto.stock = 0;
         producto.existe = false;
+        producto.TienePresentacion = false;
+        producto.ProductoMedicion = "UNIDAD";
+        let presentacion = [];
         if (producto.IdProducto) {
           const response = await this.axios(`${this.API}productos/stock`, {
             params: {
@@ -496,6 +557,14 @@ export default {
             }
           });
           const res = response.data[0];
+
+          producto.TienePresentacion = false;
+          if (producto.PreciosPorProducto) {
+            presentacion = JSON.parse(producto.PreciosPorProducto);
+            producto.TienePresentacion = presentacion.some(v => v.cantidad > 0);
+          }
+
+          producto.presentacion = presentacion.filter(v => v.cantidad > 0);
           producto.stock = res.stock;
           producto.existe = true;
           producto.ProductoMarca = res.ProductoMarca;
@@ -512,7 +581,18 @@ export default {
       });
     },
     eliminar(index) {
-      this.lstProductos.splice(index, 1);
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        text: "¿Desea eliminar el registro?",
+        showCancelButton: true,
+        allowEscapeKey: false,
+        allowOutsideClick: false
+      }).then(response => {
+        if (response.isConfirmed) {
+          this.lstProductos.splice(index, 1);
+        }
+      });
     },
     initMovimiento() {
       let currentMonth = this.$moment().month() + 1;
@@ -724,7 +804,6 @@ export default {
             this.$swal({
               icon: "success",
               title: "Registro Correcto",
-              text: "Por favor espera",
               allowOutsideClick: false,
               allowEscapeKey: false
             }).then(respuesta => {
@@ -807,6 +886,10 @@ export default {
       `;
     },
     setProducto(obj) {
+      if (this.lstPreProductos.some(v => v.IdProducto == obj.IdProducto)) {
+        this.$toasted.error("El producto ya se encuentra en el listado");
+        return false;
+      }
       obj.background = this.generarColorClaroHex();
       this.lstPreProductos.unshift(obj);
       this.lstProductos = [];
@@ -831,6 +914,30 @@ export default {
             }
           });
       }
+    },
+    abrirModalPresentacion(obj, index) {
+      this.producto = obj;
+      this.index = index;
+      this.modalPresentacion = true;
+    },
+    cambiarPresentacion(obj = {}, tipo = "UNIDAD") {
+      let prod = { ...this.producto };
+      if (tipo != "UNIDAD") {
+        prod.esPresentacion = true;
+        prod.cantidad = prod.precantidad * obj.cantidad;
+        prod.PrecioCosto = parseFloat(prod.precioUnitario / obj.cantidad).toFixed(
+          4
+        );
+        prod.ProductoMedicion = obj.nombre;
+      } else {
+        prod.esPresentacion = false;
+        prod.cantidad = prod.precantidad;
+        prod.PrecioCosto = prod.precioUnitario;
+        prod.ProductoMedicion = "UNIDAD";
+      }
+      Vue.set(this.lstProductos, this.index, prod);
+      this.modalPresentacion = false;
+      // prod.precioCosto = obj;
     }
   },
   computed: {
@@ -864,3 +971,15 @@ export default {
   mounted() {}
 };
 </script>
+<style scoped>
+.contentCard {
+  cursor: pointer;
+}
+.nomCart {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  border-right: 2px solid black;
+}
+</style>
