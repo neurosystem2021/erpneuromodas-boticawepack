@@ -40,6 +40,8 @@ import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -241,6 +243,16 @@ export default new Router({
       path: "/reportes/reporte_utilidad_bruta",
       name: "ReporteUtilidadBrutaPorUsuario",
       component: ReporteUtilidadBrutaPorUsuario
+    },
+    {
+      path: "/reporte/confrontacion",
+      name: "Confrontacion",
+      component: Confrontacion
+    },
+    {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
     }
   ]
 });
