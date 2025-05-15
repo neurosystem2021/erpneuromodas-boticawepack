@@ -75,7 +75,7 @@
                   </b-col>
 
             <b-col cols="12" class="mb-3" v-if="activarCargarXML">
-              
+                Cargar XML
                 <b-form-file ref="fileInput" @change="leerXML" accept=".xml" browse-text="Cargar Archivo xml"> </b-form-file>
             </b-col>
             
@@ -148,7 +148,8 @@
                 </b-row>
               </b-col>
 
-              <b-col cols="12" v-if="activarCargarXML">
+              <b-col cols="12" v-if="mostrarAnadirProductos">
+                <span>Recuerde solo añadir, en caso reconozca un producto y no lo haya podido encontrar el sistema</span>
                 <b-input-group>
 
                 
@@ -204,11 +205,11 @@
                     <td class="px-2" > {{producto.CodigoBarra}} </td>
                     <td class="px-2" >{{ producto.Producto }}</td>
                     <td class="px-2" >
-                      <span v-if="producto.existe">
+                      <span >
                         {{ producto.ProductoMarca }}
                       </span>
 
-                      <autocomplete v-else
+                      <!-- <autocomplete v-else
                         required="required"
                         :url="API + 'marcas'"
                         :ref="`inputMarca${index}`"
@@ -218,7 +219,7 @@
                         :on-select="(val) => setMarca(val, index)"
                         :onFocus="focusAutocomplete.bind(null, `inputMarca${index}`)"                
                         :classes="{input: 'form-control upper'}">
-                      </autocomplete>
+                      </autocomplete> -->
 
                     </td>
                     <td> 
@@ -235,10 +236,32 @@
                     <td class="px-2" style="text-align: center;"> {{ producto.precioUnitario }}</td>
                     <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
                     <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad).toFixed(2) }}</td>
-                    <td><i @click="eliminar(index)" class="fa fa-trash" aria-hidden="true" style="color: red; cursor: pointer;"></i></td>
+                    <td>
+                      <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
+                      <b-button variant="success" v-else @click="nuevoProducto(producto)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                      <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
+                    </td>
                   </tr>
                 </tbody>
                </table>
+            </b-col>
+
+            <producto-form @productoactualizado="productoactualizado" :showButton="false" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+                      
+
+            <b-col cols="12" md="4">
+              <table width="100%" class="table"> 
+                <tbody>
+                  <tr>
+                    <td> <b>Total Factura XML</b></td>
+                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
+                  </tr>
+                  <tr>
+                    <td> <b>Total Factura</b></td>
+                    <td style="background: rgb(245, 198, 203);"> {{ totalFactura }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </b-col>
             <b-col cols="12" v-if="mostrarAdvertencia" class="mt-2">
               <b-alert show variant="warning">
@@ -303,7 +326,11 @@
   <script>
 import config from "@/store/config.js";
 import { mapState, mapActions } from "vuex";
+import ProductoForm from "./../components/ProductoForm";
 export default {
+  components: {
+    ProductoForm
+  },
   data() {
     return {
       modalPresentacion: false,
@@ -319,7 +346,13 @@ export default {
       isVentas: false,
       loadCode: "",
       producto: {},
-      index: ""
+      index: "",
+      totalFacturaXML: 0,
+      productoSelect: {},
+      showButton: {
+        default: false,
+        type: Boolean
+      }
     };
   },
   methods: {
@@ -329,6 +362,38 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    async productoactualizado() {
+      this.lstPreProductos = [];
+      this.lstProductos = [];
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+      this.$nextTick(async () => {
+        setTimeout(async () => {
+          await this.validarExisteProductos();
+          await this.obtenerStock();
+        }, 100);
+      });
+      this.$swal.close();
+    },
+    editarProducto(Pro) {
+      this.productoSelect = Pro;
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = false;
+      this.$refs.productoFormEdit.manterproducto = false;
+    },
+    nuevoProducto(Pro) {
+      this.productoSelect = Pro;
+      this.$refs.productoFormEdit.show = true;
+      this.$refs.productoFormEdit.nuevo = true;
+      this.$refs.productoFormEdit.manterproducto = true;
+    },
     setMarca(val, index) {
       let prod = { ...this.lstProductos[index] };
       prod.IdProductoMarca = val.IdProductoMarca;
@@ -350,6 +415,24 @@ export default {
         const xml = event.target.result;
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "application/xml");
+
+        this.totalFacturaXML = "";
+        try {
+          const accountingSupplier = xmlDoc.getElementsByTagName(
+            "cac:LegalMonetaryTotal"
+          )[0];
+          const party = accountingSupplier.getElementsByTagName(
+            "cbc:PayableAmount"
+          )[0];
+          // const partyId = party.getElementsByTagName(
+          //   "cac:PayableAmount "
+          // )[0];
+          // const id = party.getElementsByTagName("cbc:ID")[0];
+          this.totalFacturaXML = party.textContent;
+          // this.movimiento.totalFacturaXML = id.textContent;
+        } catch (error) {
+          console.warn("No se pudo obtener total:", error);
+        }
 
         this.rucProveedor = "";
         try {
@@ -452,7 +535,8 @@ export default {
               descripcionTags.length > 0 ? descripcionTags[0].textContent : "",
             cantidad:
               cantidadTags.length > 0 ? cantidadTags[0].textContent : "",
-            precioUnitario: precioUnitario
+            precioUnitario: precioUnitario,
+            PrecioCosto: precioUnitario
           };
         });
         this.productos = productos;
@@ -747,7 +831,9 @@ export default {
 
       return hexColor;
     },
-    registrarIngreso(data) {
+    async registrarIngreso(data) {
+
+      
       if (!this.movimiento.Serie) {
         this.$toasted.error("Es importante la Serie");
         this.$refs.txtcargarNumero.focus();
@@ -774,9 +860,9 @@ export default {
           return false;
         }
       }
-      if (this.lstProductos.some(v => !v.IdProductoMarca)) {
+      if (this.lstProductos.some(v => !v.IdProducto)) {
         this.$toasted.error(
-          "Es importante que todos los productos tengan marca"
+          "Existe un producto sin registrar. Por favor. Registar El producto."
         );
         return false;
       }
@@ -797,7 +883,7 @@ export default {
         }
       });
       this.movimiento.productos = this.lstProductos;
-      this.axios
+      await this.axios
         .post(`${this.API}/movimientoxml`, this.movimiento)
         .then(res => {
           if (res.data) {
@@ -925,9 +1011,9 @@ export default {
       if (tipo != "UNIDAD") {
         prod.esPresentacion = true;
         prod.cantidad = prod.precantidad * obj.cantidad;
-        prod.PrecioCosto = parseFloat(prod.precioUnitario / obj.cantidad).toFixed(
-          4
-        );
+        prod.PrecioCosto = parseFloat(
+          prod.precioUnitario / obj.cantidad
+        ).toFixed(4);
         prod.ProductoMedicion = obj.nombre;
       } else {
         prod.esPresentacion = false;
@@ -966,6 +1052,21 @@ export default {
         return false;
       }
       return true;
+    },
+    totalFactura() {
+      let total = 0;
+      if (this.lstProductos.length > 0) {
+        total = this.lstProductos.reduce((sum, producto) => {
+          return sum + parseFloat(producto.PrecioCosto * producto.cantidad);
+        }, 0);
+      }
+      return parseFloat(total).toFixed(1);
+    },
+    mostrarAnadirProductos() {
+      // if (this.lstProductos.length > 0) {
+      //   return true;
+      // }
+      return false;
     }
   },
   mounted() {}
@@ -983,3 +1084,4 @@ export default {
   border-right: 2px solid black;
 }
 </style>
+
