@@ -75,7 +75,7 @@
                   </b-col>
 
             <b-col cols="12" class="mb-3" v-if="activarCargarXML">
-              
+                Cargar XML
                 <b-form-file ref="fileInput" @change="leerXML" accept=".xml" browse-text="Cargar Archivo xml"> </b-form-file>
             </b-col>
             
@@ -148,7 +148,8 @@
                 </b-row>
               </b-col>
 
-              <b-col cols="12" v-if="activarCargarXML">
+              <b-col cols="12" v-if="mostrarAnadirProductos">
+                <span>Recuerde solo añadir, en caso reconozca un producto y no lo haya podido encontrar el sistema</span>
                 <b-input-group>
 
                 
@@ -240,6 +241,22 @@
                 </tbody>
                </table>
             </b-col>
+
+
+            <b-col cols="12" md="4">
+              <table width="100%" class="table"> 
+                <tbody>
+                  <tr>
+                    <td> <b>Total Factura XML</b></td>
+                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
+                  </tr>
+                  <tr>
+                    <td> <b>Total Factura</b></td>
+                    <td style="background: rgb(245, 198, 203);"> {{ totalFactura }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </b-col>
             <b-col cols="12" v-if="mostrarAdvertencia" class="mt-2">
               <b-alert show variant="warning">
                 <li>
@@ -319,7 +336,8 @@ export default {
       isVentas: false,
       loadCode: "",
       producto: {},
-      index: ""
+      index: "",
+      totalFacturaXML: 0
     };
   },
   methods: {
@@ -350,6 +368,24 @@ export default {
         const xml = event.target.result;
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "application/xml");
+
+        this.totalFacturaXML = "";
+        try {
+          const accountingSupplier = xmlDoc.getElementsByTagName(
+            "cac:LegalMonetaryTotal"
+          )[0];
+          const party = accountingSupplier.getElementsByTagName(
+            "cbc:PayableAmount"
+          )[0];
+          // const partyId = party.getElementsByTagName(
+          //   "cac:PayableAmount "
+          // )[0];
+          // const id = party.getElementsByTagName("cbc:ID")[0];
+          this.totalFacturaXML = party.textContent;
+          // this.movimiento.totalFacturaXML = id.textContent;
+        } catch (error) {
+          console.warn("No se pudo obtener total:", error);
+        }
 
         this.rucProveedor = "";
         try {
@@ -925,9 +961,9 @@ export default {
       if (tipo != "UNIDAD") {
         prod.esPresentacion = true;
         prod.cantidad = prod.precantidad * obj.cantidad;
-        prod.PrecioCosto = parseFloat(prod.precioUnitario / obj.cantidad).toFixed(
-          4
-        );
+        prod.PrecioCosto = parseFloat(
+          prod.precioUnitario / obj.cantidad
+        ).toFixed(4);
         prod.ProductoMedicion = obj.nombre;
       } else {
         prod.esPresentacion = false;
@@ -966,6 +1002,21 @@ export default {
         return false;
       }
       return true;
+    },
+    totalFactura() {
+      let total = 0;
+      if (this.lstProductos.length > 0) {
+        total = this.lstProductos.reduce((sum, producto) => {
+          return sum + parseFloat(producto.PrecioCosto * producto.cantidad);
+        }, 0);
+      }
+      return parseFloat(total).toFixed(1);
+    },
+    mostrarAnadirProductos() {
+      if (this.lstProductos.length > 0) {
+        return true;
+      }
+      return false;
     }
   },
   mounted() {}
