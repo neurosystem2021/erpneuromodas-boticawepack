@@ -237,9 +237,9 @@
                     <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
                     <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad).toFixed(2) }}</td>
                     <td>
-                      <i v-if="producto.IdProducto" @click="editarProducto(producto)" class="fa fa-edit" style="cursor: pointer;color: #FF9800; " ></i>
-                      <i v-else @click="nuevoProducto(producto)" class="fa fa-plus" style="cursor: pointer; color: #1B5E20;"></i>
-                      <i @click="eliminar(index)" class="fa fa-trash" aria-hidden="true" style="color: red; cursor: pointer;"></i>
+                      <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
+                      <b-button variant="success" v-else @click="nuevoProducto(producto)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                      <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
                     </td>
                   </tr>
                 </tbody>
@@ -1084,3 +1084,4 @@ export default {
   border-right: 2px solid black;
 }
 </style>
+
