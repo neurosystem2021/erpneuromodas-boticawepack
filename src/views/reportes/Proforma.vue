@@ -119,7 +119,6 @@
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
-      <br>
       <div id="notices">
         <div>NOTA:</div>
         <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
@@ -139,6 +138,7 @@
       </div>
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+        <button class="btn btn-success" id="printBtn" @click="enviarWsp()">ENVIAR WHASTAPP</button>
       </div>
     </main>
     <!--<footer>
@@ -193,9 +193,55 @@ export default {
     },
     imprimir(){
     window.print();
+    },
+    async enviarWsp() {
+      const loadingSwal = this.$swal({
+        title: "Cargando...",
+        text: "Por favor espera...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+      let data = "";
+      await this.axios
+        .get(API + "enviarproformapdf", {
+          params: {
+            IdProforma: this.idProforma
+          }
+        })
+        .then(res => {
+          data = res.data;
+        });
+      this.$swal.close();
+      this.solicitarTelefono(data);
+    },
+
+    async solicitarTelefono(data) {
+      console.log(data);
+      const { value: telefono } = await this.$swal({
+        title: "Ingresa tu número de teléfono",
+        input: "text",
+        inputPlaceholder: "Ejemplo: 987654321",
+        showCancelButton: true,
+        inputValidator: value => {
+          const regexTelefono = /^9\d{8}$/; // Valida que comience con 9 y tenga 9 dígitos
+          if (!regexTelefono.test(value)) {
+            return "Ingresa un número válido (9 dígitos, comienza con 9)";
+          }
+        }
+      });
+
+      if (telefono) {
+        window.open(
+          `https://wa.me/51${telefono}?text=Para poder visualizar la proforma Ingrese al siguiente enlace ${data}`
+        );
+      }
     }
   }
-}
+};
 </script>
 
 <style scoped>
