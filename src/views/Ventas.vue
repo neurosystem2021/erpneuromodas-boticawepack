@@ -295,7 +295,7 @@
                         <!--  -->
                     </b-col>
 
-                          <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocularMovil">
+                          <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" >
                                 <table class="table b-table border table-footer table-sm text-center "  >
                                     <tbody>
                                         <tr>
@@ -309,10 +309,10 @@
                                             ></b-form-textarea>
                                           </td>
                                         </tr>
-                                        <tr><td colspan="2">Mano de obra bruta</td></tr>
-                                        <tr><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
-                                        <tr><td colspan="2">Mano de obra neta</td></tr>
-                                        <tr><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                        <tr class="ocularMovil"><td colspan="2">Mano de obra bruta</td></tr>
+                                        <tr class="ocularMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+                                        <tr class="ocularMovil"><td colspan="2">Mano de obra neta</td></tr>
+                                        <tr class="ocularMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
                                 </table>
                               </b-col>
