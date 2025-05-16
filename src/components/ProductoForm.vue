@@ -626,7 +626,7 @@ export default {
           if (this.manterproducto) {
             this.producto.Producto = this.preproducto.Producto;
             this.producto.PrecioCosto = this.preproducto.PrecioCosto;
-         
+
             this.$forceUpdate();
           }
         });
@@ -909,6 +909,7 @@ export default {
           PreciosPorProducto: this.producto.precios
         })
         .then(response => {
+          this.$emit("productoactualizado", response.data.insertId);
           if (this.cbGuardar) {
             this.cbGuardar(
               response.data.insertId,
@@ -948,7 +949,6 @@ export default {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
-      this.$emit("productoactualizado");
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""

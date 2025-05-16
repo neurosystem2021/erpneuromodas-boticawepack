@@ -183,6 +183,7 @@
                <table width="100%" class="table">
                 <thead>
                     <tr>
+                        <th>Grupo</th>
                         <th>Stock</th>
                         <th>Cod. Barra</th>
                         <th>Artículo</th>
@@ -195,12 +196,19 @@
                         <th style="text-align: center;">P/ U</th>
                        
                         <th style="text-align: center;">Precio Venta </th>
+                        <th style="text-align: center;">SubTotal</th>
+                        <th style="text-align: center;">IGV </th>
                         <th style="text-align: center;">Total</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(producto,index) in lstProductos" :key="index" :style="`background: ${producto.background};`">
+                    <td>
+                      <b-badge pill variant="info">
+                        {{producto.orden }}
+                      </b-badge>
+                    </td>
                     <td> {{producto.stock }}</td>
                     <td class="px-2" > {{producto.CodigoBarra}} </td>
                     <td class="px-2" >{{ producto.Producto }}</td>
@@ -228,17 +236,36 @@
                       </b-button>
                       </td>
                       <td> 
-                      <input type="text" v-model="producto.ProductoMedicion" class="form-control" style="width: 120px;" disabled>
+                      <input type="text" v-model="producto.ProductoMedicion"  :disabled="!producto.editable" class="form-control" style="width: 120px;">
                     </td>
                     <td class="px-2" style="text-align: center;"> <input type="number" v-if="producto.esPresentacion" v-model="producto.precantidad" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;"> <input type="number"  v-if="!producto.esPresentacion" v-model="producto.cantidad" class="form-control" style="width: 90px;"> </td>
+                    <td class="px-2" style="text-align: center;"> <input type="number" :disabled="!producto.editable"  v-if="!producto.esPresentacion" v-model="producto.cantidad" @input="camnbiarIGV(index)" class="form-control" style="width: 90px;"> </td>
                     <!-- <td class="px-2" style="text-align: center;"> PrecioCosto - {{ producto.PrecioCosto }}</td> -->
-                    <td class="px-2" style="text-align: center;"> {{ producto.precioUnitario }}</td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad).toFixed(2) }}</td>
+                    <td class="px-2" style="text-align: center;">
+                      <input type="number" v-model="producto.precioUnitario" v-if="producto.editable" class="form-control" style="width: 90px;" @input="camnbiarIGV(index)">
+                       <span v-else> {{ producto.precioUnitario }} </span>
+                    </td>
+                    <td class="px-2" style="text-align: center;"> <input type="number"  v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
+                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad ).toFixed(2) }}</td>
+                   
+                    <td class="px-2" style="text-align: center;"> 
+                        <b-form-checkbox
+                          id="checkbox-1"
+                          v-model="producto.tieneIgv"
+                          value="1"
+                          unchecked-value="0"
+                          :disabled="!producto.editable"
+                          @change="camnbiarIGV(index)"
+                        >
+                        {{ producto.igv }}
+                        </b-form-checkbox>
+
+                    </td>
+                    
+                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad + parseFloat(producto.igv)).toFixed(2)  }}</td>
                     <td>
                       <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
-                      <b-button variant="success" v-else @click="nuevoProducto(producto)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                      <b-button variant="success" v-else @click="nuevoProducto(producto,index)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
                       <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
                     </td>
                   </tr>
@@ -352,7 +379,8 @@ export default {
       showButton: {
         default: false,
         type: Boolean
-      }
+      },
+      index: 0
     };
   },
   methods: {
@@ -362,9 +390,8 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
-    async productoactualizado() {
-      this.lstPreProductos = [];
-      this.lstProductos = [];
+    async productoactualizado(IdProducto) {
+      console.log(IdProducto);
       this.$swal({
         title: "Procesando...",
         text: "Por favor espera",
@@ -374,12 +401,53 @@ export default {
           this.$swal.showLoading();
         }
       });
-      this.$nextTick(async () => {
-        setTimeout(async () => {
-          await this.validarExisteProductos();
-          await this.obtenerStock();
-        }, 100);
+      let pro = { ...this.lstProductos[this.index] };
+      let IdAlmacen = "";
+
+      if (this.isSalida) {
+        IdAlmacen =
+          this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1;
+      } else {
+        IdAlmacen = !this.isTraslado
+          ? this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+          : this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1;
+      }
+
+      const response = await this.axios(`${this.API}productos/stock`, {
+        params: {
+          idAlmacen: IdAlmacen,
+          idProductos: [IdProducto]
+        }
       });
+      let res = response.data[0];
+
+      pro.IdProducto = res.IdProducto;
+      pro.CodigoBarra = res.CodigoBarra;
+      pro.stock = res.stock;
+      pro.PrecioContado = res.PrecioContado;
+      pro.PrecioContado = res.PrecioContado;
+      let presentacion = [];
+
+      pro.TienePresentacion = false;
+      if (pro.PreciosPorProducto) {
+        presentacion = JSON.parse(pro.PreciosPorProducto);
+        pro.TienePresentacion = presentacion.some(v => v.cantidad > 0);
+      }
+      pro.ProductoMarca = res.ProductoMarca;
+      pro.presentacion = presentacion.filter(v => v.cantidad > 0);
+
+      Vue.set(this.lstProductos, this.index, pro);
+
+      this.$nextTick(() => {
+        this.productos = [...this.lstProductos];
+      });
+
       this.$swal.close();
     },
     editarProducto(Pro) {
@@ -388,7 +456,9 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
       this.$refs.productoFormEdit.manterproducto = false;
     },
-    nuevoProducto(Pro) {
+    nuevoProducto(Pro, index) {
+      console.log(index);
+      this.index = index;
       this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = true;
@@ -511,7 +581,7 @@ export default {
         }
 
         const invoiceLines = xmlDoc.getElementsByTagName("cac:InvoiceLine");
-        const productos = Array.from(invoiceLines).map(item => {
+        const productos = Array.from(invoiceLines).map((item, index) => {
           const descripcionTags = item.getElementsByTagName("cbc:Description");
           const cantidadTags = item.getElementsByTagName(
             "cbc:InvoicedQuantity"
@@ -519,26 +589,56 @@ export default {
           const pricingReferenceTags = item.getElementsByTagName(
             "cac:PricingReference"
           );
-          let precioUnitario = "";
 
+          let precioConIGV = 0;
           if (pricingReferenceTags.length > 0) {
             const priceAmountTags = pricingReferenceTags[0].getElementsByTagName(
               "cbc:PriceAmount"
             );
             if (priceAmountTags.length > 0) {
-              precioUnitario = priceAmountTags[0].textContent;
+              precioConIGV = parseFloat(priceAmountTags[0].textContent);
+            }
+          }
+
+          const cantidad =
+            cantidadTags.length > 0
+              ? parseFloat(cantidadTags[0].textContent)
+              : 0;
+
+          const precioUnitario = (precioConIGV / 1.18).toFixed(6); // precio sin IGV
+          const igvUnitario = (precioConIGV - precioUnitario).toFixed(6);
+          const totalLinea = (cantidad * precioUnitario).toFixed(2);
+          const totalIGV = (cantidad * igvUnitario).toFixed(2);
+          const totalConIGV = (cantidad * precioConIGV).toFixed(2);
+
+          // Afectación IGV
+          let tipoAfectacion = "";
+          const taxCategory = item.getElementsByTagName("cac:TaxCategory")[0];
+          if (taxCategory) {
+            const motivo = taxCategory.getElementsByTagName(
+              "cbc:TaxExemptionReasonCode"
+            )[0];
+            if (motivo) {
+              const code = motivo.textContent;
+              tipoAfectacion = code === "10" ? 1 : 0;
             }
           }
 
           return {
+            orden: index + 1,
             descripcion:
               descripcionTags.length > 0 ? descripcionTags[0].textContent : "",
-            cantidad:
-              cantidadTags.length > 0 ? cantidadTags[0].textContent : "",
-            precioUnitario: precioUnitario,
-            PrecioCosto: precioUnitario
+            cantidad: cantidad.toFixed(2),
+            precioUnitario: parseFloat(precioUnitario).toFixed(2),
+            igv: parseFloat(igvUnitario*cantidad).toFixed(2),
+            totalLinea: parseFloat(totalLinea),
+            totalIGV: parseFloat(totalIGV),
+            totalConIGV: parseFloat(totalConIGV),
+            precioConIGV: parseFloat(precioConIGV),
+            tieneIgv: tipoAfectacion
           };
         });
+
         this.productos = productos;
 
         this.generarDatos();
@@ -568,6 +668,9 @@ export default {
         element.CodigoBarra = "";
         element.Producto = element.descripcion;
         element.PrecioCosto = element.precioUnitario;
+        element.igv = element.igv;
+        element.tieneIgv = element.tieneIgv;
+        element.editable = false;
 
         try {
           const res = await this.axios.get(
@@ -586,7 +689,11 @@ export default {
               producto.descripcion = element.descripcion;
               producto.background = background;
               producto.cantidad = element.cantidad;
+              producto.igv = element.igv;
+              producto.tieneIgv = element.tieneIgv;
               producto.PrecioCosto = element.precioUnitario;
+              producto.orden = element.orden;
+              producto.editable = element.editable;
               this.lstPreProductos.push(producto);
             });
           } else {
@@ -659,10 +766,12 @@ export default {
       productos = await Promise.all(promesas);
 
       this.lstProductos = productos.sort((a, b) => {
-        if (a.background < b.background) return -1;
-        if (a.background > b.background) return 1;
+        if (a.orden < b.orden) return -1;
+        if (a.orden > b.orden) return 1;
         return 0;
       });
+
+      this.productos = [...this.lstProductos];
     },
     eliminar(index) {
       this.$swal({
@@ -675,6 +784,7 @@ export default {
       }).then(response => {
         if (response.isConfirmed) {
           this.lstProductos.splice(index, 1);
+          this.productos = [...this.lstProductos];
         }
       });
     },
@@ -832,8 +942,6 @@ export default {
       return hexColor;
     },
     async registrarIngreso(data) {
-
-      
       if (!this.movimiento.Serie) {
         this.$toasted.error("Es importante la Serie");
         this.$refs.txtcargarNumero.focus();
@@ -971,15 +1079,52 @@ export default {
       } / ${data.ProductoModelo}
       `;
     },
-    setProducto(obj) {
+    async setProducto(obj) {
       if (this.lstPreProductos.some(v => v.IdProducto == obj.IdProducto)) {
         this.$toasted.error("El producto ya se encuentra en el listado");
         return false;
       }
       obj.background = this.generarColorClaroHex();
-      this.lstPreProductos.unshift(obj);
-      this.lstProductos = [];
-      this.obtenerStock();
+      let IdAlmacen = "";
+      if (this.isSalida) {
+        IdAlmacen =
+          this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1;
+      } else {
+        IdAlmacen = !this.isTraslado
+          ? this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+          : this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1;
+      }
+
+      const response = await this.axios(`${this.API}productos/stock`, {
+        params: {
+          idAlmacen: IdAlmacen,
+          idProductos: [obj.IdProducto]
+        }
+      });
+      let res = response.data[0];
+      obj.stock = res.stock;
+      obj.precioUnitario = res.PrecioContado;
+
+      obj.cantidad = 1;
+      obj.editable = true;
+      obj.tieneIgv = 0;
+      obj.igv = 0;
+      obj.TienePresentacion = false;
+      let presentacion = [];
+      if (obj.PreciosPorProducto) {
+        presentacion = JSON.parse(obj.PreciosPorProducto);
+        obj.TienePresentacion = presentacion.some(v => v.cantidad > 0);
+      }
+      obj.ProductoMarca = res.ProductoMarca;
+      obj.presentacion = presentacion.filter(v => v.cantidad > 0);
+      this.lstProductos.unshift(obj);
+      this.productos = [...this.lstProductos];
     },
     loadBarcode(e) {
       if (e) {
@@ -1024,6 +1169,15 @@ export default {
       Vue.set(this.lstProductos, this.index, prod);
       this.modalPresentacion = false;
       // prod.precioCosto = obj;
+    },
+    camnbiarIGV(index) {
+      this.$nextTick(() => {
+        let prod = { ...this.lstProductos[index] };
+        prod.igv =
+          prod.tieneIgv == 1 ? prod.cantidad * prod.precioUnitario * 0.18 : 0;
+        Vue.set(this.lstProductos, index, prod);
+        console.log(prod);
+      });
     }
   },
   computed: {
@@ -1057,15 +1211,15 @@ export default {
       let total = 0;
       if (this.lstProductos.length > 0) {
         total = this.lstProductos.reduce((sum, producto) => {
-          return sum + parseFloat(producto.PrecioCosto * producto.cantidad);
+          return sum + parseFloat(producto.precioUnitario * producto.cantidad + parseFloat(producto.igv));
         }, 0);
       }
       return parseFloat(total).toFixed(1);
     },
     mostrarAnadirProductos() {
-      // if (this.lstProductos.length > 0) {
-      //   return true;
-      // }
+      if (this.lstProductos.length > 0) {
+        return true;
+      }
       return false;
     }
   },
@@ -1084,4 +1238,3 @@ export default {
   border-right: 2px solid black;
 }
 </style>
-
