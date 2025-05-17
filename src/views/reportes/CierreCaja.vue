@@ -137,7 +137,7 @@
               <!--<td>{{ item.EfectivoDesc }}</td>-->
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Efectivo | redondear }}</td>
-              <td>S/. {{ item.PagoCon }}</td>
+              <td style="background-color:	#FFF4CC;">S/. {{ item.PagoCon }}</td>
             </tr>
           </tbody>
           <tfoot>
