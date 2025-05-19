@@ -303,6 +303,8 @@
                       :options="opcionesVenta"
                       :name="`radioOptions${ventaActiva}`">
                     </b-form-radio-group>
+                    Descripcion Proforma:
+                    <textarea class="form-control" v-model="ventas[ventaActiva].Descripcion"></textarea>
                   </b-col>
                   <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                     <b-form-group>
