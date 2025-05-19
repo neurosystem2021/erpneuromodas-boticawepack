@@ -523,7 +523,7 @@ export default {
       obj.tienePresentacion = pres.some(v => v.cantidad > 0);
       this.productos.unshift(obj);
       this.$nextTick(() => {
-        let element = document.getElementById("Cantidad0");
+        let element = document.getElementById("cantidad0");
         element.focus();
         element.select();
       });
