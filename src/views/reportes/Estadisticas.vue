@@ -5,14 +5,14 @@
         <b-col md="12">
                   <b-form-group>
                     <label>Almacén:</label>
-                    <b-form-select
+                    <!-- <b-form-select
                       v-model="empresa"
                       :options="$store.state.empresas"
                       size="lg"
                       style="font-weight: bold; width: 350px"
                       class="form-control my-2"
                       @change="cambiarEmpresa"
-                    ></b-form-select>
+                    ></b-form-select> -->
                   </b-form-group>
                 </b-col>
         <b-tabs v-model="tabActive"  pills card>
