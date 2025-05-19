@@ -35,6 +35,7 @@ import ValesFacturados from "@/views/reportes/ValesFacturados.vue";
 import ReporteCantidad from "@/views/reportes/ReporteCantidad.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ReporteGalones from "@/views/reportes/ReporteGalones.vue";
+import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 
 Vue.use(Router);
 
@@ -210,6 +211,11 @@ export default new Router({
       path: "/reportes/ReporteRegistroVentas",
       name: "ReporteRegistroVentas",
       component: ReporteRegistroVentas
+    },
+    {
+      path: "/BuscadorCajaBanco",
+      name: "BuscadorCajaBanco",
+      component: BuscadorCajaBanco
     }
   ]
 });
