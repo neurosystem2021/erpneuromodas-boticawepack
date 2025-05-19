@@ -35,7 +35,7 @@
         </div>
         <hr />
         <b-row>
-          <b-col cols="6">
+          <b-col cols="12" md="6">
             <b-card align="center" class="mb-3 contentCard" @click="setProductoUni(objProd, index)">
               <b-row>
                 <b-col md="6" class="nomCart">
@@ -50,7 +50,7 @@
             </b-card>
           </b-col>
 
-          <b-col cols="6" v-for="d in preciosProd" :key="d.id">
+          <b-col cols="12" md="6" v-for="d in preciosProd" :key="d.id">
             <b-card v-if="d.cantidad != 0" align="center" class="mb-3 contentCard"
               v-bind:class="[d.nombre == 'OFERTA' ? 'oferta' : '']" @click="() => {
                 if (parseFloat(d.cantidad)) {
