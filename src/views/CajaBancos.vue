@@ -670,7 +670,12 @@ export default {
       });
     },
     aplicarPago(deuda) {
-      if (this.Importe < deuda.Total - deuda.Aplicado) {
+      if (
+        parseFloat(this.Importe).toFixed(2) <=
+        parseFloat(
+          parseFloat(deuda.Total) - parseFloat(deuda.Aplicado)
+        ).toFixed(2)
+      ) {
         deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,
@@ -680,7 +685,9 @@ export default {
           Correlativo: deuda.Correlativo,
           Total: deuda.Total,
           Aplicado: this.Importe,
-          Saldo: deuda.Total - this.Importe
+          Saldo: parseFloat(
+            parseFloat(deuda.Total) - parseFloat(this.Importe)
+          ).toFixed(2)
         });
         this.bloquearAplicar = true;
       } else {
