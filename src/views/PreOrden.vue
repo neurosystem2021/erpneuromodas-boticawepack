@@ -20,7 +20,19 @@
           >
         </b-col>
         
-        <b-col cols="12" class="mt-2"> 
+        <b-col cols="12" class="mt-2">  <b-input-group prepend="Cliente ">
+
+      
+              <clientes-form
+                txtButton="Editar"
+                v-if="
+                  venta.cliente.IdCliente &&
+                  venta.cliente.DniRuc != '00000000'
+                "
+                idModal="editCliente"
+                @onAddCliente="setCliente"
+                :editCliente="venta.cliente"
+              ></clientes-form>
             <autocomplete
                 required="required"
                 ref="inputCliente"
@@ -29,11 +41,16 @@
                 label="writer"
                 placeholder="Cliente"
                 class="font-weight-bold"
-                :onInput="(val) => newDniRuc = val"
+                :onInput="(val) => (newDniRuc = val)"
                 :on-select="setCliente" 
                 :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                 :classes="{input: 'form-control'}">
             </autocomplete>
+             <clientes-form
+                :ruc="newDniRuc"
+                @onAddCliente="setCliente"
+              ></clientes-form>
+              </b-input-group>
         </b-col>
         <b-col cols="12" lg="7" xl="7" v-if="idAlmacen" class="mt-2 mx-0"> 
           <b-input-group class="mt-2 mb-2">
@@ -297,11 +314,14 @@
 
 <script>
 import config from "@/store/config.js";
+import ClientesForm from "@/components/ClientesForm";
 export default {
+  components: { ClientesForm },
   data() {
     return {
       API: config.API,
       idAlmacen: "",
+      newDniRuc: "",
       modalPresentacion: false,
       lstAlmances: [],
       producto: {},
@@ -471,7 +491,11 @@ export default {
     },
     setCliente(obj) {
       console.log(obj);
+      this.$el.inputCliente;
       this.venta.cliente = obj;
+      const input = this.$refs.inputCliente.$el.querySelector("input");
+      input.value = obj.DniRuc + " " + obj.Cliente;
+      input.dispatchEvent(new Event("input"));
     },
     async setProducto(obj) {
       if (this.productos.some(v => v.IdProducto == obj.IdProducto)) {
