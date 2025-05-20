@@ -386,7 +386,7 @@
                 }}</b-badge>
               </h5>
               <b-button
-                class="ml-1 mb-1"
+                class="ml-1 mb-1 btnAction"
                 size="sm"
                 variant="warning"
                 @click="limpiarProforma"
@@ -720,6 +720,7 @@
               >Anular Pago Delivery</b-button
             >
             <b-button
+            class="btnAction"
               type="button"
               v-if="!this.$route.query.idPedido"
               :disabled="inProgress"
@@ -729,14 +730,14 @@
               >Crear Orden de Pedido</b-button
             >
             <b-button
-              type="submit"
+              type="submit" class="btnAction"
               :disabled="inProgress"
               v-if="idPerfil == 1 || idPerfil == 14 || idPerfil == 6"
               variant="success"
               size="lg"
               >Efectuar Venta</b-button
             >
-            <b-button
+            <b-button class="btnAction"
               v-if="ultimaVenta"
               target="_blank"
               variant="info"

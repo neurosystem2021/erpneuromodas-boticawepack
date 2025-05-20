@@ -1181,7 +1181,7 @@ export default {
                 : data.stock.toFixed(2)
               : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
+                <td style="width: 200px;text-align:left !important; padding:0 15px !important"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>

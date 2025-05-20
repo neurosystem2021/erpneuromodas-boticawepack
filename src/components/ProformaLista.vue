@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary">Ver Orden de Pedido</b-button>
+        <b-button @click="show=true" variant="warning" class="btnAction">Ver Orden de Pedido</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
