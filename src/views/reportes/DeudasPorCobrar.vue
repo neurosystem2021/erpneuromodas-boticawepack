@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
         <b-col cols="12">
             <b-row>
@@ -38,56 +38,131 @@
             </b-row>
         </b-col>
         <b-col cols="12">
-            <table class="table table-hover">
-                <thead>
-                    <tr style="background: #0D47A1; color: #ffffff;">
-                        <th>Usuario</th>
-                        <th>Fecha</th>
-                        <th style="text-align: center;">Monto</th>
-                        <th style="text-align: center;">Metodo</th>
-                        <th style="text-align: center;">Monto Cobrado</th>
-                        <th style="text-align: center;">Deuda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(deuda,index) in lstDeudas" :key="index">
-                        <td>{{deuda.NombreUsuario}}</td>
-                        <td>{{deuda.FechaReg}}</td>
-                        <td style="text-align: center;">{{parseFloat(deuda.MontoPago).toFixed(2)}}</td>
-                        <td style="text-align: center;">
-                            <tr>
-                                <th class="my-0 py-0">Método</th>
-                                <th class="my-0 py-0">Monto</th>
-                            </tr>
-                            <tr v-for="(metodo,index) in deuda.metodospago.filter(v=>v.monto!=0)" :key="index" class="my-0 py-0">
-                                    <td class="my-0 py-0">{{ metodo.label }}</td>
-                                    <td class="my-0 py-0">{{ metodo.monto }}</td>
-                            </tr>
-                        </td>
-                        <td style="text-align: center;">{{parseFloat(deuda.montocobrado).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(deuda.Deuda).toFixed(2)}}</td>
+             <b-card no-body>
+              <b-tabs pills card>
+                <b-tab title="Reporte General" active>
+                  <table class="table table-hover">
+                    <thead>
+                        <tr style="background: #0D47A1; color: #ffffff;">
+                            <th>Usuario</th>
+                            <th>Correlativo</th>
+                            <th>Cliente</th>
+                            <th>Detalle</th>
+                            <th>Fecha</th>
+                            <th style="text-align: center;">Monto</th>
+                            <th style="text-align: center;">Metodo</th>
+                            <th style="text-align: center;">Monto Cobrado</th>
+                            <th style="text-align: center;">Deuda</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(deuda,index) in lstDeudas" :key="index">
+                            <td>{{deuda.NombreUsuario}}</td>
+                            <td>{{deuda.Serie}} - {{ deuda.Numero }}</td>
+                            <td>{{deuda.Cliente}}</td>
+                            <td style="font-size: 0.85rem;">
+                              <table width="100%">
 
+                              
+                              <tr>
+                                <th class="px-0 py-0">Producto</th>
+                                <th class="px-0 py-0 text-center">Cant.</th>
+                                <th class="px-0 py-0 text-center">Prec.</th>
+                                <th class="px-0 py-0 text-center">Dto.</th>
+                                <th class="px-0 py-0 text-center">Tot.</th>
+                              </tr>
+                              <tr v-for="(detalle,index) in deuda.detalle" :key="index">
+                                <td class="px-0 py-0">{{ detalle.Producto }}</td>
+                                <td class="px-0 py-0 text-center">{{ detalle.Cantidad }}</td>
+                                <td class="px-0 py-0 text-center">{{ detalle.Precio }}</td>
+                                <td class="px-0 py-0 text-center">{{ detalle.Descuento }}</td>
+                                <td class="px-0 py-0 text-center">{{ 
+                                  parseFloat(detalle.Cantidad * detalle.Precio - detalle.Descuento).toFixed(2)
+                                }}</td>
+                              </tr>
+                              </table>
+                            </td>
+                            <td>{{deuda.FechaReg}}</td>
+                            <td style="text-align: center;">{{parseFloat(deuda.MontoPago).toFixed(2)}}</td>
+                            <td style="text-align: center;">
+                                <tr>
+                                    <th class="my-0 py-0">Método</th>
+                                    <th class="my-0 py-0">Monto</th>
+                                </tr>
+                                <tr v-for="(metodo,index) in deuda.metodospago.filter(v=>v.monto!=0)" :key="index" class="my-0 py-0">
+                                        <td class="my-0 py-0">{{ metodo.label }}</td>
+                                        <td class="my-0 py-0">{{ parseFloat(metodo.monto).toFixed(2) }}</td>
+                                </tr>
+                            </td>
+                            <td style="text-align: center;">{{parseFloat(deuda.montocobrado).toFixed(2)}}</td>
+                            <td style="text-align: center;">{{parseFloat(deuda.Deuda).toFixed(2)}}</td>
+
+                        </tr>
+                        <tr style="background: #E3F2FD;">
+                            <th colspan="6">Total</th>
+                            <th colspan="1" style="text-align: center;">
+                                {{ parseFloat(lstDeudas.reduce((sum,deuda)=>{
+                                    return sum + parseFloat(deuda.MontoPago)
+                                },0) ).toFixed(2)}}
+                            </th>
+                            <th colspan="1" style="text-align: center;">
+                                {{parseFloat( lstDeudas.reduce((sum,deuda)=>{
+                                    return sum + parseFloat(deuda.montocobrado)
+                                },0)).toFixed(2) }}
+                            </th>
+                            <th colspan="1" style="text-align: center;">
+                                {{parseFloat( lstDeudas.reduce((sum,deuda)=>{
+                                    return sum + parseFloat(deuda.Deuda)
+                                },0)).toFixed(2) }}
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+               
+               </b-tab>
+                <b-tab title="Resumen por Usuario">
+                 
+                    <table width="100%" class="table">
+                      <tr>
+                        <th class="px-0 py-0">NombreUsuario</th>
+                        <th class="px-0 py-0">Detalle por Método</th>
+                      </tr>
+                      <tr v-for="(porusuario, index) in reportePorUsuario" :key="index">
+                        <td>{{ porusuario.NombreUsuario }}</td>
+                        <td class="px-0 py-0">
+                          <table width="100%">
+                            <tr>
+                              <th class="px-0 py-0">Método</th>
+                              <th class="px-0 py-0">Total</th>
+                            </tr>
+                            <tr v-for="(monto, metodo) in porusuario.metodospago" :key="metodo"  v-if="monto > 0">
+                              <td class="px-0 py-0">{{ metodo }}</td>
+                              <td class="px-0 py-0">{{ monto.toFixed(2) }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                 
+                </b-tab>
+
+                <b-tab title="Resumen por Metodo de Pago">
+                  <table width="100%" class="table">
+                    <tr>
+                      <th>Método</th>
+                      <th>Monto</th>
                     </tr>
-                    <tr style="background: #E3F2FD;">
-                        <th colspan="3">Total</th>
-                        <th colspan="1" style="text-align: center;">
-                            {{ parseFloat(lstDeudas.reduce((sum,deuda)=>{
-                                return sum + parseFloat(deuda.MontoPago)
-                            },0) ).toFixed(2)}}
-                        </th>
-                        <th colspan="1" style="text-align: center;">
-                            {{parseFloat( lstDeudas.reduce((sum,deuda)=>{
-                                return sum + parseFloat(deuda.montocobrado)
-                            },0)).toFixed(2) }}
-                        </th>
-                        <th colspan="1" style="text-align: center;">
-                            {{parseFloat( lstDeudas.reduce((sum,deuda)=>{
-                                return sum + parseFloat(deuda.Deuda)
-                            },0)).toFixed(2) }}
-                        </th>
+                    <tr v-for="(monto,metodo) in reportePorMetodoPago" :key="metodo">
+                     <td>{{ metodo }}</td>
+                     <td>{{ monto.toFixed(2) }}</td>
                     </tr>
-                </tbody>
-            </table>
+                  </table>
+                </b-tab>
+                <!-- <b-tab title="Tab 2"><b-card-text>Tab contents 2</b-card-text></b-tab> -->
+              </b-tabs>
+            </b-card>
+
+            
         </b-col>
     </b-row>
   </b-container>
@@ -100,6 +175,8 @@ export default {
     return {
       API: config.API,
       lstDeudas: [],
+      reportePorUsuario: [],
+      reportePorMetodoPago: [],
       repartidor: [],
       IdRepartidor: "",
       desde: "",
@@ -126,8 +203,18 @@ export default {
         }
       });
     },
-    obtenerDeudasPorCobrar() {
-      this.axios(`${this.API}reporte/deudatotal`, {
+    async obtenerDeudasPorCobrar() {
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
+      await this.axios(`${this.API}reporte/deudatotal`, {
         params: {
           desde: this.desde,
           hasta: this.hasta,
@@ -149,6 +236,67 @@ export default {
         .catch(error => {
           console.error("Error al obtener deudas:", error);
         });
+      this.generarReportePorUsuario();
+      this.generarResumenPorMetodoPago();
+      this.$swal.close();
+    },
+    generarReportePorUsuario() {
+      const resumen = {};
+
+      this.lstDeudas.forEach(item => {
+        const usuario = item.NombreUsuario;
+
+        if (!resumen[usuario]) {
+          resumen[usuario] = {
+            NombreUsuario: usuario,
+            metodospago: {
+              Efectivo: 0,
+              Yape: 0,
+              Plin: 0,
+              Tarjeta: 0
+            }
+          };
+        }
+
+        item.metodospago.forEach(metodo => {
+          const label = metodo.label;
+          const monto = parseFloat(metodo.monto);
+
+          if (!resumen[usuario].metodospago[label]) {
+            resumen[usuario].metodospago[label] = 0;
+          }
+
+          resumen[usuario].metodospago[label] += monto;
+        });
+      });
+
+      const resultadoFinal = Object.values(resumen);
+      console.log(resultadoFinal);
+      // Aquí puedes asignar a otra variable si quieres mostrarlo en tabla, etc.
+      this.reportePorUsuario = resultadoFinal;
+    },
+    generarResumenPorMetodoPago() {
+      const resumen = {};
+
+      this.lstDeudas.forEach(deuda => {
+        const metodos = deuda.metodospago;
+
+        if (Array.isArray(metodos)) {
+          metodos.forEach(metodo => {
+            const label = metodo.label;
+            const monto = parseFloat(metodo.monto);
+
+            if (!resumen[label]) {
+              resumen[label] = 0;
+            }
+
+            resumen[label] += monto;
+          });
+        }
+      });
+
+      console.log("Resumen por método de pago:", resumen);
+      this.reportePorMetodoPago = resumen; // opcional, si quieres mostrarlo
     },
     exportar() {
       this.axios
