@@ -319,6 +319,7 @@ export default {
   components: { ClientesForm },
   data() {
     return {
+      vendedor: {},
       API: config.API,
       idAlmacen: "",
       newDniRuc: "",
@@ -419,10 +420,32 @@ export default {
   mounted() {
     this.fechaEntrega = this.$moment().format("YYYY-MM-DD");
     this.obtenerAlmance();
+    this.getVendedor();
   },
   methods: {
     quitarProducto(index) {
       this.productos.splice(index, 1);
+    },
+    getVendedor(user) {
+      let usuario = sessionStorage.getItem("User");
+      if (user) {
+        usuario = user;
+      }
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+        })
+        .catch(error => {
+          console.error(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    setVendedor(obj) {
+      // console.log(obj)
+      if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+
+      this.venta.vendedor = obj;
     },
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {

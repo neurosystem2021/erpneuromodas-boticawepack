@@ -1019,13 +1019,14 @@ export default {
       });
     },
     metodoPagoCambio(opc) {
-      
       switch (opc) {
         case 1:
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
           this.venta.pago.transferencia.monto = 0;
-          this.venta.pago.efectivo.monto = parseFloat(this.totalCart).toFixed(2);
+          this.venta.pago.efectivo.monto = parseFloat(this.totalCart).toFixed(
+            2
+          );
           break;
         case 2:
           this.venta.pago.mastercard.monto = 0;
@@ -1037,13 +1038,17 @@ export default {
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.transferencia.monto = 0;
-          this.venta.pago.mastercard.monto = parseFloat(this.totalCart).toFixed(2);
+          this.venta.pago.mastercard.monto = parseFloat(this.totalCart).toFixed(
+            2
+          );
           break;
         case 4:
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
-          this.venta.pago.transferencia.monto = parseFloat(this.totalCart).toFixed(2);
+          this.venta.pago.transferencia.monto = parseFloat(
+            this.totalCart
+          ).toFixed(2);
           break;
 
         default:
