@@ -138,7 +138,7 @@
       </div>
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
-        <button class="btn btn-success" id="printBtn" @click="enviarWsp()">ENVIAR WHASTAPP</button>
+        <!--<button class="btn btn-success" id="printBtn" @click="enviarWsp()">ENVIAR WHASTAPP</button>-->
       </div>
     </main>
     <!--<footer>
