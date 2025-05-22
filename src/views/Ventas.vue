@@ -307,6 +307,20 @@
                           {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
                         </p>
                     </template>
+                    <template slot="Descripcion" slot-scope="data">
+                      <textarea 
+                        :disabled="bloquearInput?true:false"
+                        class="form-control"
+                        placeholder="Descripción"
+                        cols="9" rows="3"
+                        style="width: 150px"
+                        v-model="data.item.Descripcion"
+                      ></textarea>
+                      <!--<b-form-input
+                        v-model="productos[data.index].Descripcion"
+                        type="text"
+                        placeholder="Descripción"></b-form-input>-->
+                    </template>   
                     <template slot="precio" slot-scope="data">
                       <input
                         :disabled="data.item.bloquearInputPrecio"
@@ -995,6 +1009,7 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoProducto",label: "Codigo Producto" },
         { key: "Producto" },
+        { key: "Descripcion", label: "Descripcion"  },
         { key: "ProductoModelo", label: "Modelo" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
@@ -1756,6 +1771,7 @@ export default {
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.cantidad = 1;
+      prod.Descripcion = '';
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
@@ -2118,7 +2134,7 @@ export default {
         });
         return;
       }
-
+      venta.Descripcion=(''+(venta.Descripcion?venta.Descripcion:'')).trim().toUpperCase()
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;

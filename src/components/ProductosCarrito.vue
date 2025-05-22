@@ -708,6 +708,7 @@ export default {
         return false;
       }
 
+      obj.Descripcion = '';
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
@@ -787,6 +788,7 @@ export default {
       //obj.FLETE = 0
       obj.precio = 0;
       obj.cantidad = 1;
+      obj.Descripcion = '';
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
@@ -822,6 +824,7 @@ export default {
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
       obj.tipo = "PRESENTACION";
+      obj.Descripcion = '';
       obj.precio = 0;
       obj.cantidad = prod.cantidad;
       //obj.IdLote = 0
