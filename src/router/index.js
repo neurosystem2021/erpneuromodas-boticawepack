@@ -43,6 +43,7 @@ import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -257,6 +258,11 @@ export default new Router({
       path: "/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
+    },
+    {
+      path: "/reportes/reporte_movimineto_proveedor",
+      name: "ReporteMoviminetoPorProveedor",
+      component: ReporteMoviminetoPorProveedor
     },
   ]
 });
