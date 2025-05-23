@@ -80,55 +80,61 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
-  mounted () {
-    this.loadFirstAlmacen()
+  mounted() {
+    this.loadFirstAlmacen();
   },
-  data () {
+  data() {
     return {
       API: config.API,
       almacen: {},
       productos: [],
       fechaDesde: this.$moment().format("YYYY-01-01"),
       fechaHasta: this.$moment().format("YYYY-MM-DD")
-    }
+    };
   },
   computed: {
-    hrefXls () {
-      return '/api/index.php/reporte/articulosmovimientos?idAlmacen=' + this.almacen.IdAlmacen +'&fechaDesde='+this.fechaDesde+'&fechaHasta='+this.fechaHasta;
+    hrefXls() {
+      return (
+        "/api/index.php/reporte/articulosmovimientos?idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&fechaDesde=" +
+        this.fechaDesde +
+        "&fechaHasta=" +
+        this.fechaHasta
+      );
     }
   },
   methods: {
-    loadFirstAlmacen () {
-      this.axios.get(this.API + 'almacenes/primero')
-        .then(res => {
-          this.$refs.inputAlmacen.setValue(res.data.Almacen)
-          this.almacen = res.data
-        })
+    loadFirstAlmacen() {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.almacen = res.data;
+      });
     },
-    setAlmacen (obj) {
-      this.almacen = obj
+    setAlmacen(obj) {
+      this.almacen = obj;
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
-    verArticulos () {
-      this.axios.get(this.API + 'productos/masrotacion?limit=0', {
+    verArticulos() {
+      this.axios
+        .get(this.API + "productos/masrotacion?limit=0", {
           params: {
-              idAlmacen: this.almacen.IdAlmacen,
-              fechaDesde: this.fechaDesde,
-              fechaHasta: this.fechaHasta
+            idAlmacen: this.almacen.IdAlmacen,
+            fechaDesde: this.fechaDesde,
+            fechaHasta: this.fechaHasta
           }
-      }).then((response) => {
-          this.productos = response.data
-      })
+        })
+        .then(response => {
+          this.productos = response.data;
+        });
     }
   }
-}
+};
 </script>
 <style>
-    
-
 </style>

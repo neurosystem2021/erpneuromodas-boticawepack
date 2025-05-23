@@ -43,22 +43,22 @@
                         <td style="text-align: center;">{{reporte.IdProducto}}</td>
                         <td>{{reporte.Producto}}</td>
                         <td style="text-align: center;">{{reporte.Cantidad}}</td>
-                        <td style="text-align: center;">{{reporte.PrecioCosto}}</td>
-                        <td style="text-align: center;">{{reporte.PrecioVenta}}</td>
-                        <td style="text-align: center;">{{reporte.TotalVenta}}</td>
-                        <td style="text-align: center;">{{reporte.TotalCosto}}</td>
-                        <td style="text-align: center;">{{reporte.UtilidadBruta}}</td>
-                        <td style="text-align: center;">{{reporte.PorcentajeUti}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.TotalCosto).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.UtilidadBruta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PorcentajeUti).toFixed(2)}}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr style="background: #006064; color: #ffffff; font-weight: bold;">
                         <td colspan="5">{{footer.Producto}}</td>
                        
-                        <td style="text-align: center;">{{footer.TotalVenta}}</td>
-                        <td style="text-align: center;">{{footer.TotalCosto}}</td>
-                        <td style="text-align: center;">{{footer.UtilidadBruta}}</td>
-                        <td style="text-align: center;">{{footer.PorcentajeUti}}</td>
+                        <td style="text-align: center;">{{ parseFloat(footer.TotalVenta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{ parseFloat(footer.TotalCosto).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{ parseFloat(footer.UtilidadBruta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{ parseFloat(footer.PorcentajeUti).toFixed(2)}}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -148,6 +148,16 @@ export default {
     async exportarReporte() {
       // http://localhost/api/index.php/reporte/utilidadbruta/excel?fechaInicio=2024-01-01&fechaFin=2026-01-01&almacen=0
 
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
@@ -163,8 +173,19 @@ export default {
         }
         window.open(url, "_blank");
       });
+      this.$swal.close();
     },
     async generarReporte() {
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
@@ -204,6 +225,7 @@ export default {
           };
         }
       });
+      this.$swal.close();
     }
   }
 };

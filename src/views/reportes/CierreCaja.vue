@@ -6,6 +6,9 @@
         <b-card no-body>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Ventas" active >
+              <div class="clsVentas">
+
+              
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -485,7 +488,8 @@
             </table>
           </b-col>
       </b-row>
-            </b-tab>
+            </div>
+          </b-tab>
             <b-tab title="Productos" >
               <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
@@ -564,6 +568,10 @@
             <tr>
               <td>Gran Total S/.</td>
               <td>{{ granTotal | redondear }}</td>
+            </tr>
+            <tr>
+              <td>Gran Total Ventas S/.</td>
+              <td>{{ granTotalVentas | redondear }}</td>
             </tr>
             <tr>
               <td colspan="2"></td>
@@ -1301,6 +1309,9 @@ export default {
       return this.ventas.filter(venta => {
         return venta.EsCredito;
       });
+    },
+    granTotalVentas(){
+      return this.totalVentasEfectivo
     }
   },
   methods: {
@@ -1527,6 +1538,10 @@ export default {
 };
 </script>
 <style scoped>
+.clsVentas {
+  max-height: 700px !important;
+  overflow-y: auto;
+}
 /*th {
   background-color: #f1f1f1;
 }
