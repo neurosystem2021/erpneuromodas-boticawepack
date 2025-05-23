@@ -18,7 +18,7 @@ import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Usuario from "@/views/Usuario.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
-import Confrontacion from '@/views/reportes/Confrontacion.vue'
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -42,6 +42,7 @@ import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
+import RemisionVer from "@/views/RemisionVer.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
 Vue.use(Router);
@@ -264,5 +265,10 @@ export default new Router({
       name: "ReporteMoviminetoPorProveedor",
       component: ReporteMoviminetoPorProveedor
     },
+    {
+      path: "/remision/ver/:idDocVenta/:Serie/:Numero",
+      name: "RemisionVer",
+      component: RemisionVer
+    }
   ]
 });
