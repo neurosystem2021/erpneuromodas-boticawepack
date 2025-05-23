@@ -269,6 +269,11 @@ export default new Router({
       path: "/remision/ver/:idDocVenta/:Serie/:Numero",
       name: "RemisionVer",
       component: RemisionVer
+    },
+    {
+      path: "/remision-lista",
+      name: "RemisionLista",
+      component: RemisionLista
     }
   ]
 });

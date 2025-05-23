@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -42,11 +42,11 @@
             :per-page="perPage"
             :current-page="currentPage">
           
-              <template slot="Visualizar" slot-scope="data">
+              <!-- <template slot="Visualizar" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-              </template>
+              </template> -->
               <template slot="Reimprimir" slot-scope="data">
-                <a class="fas fa-print btn btn-primary" href="#" @click.prevent="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></a>
+                <a class="fas fa-print btn btn btn-success" href="#" @click.prevent="reimprimir(data.item.idDocVenta)">{{ data.item.TipoDoc }}</a>
                  <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
                     GUÍA REMISIÓN
                    </b-button>
@@ -91,7 +91,7 @@ export default {
         { key: "TipoDoc", sortable: true },
         { key: "Cliente", sortable: true },
         { key: "Total", sortable: true },
-        { key: "Visualizar" },
+        // { key: "Visualizar" },
         { key: "Reimprimir", label: "Reimprimir", class: "text-center" }
       ],
       totalRows: 50,
