@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container fluid class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -42,8 +42,14 @@
             :per-page="perPage"
             :current-page="currentPage">
           
-              <template slot="Reimprimir" slot-scope="data">
+              <!-- <template slot="Visualizar" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+              </template> -->
+              <template slot="Reimprimir" slot-scope="data">
+                <a class="fas fa-print btn btn btn-success" href="#" @click.prevent="reimprimir(data.item.idDocVenta)">{{ data.item.TipoDoc }}</a>
+                 <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
+                    GUÍA REMISIÓN
+                   </b-button>
               </template>
           </b-table>
             <b-row>
@@ -59,79 +65,167 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "ventas/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'idDocVenta',
+      sortBy: "idDocVenta",
       sortDesc: true,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'idDocVenta', label: 'ID', sortable: true },
-            { key: 'Correlativo', sortable: true },
-            { key: 'FechaDoc', sortable: true },
-            { key: 'DniRuc', sortable: true },
-            { key: 'TipoDoc', sortable: true },
-            { key: 'Cliente', sortable: true },
-            { key: 'Total', sortable: true },
-            { key: 'Reimprimir' }
+        { key: "idDocVenta", label: "ID", sortable: true },
+        { key: "Correlativo", sortable: true },
+        { key: "FechaDoc", sortable: true },
+        { key: "DniRuc", sortable: true },
+        { key: "TipoDoc", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Total", sortable: true },
+        // { key: "Visualizar" },
+        { key: "Reimprimir", label: "Reimprimir", class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.productoSelect = item
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaVentas.refresh()
-      },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+    rowClick(item, index) {
+      this.productoSelect = item;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    actualizarTabla() {
+      this.$refs.tablaVentas.refresh();
+    },
+    nuevoProducto() {
+      this.productoSelect = {};
+      this.$refs.productoForm.show = true;
+    },
+    irGuiaRemision(item) {
+      console.log(item);
+      this.$router.push({
+        name: "RemisionVer",
+        params: {
+          idDocVenta: item.idDocVenta,
+          Serie: item.Serie,
+          Numero: item.Numero
+        }
+      });
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "ventas?noFecha=1&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
-
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    },
+    reimprimir(idDocVenta) {
+      const url = "/imprimir/index.php?IdDocVenta=" + idDocVenta + "&preview=1";
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "absolute";
+      iframe.style.width = "0px";
+      iframe.style.height = "0px";
+      iframe.style.border = "none";
+      iframe.src = url;
+      iframe.onload = function() {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      };
+      document.body.appendChild(iframe);
+    }
+    /*reimprimir(idDocVenta){
+          this.axios.get(this.API + 'ventas/reimpresion/rapida?idDocVenta=' + idDocVenta)
+          .then((response) => {
+            let venta = {
+              CampoDireccion: response.data.venta.CampoDireccion,
+              FechaCredito: response.data.venta.FechaCredito,
+              EsCredito: response.data.venta.EsCredito,
+              PagoCon: response.data.venta.PagoCon,
+              dataInfoDocVenta:{
+                Fecha: response.data.venta.FechaDoc,
+                Numero: response.data.venta.Numero,
+                Serie: response.data.venta.Serie,
+              },
+              cliente:{
+                Cliente: response.data.venta.Cliente,
+                Direccion: response.data.venta.Direccion,
+                DniRuc: response.data.venta.DniRuc,
+              },
+              productos:response.data.productos,
+              tipoVenta:{
+                CodSunat: response.data.venta.CodSunat,
+              },
+              vendedor: {
+                Usuario: response.data.venta.UsuarioReg,
+              },
+              reps: 1,
+              abrirCaja: 0
+            }
+            let ventaJson= JSON.stringify(venta)
+            let left = (screen.width/2)-(800/2)
+                let top = (screen.height/2)-(800/2)
+                let winName='Impresion';
+                let winURL='http://localhost:5000/imprimir/getdata.php';
+                let windowoption='resizable=yes,height=300,width=300,location=0,menubar=0,scrollbars=1,top='+top+', left='+left;     
+                let form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", winURL);
+                form.setAttribute("target",winName);  
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'venta';
+                input.value = ventaJson;
+                form.appendChild(input);
+                document.body.appendChild(form);                       
+                window.open('', winName,windowoption);
+                form.target = winName;
+                form.submit();                 
+                document.body.removeChild(form);  
+          })
+          .catch((error) => {
+              console.log(error)
+              this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          })
+      },*/
   },
-  components: {
-  }
-}
+  components: {}
+};
 </script>
 
 <style>
-
 </style>

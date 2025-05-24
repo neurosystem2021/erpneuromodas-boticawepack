@@ -42,6 +42,8 @@ import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
+import RemisionVer from "@/views/RemisionVer.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -253,6 +255,21 @@ export default new Router({
       path: "/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
+    },
+    {
+      path: "/reportes/reporte_movimineto_proveedor",
+      name: "ReporteMoviminetoPorProveedor",
+      component: ReporteMoviminetoPorProveedor
+    },
+    {
+      path: "/remision/ver/:idDocVenta/:Serie/:Numero",
+      name: "RemisionVer",
+      component: RemisionVer
+    },
+    {
+      path: "/remision-lista",
+      name: "RemisionLista",
+      component: RemisionLista
     }
   ]
 });
