@@ -617,7 +617,8 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="getProductosCategoria"
+                @input="getProductosCategoriaSearch"
+                @focus.prevent=""
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -1409,7 +1410,8 @@ export default {
       this.recognition.onresult = event => {
         if (event.results.length > 0) {
           this.busqueda = event.results[0][0].transcript;
-          this.search();
+          this.getProductosCategoriaSearch(this.busqueda);
+          this.busqueda = "";
         }
       };
 
@@ -1430,8 +1432,33 @@ export default {
         alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
-    search() {
-      this.getProductosCategoria(this.busqueda);
+    getProductosCategoriaSearch(search) {
+      if (search.length < 3) {
+        return;
+      }
+      if (this.venta.almacen.IdAlmacen) {
+        this.productosCategoria = [];
+        this.cargandoProductos = true;
+
+        this.axios
+          .get(this.API + "productos/categoria", {
+            params: {
+              q: search,
+              idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
+              MasMovido: search == 0 ? 1 : 0
+            }
+          })
+          .then(response => {
+            this.cargandoProductos = false;
+            this.productosCategoria = response.data;
+            //console.log(this.productosCategoria,"izi");
+          })
+          .catch(error => {
+            this.cargandoProductos = true;
+            this.productosCategoria = [];
+            this.$toasted.show("Hubo un error, no hay conexion");
+          });
+      }
     },
     irTxtLoadBarcode(event) {
       if (event) {
@@ -1439,11 +1466,8 @@ export default {
       }
       document.getElementById("txtLoadBarcode").focus();
     },
-    f(d) {
-      console.log(d);
-    },
+
     getProductosCategoria(idProductoCategoria) {
-      console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1452,6 +1476,7 @@ export default {
           .get(this.API + "productos/categoria", {
             params: {
               q: idProductoCategoria,
+              IdProductoCategoria: idProductoCategoria,
               idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
               MasMovido: idProductoCategoria == 0 ? 1 : 0
             }

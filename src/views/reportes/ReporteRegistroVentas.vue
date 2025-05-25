@@ -166,6 +166,7 @@ export default {
   },
   methods: {
     async abrirModalDetalle(item) {
+      this.title = "Detalle Reg. Ventas:";
       this.title = `${this.title} ${item.Serie}-${item.Numero}`;
       await this.axios(`${this.API}reporte/ListarRegVenta/detalle`, {
         params: { idDocVenta: item.idDocVenta }
