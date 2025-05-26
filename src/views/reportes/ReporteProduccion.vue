@@ -56,7 +56,7 @@ export default {
   mounted() {
     this.desde = this.$moment().format("YYYY-MM-DD");
     this.hasta = this.$moment().format("YYYY-MM-DD");
-
+    this.IdUsuario = sessionStorage.getItem("User");
     this.obtenerRepartidor();
     this.obtenerListado();
   },
