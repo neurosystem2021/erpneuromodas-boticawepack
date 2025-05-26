@@ -23,6 +23,7 @@ import RemisionLista from '@/views/RemisionLista.vue'
 import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
 import ReporteCantidad from '@/views/reportes/ReporteCantidad.vue'
 import VentasMetodoPago from '@/views/reportes/VentasMetodoPago.vue'
+import ReporteRegistroVentas from '@/views/reportes/ReporteRegistroVentas.vue'
 
 
 Vue.use(Router)
@@ -134,6 +135,11 @@ export default new Router({
       path: '/reportes/ventas/metodopago',
       name: 'VentasMetodoPago',
       component: VentasMetodoPago
+    },
+    {
+      path: '/reportes/ReporteRegistroVentas',
+      name: 'ReporteRegistroVentas',
+      component: ReporteRegistroVentas
     },
   ]
 })
