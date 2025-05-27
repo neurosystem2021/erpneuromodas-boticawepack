@@ -125,7 +125,7 @@
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ prod.Producto}} ({{ prod.Descripcion}})</td>                   
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>

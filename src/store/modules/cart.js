@@ -134,6 +134,7 @@ const actions = {
       }
 
       // console.log(producto);
+      producto.Descripcion = (''+(producto.Descripcion || "")).trim()
       producto.disabledProf = 0;
 
       commit("AGREGAR_PRODUCTO", producto);
