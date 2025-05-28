@@ -111,6 +111,57 @@
           </table>
         
     </b-modal>
+
+
+    <b-modal v-model="tipoExcel" size="lg">
+	
+				<div class="row">
+					<table class="table table-bordered table-striped">
+						<tbody>
+							<tr>
+								<td>Exportar todos los tipos</td>
+								<td>
+									Se exporta <b>TODOS</b> los tipos de venta.
+								</td>
+								<td>
+									<button class="btn btn-success" @click="exportarPorTipoReporte({todos:1})" style="width: -webkit-fill-available;">Exportar Todos</button>
+								</td>
+							</tr>
+							<tr>
+								<td>Exportar VALES DE CREDITO Y CANJES</td>
+								<td>
+									Se exporta solo <b>VALES DE CREDITO Y CANJES</b>.
+								</td>
+								<td>
+									<button class="btn btn-success" @click="exportarPorTipoReporte({canjes:1})" style="width: -webkit-fill-available;">Expotar Vales y Canjes</button>
+								</td>
+							</tr>
+							<tr>
+								<td>Exportar solo tipos electronicos <b>(PARA EL CONTADOR)</b></td>
+								<td>
+									Se exporta solo documentos electronicos <b>(BOLETAS ELEC., FACTURAS ELEC. Y NOTAS DE CRÉDITO ELEC.).</b>
+								</td>
+								<td>
+									<button class="btn btn-success" @click="exportarPorTipoReporte({electronicos:1})" style="width: -webkit-fill-available;">Exportar Electronicos Fox</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div style="margin:4px">
+						<label style="color:red">IMPORTANTE:</label><br>
+						<ul>
+							<li style="margin: 3px">
+							El sistema solo emite documentos electronicos a SUNAT <strong>(BOLETAS ELEC., FACTURAS ELEC. Y NOTAS DE CRÉDITO ELEC.).</strong>
+							</li>
+							<li style="margin: 3px">
+							Las <strong>NOTAS DE VENTA, VALES DE CREDITO Y CANJES</strong> son para control interno estás no se declaran, por favor informar a su contador.
+							</li>
+						</ul>
+					</div>
+				</div>
+		
+	</div>
+</b-modal>
   </b-container>
 </template>
 
@@ -119,6 +170,7 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      tipoExcel: false,
       dialogDetalle: false,
       fechaInicio: "",
       fechaFin: "",
@@ -263,6 +315,9 @@ export default {
       return parseFloat(total).toFixed(2);
     },
     async exportarReporte() {
+      this.tipoExcel = true;
+    },
+    async exportarPorTipoReporte({ todos = 0, electronicos = 0, canjes = 0 }) {
       this.$swal({
         title: "Procesando...",
         text: "Por favor espera",
@@ -276,7 +331,10 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        todos: todos,
+        electronicos: electronicos,
+        canjes: canjes
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
