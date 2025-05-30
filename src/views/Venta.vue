@@ -1645,6 +1645,7 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
+      prod.PrecioCost = producto.PrecioCosto;
       productos.unshift(prod);
 
       // this.$nextTick(() => {
@@ -2422,11 +2423,13 @@ export default {
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
+        producto.PrecioCost = obj.precioc;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
       } else {
+        producto.PrecioCost = producto.PrecioCost;
         producto.Descripcion = obj.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
