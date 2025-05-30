@@ -489,8 +489,9 @@
           </b-col>
       </b-row>
     </div> 
-  </b-tab>
+            </b-tab>
             <b-tab title="Productos" >
+              <b-button variant="primary" @click="imprimirProductos"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
               <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -630,42 +631,68 @@
     
     </b-row>
 
-    <b-row class="si-print">
+    <b-row class="si-print" v-if="ResumenFlag">
        <h1> <center>Cierre Caja</center></h1>
        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
        <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
         
-        <table class="table table-sm" width="100%">
-          <thead>
-            <tr class="thDetalle">
-              <th width="5%">ID</th>
-              <th width="65%">Producto</th>
-              <th width="15%">Cantidad Vendida</th>
-              <th width="15%">Monto</th>
-            </tr>
-          </thead>
+       <table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
-            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
-               <td> {{ produtos.IdProducto }} </td>
-               <td> {{ produtos.Producto }} </td>
-               <td> {{ produtos.total }} </td>
-               <td> {{ produtos.Precio }} </td>
-              
+            <tr>
+              <td>Gran Total S/.</td>
+              <td>{{ granTotal | redondear }}</td>
             </tr>
-            
-          </tbody>
-          <tfoot>
             <tr>
               <td colspan="2"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ parseFloat(reportePorProveedor.reduce((total,prod)=>{
-                      return total + parseFloat(prod.Precio)
-                  },0) ).toFixed(2)}}</b></td>
             </tr>
-          </tfoot>
-        </table>
+            <tr>
+              <td>Ingresos S/.</td>
+              <td>{{ totalIngresos | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Salida S/.</td>
+              <td>{{ totalSalidas | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Crédito S/.</td>
+              <td>{{ totalVentasCredito | redondear }} </td>
+            </tr>
+          
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+            <tr>
+              <td>Efectivo S/.</td>
+              <td>{{ totalVentasEfectivo | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Yape/Plin S/.</td>
+              <td>{{ totalVentasMastercard | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | redondear }} </td>
+            </tr>
+            
+            <tr>
+              <td colspan="2"></td>
+            </tr>
 
+            <tr>
+              <td>Vales de Crédito S/.</td>
+              <td>{{ totalVentasValeCredito | redondear }} </td>
+            </tr>
+            <tr>
+              <td>Canjes S/.</td>
+              <td>{{ totalVentasCanje | redondear }} </td>
+            </tr>
+          </tbody>
+        </table>
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -1148,6 +1175,43 @@
       </b-row>
            
     </b-row>
+
+    <b-row class="si-print-productos" v-if="ProductosFlag">
+       <h1> <center>Cierre Caja</center></h1>
+       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
+        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
+       <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
+        
+        <table class="table table-sm" width="100%">
+          <thead>
+            <tr class="thDetalle">
+              <th width="5%">ID</th>
+              <th width="65%">Producto</th>
+              <th width="15%">Cantidad Vendida</th>
+              <th width="15%">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+              
+            </tr>
+            
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ parseFloat(reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0) ).toFixed(2)}}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+    </b-row>
   </b-container>
 
 </template>
@@ -1166,6 +1230,8 @@ export default {
   },
   data() {
     return {
+      ResumenFlag: false,
+      ProductosFlag: false,
       API: config.API,
       ventas: [],
       ingresos: [],
@@ -1338,7 +1404,18 @@ export default {
         });
     },
     imprimir() {
-      window.print();
+      this.ProductosFlag = false;
+      this.ResumenFlag = true;
+      this.$nextTick(() => {
+        window.print();
+      });
+    },
+    imprimirProductos() {
+      this.ProductosFlag = true;
+      this.ResumenFlag = false;
+      this.$nextTick(() => {
+        window.print();
+      });
     },
     async loadData() {
       await this.getVentas();
@@ -1617,17 +1694,24 @@ th {
 .si-print {
   display: none;
 }
+.si-print-productos {
+  display: none;
+}
 @media print {
   .no-print {
     display: none;
   }
   .si-print {
+    max-width: 850px;
+    display: block;
+  }
+  .si-print-productos {
     max-width: 350px;
     display: block;
   }
   .table {
-    max-width: 350px;
-    font-size: 0.5em;
+    max-width: 850px;
+    font-size: 1em;
   }
   th {
     background: #ffffff !important;
