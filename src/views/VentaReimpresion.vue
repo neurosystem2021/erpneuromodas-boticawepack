@@ -45,6 +45,14 @@
               <template slot="Reimprimir" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               </template>
+              <template slot="Estado" slot-scope="data">
+                <span v-if="data.item.Anulado == 1">
+                  <span class="btn btn-danger">ANULADO</span>
+                </span>
+                <span v-else>
+                  <span class="btn btn-success">ACTIVO</span>
+                </span>
+              </template>
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
@@ -85,7 +93,8 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true },
-            { key: 'Reimprimir' }
+            { key: 'Reimprimir' },
+            { key: 'Estado', sortable: true },
       ],
       totalRows: 50,
       perPage: 10,
