@@ -416,6 +416,7 @@ export default {
     },
     setAlmacenOrigen(obj) {
       this.limpiarCart();
+      this.movimiento.almacenOrigen = obj;
       if (this.isSalida) {
         this.obtenerStok({
           IdAlmacen:
