@@ -6,13 +6,13 @@
             <h5>*Por Defecto la fecha de Entrega, será la fecha de hoy.*</h5>
       </b-col>
         <b-col cols="4" class="my-2">
-            <b-input-group prepend="Fecha. Reg." class="mt-2">
+            <b-input-group prepend="Fecha. Desde." class="mt-2">
                 
                 <input type="date" class="form-control" v-model="FechaPedido"/>
             </b-input-group>
         </b-col>
         <b-col cols="4" class="my-2">
-            <b-input-group prepend="Fecha. Entrega." class="mt-2">
+            <b-input-group prepend="Fecha. Hasta." class="mt-2">
                 
                 <input type="date" class="form-control" v-model="FechaEntrega"/>
             </b-input-group>
@@ -47,6 +47,7 @@ export default {
     };
   },
   mounted() {
+    this.FechaPedido = this.$moment().format("YYYY-MM-DD");
     this.FechaEntrega = this.$moment().format("YYYY-MM-DD");
     this.obtenerListado();
     // this.reCalcularHeader();

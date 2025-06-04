@@ -138,6 +138,16 @@ export default {
   },
   methods: {
     async obtenerPedidosAsignado() {
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
       this.lstRepartos = [];
       await this.axios(`${this.API}listado/entregas_por_repatidor`, {
         params: {
@@ -148,6 +158,7 @@ export default {
           this.lstRepartos = res.data;
         }
       });
+      this.$swal.close();
     },
     abrirModalFinalizar(producto) {
       this.item = producto;
@@ -188,7 +199,17 @@ export default {
       }
     },
     async finalizar() {
-    
+      this.finalizarFlag = false;
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
       let montoPagado = parseFloat(
         this.metodoPago.reduce((sum, metodo) => {
           return sum + parseFloat(metodo.monto);
@@ -232,6 +253,7 @@ export default {
 
       await this.axios.post(`${this.API}finalizar_entregas`, data).then(res => {
         if (res) {
+          this.$swal.close();
           this.$swal({
             icon: "success",
             title: "Confirmado",
@@ -253,6 +275,8 @@ export default {
           });
         }
       });
+
+      this.obtenerPedidosAsignado();
     }
   }
 };
