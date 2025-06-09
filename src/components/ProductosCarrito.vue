@@ -1314,7 +1314,7 @@ export default {
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
       obj.precio = 0;
-      obj.cantidad = 0;
+      obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
@@ -1604,6 +1604,30 @@ export default {
       }
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
+      if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
+        let index = this.productos.findIndex(
+          v => v.IdProducto == item.IdProducto
+        );
+        let prod = {
+          ...this.productos.filter(v => v.IdProducto == item.IdProducto)[0]
+        };
+
+        if (prod.tipo == "UNIDAD") {
+          prod.cantidad++;
+        }
+        if (prod.tipo == "PRESENTACION") {
+          prod.cantxPrecio++;
+        }
+
+        Vue.set(this.productos, index, prod);
+        this.$nextTick(() => {
+          this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+            .recalcularTotalPorEmpresaFlag;
+        });
+        this.$toasted.success("Producto añadido correctamente");
+        this.loadCode = "";
+        return;
+      }
       this.abrirModal = abrirModal;
       this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
@@ -1651,7 +1675,7 @@ export default {
         this.errorMontoPresentacion = "Ingrese una Cantidad";
         return false;
       }
-      // console.log(prod);
+
       let prod = this.itemProducto;
       this.itemProducto.tipo = "PRESENTACION";
       prod.estadoPxP = true;
@@ -1692,7 +1716,7 @@ export default {
       prod.tipo = "UNIDAD";
       prod.estadoPxP = true;
       prod.cantxPrecio = 0;
-      prod.cantidad = 0;
+      prod.cantidad = this.monto;
       prod.descuento = 0;
       prod.disabled = false;
       if (!prod.Empresa || typeof prod.Empresa == "undefined") {

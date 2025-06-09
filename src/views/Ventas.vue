@@ -940,6 +940,9 @@ export default {
           });
         }
       });
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     metodoPagoCambio(opc) {
       switch (opc) {
