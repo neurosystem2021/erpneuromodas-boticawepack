@@ -702,7 +702,7 @@
               v-if="!this.$route.query.idPedido"
               :disabled="inProgress"
               variant="primary"
-              size="md"
+              size="lg"
               @click="guardarProforma"
               class="btnAction"
               >Crear Proforma</b-button
@@ -883,8 +883,10 @@ export default {
       this.recalcularTotalesPorEmpresa();
     },
     recalcularTotalPorEmpresaFlag() {
-      console.log("ddd");
-      this.recalcularTotalesPorEmpresa();
+      this.$nextTick(() => {
+        this.recalcularTotalesPorEmpresa();
+        this.metodoPagoCambio(1);
+      });
     }
   },
   computed: {

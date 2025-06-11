@@ -3,7 +3,8 @@
     <b-button
       block
       @click="show = true"
-      variant="outline-info"
+      variant="info"
+      class="btnAction"
       size="md"
       v-bind:class="{ parpadea: pedidos.length > 0 }"
     >
