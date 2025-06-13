@@ -57,14 +57,14 @@
             @change="(e) => addManoDeObra(index, e)"
             v-if="prod.CodigoBarra != 'MANODEOBRA'" 
             v-model="prod.EsManoDeObra"
-            :disabled="prod.Pagado"
+            :disabled="prod.Pagado==1"
             class="form-check-input" type="checkbox" />
           </td>
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
           <td>
             <span class="hideInModal">{{ prod.Precio }}</span>
-            <input :disabled="prod.Pagado ==1" step="0.01" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
+            <input :disabled="prod.Pagado ==1" step="0.0001" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
           <td>
             <span class="hideInModal">{{ prod.Cantidad }}</span> 
@@ -238,7 +238,7 @@ export default {
       data.cantidad = 1;
       data.Cantidad = 1;
 
-      this.productos.push(data);
+      this.productos.unshift(data);
       this.$toasted.success("Producto agregado");
       this.emitUpdate();
     },
@@ -250,7 +250,7 @@ export default {
       this.emitUpdate();
     },
     focusAutocomplete(ref) {
-      this.$refs[ref].type = ""
+      this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
     },
     addManoDeObra(index, e) {
