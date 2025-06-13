@@ -305,7 +305,7 @@
                 ></pre-orden-form-det>
 
                 <b-row>
-                  <b-col md="6">
+                  <b-col md="4">
                     <table class="table b-table border table-footer table-sm text-center" >
                     <tbody>
                       <tr><td>Mano de obra bruta</td></tr>
@@ -315,13 +315,35 @@
                     </tbody>
                     </table>
                   </b-col>
-                  <b-col md="6">
+                  <b-col md="4">
                     <table class="table b-table border table-footer table-sm text-center" >
                     <tbody>
                       <tr><td>Total de Gastos</td></tr>
                       <tr><td><h3>{{ totalGastos | redondear }}</h3></td></tr>
                       <tr><td>Mano de obra neta + Operativos</td></tr>
                       <tr><td><h3 :class="{'text-danger': totalManoObraNeta <= 0}">{{ totalManoObraNeta | redondear }}</h3></td></tr>
+                    </tbody>
+                    </table>
+                  </b-col>
+                   <b-col md="4">
+                    <table class="table b-table border table-footer table-sm text-center" >
+                    <tbody>
+                        <tr>
+                          <td>Total Productos</td>
+                        </tr>
+                         <tr>
+                            <td>
+                                <h3>{{ totalGeneral | redondear }}</h3>
+                            </td>
+                          </tr>
+                        <tr>
+                          <td>Total Adelantos</td>
+                        </tr>
+                         <tr>
+                            <td>
+                                <h3>{{ totalAdelantos | redondear }}</h3>
+                            </td>
+                          </tr>
                     </tbody>
                     </table>
                   </b-col>
@@ -480,6 +502,7 @@ export default {
       totalManoObraNeta: 0,
       totalSumaProductos: 0,
       totalGastos: 0,
+      totalGeneral: 0,
       totalAdelantos: 0,
       editarDescripcion: false,
       newDniRuc: "",
@@ -490,6 +513,7 @@ export default {
     ...mapState({
       productos: state => state.cart.productos
     })
+
     /* 		totalAdelantos() {
     let sumatoria = 0
     this.adelantos.map(ad => {
@@ -514,6 +538,18 @@ export default {
   methods: {
     abrirMdlNuevoProyecto() {
       this.mdlNuevoProyecto = true;
+    },
+    calcularGeneral(productos) {
+      this.$nextTick(() => {
+        // console.log("ssss", this.productos);
+        let total = productos.reduce((sum, producto) => {
+          console.log(producto);
+          return sum + parseFloat(producto.Precio * producto.Cantidad);
+        }, 0);
+        // return parseFloat(total).toFixed(2);
+
+        this.totalGeneral = total;
+      });
     },
     startRecognition(event) {
       event.preventDefault(); // Evita el comportamiento por defecto
@@ -696,7 +732,7 @@ export default {
         });
     },
     openCarrito(hab) {
-      console.log(hab);
+      // console.log(hab);
       this.proformaTotal = null;
       this.selectProducto = hab;
       this.$refs.modalCarrito.show();
@@ -957,6 +993,7 @@ export default {
     return total?total.toFixed(2):0
   }, */
     calcularManoObra(e) {
+      console.log(e)
       let pManoObra = e.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.Precio : 0;
       let cantidad = pManoObra
@@ -973,6 +1010,7 @@ export default {
         }
       });
       this.calculoGastosAdelantos();
+      this.calcularGeneral(e);
     },
     calculoGastosAdelantos() {
       let sumatoriaGas = 0;
@@ -1068,10 +1106,7 @@ export default {
     display: block;
   }
 }
-</style>
-
-<style scoped>
-h5 {
+</ > <style scoped > h5 {
   font-size: 1.2rem;
 }
 h6 {
