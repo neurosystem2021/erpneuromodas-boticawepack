@@ -1222,10 +1222,12 @@ import CierresCaja from "@/components/CierresCaja.vue";
 export default {
   mounted() {
     if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id);
-      this.loadData();
+      this.getCierre(this.$route.params.id)
+      this.loadData()
+      this.getVendedor()
     } else {
-      this.getVendedor();
+      this.getVendedor()
+      this.loadData()
     }
   },
   data() {
@@ -1391,12 +1393,16 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.$nextTick(() => {
+            if (this.$refs.inputVendedor) {
+              this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+              this.$refs.inputVendedor.$refs.input.disabled = true;
 
           if (response.data.IdUsuarioPerfil !== 1) {
-            // this.$refs.inputVendedor.$refs.input.disabled = true
-          }
+                this.$refs.inputVendedor.$refs.input.disabled = true;
+              }
+            }
+          });
         })
         .catch(error => {
           console.log(error);
@@ -1534,7 +1540,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        //params.usuario = this.vendedor.Usuario;
       }
       // cierre de caja enviar el vendedor
       await this.axios
@@ -1555,7 +1561,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        //params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/ingresos", {
@@ -1574,7 +1580,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        //params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/salidas", {
