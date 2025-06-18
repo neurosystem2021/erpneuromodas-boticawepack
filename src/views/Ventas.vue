@@ -693,7 +693,7 @@
                               </table>
                             </slot>
                             </b-popover>
-                          </td> -->
+                          </td> -->s
                           <td class="table-success">SubTotal</td>
                           <td class="table-success">{{ getSubTotal() }}</td>
                         </tr>
@@ -1740,9 +1740,14 @@ export default {
     async setProducto(producto, esNota = false) {
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+        let prod = productos.filter(v => v.IdProducto == producto.IdProducto);
+        if (prod[0].presentacion == "UNIDAD") {
+          console.log("a");
+          prod[0].cantidad += parseFloat(1);
+        } else {
+          console.log("b");
+          prod[0].CantidadPresentacion += parseFloat(1);
+        }
         this.metodoPagoCambio(1);
         return false;
       }
@@ -1858,7 +1863,7 @@ export default {
         subtotal = prod.cantidad * prod.precio;
         // console.log(prod);
       }
-      return subtotal;
+      return parseFloat(subtotal).toFixed(2);
     },
     getTotalDetalle(prod) {
       let total = 0;
@@ -1870,7 +1875,7 @@ export default {
         total = prod.cantidad * prod.precio - prod.descuento;
       }
 
-      return total;
+      return parseFloat(total).toFixed(2);
     },
     getSubTotal() {
       let prod = [...this.ventas[this.ventaActiva].productos];
@@ -1883,10 +1888,12 @@ export default {
               total +
               parseFloat(
                 prod.CantidadPresentacion * prod.cantidad * prod.precio
-              )
+              ).toFixed(2)
             );
           } else {
-            return total + parseFloat(prod.cantidad * prod.precio);
+            return parseFloat(
+              total + parseFloat(prod.cantidad * prod.precio)
+            ).toFixed(2);
           }
           // return (
           //   total +

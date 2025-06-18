@@ -194,7 +194,7 @@ export default {
             idDocVenta: item.idDocVenta
           };
           await this.axios
-            .put(`${this.API}/reporte/ListarRegVenta/anular`)
+            .put(`${this.API}/reporte/ListarRegVenta/anular`, data)
             .then(res => {
               console.log(res);
               this.generarReporte();
