@@ -41,6 +41,7 @@ import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import RemisionListado from "@/views/reportes/RemisionListado.vue";
+import RemisionVer from "@/views/RemisionVer.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -235,6 +236,11 @@ export default new Router({
       path: "/KardexValorizado",
       name: "KardexValorizado",
       component: KardexValorizado
+    },
+    {
+      path: "/remision/ver/:idDocVenta/:Serie/:Numero",
+      name: "RemisionVer",
+      component: RemisionVer
     },
     {
       path: "/remision/listado",
