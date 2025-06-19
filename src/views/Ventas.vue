@@ -626,12 +626,13 @@
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
                       <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar Impresora</b-button>
                       <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
                         <span v-if="mostrarNav"> Ocultar Nav</span>
                         <span v-else> Mostrar Nav</span>
                       </b-button>
-                       <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar Impresora</b-button>
+                      
                     </b-row>
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
