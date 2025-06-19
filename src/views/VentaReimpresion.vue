@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row" fluid>
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -47,6 +47,9 @@
               </template>
               <template slot="Reimprimir" slot-scope="data">
                 <a class="fas fa-print btn btn-primary" href="#" @click.prevent="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></a>
+                 <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
+                    GUÍA REMISIÓN
+                   </b-button>
               </template>
           </b-table>
             <b-row>
@@ -62,89 +65,110 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "ventas/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'idDocVenta',
+      sortBy: "idDocVenta",
       sortDesc: true,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'idDocVenta', label: 'ID', sortable: true },
-            { key: 'Correlativo', sortable: true },
-            { key: 'FechaDoc', sortable: true },
-            { key: 'DniRuc', sortable: true },
-            { key: 'TipoDoc', sortable: true },
-            { key: 'Cliente', sortable: true },
-            { key: 'Total', sortable: true },
-            { key: 'Visualizar' },
-            { key: 'Reimprimir', label:'Reimprimir', class:'text-center' }
+        { key: "idDocVenta", label: "ID", sortable: true },
+        { key: "Correlativo", sortable: true },
+        { key: "FechaDoc", sortable: true },
+        { key: "DniRuc", sortable: true },
+        { key: "TipoDoc", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Total", sortable: true },
+        { key: "Visualizar" },
+        { key: "Reimprimir", label: "Reimprimir", class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.productoSelect = item
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaVentas.refresh()
-      },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+    irGuiaRemision(item) {
+      console.log(item);
+      this.$router.push({
+        name: "RemisionVer",
+        params: {
+          idDocVenta: item.idDocVenta,
+          Serie: item.Serie,
+          Numero: item.Numero
+        }
+      });
+    },
+    rowClick(item, index) {
+      this.productoSelect = item;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    actualizarTabla() {
+      this.$refs.tablaVentas.refresh();
+    },
+    nuevoProducto() {
+      this.productoSelect = {};
+      this.$refs.productoForm.show = true;
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "ventas?noFecha=1&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
-
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      },
-      reimprimir(idDocVenta) {
-        const url = '/imprimir/index.php?IdDocVenta=' + idDocVenta + '&preview=1';
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.width = '0px';
-        iframe.style.height = '0px';
-        iframe.style.border = 'none';
-        iframe.src = url;
-        iframe.onload = function () {
-          iframe.contentWindow.print();
-          setTimeout(() => document.body.removeChild(iframe), 1000);
-        };
-        document.body.appendChild(iframe);
-      },
-      /*reimprimir(idDocVenta){
+          return [];
+        });
+    },
+    reimprimir(idDocVenta) {
+      const url = "/imprimir/index.php?IdDocVenta=" + idDocVenta + "&preview=1";
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "absolute";
+      iframe.style.width = "0px";
+      iframe.style.height = "0px";
+      iframe.style.border = "none";
+      iframe.src = url;
+      iframe.onload = function() {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      };
+      document.body.appendChild(iframe);
+    }
+    /*reimprimir(idDocVenta){
           this.axios.get(this.API + 'ventas/reimpresion/rapida?idDocVenta=' + idDocVenta)
           .then((response) => {
             let venta = {
@@ -199,11 +223,9 @@ export default {
           })
       },*/
   },
-  components: {
-  }
-}
+  components: {}
+};
 </script>
 
 <style>
-
 </style>

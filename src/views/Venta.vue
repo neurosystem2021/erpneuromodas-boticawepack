@@ -191,7 +191,8 @@
                       type="number"
                       @focus="abrirModalTouch(data.index,2)"
                       style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
-                      autocomplete="false"  @input="metodoPagoCambio(1)"
+                      autocomplete="false"
+                      @input="metodoPagoCambio(1)"
                       class="form-control"
                       />
                      
@@ -204,6 +205,7 @@
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
                       class="form-control"
+                       @input="metodoPagoCambio(1)"
                       />
                      
                   </template>
@@ -1486,6 +1488,10 @@ export default {
         this.$toasted.show("No se encontró ningun producto");
       }
       this.loadCode = "";
+      this.$refs.barcodeInput.focus();
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     startRecognition() {
       this.busqueda = "";
@@ -1686,7 +1692,7 @@ export default {
         this.$nextTick(() => {
           this.irTxtLoadBarcode();
         });
-
+        this.metodoPagoCambio(1);
         return false;
       }
       // console.log("producto", producto);
@@ -2175,8 +2181,16 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
 
-      console.log("ab");
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
@@ -2195,6 +2209,7 @@ export default {
           this.eliminarVentana();
           this.getVendedorInfo();
         }
+        this.$swal.close();
 
         // if (response.data.actualizar) {
         //   this.$toasted.show(response.data.msg);
