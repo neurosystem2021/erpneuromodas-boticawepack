@@ -631,6 +631,7 @@
                         <span v-if="mostrarNav"> Ocultar Nav</span>
                         <span v-else> Mostrar Nav</span>
                       </b-button>
+                       <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar Impresora</b-button>
                     </b-row>
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
@@ -1162,6 +1163,20 @@ export default {
     });
   },
   methods: {
+    testImpresora() {
+      var left = screen.width / 2 - 800 / 2;
+      var top = screen.height / 2 - 800 / 2;
+      let params =
+        "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
+        top +
+        ", left=" +
+        left;
+      window.open(
+        "http://localhost:5000/imprimir/test.php",
+        "Impresión",
+        params
+      );
+    },
     async actualizarRegistro(event) {
       let producto = { ...event };
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -2161,10 +2176,95 @@ export default {
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
+          venta.productos.map(pro => {
+            delete pro.nuevoPrecioContado;
+            delete pro.Descripcion;
+            delete pro.disabledProf;
+            delete pro.normalPrecioContado;
+            delete pro.Anulado;
+            delete pro.Botapie;
+            delete pro.Codigo;
+            delete pro.CodigoBarra;
+            delete pro.Color;
+            delete pro.ControlaStock;
+            delete pro.Dosis;
+            delete pro.EsPadre;
+            delete pro.FechaMod;
+            delete pro.FechaReg;
+            delete pro.Genero;
+            delete pro.Hash;
+            delete pro.IdBloque;
+            delete pro.IdProducto;
+            delete pro.IdProductoCategoria;
+            delete pro.IdProductoFormaFarmaceutica;
+            delete pro.IdProductoMarca;
+            delete pro.IdProductoMedicion;
+            delete pro.IdProductoTalla;
+            delete pro.PorcentajeUtilidad;
+            delete pro.PrecioContado;
+            delete pro.PrecioCosto;
+            delete pro.PrecioPorMayor;
+            delete pro.ProductoCategoria;
+            delete pro.ProductoDesc;
+            delete pro.ProductoDescCorto;
+            delete pro.ProductoMarca;
+            delete pro.ProductoMedicion;
+            delete pro.ProductoModelo;
+            delete pro.ProductoTalla;
+            delete pro.StockMinimo;
+            delete pro.StockPorMayor;
+            delete pro.UsuarioMod;
+            delete pro.UsuarioReg;
+            delete pro.VentaEstrategica;
+            delete pro.stock;
+          });
+          delete venta.cliente.Anulado;
+          delete venta.cliente.FechaReg;
+          delete venta.cliente.UsuarioReg;
+          delete venta.cliente.FechaMod;
+          delete venta.cliente.UsuarioMod;
+          delete venta.cliente.FechaNacimiento;
+          delete venta.cliente.Nacionalidad;
+          delete venta.cliente.Direccion3;
+          delete venta.cliente.Telefono;
+          delete venta.cliente.Email;
+          delete venta.cliente.Puntos;
+          delete venta.cliente.EsVIP;
+          delete venta.cliente.Direccion2;
+          delete venta.cliente.Sexo;
+          delete venta.cliente.Ocupacion;
+          delete venta.cliente.NombreComercial;
+          delete venta.cliente.esComisionista;
+          delete venta.idProductos;
+          delete venta.vendedor.APPTOKEN;
+          delete venta.vendedor.APPURL;
+          delete venta.vendedor.Anulado;
+          delete venta.vendedor.FechaReg;
+          delete venta.vendedor.UsuarioReg;
+          delete venta.vendedor.FechaMod;
+          delete venta.vendedor.UsuarioMod;
+          delete venta.vendedor.Password;
+          delete venta.puntoVenta;
+          delete venta.almacen;
+          let dataInfoDocVenta = {
+            Serie: response.data.serie,
+            Numero: response.data.numero,
+            Fecha: response.data.fecha
+          };
+          venta.dataInfoDocVenta = dataInfoDocVenta;
+          let ventaJson = JSON.stringify(venta);
+          var left = screen.width / 2 - 800 / 2;
+          var top = screen.height / 2 - 800 / 2;
+          let params =
+            "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
+            top +
+            ", left=" +
+            left;
           window.open(
-            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
-            "_blank",
-            "noopener"
+            "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
+              encodeURIComponent(ventaJson),
+            "Impresión",
+            params
           );
         }
 
