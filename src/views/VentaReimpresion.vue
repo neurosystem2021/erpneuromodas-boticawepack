@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row" fluid>
         <b-row>
           <b-col md="6" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
@@ -44,7 +44,12 @@
           
               <template slot="Reimprimir" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-              </template>
+
+                   <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
+                    GUÍA REMISIÓN
+                   </b-button>
+              
+                </template>
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
@@ -59,79 +64,98 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "ventas/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'idDocVenta',
+      sortBy: "idDocVenta",
       sortDesc: true,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'idDocVenta', label: 'ID', sortable: true },
-            { key: 'Correlativo', sortable: true },
-            { key: 'FechaDoc', sortable: true },
-            { key: 'DniRuc', sortable: true },
-            { key: 'TipoDoc', sortable: true },
-            { key: 'Cliente', sortable: true },
-            { key: 'Total', sortable: true },
-            { key: 'Reimprimir' }
+        { key: "idDocVenta", label: "ID", sortable: true },
+        { key: "Correlativo", sortable: true },
+        { key: "FechaDoc", sortable: true },
+        { key: "DniRuc", sortable: true },
+        { key: "TipoDoc", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Total", sortable: true },
+        { key: "Reimprimir" }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.productoSelect = item
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaVentas.refresh()
-      },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+    rowClick(item, index) {
+      this.productoSelect = item;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    actualizarTabla() {
+      this.$refs.tablaVentas.refresh();
+    },
+    nuevoProducto() {
+      this.productoSelect = {};
+      this.$refs.productoForm.show = true;
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "ventas?noFecha=1&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'ventas?noFecha=1&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
-
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    },
+    irGuiaRemision(item) {
+      console.log(item);
+      this.$router.push({
+        name: "RemisionVer",
+        params: {
+          idDocVenta: item.idDocVenta,
+          Serie: item.Serie,
+          Numero: item.Numero
+        }
+      });
+    }
   },
-  components: {
-  }
-}
+  components: {}
+};
 </script>
 
 <style>
-
 </style>
