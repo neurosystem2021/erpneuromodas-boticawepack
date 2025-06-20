@@ -41,6 +41,8 @@ import KardexValorizado from "@/views/KardexValorizado.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import Traslado from "@/views/Traslado.vue";
+import RemisionVer from "@/views/RemisionVer.vue";
+import RemisionListado from "@/views/reportes/RemisionListado.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -231,6 +233,16 @@ export default new Router({
       path: "/traslado",
       name: "Traslado",
       component: Traslado
+    },
+    {
+      path: "/remision/ver/:idDocVenta/:Serie/:Numero",
+      name: "RemisionVer",
+      component: RemisionVer
+    },
+    {
+      path: "/remision/listado",
+      name: "RemisionListado",
+      component: RemisionListado
     }
   ]
 });
