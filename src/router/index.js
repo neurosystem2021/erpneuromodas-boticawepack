@@ -41,7 +41,9 @@ import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
-import Confrontacion from '@/views/reportes/Confrontacion.vue'
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
+import RemisionVer from "@/views/RemisionVer.vue";
+import RemisionListado from "@/views/reportes/RemisionListado.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -242,10 +244,20 @@ export default new Router({
       name: "PreOrden",
       component: PreOrden
     },
-        {
-          path: '/reporte/confrontacion',
-          name: 'Confrontacion',
-          component: Confrontacion
-        }
+    {
+      path: "/reporte/confrontacion",
+      name: "Confrontacion",
+      component: Confrontacion
+    },
+    {
+      path: "/remision/ver/:idDocVenta/:Serie/:Numero",
+      name: "RemisionVer",
+      component: RemisionVer
+    },
+    {
+      path: "/remision/listado",
+      name: "RemisionListado",
+      component: RemisionListado
+    }
   ]
 });
