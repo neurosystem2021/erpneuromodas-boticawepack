@@ -47,30 +47,33 @@
             </b-col>
             </b-row>
           </b-col>
-          <b-col md="4">
-            <b-form-group>
-              <label>Fecha Emisión Inicio:</label>
-              <b-form-input
-                v-model="rango.fechaDesde"
-                type="date"
-                step="1"
-                @input="val => $refs.tablaProductos.refresh()"
+        <b-col md="3">
+          <b-form-group>
+            <label>Fecha Emisión Inicio:</label>
+            <b-form-input
+              v-model="rango.fechaDesde"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="3">
+          <b-form-group>
+            <label>Fecha Emisión Fin:</label>
+            <b-form-input
+              v-model="rango.fechaHasta"
+              type="date"
+              step="1"
                 placeholder="Fecha Inicio">
-              </b-form-input>
-            </b-form-group>
-          </b-col>
-          <b-col md="4">
-            <b-form-group>
-              <label>Fecha Emisión Fin:</label>
-              <b-form-input
-                v-model="rango.fechaHasta"
-                type="date"
-                step="1"
-                @input="val =>$refs.tablaProductos.refresh() "
-                placeholder="Fecha Inicio">
-              </b-form-input>
-            </b-form-group>
-          </b-col>
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="2" class="d-flex align-items-end mb-3">
+          <b-button variant="primary" block @click="generarReporte">
+            Generar Reporte
+          </b-button>
+        </b-col>
           <b-col md="4">
             <h4>
               <b-form-group class="mt-4">
@@ -160,14 +163,35 @@ export default {
         IdAlmacen: 1
       },
       rango: {
-        fechaDesde: this.$moment().format("YYYY-01-01"),
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
+      mostrarTabla: false,
       showLetras: false,
       urlImg: "/resources/images/logo.png"
     };
   },
   methods: {
+    generarReporte() {
+    if (!this.rango.fechaDesde || !this.rango.fechaHasta) {
+      this.$bvToast.toast('Debes seleccionar ambas fechas.', {
+        title: 'Error',
+        variant: 'danger',
+        solid: true
+      });
+      return;
+    }
+
+    this.mostrarTabla = true;
+
+    this.$nextTick(() => {
+      if (this.$refs.tablaProductos && typeof this.$refs.tablaProductos.refresh === 'function') {
+        this.$refs.tablaProductos.refresh();
+      }
+    });
+
+    console.log('Generando reporte desde', this.rango.fechaDesde, 'hasta', this.rango.fechaHasta);
+  },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
