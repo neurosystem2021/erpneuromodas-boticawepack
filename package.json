@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.11",
+    "bootstrap-vue-treeview": "^1.0.8",
     "chart.js": "^2.9.4",
     "detect-browser": "^2.5.1",
     "leaflet": "^1.7.1",
@@ -22,7 +23,7 @@
     "vue-moment": "^4.0.0-0",
     "vue-router": "^3.0.1",
     "vue-simple-spinner": "^1.2.10",
-    "vue-socket.io": "^3.0.7",
+    "vue-socket.io": "^3.0.10",
     "vue-sweetalert2": "^5.0.2",
     "vue-toasted": "^1.1.24",
     "vue2-autocomplete-js": "^0.2.2",

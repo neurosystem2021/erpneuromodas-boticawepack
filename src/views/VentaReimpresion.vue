@@ -44,12 +44,13 @@
           
               <template slot="Visualizar" slot-scope="data">
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-                  <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
-                    GUÍA REMISIÓN
-                   </b-button>
+                  
               </template>
               <template slot="Reimprimir" slot-scope="data">
                 <a class="fas fa-print btn btn-primary" href="#" @click.prevent="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></a>
+              <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
+                    GUÍA REMISIÓN
+                   </b-button>
               </template>
           </b-table>
             <b-row>
@@ -100,6 +101,17 @@ export default {
     };
   },
   methods: {
+    irGuiaRemision(item) {
+      console.log(item);
+      this.$router.push({
+        name: "RemisionVer",
+        params: {
+          idDocVenta: item.idDocVenta,
+          Serie: item.Serie,
+          Numero: item.Numero
+        }
+      });
+    },
     rowClick(item, index) {
       this.productoSelect = item;
       //this.$refs.productoForm.producto.IdProducto = 'a'
