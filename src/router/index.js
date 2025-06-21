@@ -45,6 +45,8 @@ import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
+import RemisionListado from '@/views/reportes/RemisionListado.vue'
+
 Vue.use(Router);
 
 export default new Router({
