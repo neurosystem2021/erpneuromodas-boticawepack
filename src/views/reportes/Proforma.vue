@@ -163,6 +163,8 @@
       </div>
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+
+        <button class="btn btn-primary" id="printBtn" @click="imprimirguia()">IMPRIMIR PDF</button>
       </div>
     </main>
     <!--<footer>
@@ -232,6 +234,15 @@ export default {
     },
     imprimir(){
     window.print();
+    },
+    imprimirguia(){
+      this.axios(`${API}venta/proforma/generar_pdf?id=${this.idProforma}`).then(
+        res => {
+          if (res.data.url) {
+            window.open(res.data.url, "_blank");
+            }
+        }
+      );
     }
   }
 }
