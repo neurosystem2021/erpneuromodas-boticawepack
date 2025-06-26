@@ -255,8 +255,8 @@
                     </b-form-group>
                   </b-col>
                 </b-row> -->
-                <div style="height: 40vh;">
-                <b-row class="mt-2"  style="position: relative;max-height: 40vh;overflow-y: scroll;">
+                <div class="divCarrito">
+                <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos">
                     <template slot="pres" slot-scope="data">
                       <b-button   
@@ -619,10 +619,10 @@
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
-                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
                       <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
+                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
@@ -1460,7 +1460,6 @@ export default {
       this.axios
         .get(this.API + "/usuarios/" + usuario)
         .then(response => {
-          console.log(response.data);
           this.setVendedor(response.data);
           let almacen = {
             IdAlmacen: response.data.IdAlmacen,
@@ -1489,10 +1488,18 @@ export default {
         });
     },
     focusAutocomplete(ref) {
-      // console.log(ref);
+      let prod = "autocompleteProducto";
+      let val = ref.includes(prod);
+
       let element = document.getElementById(ref);
+      if (val) {
+        element.value = "";
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
+      
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
@@ -1607,7 +1614,6 @@ export default {
       this.loadCode = "";
     },
     setPuntoVenta(obj) {
-      console.log("setPuntoVenta", obj);
       this.ventas[this.ventaActiva].puntoVenta = obj;
       this.getNumeroVenta();
     },
@@ -2732,7 +2738,25 @@ export default {
 .txtAutoComplete {
   min-width: 960px;
 }
+.divCarrito {
+  height: 40vh;
+}
+.clsCarrito {
+  position: relative;
+  max-height: 40vh;
+  overflow-y: scroll;
+}
+
 @media (max-width: 1250px) {
+  .divCarrito {
+    height: 70vh;
+  }
+
+  .clsCarrito {
+    position: relative;
+    max-height: 70vh;
+    overflow-y: scroll;
+  }
   .ocultarMovil {
     display: none;
   }
