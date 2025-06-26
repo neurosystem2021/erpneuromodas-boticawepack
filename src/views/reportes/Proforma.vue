@@ -162,7 +162,7 @@
         </table>
       </div>
       <div style="text-align:center">
-        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+        <!-- <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button> -->
 
         <button class="btn btn-primary" id="printBtn" @click="imprimirguia()">IMPRIMIR PDF</button>
       </div>

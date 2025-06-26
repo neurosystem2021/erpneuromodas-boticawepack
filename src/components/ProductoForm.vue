@@ -324,6 +324,17 @@
             </b-form-group>
             
             <b-form-group>
+              <label>Precio Compra:</label>
+              <input 
+                v-model="producto.precios[i-1].precioc"
+                :disabled="(idPerfil == 1) ? false : true"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+
+            <b-form-group>
               <label>Precio:</label>
               <input 
                 v-model="producto.precios[i-1].precio"
@@ -504,6 +515,11 @@ export default {
             this.producto.IdOfertaCategoria = newVal.IdOfertaCategoria;
             if (newVal.PreciosPorProducto) {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
+              this.producto.precios.forEach(element => {
+                if (!element.precioc) {
+                  element.precioc = 0;
+                }
+              });
             }
           })
           .catch(error => {
@@ -675,11 +691,11 @@ export default {
         },
         Imagen: null,
         precios: [
-          { nombre: "PRECIO 1", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 2", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 3", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 4", cantidad: 0, precio: 0 },
-          { nombre: "OFERTA", cantidad: 0, precio: 0 }
+          { nombre: "PRECIO 1", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 2", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 3", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 4", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "OFERTA", cantidad: 0, precio: 0, precioc: 0 }
         ]
       };
     },
@@ -698,6 +714,11 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.producto.precios.forEach(element => {
+        if (!element.precioc) {
+          element.precioc = 0;
+        }
+      });
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
