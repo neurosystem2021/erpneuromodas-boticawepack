@@ -1,5 +1,5 @@
 <template>
-    <b-container fluid>
+    <b-container fluid class="my-0 py-0">
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
@@ -205,7 +205,7 @@
                     placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
                   </b-col> -->
                   <b-col lg="12" xl="12"  cols="12">
-                    <b-form-group>
+                    <b-form-group class="my-0 py-0">
                         <b-input-group>
                           <b-input-group-append>
                             <autocomplete
@@ -240,6 +240,7 @@
                         </b-input-group-append>
                         </b-input-group>
                     </b-form-group>
+                    <span class="my-0 py-0">Busqueda avanzada (Producto, Categoria, Marca, Modelo, Talla)</span>
                     </b-col>
                 </b-row>
                
@@ -255,8 +256,8 @@
                     </b-form-group>
                   </b-col>
                 </b-row> -->
-                <div style="height: 40vh;">
-                <b-row class="mt-2"  style="position: relative;max-height: 40vh;overflow-y: scroll;">
+                <div class="divCart">
+                <b-row class="mt-2 clsCart">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos">
                     <template slot="pres" slot-scope="data">
                       <b-button   
@@ -619,14 +620,14 @@
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
+                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
                       <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
                       <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
-                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar Impresora</b-button>
+                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
                         <span v-if="mostrarNav"> Ocultar Nav</span>
@@ -1507,7 +1508,13 @@ export default {
     },
     focusAutocomplete(ref) {
       // console.log(ref);
+      let prod = "autocompleteProducto";
+
       let element = document.getElementById(ref);
+      if (ref.includes(prod)) {
+        element.value = "";
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+      }
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
     },
@@ -2841,7 +2848,23 @@ export default {
 .txtAutoComplete {
   min-width: 960px;
 }
+.divCart {
+  height: 40vh;
+}
+.clsCart {
+  position: relative;
+  max-height: 40vh;
+  overflow-y: scroll;
+}
 @media (max-width: 1250px) {
+  .divCart {
+    height: 80vh;
+  }
+  .clsCart {
+    position: relative;
+    max-height: 80vh;
+    overflow-y: scroll;
+  }
   .ocultarMovil {
     display: none;
   }
