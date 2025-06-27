@@ -693,7 +693,7 @@
                               </table>
                             </slot>
                             </b-popover>
-                          </td> -->s
+                          </td> -->
                           <td class="table-success">SubTotal</td>
                           <td class="table-success">{{ getSubTotal() }}</td>
                         </tr>
