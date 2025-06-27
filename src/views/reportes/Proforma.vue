@@ -38,6 +38,10 @@
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
                 <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
               </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Placa</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Placa }}</td>
+              </tr>
             </tbody>
           </table>
         </div>

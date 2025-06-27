@@ -987,6 +987,7 @@ export default {
             }
 
             this.venta.productos = this.productos
+            this.venta.Placa = (''+this.venta.Placa).toUpperCase()
             this.venta.diasValidosProf = this.diasValidosProf
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
