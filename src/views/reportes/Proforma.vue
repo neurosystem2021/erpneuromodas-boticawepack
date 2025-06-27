@@ -77,6 +77,7 @@
             <th></th>
             <th class="desc">DESCRIPCIÓN</th>
             <th class="qty">CANT.</th>
+             <th class="qty">Marca.</th>
             <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
           </tr>
@@ -87,6 +88,7 @@
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
+            <td class="qty" style="font-size:1.1rem">{{ prod.ProductoMarca }}</td>
             <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:1.1rem">
               <div v-if="prod.DisabledTotal === 0">
@@ -98,7 +100,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
@@ -108,7 +110,7 @@
             <td>$1,300.00</td>
           </tr>-->
           <tr>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td colspan="2" style="background:#57B223">TOTAL</td>
             <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
           </tr>
