@@ -2268,12 +2268,13 @@ export default {
             top +
             ", left=" +
             left;
-          window.open(
+            window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+          /*window.open(
             "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
               encodeURIComponent(ventaJson),
             "Impresión",
             params
-          );
+          );*/
         }
 
         if (this.ventas.length == 1) {
