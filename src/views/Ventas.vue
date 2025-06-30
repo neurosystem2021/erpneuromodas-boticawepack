@@ -2183,6 +2183,13 @@ export default {
         .trim();
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
+          window.open(
+            "/imprimir/index.php?IdDocVenta=" +
+              response.data.insertId +
+              "&preview=1",
+            '_blank'
+          );
+
           this.$toasted.success("Venta realizada con exito");
           venta.productos.map(pro => {
             delete pro.nuevoPrecioContado;
@@ -2261,19 +2268,19 @@ export default {
           };
           venta.dataInfoDocVenta = dataInfoDocVenta;
           let ventaJson = JSON.stringify(venta);
-          var left = screen.width / 2 - 800 / 2;
-          var top = screen.height / 2 - 800 / 2;
-          let params =
-            "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
-            top +
-            ", left=" +
-            left;
-          window.open(
-            "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
-              encodeURIComponent(ventaJson),
-            "Impresión",
-            params
-          );
+          // var left = screen.width / 2 - 800 / 2;
+          // var top = screen.height / 2 - 800 / 2;
+          // let params =
+          //   "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
+          //   top +
+          //   ", left=" +
+          //   left;
+          // window.open(
+          //   "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
+          //     encodeURIComponent(ventaJson),
+          //   "Impresión",
+          //   params
+          // );
         }
 
         if (this.ventas.length == 1) {
