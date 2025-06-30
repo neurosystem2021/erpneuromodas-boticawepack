@@ -44,6 +44,7 @@ import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
+import RemisionListado from "@/views/reportes/RemisionListado.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -270,6 +271,11 @@ export default new Router({
       path: "/remision-lista",
       name: "RemisionLista",
       component: RemisionLista
+    },
+    {
+      path: "/remision/listado",
+      name: "RemisionLista",
+      component: RemisionListado
     }
   ]
 });
