@@ -1,5 +1,5 @@
 <template>
-    <b-container fluid class="ancho"  id="conten">
+    <b-container fluid class="ancho px-0 py-0"  id="conten">
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
@@ -9,9 +9,9 @@
         </b-row>
       </b-modal>
       <b-row id="header">
-        <b-col cols="12"  class="py-0">
-          <b-card no-body>
-          <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2" >
+        <b-col cols="12"  class="py-0 mt-0">
+          <b-card no-body class="mt-0">
+          <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0" >
             <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" class="mt-0 pt-0">
               <b-container fluid>
                 <b-row>
@@ -1494,12 +1494,11 @@ export default {
       let element = document.getElementById(ref);
       if (val) {
         element.value = "";
-        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event("input", { bubbles: true }));
       }
 
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
-      
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
