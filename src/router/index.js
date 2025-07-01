@@ -18,6 +18,7 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Proforma from '@/views/reportes/Proforma.vue'
+import Kardex from '@/views/reportes/Kardex.vue'
 import Vales from '@/views/reportes/Vales.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import ValesFacturados from '@/views/reportes/ValesFacturados.vue'
@@ -84,6 +85,11 @@ export default new Router({
       path: '/reportes/stockminimo',
       name: 'StockMinimo',
       component: StockMinimo
+    },
+    {
+      path: '/reportes/kardex',
+      name: 'Kardex',
+      component: Kardex
     },
     {
       path: '/reportes/deudaclientes',
