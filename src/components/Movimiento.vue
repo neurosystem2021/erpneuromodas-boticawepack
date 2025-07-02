@@ -1,7 +1,7 @@
 <template>
     <div>
-      <b-button-group size="sm">
-        <b-button @click="promptPassword" variant="outline-primary">Caja/Banco</b-button>
+      <b-button-group>
+        <b-button @click="promptPassword" variant="primary">Caja/Banco</b-button>
       </b-button-group>
       <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
         <b-tabs content-class="mt-3">
