@@ -389,7 +389,11 @@ export default {
       productosDet: [],
       precioLiquidacion: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
-      file: ""
+      file: "",
+      manterproducto: {
+        default: false,
+        type: Boolean
+      }
     };
   },
   beforeMount() {
@@ -397,11 +401,20 @@ export default {
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
-    show(val) {
+    async show(val) {
+      this.preproducto = { ...this.productoUpdate };
       if (val) {
       } else {
         this.producto.IdProducto;
       }
+      this.$nextTick(() => {
+        if (this.manterproducto) {
+          this.producto.Producto = this.preproducto.Producto;
+          this.producto.PrecioCosto = this.preproducto.PrecioCosto;
+
+          this.$forceUpdate();
+        }
+      });
     },
     productoUpdate(newVal) {
       if (newVal.IdProducto) {
@@ -651,6 +664,7 @@ export default {
           PreciosPorProducto: this.producto.precios
         })
         .then(response => {
+          this.$emit("productoactualizado", response.data.insertId);
           if (this.cbGuardar) {
             this.cbGuardar(response.data.insertId);
           }
