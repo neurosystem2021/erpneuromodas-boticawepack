@@ -1893,16 +1893,6 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-      this.$swal({
-        title: "Procesando...",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
-
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2100,6 +2090,15 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+      this.$swal({
+        title: "Procesando...",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
