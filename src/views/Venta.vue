@@ -2414,6 +2414,7 @@ export default {
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       this.modalPresentacion = false;
+      this.metodoPagoCambio(1);
     },
     probarImpresora() {
       if (
