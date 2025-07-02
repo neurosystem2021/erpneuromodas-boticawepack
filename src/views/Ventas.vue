@@ -27,7 +27,7 @@
                       :id="`inputTipoVenta${index}`"
                       :url="API + 'ventas/tipos'"
                       anchor="TipoDoc"
-                      initValue="NOTA DE VENTA."
+                      initValue="BOLETA ELEC."
                       class="font-weight-bold"
                       label="writer"
                       placeholder=""
@@ -1034,7 +1034,7 @@ export default {
         Observacion: "",
         comisionista: {},
         tipoVenta: {
-          IdTipoDoc: 10,
+          IdTipoDoc: 7,
           TipoDoc: "BOLETA ELEC.",
           LimitItems: 0,
           CodSunat: "03"
@@ -1094,7 +1094,7 @@ export default {
           cliente: {},
           comisionista: {},
           tipoVenta: {
-            IdTipoDoc: 10,
+            IdTipoDoc: 7,
             TipoDoc: "BOLETA ELEC.",
             LimitItems: 0,
             CodSunat: "03"
