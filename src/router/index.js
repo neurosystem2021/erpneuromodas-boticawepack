@@ -44,6 +44,8 @@ import Traslado from "@/views/Traslado.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import RemisionListado from "@/views/reportes/RemisionListado.vue";
 import ReporteCierreCaja from "@/views/reportes/ReporteCierreCaja.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
+
 Vue.use(Router);
 
 export default new Router({
@@ -249,6 +251,11 @@ export default new Router({
       path: "/remision/listado",
       name: "RemisionListado",
       component: RemisionListado
+    },
+    {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
     }
   ]
 });
