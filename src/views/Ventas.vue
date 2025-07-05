@@ -2274,13 +2274,14 @@ export default {
             "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
             top +
             ", left=" +
-            left;
+            window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+          /*window.open(
           window.open(
             "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
               encodeURIComponent(ventaJson),
             "Impresión",
             params
-          );
+          );*/
         }
 
         if (this.ventas.length == 1) {
