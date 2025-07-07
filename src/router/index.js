@@ -45,6 +45,7 @@ import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import RemisionListado from "@/views/reportes/RemisionListado.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -276,6 +277,11 @@ export default new Router({
       path: "/remision/listado",
       name: "RemisionLista",
       component: RemisionListado
+    },
+    {
+      path: "/reportes/reporte_utilidad_bruta",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
     }
   ]
 });
