@@ -52,19 +52,19 @@
                 <td colspan="5"> Sumatoria
                 </td>
                 <td><strong class="sumTotalVenta">
-                    {{ lstReporte.reduce((sum,reporte)=>{
+                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
                         return sum+parseFloat(reporte.TotalVenta)
-                    },0) }}
+                    },0)).toFixed(2) }}
                 </strong></td>
                 <td><strong class="sumTotalCosto">
-                    {{ lstReporte.reduce((sum,reporte)=>{
+                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
                         return sum+parseFloat(reporte.TotalCosto)
-                    },0) }}
+                    },0)).toFixed(2) }}
                 </strong></td>
                 <td><strong class="sumUtilidadBruta">
-                    {{ lstReporte.reduce((sum,reporte)=>{
+                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
                         return sum+parseFloat(reporte.UtilidadBruta)
-                    },0) }}
+                    },0)).toFixed(2) }}
                 </strong></td>
                 </tr>
             </tfoot>
