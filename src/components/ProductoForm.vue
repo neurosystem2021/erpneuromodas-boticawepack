@@ -114,7 +114,7 @@
           <b-form-group>
             <label>Anaquel:</label>
             <autocomplete
-                :url="API + 'productos/presentaciones'"
+                :url="API + 'productos/anaquel'"
                 ref="inputPresentacion"
                 anchor="Anaquel"
                 label="writer"
