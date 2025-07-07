@@ -276,10 +276,23 @@
             </b-row>
         </b-col>
       </b-row>
-
-      <hr />
-        <b-row>
-        <b-col md="3" v-for="i in 4" :key="i.id">
+       <hr />
+      <b-row>
+        <b-col md="12" >
+          
+          <b-form-checkbox
+            v-model="TienePresentacion"
+            name="checkbox-1"
+            :value="true"
+            :unchecked-value="false"
+          >
+           Tiene Presentación
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
+     
+        <b-row v-if="TienePresentacion">
+        <b-col md="3" v-for="i in 4" :key="i.id" >
           <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
               <b-form-input
@@ -393,7 +406,8 @@ export default {
       manterproducto: {
         default: false,
         type: Boolean
-      }
+      },
+      TienePresentacion: false
     };
   },
   beforeMount() {
@@ -472,6 +486,7 @@ export default {
         this.producto.ProductoModelo = newVal.ProductoModelo;
         this.producto.PrecioCosto = newVal.PrecioCosto;
         this.producto.PrecioContado = newVal.PrecioContado;
+        this.TienePresentacion = Boolean(newVal.TienePresentacion);
         this.producto.Imagen = newVal.Imagen;
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion;
         this.actualizarLiquidacion();
@@ -493,6 +508,12 @@ export default {
     }
   },
   methods: {
+    activarPresentacion(e) {
+      // this.producto.TienePresentacion = Number(e);
+      console.log(this.producto.TienePresentacion);
+      console.log(typeof this.producto.TienePresentacion);
+      console.log("---------");
+    },
     eliminarProducto(producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm("¿Esta seguro de Anular este producto?");
@@ -651,6 +672,7 @@ export default {
         this.producto.PorcentajeLiquidacion > 0
           ? this.producto.PorcentajeLiquidacion
           : 0;
+      this.producto.TienePresentacion = this.TienePresentacion;
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
 
       // Agregar producto DET

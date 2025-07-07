@@ -62,87 +62,96 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
-import ProductoForm from '@/components/ProductoForm'
-import CodigoMultiple from '@/components/CodigoMultiple.vue'
+import config from "@/store/config.js";
+import ProductoForm from "@/components/ProductoForm";
+import CodigoMultiple from "@/components/CodigoMultiple.vue";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'productos/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "productos/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: 'IdProducto',
+      sortBy: "IdProducto",
       sortDesc: false,
       productoSelect: {},
       items: [],
       isBusy: false,
       fields: [
-            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
-            { key: 'Producto', sortable: true },
-            { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
-            { key: 'ProductoMarca', label: 'Marca', sortable: true },
-            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
-            { key: 'Color', sortable: true },
-            { key: 'ProductoTalla', label: 'Talla', sortable: true },
-            { key: 'Genero', sortable: true },
-            //{ key: 'Botapie', sortable: true }
+        { key: "CodigoBarra", label: "Codigo", sortable: true },
+        { key: "Producto", sortable: true },
+        { key: "ProductoCategoria", label: "Categoría", sortable: true },
+        { key: "ProductoMarca", label: "Marca", sortable: true },
+        { key: "ProductoModelo", label: "Modelo", sortable: true },
+        { key: "Color", sortable: true },
+        { key: "ProductoTalla", label: "Talla", sortable: true },
+        { key: "Genero", sortable: true }
+        //{ key: 'Botapie', sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      rowClick (item, index) {
-        this.productoSelect = item
-        this.$refs.productoForm.show = true;
-        //this.$refs.productoForm.producto.IdProducto = 'a'
-        //console.log(this.$refs.productoForm.$refs.productoForm)
-      },
-      actualizarTabla() {
-        this.$refs.tablaProductos.refresh()
-      },
-      nuevoProducto () {
-          this.productoSelect = {}
-          this.$refs.productoForm.show = true
+    rowClick(item, index) {
+      this.productoSelect = item;
+      this.$refs.productoForm.show = true;
+      //this.$refs.productoForm.producto.IdProducto = 'a'
+      //console.log(this.$refs.productoForm.$refs.productoForm)
+    },
+    actualizarTabla() {
+      this.$refs.tablaProductos.refresh();
+    },
+    nuevoProducto() {
+      this.productoSelect = {};
+      this.$refs.productoForm.show = true;
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let url =
+        this.API +
+        "productos?limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      let promise = this.axios.get(url);
 
-      },
-      myProvider (ctx) {
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let url = this.API + 'productos?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-        url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-        let promise = this.axios.get( url )
-
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           this.actualizarTabla();
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           this.actualizarTabla();
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    }
   },
   components: {
-      ProductoForm,
-      CodigoMultiple
+    ProductoForm,
+    CodigoMultiple
   }
-}
+};
 </script>
 
 <style>
-
 </style>
