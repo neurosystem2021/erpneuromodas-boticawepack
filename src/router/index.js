@@ -44,6 +44,8 @@ import PreOrden from "@/views/PreOrden.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import RemisionListado from "@/views/reportes/RemisionListado.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -253,6 +255,16 @@ export default new Router({
       path: "/remision/ver/:idDocVenta/:Serie/:Numero",
       name: "RemisionVer",
       component: RemisionVer
+    },
+    {
+      path: "/reportes/reporte_utilidad_bruta",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
+    },
+    {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
     },
     {
       path: "/remision/listado",
