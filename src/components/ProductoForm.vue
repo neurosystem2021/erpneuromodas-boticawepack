@@ -413,7 +413,11 @@ export default {
       productosDet: [],
       file: "",
       idPerfil: sessionStorage.getItem("IdPerfil"),
-      categoriaItems: []
+      categoriaItems: [],
+      manterproducto: {
+        default: false,
+        type: Boolean
+      }
     };
   },
   beforeMount() {
@@ -422,6 +426,8 @@ export default {
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
     show(val) {
+      this.preproducto = { ...this.productoUpdate };
+
       if (val) {
         //this.cargarCatOferta()
       }
@@ -533,6 +539,15 @@ export default {
 
         //this.$refs.inputCodigoBarra.$el.disabled = false
       }
+      this.$nextTick(() => {
+        if (this.manterproducto) {
+          this.producto.Producto = this.preproducto.Producto;
+          this.producto.PrecioCosto = this.preproducto.PrecioCosto;
+          this.producto.ControlaStock = 1;
+
+          this.$forceUpdate();
+        }
+      });
     }
   },
   methods: {
@@ -765,6 +780,7 @@ export default {
           });
 
           this.$refs.productoForm.hide();
+          this.$emit("productoactualizado", response.data.insertId);
         })
         .catch(error => {
           console.log(error);
