@@ -40,6 +40,8 @@ import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -234,6 +236,16 @@ export default new Router({
       path: "/KardexValorizado",
       name: "KardexValorizado",
       component: KardexValorizado
+    },
+    {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
+    },
+    {
+      path: "/reportes/reporte_utilidad_bruta",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
     }
   ]
 });
