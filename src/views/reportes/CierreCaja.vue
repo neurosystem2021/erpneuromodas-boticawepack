@@ -184,7 +184,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
