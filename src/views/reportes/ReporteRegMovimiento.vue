@@ -257,12 +257,20 @@ export default {
       URL.revokeObjectURL(a.href);
     },
     async exportarReporte() {
-      window.open(
-        `/views/ReporteExcel6.php?&fechaIni=${this.fechaInicio}&fechaFin=${
+      await await this.axios(
+        `${this.API}reporte/movimientos?fechaIni=${this.fechaInicio}&fechaFin=${
           this.fechaFin
-        }&descripcion=${this.descripcion}&declarado=${this.declarado}`,
-        "_blank"
-      );
+        }&descripcion=${this.descripcion}&declarado=${this.declarado}`
+      ).then(res => {
+        window.open(res.data.link, "_blank");
+      });
+
+      // window.open(
+      //   `/views/ReporteExcel6.php?&fechaIni=${this.fechaInicio}&fechaFin=${
+      //     this.fechaFin
+      //   }&descripcion=${this.descripcion}&declarado=${this.declarado}`,
+      //   "_blank"
+      // );
     },
 
     elimimnarRegistro(item) {

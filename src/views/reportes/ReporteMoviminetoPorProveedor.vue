@@ -7,7 +7,7 @@
             <input type="date" v-model="desde" class="form-control" >
         </b-col>
         <b-col cols="3">
-            Fecha Desde:
+            Fecha Hasta:
             <input type="date" v-model="hasta"  class="form-control" >
         </b-col>
         <b-col cols="3">

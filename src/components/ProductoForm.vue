@@ -564,9 +564,11 @@ export default {
     },
     actualizarPrecioContado() {
       var precioCosto = this.producto.PrecioCosto;
-      var utilidad = this.producto.PorcentajeUtilidad;
-      var nuevoPrecioContado = precioCosto + precioCosto * (utilidad / 100);
+      var utilidad = this.producto.PorcentajeUtilidad / 100;
+      var nuevoPrecioContado =
+        parseFloat(precioCosto) + parseFloat(precioCosto * utilidad);
 
+      console.log(nuevoPrecioContado);
       this.producto.precioContadoNormal = nuevoPrecioContado;
       this.producto.PrecioContado = this.$options.filters.redondeoMayor(
         nuevoPrecioContado

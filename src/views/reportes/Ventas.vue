@@ -12,7 +12,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="VENTA"
+                      initValue="PRINCIPAL"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 

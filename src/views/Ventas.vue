@@ -564,7 +564,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -574,7 +574,7 @@
                                         <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -585,7 +585,7 @@
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -1452,6 +1452,12 @@ export default {
     addNumber(number) {
       this.cantidadInput = this.cantidadInput + number;
     },
+    addPoint(number) {
+      const regex = /\./;
+      if (!regex.test(this.cantidadInput) && this.cantidadInput.length > 0) {
+        this.cantidadInput = this.cantidadInput + ".";
+      }
+    },
     cerrrarNum() {
       this.cantidadInput = "";
       this.$refs["modalIngCant"].hide();
@@ -2187,7 +2193,7 @@ export default {
             "/imprimir/index.php?IdDocVenta=" +
               response.data.insertId +
               "&preview=1",
-            '_blank'
+            "_blank"
           );
 
           this.$toasted.success("Venta realizada con exito");
@@ -2270,11 +2276,14 @@ export default {
           let ventaJson = JSON.stringify(venta);
           var left = screen.width / 2 - 800 / 2;
           var top = screen.height / 2 - 800 / 2;
-          let params =
-            "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
-            top +
-            ", left=" +
-            window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank');
+          // let params =
+          //   "scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=300,height=300,top=" +
+          //   top +
+          //   ", left=" +
+          //   window.open(
+          //     "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+          //     "_blank"
+          //   );
           /*window.open(
           window.open(
             "http://localhost:5000/imprimir/getdata.php?rep=2&venta=" +
