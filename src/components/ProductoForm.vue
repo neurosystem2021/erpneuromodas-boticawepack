@@ -50,6 +50,21 @@
               :value="producto.Producto"
               ></b-form-input>
           </b-form-group>
+          
+          <b-form-group>
+            <label>Anaquel:</label>
+            <autocomplete
+                :url="API + 'productos/anaquel'"
+                ref="inputPresentacion"
+                anchor="Anaquel"
+                label="writer"
+                :placeholder.sync="producto.Anaquel"
+                :on-select="val => producto.Anaquel = val.Anaquel && val.Anaquel.toUpperCase()"
+                :onInput="val => producto.Anaquel = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+          </b-form-group>
 
           <b-form-group>
             <label>Marca:</label>
@@ -459,7 +474,7 @@ export default {
 
         // this.$refs.inputModelo.setValue('')
         this.$refs.inputModelo.setValue(newVal.ProductoModelo);
-
+        this.$refs.inputPresentacion.setValue(newVal.Anaquel);
         this.$refs.inputTalla.setValue(newVal.ProductoTalla);
 
         this.$refs.inputColor.setValue(newVal.Color);
@@ -485,6 +500,7 @@ export default {
         this.producto.CodigoBarra = newVal.CodigoBarra;
         this.producto.ProductoModelo = newVal.ProductoModelo;
         this.producto.PrecioCosto = newVal.PrecioCosto;
+        this.producto.Anaquel = newVal.Anaquel;
         this.producto.PrecioContado = newVal.PrecioContado;
         this.TienePresentacion = Boolean(newVal.TienePresentacion);
         this.producto.Imagen = newVal.Imagen;
