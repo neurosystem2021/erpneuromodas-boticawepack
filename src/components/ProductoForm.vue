@@ -487,7 +487,7 @@ export default {
         this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
-        };
+        }; 
         this.producto.Producto = newVal.Producto.split("-")
           .slice(0, -1)
           .join();
