@@ -334,7 +334,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.yape.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -357,7 +357,30 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.yape.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Yape/Plin</td>
+                                            <td>
+                                                <b-form-input
+                                                    :disabled="bloquearInput?true:false"
+                                                    v-model="venta.pago.yape.descripcion"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    :disabled="bloquearInput?true:false"
+                                                    class="form-control"
+                                                    v-model="venta.pago.yape.monto"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -465,7 +488,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))
+             this.venta.pago.efectivo.monto = newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.yape.monto))
         }
     },
     computed: {
@@ -577,7 +600,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    yape: { IdMetodoPago: 4, monto: 0 }
                 },
                 idProductos:[],
                 NroComprobanteModifica: '',
@@ -913,7 +937,7 @@ export default {
             totalPagos += parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += parseFloat(this.venta.pago.visa.monto)
             totalPagos += parseFloat(this.venta.pago.mastercard.monto)
-
+            totalPagos += parseFloat(this.venta.pago.yape.monto)
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
                     this.$toasted.show('Los pagos no coinciden con la venta')
