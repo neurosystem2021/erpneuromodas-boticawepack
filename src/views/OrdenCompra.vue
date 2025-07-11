@@ -155,7 +155,7 @@ export default {
           this.$swal.showLoading();
         }
       });
-
+      this.$store.state.cart.productos = [];
       await this.axios
         .get(this.API + "productos/proveedor", {
           params: {
@@ -174,6 +174,10 @@ export default {
           //   CalculoCantidad: 1
           // });
         });
+      await this.obtenerStok({
+        IdAlmacen: this.movimiento.almacen.IdAlmacen,
+        CalculoCantidad: 1
+      });
       await this.eliminarProductosStock();
       this.$swal.close();
     },

@@ -62,6 +62,7 @@ const mutations = {
   },
   OBTENER_CANTIDAD(state, obj) {
     state.productos = state.productos.map(prod => {
+      console.log(prod);
       if (obj.opc == 0 && prod.ControlaStock == 1) {
         prod.cantidad = (prod.cantidadPedida || 0) - (prod.stock || 0);
       }
