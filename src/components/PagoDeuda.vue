@@ -140,7 +140,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(pago, index) in pagos" :key="index">
+                                <tr v-for="(pago, index) in pagos" :key="index" :class="{anulado: pago.Anulado}">
                                     <td>{{ pago.IdCajaBanco }}</td>
                                     <td>{{ pago.FechaDoc }}</td>
                                     <td>{{ pago.Cuenta }}</td>
@@ -318,5 +318,9 @@ import config from '@/store/config.js'
 <style>
 #modalConfigVenta .modal-dialog{
     max-width: 65% !important;
+}
+.anulado td{
+  /*font-style: italic;*/
+  text-decoration: line-through;
 }
 </style>

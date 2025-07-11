@@ -296,7 +296,7 @@
 
 
       <b-row>
-        <b-col v-if="totalIngresos">
+        <b-col  v-show="ingresos.length">
           <h5>Ingresos Caja Principal</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -305,7 +305,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresos" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -321,7 +321,7 @@
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col v-if="totalSalidas" v-show="salidas.length">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -330,7 +330,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
+              <tr v-for="(item, index) in salidas" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -350,7 +350,7 @@
       
 
       <b-row>
-        <b-col v-if="totalIngresosTarjeta">
+        <b-col v-if="ingresosTarjeta.length">
           <h5>Ingresos de Cuentas Bancarias </h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -359,7 +359,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+              <tr v-for="(item, index) in ingresosTarjeta" :key="index" :class="{anulado: item.Anulado}">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -449,7 +449,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresosTarjeta + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
