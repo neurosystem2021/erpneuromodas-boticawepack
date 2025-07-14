@@ -2,7 +2,7 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+    <b-form @submit.prevent="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container class="bv-example-row" fluid>
           <b-row>
               <b-col md="8">
@@ -243,6 +243,8 @@ export default {
         { key: "Producto", label: "Artículo" },
         { key: "Descripcion", label: "Descripción" },
         { key: "ProductoMarca", label: "Marca" },
+        { key: "Series", label: "Series" },
+        { key: "AddSeries", label: "" },
         { key: "eventPres", label: "Presentacion" },
         { key: "ProductoPresentacion", label: "Anaquel" },
         // { key: 'ProductoMedicion', label: 'Medición' },

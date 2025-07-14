@@ -258,6 +258,16 @@
                 <div class="divCarrito">
                 <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos">
+                    <template slot="Serie" slot-scope="data">
+                      <b-select 
+                      v-if="data.item.productoSerie.length>0"
+                      v-model="data.item.IdProductoSerie" 
+                      :options="data.item.productoSerie"
+                       value-field="IdProductoSerie"
+                       text-field="Serie"
+                      ></b-select>
+                      
+                      </template>
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -997,6 +1007,7 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "Serie" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
@@ -1756,6 +1767,9 @@ export default {
         this.metodoPagoCambio(1);
         return false;
       }
+      let productoSerie = await this.obtenerSeriePorProducto(
+        producto.IdProducto
+      );
 
       // console.log("producto", producto);
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -1765,6 +1779,7 @@ export default {
         let newPres = JSON.parse(prod.PreciosPorProducto);
         pres = newPres.filter(v => v.cantidad > 0);
       }
+      prod.productoSerie = productoSerie;
       prod.PreciosPorProducto = pres;
       prod.presentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
@@ -2127,7 +2142,21 @@ export default {
 
         return;
       }
-
+      let val = true;
+      productos.forEach(element => {
+        if (element.productoSerie.length > 0) {
+          console.log(element.productoSerie.length);
+          if (!element.IdProductoSerie) {
+            val = false;
+          }
+        }
+      });
+      if (!val) {
+        this.$toasted.error(
+          "Existen Uno o más Productos que no se le ha seleccionado una Serie"
+        );
+        return;
+      }
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2579,6 +2608,19 @@ export default {
       this.productoNombre = producto;
       this.productoUrl = url;
       this.$refs["modalImagen"].show();
+    },
+    async obtenerSeriePorProducto(id) {
+      let productoSerie = [];
+      await this.axios
+        .get(this.API + "productos/serie", {
+          params: { IdProducto: id, Todos: false }
+        })
+        .then(res => {
+          if (res) {
+            productoSerie = res.data;
+          }
+        });
+      return productoSerie;
     }
   },
   computed: {

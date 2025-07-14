@@ -358,7 +358,8 @@ export default {
           title: "Error en la autentificación de delivery",
           text: "No hay conexión con el servidor de delivery",
           target: document.getElementById("conten"),
-          footer: "Por favor cierre sesion e ingrese nuevamente"
+          footer: "Por favor cierre sesion e ingrese nuevamente",
+          timer: 4000
         });
       }
     },

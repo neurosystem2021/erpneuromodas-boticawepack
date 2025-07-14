@@ -362,7 +362,51 @@
             ></producto-form-det>
         </b-col>
       </b-row>
+       <b-row>
+        <b-col cols="12">
+          <b-button  size="sm" class="my-2" variant="success" v-if="!nuevaSerie" @click="activarInactivarAgregarNuevaSerie">Nueva Serie</b-button>
+          
+        </b-col>
+        <b-col cols="12" v-if="nuevaSerie">
+          <b-row>
+            <b-col cols="3">Serie:</b-col>
+            <b-col cols="9"><input type="text" class="form-control" required v-model="Serie"></b-col>
+             <b-col style="text-align: right;" class="my-2">
+               <b-button  size="sm" variant="success" @click="anadirSerie">Guardar</b-button>
+               <b-button  size="sm" variant="danger" @click="activarInactivarAgregarNuevaSerie">Cancelar</b-button>
+              </b-col>   
+           </b-row>   
+        </b-col>         
+        <b-col cols="12">         
+           <b-table 
+                striped 
+                hover 
+                :items="productoSerie" 
+                :fields="headerSerie" 
+                small
+                :per-page="perPage"
+                :current-page="currentPage"
+            >
+              <template slot="Estado" slot-scope="data">
+                {{ data.item.Estado==1 ? 'Activo' : data.item.Estado==3? 'Vendido' :'Anulado'  }}
+              </template>
+               <template slot="action" slot-scope="data">
+                  <b-button  size="sm" v-if="data.item.Estado==1" variant="danger" 
+                    @click="eliminarRegistroSerie(data.item,data['index'])">
+                    <i  class="fa fa-trash" aria-hidden="true"></i>
+                  </b-button>
+               </template>
+           </b-table>
 
+           <b-pagination
+            v-model="currentPage"
+            :total-rows="productoSerie.length"
+            :per-page="perPage"
+            aria-controls="my-table"
+          ></b-pagination>
+
+        </b-col>
+        </b-row>
       <div slot="modal-footer" >
         <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
           <b-input-group>
@@ -403,6 +447,8 @@ import ProductoFormDet from "@/components/ProductoFormDet";
 export default {
   data() {
     return {
+      currentPage: 1,
+      perPage: 5,
       showProductoDet: true,
       cantidadCodigoBarra: 1,
       title: "Nuevo Producto",
@@ -411,13 +457,22 @@ export default {
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
+      productoSerie: [],
       file: "",
       idPerfil: sessionStorage.getItem("IdPerfil"),
       categoriaItems: [],
       manterproducto: {
         default: false,
         type: Boolean
-      }
+      },
+      headerSerie: [
+        { label: "Serie", key: "Serie" },
+        { label: "Estado", key: "Estado" },
+        { label: "Doc Venta", key: "CorrelativoVenta" },
+        { label: "", key: "action" }
+      ],
+      nuevaSerie: false,
+      Serie: ""
     };
   },
   beforeMount() {
@@ -427,7 +482,7 @@ export default {
   watch: {
     show(val) {
       this.preproducto = { ...this.productoUpdate };
-
+      this.nuevaSerie = false;
       if (val) {
         //this.cargarCatOferta()
       }
@@ -533,6 +588,9 @@ export default {
             this.initForm();
             this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           });
+        if (val) {
+          this.obtenerSerie(newVal.IdProducto);
+        }
       } else {
         this.title = "Nuevo Producto";
         this.clearForm();
@@ -551,6 +609,41 @@ export default {
     }
   },
   methods: {
+    obtenerSerie(id) {
+      this.axios
+        .get(this.API + "productos/serie", {
+          params: { IdProducto: id, Todos: true }
+        })
+        .then(res => {
+          if (res) {
+            this.productoSerie = res.data;
+          }
+        });
+    },
+    activarInactivarAgregarNuevaSerie() {
+      this.Serie = "";
+      this.nuevaSerie = !this.nuevaSerie;
+    },
+    anadirSerie() {
+      if (this.Serie) {
+        this.productoSerie.unshift({
+          IdProductoSerie: 0,
+          Serie: this.Serie,
+          Estado: 1
+        });
+        this.nuevaSerie = false;
+      }
+    },
+    eliminarRegistroSerie(item, index) {
+      let serie = { ...item };
+      console.log(item);
+      if (serie.IdProductoSerie == 0) {
+        this.productoSerie.splice(index, 1);
+      } else {
+        serie.Estado = 0;
+        Vue.set(this.productoSerie, index, serie);
+      }
+    },
     /*cargarCatOferta(){
       this.categoriaItems = []
       this.axios.get(this.API + 'categorias/oferta')
@@ -737,7 +830,8 @@ export default {
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
-          PreciosPorProducto: this.producto.precios
+          PreciosPorProducto: this.producto.precios,
+          productoSerie: this.productoSerie
         })
         .then(response => {
           // if (this.cbGuardar) {

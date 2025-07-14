@@ -134,6 +134,18 @@
           <span>x{{productos[data.index].cantidadPres}}</span>
         </template>
 
+        <template slot="Series" slot-scope="data">
+          <ul>
+            <li v-for="(serie,index) in data.item.Serie.split(',')" :key="index">
+              {{serie}}
+            </li>
+          </ul>
+        </template>
+        <template slot="AddSeries" slot-scope="data">
+          <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
+            <i class="fa fa-barcode" aria-hidden="true"></i>
+          </b-button>
+        </template>
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="data.item.cantidad"
@@ -357,6 +369,60 @@
           </table>
     </b-col>
     <br><br>
+
+    <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
+      <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
+      <b-row>
+        <b-col cols="12">
+          <b-input-group prepend="Serie">
+            <b-input-group-append>
+                <input type="text" class="form-control" id="txtSerie" v-model="Serie">
+            </b-input-group-append>
+            <b-button variant="info" size="sm" @click="anadirSerie()">AÑADIR</b-button>
+          </b-input-group>
+        </b-col>
+        <b-col cols="6">
+          
+        </b-col>
+     
+         <b-col cols="12">   
+          <table width="100%" class="mt-3">
+              <thead>
+                <tr>
+
+                  <th>#</th>
+                  <th>Serie</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(s,index) in Series" :key="index">
+                  <td>{{ index+1 }}</td>
+                  <td>
+                    <input
+                    type="text"
+                    class="form-control"
+                    :value="s"
+                    @input="updateSerie(index, $event.target.value)"
+                  >
+                  </td>
+                  <td>
+                    <b-button variant="danger" @click="eliminarSerieModal(index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </b-button>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+       </b-col>
+       <b-col cols="12" style="text-align: right;" class="mt-3">
+          <b-button @click="guardarSerie" variant="success">Guardar</b-button>
+          <b-button @click="anadirSerieFlag=!anadirSerieFlag" variant="danger">Cancelar</b-button>
+       </b-col>
+      </b-row>
+       
+    </b-modal>
+
   </b-row>
 </template>
 
@@ -372,6 +438,7 @@ export default {
   data() {
     return {
       API: config.API,
+      anadirSerieFlag: false,
       loadCode: "",
       pasteCode: false,
       producto: {},
@@ -388,7 +455,10 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
-      productoUrl: ""
+      productoUrl: "",
+      index: 0,
+      Serie: "",
+      Series: []
     };
   },
   watch: {
@@ -520,6 +590,52 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    abrirmodalNuevaSerie(index, producto) {
+      this.Serie = "";
+      this.Series = [];
+      this.objProd = { ...producto };
+
+      if (this.objProd.Serie) {
+        this.Series = this.objProd.Serie.split(",");
+      }
+      this.index = index;
+      this.anadirSerieFlag = true;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          let txtSerie = document.getElementById("txtSerie");
+          txtSerie.focus();
+        }, 500);
+      });
+    },
+
+    anadirSerie() {
+      if (!this.Serie) {
+        return;
+      }
+      if (this.Series.some(v => v == this.Serie)) {
+        this.$toasted.error(
+          "La serie ya se encuentra en el listado. Modifique"
+        );
+        return;
+      }
+      this.Series.unshift(this.Serie);
+      setTimeout(() => {
+        this.Serie = "";
+        let txtSerie = document.getElementById("txtSerie");
+        txtSerie.focus();
+      }, 200);
+    },
+    updateSerie(index, newValue) {
+      this.Series.splice(index, 1, newValue);
+    },
+    guardarSerie() {
+      this.objProd.Serie = this.Series.join(",");
+      Vue.set(this.productos, this.index, this.objProd);
+      this.anadirSerieFlag = false;
+    },
+    eliminarSerieModal(index) {
+      this.Series.splice(index, 1);
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
@@ -755,8 +871,8 @@ export default {
       obj.EsVenta = this.isVentas;
       obj.cantidad = 1;
       obj.subtotal = 0;
-      obj.precio= obj.PrecioCosto;
-      obj.nuevoPrecioContado= obj.PrecioContado;
+      obj.precio = obj.PrecioCosto;
+      obj.nuevoPrecioContado = obj.PrecioContado;
       obj.subtotal = 0;
       obj.tipo = "UNIDAD";
       obj.PreciosPorProducto = JSON.stringify(obj.PreciosPorProducto);
@@ -838,7 +954,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      
+
       let index = this.$store.state.cart.productos.findIndex(
         v => v.IdProducto == obj.IdProducto
       );
