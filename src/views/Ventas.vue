@@ -316,7 +316,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -339,7 +339,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
