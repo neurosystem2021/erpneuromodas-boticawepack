@@ -602,7 +602,7 @@ export default {
 
       if (!this.productos[index].PreciosPorProducto) return;
 
-      if (!this.precioHabilitado) {
+      /*if (!this.precioHabilitado) {
         let arr = JSON.parse(this.productos[index].PreciosPorProducto || "[]");
         arr = arr.map(r => {
           r.cantidad = Number(r.cantidad || 0);
@@ -625,7 +625,7 @@ export default {
         // if (!cambio) {
         //   this.productos[index].precio = this.productos[index].PrecioContado;
         // }
-      }
+      }*/
     },
     obtenerAnaquel(data) {
       if (data.Anaqueles && data.Anaqueles != "null" && this.idAlmacen > 0) {
