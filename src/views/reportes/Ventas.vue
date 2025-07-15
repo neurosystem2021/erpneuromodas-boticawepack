@@ -139,11 +139,12 @@
         </b-row>
         <br />
         <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" 
-              :href="'/api/index.php/reporte/ventasporvendedor?idAlmacen='+almacen.IdAlmacen+'&vendedor='+vendedor.Usuario+'&fechaInicio='+fechaInicio+
-              '&fechaFin='+fechaFin+'&declarado='+declarado+'&idTipoDoc='+tipoDoc.IdTipoDoc" 
-              target="_blank">Exportar</b-button>
+            <b-col cols="12" md="3" class="mb-2">
+              <b-button block title="Descargar un resumen general de las ventas" variant="success" size="lg" :href="'/api/index.php/reporte/ventasxvendedor?fechaInicio=' +fechaInicio+'&fechaFin=' +fechaFin+'&idTipoDoc='+(tipoDoc.IdTipoDoc || '')+'&usuario='+(vendedor.Usuario||'')+'&idAlmacen='+(almacen.IdAlmacen||'')+'&almacen='+(almacen.Almacen||'')" target="_blank">📄 Exportar resumen</b-button>
+            </b-col>
+
+            <b-col cols="12" md="3" class="mb-2">
+              <b-button block title="Descargar el detalle completo de cada venta" variant="info" size="lg" :href="'/api/index.php/reporte/ventasxvendedordetallado?fechaInicio=' +fechaInicio+'&fechaFin=' +fechaFin+'&idTipoDoc='+(tipoDoc.IdTipoDoc || '')+'&usuario='+(vendedor.Usuario||'')+'&idAlmacen='+(almacen.IdAlmacen||'')+'&almacen='+(almacen.Almacen||'')" target="_blank">📋 Exportar con detalle</b-button>
             </b-col>
         </b-row>
         <br /><br />
