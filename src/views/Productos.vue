@@ -78,7 +78,7 @@ export default {
       API: config.API,
       pageOptions: [5, 10, 15, 50, 100],
       filter: null,
-      sortBy: "IdProducto",
+      sortBy: "CodigoBarra",
       sortDesc: false,
       productoSelect: {},
       items: [],
