@@ -403,7 +403,7 @@
             </b-form-text>
         </template>
 
-        <template slot="utilidad" slot-scope="data">
+        <template v-if="idPerfil == '1'" slot="utilidad" slot-scope="data">
           <input 
             :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
             class="form-control"
