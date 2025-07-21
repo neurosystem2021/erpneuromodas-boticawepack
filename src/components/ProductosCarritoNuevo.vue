@@ -280,19 +280,12 @@
                     @focus="abrirPop2(data.index)"
                     placeholder="Precio"
                     autocomplete="off"
-                    @input="setNuevaCantidad(data.item,data.index)"
+                    @input="setNuevoPrecioContado(data.index)"
                     class="form-control"
                     />
                 </template>
                 <template slot="subtotal" slot-scope="data">
-                    <input                      
-                      type="number" 
-                      style="width: 90px;" 
-                      class="form-control my-2"
-                      step="0.001"
-                      v-model="data.item.subtotal"
-                      @input="recalcularKilake(data.index)"
-                    >
+                {{ getSubtotal(data.index) }}
                 </template>
                 <template slot="igv" slot-scope="data">
                 <b-form-checkbox
