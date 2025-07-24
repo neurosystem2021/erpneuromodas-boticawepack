@@ -619,7 +619,7 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="getProductosCategoria"
+                @input="getProductosSearch"
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -1433,7 +1433,7 @@ export default {
       }
     },
     search() {
-      this.getProductosCategoria(this.busqueda);
+      this.getProductosSearch(this.busqueda);
     },
     irTxtLoadBarcode(event) {
       if (event) {
@@ -1445,6 +1445,33 @@ export default {
       console.log(d);
     },
     getProductosCategoria(idProductoCategoria) {
+      console.log(idProductoCategoria);
+      if (this.venta.almacen.IdAlmacen) {
+        this.productosCategoria = [];
+        this.cargandoProductos = true;
+        this.busqueda = "";
+        this.axios
+          .get(this.API + "productos/categoria", {
+            params: {
+              IdProductoCategoria: idProductoCategoria,
+              idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
+              MasMovido: idProductoCategoria == 0 ? 1 : 0
+            }
+          })
+          .then(response => {
+            this.cargandoProductos = false;
+            this.productosCategoria = response.data;
+            //console.log(this.productosCategoria,"izi");
+          })
+          .catch(error => {
+            this.cargandoProductos = true;
+            this.productosCategoria = [];
+            this.$toasted.show("Hubo un error, no hay conexion");
+          });
+      }
+    },
+
+    getProductosSearch(idProductoCategoria) {
       console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
