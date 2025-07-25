@@ -1023,6 +1023,7 @@ export default {
         },
         { key: "acciones", label: "", thStyle: { width: "5%" } }
       ],
+      ventaSinStock: 0,
       busqueda: "",
       loadCode: "",
       tabActive: 0,
@@ -1151,6 +1152,7 @@ export default {
     };
   },
   mounted() {
+    this.configStock();
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1172,6 +1174,19 @@ export default {
     });
   },
   methods: {
+
+    configStock() {
+      this.axios
+        .get(this.API + "config/stock")
+        .then(res => {
+          //this.ventaSinStock = parseInt(res.data); // por si devuelve string
+          this.ventaSinStock = parseInt(res.data.VENTASINSTOCK); // CORREGIDO
+           console.log("Respuesta de /config/stock:", res.data);
+        })
+        .catch(err => {
+          this.ventaSinStock = 0; // fallback: sí permite la venta si hay error
+        });
+    },
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1894,20 +1909,38 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-      this.$swal({
-        title: "Procesando...",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
+      // this.$swal({
+      //   title: "Procesando...",
+      //   text: "Por favor espera",
+      //   allowOutsideClick: false,
+      //   showConfirmButton: false,
+      //   didOpen: () => {
+      //     this.$swal.showLoading();
+      //   }
+      // });
 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
+      
+      //this.$toasted.show("prueba de mensaje");
+         // Validación de stock | 0=false (deshabilitado)
+        if (this.ventaSinStock === 0) {
+          const sinStock = productos.some(
+            p =>
+              p.cantidad * (p.CantidadPresentacion || 1) > p.stock
+          );
 
+          if (sinStock) {
+             this.$swal({
+              title: "No se puede vender un producto sin stock",
+              icon: "error",
+              confirmButtonColor: "#d33",
+              confirmButtonText: "Aceptar"
+            })
+            return;
+          }
+        }
       totalPagos +=
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
@@ -1948,7 +1981,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -1963,7 +1996,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //// target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
@@ -1979,10 +2012,11 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
+
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
         //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
@@ -1992,7 +2026,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2010,7 +2044,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2024,7 +2058,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2047,33 +2081,13 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
         return;
       }
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        return;
-      }
-
+      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);   
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2166,7 +2180,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2181,7 +2195,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
@@ -2197,7 +2211,7 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
@@ -2210,7 +2224,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2228,7 +2242,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2242,7 +2256,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2265,7 +2279,7 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2285,7 +2299,7 @@ export default {
       //     title: "No se puede vender un producto sin stock",
       //     showConfirmButton: true,
       //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
+      //     // target: document.getElementById("conten"),
       //     confirmButtonColor: "#0275d8"
       //   });
       //   return;
@@ -2589,7 +2603,7 @@ export default {
           this.$swal({
             position: "top-end",
             icon: "info",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             title:
               "Pedido de Delivery de: <br> " +
               "<strong>" +
