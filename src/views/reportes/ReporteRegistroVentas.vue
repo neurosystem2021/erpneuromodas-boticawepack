@@ -41,6 +41,7 @@
                       <th>Id</th>
                       <th>Vendedor</th>
                       <th>Fecha Doc</th>
+                      <th>Cliente</th>
                       <th>Cod. Sunat</th>
                       <th>Tipo Doc.</th>
                       <th>Anulado</th>
@@ -57,6 +58,7 @@
                         <td style="text-align: center;">{{reporte.idDocVenta}}</td>
                         <td>{{reporte.UsuarioReg}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
+                        <td style="text-align: center;">{{reporte.Cliente}}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
                         <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
