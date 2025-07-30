@@ -508,7 +508,7 @@ export default {
             tieneIgv: false,
             venta: {},
             bloquearInput:false,
-            diasValidosProf:0,
+            diasValidosProf:1,
             adelantosPreOrden:[],
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },

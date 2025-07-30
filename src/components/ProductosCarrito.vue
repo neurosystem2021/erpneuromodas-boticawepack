@@ -262,6 +262,40 @@
               <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
             </div>
         </b-modal>
+
+        <b-modal ref="modalDescripcion" id="porcentajeUtilidad" size="lg" hide-footer class="porcentajeUtilidad" title="Porcentaje de utilidad" hide-header-close>
+          <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
+          <input type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+            <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <td class="botones" @click="addPoint('.');">.</td>
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+              </tbody>
+            </table>
+            <br>
+            <div style="text-align: center; width: 100%; height: 100%;">
+              <b-button style="width: 49%;" size="md" variant="success" @click="ingresaNum(capturaIndex)">Ingresar</b-button>
+              <b-button style="width: 49%;" size="md" variant="danger" @click="cerrrarNum()">Cerrar</b-button>
+            </div>
+        </b-modal>
         <!-- MODALS TOUCH -->
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
@@ -457,6 +491,7 @@
             placeholder="Descripción"
             cols="9" rows="1"
             style="width: 150px"
+            @focus="abrirModalTouch(data.index, 6)"
             v-model="productos[data.index].Descripcion"></textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
@@ -562,21 +597,21 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
-  data () {
+  data() {
     return {
       cantidadInput: "",
       capturaIndex: null,
       touchHab: false,
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
       producto: {},
       items: [],
@@ -588,23 +623,23 @@ export default {
       objProd: {},
       cant: 0,
       precioCont: 0,
-      medicionPro:'UNIDAD',
+      medicionPro: "UNIDAD",
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil'),
-      productoNombre:'',
-      productoUrl:'',
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      productoNombre: "",
+      productoUrl: "",
       microfonoActivo: false
-    }
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     },
-    productos (prods) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+    productos(prods) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
-        this.productos[pi].precioBruta = this.productos[pi].precio
+        this.productos[pi].precioBruta = this.productos[pi].precio;
       }
     }
   },
@@ -616,12 +651,12 @@ export default {
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
-    bloquearInput:Boolean,
-    esDelivery:Boolean,
+    bloquearInput: Boolean,
+    esDelivery: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -629,29 +664,34 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-          { key: 'CodigoBarra', label: 'Código'},
+          {
+            key: "stock",
+            label: "Stock",
+            variant: "info",
+            class: "text-center"
+          },
+          { key: "CodigoBarra", label: "Código" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'Descripcion', label: 'Descripción'},
-          { key: 'ProductoMarca', label: 'Marca' },
+          { key: "Producto", label: "Artículo" },
+          { key: "Descripcion", label: "Descripción" },
+          { key: "ProductoMarca", label: "Marca" },
           //{ key: 'ProductoPresentacion', label: 'Anaquel' },
-          { key: 'obsequio', label: 'Obsequio', class:'thcenter' },
-          { key: 'eventPres', label: '' },
-          { key: 'cantxPrecio', variant: 'warning' },
+          { key: "obsequio", label: "Obsequio", class: "thcenter" },
+          { key: "eventPres", label: "" },
+          { key: "cantxPrecio", variant: "warning" },
           // { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta (S/)' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta (S/)" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     }
@@ -661,66 +701,66 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    APIProductos () {
+    APIProductos() {
       if (this.idAlmacen) {
-        return this.API + 'productos/puntoventa/stock/' + this.idAlmacen
+        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
       } else {
-        return this.API + 'productos'
+        return this.API + "productos";
       }
     },
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         //sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart',
-      actualizarProd : 'actualizarProducto',
-      obtenerStok: 'obtenerStock',
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto",
+      obtenerStok: "obtenerStock"
     }),
     abrirMicrofono() {
       this.busqueda = "";
@@ -735,41 +775,45 @@ export default {
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
 
-       this.microfonoActivo = true;
+      this.microfonoActivo = true;
 
-      this.recognition.onresult = (event) => {
+      this.recognition.onresult = event => {
         if (event.results.length > 0) {
           this.busqueda = event.results[0][0].transcript;
 
-          const inputInterno = this.$refs.autocompleteProducto &&
-                              this.$refs.autocompleteProducto.$el &&
-                              this.$refs.autocompleteProducto.$el.querySelector("input");
+          const inputInterno =
+            this.$refs.autocompleteProducto &&
+            this.$refs.autocompleteProducto.$el &&
+            this.$refs.autocompleteProducto.$el.querySelector("input");
 
           if (inputInterno) {
             inputInterno.focus();
           } else {
-            console.warn("No se encontró el input dentro del componente autocomplete.");
+            console.warn(
+              "No se encontró el input dentro del componente autocomplete."
+            );
           }
         }
       };
 
-      this.recognition.onerror = (event) => {
+      this.recognition.onerror = event => {
         console.error("Speech Recognition Error:", event);
-         this.microfonoActivo = false;
+        this.microfonoActivo = false;
         this.handleError(event.error);
       };
 
       this.recognition.onend = async () => {
-        this.microfonoActivo = false; 
+        this.microfonoActivo = false;
         const inputEvent = new Event("input", {
           bubbles: true,
-          cancelable: true,
+          cancelable: true
         });
 
         setTimeout(() => {
-          const inputInterno = this.$refs.autocompleteProducto &&
-                              this.$refs.autocompleteProducto.$el &&
-                              this.$refs.autocompleteProducto.$el.querySelector("input");
+          const inputInterno =
+            this.$refs.autocompleteProducto &&
+            this.$refs.autocompleteProducto.$el &&
+            this.$refs.autocompleteProducto.$el.querySelector("input");
 
           if (inputInterno) {
             inputInterno.value = this.busqueda;
@@ -800,8 +844,8 @@ export default {
     handleInput(index) {
       const cantidad = this.productos[index].cantidad;
       // Emitir el valor de cantidad
-      this.$emit('onInputCantidad', cantidad);
-      
+      this.$emit("onInputCantidad", cantidad);
+
       // Validar si PreciosPorProducto está disponible
       if (!this.productos[index].PreciosPorProducto) {
         return;
@@ -809,19 +853,27 @@ export default {
 
       if (!this.precioHabilitado) {
         // Obtener los precios por producto como array y convertir a números
-        let preciosPorProducto = JSON.parse(this.productos[index].PreciosPorProducto || '[]');
-        preciosPorProducto.forEach((precio) => {
+        let preciosPorProducto = JSON.parse(
+          this.productos[index].PreciosPorProducto || "[]"
+        );
+        preciosPorProducto.forEach(precio => {
           precio.cantidad = Number(precio.cantidad || 0);
           precio.precio = Number(precio.precio || 0);
         });
 
         // Ordenar los precios por cantidad
-        let preciosOrdenados = preciosPorProducto.sort((a, b) => a.cantidad - b.cantidad);
+        let preciosOrdenados = preciosPorProducto.sort(
+          (a, b) => a.cantidad - b.cantidad
+        );
         let cambio = false;
 
         // Determinar el precio correcto basado en la cantidad
-        preciosOrdenados.forEach((precio) => {
-          if (precio.cantidad > 0 && precio.precio > 0 && cantidad >= precio.cantidad) {
+        preciosOrdenados.forEach(precio => {
+          if (
+            precio.cantidad > 0 &&
+            precio.precio > 0 &&
+            cantidad >= precio.cantidad
+          ) {
             this.productos[index].precio = precio.precio;
             cambio = true;
           }
@@ -841,16 +893,16 @@ export default {
       this.cantidadInput = "";
       this.objProd = this.productos[index];
 
-      if (!this.touchHab){
+      if (!this.touchHab) {
         return;
-      } 
-
+      }
       // Ocultamos todos los modales
       this.$refs["modalIngDesc"].hide();
       this.$refs["modalIngCant"].hide();
       this.$refs["modalIngPre"].hide();
       this.$refs["modalCantxPrecio"].hide();
       this.$refs["modalPorcentajeUtilidad"].hide();
+      this.$refs["modalDescripcion"].hide();
 
       // Mostramos el modal correspondiente según el tipo
       if (tipo === 1) {
@@ -861,14 +913,18 @@ export default {
         this.$refs["modalIngDesc"].show();
       } else if (tipo === 4) {
         this.$refs["modalCantxPrecio"].show();
-      }else if (tipo === 5) {
+      } else if (tipo === 5) {
         this.$refs["modalPorcentajeUtilidad"].show();
+      } else if (tipo === 6) {
+        this.$refs["modalDescripcion"].show();
       }
     },
     ingresaNum() {
-      
       if (this.$refs["modalIngCant"].is_show) {
         this.objProd.cantidad = this.cantidadInput;
+      }
+      if (this.$refs["modalDescripcion"].is_show) {
+        this.objProd.Descripcion = this.cantidadInput;
       }
       if (this.$refs["modalIngPre"].is_show) {
         this.objProd.precio = this.cantidadInput;
@@ -890,6 +946,7 @@ export default {
       this.$refs["modalIngDesc"].hide();
       this.$refs["modalCantxPrecio"].hide();
       this.$refs["modalPorcentajeUtilidad"].hide();
+      this.$refs["modalDescripcion"].hide();
     },
     deleteNumber() {
       this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
@@ -904,89 +961,103 @@ export default {
       this.$refs["modalIngDesc"].hide();
       this.$refs["modalCantxPrecio"].hide();
       this.$refs["modalPorcentajeUtilidad"].hide();
+      this.$refs["modalDescripcion"].hide();
     },
-    addPoint(){
-     if (!(''+this.cantidadInput).includes('.')){
-          this.$nextTick(()=>{
-            this.cantidadInput = this.cantidadInput + '.'
-          })
-     }
+    addPoint() {
+      if (!("" + this.cantidadInput).includes(".")) {
+        this.$nextTick(() => {
+          this.cantidadInput = this.cantidadInput + ".";
+        });
+      }
     },
     setSubtotal(index, val, prod) {
-      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
-      Vue.set(this.productos[index], 'precio', precio)
-      this.actualizarProd({Producto:prod,Pos:index})
+      let precio = this.$options.filters.redondear(
+        val / this.productos[index].cantidad,
+        3
+      );
+      Vue.set(this.productos[index], "precio", precio);
+      this.actualizarProd({ Producto: prod, Pos: index });
     },
-    abrirImagen(producto,url){
-      this.productoNombre = producto
-      this.productoUrl = url
-      this.$refs['modalImagen'].show()
+    abrirImagen(producto, url) {
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
     },
-    setAltImg(event) { 
-        event.target.src = "static/no-photo.png" 
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
     },
-    changeCant (val, prod, index) {
-      if (val>0) {
-        prod.cantidad = prod.cantidadPres
-        prod.cantidad *= val
+    changeCant(val, prod, index) {
+      if (val > 0) {
+        prod.cantidad = prod.cantidadPres;
+        prod.cantidad *= val;
       }
-      prod.subt = ''
+      prod.subt = "";
       this.$nextTick(() => {
-        this.actualizarProd({Producto:prod,Pos:index})
-      })
+        this.actualizarProd({ Producto: prod, Pos: index });
+      });
     },
 
-    cambiarPrecio (index, prod) {
-      var utilidad =  this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100)
-      this.productos[index].precio = Math.ceil(this.productos[index].PrecioCosto + utilidad)
+    cambiarPrecio(index, prod) {
+      var utilidad =
+        this.productos[index].PrecioCosto *
+        (this.productos[index].PorcentajeUtilidad / 100);
+      this.productos[index].precio = Math.ceil(
+        this.productos[index].PrecioCosto + utilidad
+      );
     },
-    
-    addManoDeObra (index, e) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
-      if ( pi < 0 ) {
-        this.$toasted.error('Primero seleccione el producto MANODEOBRA')
-        
-        this.productos[index].EsManoDeObra = 0
-        return ;
+
+    addManoDeObra(index, e) {
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+      if (pi < 0) {
+        this.$toasted.error("Primero seleccione el producto MANODEOBRA");
+
+        this.productos[index].EsManoDeObra = 0;
+        return;
       }
 
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = true
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) -
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = true;
       } else {
-        e.target.parentNode.parentNode.removeAttribute("style")
-        this.productos[pi].precio = 0
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) + (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = false
+        e.target.parentNode.parentNode.removeAttribute("style");
+        this.productos[pi].precio = 0;
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) +
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = false;
       }
     },
 
-    updateManoDeObraNeta (index) {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
+    updateManoDeObraNeta(index) {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       this.productos.filter(p => p.EsManoDeObra).map(p => {
-          precio -= (parseFloat(p.precio) * parseFloat(p.cantidad))
-      })
-      
-      let pi = this.productos.findIndex(p => p.CodigoBarra === 'MANODEOBRA');
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
+
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
-        this.productos[pi].precio = precio
+        this.productos[pi].precio = precio;
       }
     },
 
-    asignarDisabledProf (index, e) {
+    asignarDisabledProf(index, e) {
       if (e.target.checked === true) {
-        this.productos[index].disabledProf = 1
-        return
+        this.productos[index].disabledProf = 1;
+        return;
       }
-      this.productos[index].disabledProf = 0
+      this.productos[index].disabledProf = 0;
     },
 
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     // loadBarcode (e) {
     //   e.preventDefault()
@@ -1005,21 +1076,22 @@ export default {
     //   }
     // },
 
-    loadBarcode (e) {
-      e.preventDefault()
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = {codigoBarra: idProducto}
-        this.axios.get(this.API + 'productos/id/' + idProducto, {params: params})
-        .then((response) => {
-          if (response.data.IdProducto) {
-            this.setProducto(response.data)
-          } else {
-            this.loadCode = ''
-            this.$toasted.show('No se encontró ningun producto')    
-          }
-        })
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data);
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
       }
     },
 
@@ -1051,140 +1123,154 @@ export default {
         this.pasteCode = false
       }
     },*/
-    setObsequio(index){
-      this.productos[index].precio = 0
-      this.productos[index].nuevoPrecioContado = 0
+    setObsequio(index) {
+      this.productos[index].precio = 0;
+      this.productos[index].nuevoPrecioContado = 0;
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
-    editarProducto(Pro){
-      this.productoSelect = Pro
+    editarProducto(Pro) {
+      this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    agregarGuardar(id,pxp,obj){
-      this.add([id,false,false,false,false,true,this.isVentas]);
+    agregarGuardar(id, pxp, obj) {
+      this.add([id, false, false, false, false, true, this.isVentas]);
       setTimeout(() => {
-              this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, 200); 
-      
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      }, 200);
 
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === '0')
-        if(fPP.length!=4){
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion
-          obj.IdProductoMarca= obj.marca.IdProductoMarca
-          obj.ProductoMarca= obj.marca.ProductoMarca
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria
-          this.productoSelect = obj
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp)
-          this.showPresentacion(this.productoSelect)
-        }
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+      if (fPP.length != 4) {
+        obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+        obj.IdProductoMarca = obj.marca.IdProductoMarca;
+        obj.ProductoMarca = obj.marca.ProductoMarca;
+        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+        obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+        this.productoSelect = obj;
+        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+        this.showPresentacion(this.productoSelect);
+      }
     },
-    setProducto (obj) {
-      this.precioCont = obj.PrecioContado
-      obj.estadoPxP = false
-      this.loadCode = ''
-      this.preciosProd = []
-      this.objProd = {}
-      obj.EsObsequio = 0
-      obj.EsVenta = this.isVentas
+    setProducto(obj) {
+      this.precioCont = obj.PrecioContado;
+      obj.estadoPxP = false;
+      this.loadCode = "";
+      this.preciosProd = [];
+      this.objProd = {};
+      obj.EsObsequio = 0;
+      obj.EsVenta = this.isVentas;
       obj.EsVentaNew = true;
 
-      this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
-      let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
-      
-      if (fPP.length==4) {
-        obj.estadoPxP = true
-        obj.cantxPrecio=1
-        this.setProductoUni(obj)
-        return
+      this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
+      let fPP = this.preciosProd.filter(
+        p => p.cantidad === 0 || p.cantidad === "0"
+      );
+
+      if (fPP.length == 4) {
+        obj.estadoPxP = true;
+        obj.cantxPrecio = 1;
+        this.setProductoUni(obj);
+        return;
       }
 
-      this.indexProdSelect = null
-      this.$refs['modalCant'].show()
+      this.indexProdSelect = null;
+      this.$refs["modalCant"].show();
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
-      this.objProd = obj
-    },  
-    setProductoUni (obj) {
-      this.objProd.cantxPrecio = 1
+      this.objProd = obj;
+    },
+    setProductoUni(obj) {
+      this.objProd.cantxPrecio = 1;
       //this.$refs.autocompleteProducto.setValue('')
-      obj.subt = ''
+      obj.subt = "";
       //obj.FLETE = 0
-      obj.precio = obj.PrecioContado
-      obj.cantidad = 0
+      obj.precio = obj.PrecioContado;
+      obj.cantidad = 0;
       obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      obj.cantidadPres = obj.cantidad
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto añadido correctamente')
-        //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
-      }, { setPrecioCosto: (this.tipo == 'mov' ? true : false) }, false, false])
-      this.loadCode=''
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj = this.onSetProducto(obj);
+      obj.cantidadPres = obj.cantidad;
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto añadido correctamente");
+          //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) ;
+        },
+        { setPrecioCosto: this.tipo == "mov" ? true : false },
+        false,
+        false
+      ]);
+      this.loadCode = "";
       // Vue.set(this.productos, obj.IdProducto, obj)
-      this.$refs['modalCant'].hide()
-      this.$refs.barcodeInput.focus()
+      this.$refs["modalCant"].hide();
+      this.$refs.barcodeInput.focus();
       //this.actualizarProd(obj)
     },
-    setProductoCant (prod) {
-      this.objProd.cantxPrecio = 1
-      this.cant = prod.cantidad
-      let obj = this.objProd
+    setProductoCant(prod) {
+      this.objProd.cantxPrecio = 1;
+      this.cant = prod.cantidad;
+      let obj = this.objProd;
       //this.$refs.autocompleteProducto.setValue('')
-      obj.subt = ''
+      obj.subt = "";
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
-      obj.precio = 0
-      obj.cantidad = 1
+      obj.precio = 0;
+      obj.cantidad = 1;
       obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj.cantidadPres = this.cant
-      obj = this.onSetProducto(obj, prod.cantidad,prod.precio)
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj.cantidadPres = this.cant;
+      obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
-      if(this.indexProdSelect == null){
-        this.add([obj, () => {
-          this.$emit('onAddProducto', obj)
-          this.$toasted.success('Producto añadido correctamente')
-          //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-        }, false, false])
-      }else{
-        this.actualizarProd({Producto:obj,Pos:this.indexProdSelect});
-        this.indexProdSelect = null
+      if (this.indexProdSelect == null) {
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            this.$toasted.success("Producto añadido correctamente");
+            //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+          },
+          false,
+          false
+        ]);
+      } else {
+        this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
+        this.indexProdSelect = null;
       }
-      
-      this.$refs['modalCant'].hide()
-      this.$refs.barcodeInput.focus()
+
+      this.$refs["modalCant"].hide();
+      this.$refs.barcodeInput.focus();
       //this.actualizarProd(obj)
     },
-    showPresentacion (obj) {
-      if (!obj.PreciosPorProducto !== '') {
-        this.precioCont = obj.PrecioContado
-        obj.estadoPxP = false
-        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : []
-        this.objProd = obj
-        this.$refs['modalCant'].show()
-        return
+    showPresentacion(obj) {
+      if (!obj.PreciosPorProducto !== "") {
+        this.precioCont = obj.PrecioContado;
+        obj.estadoPxP = false;
+        this.preciosProd = obj.PreciosPorProducto
+          ? JSON.parse(obj.PreciosPorProducto)
+          : [];
+        this.objProd = obj;
+        this.$refs["modalCant"].show();
+        return;
       }
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let styleStock = ''
-        if(data.stock <= 0){
-          styleStock = 'table-danger'
-        }else{
-          styleStock = 'table-success'
+        let styleStock = "";
+        if (data.stock <= 0) {
+          styleStock = "table-danger";
+        } else {
+          styleStock = "table-success";
         }
 
         return `
@@ -1213,208 +1299,239 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre==1?'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />':(data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock)}</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${
+          data.EsPadre == 1
+            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+            : data.stock
+              ? Number.isInteger(data.stock)
+                ? data.stock
+                : data.stock.toFixed(2)
+              : data.stock
+        }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
                 <td style="width: 5%">
-                  <img src="${data.Imagen==null || data.Imagen=='' ? 'static/no-photo.png' : '/resources/images/productos/'+data.Imagen}" class="imagen">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica==1?'<i class="fas fa-star" style="color:yellow !important" ></i>':''}</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
               </tr>
             </tbody>
           </table>   
         </div>
-        `
+        `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
-    setNuevoPrecioContado (index) {
-
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
-      let precioFinal=0
+      let precioFinal = 0;
       //if(this.isVentas){
-        //precio += (precio * (this.productos[index].PorcentajeUtilidad/100)) 
-       // let precioFinal = 
+      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
+      // let precioFinal =
       // }else{
-      precioFinal = precio*this.productos[index].PorcentajeUtilidad/100+precio
-      if(this.isVentas){
-        Vue.set(this.productos[index], 'subt', '')
+      precioFinal =
+        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
+      if (this.isVentas) {
+        Vue.set(this.productos[index], "subt", "");
       }
-       // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
+      // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
       //}
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
-
-      let normalPrecio = this.$options.filters.redondear(precioFinal)
+      let normalPrecio = this.$options.filters.redondear(precioFinal);
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1)
-      
+      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
+
       if (this.tipoCambio > 0) {
-        normalPrecio *= this.tipoCambio
-        nuevoPrecio *= this.tipoCambio
+        normalPrecio *= this.tipoCambio;
+        nuevoPrecio *= this.tipoCambio;
       }
 
-      Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
-      this.getSubtotal(index)
+      Vue.set(
+        this.productos[index],
+        "normalPrecioContado",
+        parseFloat(normalPrecio).toFixed(2)
+      );
+      Vue.set(
+        this.productos[index],
+        "nuevoPrecioContado",
+        Math.ceil(nuevoPrecio)
+      );
+      this.getSubtotal(index);
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
-      this.updateManoDeObraNeta(index)
+      // return nuevoPrecio
+      this.updateManoDeObraNeta(index);
     },
-    actualizarDescu(index){
+    actualizarDescu(index) {
       let obj = this.productos[index];
-      this.actualizarProd({Producto:obj,Pos:index})
+      this.actualizarProd({ Producto: obj, Pos: index });
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     },
 
     formatFecha(fecha) {
       if (fecha) {
-			  return this.$moment(fecha, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD')
+        return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
       } else {
-        return ''
+        return "";
       }
-		}
+    }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style scoped>
-  .contentCard {
-    cursor: pointer;
-  }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
-  .oferta{
-     border: 4px solid #dc3545;
-  }
-  .ofertanom{
-    color: #dc3545;
-    border-right: 2px solid #dc3545;
-  }
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+.oferta {
+  border: 4px solid #dc3545;
+}
+.ofertanom {
+  color: #dc3545;
+  border-right: 2px solid #dc3545;
+}
 
-  .calc__numbers {
-    width: 15vw;
-    height: 15vw;
-  }
-  .calc__numbers2 {
-    width: 100%;
-    height: 20vh;
-  }
-  .calc__numbers td {
-    min-width: 40px;
-    min-height: 40px;
-    border: 0.5px solid #a3a3a3;
-    cursor: pointer;
-    text-align: center;
-    vertical-align: middle;
-    padding: 1.8% 1.8%;
-    font-size: 0.8rem;
-    font-weight: bold;
-    font-family: Arial;
-    color: black;
-    background-color: #ffffff;
-  }
-  .calc__numbers td:last-child {
-    background-color: #eaeaea;
-  }
-  .calc__numbers2 td:last-child {
-    background-color: white;
-  }
-  .calc__numbers .botones:hover {
-    color: #fff;
-    background: #65ba9b;
-  }
-  .calc__numbers .accionActiva {
-    color: #fff !important;
-    background: #65ba9b !important;
-  }
-  
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers td {
+  min-width: 40px;
+  min-height: 40px;
+  border: 0.5px solid #a3a3a3;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  padding: 1.8% 1.8%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  font-family: Arial;
+  color: black;
+  background-color: #ffffff;
+}
+.calc__numbers td:last-child {
+  background-color: #eaeaea;
+}
+.calc__numbers2 td:last-child {
+  background-color: white;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+}
+.calc__numbers .accionActiva {
+  color: #fff !important;
+  background: #65ba9b !important;
+}
 </style>
 <style>
-  .popover{
-    max-width: 420px !important;
-  }
-  .nomCart {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    border-right: 2px solid black;
-  }
-  #modalImagen .modal-dialog {
-    max-width: 75% !important;
-  }
-  .imagenGrande{
-    width: 100%;
-  }
-  .obsequio{
-    display: flex;
-    justify-content: center;
-    justify-items: center;
-  }
+.popover {
+  max-width: 420px !important;
+}
+.nomCart {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  border-right: 2px solid black;
+}
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+.obsequio {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
 </style>
