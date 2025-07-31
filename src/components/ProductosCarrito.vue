@@ -933,6 +933,7 @@ export default {
       }
     },
     setProducto(obj) {
+      obj.Descripcion = '';
       this.precioCont = obj.PrecioContado;
       this.medicionPro = obj.ProductoMedicion;
       this.loadCode = "";
@@ -960,6 +961,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
+      obj.Descripcion = '';
       this.$refs.autocompleteProducto.setValue("");
       obj.subt = "";
       obj.precio = obj.PrecioCosto;
@@ -990,6 +992,7 @@ export default {
       obj.Presentacion = prod.nombre;
       obj.CantidadPresentacion = prod.cantidad;
       obj.precio = 0;
+      obj.Descripcion = '';
       obj.cantidad = 1;
       obj.EsPresentacion = 1;
       obj.subt = "";

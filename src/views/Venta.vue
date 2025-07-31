@@ -14,7 +14,7 @@
                     :id="`inputTipoVenta${index}`"
                     :url="API + 'ventas/tipos'"
                     anchor="TipoDoc"
-                    initValue="BOLETA ELEC."
+                    initValue="NOTA DE VENTA"
                     class="font-weight-bold"
                     label="writer"
                     placeholder=""
@@ -155,7 +155,7 @@
                   </template>
                   <template slot="presentacion" slot-scope="data">
                     <b-form-input
-                      v-model="data.item.Descripcion"
+                      v-model="data.item.Descripcion2"
                       type="text"
                       style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
                       autocomplete="false"
@@ -195,6 +195,16 @@
                       class="form-control"
                       />
                      
+                  </template>
+                  <template slot="Descripcion" slot-scope="data">
+                    <textarea 
+                      :disabled="bloquearInput?true:false"
+                      class="form-control"
+                      placeholder="Descripción"
+                      cols="9" rows="3"
+                      style="width: 150px"
+                      v-model="data.item.Descripcion"
+                    ></textarea>
                   </template>
                   <template slot="descuento" slot-scope="data">
                     <input
@@ -1000,6 +1010,7 @@ export default {
         },
         { key: "Producto", thStyle: { width: "53%" } },
         { key: "pres", label: "", thStyle: { width: "5%" } },
+        { key: "Descripcion", label: "Descripcion"  },
         {
           key: "presentacion",
           label: "Pres.",
@@ -1649,13 +1660,14 @@ export default {
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
+      prod.Descripcion2 = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.cantidad = 1;
+      prod.Descripcion = '';
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
@@ -2090,7 +2102,7 @@ export default {
         return;
       }
       console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-
+      venta.Descripcion=(''+(venta.Descripcion?venta.Descripcion:'')).trim().toUpperCase()
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2438,14 +2450,14 @@ export default {
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
       if (esPresentacion) {
-        producto.Descripcion = obj.nombre;
+        producto.Descripcion2 = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.Descripcion = obj.ProductoPresentacion;
+        producto.Descripcion2 = obj.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = false;
