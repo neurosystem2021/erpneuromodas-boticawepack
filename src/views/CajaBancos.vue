@@ -670,7 +670,7 @@ export default {
       });
     },
     aplicarPago(deuda) {
-      if (this.Importe < deuda.Total - deuda.Aplicado) {
+      if (this.Importe <= deuda.Total - deuda.Aplicado) {
         deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,
