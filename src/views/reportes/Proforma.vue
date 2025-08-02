@@ -72,7 +72,7 @@
         </tfoot>
       </table>
       <div id="accounts">
-        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+        <img style="max-width: 100%; margin-left: 120px;" src="/resources/images/cuentas.png" />
       </div>
       <div id="thanks">¡Dios lo Bendiga!</div>
       <div id="notices">
