@@ -347,7 +347,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito |  redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -1209,35 +1209,35 @@ export default {
     },
     totalIngresos() {
       let total = 0;
-      this.ingresos.forEach(ingreso => {
+      this.ingresos.filter(v => v.Anulado == 0).forEach(ingreso => {
         if (!ingreso.Anulado) total += ingreso.Importe;
       });
       return total;
     },
     totalIngresosTarjeta() {
       let total = 0;
-      this.ingresosTarjeta.forEach(ingresoTar => {
+      this.ingresosTarjeta.filter(v => v.Anulado == 0).forEach(ingresoTar => {
         if (!ingresoTar.Anulado) total += ingresoTar.Importe;
       });
       return total;
     },
     totalSalidasTarjeta() {
       let total = 0;
-      this.salidasTarjeta.forEach(salidaTar => {
+      this.salidasTarjeta.filter(v => v.Anulado == 0).forEach(salidaTar => {
         if (!salidaTar.Anulado) total += salidaTar.Importe;
       });
       return total;
     },
     totalAdelantos() {
       let total = 0;
-      this.adelantos.forEach(ade => {
+      this.adelantos.filter(v => v.Anulado == 0).forEach(ade => {
         if (!ade.Anulado) total += ade.Importe;
       });
       return total;
     },
     totalAdelantosActivos() {
       let total = 0;
-      this.adelantos.forEach(ade => {
+      this.adelantos.filter(v => v.Anulado == 0).forEach(ade => {
         if (!ade.Anulado && !ade.AnuladoVenta && !ade.EsCreditoVenta)
           total += ade.Importe;
       });
@@ -1245,7 +1245,7 @@ export default {
     },
     totalVentasEfectivo() {
       let total = 0;
-      this.ventasEfectivo.forEach(venta => {
+      this.ventasEfectivo.filter(v => v.Anulado == 0).forEach(venta => {
         if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
       });
       return total;
@@ -1293,7 +1293,7 @@ export default {
     },
     totalVentasCredito() {
       let total = 0;
-      this.ventasCredito.forEach(venta => {
+      this.ventasCredito.filter(v => v.Anulado == 0).forEach(venta => {
         if (!venta.Anulado) total += venta.Total;
       });
       return total;
