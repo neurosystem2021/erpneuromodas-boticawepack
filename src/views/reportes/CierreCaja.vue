@@ -1,14 +1,12 @@
 <template>
-  <b-container fluid class="px-5 py-0">
+  <b-container fluid class="px-5 py-5">
     <b-row class="no-print">  
       <b-col cols="9" class="no-print">
         
         <b-card no-body>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
-            <b-tab title="Ventas" active >
-              <div class="clsScroll">
-
-              
+            <b-tab title="Ventas" active class="clsVentas">
+              <div class="clsVentas">
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -67,7 +65,7 @@
                     </td>
                     
                     <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Efectivo  | redondear }}</td>
+                    <td>S/. {{ item.Efectivo | redondear }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -349,7 +347,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito |  redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -488,10 +486,8 @@
             </table>
           </b-col>
       </b-row>
-    </div> 
-            </b-tab>
+    </div> </b-tab>
             <b-tab title="Productos" >
-              <b-button variant="primary" @click="imprimirProductos"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
               <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
           <thead>
@@ -610,14 +606,14 @@
               <td colspan="2"></td>
             </tr>
 
-            <tr>
+            <!-- <tr>
               <td>Vales de Crédito S/.</td>
               <td>{{ totalVentasValeCredito | redondear }} </td>
-            </tr>
-            <tr>
+            </tr> -->
+            <!-- <tr>
               <td>Canjes S/.</td>
               <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </b-col>
@@ -631,68 +627,42 @@
     
     </b-row>
 
-    <b-row class="si-print" v-if="ResumenFlag">
+    <b-row class="si-print">
        <h1> <center>Cierre Caja</center></h1>
        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
        <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
         
-       <table class="table b-table table-sm table-striped table-bordered tableResumen">
+        <table class="table table-sm" width="100%">
+          <thead>
+            <tr class="thDetalle">
+              <th width="5%">ID</th>
+              <th width="65%">Producto</th>
+              <th width="15%">Cantidad Vendida</th>
+              <th width="15%">Monto</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr>
-              <td>Gran Total S/.</td>
-              <td>{{ granTotal | redondear }}</td>
-            </tr>
-            <tr>
-              <td colspan="2"></td>
-            </tr>
-            <tr>
-              <td>Ingresos S/.</td>
-              <td>{{ totalIngresos | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Salida S/.</td>
-              <td>{{ totalSalidas | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Crédito S/.</td>
-              <td>{{ totalVentasCredito | redondear }} </td>
-            </tr>
-          
-            <tr>
-              <td colspan="2"></td>
-            </tr>
-            <tr>
-              <td>Efectivo S/.</td>
-              <td>{{ totalVentasEfectivo | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Tarjeta S/.</td>
-              <td>{{ totalVentasVisa | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Yape/Plin S/.</td>
-              <td>{{ totalVentasMastercard | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Transferencia S/.</td>
-              <td>{{ totalVentasTransferencia | redondear }} </td>
+            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
+               <td> {{ produtos.IdProducto }} </td>
+               <td> {{ produtos.Producto }} </td>
+               <td> {{ produtos.total }} </td>
+               <td> {{ produtos.Precio }} </td>
+              
             </tr>
             
+          </tbody>
+          <tfoot>
             <tr>
               <td colspan="2"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ parseFloat(reportePorProveedor.reduce((total,prod)=>{
+                      return total + parseFloat(prod.Precio)
+                  },0) ).toFixed(2)}}</b></td>
             </tr>
-
-            <tr>
-              <td>Vales de Crédito S/.</td>
-              <td>{{ totalVentasValeCredito | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Canjes S/.</td>
-              <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
-          </tbody>
+          </tfoot>
         </table>
+
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -1175,43 +1145,6 @@
       </b-row>
            
     </b-row>
-
-    <b-row class="si-print-productos" v-if="ProductosFlag">
-       <h1> <center>Cierre Caja</center></h1>
-       <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
-        <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
-       <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
-        
-        <table class="table table-sm" width="100%">
-          <thead>
-            <tr class="thDetalle">
-              <th width="5%">ID</th>
-              <th width="65%">Producto</th>
-              <th width="15%">Cantidad Vendida</th>
-              <th width="15%">Monto</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
-               <td> {{ produtos.IdProducto }} </td>
-               <td> {{ produtos.Producto }} </td>
-               <td> {{ produtos.total }} </td>
-               <td> {{ produtos.Precio }} </td>
-              
-            </tr>
-            
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"></td>
-              <td class="total"><b>Total Efectivo</b></td>
-              <td class="total"><b>S/. {{ parseFloat(reportePorProveedor.reduce((total,prod)=>{
-                      return total + parseFloat(prod.Precio)
-                  },0) ).toFixed(2)}}</b></td>
-            </tr>
-          </tfoot>
-        </table>
-    </b-row>
   </b-container>
 
 </template>
@@ -1222,18 +1155,14 @@ import CierresCaja from "@/components/CierresCaja.vue";
 export default {
   mounted() {
     if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id)
-      this.loadData()
-      this.getVendedor()
+      this.getCierre(this.$route.params.id);
+      this.loadData();
     } else {
-      this.getVendedor()
-      this.loadData()
+      this.getVendedor();
     }
   },
   data() {
     return {
-      ResumenFlag: false,
-      ProductosFlag: false,
       API: config.API,
       ventas: [],
       ingresos: [],
@@ -1260,9 +1189,6 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
-        this.totalVentasTransferencia +
         this.totalIngresos -
         this.totalSalidas -
         this.totalAdelantosActivos
@@ -1283,35 +1209,35 @@ export default {
     },
     totalIngresos() {
       let total = 0;
-      this.ingresos.forEach(ingreso => {
+      this.ingresos.filter(v => v.Anulado == 0).forEach(ingreso => {
         if (!ingreso.Anulado) total += ingreso.Importe;
       });
       return total;
     },
     totalIngresosTarjeta() {
       let total = 0;
-      this.ingresosTarjeta.forEach(ingresoTar => {
+      this.ingresosTarjeta.filter(v => v.Anulado == 0).forEach(ingresoTar => {
         if (!ingresoTar.Anulado) total += ingresoTar.Importe;
       });
       return total;
     },
     totalSalidasTarjeta() {
       let total = 0;
-      this.salidasTarjeta.forEach(salidaTar => {
+      this.salidasTarjeta.filter(v => v.Anulado == 0).forEach(salidaTar => {
         if (!salidaTar.Anulado) total += salidaTar.Importe;
       });
       return total;
     },
     totalAdelantos() {
       let total = 0;
-      this.adelantos.forEach(ade => {
+      this.adelantos.filter(v => v.Anulado == 0).forEach(ade => {
         if (!ade.Anulado) total += ade.Importe;
       });
       return total;
     },
     totalAdelantosActivos() {
       let total = 0;
-      this.adelantos.forEach(ade => {
+      this.adelantos.filter(v => v.Anulado == 0).forEach(ade => {
         if (!ade.Anulado && !ade.AnuladoVenta && !ade.EsCreditoVenta)
           total += ade.Importe;
       });
@@ -1319,7 +1245,7 @@ export default {
     },
     totalVentasEfectivo() {
       let total = 0;
-      this.ventasEfectivo.forEach(venta => {
+      this.ventasEfectivo.filter(v => v.Anulado == 0).forEach(venta => {
         if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
       });
       return total;
@@ -1367,7 +1293,7 @@ export default {
     },
     totalVentasCredito() {
       let total = 0;
-      this.ventasCredito.forEach(venta => {
+      this.ventasCredito.filter(v => v.Anulado == 0).forEach(venta => {
         if (!venta.Anulado) total += venta.Total;
       });
       return total;
@@ -1393,16 +1319,12 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          this.$nextTick(() => {
-            if (this.$refs.inputVendedor) {
-              this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-              this.$refs.inputVendedor.$refs.input.disabled = true;
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
 
           if (response.data.IdUsuarioPerfil !== 1) {
-                this.$refs.inputVendedor.$refs.input.disabled = true;
-              }
-            }
-          });
+            // this.$refs.inputVendedor.$refs.input.disabled = true
+          }
         })
         .catch(error => {
           console.log(error);
@@ -1410,44 +1332,27 @@ export default {
         });
     },
     imprimir() {
-      this.ProductosFlag = false;
-      this.ResumenFlag = true;
-      this.$nextTick(() => {
-        window.print();
-      });
-    },
-    imprimirProductos() {
-      this.ProductosFlag = true;
-      this.ResumenFlag = false;
-      this.$nextTick(() => {
-        window.print();
-      });
+      window.print();
     },
     async loadData() {
       await this.getVentas();
       await this.getIngresos();
       await this.getSalidas();
+
       await this.generarReporte();
       // console.log(this.ventas);
     },
     generarReporte() {
       let productos = [];
-
-      this.ventas
-        .filter(
-          ventas =>
-            !ventas.Anulado &&
-            (ventas.Efectivo > 0 ||
-              ventas.Visa > 0 ||
-              ventas.Mastercard > 0 ||
-              ventas.Transferencia > 0)
-        )
-        .forEach(venta => {
+      this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
+        console.log(venta);
+        if (venta.productos) {
           venta.productos.forEach(producto => {
             productos.push(producto);
           });
-        });
-      console.log(productos);
+        }
+      });
+
       const productosUnicos = Array.from(
         new Set(productos.map(item => item.IdProducto))
       ).map(producto => {
@@ -1497,6 +1402,7 @@ export default {
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
+            idAlmacen: sessionStorage.getItem("IdAlmacen"),
             totalVentas: this.totalVentas
           })
           .then(res => {
@@ -1519,10 +1425,8 @@ export default {
     },
     async loadDetalles() {
       await this.axios
-        .get(this.API + "ventas/detalle", {
-          params: {
-            idDocVentas: this.ventas.map(item => item.idDocVenta)
-          }
+        .post(this.API + "ventas/detalle", {
+          idDocVentas: this.ventas.map(item => item.idDocVenta)
         })
         .then(response => {
           this.itemsDetalle = response.data;
@@ -1540,7 +1444,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario;
+        params.usuario = this.vendedor.Usuario;
       }
       // cierre de caja enviar el vendedor
       await this.axios
@@ -1561,15 +1465,16 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario;
+        params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/ingresos", {
           params: params
         })
         .then(res => {
-          this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
-          this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
+          this.ingresos = res.data;
+          // this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
+          // this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
         })
         .catch(err => {
           console.log(err);
@@ -1580,27 +1485,25 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario;
+        params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/salidas", {
           params: params
         })
         .then(res => {
-          this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
-          this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
+          this.salidas = res.data;
+          // this.salidas = res.data.filter(sal => sal.EsTarjeta == 0);
+          // this.salidasTarjeta = res.data.filter(sal => sal.EsTarjeta == 1);
         })
         .catch(err => {
           console.log(err);
         });
     },
     getAdelantos() {
-      let params = {
-        idDocVentas: this.ventas.map(v => v.idDocVenta)
-      };
       this.axios
-        .get(this.API + "cierrecaja/ingresos/adelantos", {
-          params: params
+        .post(this.API + "cierrecaja/ingresos/adelantos", {
+          idDocVentas: this.ventas.map(v => v.idDocVenta)
         })
         .then(res => {
           this.adelantos = res.data;
@@ -1627,10 +1530,6 @@ export default {
 };
 </script>
 <style scoped>
-.clsScroll {
-  max-height: 820px;
-  overflow-y: auto;
-}
 /*th {
   background-color: #f1f1f1;
 }
@@ -1662,6 +1561,7 @@ th {
 }
 .total {
   background-color: #e4ff95;
+  color: #000000;
 }
 .total-salida {
   background-color: #ffd4d3;
@@ -1700,29 +1600,28 @@ th {
 .si-print {
   display: none;
 }
-.si-print-productos {
-  display: none;
-}
 @media print {
   .no-print {
     display: none;
   }
   .si-print {
-    max-width: 850px;
-    display: block;
-  }
-  .si-print-productos {
     max-width: 350px;
     display: block;
   }
   .table {
-    max-width: 850px;
-    font-size: 1em;
+    max-width: 350px;
+    font-size: 0.5em;
   }
   th {
     background: #ffffff !important;
     color: #000000 !important;
     border: 1px solid #ffffff;
   }
+}
+
+.clsVentas {
+  overflow-y: auto;
+  max-height: 720px !important;
+  scroll-behavior: auto;
 }
 </style>
