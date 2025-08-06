@@ -920,7 +920,7 @@ export default {
                 this.$toasted.show('Proforma Guardada con exito')
                 this.limpiarDespuesVenta()
                  this.loadClienteVarios()
-                window.open('/imprimir/proforma.php?IdProforma=' + response.data.insertId,'_blank');
+                window.open('/nuevo/index.html#/reportes/proforma/' + response.data.insertId,'_blank');
             })
             .catch((error) => {
                 console.log(error)
