@@ -2004,18 +2004,21 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
+
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
         return;
       }
+
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         return;
       }
+
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
@@ -2026,94 +2029,45 @@ export default {
         this.$toasted.show("Debe seleccionar un método de pago");
         return;
       }
-
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
 
         return;
       }
+      console.log("a");
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+
         return;
       }
-
+      console.log("b");
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        return;
-      }
-      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
 
         return;
       }
+      console.log("c");
+      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
+
+        return;
+      }
+      console.log("d");
       if (
         venta.tipoVenta.CodSunat == "07" ||
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
 
           return;
         }
@@ -2127,38 +2081,13 @@ export default {
           item => item.value == venta.NotaIdMotivo
         )[0].text;
       }
+      console.log("e");
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("DNo hay productos para vender");
 
         return;
       }
-      // console.log(productos);
-      // if (
-      //   productos.some(
-      //     v =>
-      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-      //       v.stock
-      //   )
-      // ) {
-      //   this.$swal({
-      //     position: "center",
-      //     icon: "info",
-      //     title: "No se puede vender un producto sin stock",
-      //     showConfirmButton: true,
-      //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
-      //     confirmButtonColor: "#0275d8"
-      //   });
-      //   return;
-      // }
+      console.log("f");
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
@@ -2187,6 +2116,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           window.open(
@@ -2340,60 +2270,27 @@ export default {
       }
 
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
 
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
 
         return;
       }
@@ -2402,30 +2299,12 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
 
           return;
         }
@@ -2440,15 +2319,7 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No hay productos para vender");
 
         return;
       }

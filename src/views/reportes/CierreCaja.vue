@@ -347,7 +347,7 @@
             <tr>
               <td colspan="3"></td>
               <td><b>Total Credito</b></td>
-              <td><b>S/. {{ totalVentasCredito |  redondear }}</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
