@@ -38,25 +38,29 @@
             <table class="table table-hover table-striped ">
                 <thead>
                     <tr>
-                      <th>Id</th>
-                      <th>Vendedor</th>
-                      <th>Fecha Doc</th>
-                      <th>Cod. Sunat</th>
-                      <th>Tipo Doc.</th>
-                      <th>Anulado</th>
-                      <th>Serie</th>
-                      <th>Número</th>
-                      <th>SubTotal</th>
-                      <th>IGV</th>
-                      <th>Total</th>
-                      <th></th>
+                      <th width="5%" style="text-align: center;">Id</th>
+                      <th width="10%" style="text-align: center;">Vendedor</th>
+                      <th width="10%" style="text-align: center;">Fecha Doc</th>
+                      <th width="15%" style="text-align: center;">Cliente</th>
+                      <th width="5%" style="text-align: center;">Crédito</th>
+                      <th width="7%" style="text-align: center;">Cod. Sunat</th>
+                      <th width="7%" style="text-align: center;">Tipo Doc.</th>
+                      <th width="7%" style="text-align: center;">Anulado</th>
+                      <th width="3%" style="text-align: center;">Serie</th>
+                      <th width="3%" style="text-align: center;">Número</th>
+                      <th width="6%" style="text-align: center;">SubTotal</th>
+                      <th width="5%" style="text-align: center;">IGV</th>
+                      <th width="10%" style="text-align: center;">Total</th>
+                      <th width="7%"></th>
                     </tr>
                 </thead>
                 <tbody class="scrollable-tbody">
                     <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirModalDetalle(reporte)" :class="{'clsAnulado': reporte.Anulado == 1}">
                         <td style="text-align: center;">{{reporte.idDocVenta}}</td>
-                        <td>{{reporte.UsuarioReg}}</td>
+                        <td style="text-align: center;">{{reporte.UsuarioReg}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
+                        <td style="text-align: center;">{{reporte.Cliente}}</td>
+                        <td style="text-align: center;">{{reporte.EsCredito == 1 ? 'SI' : 'NO'}}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
                         <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
