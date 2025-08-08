@@ -51,7 +51,7 @@
                   </b-form-group>
                   <b-form-group>
                     Total Costo:
-                    <input v-model="selectProducto.TotalGasto" readonly required type="number" class="form-control" step="0.01" placeholder="S/." />
+                    <input v-model="selectProducto.TotalGasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
                   </b-form-group>
                  
                   <label>Descripción:</label>
@@ -281,7 +281,7 @@ export default {
 
       this.selectProducto.Cantidad = 1;
       this.selectProducto.Gasto = valor.PrecioCosto;
-      this.selectProducto.TotalGasto = valor.PrecioCosto;
+      this.selectProducto.TotalGasto = valor.PrecioCosto * this.selectProducto.Cantidad;
       this.recalcularTotal();
     },
     async insertarGasto() {
