@@ -90,7 +90,7 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no" style="text-align: center; vertical-align: middle;">{{ index+1 }}</td>
             <td style="text-align: center; vertical-align: middle;"><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:0.75rem">{{ prod.Producto }}</h3>{{ prod.Descripcion }}</td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:black; font-size:0.75rem">{{ prod.Producto }} ({{ prod.Descripcion }})</h3></td>
             <td class="qty" style="font-size:0.75rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:0.75rem">S/. {{ prod.Precio | moneda }}</td>
             <td class="total" style="font-size:0.75rem">
