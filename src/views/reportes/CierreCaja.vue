@@ -377,7 +377,7 @@
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col v-if="salidas.length>0">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
@@ -1202,9 +1202,9 @@ export default {
     },
     totalSalidas() {
       let total = 0;
-      this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe;
-      });
+      // this.salidas.forEach(salida => {
+      //   if (!salida.Anulado) total += salida.Importe;
+      // });
       return total;
     },
     totalIngresos() {
@@ -1345,7 +1345,6 @@ export default {
     generarReporte() {
       let productos = [];
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
-        console.log(venta);
         if (venta.productos) {
           venta.productos.forEach(producto => {
             productos.push(producto);

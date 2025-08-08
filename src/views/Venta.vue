@@ -183,6 +183,7 @@
                       </p>
                   </template>
                   <template slot="precio" slot-scope="data">
+                  
                     <input
                       :disabled="data.item.bloquearInputPrecio"
                       v-model="data.item.precio"
@@ -205,7 +206,11 @@
                       @focus="abrirModalTouch(data.index,3)"
                       @input="metodoPagoCambio(1)"
                       class="form-control"
+                      :class="data.item.PrecioCosto * data.item.cantidad < data.item.descuento  ? 'clsError' : ''"
                       />
+                      <p v-if="data.item.PrecioCosto * data.item.cantidad < data.item.descuento" style="font-size: 0.7rem; color: red;">
+                        Descuento Excede al P. C.
+                      </p>
                      
                   </template>
                   <template slot="subtotal" slot-scope="data">
@@ -1174,14 +1179,13 @@ export default {
     });
   },
   methods: {
-
     configStock() {
       this.axios
         .get(this.API + "config/stock")
         .then(res => {
           //this.ventaSinStock = parseInt(res.data); // por si devuelve string
           this.ventaSinStock = parseInt(res.data.VENTASINSTOCK); // CORREGIDO
-           console.log("Respuesta de /config/stock:", res.data);
+          console.log("Respuesta de /config/stock:", res.data);
         })
         .catch(err => {
           this.ventaSinStock = 0; // fallback: sí permite la venta si hay error
@@ -1922,25 +1926,24 @@ export default {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
-      
-      //this.$toasted.show("prueba de mensaje");
-         // Validación de stock | 0=false (deshabilitado)
-        if (this.ventaSinStock === 0) {
-          const sinStock = productos.some(
-            p =>
-              p.cantidad * (p.CantidadPresentacion || 1) > p.stock
-          );
 
-          if (sinStock) {
-             this.$swal({
-              title: "No se puede vender un producto sin stock",
-              icon: "error",
-              confirmButtonColor: "#d33",
-              confirmButtonText: "Aceptar"
-            })
-            return;
-          }
+      //this.$toasted.show("prueba de mensaje");
+      // Validación de stock | 0=false (deshabilitado)
+      if (this.ventaSinStock === 0) {
+        const sinStock = productos.some(
+          p => p.cantidad * (p.CantidadPresentacion || 1) > p.stock
+        );
+
+        if (sinStock) {
+          this.$swal({
+            title: "No se puede vender un producto sin stock",
+            icon: "error",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Aceptar"
+          });
+          return;
         }
+      }
       totalPagos +=
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
@@ -2016,7 +2019,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
         return;
-
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
         //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
@@ -2087,7 +2089,14 @@ export default {
 
         return;
       }
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);   
+
+      productos.length.forEach(prod => {
+        if (prod.PrecioCosto * prod.cantidad < prod.descuento) {
+          return;
+        }
+      });
+
+      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2628,6 +2637,9 @@ export default {
 };
 </script>
 <style scoped>
+.clsError {
+  border: 1px solid red !important;
+}
 .alert {
   margin-bottom: 0;
 }
