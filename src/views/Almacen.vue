@@ -188,6 +188,20 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Botapie:</label>
+                  <autocomplete
+                    :url="API + 'productos/botapies'"
+                    ref="inputBotapie"
+                    anchor="Botapie"
+                    label="writer"
+                    :on-select="val => generateFilter('botapie', val.Botapie)"
+                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
             </b-row>
           </b-col>
         </b-row>
@@ -365,6 +379,7 @@ export default {
             { key: 'Color', sortable: true },
             { key: 'ProductoTalla', label: 'Talla', sortable: true },
             { key: 'Genero', sortable: true },
+            { key: 'Botapie', sortable: true },
             { key: 'stock', sortable: false, variant: '', class:'text-center'}
       ],
       totalRows: 50,
