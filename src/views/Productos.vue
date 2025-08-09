@@ -90,8 +90,8 @@ export default {
         { key: "ProductoModelo", label: "Modelo", sortable: true },
         { key: "Color", sortable: true },
         { key: "ProductoTalla", label: "Talla", sortable: true },
-        { key: "Genero", sortable: true }
-        //{ key: 'Botapie', sortable: true }
+        { key: "Genero", sortable: true },
+        { key: 'Botapie', sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
