@@ -385,7 +385,7 @@
               <b>
                 Total: {{ 
                     (producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
-                    (producto.precios[i-1].precioc? producto.precios[i-1].precioc : 0)
+                   g (producto.precios[i-1].precioc? producto.precios[i-1].precioc : 0)
                   }}
               </b>
              </p>
