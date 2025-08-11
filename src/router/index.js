@@ -23,6 +23,9 @@ import Articulosmovimientos from "@/views/reportes/Articulosmovimientos.vue";
 import Vencimiento from "@/views/reportes/Vencimiento.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -133,5 +136,20 @@ export default new Router({
       name: "Dashboard",
       component: Dashboard
     },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
+    {
+      path: "/reportes/reporte_utilidad_bruta",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
+    }
   ]
 });
