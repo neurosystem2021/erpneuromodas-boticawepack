@@ -207,7 +207,6 @@
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <input 
-              required="required"
               v-model="producto.PorcentajeUtilidad"
               @input="actualizarPrecioContado"
               type="number"
@@ -242,6 +241,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
+              @input="actualizarPorcentajeUtilidad"
               type="number"
               class="form-control"
               step="0.0001"
@@ -438,7 +438,7 @@ export default {
       }
       this.$nextTick(() => {
         if (this.manterproducto) {
-          this.producto.Producto = this.preproducto.Producto;
+          this.producto.Producto = this.preproducto.Producto.split("-")[0].trim();
           this.producto.PrecioCosto = this.preproducto.PrecioCosto;
 
           this.$forceUpdate();
@@ -493,7 +493,8 @@ export default {
           .join();
         this.producto.IdProducto = newVal.IdProducto;
         this.producto.Genero = newVal.Genero;
-        //this.producto.Botapie = newVal.Botapie
+        this.producto.Botapie = newVal.Botapie;
+        this.producto.Talla = newVal.Talla;
         this.producto.Color = newVal.Color;
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
         this.producto.StockMinimo = newVal.StockMinimo;
@@ -524,6 +525,16 @@ export default {
     }
   },
   methods: {
+    actualizarPorcentajeUtilidad() {
+      const costo = parseFloat(this.producto.PrecioCosto) || 0;
+      const venta = parseFloat(this.producto.PrecioContado) || 0;
+
+      if (venta > 0) {
+        this.producto.PorcentajeUtilidad = Number(((venta - costo) / costo * 100).toFixed(2));
+      } else {
+        this.producto.PorcentajeUtilidad = 0;
+      }
+    },
     activarPresentacion(e) {
       // this.producto.TienePresentacion = Number(e);
       console.log(this.producto.TienePresentacion);
@@ -577,6 +588,7 @@ export default {
             10
         ) /
           10;
+      this.actualizarPorcentajeUtilidad();
     },
     actualizarPrecioContado() {
       var precioCosto = this.producto.PrecioCosto;

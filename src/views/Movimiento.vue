@@ -236,6 +236,7 @@ export default {
           { key: "Color", label: "Color" },
           { key: "ProductoTalla", label: "Talla" },
           { key: "Genero" },
+          { key: "Botapie", label: "Botapie" },
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           {
