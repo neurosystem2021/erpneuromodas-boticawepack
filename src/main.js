@@ -12,6 +12,9 @@ import VueAxios from "vue-axios";
 import Toasted from "vue-toasted";
 import VueMoment from "vue-moment";
 import { detect } from "detect-browser";
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+Vue.use(VueSweetalert2)
 
 const browser = detect();
 
