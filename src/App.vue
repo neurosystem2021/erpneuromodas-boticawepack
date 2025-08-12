@@ -20,4 +20,19 @@ export default {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+.clsCaja {
+  padding: 15px !important;
+  margin: 5px 0px !important;
+  border: 2px solid #1a237e !important;
+  border-radius: 25px !important;
+  box-shadow: 3px 3px #1a237e !important;
+}
+.clsCuenta {
+  padding: 15px !important;
+  margin: 5px 0px !important;
+  border: 2px solid #1a237e !important;
+  border-radius: 25px !important;
+  box-shadow: 3px 3px #1a237e !important;
+}
 </style>

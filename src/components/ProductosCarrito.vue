@@ -845,7 +845,7 @@ export default {
       this.$refs["modalCant"].show();
     },
     setProductoUni(objIni, presentacion = false) {
-      console.log('objIni',objIni)
+      console.log("objIni", objIni);
       let obj = { ...objIni };
       obj.cantxPrecio = 1;
       if (presentacion) {
@@ -1111,7 +1111,8 @@ export default {
 };
 </script>
 
-<style>
+
+<style scoped>
 .danger {
   background-color: #ff7675;
   color: #ffffff;
