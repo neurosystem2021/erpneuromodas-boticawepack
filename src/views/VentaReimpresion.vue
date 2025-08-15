@@ -44,10 +44,15 @@
           
               <template slot="Reimprimir" slot-scope="data">
                   <a class="btn btn-success mx-1" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-                   <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
-                    GUÍA REMISIÓN
-                   </b-button>
                   <!-- <a class="btn btn-success mx-1" > GUÍA REMISIÓN</a> -->
+              </template>
+              <template slot="Guia" slot-scope="data">
+                <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
+                 GUÍA REMISIÓN
+                </b-button>              
+              </template>
+              <template slot="XML" slot-scope="data">
+                <b-button variant="warning" @click="descargarXML(data.item)">XML</b-button>
               </template>
           </b-table>
             <b-row>
@@ -89,7 +94,9 @@ export default {
         { key: "TipoDoc", sortable: true },
         { key: "Cliente", sortable: true },
         { key: "Total", sortable: true },
-        { key: "Reimprimir" }
+        { key: 'Reimprimir', label:'Reimprimir', class:'text-center' },
+        { key: 'Guia', label:'Guia', class:'text-center' },
+        { key: 'XML', label:'Reimprimir', class:'text-center' }
       ],
       totalRows: 50,
       perPage: 10,
@@ -97,6 +104,45 @@ export default {
     };
   },
   methods: {
+    descargarXML: function (doc) {
+    if (!doc || !(doc.idDocVenta || doc.IdDocVenta)) {
+      this.$toasted.error("Id de venta no disponible");
+      return;
+    }
+
+    this.axios.post(this.API + 'emitirelectronico', {
+      generarXml: true,
+      docVenta: doc
+    })
+    .then(function (response) {
+      if (response.data.success) {
+        this.$toasted.success(response.data.msj_sunat || "XML generado correctamente");
+
+        var id = doc.idDocVenta || doc.IdDocVenta;
+        this.axios.get(this.API + 'imprimirxml/' + id)
+          .then(function (res) {
+            if (res.data.success && res.data.xmlBase64) {
+              var blob = new Blob(
+                [Uint8Array.from(atob(res.data.xmlBase64), c => c.charCodeAt(0))],
+                { type: 'application/xml' }
+              );
+              var link = document.createElement('a');
+              link.href = window.URL.createObjectURL(blob);
+              link.download = res.data.nombreArchivo; // ← nombre exacto del backend
+              link.click();
+            } else {
+              this.$toasted.error("No se pudo obtener el XML");
+            }
+          }.bind(this));
+      } else {
+        this.$toasted.error(response.data.msj_sunat || "Error generando XML");
+      }
+    }.bind(this))
+    .catch(function (error) {
+      console.error(error);
+      this.$toasted.error("Error en la petición");
+    }.bind(this));
+  },
     rowClick(item, index) {
       this.productoSelect = item;
       //this.$refs.productoForm.producto.IdProducto = 'a'
