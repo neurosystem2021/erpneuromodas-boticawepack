@@ -62,7 +62,7 @@
   
   #client {
     padding-left: 6px;
-    border-left: 6px solid #57B223;
+    border-left: 6px solid #FFA52B;
     float: left;
     width: 12cm;
   }
@@ -131,7 +131,7 @@
   table .no {
     color: #FFFFFF;
     font-size: 1em;
-    background: #57B223;
+    background: #FFA52B;
   }
   
   table .desc {
@@ -153,7 +153,7 @@
   }
   
   table .total {
-    background: #57B223;
+    background: #FFA52B;
     color: black;
     text-align: right;
   }
@@ -209,7 +209,7 @@
   
   #notices{
     padding-left: 6px;
-    border-left: 6px solid #57B223;
+    border-left: 6px solid #FFA52B;
   }
   
   #notices .notice {
