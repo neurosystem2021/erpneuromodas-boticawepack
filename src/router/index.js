@@ -42,6 +42,7 @@ import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
+import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -246,6 +247,11 @@ export default new Router({
       path: "/reporte/confrontacion",
       name: "Confrontacion",
       component: Confrontacion
+    },
+    {
+      path: "/BuscadorCajaBanco",
+      name: "BuscadorCajaBanco",
+      component: BuscadorCajaBanco
     }
   ]
 });

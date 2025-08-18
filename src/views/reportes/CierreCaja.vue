@@ -29,7 +29,10 @@
               <cierres-caja></cierres-caja>
             </b-button-group>
             <b-button-group size="sm">
-              <b-button variant="outline-primary" @click="imprimir">IMPRIMIR</b-button>
+              <b-button variant="outline-primary" @click="imprimir(true)">IMPRIMIR</b-button>
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-danger" @click="imprimir(false)">IMPRIMIR DETALLADO</b-button>
             </b-button-group>
           </b-col>
       </b-row>
@@ -95,7 +98,7 @@
         </b-col>
       </b-row>
 
-      <div class="si-print">         
+      <div class="si-print" v-if="resumenFlag">          
           <h2>Resumen Por Producto</h2>
           <table class="table">
               <thead>
@@ -116,42 +119,309 @@
               </tbody>
 
           </table>
-          </div>
-       <!--<b-row  class="no-print">
-        <b-col>
-          <table class="table b-table table-sm table-striped table-bordered">
+      </div>
+      <div class="si-print px-5" v-else>          
+      <b-row>
+        <h5>Ventas Efectivo</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>
+                <table class="table table-sm" style="font-size: 0.75rem;">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Efectivo | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Efectivo</b></td>
+              <td class="total"><b>S/. {{ totalVentasEfectivo | redondear  }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row>
+        <h5>Ventas Tarjeta Débito o Crédito</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+               <td>
+                <table class="table table-sm" style="font-size: 0.75rem;">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Visa | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Tarjeta Débito o Crédito</b></td>
+              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+ 
+      <b-row class="">
+        <h5>Ventas Yape, Plin o Transf.</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+             
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>
+                <table class="table table-sm" style="font-size: 0.75rem;">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Mastercard | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Yape, Plin o Transf.</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row class="credito" >
+        <h5>Ventas a Credito</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+             
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+               <td>
+                <table class="table table-sm" style="font-size: 0.75rem;">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>S/. {{ item.Total | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"></td>
+              <td><b>Total Credito</b></td>
+              <td><b>S/. {{ totalVentasCredito | moneda }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+
+      <b-row class="">
+        <b-col v-if="totalIngresos">
+          <h5>Ingresos</h5><br>
+          <table class="table b-table table-sm">
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>TipoDoc</th>
-                <th>Serie</th>
-                <th>Numero</th>
-                <th>Total</th>
-                <th>Condición Venta</th>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(venta, index) in ventas" :key="index">
-                <td>{{ venta.FechaDoc }}</td>
-                <td>{{ venta.TipoDoc }}</td>
-                <td>{{ venta.Serie }}</td>
-                <td>{{ venta.Numero }}</td>
-                <td>{{ venta.Total | moneda }}</td>
-                <td>{{ estadoVenta(venta) }}</td>
-              </tr>-->
-              <!--<tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="(item, index) in ingresos" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
-                <td>RECIBO</td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
-              </tr>-->
-             <!--</tbody>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+              </tr>
+            </tfoot>
           </table>
         </b-col>
-      </b-row>-->
+        <b-col v-if="totalSalidas">
+          <h5>Salidas</h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
+      </div>
+
       
-      <b-tabs content-class="mt-3" class="no-print">
-        <b-tab title="Productos" active>
+      <b-tabs content-class="mt-3" class="no-print" pills card fill justified align="center">
+        <b-tab title="Productos" active >
           <div class="">         
           <h2>Resumen Por Producto</h2>
           <table class="table table-sm">
@@ -181,7 +451,6 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -244,7 +513,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
             </tr>
           </thead>
           <tbody>
@@ -252,7 +526,36 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.VisaDesc }}</td>
+               <td>
+                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
+                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Visa | redondear }}</td>
             </tr>
@@ -272,7 +575,14 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+             
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
             </tr>
           </thead>
           <tbody>
@@ -280,7 +590,36 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ item.MastercardDesc }}</td>
+              <td>
+                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
+                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
               <td>{{ estadoVenta(item) }}</td>
               <td>S/. {{ item.Mastercard | redondear }}</td>
             </tr>
@@ -300,7 +639,14 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
+             
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
             </tr>
           </thead>
           <tbody>
@@ -308,7 +654,36 @@
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
-              <td>{{ estadoVenta(item) }}</td>
+               <td>
+                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
+                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
               <td>S/. {{ item.Total | redondear }}</td>
             </tr>
           </tbody>
@@ -402,6 +777,7 @@ export default {
   },
   data() {
     return {
+      resumenFlag: false,
       API: config.API,
       ventas: [],
       ingresos: [],
@@ -520,8 +896,11 @@ export default {
       this.vendedor = obj;
       this.loadData();
     },
-    imprimir() {
-      window.print();
+    imprimir(estado) {
+      this.resumenFlag = estado;
+      setTimeout(() => {
+        window.print();
+      }, 500);
     },
     async loadData() {
       console.log(Date());
