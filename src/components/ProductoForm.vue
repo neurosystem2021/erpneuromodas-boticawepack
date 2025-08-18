@@ -62,7 +62,6 @@
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
-                required="required"
                 :url="API + 'productos/modelos'"
                 ref="inputModelo"
                 anchor="ProductoModelo"
@@ -268,7 +267,14 @@
               Tiene Presentacion
             </b-form-checkbox>
           </b-form-group>
-
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.ExcluyeStock"
+                   :value="1"
+                   :unchecked-value="0">
+              Excluye a stock
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group v-if="producto.IdProducto" style="border: 1.7px dashed #0020FF; padding: 10px; ">
             <label>Pedi2.pe:</label> <img src="static/logo.png" style="width: 32px" /><br>
             <b-form-checkbox
@@ -578,6 +584,7 @@ export default {
               this.producto.MostrarApp = newVal.MostrarApp;
               this.producto.PosOferta = newVal.PosOferta;
               this.producto.TienePresentacion = newVal.TienePresentacion;
+              this.producto.ExcluyeStock = newVal.ExcluyeStock;
               this.producto.PorcentajeLiquidacion =
                 newVal.PorcentajeLiquidacion;
 
@@ -801,6 +808,7 @@ export default {
         IdOfertaCategoria: null,
         PorcentajeLiquidacion: 0,
         TienePresentacion: 0,
+        ExcluyeStock: 0,
         // modelo: {},
         //talla: {},
         EsServicio: 0,
