@@ -1897,15 +1897,15 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-      this.$swal({
-        title: "Procesando...",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
+      // this.$swal({
+      //   title: "Procesando...",
+      //   text: "Por favor espera",
+      //   allowOutsideClick: false,
+      //   showConfirmButton: false,
+      //   didOpen: () => {
+      //     this.$swal.showLoading();
+      //   }
+      // });
 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
@@ -1944,60 +1944,62 @@ export default {
       }
 
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "Debe seleccionar un cliente",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "El RUC debe ser numérico, editar cliente.",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title:
+        //     "Una factura debe ser emitida para una empresa, no a un usuario común",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "Una boleta no debe ser emitida para una empresa",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
@@ -2006,30 +2008,30 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Documento de Referencia...",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Motivo",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
@@ -2044,15 +2046,16 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No hay productos para vender");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "No hay productos para vender",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
@@ -2065,15 +2068,15 @@ export default {
         ) &&
         this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
       ) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No se puede vender un producto sin stock");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
 
@@ -2331,6 +2334,12 @@ export default {
           );
         }
 
+        if (this.ventas.length == 1) {
+          window.location.reload();
+        } else {
+          this.eliminarVentana();
+          this.getVendedorInfo();
+        }
         // setTimeout(() => {
         //   if (this.ventas.length == 1) {
         //     window.location.reload();
