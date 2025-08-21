@@ -534,8 +534,8 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = this.productoSelect.PrecioContado*(this.productoSelect.TienePerdida==1?(this.productoSelect.Largo==this.largo?1:1.2):1)/(this.productoSelect.Largo/100)*this.largo/100
-        //let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo
+        let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo;
+        precio = this.redondearPrecio(precio);
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
         return;
@@ -548,8 +548,9 @@ export default {
       // let largo = (largo == '0' ) ? false : prod.Largo;
 
       if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
-        this.pie2corte = (((Number(this.ancho)+Number(this.perdida>0?this.perdida:0))*(Number(this.largo)+Number(this.perdida>0?this.perdida:0))/this.factor)*10)/10
+        this.pie2corte = ((this.ancho*this.largo/this.factor)*10)/10;
         let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
+        precio = this.redondearPrecio(precio);
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
       }
@@ -600,6 +601,17 @@ export default {
       //   this.productoSelect.cantidad = 1
       // }
 
+    },
+    redondearPrecio(precio) {
+    // Redondear a los incrementos más cercanos de 0.50 céntimos
+    let resto = precio % 0.50;
+    if (resto === 0) {
+      return precio;
+    } else if (resto < 0.25) {
+      return precio - resto; // Redondear hacia abajo al múltiplo de 0.50 más cercano
+    } else if (resto < 0.50) {
+      return precio - resto + 0.50; // Redondear hacia arriba al múltiplo de 0.50 más cercano
+    }
     },
     seleccionarCalcularM2 () {
       if(this.productoSelect.SoloLargo==1 && (this.largo == 0 || this.largo=='')){
