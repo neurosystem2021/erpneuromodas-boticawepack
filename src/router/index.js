@@ -31,6 +31,7 @@ import Remision from "@/views/Remision.vue";
 import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
+import Cotizacion from "@/views/Cotizacion.vue";
 
 Vue.use(Router);
 
@@ -181,6 +182,11 @@ export default new Router({
       path: "/RegistroVehiculoXCliente",
       name: "RegistroVehiculoXCliente",
       component: RegistroVehiculoXCliente
+    },
+    {
+      path: "/Cotizacion",
+      name: "Cotizacion",
+      component: Cotizacion
     },
   ]
 });
