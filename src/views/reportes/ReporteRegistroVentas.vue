@@ -31,7 +31,7 @@
           </b-form-checkbox>
         </b-col>
         <b-col cols="2" class="pt-4">
-            <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+            <b-button variant="info" @click="abrirModalSeleccionTipoDePago()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
@@ -60,7 +60,7 @@
                         <td style="text-align: center;">{{reporte.UsuarioReg}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
                         <td style="text-align: center;">{{reporte.Cliente}}</td>
-                        <td style="text-align: center;">{{reporte.EsCredito == 1 ? 'SI' : 'NO'}}</td>
+                        <td style="text-align: center;">{{reporte.TipoPago }}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
                         <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
@@ -74,7 +74,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="10">Total</td>
+                        <td colspan="12">Total</td>
                         <td style="text-align: center;">{{footerTotal}}</td>
                         <td colspan="1"></td>
                     </tr>
@@ -113,6 +113,14 @@
           </table>
         
     </b-modal>
+    <b-modal v-model="dlgGenerar" title="Generar Reporte" @ok="generarReporte">
+        <p> Tipo de Pago:</p>
+        <input type="radio" v-model="tipoPago" id="todos" :value="0" label="TODOS"  placeholder="TODOS"/> <label for="todos">TODOS</label> <br>
+        <input type="radio" v-model="tipoPago" id="Efectivo" :value="1" label="EFECTIVO"  placeholder="EFECTIVO"/> <label for="Efectivo">EFECTIVO</label> <br>
+        <input type="radio" v-model="tipoPago" id="Tarjeta" :value="2" label="TARJETA"  placeholder="TARJETA"/> <label for="Tarjeta">TARJETA</label> <br>
+        <input type="radio" v-model="tipoPago" id="Yape" :value="3" label="YAPE/PLIN"  placeholder="YAPE/PLIN"/> <label for="Yape">YAPE/PLIN</label> <br>
+        <input type="radio" v-model="tipoPago" id="TansBanc" :value="4" label="TRANSF. BAMC"  placeholder="TRANSF. BAMC"/> <label for="TansBanc">TRANSF. BANC</label> <br>
+    </b-modal>
   </b-container>
 </template>
 
@@ -122,6 +130,7 @@ export default {
   data() {
     return {
       dialogDetalle: false,
+      dlgGenerar: false,
       fechaInicio: "",
       fechaFin: "",
       almacen: 1,
@@ -155,7 +164,8 @@ export default {
         UtilidadBruta: 0,
         PorcentajeUti: 0
       },
-      detalle: []
+      detalle: [],
+      tipoPago: 0
     };
   },
   mounted() {
@@ -242,13 +252,18 @@ export default {
         window.open(url, "_blank");
       });
     },
+    abrirModalSeleccionTipoDePago() {
+      this.dlgGenerar = true;
+    },
+    
     async generarReporte() {
       this.lstReporte = [];
       let params = {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipoPago: this.tipoPago
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params
