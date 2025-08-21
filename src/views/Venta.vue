@@ -2090,7 +2090,7 @@ export default {
         return;
       }
 
-      productos.length.forEach(prod => {
+      productos.forEach(prod => {
         if (prod.PrecioCosto * prod.cantidad < prod.descuento) {
           return;
         }
