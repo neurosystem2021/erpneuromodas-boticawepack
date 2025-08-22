@@ -183,13 +183,13 @@
                       </p>
                   </template>
                   <template slot="precio" slot-scope="data">
-                  
                     <input
                       :disabled="data.item.bloquearInputPrecio"
                       v-model="data.item.precio"
                       min="0"
                       step="0.00001"
                       type="number"
+                      :class="data.item.precio < data.item.PrecioCosto ? 'clsError': ''"
                       @focus="abrirModalTouch(data.index,2)"
                       style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
                       autocomplete="false"  @input="metodoPagoCambio(1)"
@@ -2089,14 +2089,34 @@ export default {
 
         return;
       }
+      let val = true;
+      productos.forEach(prod => {
+        if (prod.precio * prod.cantidad < prod.descuento) {
+          this.$toasted.show(
+            "No puede vender un producto con descuenta mayor que la venta"
+          );
+          val = false;
+        }
+      });
+      // productos.forEach(prod => {
+      //   if (prod.precio * prod.cantidad < prod.descuento) {
+      //     return;
+      //   }
+      // });
 
       productos.forEach(prod => {
-        if (prod.PrecioCosto * prod.cantidad < prod.descuento) {
-          return;
+        if (prod.precio < prod.PrecioCosto) {
+          this.$toasted.show(
+            "No puede vender un producto por debajo del precio de Costo"
+          );
+          val = false;
         }
       });
 
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+      if (!val) {
+        return;
+      }
+
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2704,6 +2724,9 @@ export default {
 .pagocon .input-group-text {
   font-size: 0.8rem;
   font-weight: bold;
+}
+.clsError {
+  border: 1px solid red !important;
 }
 </style>
 <style>

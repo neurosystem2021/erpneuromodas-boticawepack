@@ -29,10 +29,13 @@
               <cierres-caja></cierres-caja>
             </b-button-group>
             <b-button-group size="sm">
-              <b-button variant="outline-primary" @click="imprimir(true)">IMPRIMIR</b-button>
+              <b-button variant="outline-primary" @click="imprimir(1)">IMPRIMIR</b-button>
             </b-button-group>
             <b-button-group size="sm">
-              <b-button variant="outline-danger" @click="imprimir(false)">IMPRIMIR DETALLADO</b-button>
+              <b-button variant="outline-danger" @click="imprimir(2)">IMPRIMIR DETALLADO</b-button>
+            </b-button-group>
+            <b-button-group size="sm">
+              <b-button variant="outline-danger" @click="imprimir(3)">IMPRIMIR PRODUCTOS</b-button>
             </b-button-group>
           </b-col>
       </b-row>
@@ -50,7 +53,7 @@
         <table class="table b-table table-sm table-striped table-bordered">
           <tbody>
             <tr>
-              <td>Total En Caja S/.</td>
+              <td>GRAN TOTAL S/.</td>
               <td>{{ granTotal | moneda }}</td>
             </tr>
           </tbody>
@@ -98,7 +101,7 @@
         </b-col>
       </b-row>
 
-      <div class="si-print" v-if="resumenFlag">          
+      <div class="si-print" v-if="tipo ==3">          
           <h2>Resumen Por Producto</h2>
           <table class="table">
               <thead>
@@ -120,7 +123,7 @@
 
           </table>
       </div>
-      <div class="si-print px-5" v-else>          
+      <div class="si-print px-5" v-if="tipo==2">          
       <b-row>
         <h5>Ventas Efectivo</h5><br>
         <table class="table b-table table-sm">
@@ -777,7 +780,7 @@ export default {
   },
   data() {
     return {
-      resumenFlag: false,
+      tipo: 1,
       API: config.API,
       ventas: [],
       ingresos: [],
@@ -896,8 +899,8 @@ export default {
       this.vendedor = obj;
       this.loadData();
     },
-    imprimir(estado) {
-      this.resumenFlag = estado;
+    imprimir(tipo) {
+      this.tipo = tipo;
       setTimeout(() => {
         window.print();
       }, 500);
