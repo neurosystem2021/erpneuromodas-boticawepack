@@ -43,6 +43,7 @@
                       <th width="10%" style="text-align: center;">Fecha Doc</th>
                       <th width="15%" style="text-align: center;">Cliente</th>
                       <th width="5%" style="text-align: center;">Crédito</th>
+                      <th width="5%" style="text-align: center;">Tipo Pago</th>
                       <th width="7%" style="text-align: center;">Cod. Sunat</th>
                       <th width="7%" style="text-align: center;">Tipo Doc.</th>
                       <th width="7%" style="text-align: center;">Anulado</th>
@@ -60,7 +61,8 @@
                         <td style="text-align: center;">{{reporte.UsuarioReg}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
                         <td style="text-align: center;">{{reporte.Cliente}}</td>
-                        <td style="text-align: center;">{{reporte.TipoPago }}</td>
+                        <td style="text-align: center;">{{reporte.EsCredito == 1 ? 'SI' : 'NO'}}</td>
+                         <td style="text-align: center;">{{reporte.TipoPago }}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
                         <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
@@ -115,11 +117,13 @@
     </b-modal>
     <b-modal v-model="dlgGenerar" title="Generar Reporte" @ok="generarReporte">
         <p> Tipo de Pago:</p>
-        <input type="radio" v-model="tipoPago" id="todos" :value="0" label="TODOS"  placeholder="TODOS"/> <label for="todos">TODOS</label> <br>
-        <input type="radio" v-model="tipoPago" id="Efectivo" :value="1" label="EFECTIVO"  placeholder="EFECTIVO"/> <label for="Efectivo">EFECTIVO</label> <br>
-        <input type="radio" v-model="tipoPago" id="Tarjeta" :value="2" label="TARJETA"  placeholder="TARJETA"/> <label for="Tarjeta">TARJETA</label> <br>
-        <input type="radio" v-model="tipoPago" id="Yape" :value="3" label="YAPE/PLIN"  placeholder="YAPE/PLIN"/> <label for="Yape">YAPE/PLIN</label> <br>
-        <input type="radio" v-model="tipoPago" id="TansBanc" :value="4" label="TRANSF. BAMC"  placeholder="TRANSF. BAMC"/> <label for="TansBanc">TRANSF. BANC</label> <br>
+        <input type="radio" v-model="tipoPago" id="todos" :value="0" /> <label for="todos">TODOS</label> <br>
+        <input type="radio" v-model="tipoPago" id="Efectivo" :value="1" /> <label for="Efectivo">EFECTIVO</label> <br>
+        <input type="radio" v-model="tipoPago" id="Tarjeta" :value="2" placeholder="TARJETA"/> <label for="Tarjeta">TARJETA</label> <br>
+        <input type="radio" v-model="tipoPago" id="Yape" :value="3" /> <label for="Yape">YAPE/PLIN</label> <br>
+        <input type="radio" v-model="tipoPago" id="TansBanc" :value="4"/> <label for="TansBanc">TRANSF. BANC</label> <br>
+        <input type="radio" v-model="tipoPago" id="Contado" :value="5" /> <label for="Contado">CONTADO</label> <br>
+        <input type="radio" v-model="tipoPago" id="Credito" :value="6" /> <label for="Credito">CRÉDITO</label> <br>
     </b-modal>
   </b-container>
 </template>
@@ -239,7 +243,8 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipoPago: this.tipoPago
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
@@ -255,7 +260,7 @@ export default {
     abrirModalSeleccionTipoDePago() {
       this.dlgGenerar = true;
     },
-    
+
     async generarReporte() {
       this.lstReporte = [];
       let params = {
