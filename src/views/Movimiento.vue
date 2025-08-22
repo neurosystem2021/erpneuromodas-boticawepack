@@ -323,8 +323,8 @@ export default {
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
           this.$browser.name == "chrome"
-            ? this.$moment().format("YYYY-MM-DDThh:mm:ss")
-            : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
+            ? this.$moment().format("YYYY-MM-DDTHH:mm:ss")
+            : this.$moment().format("YYYY-MM-DD HH:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
