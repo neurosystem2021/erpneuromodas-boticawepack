@@ -203,7 +203,7 @@
               </b-input-group>
             </b-col>
             <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
-                <b-button variant="success">Guardar Cotización</b-button>
+                <b-button variant="success" @click="guardarCotizacion">Guardar Cotización</b-button>
             </b-col>
           </b-row>
         </b-tab>
@@ -303,7 +303,10 @@ export default {
       vendedor: {},
       almacen: {},
       puntoVenta: {},
-      moneda: {},
+      moneda: {
+        IdMoneda: 1,
+        Moneda: "PEN"
+      },
       productos: [],
       TipoCambio: 1,
       garantia: "De Fabrica",
@@ -406,6 +409,70 @@ export default {
       obj.diasEntregaImportacion = 0;
       this.productos.unshift(obj);
       this.modalSeleccionarProducto = false;
+    },
+    guardarCotizacion() {
+      if (!(Object.keys(this.cliente).length > 0)) {
+        this.$toasted.error("Seleccione un Cliente. Verifique.", {
+          duration: 2000
+        });
+        return false;
+      }
+      if (!(Object.keys(this.vendedor).length > 0)) {
+        this.$toasted.error("Seleccione un Vendedor. Verifique.", {
+          duration: 2000
+        });
+        return false;
+      }
+      if (!(Object.keys(this.almacen).length > 0)) {
+        this.$toasted.error("Seleccione un Almacén. Verifique.", {
+          duration: 2000
+        });
+        return false;
+      }
+      if (!(Object.keys(this.puntoVenta).length > 0)) {
+        this.$toasted.error("Seleccione un Punto de Venta. Verifique.", {
+          duration: 2000
+        });
+        return false;
+      }
+      if (!(Object.keys(this.moneda).length > 0)) {
+        this.$toasted.error("Seleccione una Moneda. Verifique.", {
+          duration: 2000
+        });
+        return false;
+      }
+      if (this.productos.length == 0) {
+        this.$toasted.error(
+          "No existen Productos para la cotización. Verifique.",
+          {
+            duration: 2000
+          }
+        );
+      }
+
+      if (this.productos.some(v => v.cantidad < 0)) {
+        this.$toasted.error(
+          "No puede vender un producto con 0 o menos, cantidad. Verifique.",
+          {
+            duration: 2000
+          }
+        );
+      }
+      if (
+        this.productos.some(
+          v =>
+            (v.stock < 0 && !(v.cantidadSucursal || v.cantidadImportacion)) ||
+            (v.stock < v.cantidad &&
+              !(v.cantidadSucursal || v.cantidadImportacion))
+        )
+      ) {
+        this.$toasted.error(
+          "No puede vender un producto sin stock, sin que seleccione Cantidad en otra sucursal o Importación , cantidad. Verifique.",
+          {
+            duration: 2000
+          }
+        );
+      }
     }
   },
   computed: {
