@@ -145,7 +145,7 @@
               <div class="clsProductos">
                   <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
                     <template slot="cantidad" slot-scope="data">
-                      <input class="form-control" type="number" v-model="data.item.cantidad">
+                      <input :id="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
                     <template slot="precio" slot-scope="data">
                       <input class="form-control" type="number" v-model="data.item.precio">
@@ -190,6 +190,9 @@
                           ).toFixed(2)
                         }}
                     </template>
+                     <template slot="acciones" slot-scope="data">
+                       <b-button variant="danger" @click="eliminarProducto(data.index)"><i class="fas fa-trash-alt"></i></b-button>
+                     </template>
                     <!-- <template slot="observacion" slot-scope="data"></template> -->
                   </b-table>
                </div>
@@ -409,37 +412,46 @@ export default {
       obj.diasEntregaImportacion = 0;
       this.productos.unshift(obj);
       this.modalSeleccionarProducto = false;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          document.getElementById("cantidad0").focus();
+          document.getElementById("cantidad0").select();
+        }, 100);
+      });
     },
-    guardarCotizacion() {
+    eliminarProducto(index) {
+      this.productos.splice(index, 1);
+    },
+    async guardarCotizacion() {
       if (!(Object.keys(this.cliente).length > 0)) {
         this.$toasted.error("Seleccione un Cliente. Verifique.", {
           duration: 2000
         });
-        return false;
+        return;
       }
       if (!(Object.keys(this.vendedor).length > 0)) {
         this.$toasted.error("Seleccione un Vendedor. Verifique.", {
           duration: 2000
         });
-        return false;
+        return;
       }
       if (!(Object.keys(this.almacen).length > 0)) {
         this.$toasted.error("Seleccione un Almacén. Verifique.", {
           duration: 2000
         });
-        return false;
+        return;
       }
       if (!(Object.keys(this.puntoVenta).length > 0)) {
         this.$toasted.error("Seleccione un Punto de Venta. Verifique.", {
           duration: 2000
         });
-        return false;
+        return;
       }
       if (!(Object.keys(this.moneda).length > 0)) {
         this.$toasted.error("Seleccione una Moneda. Verifique.", {
           duration: 2000
         });
-        return false;
+        return;
       }
       if (this.productos.length == 0) {
         this.$toasted.error(
@@ -448,6 +460,7 @@ export default {
             duration: 2000
           }
         );
+        return;
       }
 
       if (this.productos.some(v => v.cantidad < 0)) {
@@ -457,6 +470,7 @@ export default {
             duration: 2000
           }
         );
+        return;
       }
       if (
         this.productos.some(
@@ -472,7 +486,35 @@ export default {
             duration: 2000
           }
         );
+        return;
       }
+
+      let data = {
+        IdCliente: this.cliente.IdCliente,
+        IdVendedor: this.vendedor.Usuario,
+        IdAlmacen: this.almacen.IdAlmacen,
+        IdPuntoVenta: this.puntoVenta.IdDocVentaPuntoVenta,
+        IdMoneda: this.moneda.IdMoneda,
+        TipoCambio: this.TipoCambio,
+        Garantia: this.garantia,
+        Observacion: this.observacion,
+        Direccion: this.CampoDireccion,
+        detalle: this.productos
+      };
+      await this.axios.post(`${this.API}cotizacion`, data).then(res => {
+        if (res.data) {
+          this.$swal({
+            icon: "success",
+            title: "Registro Correcto",
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          }).then(res => {
+            if (res.isConfirmed) {
+              window.location.reload();
+            }
+          });
+        }
+      });
     }
   },
   computed: {
