@@ -503,6 +503,10 @@ export default {
       };
       await this.axios.post(`${this.API}cotizacion`, data).then(res => {
         if (res.data) {
+          window.open(
+            "/nuevo/index.html#/reportes/proforma/" + res.data,
+            "_blank"
+          );
           this.$swal({
             icon: "success",
             title: "Registro Correcto",

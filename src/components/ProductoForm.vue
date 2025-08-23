@@ -222,8 +222,7 @@
                   ></b-form-input>
               </b-form-group>
 
-              <!-- <b-form-group>
-                {{ producto.Anaquel }}
+              <b-form-group>
                 <label>Anquel:</label>
                  <autocomplete
                     ref="inputAnaquel"
@@ -235,7 +234,7 @@
                     :onFocus="focusAutocomplete.bind(null, 'inputAnaquel')"
                     :classes="{input: 'form-control'}">
                 </autocomplete>
-              </b-form-group> -->
+              </b-form-group>
 
              
 
@@ -818,10 +817,10 @@ export default {
     },
     setAnquel(obj) {
       console.log(obj);
-      this.producto.Anaquel = obj;
+      this.producto.Anaquel = obj.Anaquel;
       this.$refs.inputAnaquel.setValue(obj.Anquel);
       console.log(this.producto.Anaquel)
-      // this.$forceUpdate();
+      this.$forceUpdate();
     },
     /* setModelo (obj) {
       this.producto.modelo = obj
