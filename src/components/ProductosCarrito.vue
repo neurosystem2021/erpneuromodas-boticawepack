@@ -534,12 +534,14 @@ export default {
     },
     calcularm2 () {
       if (this.productoSelect.SoloLargo) {
-        let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo;
+         // let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo;
+        let precio = this.productoSelect.PrecioContado * 1.2 / 6 * (this.largo / 100);
         precio = this.redondearPrecio(precio);
         this.precioCorte = precio.toFixed(2);
         this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
         return;
       }
+      // precio * 1.2 / 6 * (medida/100)
 
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       //halla el pie2
@@ -603,15 +605,9 @@ export default {
 
     },
     redondearPrecio(precio) {
-    // Redondear a los incrementos más cercanos de 0.50 céntimos
-    let resto = precio % 0.50;
-    if (resto === 0) {
-      return precio;
-    } else if (resto < 0.25) {
-      return precio - resto; // Redondear hacia abajo al múltiplo de 0.50 más cercano
-    } else if (resto < 0.50) {
-      return precio - resto + 0.50; // Redondear hacia arriba al múltiplo de 0.50 más cercano
-    }
+      // Siempre subir al próximo múltiplo de 0.10
+      let redondeado = Math.ceil(precio * 10) / 10;
+      return parseFloat(redondeado.toFixed(2));
     },
     seleccionarCalcularM2 () {
       if(this.productoSelect.SoloLargo==1 && (this.largo == 0 || this.largo=='')){
