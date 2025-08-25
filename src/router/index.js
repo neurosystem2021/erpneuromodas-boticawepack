@@ -32,6 +32,7 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Cotizacion from "@/views/Cotizacion.vue";
+import Cobros from "@/views/Cobros.vue";
 
 Vue.use(Router);
 
@@ -187,6 +188,11 @@ export default new Router({
       path: "/Cotizacion",
       name: "Cotizacion",
       component: Cotizacion
+    },
+    {
+      path: "/cobros",
+      name: "Cobros",
+      component: Cobros
     },
   ]
 });
