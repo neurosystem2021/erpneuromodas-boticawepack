@@ -200,6 +200,7 @@
                   <template slot="descuento" slot-scope="data">
                     <input
                       v-model="data.item.descuento"
+                      disabled
                       type="number"
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
