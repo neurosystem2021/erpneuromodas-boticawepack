@@ -204,6 +204,9 @@
               <b-input-group  class="my-2" prepend="Observacion:">
                 <b-form-textarea v-model="observacion" class="txtComentario" /> 
               </b-input-group>
+              <b-input-group  class="my-2" prepend="Peso:">
+                <input class="form-control" v-model="peso" type="number" /> 
+              </b-input-group>
             </b-col>
             <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
                 <b-button variant="success" @click="guardarCotizacion">Guardar Cotización</b-button>
@@ -313,7 +316,8 @@ export default {
       productos: [],
       TipoCambio: 1,
       garantia: "De Fabrica",
-      observacion: ""
+      observacion: "",
+      peso: 0
     };
   },
   mounted() {
@@ -494,11 +498,12 @@ export default {
         IdVendedor: this.vendedor.Usuario,
         IdAlmacen: this.almacen.IdAlmacen,
         IdPuntoVenta: this.puntoVenta.IdDocVentaPuntoVenta,
-        IdMoneda: this.moneda.IdMoneda,
+        IdMoneda: this.moneda.Moneda,
         TipoCambio: this.TipoCambio,
         Garantia: this.garantia,
         Observacion: this.observacion,
         Direccion: this.CampoDireccion,
+        peso: this.peso,
         detalle: this.productos
       };
       await this.axios.post(`${this.API}cotizacion`, data).then(res => {

@@ -53,7 +53,7 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
-                <td class="celda" style="text-transform: uppercase">: Soles</td>
+                <td class="celda" style="text-transform: uppercase">: {{proforma.Moneda}}</td>
               </tr>
             </tbody>
           </table>
@@ -130,7 +130,12 @@
     </b-row>
       
     <b-row>
-      <b-col cols="8"></b-col>
+      <b-col cols="4">
+        <div class="clsPeso">
+          <b>Peso:</b> {{ proforma.Peso }} Kg.
+        </div>
+      </b-col>
+      <b-col cols="4"></b-col>
       <b-col cols="4" class="clsSubTotal">
         <table>
           <tr>
@@ -360,6 +365,12 @@ export default {
 .clsSubTotal {
   border: 1px solid #000000;
   margin: 20px 0 0 0;
+  border-radius: 15px;
+}
+.clsPeso {
+  border: 1px solid #000000;
+  margin: 20px 0 0 0;
+  padding: 2% 5%;
   border-radius: 15px;
 }
 </style>
