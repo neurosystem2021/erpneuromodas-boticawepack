@@ -33,6 +33,7 @@ import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Cotizacion from "@/views/Cotizacion.vue";
 import Cobros from "@/views/Cobros.vue";
+import Usuario from "@/views/Usuario.vue";
 
 Vue.use(Router);
 
@@ -193,6 +194,11 @@ export default new Router({
       path: "/cobros",
       name: "Cobros",
       component: Cobros
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
   ]
 });
