@@ -167,7 +167,7 @@
                                     </b-row>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="6" class="mb-1" style="margin-top:-15px">
+                            <b-col md="3" class="mb-1" style="margin-top:-15px">
                                 <b-form-group horizontal label="Obs:">
                                     <input v-model="venta.Observacion"
                                             type="text"
@@ -176,14 +176,38 @@
                                             placeholder="Observacion" />
                                 </b-form-group>
                             </b-col>
-                            <b-col md="6" class="mb-1" style="margin-top:-15px">
-                                <b-form-group horizontal label="Nº Placa:">
+                            <b-col md="3" class="mb-1" style="margin-top:-15px">
+                                <b-form-group horizontal label="N.Placa:">
                                     <input v-model="venta.Placa"
                                             type="text"
                                             class="form-control"
                                             style="text-transform:uppercase"
                                             placeholder="Placa" />
                                 </b-form-group>
+                            </b-col>
+                            <b-col md="3" class="mb-1" style="margin-top:-15px">
+                               <b-form-group horizontal label="Moneda">
+                              <autocomplete
+                                :url="API + 'monedas'"
+                                initValue="PEN"
+                                anchor="Moneda"
+                                ref="inputMoneda"
+                                label="PEN"
+                                placeholder="PEN"
+                                :on-select="setMoneda"
+                                :onFocus="focusAutocomplete.bind(null, 'inputMoneda')"
+                                :classes="{input: 'form-control'}">
+                              </autocomplete>
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="3" class="mb-1" style="margin-top:-15px">
+                            <b-form-group horizontal label="T.Cambio">
+                              <input v-model="TipoCambio"
+                                type="number"
+                                class="form-control"
+                                step="0.0001"
+                                placeholder="Tipo de cambio"/>
+                            </b-form-group>
                             </b-col>
                         </b-row>
                     </b-col>
@@ -264,7 +288,9 @@
                             :isVentas="true"
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto"
-                            :esDelivery="venta.EsDelivery">
+                            :esDelivery="venta.EsDelivery"
+                            :TipoCambio="TipoCambio"
+                            >
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
@@ -447,7 +473,7 @@
                     <b-col cols="8">
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <!-- <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button> -->
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
                         <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
@@ -480,9 +506,16 @@ export default {
     this.loadClienteVarios();
     this.escucharPedidos();
     this.configStock();
+    this.setMoneda({
+      IdMoneda: "PEN",
+      Moneda: "PEN",
+      TipoCambio: 1
+    });
   },
   data() {
     return {
+      objMoneda: {},
+      TipoCambio: 1,
       isNota: false,
       dni: "",
       adelanto: 0,
@@ -614,6 +647,7 @@ export default {
       }
     },
     selectPreOrden(orden) {
+      console.log("orden", orden);
       // console.log(orden)
       // this.venta.IdPreOrden = this.venta.IdPreOrden || []
       // if (Array.isArray(this.venta.IdPreOrden) ) {
@@ -679,6 +713,10 @@ export default {
           IdDocVentaPuntoVenta: 1,
           PuntoVenta: "PRINCIPAL"
         },
+        Moneda: {
+          Moneda: "PEN"
+        },
+        TipoCambio: this.TipoCambio,
         vendedor: {},
         adelantosPreOrden: [],
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
@@ -886,6 +924,13 @@ export default {
 
       if (typeof obj === "object") {
         this.$refs.inputCliente.setValue(obj.Cliente);
+        this.$refs.inputMoneda.setValue(obj.IdMoneda);
+        if (typeof obj.IdMoneda !== "undefined") {
+          this.setMoneda({
+            Moneda: obj.IdMoneda,
+            TipoCambio: obj.TipoCambio
+          });
+        }
         this.venta.cliente = obj;
         this.venta.CampoDireccion = this.venta.cliente.Direccion;
       } else {
@@ -1235,6 +1280,8 @@ export default {
       this.venta.adelantosPreOrden = this.adelantosPreOrden;
       this.venta.IdPedido = this.$route.query.idPedido || null;
       this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
+      this.venta.Moneda = this.objMoneda;
+      this.venta.TipoCambio = this.TipoCambio;
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
@@ -1426,8 +1473,18 @@ export default {
           });
         }
       });
-    }
+    },
     //Fin Sockets
+    setMoneda(obj) {
+      if (obj.Moneda == "PEN") {
+        this.TipoCambio = 1;
+      } else {
+        this.TipoCambio = obj.TipoCambio;
+      }
+
+      this.objMoneda = obj;
+      this.$refs.inputMoneda.setValue(obj.Moneda);
+    }
   },
   components: {
     ProductosCarrito,
