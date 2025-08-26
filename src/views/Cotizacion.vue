@@ -1,13 +1,11 @@
 <template>
   <b-container fluid>
      <b-breadcrumb :items="items"></b-breadcrumb>
-    <b-tabs>
+    <b-tabs pills card>
         <b-tab title="Por Producto" active class="px-5">
           <b-row>
             <b-col cols="4">
-              <b-form-group>
-                      <label>Cliente:</label>
-                      <b-input-group>
+            <b-input-group  class="my-2" prepend="Peso:">
                        <clientes-form txtButton="Editar" v-if="cliente.IdCliente && cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="cliente"></clientes-form>
                           <autocomplete
                               style="width:40%"
@@ -25,17 +23,16 @@
                           <b-input-group-append>
                               <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                           </b-input-group-append>
-                      </b-input-group>
+            </b-input-group>
                        <b-form-select v-if="valDireccion" v-model="CampoDireccion" class="mb-3">
                           <option v-if="cliente.Direccion" :value="cliente.Direccion">{{ cliente.Direccion }}</option>
                           <option v-if="cliente.Direccion2" :value="cliente.Direccion2">{{ cliente.Direccion2 }}</option>
                           <option v-if="cliente.Direccion3" :value="cliente.Direccion3">{{ cliente.Direccion3 }}</option>
                       </b-form-select>
-                   </b-form-group>
+                
             </b-col>
             <b-col cols="2">
-              <b-form-group>
-                <label>Vendedor:</label>
+             <b-input-group  class="my-2" prepend="Vendedor:">
                 <autocomplete
                     required="required"
                     ref="inputVendedor"
@@ -46,12 +43,11 @@
                     :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                     :classes="{input: 'form-control'}">
                 </autocomplete>
-              </b-form-group>
+              </b-input-group>
             </b-col>
             <b-col cols="2">
-              <b-form-group>
-                <label>Almacen:</label>
-                <b-input-group>
+             <b-input-group  class="my-2" prepend="Almacén:">
+               
                 <autocomplete
                     required="required"
                     ref="inputAlmacen"
@@ -64,13 +60,10 @@
                     :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                     :classes="{input: 'form-control'}">
                 </autocomplete>
-                </b-input-group>
-              </b-form-group>
+             </b-input-group> 
             </b-col>
             <b-col cols="2">
-              <b-form-group>
-                <label>Punto de Venta:</label>
-                <b-input-group>
+              <b-input-group  class="my-2" prepend="Punto Venta:">
                 <autocomplete
                     required="required"
                     ref="inputPuntoVenta"
@@ -83,12 +76,10 @@
                     :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                     :classes="{input: 'form-control'}">
                 </autocomplete>
-                </b-input-group>
-              </b-form-group>
+              </b-input-group>
             </b-col>
             <b-col cols="2">
-              <b-form-group>
-                <label>Moneda:</label>
+             <b-input-group  class="my-2" prepend="Moneda:">
                 <autocomplete
                   :url="API + 'monedas'"
                   initValue="PEN"
@@ -100,22 +91,20 @@
                   :onFocus="focusAutocomplete.bind(null, 'inputMoneda')"
                   :classes="{input: 'form-control'}">
                 </autocomplete>
-              </b-form-group>
-
-              <b-form-group>
-                <label>Tipo de cambio:</label>
+            </b-input-group>
+              <b-input-group  class="my-2" prepend="Tipo Cambio:">
                 <input v-model.number="TipoCambio"
                   type="number"
                   class="form-control"
                   step="0.0001"
                   placeholder="Tipo de cambio"/>
-              </b-form-group>
+              </b-input-group>
             </b-col>
           </b-row>
           <b-row>
             <b-col cols="12">
               <b-row>
-                <b-col cols="12"> 
+                <b-col cols="4"> 
                   <b-form-group label="Buscar Por:">
                     <b-form-radio-group
                       v-model="tipoBusqueda"
@@ -209,7 +198,7 @@
               </b-input-group>
             </b-col>
             <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
-                <b-button variant="success" @click="guardarCotizacion">Guardar Cotización</b-button>
+                <b-button variant="success" class="btnAction" @click="guardarCotizacion">Guardar Cotización</b-button>
             </b-col>
           </b-row>
         </b-tab>
@@ -237,7 +226,7 @@ export default {
   data() {
     return {
       modalSeleccionarProducto: false,
-      tipoBusqueda: 1,
+      tipoBusqueda: 2,
       items: [
         {
           text: "Cotización",
@@ -559,8 +548,8 @@ export default {
   padding: 0 1%;
   border-radius: 25px;
   border: 1px solid #e0e0e0;
-  min-height: 520px;
-  max-height: 520px;
+  min-height: 320px;
+  max-height: 320px;
   overflow-y: scroll;
   margin: 0 0 2%;
 }
