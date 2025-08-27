@@ -5,7 +5,7 @@
         <b-tab title="Por Producto" active class="px-5">
           <b-row>
             <b-col cols="4">
-            <b-input-group  class="my-2" prepend="Peso:">
+            <b-input-group  class="my-2" prepend="Cliente:">
                        <clientes-form txtButton="Editar" v-if="cliente.IdCliente && cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="cliente"></clientes-form>
                           <autocomplete
                               style="width:40%"

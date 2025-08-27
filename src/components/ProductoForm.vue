@@ -10,17 +10,23 @@
             <b-col md="6">
               <b-form-group>
                 <label>Tipo:</label>
-                  <autocomplete
-                    required="required"
-                    :url="API + 'producto/tipos'"
-                    ref="inputTipos"
-                    anchor="ProductoTipo"
-                    label="writer"
-                    :placeholder="producto.ProductoTipo.ProductoTipo"
-                    :on-select="setTipo"
-                    :onFocus="focusAutocomplete.bind(null, 'inputTipos')"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
+                <b-input-group>
+                    <autocomplete
+                      required="required"
+                      :url="API + 'producto/tipos'"
+                      ref="inputTipos"
+                      anchor="ProductoTipo"
+                      label="writer"
+                      :placeholder.sync="producto.ProductoTipo.ProductoTipo"
+                      :on-select="setTipo"
+                      :onFocus="focusAutocomplete.bind(null, 'inputTipos')"
+                      :classes="{input: 'form-control upper'}">
+                    </autocomplete>
+                    <b-input-group-append>
+                      <b-btn variant="primary" @click="crearTipo"><b>Guardar</b></b-btn>                
+                      <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+                    </b-input-group-append>
+                </b-input-group>
               </b-form-group>
               
               <b-form-group>
@@ -614,7 +620,6 @@ export default {
 
             this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc;
             this.$refs.inputAnaquel.$el.value = newVal.Anaquel;
-            console.log("inputAnaquel", this.$refs.inputAnaquel.$el.value);
             //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
             //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
@@ -816,10 +821,8 @@ export default {
       this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
     setAnquel(obj) {
-      console.log(obj);
       this.producto.Anaquel = obj.Anaquel;
       this.$refs.inputAnaquel.setValue(obj.Anquel);
-      console.log(this.producto.Anaquel)
       this.$forceUpdate();
     },
     /* setModelo (obj) {
@@ -831,16 +834,21 @@ export default {
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
     },*/
     clearForm() {
-      this.$refs.inputCategoria.setValue("");
-      this.$refs.inputMarca.setValue("");
-      this.$refs.inputMedicion.setValue("UNIDAD");
-      // this.$refs.inputTalla.setValue('')
-      this.$refs.inputModelo.setValue("");
-      this.$refs.inputPresentacion.setValue("");
-      // this.$refs.inputColor.setValue('')
-      // this.$refs.inputBotapie.setValue('')
-      this.$refs.inputProductoDesc.$el.value = "";
-      this.initForm();
+      this.$nextTick(() => {
+        this.$refs.inputCategoria.setValue("");
+        this.$refs.inputMarca.setValue("");
+        this.$refs.inputMedicion.setValue("UNIDAD");
+        this.$refs.inputTipos.setValue("");
+        this.$refs.inputProductoDesc.setValue("");
+
+        // this.$refs.inputTalla.setValue('')
+        // this.$refs.inputModelo.setValue("");
+        // this.$refs.inputPresentacion.setValue("");
+        // this.$refs.inputColor.setValue('')
+        // this.$refs.inputBotapie.setValue('')
+
+        this.initForm();
+      });
     },
     initForm() {
       this.producto = {
@@ -904,8 +912,7 @@ export default {
           { id: null, nombre: "" },
           { id: null, nombre: "" },
           { id: null, nombre: "" }
-        ],
-       
+        ]
       };
     },
     keyDownInput(e) {
@@ -1008,12 +1015,12 @@ export default {
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      console.log(ref);
+
       this.$refs[ref].handleDoubleClick();
     },
     focusAutocompletedet(ref) {
       // this.$refs[ref].type = ""
-      console.log(ref);
+
       this.$refs[ref].handleDoubleClick();
     },
     crearCategoria() {
@@ -1045,6 +1052,25 @@ export default {
           .post(this.API + "marcas", marca)
           .then(response => {
             this.$toasted.show("Marca guardada correctamente");
+            this.setMarca({
+              IdProductoMarca: response.data.insertId,
+              ProductoMarca: response.data.ProductoMarca
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearTipo() {
+      if (this.$refs.inputTipos.type) {
+        let Tipo = {};
+        Tipo.Tipo = this.$refs.inputTipos.type.toUpperCase();
+        this.axios
+          .post(this.API + "tipos", Tipo)
+          .then(response => {
+            this.$toasted.show("Tipo guardado correctamente");
             this.setMarca({
               IdProductoMarca: response.data.insertId,
               ProductoMarca: response.data.ProductoMarca
