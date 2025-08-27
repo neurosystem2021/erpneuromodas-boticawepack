@@ -12,6 +12,7 @@ import Habitaciones from "@/views/Habitaciones.vue";
 import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import PuntoRevisionProducto from "@/views/PuntoRevisionProducto.vue";
+import Usuario from "@/views/Usuario.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -238,8 +239,8 @@ export default new Router({
     },
     {
       path: "/usuario",
-      name: "BuscadorCajaBanco",
-      component: BuscadorCajaBanco
+      name: "Usuario",
+      component: Usuario
     },
   ]
 });
