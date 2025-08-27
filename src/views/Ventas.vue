@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'fondo-empresa': this.empresa === 'modasm' }">
+  <div :class="this.empresa">
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
     <Menu v-if="false"></Menu>
@@ -2042,7 +2042,19 @@ export default {
   }
 }
 
-.fondo-empresa {
+.modasm {
   background: #eff9ff;
+}
+.modasgio {
+  background: #c1e7ff;
+}
+.modasjes {
+  background: #cdcdcd;
+}
+.modasjun {
+  background: #c2ffc0;  
+}
+.modaspau {
+  background: #ffdaf0;
 }
 </style>

@@ -47,6 +47,7 @@
             ></producto-form>
           </b-input-group-append>
         </b-input-group>
+        <span class="ml">Búsqueda Avanzanda (Producto,Categoría,Marca)</span>
       </b-form-group>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
@@ -1443,7 +1444,7 @@ export default {
       this.actualizarProd(obj);
     },
     setProductoCant(prod) {
-      console.log('setProductoCant')
+      console.log("setProductoCant");
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
