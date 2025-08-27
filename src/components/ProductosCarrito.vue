@@ -108,9 +108,10 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="Producto" slot-scope="data">
-          <span v-if="data.item.TipoColor==-1"> 🔴 {{ data.item.Producto }}></span>
-          <span v-if="data.item.TipoColor==0">🟡 {{ data.item.Producto }}</span>
-          <span v-if="data.item.TipoColor==1">🟢 {{ data.item.Producto }}</span>
+          <span v-if="data.item.TipoColor==-1"> 🔴 </span>
+          <span v-if="data.item.TipoColor==0">🟡 </span>
+          <span v-if="data.item.TipoColor==1">🟢 </span>
+          {{ data.item.Producto }}
         </template>
         <template slot="eventPres" slot-scope="data">
           <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
