@@ -235,6 +235,11 @@ export default new Router({
       path: "/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
-    }
+    },
+    {
+      path: "/usuario",
+      name: "BuscadorCajaBanco",
+      component: BuscadorCajaBanco
+    },
   ]
 });
