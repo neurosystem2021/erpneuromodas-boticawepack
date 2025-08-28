@@ -384,8 +384,8 @@
             <p>
               <b>
                 Total: {{ 
-                    (producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
-                   (producto.precios[i-1].precioc? producto.precios[i-1].precioc : 0)
+                    parseFloat((producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
+                   (producto.precios[i-1].precioc? producto.precios[i-1].precioc : 0)).toFixed(2)
                   }}
               </b>
              </p>
@@ -401,8 +401,8 @@
              <p>
               <b>
                 Total: {{ 
-                    (producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
-                    (producto.precios[i-1].precioc? producto.precios[i-1].precio : 0)
+                    parseFloat((producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
+                    (producto.precios[i-1].precioc? producto.precios[i-1].precio : 0)).toFixed(2)
                   }}
               </b>
              </p>
