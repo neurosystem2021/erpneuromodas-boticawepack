@@ -794,9 +794,7 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      lstProductos: [],
-      reportePorProveedor: [],
-      itemsDetalle: []
+      lstProductos: []
     };
   },
   computed: {
@@ -806,8 +804,8 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
+        // this.totalVentasVisa +
+        // this.totalVentasMastercard +
         this.totalIngresos -
         this.totalSalidas
       );
@@ -883,64 +881,6 @@ export default {
     }
   },
   methods: {
-    generarReporte() {
-      let productos = [];
-      this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
-        console.log(venta);
-        if (venta.productos) {
-          venta.productos.forEach(producto => {
-            productos.push(producto);
-          });
-        }
-      });
-
-      const productosUnicos = Array.from(
-        new Set(productos.map(item => item.IdProducto))
-      ).map(producto => {
-        return { IdProducto: producto };
-      });
-
-      this.reportePorProveedor = [];
-      productosUnicos.forEach(producto => {
-        let lstProducto = productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        );
-        let total = lstProducto.reduce((total, producto) => {
-          return total + parseFloat(producto.Cantidad);
-        }, 0);
-        let Precio = lstProducto.reduce((total, producto) => {
-          return (
-            total +
-            parseFloat(producto.Precio * producto.Cantidad) -
-            parseFloat(producto.Descuento)
-          );
-        }, 0);
-        this.reportePorProveedor.push({
-          IdProducto: producto.IdProducto,
-          Producto: lstProducto[0].Producto,
-          total: total,
-          Precio: Precio
-        });
-      });
-      // console.log(prod);
-    },
-
-    async loadDetalles() {
-      await this.axios
-        .post(this.API + "ventas/detalle", {
-          idDocVentas: this.ventas.map(item => item.idDocVenta)
-        })
-        .then(response => {
-          this.itemsDetalle = response.data;
-          this.ventas = this.ventas.map(item => {
-            item.productos = this.getDetalles(item.idDocVenta);
-            return item;
-          });
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
       this.axios
@@ -970,10 +910,9 @@ export default {
       await Promise.all([
         this.getVentas(),
         this.getIngresos(),
-        this.getSalidas(),
-        this.generarReporte()
+        this.getSalidas()
       ]);
-      await this.loadDetalles();
+      console.log(Date());
       this.generarProductoListado();
     },
     cerrarCaja() {
