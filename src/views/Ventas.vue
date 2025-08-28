@@ -884,8 +884,10 @@ export default {
     },
     recalcularTotalPorEmpresaFlag() {
       this.$nextTick(() => {
-        this.recalcularTotalesPorEmpresa();
-        this.metodoPagoCambio(1);
+        setTimeout(() => {
+          this.recalcularTotalesPorEmpresa();
+          // this.metodoPagoCambio(1);
+        }, 100);
       });
     }
   },
@@ -942,6 +944,10 @@ export default {
           });
         }
       });
+      let totalCart = this.lstTotalPorEmpresa.reduce((sum, emp) => {
+        return sum + parseFloat(emp.total);
+      }, 0);
+      this.$store.state.cart.totalCart = totalCart;
       this.$nextTick(() => {
         this.metodoPagoCambio(1);
       });
@@ -1580,8 +1586,6 @@ export default {
         this.inProgress = false;
         return;
       }
-      console.log(this.totalCart);
-      console.log(totalPagos);
       if (!this.venta.EsCredito) {
         if (
           parseFloat(this.totalCart).toFixed(2) !=
@@ -2052,7 +2056,7 @@ export default {
   background: #cdcdcd;
 }
 .modasjun {
-  background: #c2ffc0;  
+  background: #c2ffc0;
 }
 .modaspau {
   background: #ffdaf0;

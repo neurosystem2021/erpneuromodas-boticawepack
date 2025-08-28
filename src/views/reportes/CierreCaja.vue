@@ -113,7 +113,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(prod,index) in lstProductos" :key="index">
+                <tr v-for="(prod,index) in reportePorProveedor" :key="index">
                     <td>{{ index+1 }}</td>
                     <td>{{ prod.Producto }}</td>
                     <td>{{ prod.Cantidad }}</td>
@@ -437,11 +437,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(prod,index) in lstProductos" :key="index">
+                <tr v-for="(prod,index) in reportePorProveedor" :key="index">
                     <td>{{ index+1 }}</td>
                     <td>{{ prod.Producto }}</td>
-                    <td>{{ prod.Cantidad }}</td>
-                    <td>{{ prod.Monto }}</td>
+                    <td>{{ prod.total }}</td>
+                    <td>{{ prod.Precio }}</td>
                 </tr>
               </tbody>
 
@@ -938,7 +938,7 @@ export default {
     totalVentasCredito() {
       let total = 0;
       this.ventasCredito.forEach(venta => {
-        console.log(venta.Total);
+       
 
         if (!venta.Anulado) total += venta.Total;
       });
@@ -1009,6 +1009,7 @@ export default {
       await this.getIngresos();
       await this.getSalidas();
       await this.generarReporte();
+      await this.generarReporte();
       // console.log(this.ventas);
     },
     generarReporte() {
@@ -1051,7 +1052,6 @@ export default {
     },
     setVendedor(obj) {
       obj.Usuario = obj.Usuario.toLowerCase();
-      console.log(obj);
       this.vendedor = obj;
       this.loadData();
     },
@@ -1196,6 +1196,44 @@ export default {
         .then(res => {
           this.cierre = res.data[0];
         });
+    },
+    generarReporte() {
+      let productos = [];
+      this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
+        venta.productos.forEach(producto => {
+          productos.push(producto);
+        });
+      });
+      const productosUnicos = Array.from(
+        new Set(productos.map(item => item.IdProducto))
+      ).map(producto => {
+        return { IdProducto: producto };
+      });
+      
+    
+      this.reportePorProveedor = [];
+      productosUnicos.forEach(producto => {
+        let lstProducto = productos.filter(
+          v => v.IdProducto == producto.IdProducto
+        );
+        let total = lstProducto.reduce((total, producto) => {
+          return total + parseFloat(producto.Cantidad);
+        }, 0);
+        let Precio = lstProducto.reduce((total, producto) => {
+          return (
+            total +
+            parseFloat(producto.Precio * producto.Cantidad) -
+            parseFloat(producto.Descuento)
+          );
+        }, 0);
+        this.reportePorProveedor.push({
+          IdProducto: producto.IdProducto,
+          Producto: lstProducto[0].Producto,
+          total: total,
+          Precio: Precio
+        });
+      });
+      // console.log(prod);
     }
   },
   components: {
