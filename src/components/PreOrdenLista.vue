@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="cargarPreOrden" variant="outline-success">Pagos Pendientes</b-button>
+        <b-button @click="cargarPreOrden" variant="success" class="btnAction">Pagos Pendientes</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
