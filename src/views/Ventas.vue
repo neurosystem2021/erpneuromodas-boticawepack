@@ -206,7 +206,8 @@
                                 type="number"
                                 class="form-control"
                                 step="0.0001"
-                                placeholder="Tipo de cambio"/>
+                                placeholder="Tipo de cambio"
+                                readonly/>
                             </b-form-group>
                             </b-col>
                         </b-row>
@@ -511,6 +512,7 @@ export default {
       Moneda: "PEN",
       TipoCambio: 1
     });
+    this.obtenerTipoCambio();
   },
   data() {
     return {
@@ -548,18 +550,20 @@ export default {
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-          { key: "itemNum", label: "#", class: "text-center thclass" },
+          // { key: "itemNum", label: "#", class: "text-center thclass" },
           {
             key: "stock",
             label: "Stock",
             variant: "info",
             class: "text-center"
           },
-          { key: "CodigoBarra", label: "Codigo" },
+          { key: "CodigoFrabricante" },
+          { key: "CodigoInterno" },
           { key: "VentaEstrategica", label: "" },
           { key: "Producto" },
-          { key: "ProductoModelo", label: "Modelo" },
+          // { key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoCategoria", label: "Categoria" },
           { key: "Anaquel", label: "Anaquel" },
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: "eventPres", label: "" },
@@ -624,6 +628,12 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    async obtenerTipoCambio() {
+      let tipoCambio = await this.axios(
+        "https://deperu.com/api/rest/cotizaciondolar.json"
+      );
+      this.TipoCambioUSD = tipoCambio.data.Cotizacion[0].Compra;
+    },
     configStock() {
       this.axios
         .get(this.API + "config/stock")
@@ -1479,7 +1489,7 @@ export default {
       if (obj.Moneda == "PEN") {
         this.TipoCambio = 1;
       } else {
-        this.TipoCambio = obj.TipoCambio;
+        this.TipoCambio = this.TipoCambioUSD;
       }
 
       this.objMoneda = obj;

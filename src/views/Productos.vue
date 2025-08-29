@@ -87,7 +87,8 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-            { key: 'CodigoBarra', label: 'Codigo', sortable: true },
+            { key: 'CodigoFrabricante',  sortable: true },
+            { key: 'CodigoInterno',  sortable: true },
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },

@@ -8,7 +8,7 @@
         </p>
         <p class="my-0 py-0" style="font-weight: bold;">
           <img src="/resources/images/whatsapp_logo.webp" style="max-width: 50px;">
-          966 964 014 /966 975 525 /966 897 733 /966 975 686 /973 868 018 /900 636 380 /925 998 940 /926 055 821
+          949434255/ 998811867/ 986779444/ 949658603
         </p> 
       </b-col>
       <b-col cols="4">
@@ -103,6 +103,8 @@
             <th>MARCA</th>
             <th>UNIDAD</th>
             <th>CANT.</th>
+            <th>CANT. SUCURSAL</th>
+            <th>CANT. IMPORTACIÓN</th>
             <th>PRECIO U.</th>
             <th>TOTAL</th>
           </tr>
@@ -117,6 +119,8 @@
             <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMedicion }}</h3></td>
             <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.Cantidad }}</td>
             <td style="text-align: center !important; align-content: center; align-items: center;"> {{ prod.Precio | moneda }}</td>
+            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal }}</td>
+            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadImportacion }}</td>
             <td style="text-align: center !important; align-content: center; align-items: center;">
               <div v-if="prod.DisabledTotal === 0">
                  {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
@@ -183,39 +187,29 @@
                  <img src="/resources/images/bcp_logo.png" style="max-width: 120px">
               </td>
               <td style="text-align: center !important;">SOLES</td>
-              <td style="text-align: center !important;">191-1848632-0-49</td>
-              <td style="text-align: center !important;">002 191 00184863204954</td>
+              <td style="text-align: center !important;">365-2563145-0-20</td>
+              <td style="text-align: center !important;">0023650025631452059</td>
             </tr>
             <tr>
               <td style="text-align: center !important;">DÓLARES</td>
-              <td style="text-align: center !important;">191-1850493-1-57</td>
-              <td style="text-align: center !important;">002 191 00185049315759</td>
+              <td style="text-align: center !important;">365-2495697-1-36</td>
+              <td style="text-align: center !important;">00236500249569713650</td>
             </tr>
             <tr>
-              <td  rowspan="2"  style="text-align: center !important;">
-                 <img src="/resources/images/scotiabank_logo.png" style="max-width: 120px">
-              </td>
-              <td style="text-align: center !important;">SOLES</td>
-              <td style="text-align: center !important;">000-3839370</td>
-              <td style="text-align: center !important;"></td>
-            </tr>
-            <tr>
-              <td style="text-align: center !important;">DÓLARES</td>
-              <td style="text-align: center !important;">000-4437275</td>
-              <td style="text-align: center !important;"></td>
-            </tr>
-            <tr>
-              <td  rowspan="2"  style="text-align: center !important;">
+              <td  rowspan="1"  style="text-align: center !important;">
                  <img src="/resources/images/bbva_logo.png" style="max-width: 120px">
               </td>
               <td style="text-align: center !important;">SOLES</td>
-              <td style="text-align: center !important;">0011-0023-0100017518</td>
-              <td style="text-align: center !important;">011-023-000100017518-90</td>
+              <td style="text-align: center !important;">001102100100065438</td>
+              <td style="text-align: center !important;"></td>
             </tr>
             <tr>
-              <td style="text-align: center !important;">DÓLARES</td>
-              <td style="text-align: center !important;">0011-0023-0100017526</td>
-              <td style="text-align: center !important;">011-023-000100017526-93</td>
+              <td  rowspan="1"  style="text-align: center !important;">
+                 <img src="/resources/images/yape.png" style="max-width: 120px">
+              </td>
+              <td style="text-align: center !important;">Inversiones Caspro SCRL</td>
+              <td style="text-align: center !important;">949 434 255</td>
+              <td style="text-align: center !important;"></td>
             </tr>
           </tbody>
         </table>

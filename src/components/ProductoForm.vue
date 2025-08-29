@@ -342,7 +342,7 @@
               <hr>
             </b-col>
             <b-col cols="7">
-              <ProductoFormReemplazo :ProductoReempleazo="ProductoReempleazo"/>
+              <ProductoFormReemplazo :ProductoReempleazo="ProductoReempleazo" :IdProducto="producto.IdProducto "/>
             </b-col>
              <!-- <b-col cols="5">
               <ProductoAnaquel :ProductoAnaquel="producto.anaqueles"/>
@@ -810,6 +810,7 @@ export default {
       this.$refs.inputCategoria.setValue(obj.ProductoCategoria);
     },
     setTipo(obj) {
+      console.log(obj);
       this.producto.ProductoTipo = obj;
       this.$refs.inputTipos.setValue(obj.ProductoTipo);
     },
@@ -1071,9 +1072,10 @@ export default {
           .post(this.API + "tipos", Tipo)
           .then(response => {
             this.$toasted.show("Tipo guardado correctamente");
-            this.setMarca({
-              IdProductoMarca: response.data.insertId,
-              ProductoMarca: response.data.ProductoMarca
+            console.log(response.data);
+            this.setTipo({
+              IdProductoTipo: response.data.insertId,
+              ProductoTipo: response.data.ProductoTipo
             });
           })
           .catch(error => {

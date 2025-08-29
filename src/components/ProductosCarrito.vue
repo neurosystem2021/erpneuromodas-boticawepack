@@ -20,7 +20,7 @@
                   type="text"
                   ref="barcodeInput"
                   class="form-control"
-                  placeholder="Codigo de Barra" />
+                  placeholder="Codigo Fabricante" />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
@@ -482,6 +482,28 @@
           </table>
     </b-col>
     <br><br>
+    <b-modal v-model="modalSelecProducto" size="lg">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Cod. Fabricante</th>
+            <th>Cod. Interno</th>
+            <th>Artículo</th>
+            <th>Marca</th>
+            <th>Categoria</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(p,index) in ProductoCodFab" :key="index" @dblclick="setProducto(p)"> 
+            <td>{{ p.CodigoFrabricante }}</td>
+            <td>{{ p.CodigoInterno }}</td>
+            <td>{{ p.Producto }}</td>
+            <td>{{ p.ProductoMarca }}</td>
+            <td>{{ p.ProductoCategoria }}</td> 
+          </tr>
+        </tbody>
+      </table>
+    </b-modal>
   </b-row>
 </template>
 
@@ -501,6 +523,8 @@ export default {
   },
   data() {
     return {
+      ProductoCodFab: [],
+      modalSelecProducto: false,
       readerSize: {
         width: 1600,
         height: 1080
@@ -595,12 +619,15 @@ export default {
             variant: "info",
             class: "text-center"
           },
-          { key: "CodigoBarra", label: "Código" },
+          // { key: "CodigoBarra", label: "Código" },
+          { key: "CodigoFrabricante" },
+          { key: "CodigoInterno" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: "Producto", label: "Artículo" },
           //{ key: 'Descripcion', label: 'Descripción'},
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoModelo", label: "Modelo/Color" },
+          { key: "ProductoCategoria", label: "Categoria" },
+          // { key: "ProductoModelo", label: "Modelo/Color" },
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
           { key: "eventPres", label: "" },
           //{ key: 'cantxPrecio', variant: 'warning' },
@@ -838,16 +865,29 @@ export default {
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        let params = { codigoBarra: idProducto };
+        let params = { CodigoFrabricante: idProducto };
         this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .get(this.API + "producto/codigoFabricante", {
+            params: params
+          })
           .then(response => {
-            if (response.data.IdProducto) {
-              this.setProducto(response.data);
-            } else {
+            let productos = response.data.producto;
+            if (productos.length == 0) {
               this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
+            } else if (productos.length == 1) {
+              this.setProducto(productos[0]);
+            } else {
+              this.ProductoCodFab = productos;
+              this.modalSelecProducto = true;
             }
+            console.log(response.data);
+            // if (response.data.producto.IdProducto) {
+            //   this.setProducto(response.data.producto);
+            // } else {
+            //   this.loadCode = "";
+            //   this.$toasted.show("No se encontró ningun producto");
+            // }
           });
       }
     },
@@ -913,6 +953,7 @@ export default {
       }
     },
     setProducto(obj) {
+      this.modalSelecProducto = false;
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
