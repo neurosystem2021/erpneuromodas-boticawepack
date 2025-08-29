@@ -172,13 +172,14 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
+        <template slot="flete" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FLETE"
             type="number"
             min="0"
-            placeholder="Flete"></b-form-input>
-        </template>-->
+            placeholder="Flete"
+            @input="setNuevoPrecioContado(data.index)"></b-form-input>
+        </template>
         
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
@@ -328,6 +329,10 @@
                 <td class="table-danger">Descuento</td>
                 <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
               </tr>
+              <tr v-if="sumatoriaFlete >= 0">
+                <td class="table-danger">Flete</td>
+                <td class="table-danger">{{ sumatoriaFlete  }}</td>
+              </tr>
               <tr>
                 <td><b>SubTotal</b></td>
                 <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
@@ -444,7 +449,7 @@ export default {
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
-          // { key: 'flete', label: 'FLETE' },
+          { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
           { key: "precioVenta", label: "Precio venta (S/)" },
           { key: "total", label: "Total", variant: "danger" },
@@ -507,6 +512,13 @@ export default {
       let sumatoria = 0;
       this.productos.map(value => {
         sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
+    },
+    sumatoriaFlete() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.FLETE || 0);
       });
       return this.$options.filters.redondear(sumatoria);
     }
@@ -626,7 +638,7 @@ export default {
     // },
 
     loadBarcode(e) {
-      e.preventDefault();
+        e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -793,7 +805,7 @@ export default {
       );
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
+      obj.FLETE = 0
       obj.precio = 0;
       obj.cantidad = 1;
       //obj.IdLote = 0
@@ -804,17 +816,17 @@ export default {
       obj.subtotal = obj.PrecioCosto;
       // obj.subtotal = 0;
       if (index == -1) {
-        obj = this.onSetProducto(obj);
-        this.add([
-          obj,
-          () => {
-            this.$emit("onAddProducto", obj);
-            this.$toasted.success("Producto añadido correctamente");
-          },
-          { setPrecioCosto: this.tipo == "mov" ? true : false },
-          false,
-          this.cliente.EsVIP
-        ]);
+      obj = this.onSetProducto(obj);
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto añadido correctamente");
+        },
+        { setPrecioCosto: this.tipo == "mov" ? true : false },
+        false,
+        this.cliente.EsVIP
+      ]);
       } else {
         Vue.set(this.$store.state.cart.productos, index, obj);
       }
@@ -828,7 +840,7 @@ export default {
       this.cant = prod.cantidad;
       let obj = this.objProd;
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
+      obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
       obj.tipo = "PRESENTACION";
@@ -916,10 +928,10 @@ export default {
           data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
-              ? Number.isInteger(data.stock)
-                ? data.stock
-                : data.stock.toFixed(2)
-              : data.stock
+            ? Number.isInteger(data.stock)
+              ? data.stock
+              : data.stock.toFixed(2)
+            : data.stock
         }</b></td>
                 <td style="width: 200px"><b>${data.Producto} - ${
           data.CodigoBarra
@@ -957,27 +969,51 @@ export default {
     //   this.$emit('onInputCantidad', val)
     // },
     setNuevoPrecioContado(index) {
-      let obj = JSON.parse(
-        JSON.stringify(this.$store.state.cart.productos[index])
-      );
-      console.log(obj.tipo);
-      let prod = JSON.parse(
-        JSON.stringify(this.$store.state.cart.productos[index])
-      );
+  let obj = JSON.parse(
+    JSON.stringify(this.$store.state.cart.productos[index])
+  );
+  let prod = JSON.parse(
+    JSON.stringify(this.$store.state.cart.productos[index])
+  );
 
-      if (obj.tipo == "UNIDAD") {
-        obj.subtotal = Number(prod.cantidad) * Number(prod.precio);
-      }
-      if (obj.tipo == "PRESENTACION") {
-        obj.subtotal =
-          Number(prod.cantxPrecio) *
-          Number(prod.cantidadPres) *
-          Number(prod.precio);
-      }
+  if (obj.tipo == "UNIDAD") {
+    obj.subtotal = Number(prod.cantidad) * Number(prod.precio);
+  }
+  if (obj.tipo == "PRESENTACION") {
+    obj.subtotal =
+      Number(prod.cantxPrecio) *
+      Number(prod.cantidadPres) *
+      Number(prod.precio);
+  }
 
-      Vue.set(this.$store.state.cart.productos, index, obj);
-      this.$forceUpdate(); // Forzar actualización de Vue
-    },
+  Vue.set(this.$store.state.cart.productos, index, obj);
+  this.$forceUpdate();
+
+  let producto = { ...this.productos[index] };
+
+  let precioBase = parseFloat(producto.precioBaseVenta || producto.nuevoPrecioContado) || 0;
+  Vue.set(this.productos[index], "precioBaseVenta", precioBase);
+
+  // IGV
+  if (producto.TieneIgv) {
+    precioBase = precioBase * 1.18;
+  }
+
+  // Flete
+  let flete = producto.FLETE ? parseFloat(producto.FLETE) : 0;
+
+
+  let precioFinal = precioBase + flete;
+
+  let normalPrecio = precioFinal.toFixed(2);
+  let nuevoPrecio = normalPrecio;
+
+  Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+  Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
+
+  this.getSubtotal(index);
+  this.updateManoDeObraNeta(index);
+},
 
     actualizarDescu(index) {
       let obj = this.productos[index];
@@ -1006,9 +1042,9 @@ export default {
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);
 
-      if (this.productos[index].FLETE) {
+      /*if (this.productos[index].FLETE) {
         total += parseFloat(this.productos[index].FLETE);
-      }
+      }*/
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
       }
