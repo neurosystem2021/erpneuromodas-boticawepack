@@ -76,6 +76,9 @@
 										</b-col>
 									</b-row>
 								</div>			
+                <div class="clsBody">
+
+                
                 <div class="clsImag">
                   <img src="../../public/imagen/cama.png" style="width: 70%; " alt="sss" class="my-2">
                   <center>
@@ -138,7 +141,8 @@
 										<b-button variant="success" size="sm" @click="agregarHuesped(hab,pi+''+ index)">Agregar Huesped</b-button>	
 									</b-popover>
 								</ul>
-								<div slot="footer">
+                </div>
+								<div slot="footer" class="footer">
 									<b-btn @click="liberarHab(hab)" variant="info" size="sm">Liberar</b-btn>	
 									<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>	
 									<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
@@ -1236,11 +1240,21 @@ h5 {
   font-size: 0.8rem;
   color: #363636;
 }
+.clsBody{
+  height: 240px;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+}
+.footer{
+  height: 80px;
+}
 .clsImag {
   /* height: 150px; */
   text-align: center;
   align-content: center;
   align-items: center;
+  
 }
 .clsImag >>> h5 {
   background: #ffffff;
