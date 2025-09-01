@@ -199,8 +199,10 @@ export default {
             PrecioVenta: parseFloat(PrecioVenta).toFixed(2),
             TotalVenta: parseFloat(TotalVenta).toFixed(2),
             TotalCosto: parseFloat(TotalCosto).toFixed(2),
-            UtilidadBruta: parseFloat(UtilidadBruta).toFixed(2),
-            PorcentajeUti: parseFloat(PorcentajeUti).toFixed(2)
+            UtilidadBruta: parseFloat((TotalVenta)- parseFloat(TotalCosto)).toFixed(2),
+            PorcentajeUti: parseFloat(((TotalVenta)- parseFloat(TotalCosto))/Cantidad).toFixed(2),
+            // PorcentajeUti: parseFloat((TotalVenta)- parseFloat(TotalCosto)).toFixed(2),
+            // : 
           };
         }
       });

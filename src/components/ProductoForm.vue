@@ -381,14 +381,7 @@
                 step="0.00001"
                 />
             </b-form-group>
-            <p>
-              <b>
-                Total: {{ 
-                    parseFloat((producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
-                   (producto.precios[i-1].precioc? producto.precios[i-1].precioc : 0)).toFixed(2)
-                  }}
-              </b>
-             </p>
+            
             <b-form-group class="text-left">
               <label>Precio Venta:</label>
               <input 
@@ -398,14 +391,7 @@
                 step="0.00001"
                 />
             </b-form-group>
-             <p>
-              <b>
-                Total: {{ 
-                    parseFloat((producto.precios[i-1].cantidad? producto.precios[i-1].cantidad : 0) *
-                    (producto.precios[i-1].precioc? producto.precios[i-1].precio : 0)).toFixed(2)
-                  }}
-              </b>
-             </p>
+            
           </b-card>
         </b-col>
       </b-row>
