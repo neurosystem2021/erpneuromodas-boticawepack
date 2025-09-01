@@ -1,129 +1,114 @@
 <template>
-	<b-container class="px-5">
+	<b-container >
     <b-row>
-      <b-col cols="4" class="clsHeader">
-        <p class="my-0 py-0" style="font-size: 1.5rem; color: #1A237E; font-weight: bold;" > INVERSIONES CASPRO S.R.L. </p>
-        <p class="my-0 py-0"> 
-            MZA. C LOTE. 1 URB. LOS CIPRECES (A UNA CUADRA DE MOPAL) HUANUCO - HUANUCO - AMARILIS
-        </p>
-        <p class="my-0 py-0" style="font-weight: bold;">
-          <img src="/resources/images/whatsapp_logo.webp" style="max-width: 50px;">
-          949434255/ 998811867/ 986779444/ 949658603
-        </p> 
-      </b-col>
       <b-col cols="4">
         <div id="logo">
           <img src="/resources/images/banner-proforma.jpg">
         </div>
-        
       </b-col>
-      <b-col cols="4" class="clsHeader">
-        <div class="clsCotizacion">
-          <h3>COTIZACIÓN</h3>
-           <p class="my-0 py-0" style="color: #B71C1C; font-weight: bold;">N° 0000000{{ proforma.Numero}}</p>
+      <b-col cols="8" >
+        <div style="border-right: 5px solid #E0E0E0;
+            border-top: 5px solid #E0E0E0;
+            border-bottom: 5px solid #E0E0E0;
+            padding: 1% 2%;
+            margin: 1% 0;"
+        >
+             <b-row>
+              <b-col cols="6">
+                <div>
+                  <p> <b> COTIZACIÓN :</b> N° 0000000-{{ proforma.Numero}}</p>
+                  <p> <b> FECHA EMISIÓN </b>{{ fechaHoy }}</p>
+                </div>
+              </b-col>
+              
+              <b-col cols="6">
+                <img src="/resources/images/cat_logo.png" style="max-width: 50px;">
+                <img src="/resources/images/ctp_logo.png" style="max-width: 50px;">
+              </b-col>         
+            </b-row>
         </div>
-         <p class="my-0 py-0" style="font-weight: bold; color: #000000;">RUC: 20601250501</p>
-         <p class="my-0 py-0">{{ fechaHoy }}</p>
+       
       </b-col>
     </b-row>
     <b-row>
-      <hr />
+      <b-col cols="6" style="text-align: center;">
+            <p class="my-0 py-0" style="font-weight: bold;" > RUC: 20601250501 </p>
+            <p class="my-0 py-0" style="font-weight: bold;" > INVERSIONES CASPRO S.R.L. </p>
+            <p class="my-0 py-0"> 
+              MZA. C LOTE. 1 URB. LOS CIPRECES (A UNA CUADRA DE MOPAL) HUANUCO - HUANUCO - AMARILIS
+            </p>
+      </b-col>
+      <b-col cols="6" style="text-align: center; align-items: center;align-content: center;">
+        REPUESTOS ORIGINALES Y ALTERNATIVOS
+        PARA MAQUINARIA PESADA
+      </b-col>
     </b-row>
 
     <b-row>
-        <b-col cols="6">
-         
-          <table>
-            <tbody>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Señores:</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">RUC</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Documento }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
-                <td class="celda" style="text-transform: uppercase">: {{proforma.Moneda}}</td>
+        <b-col cols="12" >
+          <div style="border: 5px solid #E0E0E0 !important; padding: 1% 2%; margin: 1% 0;">
+
+            <table width="100%">
+              <tbody>
+                <tr>
+                  <td style="text-align: left !important;" colspan="3"><b>SEÑOR(ES):</b></td>
+                  <td style="text-align: left !important;" colspan="3">{{ proforma.Cliente }}</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left !important;" colspan="3"><b>DIRECCIÓN:</b></td>
+                  <td style="text-align: left !important;" colspan="3">{{ proforma.ClienteDireccion}}</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left !important;"><b>DOCUMENTO</b></td>
+                <td style="text-align: left !important;">{{ proforma.Documento }}</td>
+                <td style="text-align: left !important;"><b>ATENCIÓN</b></td>
+                <td style="text-align: left !important;">{{ proforma.UsuarioReg }}</td>
+                <td style="text-align: left !important;"><b>TELÉFONO</b></td>
+                <td style="text-align: left !important;">{{ proforma.UsuarioReg }}</td>
               </tr>
             </tbody>
           </table>
+        </div>
         </b-col>
-        <b-col cols="6">
-         
-          <table>
-            <tbody>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Validez de la Oferta</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.DiasValidos }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Plazo de la Importación</td>
-                <td class="celda" style="text-transform: uppercase">: {{ DiasEntregaImportacion.join() }} </td>
-              </tr>
-              
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Garantía de Referencia</td>
-                <td class="celda" style="text-transform: uppercase">: {{proforma.Garantia}}</td>
-              </tr>
-              <!--<tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>-->
-            </tbody>
-          </table>
-        </b-col>
-        <div id="details">
-        
-        
-      </div>
     </b-row>
 		
     <b-row>
-       <table class="clsTable">
+      <b-col cols="12" >
+      <div style="border: 5px solid #E0E0E0 !important; padding: 1%; margin: 1% 0;">
+      <table>
         <thead>
-          <tr>
-            <th>#</th>
-            <th>CÓDIGO</th>
-            <th>DESCRIPCIÓN</th>
-            <th>UBICACIÓN</th>
-            <th>MARCA</th>
-            <th>UNIDAD</th>
-            <th>CANT.</th>
-            <th>CANT. SUCURSAL</th>
-            <th>CANT. IMPORTACIÓN</th>
-            <th>PRECIO U.</th>
-            <th>TOTAL</th>
+          <tr style="border-bottom: 2px solid #E0E0E0">
+            <th >#</th>
+            <th >CÓDIGO</th>
+            <th >DESCRIPCIÓN</th>
+            <th >UBICACIÓN</th>
+            <th >MARCA</th>
+            <th >UNIDAD</th>
+            <th >CANT.</th>
+            <th >CANT. SUCURSAL</th>
+            <th >CANT. IMPORTACIÓN</th>
+            <th >PRECIO U.</th>
+            <th >TOTAL CANT.</th>
+            <th >TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td>{{ index+1 }}</td>
-            <td><h3>{{ prod.CodigoInterno }}</h3></td>
-            <td><h3>{{ prod.Producto }}</h3></td>
+            <!-- {{ prod }} -->
+            <td style="">{{ index+1 }}</td>
+            <td style=""><h3>{{ prod.CodigoInterno }}</h3></td>
+            <td style=""><h3>{{ prod.Producto }}</h3></td>
             <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.Anaquel }}</h3></td>
             <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMarca }}</h3></td>
             <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMedicion }}</h3></td>
             <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.Cantidad }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;"> {{ prod.Precio | moneda }}</td>
             <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal }}</td>
             <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadImportacion }}</td>
+            <td style="text-align: center !important; align-content: center; align-items: center;"> {{ prod.Precio | moneda }}</td>
+            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal + parseFloat(prod.CantidadImportacion) }}</td>
             <td style="text-align: center !important; align-content: center; align-items: center;">
               <div v-if="prod.DisabledTotal === 0">
-                 {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+                 {{ prod.Precio * (parseFloat(prod.CantidadSucursal) +parseFloat(prod.CantidadImportacion)) - prod.Descuento | redondear }}<br>
                 <span v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
@@ -131,17 +116,51 @@
         </tbody>
         
       </table>
+      </div>
+      </b-col>
     </b-row>
       
     <b-row>
       <b-col cols="4">
-        <div class="clsPeso">
-          <b>Peso:</b> {{ proforma.Peso }} Kg.
-        </div>
+        <p><b><u>CONDICIONES COMERCIALES</u></b></p>
+       
+        <table>
+          <tbody>
+            <tr>
+              <td style="text-align: left;"> <b> VALIDEZ DE OFERTA : </b></td>
+              <td>{{ proforma.DiasValidos }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> TIEMPO DE ENTREGA: SUCURSAL: </b></td>
+              <td>{{ maxDiaEntrega }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> TIEMPO DE ENTREGA IMPORTACION: </b></td>
+              <td>{{ maxDiaEntregaImportacion }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> FORMA DE PAGO : </b></td>
+              <td>CONTADO</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> GARANTIA :  </b></td>
+              <td>{{ proforma.Garantia }}</td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> TELEFONO: </b></td>
+              <td> 949434255/ 998811867/ 986779444/ 949658603 </td>
+            </tr>
+            <tr>
+              <td style="text-align: left;"> <b> OBSERVACION : </b></td>
+            </tr>
+          </tbody>
+        </table>
       </b-col>
       <b-col cols="4"></b-col>
-      <b-col cols="4" class="clsSubTotal">
-        <table>
+      <b-col cols="4">
+        <div style="border: 5px solid #E0E0E0 !important; padding: 1% 2%; margin: 1% 0;">
+
+        <table width="100%">
           <tr>
             <th colspan="2">SUBTOTAL</th>
             <td>USD {{ subTotal | redondear }}</td>
@@ -151,67 +170,51 @@
             <td colspan="1">I.G.V</td>
             <td>USD {{ subTotal * 0.18 | redondear }}</td>
           </tr>
-          <tr>
+          <tr v-if="mostrarDolar">
             <th colspan="2">TOTAL DOLARES</th>
             <td>USD {{ total | redondear }}</td>
           </tr>
-          <tr>
-            <td colspan="2" style="text-align: center;">Tipo de Cambio</td>
-            <td>S/. {{ proforma.TipoCambio | redondear }}</td>
-          </tr>
-          <tr>
+
+          <tr v-else>
             <th colspan="2">TOTAL SOLES</th>
             <td>S/. {{ total *proforma.TipoCambio| redondear }}</td>
           </tr>
         </table>
+        </div>
       </b-col>
     </b-row>
 
     <b-row>
-      <b-col cols="12">
-        Cuentas de Bancos:
-      </b-col>
       <b-col>
           <table class="clsTable">
-          <thead>
-            <tr>
-              <th style="align-items: center;">Banco</th>
-              <th style="align-content: center;">Moneda</th>
-              <th style="align-content: center;">Cuenta</th>
-              <th style="align-content: center;">CCI</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td  rowspan="2"  style="text-align: center !important;">
-                 <img src="/resources/images/bcp_logo.png" style="max-width: 120px">
-              </td>
-              <td style="text-align: center !important;">SOLES</td>
-              <td style="text-align: center !important;">365-2563145-0-20</td>
-              <td style="text-align: center !important;">0023650025631452059</td>
-            </tr>
-            <tr>
-              <td style="text-align: center !important;">DÓLARES</td>
-              <td style="text-align: center !important;">365-2495697-1-36</td>
-              <td style="text-align: center !important;">00236500249569713650</td>
-            </tr>
-            <tr>
-              <td  rowspan="1"  style="text-align: center !important;">
-                 <img src="/resources/images/bbva_logo.png" style="max-width: 120px">
-              </td>
-              <td style="text-align: center !important;">SOLES</td>
-              <td style="text-align: center !important;">001102100100065438</td>
-              <td style="text-align: center !important;"></td>
-            </tr>
-            <tr>
-              <td  rowspan="1"  style="text-align: center !important;">
-                 <img src="/resources/images/yape.png" style="max-width: 120px">
-              </td>
-              <td style="text-align: center !important;">Inversiones Caspro SCRL</td>
-              <td style="text-align: center !important;">949 434 255</td>
-              <td style="text-align: center !important;"></td>
-            </tr>
-          </tbody>
+            <tbody>
+              <tr>
+                <td rowspan="1"  style="text-align: center !important;">
+                  <img src="/resources/images/bcp_logo.png" style="max-width: 120px">
+                </td> 
+                <td>
+                  <p> USD 365-2495697-1-36 / 00236500249569713650 </p>
+                  <p> S/. 365-2563145-0-20 / 0023650025631452059 </p>
+                </td>
+
+                <td rowspan="1"  style="text-align: center !important;">
+                   <img src="/resources/images/bbva_logo.png" style="max-width: 120px">
+                </td>
+                <td>
+                  <p> S/. 001102100100065438 </p>
+                  <p> USD 001102100100065438 </p>
+                </td>
+              </tr>
+              <tr>
+                <td  colspan="2"  style="text-align: center !important;">
+                 <img src="/resources/images/yape.png" style="max-width: 60px">
+                </td>
+                <td colspan="2">
+                  <p>949 434 255 </p>
+                   Inversiones Caspro SCRL
+                </td>
+              </tr>
+            </tbody>
         </table>
       </b-col>
     </b-row>
@@ -252,16 +255,53 @@ export default {
     subTotal() {
       let sumatoria = 0;
       this.proforma.productos.forEach(prod => {
-        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+        sumatoria +=
+          (parseFloat(prod.CantidadSucursal) +
+            parseFloat(prod.CantidadImportacion)) *
+            prod.Precio -
+          prod.Descuento;
       });
       return sumatoria;
     },
     total() {
       let sumatoria = 0;
       this.proforma.productos.forEach(prod => {
-        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+        sumatoria +=
+          (parseFloat(prod.CantidadSucursal) +
+            parseFloat(prod.CantidadImportacion)) *
+            prod.Precio -
+          prod.Descuento;
       });
+
       return sumatoria + sumatoria * 0.18;
+    },
+    mostrarDolar() {
+      return this.proforma.Moneda === "USD";
+    },
+    maxDiaEntrega() {
+      // Inicializamos el acumulador con un objeto que tenga el valor más bajo posible en DiasEntrega
+      if (
+        !this.proforma ||
+        !this.proforma.productos ||
+        this.proforma.productos.length === 0
+      ) {
+        return null; // O el valor que consideres apropiado para un array vacío
+      }
+
+      const dias = this.proforma.productos.map(p => p.DiasEntrega);
+      return Math.max(...dias);
+    },
+    maxDiaEntregaImportacion() {
+      if (
+        !this.proforma ||
+        !this.proforma.productos ||
+        this.proforma.productos.length === 0
+      ) {
+        return null; // O el valor que consideres apropiado para un array vacío
+      }
+
+      const dias = this.proforma.productos.map(p => p.DiasEntregaImportacion);
+      return Math.max(...dias);
     }
   },
   methods: {
@@ -331,38 +371,34 @@ export default {
     display: none;
   }
 }
-.clsHeader {
-  text-align: center;
-  align-content: center;
-  align-items: center;
-}
+
 .clsCotizacion {
-  border: 1px solid #000000;
+  border: 1px solid #E0E0E0;
   border-radius: 10px;
   padding: 2% 2% !important;
   height: 100px;
-  text-align: end;
+  /* text-align: end; */
   align-content: center;
   align-items: center;
 }
 .clsTable {
-  border: 1px solid #000000;
+  border: 5px solid #E0E0E0;
 }
 .clsTable th {
-  border: 1px solid #000000;
+  /* border: 1px solid #E0E0E0; */
 }
 .clsTable td {
   text-align: start !important;
-  /* padding:1% ; */
-  border: 1px solid #000000 !important;
+  padding: 1%;
+  /* border: 1px solid #E0E0E0 !important; */
 }
 .clsSubTotal {
-  border: 1px solid #000000;
+  border: 1px solid #E0E0E0;
   margin: 20px 0 0 0;
   border-radius: 15px;
 }
 .clsPeso {
-  border: 1px solid #000000;
+  border: 1px solid #E0E0E0;
   margin: 20px 0 0 0;
   padding: 2% 5%;
   border-radius: 15px;
