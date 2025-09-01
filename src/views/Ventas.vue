@@ -318,6 +318,7 @@
                         type="text"
                         style="text-align:center; font-weight:bold; width: 105px;"
                         autocomplete="false"
+                        @input="metodoPagoCambio(1)"
                          @focus="abrirModalTouch(data.index, 2)"
                          class="form-control"
                         >
@@ -1808,7 +1809,7 @@ export default {
         prod.precio = producto.PrecioContado;
       }
       this.$nextTick(() => {
-        let input = document.getElementById("input0");
+        let input = document.getElementById("txtCodeBar0");
         input.focus();
         input.select();
       });
