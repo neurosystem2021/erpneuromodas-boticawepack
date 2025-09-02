@@ -218,6 +218,9 @@
         </b-table>
     </b-modal>
     <b-modal v-model="vehiculoFlag" size="lg" class="modalVehiculo" id="modalProducto">
+      <div style="text-align: right;" class="my-2">
+        <b-button variant="success" @click="abrirModalNuevoRegistro"> Nuevo</b-button>
+      </div>
       <b-table :items="lstVehiculos" :fields="fieldsVehiculo">
 
                 <template slot="comentario" slot-scope="data">
@@ -239,6 +242,80 @@
 
             </b-table>
     </b-modal>
+
+        <b-modal v-model="nuevoRegistroFlag" size="lg" hide-footer title="Vehículo" no-close-on-backdrop no-close-on-esc>
+        <b-row>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Nombre Máquina" class="my-2">
+                    <b-form-input :class="nombreError ? 'clsRequerido' :''" v-model="formVehiculo.nombre"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Marca Máquina" class="my-2">
+                    <b-form-input :class="marcaError ? 'clsRequerido' :''" v-model="formVehiculo.marca"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Modelo Máquina" class="my-2">
+                    <b-form-input :class="modeloError ? 'clsRequerido' :''" v-model="formVehiculo.modelo"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Serie Máquina" class="my-2">
+                    <b-form-input :class="serieError ? 'clsRequerido' :''" v-model="formVehiculo.serie"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Horas" class="my-2">
+                    <b-form-input :class="horasError ? 'clsRequerido' :''" v-model="formVehiculo.horas" type="number"></b-form-input>
+                </b-input-group>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col>
+                <hr>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Motor del Vehículo" class="my-2">
+                    <b-form-input :class="motorError ? 'clsRequerido' :''" v-model="formVehiculo.motor"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Serie del Motor" class="my-2">
+                    <b-form-input :class="serieMotorError ? 'clsRequerido' :''" v-model="formVehiculo.serieMotor"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Año de Fab. Motor" class="my-2">
+                    <b-form-input :class="aniomotorError ? 'clsRequerido' :''"  type="number" min="1800" max="2100" v-model="formVehiculo.aniomotor"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <!-- <b-col cols="12" md="6">
+                <b-input-group prepend="Carga Bruta del Motor " class="my-2">
+                    <b-form-input v-model="formVehiculo.cargaBruta" type="number"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6">
+                <b-input-group prepend="Carga Neta del Motor " class="my-2">
+                    <b-form-input v-model="formVehiculo.cargaNeta" type="number"></b-form-input>
+                </b-input-group>
+            </b-col> -->
+            <b-col cols="12">
+                <b-input-group prepend="Comentario " class="my-2">
+                     <b-form-textarea :class="comentarioError ? 'clsRequerido' :''" v-model="formVehiculo.comentario" class="txtComentario"/>
+                </b-input-group>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col cols="12" style="text-align: right !important; align-items: right !important; align-content: right !important;">
+                    <b-button variant="success" v-if="nuevoFlag" @click="guardarVehiculo">Guardar</b-button>
+                    <b-button variant="success" v-if="actualizarFlag" @click="actualizarVehiculo">Actualizar</b-button>
+                    <b-button variant="danger" @click="nuevoRegistroFlag=!nuevoRegistroFlag">Cancelar</b-button>              
+            </b-col>
+        </b-row>
+    </b-modal>
   </b-container>
 </template>
 
@@ -253,6 +330,17 @@ export default {
   },
   data() {
     return {
+      nuevoFlag: false,
+      actualizarFlag: false,
+      nombreError: false,
+      marcaError: false,
+      modeloError: false,
+      serieError: false,
+      horasError: false,
+      motorError: false,
+      serieMotorError: false,
+      aniomotorError: false,
+      comentarioError: false,
       modalSeleccionarProducto: false,
       tipoBusqueda: 1,
       items: [
@@ -351,7 +439,21 @@ export default {
       peso: 0,
       TipoCambioUSD: 1,
       lstVehiculos: [],
-      vehiculoFlag: false
+      vehiculoFlag: false,
+      formVehiculo: {
+        nombre: "",
+        marca: "",
+        modelo: "",
+        serie: "",
+        horas: "",
+        motor: "",
+        serieMotor: "",
+        cargaBruta: "",
+        cargaNeta: "",
+        comentario: "",
+        aniomotor: ""
+      },
+      nuevoRegistroFlag: false
     };
   },
   mounted() {
@@ -359,6 +461,92 @@ export default {
     this.obtenerTipoCambio();
   },
   methods: {
+    abrirModalNuevoRegistro() {
+      this.nuevoFlag = true;
+      this.actualizarFlag = false;
+      this.formVehiculo = {
+        nombre: "",
+        marca: "",
+        modelo: "",
+        serie: "",
+        horas: "",
+        motor: "",
+        serieMotor: "",
+        cargaBruta: "",
+        cargaNeta: "",
+        aniomotor: "",
+        comentario: ""
+      };
+      this.nombreError = false;
+      this.marcaError = false;
+      this.modeloError = false;
+      this.serieError = false;
+      this.horasError = false;
+      this.motorError = false;
+      this.serieMotorError = false;
+      this.comentarioError = false;
+      this.aniomotorError = false;
+      this.nuevoRegistroFlag = true;
+    },
+    validarFormulario() {
+      this.nombreError = false;
+      this.marcaError = false;
+      this.modeloError = false;
+      this.serieError = false;
+      this.horasError = false;
+      this.motorError = false;
+      this.serieMotorError = false;
+      this.aniomotorError = false;
+      this.comentarioError = false;
+      let val = false;
+      if (!this.formVehiculo.marca) {
+        this.nombreError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.marca) {
+        this.marcaError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.modelo) {
+        this.modeloError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.serie) {
+        this.serieError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.horas) {
+        this.horasError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.motor) {
+        this.motorError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.serieMotor) {
+        this.serieMotorError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.aniomotor) {
+        this.aniomotorError = true;
+        val = true;
+      }
+      if (!this.formVehiculo.comentario) {
+        this.comentarioError = true;
+        val = true;
+      }
+      return val;
+    },
+    async guardarVehiculo() {
+      let res = this.validarFormulario();
+      if (res) {
+        return;
+      }
+      let data = { ...this.cliente, ...this.formVehiculo };
+      await this.axios.post(`${this.API}vehiculo`, data);
+      this.verVehiculos();
+      this.nuevoRegistroFlag = false;
+    },
     async verVehiculos() {
       this.lstVehiculos = [];
       await this.axios(`${this.API}cliente/vehiculo`, {
@@ -630,8 +818,14 @@ export default {
             </thead>
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.stock}</b></td>
-                <td style="width: 60px"><b>${data.EsPadre == 1 ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />': data.CodigoFrabricante}</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${
+        data.stock
+      }</b></td>
+                <td style="width: 60px"><b>${
+                  data.EsPadre == 1
+                    ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+                    : data.CodigoFrabricante
+                }</b></td>
                 <td style="width: 60px"><b>${data.CodigoInterno}</b></td>
                 <td style="width: 200px"><b>${data.Producto}</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
