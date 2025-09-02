@@ -64,7 +64,7 @@
                 <td style="text-align: left !important;"><b>ATENCIÓN</b></td>
                 <td style="text-align: left !important;">{{ proforma.UsuarioReg }}</td>
                 <td style="text-align: left !important;"><b>TELÉFONO</b></td>
-                <td style="text-align: left !important;">{{ proforma.UsuarioReg }}</td>
+                <td style="text-align: left !important;"></td>
               </tr>
             </tbody>
           </table>
@@ -163,16 +163,16 @@
         <table width="100%">
           <tr>
             <th colspan="2">SUBTOTAL</th>
-            <td>USD {{ subTotal | redondear }}</td>
+            <td>{{ subTotal | redondear }}</td>
           </tr>
           <tr>
             <td colspan="1">18.00%</td>
             <td colspan="1">I.G.V</td>
-            <td>USD {{ subTotal * 0.18 | redondear }}</td>
+            <td>{{ subTotal * 0.18 | redondear }}</td>
           </tr>
           <tr v-if="mostrarDolar">
             <th colspan="2">TOTAL DOLARES</th>
-            <td>USD {{ total | redondear }}</td>
+            <td>{{ total | redondear }}</td>
           </tr>
 
           <tr v-else>
@@ -373,7 +373,7 @@ export default {
 }
 
 .clsCotizacion {
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 2% 2% !important;
   height: 100px;
@@ -382,7 +382,7 @@ export default {
   align-items: center;
 }
 .clsTable {
-  border: 5px solid #E0E0E0;
+  border: 5px solid #e0e0e0;
 }
 .clsTable th {
   /* border: 1px solid #E0E0E0; */
@@ -393,12 +393,12 @@ export default {
   /* border: 1px solid #E0E0E0 !important; */
 }
 .clsSubTotal {
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   margin: 20px 0 0 0;
   border-radius: 15px;
 }
 .clsPeso {
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   margin: 20px 0 0 0;
   padding: 2% 5%;
   border-radius: 15px;

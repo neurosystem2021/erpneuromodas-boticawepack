@@ -23,6 +23,9 @@
                           <b-input-group-append>
                               <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                           </b-input-group-append>
+                          <b-input-group-append  v-if="cliente.IdCliente && cliente.DniRuc != '00000000'">
+                              <b-button variant="info" @click="verVehiculos"><i class="fa fa-car" aria-hidden="true"></i></b-button>
+                          </b-input-group-append>
             </b-input-group>
                        <b-form-select v-if="valDireccion" v-model="CampoDireccion" class="mb-3">
                           <option v-if="cliente.Direccion" :value="cliente.Direccion">{{ cliente.Direccion }}</option>
@@ -125,7 +128,7 @@
                     placeholder=""
                     :on-select="setProducto" 
                     :onFocus="focusAutocomplete.bind(null, 'inputProductos')"
-                     :customParams="{ tipoBusqueda: tipoBusqueda }"
+                     :customParams="{ tipoBusqueda: tipoBusqueda,idAlmacen:almacen.IdAlmacen }"
                     :classes="{input: 'form-control'}"
                     :onShouldRenderChild="renderChild"
                     >
@@ -214,6 +217,28 @@
             </template>
         </b-table>
     </b-modal>
+    <b-modal v-model="vehiculoFlag" size="lg" class="modalVehiculo" id="modalProducto">
+      <b-table :items="lstVehiculos" :fields="fieldsVehiculo">
+
+                <template slot="comentario" slot-scope="data">
+                    <b-button variant="info" @click="data.item.mostrarComentario=!data.item.mostrarComentario" v-if="!data.item.mostrarComentario"> <i class="fa fa-eye" aria-hidden="true"></i> </b-button>
+                    <b-button variant="secondary" @click="data.item.mostrarComentario=!data.item.mostrarComentario" v-else> <i class="fa fa-eye-slash" aria-hidden="true"></i> </b-button>
+                    <p v-if="data.item.mostrarComentario">
+                       {{ data.item.comentario }} 
+                    </p>
+                    
+                </template>
+                <!-- <template slot="action" slot-scope="data">
+                    <b-button variant="warning" @click="abrirModalActualizar(data.item)">
+                        <i class="fas fa-pencil-alt"></i>
+                    </b-button>
+                    <b-button variant="danger" @click="eliminarVehiculo(data.item)">
+                        <i class="fas fa-trash-alt"></i>
+                    </b-button>
+                </template> -->
+
+            </b-table>
+    </b-modal>
   </b-container>
 </template>
 
@@ -292,6 +317,20 @@ export default {
 
         { key: "acciones", label: "" }
       ],
+      fieldsVehiculo: [
+        { key: "nombre", label: "Nombre Máquina" },
+        { key: "marca", label: "Marca Vehículo" },
+        { key: "modelo", label: "Modelo Máquina" },
+        { key: "serie", label: "Serie Máquina" },
+        { key: "horas" },
+        { key: "motor", label: "Modelo Vehículo" },
+        { key: "seriemotor", label: "Serie Motor" },
+        { key: "aniomotor", label: "Año Fabricación" },
+        // { key: "cargabruta", label: "Carga Bruta" },
+        // { key: "carganeta", label: "Carga Neta" },
+        { key: "comentario", label: "Comentarios" }
+        // { key: "action", label: "" }
+      ],
       lstProducto: [],
       API: config.API,
       dni: "",
@@ -310,7 +349,9 @@ export default {
       garantia: "De Fabrica",
       observacion: "",
       peso: 0,
-      TipoCambioUSD: 1
+      TipoCambioUSD: 1,
+      lstVehiculos: [],
+      vehiculoFlag: false
     };
   },
   mounted() {
@@ -318,6 +359,21 @@ export default {
     this.obtenerTipoCambio();
   },
   methods: {
+    async verVehiculos() {
+      this.lstVehiculos = [];
+      await this.axios(`${this.API}cliente/vehiculo`, {
+        params: this.cliente
+      }).then(res => {
+        if (res.data) {
+          let data = res.data;
+          data = data.map(item => {
+            return { ...item, mostrarComentario: false };
+          });
+          this.lstVehiculos = data;
+          this.vehiculoFlag = true;
+        }
+      });
+    },
     async obtenerTipoCambio() {
       let tipoCambio = await this.axios(
         "https://deperu.com/api/rest/cotizaciondolar.json"
@@ -562,6 +618,7 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <thead>
               <tr>
+                <th>Stock</th>
                 <th>Cód. Fab.</th>
                 <th>Cód. Int..</th>
                 <th>Producto</th>
@@ -573,11 +630,8 @@ export default {
             </thead>
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${
-        data.EsPadre == 1
-          ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
-          : data.CodigoFrabricante
-      }</b></td>
+                <td style="width: 60px" class="${styleStock}"><b>${data.stock}</b></td>
+                <td style="width: 60px"><b>${data.EsPadre == 1 ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />': data.CodigoFrabricante}</b></td>
                 <td style="width: 60px"><b>${data.CodigoInterno}</b></td>
                 <td style="width: 200px"><b>${data.Producto}</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
@@ -641,5 +695,8 @@ export default {
   max-height: 320px;
   overflow-y: scroll;
   margin: 0 0 2%;
+}
+#modalProducto .modal-dialog {
+  min-width: 80% !important;
 }
 </style>

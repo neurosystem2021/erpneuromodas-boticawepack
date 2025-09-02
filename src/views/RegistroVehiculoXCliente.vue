@@ -280,7 +280,6 @@ export default {
       this.serieMotorError = false;
       this.comentarioError = false;
       this.aniomotorError = false;
-      this.nuevoRegistroFlag = true;
       let vehiculo = { ...item };
       vehiculo.serieMotor = item.seriemotor;
       this.nuevoFlag = false;
@@ -308,9 +307,9 @@ export default {
         return;
       }
       let data = { ...this.cliente, ...this.formVehiculo };
-      //   await this.axios.post(`${this.API}vehiculo`, data);
-      this.obtenerVehiculos();
-      this.nuevoRegistroFlag = false;
+        await this.axios.post(`${this.API}vehiculo`, data);
+        this.obtenerVehiculos();
+        this.nuevoRegistroFlag = false;
     },
     async actualizarVehiculo() {
       let res = this.validarFormulario();
