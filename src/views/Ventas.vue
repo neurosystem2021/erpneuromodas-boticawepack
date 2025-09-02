@@ -769,6 +769,15 @@ export default {
                 this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.venta.NotaIdMotivo)[0].text
             }
 
+            if (this.venta.cliente.DniRuc == "00000000" && this.totalCart >= 700) {
+                this.$toasted.show("El monto es mayor a 700 soles y para un cliente varios, use otro cliente para la venta", {
+                    type: "info",
+                    duration: 5000
+                });
+                this.inProgress = false;
+                return;
+            }
+
             // NO PERMITE CANTIDAD Y PRECIOS EN CERO
             let sinStock = 0
             let totalCero = 0 
