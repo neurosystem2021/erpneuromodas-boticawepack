@@ -59,7 +59,7 @@
                 </b-col>
                 <b-col cols="8" >
                   <b-form-input 
-                  v-model="venta.nombreOrganizacion" 
+                  v-model="venta.NombreOrganizacion" 
                   v-if="venta.EsOrganizacion"
                   :id="`txtNombreOrganizacion-${index}`"
                   placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
@@ -469,6 +469,41 @@
                                                     Por entregar
                                                 </b-form-checkbox> -->
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b-input-group prepend="Proforma válidez: " append="días">
+                                                <b-form-input
+                                                    :disabled="bloquearInput?true:false"
+                                                    v-model="diasValidosProf"
+                                                    min="0"
+                                                    value="0"
+                                                    type="number"
+                                                ></b-form-input>
+                                            </b-input-group>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <b-input-group>
+                                              <b-form-checkbox 
+                                              :disabled="bloquearInput?true:false"
+                                              v-model="ventas[ventaActiva].EsCreditoProforma"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                                Proforma a Credito
+                                              </b-form-checkbox>
+                                              <div v-if="ventas[ventaActiva].EsCreditoProforma">
+                                                <div class="mb-3">
+                                                  <input v-model="ventas[ventaActiva].FechaCreditoProforma"
+                                                    type="date"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Fecha Crédito"/>
+                                                </div>
+                                              </div>
+                                            </b-input-group>
+                                          </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -977,6 +1012,7 @@ export default {
       productosCategoria: [],
       isNota: [],
       tieneIgv: [],
+      diasValidosProf:0,
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1054,7 +1090,7 @@ export default {
         },
         vendedor: {},
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
-        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),        
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
@@ -1117,6 +1153,8 @@ export default {
           },
           idProductos: [],
           NroComprobanteModifica: "",
+          EsCreditoProforma: 0,
+          FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
           CodSunatModifica: "",
           NotaIdMotivo: "",
           NotaDescMotivo: "",
@@ -2145,6 +2183,11 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
+      if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
+                this.$toasted.show('Debe ingresar los días de validez de la proforma')
+                this.inProgress = false
+                return
+            }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
@@ -2324,7 +2367,9 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+      venta.diasValidosProf = this.diasValidosProf
       await this.axios.post(this.API + "proformas", venta).then(response => {
+        this.diasValidosProf = 0;
         console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");

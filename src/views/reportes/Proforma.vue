@@ -58,13 +58,25 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>
                 <td class="celda" style="text-transform: uppercase">: {{fechaHasta}}</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
                 <td class="celda" style="text-transform: uppercase">: CONTADO</td>
+              </tr> -->
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCreditoProforma == 1 ? 'CRÉDITO' : 'CONTADO'}}</td>
+              </tr>
+              <tr v-if="proforma.EsCreditoProforma == 1">
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha De Pago</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCreditoProforma }}</td>
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Descripción</td>
+                <td class="celda" style="text-transform: uppercase">: {{proforma.Descripcion}}</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -125,17 +137,23 @@
           </tr>
         </tfoot>
       </table>
-      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+      <!-- <div id="accounts" style="margin-top:-10px; font-weight:bold;">
         <h3 style="font-weight:bold">Información de pago</h3>
         <div style="margin-bottom:10px;">
           CTA AHORROS SOLES 
         </div>
+      </div> -->
+      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
       <br>
       <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
+        <div  style="font-weight:bold">TÉRMINOS Y CONDICIONES:</div>
+        <div style="font-style: italic; font-size: 15px;">Esta cotización esta sujeta a los términos y condiciones que se enuncian acontinuación:</div>
+        <div class="notice">1. Duración de la oferta <span style="font-weight:bold">{{proforma.DiasValidos}} DIAS.</span> </div>
+        <div class="notice">2. Para iniciar la <span style="font-weight:bold">produccón o servicio</span> se realizará el anticipo de <span style="font-weight:bold">50%</span></div>
+        <div class="notice">3. Entregado el trabajo o ejecutado el servicio no existen <span style="font-weight:bold">devoluciones</span></div>
+        <div style="font-style: italic;">La aceptación del cliente (firmar a continuación)</div>
       </div>
       <div>
         <br>
@@ -143,9 +161,9 @@
         <br>
         <table>
           <tbody>
+            <td style="border: none !important; border-top:3px solid #E7BC2F; background: white !important; width:10%;"></td>
+            <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:left; color:black">NOMBRE DEL CLIENTE:</td>
             <td style="border: none !important; border-top:3px solid #E7BC2F; background: white !important; width:50%"></td>
-            <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #E7BC2F; background: white !important; width:10%"></td>
           </tbody>
         </table>
       </div>
