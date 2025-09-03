@@ -22,6 +22,7 @@ import CierreCaja from "@/views/reportes/CierreCaja.vue";
 import RegistroHuespedes from "@/views/reportes/RegistroHuespedes.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 
 Vue.use(Router);
 
@@ -127,6 +128,11 @@ export default new Router({
       path: "/CajaBancos",
       name: "CajaBancos",
       component: CajaBancos
+    },
+    {
+      path: "/ReporteUtilidadBruta",
+      name: "ReporteUtilidadBruta",
+      component: ReporteUtilidadBruta
     },
   ]
 });
