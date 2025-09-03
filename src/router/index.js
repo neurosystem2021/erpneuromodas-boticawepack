@@ -17,6 +17,7 @@ import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
 import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
+import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import Ordenes from "@/views/reportes/Ordenes.vue";
 
 // Reportes
@@ -253,6 +254,11 @@ export default new Router({
       path: "/CargarComprasXml",
       name: "CargarComprasXml",
       component: CargarComprasXml
+    },
+    {
+      path: "/reporte/BuscadorCajaBanco",
+      name: "BuscadorCajaBanco",
+      component: BuscadorCajaBanco
     }
   ]
 });
