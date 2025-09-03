@@ -12,6 +12,7 @@ import Habitaciones from "@/views/Habitaciones.vue";
 import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import RegistroVehiculoXCliente from "@/views/RegistroVehiculoXCliente.vue";
+import OrdenCompra from "@/views/OrdenCompra.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -34,6 +35,7 @@ import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Cotizacion from "@/views/Cotizacion.vue";
 import Cobros from "@/views/Cobros.vue";
 import Usuario from "@/views/Usuario.vue";
+import Ordenes from "../views/reportes/Ordenes.vue";
 
 Vue.use(Router);
 
@@ -199,6 +201,16 @@ export default new Router({
       path: "/usuario",
       name: "Usuario",
       component: Usuario
+    },
+    {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
+    },
+    {
+      path: "/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
     },
   ]
 });

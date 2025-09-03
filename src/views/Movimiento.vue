@@ -6,7 +6,7 @@
         <b-container fluid class="ancho bv-example-row">
           <b-row>
               <b-col md="12" style="text-align: right;">
-               <PreOrdenLista />
+                <b-button @click="abrirModalOrdenCompra" variant="info">Cargar Orden Compra</b-button>
               </b-col>
               <b-col md="8">
 
@@ -212,7 +212,13 @@
         <br><br>
     </b-form>
     
-   
+    <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
+          <b-table :items="productosInf"  :fields="fields">
+            <template slot="action" slot-scope="data">
+              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
+    </b-modal>
   </div>
 </template>
 
@@ -223,7 +229,6 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
-import PreOrdenLista from "../components/PreOrdenLista.vue";
 
 export default {
   mounted() {},
@@ -237,7 +242,16 @@ export default {
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      productosInf: [],
+      fields: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ]
     };
   },
   computed: {
@@ -254,7 +268,22 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    verArticulos() {
+      this.productosInf = [];
+      this.axios
+        .get(this.API + "ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: -1
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
+    },
     abrirModalOrdenCompra() {
+      this.verArticulos();
       this.modalMovimientos = true;
     },
     onSetProducto(obj, cant, precio) {
@@ -515,13 +544,43 @@ export default {
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
+    },
+    addPreOrdenCompra(item) {
+      console.log(item);
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      this.mostrarDetalles(item);
+      this.modalMovimientos = false;
+    },
+    mostrarDetalles(data) {
+      this.$store.state.cart.productos = [];
+      this.axios
+        .get(this.API + "ordencompra/detalle", {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra,
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          let detalle = response.data;
+          detalle.forEach(element => {
+            this.$store.state.cart.productos.unshift(element);
+          });
+          console.log(detalle);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
   components: {
     Menu,
     ProductosCarrito,
-    ProveedoresForm,
-    PreOrdenLista
+    ProveedoresForm
   }
 };
 </script>
@@ -531,7 +590,7 @@ export default {
 }
 
 #modalOrdenCompra .modal-dialog {
-  min-width: 80% !important;
+  min-width: 70% !important;
 }
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
