@@ -17,6 +17,7 @@ import AgenteReimpresion from "@/views/AgenteReimpresion.vue";
 import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
+import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -258,6 +259,11 @@ export default new Router({
       path: "/reporte/confrontacion",
       name: "Confrontacion",
       component: Confrontacion
+    },
+    {
+      path: "/reporte/BuscadorCajaBanco",
+      name: "BuscadorCajaBanco",
+      component: BuscadorCajaBanco
     }
   ]
 });
