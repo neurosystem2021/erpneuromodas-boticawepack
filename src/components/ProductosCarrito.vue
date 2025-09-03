@@ -268,7 +268,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput?true:false  || esDelivery"
+            :disabled="bloquearInput?false:true  || esDelivery"
             v-model="productos[data.index].PorcentajeDesc"
             type="number"
             min="0"
