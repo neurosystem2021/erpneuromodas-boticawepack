@@ -114,10 +114,14 @@ export default {
         title: "Eliminar Movimiento",
         allowEscapeKey: false,
         allowOutsideClick: false,
-        ConfirmButtonText: "Si, Eliminar",
+        confirmButtonText: "Si, Eliminar",
         showCancelButton: true
-      })
-      console.log(item);
+      }).then(async res => {
+        if (res.isConfirmed) {
+          await this.axios.put(`${this.API}cajabanco/eliminar`, item);
+          this.buscadorCajaBanco();
+        }
+      });
     },
     setCuenta(obj) {
       this.Cuenta = obj;
