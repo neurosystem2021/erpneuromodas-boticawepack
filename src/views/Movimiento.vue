@@ -5,6 +5,9 @@
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container fluid class="ancho bv-example-row">
           <b-row>
+              <b-col md="12" style="text-align: right;">
+               <PreOrdenLista />
+              </b-col>
               <b-col md="8">
 
                 <b-row>
@@ -208,7 +211,8 @@
         </b-container>
         <br><br>
     </b-form>
-
+    
+   
   </div>
 </template>
 
@@ -219,11 +223,13 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
+import PreOrdenLista from "../components/PreOrdenLista.vue";
 
 export default {
   mounted() {},
   data() {
     return {
+      modalMovimientos: false,
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -248,6 +254,9 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    abrirModalOrdenCompra() {
+      this.modalMovimientos = true;
+    },
     onSetProducto(obj, cant, precio) {
       if (cant) {
         obj.cantidad = cant;
@@ -511,13 +520,18 @@ export default {
   components: {
     Menu,
     ProductosCarrito,
-    ProveedoresForm
+    ProveedoresForm,
+    PreOrdenLista
   }
 };
 </script>
 <style>
 .input-group {
   /*margin: 0.25rem 0 !important;*/
+}
+
+#modalOrdenCompra .modal-dialog {
+  min-width: 80% !important;
 }
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */

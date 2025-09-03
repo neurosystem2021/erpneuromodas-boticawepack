@@ -82,6 +82,13 @@
               </b-input-group>
             </b-col>
             <b-col cols="2">
+              <b-form-checkbox
+                  v-model="igv"
+                  :value="1"
+                  :unchecked-value="0"
+                >
+                  IGV
+              </b-form-checkbox>
              <b-input-group  class="my-2" prepend="Moneda:">
                 <autocomplete
                   :url="API + 'monedas'"
@@ -139,6 +146,9 @@
             <b-col cols="12" class="mt-2">
               <div class="clsProductos">
                   <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+                    <template slot="img" slot-scope="data">
+                        <img :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen" class="imagen">
+                    </template>
                     <template slot="cantidad" slot-scope="data">
                       <input :id="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
@@ -330,6 +340,7 @@ export default {
   },
   data() {
     return {
+      igv: 1,
       nuevoFlag: false,
       actualizarFlag: false,
       nombreError: false,
@@ -363,6 +374,7 @@ export default {
         { key: "action", label: "" }
       ],
       fields: [
+        { key: "img", label: "" },
         //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
         {
           key: "stock",
@@ -747,6 +759,7 @@ export default {
         Observacion: this.observacion,
         Direccion: this.CampoDireccion,
         peso: this.peso,
+        igv: this.igv,
         detalle: this.productos
       };
       await this.axios.post(`${this.API}cotizacion`, data).then(res => {

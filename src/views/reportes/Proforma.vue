@@ -7,16 +7,16 @@
         </div>
       </b-col>
       <b-col cols="8" >
-        <div style="border-right: 5px solid #E0E0E0;
-            border-top: 5px solid #E0E0E0;
-            border-bottom: 5px solid #E0E0E0;
+        <div style="border-right: 1px solid #000000;
+            border-top: 1px solid #000000;
+            border-bottom: 1px solid #000000;
             padding: 1% 2%;
             margin: 1% 0;"
         >
              <b-row>
               <b-col cols="6">
-                <div>
-                  <p> <b> COTIZACIÓN :</b> N° 0000000-{{ proforma.Numero}}</p>
+                <div style="text-align: center; align-items: center; align-content: center;">
+                  <p> <b> COTIZACIÓN :</b> <span style="color:red; font-weight: bold; text-align: center;">N° 0000000-  {{ proforma.Numero}} </span></p>
                   <p> <b> FECHA EMISIÓN </b>{{ fechaHoy }}</p>
                 </div>
               </b-col>
@@ -31,14 +31,17 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col cols="6" style="text-align: center;">
+      <b-col cols="4" style="text-align: left;">
             <p class="my-0 py-0" style="font-weight: bold;" > RUC: 20601250501 </p>
             <p class="my-0 py-0" style="font-weight: bold;" > INVERSIONES CASPRO S.R.L. </p>
             <p class="my-0 py-0"> 
               MZA. C LOTE. 1 URB. LOS CIPRECES (A UNA CUADRA DE MOPAL) HUANUCO - HUANUCO - AMARILIS
             </p>
+            <p>
+              949434255/ 998811867/ 986779444/ 949658603
+            </p>
       </b-col>
-      <b-col cols="6" style="text-align: center; align-items: center;align-content: center;">
+      <b-col cols="8" style="text-align: center; align-items: center;align-content: center;">
         REPUESTOS ORIGINALES Y ALTERNATIVOS
         PARA MAQUINARIA PESADA
       </b-col>
@@ -46,7 +49,7 @@
 
     <b-row>
         <b-col cols="12" >
-          <div style="border: 5px solid #E0E0E0 !important; padding: 1% 2%; margin: 1% 0;">
+          <div style="border: 1px solid #000000 !important; padding: 1% 2%; margin: 1% 0;">
 
             <table width="100%">
               <tbody>
@@ -74,39 +77,39 @@
 		
     <b-row>
       <b-col cols="12" >
-      <div style="border: 5px solid #E0E0E0 !important; padding: 1%; margin: 1% 0;">
+      <div>
       <table>
         <thead>
-          <tr style="border-bottom: 2px solid #E0E0E0">
-            <th >#</th>
-            <th >CÓDIGO</th>
-            <th >DESCRIPCIÓN</th>
-            <th >UBICACIÓN</th>
-            <th >MARCA</th>
-            <th >UNIDAD</th>
-            <th >CANT.</th>
-            <th >CANT. SUCURSAL</th>
-            <th >CANT. IMPORTACIÓN</th>
-            <th >PRECIO U.</th>
-            <th >TOTAL CANT.</th>
-            <th >TOTAL</th>
+          <tr style="border-bottom: 1px solid #000000">
+            <th style="border: 1px solid #000000;">#</th>
+            <th style="border: 1px solid #000000;">CÓD. INTERNO </th>
+            <th style="border: 1px solid #000000;">DESCRIPCIÓN</th>
+            <th style="border: 1px solid #000000;">UBICACIÓN</th>
+            <th style="border: 1px solid #000000;">MARCA</th>
+            <th style="border: 1px solid #000000;">UNIDAD</th>
+            <th style="border: 1px solid #000000;">CANT.</th>
+            <th style="border: 1px solid #000000;">CANT. SUCURSAL</th>
+            <th style="border: 1px solid #000000;">CANT. IMPORTACIÓN</th>
+            <th style="border: 1px solid #000000;">PRECIO U.</th>
+            <th style="border: 1px solid #000000;">TOTAL CANT.</th>
+            <th style="border: 1px solid #000000;">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <!-- {{ prod }} -->
-            <td style="">{{ index+1 }}</td>
-            <td style=""><h3>{{ prod.CodigoInterno }}</h3></td>
-            <td style=""><h3>{{ prod.Producto }}</h3></td>
-            <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.Anaquel }}</h3></td>
-            <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMarca }}</h3></td>
-            <td style="text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMedicion }}</h3></td>
-            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.Cantidad }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadImportacion }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;"> {{ prod.Precio | moneda }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal + parseFloat(prod.CantidadImportacion) }}</td>
-            <td style="text-align: center !important; align-content: center; align-items: center;">
+            <td style="border: 1px solid #000000; ">{{ index+1 }}</td>
+            <td style="border: 1px solid #000000; "><h3>{{ prod.CodigoInterno }}</h3></td>
+            <td style="border: 1px solid #000000; text-align: left;"><h3>{{ prod.Producto }}</h3></td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.Anaquel }}</h3></td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMarca }}</h3></td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;"><h3>{{ prod.ProductoMedicion }}</h3></td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">{{ prod.Cantidad }}</td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal }}</td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadImportacion }}</td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;"> {{ prod.Precio | moneda }}</td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal + parseFloat(prod.CantidadImportacion) }}</td>
+            <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">
               <div v-if="prod.DisabledTotal === 0">
                  {{ prod.Precio * (parseFloat(prod.CantidadSucursal) +parseFloat(prod.CantidadImportacion)) - prod.Descuento | redondear }}<br>
                 <span v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
@@ -128,15 +131,15 @@
           <tbody>
             <tr>
               <td style="text-align: left;"> <b> VALIDEZ DE OFERTA : </b></td>
-              <td>{{ proforma.DiasValidos }}</td>
+              <td>{{ proforma.DiasValidos }} Días</td>
             </tr>
             <tr>
               <td style="text-align: left;"> <b> TIEMPO DE ENTREGA: SUCURSAL: </b></td>
-              <td>{{ maxDiaEntrega }}</td>
+              <td>{{ maxDiaEntrega }} Días</td>
             </tr>
             <tr>
               <td style="text-align: left;"> <b> TIEMPO DE ENTREGA IMPORTACION: </b></td>
-              <td>{{ maxDiaEntregaImportacion }}</td>
+              <td>{{ maxDiaEntregaImportacion }} Días</td>
             </tr>
             <tr>
               <td style="text-align: left;"> <b> FORMA DE PAGO : </b></td>
@@ -146,10 +149,7 @@
               <td style="text-align: left;"> <b> GARANTIA :  </b></td>
               <td>{{ proforma.Garantia }}</td>
             </tr>
-            <tr>
-              <td style="text-align: left;"> <b> TELEFONO: </b></td>
-              <td> 949434255/ 998811867/ 986779444/ 949658603 </td>
-            </tr>
+           
             <tr>
               <td style="text-align: left;"> <b> OBSERVACION : </b></td>
             </tr>
@@ -158,14 +158,14 @@
       </b-col>
       <b-col cols="4"></b-col>
       <b-col cols="4">
-        <div style="border: 5px solid #E0E0E0 !important; padding: 1% 2%; margin: 1% 0;">
+        <div style="border: 1px solid #000000 !important; padding: 1% 2%; margin: 1% 0;">
 
         <table width="100%">
           <tr>
             <th colspan="2">SUBTOTAL</th>
             <td>{{ subTotal | redondear }}</td>
           </tr>
-          <tr>
+          <tr v-if="proforma.IGV==1">
             <td colspan="1">18.00%</td>
             <td colspan="1">I.G.V</td>
             <td>{{ subTotal * 0.18 | redondear }}</td>
@@ -185,40 +185,54 @@
     </b-row>
 
     <b-row>
-      <b-col>
-          <table class="clsTable">
+      <b-col cols="12">
+        <table width="100%" style="border: 1px solid #000000 !important">
+          <thead>
+            <tr>
+              <th>BANCO</th>
+              <th>MONEDA</th>
+              <th>CUENTA</th>
+              <th>CCI</th>
+            </tr>
+          </thead>
             <tbody>
               <tr>
-                <td rowspan="1"  style="text-align: center !important;">
-                  <img src="/resources/images/bcp_logo.png" style="max-width: 120px">
-                </td> 
-                <td>
-                  <p> USD 365-2495697-1-36 / 00236500249569713650 </p>
-                  <p> S/. 365-2563145-0-20 / 0023650025631452059 </p>
+                <td rowspan="2">
+                  <img src="/resources/images/bcp_logo.png" style="max-width: 120px" />
                 </td>
-
-                <td rowspan="1"  style="text-align: center !important;">
-                   <img src="/resources/images/bbva_logo.png" style="max-width: 120px">
-                </td>
-                <td>
-                  <p> S/. 001102100100065438 </p>
-                  <p> USD 001102100100065438 </p>
-                </td>
+                <td>USD</td>
+                <td>365-2495697-1-36</td>
+                <td>00236500249569713650</td>
               </tr>
               <tr>
-                <td  colspan="2"  style="text-align: center !important;">
-                 <img src="/resources/images/yape.png" style="max-width: 60px">
+                <td>SOLES</td>
+                <td>365-2563145-0-20</td>
+                <td>0023650025631452059</td>
+              </tr>
+              <tr>
+                <td rowspan="2">
+                  <img src="/resources/images/bbva_logo.png" style="max-width: 120px" />
                 </td>
-                <td colspan="2">
-                  <p>949 434 255 </p>
-                   Inversiones Caspro SCRL
-                </td>
+                <td>USD</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>SOLES</td>
+                <td>001102100100065438</td>
+                <td>01121000010006543822</td>
               </tr>
             </tbody>
         </table>
+      </b-col>    
+    </b-row>
+    <b-row>
+       <b-col cols="12" class="mt-5">
+        <img src="/resources/images/qr_yape.jpg" style="max-width: 120px">
+        <p>949 434 255 </p>
+        Inversiones Caspro SCRL
       </b-col>
     </b-row>
-
     <b-row>
       <div style="align-items: center; text-align: center; align-content: center;">
         <center>
@@ -236,7 +250,7 @@
 import { API } from "@/store/config.js";
 export default {
   mounted() {
-    this.fechaHoy = this.$moment().format("YYYY-MM-DD");
+    this.fechaHoy = this.$moment().format("YYYY-MM-DD HH:mm:ss");
     this.getProforma();
     this.getEmpresa();
   },
@@ -273,7 +287,7 @@ export default {
           prod.Descuento;
       });
 
-      return sumatoria + sumatoria * 0.18;
+      return sumatoria + sumatoria * (this.proforma.IGV == 1 ? 0.18 : 0);
     },
     mostrarDolar() {
       return this.proforma.Moneda === "USD";
@@ -373,7 +387,7 @@ export default {
 }
 
 .clsCotizacion {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   border-radius: 10px;
   padding: 2% 2% !important;
   height: 100px;
@@ -382,7 +396,7 @@ export default {
   align-items: center;
 }
 .clsTable {
-  border: 5px solid #e0e0e0;
+  border: 1px solid #000000;
 }
 .clsTable th {
   /* border: 1px solid #E0E0E0; */
@@ -393,12 +407,12 @@ export default {
   /* border: 1px solid #E0E0E0 !important; */
 }
 .clsSubTotal {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   margin: 20px 0 0 0;
   border-radius: 15px;
 }
 .clsPeso {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   margin: 20px 0 0 0;
   padding: 2% 5%;
   border-radius: 15px;
