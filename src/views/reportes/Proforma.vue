@@ -188,47 +188,47 @@
       <b-col cols="12">
         <table width="100%" style="border: 1px solid #000000 !important">
           <thead>
-            <tr>
-              <th>BANCO</th>
-              <th>MONEDA</th>
-              <th>CUENTA</th>
-              <th>CCI</th>
+            <tr style="border: 1px solid #000000 !important">
+              <th style="border: 1px solid #000000 !important">BANCO</th>
+              <th style="border: 1px solid #000000 !important">MONEDA</th>
+              <th style="border: 1px solid #000000 !important">CUENTA</th>
+              <th style="border: 1px solid #000000 !important">CCI</th>
             </tr>
           </thead>
             <tbody>
-              <tr>
-                <td rowspan="2">
+              <tr style="border: 1px solid #000000 !important">
+                <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="2">
                   <img src="/resources/images/bcp_logo.png" style="max-width: 120px" />
                 </td>
-                <td>USD</td>
-                <td>365-2495697-1-36</td>
-                <td>00236500249569713650</td>
+                <td style="border: 1px solid #000000 !important;text-align: center;">USD</td>
+                <td style="border: 1px solid #000000 !important;text-align: center;">365-2495697-1-36</td>
+                <td style="border: 1px solid #000000 !important;text-align: center;">00236500249569713650</td>
+              </tr>
+              <tr style="border: 1px solid #000000 !important">
+                <td style="text-align: center; border: 1px solid #000000 !important;">SOLES</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">365-2563145-0-20</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">0023650025631452059</td>
               </tr>
               <tr>
-                <td>SOLES</td>
-                <td>365-2563145-0-20</td>
-                <td>0023650025631452059</td>
-              </tr>
-              <tr>
-                <td rowspan="2">
+                <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="2">
                   <img src="/resources/images/bbva_logo.png" style="max-width: 120px" />
                 </td>
-                <td>USD</td>
-                <td></td>
-                <td></td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">USD</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
+                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
               </tr>
               <tr>
-                <td>SOLES</td>
-                <td>001102100100065438</td>
-                <td>01121000010006543822</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">SOLES</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">001102100100065438</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">01121000010006543822</td>
               </tr>
             </tbody>
         </table>
       </b-col>    
     </b-row>
     <b-row>
-       <b-col cols="12" class="mt-5">
-        <img src="/resources/images/qr_yape.jpg" style="max-width: 120px">
+       <b-col cols="12" class="mt-5" style="text-align: center;">
+        <img src="/resources/images/qr_yape.jpg" style="max-width: 200px">
         <p>949 434 255 </p>
         Inversiones Caspro SCRL
       </b-col>
