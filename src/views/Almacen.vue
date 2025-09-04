@@ -89,7 +89,7 @@
                   <autocomplete
                     :url="API + 'categorias'"
                     ref="inputCategoria"
-                    :debounce="600"
+                    :debounce="1000"
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
@@ -104,7 +104,7 @@
                   <autocomplete
                     :url="API + 'productos'"
                     ref="inputProducto"
-                    :debounce="600"
+                    :debounce="1000"
                     anchor="Producto"
                     label="writer"
                     :on-select="val => generateFilter('producto', val.Producto)"                    
@@ -119,7 +119,7 @@
                   <autocomplete
                     :url="API + 'marcas'"
                     ref="inputMarca"
-                    :debounce="600"
+                    :debounce="1000"
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
@@ -134,7 +134,7 @@
                   <autocomplete
                     :url="API + 'compuestos'"
                     ref="inputCompuesto"
-                    :debounce="600"
+                    :debounce="1000"
                     anchor="ProductoCompuesto"
                     label="writer"
                     :on-select="val => generateFilter('compuesto', val.ProductoCompuesto)"                    
@@ -455,6 +455,8 @@ export default {
         Almacen: "PRINCIPAL"
       },
       pageOptions: [5, 10, 15, 50, 100],
+      cancelTokenSource: null,  
+      debounceTimer: null,   
       filters: {},
       filter: "",
       sortBy: "IdProducto",
@@ -828,11 +830,12 @@ export default {
     actualizarTabla() {
       this.$refs.tablaProductos.refresh();
     },
-    async myProvider(l = null) {
-      this.items = [];
+    async myProvider() {
+      if (this.cancelTokenSource) {
+        this.cancelTokenSource.cancel("Nueva búsqueda en curso");
+      }
+      this.cancelTokenSource = this.axios.CancelToken.source();
 
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
       let url =
         this.API +
         this.APISTOCK +
@@ -845,16 +848,20 @@ export default {
         "&filter=" +
         (this.filter || "") +
         "&sortBy=" +
-        this.sortBy;
-      url += "&sortDesc=" + (this.sortDesc ? 1 : 0);
-      await this.axios
-        .get(url)
-        .then(result => {
-          this.items = result.data;
-        })
-        .catch(error => {
-          return [];
+        this.sortBy +
+        "&sortDesc=" +
+        (this.sortDesc ? 1 : 0);
+
+      try {
+        const result = await this.axios.get(url, {
+          cancelToken: this.cancelTokenSource.token
         });
+        this.items = result.data;
+      } catch (err) {
+        if (this.axios.isCancel(err)) {
+          console.log("Petición cancelada:", err.message);
+        }
+      }
     },
     limpiarFiltros() {
       this.APISTOCK = "productos";
@@ -888,9 +895,10 @@ export default {
       }
       this.currentPage = 1;
       this.filter = filter;
-      setTimeout(() => {
-        this.myProvider("llegó");
-      }, 100);
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.myProvider();
+      }, 400);
     },
     exportarProductos() {}
   },
@@ -988,4 +996,4 @@ export default {
   color: #fff;
 }
 </style>
-</style>
+
