@@ -465,8 +465,8 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>
-                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
-                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <!-- <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button> -->
+                <!-- <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button> -->
                 <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
                   <thead>
                     <tr>
@@ -527,8 +527,8 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
                <td>
-                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
-                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <!-- <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button> -->
+                <!-- <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button> -->
                 <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
                   <thead>
                     <tr>
@@ -591,8 +591,8 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
               <td>
-                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
-                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <!-- <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button> -->
+                <!-- <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button> -->
                 <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
                   <thead>
                     <tr>
@@ -655,8 +655,8 @@
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
                <td>
-                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
-                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <!-- <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button> -->
+                <!-- <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button> -->
                 <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
                   <thead>
                     <tr>
@@ -922,7 +922,8 @@ export default {
         this.axios
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
-            user: this.vendedor.Usuario
+            user: this.vendedor.Usuario,
+            granTotal: this.granTotal
           })
           .then(res => {
             this.loadData();
@@ -957,7 +958,7 @@ export default {
         })
         .then(res => {
           let data = res.data.map(item => {
-            return { ...item, mostrar: false };
+            return { ...item, mostrar: true };
           });
           this.ventas = data;
         })
