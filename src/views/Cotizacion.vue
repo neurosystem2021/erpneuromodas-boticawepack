@@ -1,5 +1,14 @@
 <template>
   <b-container fluid>
+    <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+        <div class="d-block text-center">
+          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
+        </div>
+        <b-row style="display:flex; justify-content:center; align-items:center">
+          <b-img :src="productoUrl" class="imagenGrande"></b-img>
+        </b-row>
+      </b-modal>
+
      <b-breadcrumb :items="items"></b-breadcrumb>
     <b-tabs pills card>
         <b-tab title="Por Producto" active class="px-5">
@@ -147,7 +156,13 @@
               <div class="clsProductos">
                   <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
                     <template slot="img" slot-scope="data">
-                        <img :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen" class="imagen">
+                      <b-button @click="abrirImagen(data.item.Producto,data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                       <b-popover  placement="right" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
+                          <div style="text-align:center">
+                            <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+                          </div>
+                        </b-popover>
+                        
                     </template>
                     <template slot="cantidad" slot-scope="data">
                       <input :id="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
@@ -374,7 +389,6 @@ export default {
         { key: "action", label: "" }
       ],
       fields: [
-        { key: "img", label: "" },
         //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
         {
           key: "stock",
@@ -388,6 +402,7 @@ export default {
         { key: "ProductoMarca", label: "Marca" },
         { key: "ProductoMedicion", label: "U. M." },
 
+        { key: "img", label: "" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         {
@@ -465,7 +480,9 @@ export default {
         comentario: "",
         aniomotor: ""
       },
-      nuevoRegistroFlag: false
+      nuevoRegistroFlag: false,
+      productoNombre: "",
+      productoUrl: ""
     };
   },
   mounted() {
@@ -473,6 +490,14 @@ export default {
     this.obtenerTipoCambio();
   },
   methods: {
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
+    abrirImagen(producto, url) {
+      this.productoNombre = producto;
+      this.productoUrl = url;
+      this.$refs["modalImagen"].show();
+    },
     abrirModalNuevoRegistro() {
       this.nuevoFlag = true;
       this.actualizarFlag = false;
