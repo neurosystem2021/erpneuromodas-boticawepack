@@ -35,7 +35,6 @@
                                         placeholder=""
                                         :on-select="setTipoVenta" 
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
-                                        :customParams="{IdUsuarioPerfil:venta.vendedor.IdUsuarioPerfil}"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                     </b-input-group>
