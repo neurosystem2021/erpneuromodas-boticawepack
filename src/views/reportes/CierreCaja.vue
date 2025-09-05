@@ -801,8 +801,8 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
+        // this.totalVentasVisa +
+        // this.totalVentasMastercard +
         this.totalIngresos -
         this.totalSalidas
       );
