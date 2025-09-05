@@ -104,6 +104,16 @@ export default new Router({
       component: CierreCaja
     },
     {
+      path: "/OrdenCompra",
+      name: "OrdenCompra",
+      component: OrdenCompra
+    },
+    {
+      path: "/reportes/Ordenes",
+      name: "Ordenes",
+      component: Ordenes
+    },
+    {
       path: "/reportes/proforma/:id",
       name: "Proforma",
       component: Proforma

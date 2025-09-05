@@ -303,6 +303,7 @@
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label> 
+            <label>Precio de Costo:</label> 
             <input
               v-model="producto.PrecioCosto"
                :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
@@ -463,6 +464,7 @@ export default {
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       preproducto: {},
+      preproducto: {},
       productosDet: [],
       file: "",
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -495,6 +497,7 @@ export default {
 
         let newVal = this.productoUpdate || {};
         if (newVal.IdProducto && !this.nuevo) {
+          await this.axios
           await this.axios
             .get(this.API + "productos/id/" + newVal.IdProducto)
             .then(response => {
@@ -949,6 +952,7 @@ export default {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
+      this.$emit("productoactualizado");
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""

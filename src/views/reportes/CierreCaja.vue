@@ -795,6 +795,14 @@ export default {
     };
   },
   computed: {
+    esAdmin() {
+      let usr = sessionStorage.getItem("IdPerfil");
+      if (usr == 1) {
+        return false;
+      }
+      console.log(usr);
+      return true;
+    },
     getFechaCierre() {
       //return this.$route.params.id ?
     },
@@ -885,7 +893,7 @@ export default {
         .then(response => {
           this.setVendedor(response.data);
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-          this.$refs.inputVendedor.$refs.input.disabled = true;
+          this.$refs.inputVendedor.$refs.input.disabled = this.esAdmin;
         })
         .catch(error => {
           console.log(error);
