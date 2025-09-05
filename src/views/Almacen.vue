@@ -378,9 +378,13 @@ export default {
           this.sumaValorizado = (response.data[0].sumaValorizado);
         })*/
       
-      this.axios.get(this.API + 'empresa/config/1')
+      // this.axios.get(this.API + 'empresa/config/1')
+      //   .then( response => {
+      //     this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
+      //   })
+      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizado=1')
         .then( response => {
-          this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
+          this.sumaValorizado = (response.data[0].sumaValorizado);
         })
 
       this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1')
