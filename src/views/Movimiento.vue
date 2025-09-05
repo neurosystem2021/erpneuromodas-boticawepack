@@ -150,7 +150,7 @@
                       <autocomplete
                         ref="inputMoneda"
                         :url="API + 'monedas'"
-                        initValue="PEN"
+                        initValue="USD"
                         anchor="Moneda"
                         label="writer"
                         placeholder="Moneda"
@@ -280,7 +280,7 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false,
-      tipocambio: 3.7,
+      tipocambio: "",
       gravadaflag: 0,
       igvflag: 0,
       fields: [
@@ -330,9 +330,13 @@ export default {
       this.imprimirCodigoBarra = true;
     },
     async obtnerTipoCambio() {
-      await this.axios(this.API + "tipocambio/usd").then(res => {
-        this.tipocambio = res.data;
-      });
+      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
+        res => {
+          this.tipocambio = res.data.Cotizacion[0].Venta;
+          this.movimiento.TipoCambio = res.data.Cotizacion[0].Venta;
+        }
+      );
+      // console.log(this.tipocambio);
     },
     imprimirCodigoMulti(evt) {
       evt.preventDefault();
@@ -398,7 +402,7 @@ export default {
         EsCredito: 0,
         alterarProductos: 1,
         FechaVenCredito: "",
-        Moneda: "PEN",
+        Moneda: "USD",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
