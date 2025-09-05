@@ -53,6 +53,7 @@
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
+                                         :customParams="{IdUsuarioPerfil: IdUsuarioPerfil}"
                                         :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
@@ -516,6 +517,7 @@ export default {
   },
   data() {
     return {
+      IdUsuarioPerfil: 1,
       objMoneda: {},
       TipoCambio: 1,
       isNota: false,
@@ -907,9 +909,9 @@ export default {
         });
     },
     setVendedor(obj) {
-      // console.log(obj)
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
-
+      this.IdUsuarioPerfil = obj.IdUsuarioPerfil;
+      console.log(this.IdUsuarioPerfil)
       this.venta.vendedor = obj;
     },
     setComisionista(obj) {

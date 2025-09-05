@@ -153,7 +153,7 @@
                       <label>Moneda:</label>
                       <autocomplete
                         :url="API + 'monedas'"
-                        initValue="PEN"
+                        initValue="USD"
                         anchor="Moneda"
                         label="writer"
                         placeholder="Moneda"
@@ -231,7 +231,9 @@ import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
 
 export default {
-  mounted() {},
+  mounted() {
+    this.obtnerTipoCambio();
+  },
   data() {
     return {
       modalMovimientos: false,
@@ -268,6 +270,14 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    async obtnerTipoCambio() {
+      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
+        res => {
+          this.tipocambio = res.data.Cotizacion[0].Venta;
+          this.movimiento.TipoCambio = res.data.Cotizacion[0].Venta;
+        }
+      );
+    },
     verArticulos() {
       this.productosInf = [];
       this.axios
