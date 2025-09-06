@@ -103,16 +103,7 @@ export default new Router({
       name: "CierreCaja",
       component: CierreCaja
     },
-    {
-      path: "/OrdenCompra",
-      name: "OrdenCompra",
-      component: OrdenCompra
-    },
-    {
-      path: "/reportes/Ordenes",
-      name: "Ordenes",
-      component: Ordenes
-    },
+
     {
       path: "/reportes/proforma/:id",
       name: "Proforma",
@@ -254,11 +245,6 @@ export default new Router({
       path: "/CargarComprasXml",
       name: "CargarComprasXml",
       component: CargarComprasXml
-    },
-    {
-      path: "/oferta",
-      name: "ConfigurarOferta",
-      component: ConfigurarOferta
     },
     {
       path: "/reportes/reporte_utilidad_bruta",
