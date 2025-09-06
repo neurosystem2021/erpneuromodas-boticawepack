@@ -290,7 +290,7 @@
                 </table>
               </td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -621,7 +621,7 @@
                 </table>
               </td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -863,13 +863,13 @@ export default {
     totalVentasMastercard() {
       let total = 0;
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard;
+        if (!venta.Anulado) total += venta.Yape;
       });
       return total;
     },
     ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0 && !venta.EsCredito;
+        return venta.Yape > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
