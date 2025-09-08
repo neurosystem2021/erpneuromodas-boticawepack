@@ -99,6 +99,8 @@ export default {
       movimiento: this.initMovimiento(),
       carrito: {
         fields: [
+          { key: "CodigoFrabricante", label: "Cód. Fabricante" },
+          { key: "CodigoInterno", label: "Cód. Interno" },
           { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
           { key: "ProductoMarca", label: "Marca" },
