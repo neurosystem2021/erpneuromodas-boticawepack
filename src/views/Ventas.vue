@@ -1,8 +1,8 @@
 <template>
    <b-container fluid>
     <b-tabs pills card  v-model="opcion">
-      {{ opcion }}
       <b-tab :title="`Venta ${index+1}`" v-for="(venta,index) in ventas" :key="index">
+        {{ typeof index }} {{ index }}
         <b-row>
           <b-col cols="7">
             <b-row>
@@ -13,14 +13,15 @@
                     <b-input-group>
                     <autocomplete
                         required="required"
-                        :ref="`inputTipoVenta${opcion}`"
+                        :id="`inputTipoVenta${index}`"
+                        :ref="`inputTipoVenta${index}`"
                         :url="API + 'ventas/tipos'"
                         anchor="TipoDoc"
                         initValue="BOLETA ELEC."
                         label="writer"
                         placeholder=""
                         :on-select="setTipoVenta" 
-                        :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${opcion}`)"
+                        :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                     </b-input-group>
@@ -29,14 +30,14 @@
                    <label>Doc. Referencia:</label>
                    <autocomplete
                        required="required"
-                       ref="inputDocRef"
+                       :id="`inputDocRef${index}`"
                        :url="API + 'ventas/lista/'+venta.puntoVenta.IdDocVentaPuntoVenta"
                        anchor="NroComprobante"
                        initValue=""
                        label="writer"
                        placeholder=""
                        :on-select="setDocRef"
-                       :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                       :onFocus="focusAutocomplete.bind(null, `inputDocRef${index}`)"
                        :classes="{input: 'form-control'}">
                    </autocomplete>
                 </b-form-group>                  
@@ -46,14 +47,14 @@
                       <label class="my-0">Almacen:</label>
                       <autocomplete
                           required="required"
-                          ref="inputAlmacen"
+                          :id="`inputAlmacen${index}`"
                           :url="API + 'almacenes'"
                           anchor="Almacen"
                           initValue="HUANUCO"
                           label="writer"
                           placeholder=""
                           :on-select="setAlmacen" 
-                          :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                          :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
                           :classes="{input: 'form-control'}">
                       </autocomplete>
                   </b-form-group>
@@ -67,14 +68,14 @@
                     <label class="my-0">Punto de Venta:</label>
                     <autocomplete
                       required="required"
-                      ref="inputPuntoVenta"
+                      :id="`inputPuntoVenta${opcion}`"
                       :url="API + 'ventas/puntos'"
                       anchor="PuntoVenta"
                       initValue="HUANUCO"
                       label="writer"
                       placeholder=""
                       :on-select="setPuntoVenta" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
+                      :onFocus="focusAutocomplete.bind(null, `inputPuntoVenta${opcion}`)"
                       :classes="{input: 'form-control'}">
                     </autocomplete>
                   </b-form-group>
@@ -163,12 +164,12 @@
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
-                                ref="inputVendedor"
+                                :id="`inputVendedor${opcion}`"
                                 :url="API + 'usuarios'"
                                 anchor="NombreUsuario"
                                 label="writer"
                                 :on-select="setVendedor" 
-                                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                :onFocus="focusAutocomplete.bind(null, `inputVendedor${opcion}`)"
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
@@ -193,7 +194,7 @@
         </b-row>
         <b-row>
             <b-col cols="12"> 
-              <productos-carrito 
+              <!-- <productos-carrito 
                 @onInputCantidad="actualizarDescuento"
                 @onAddProducto="onAddProducto"
                 @onRemoveProducto="actualizarDescuento"
@@ -210,7 +211,7 @@
                 :productos="venta.productos"
                 :index="index"
                 >
-              </productos-carrito>
+              </productos-carrito> -->
             </b-col>
           </b-row>
       </b-tab>
@@ -336,11 +337,11 @@ export default {
   },
   watch: {
     totalCart(newVal) {
-      this.venta.pago.efectivo.monto = parseFloat(
+      this.ventas[this.opcion].pago.efectivo.monto = parseFloat(
         newVal -
-          (parseFloat(this.venta.pago.visa.monto) +
-            parseFloat(this.venta.pago.mastercard.monto) +
-            parseFloat(this.venta.pago.yape.monto))
+          (parseFloat(this.ventas[this.opcion].pago.visa.monto) +
+            parseFloat(this.ventas[this.opcion].pago.mastercard.monto) +
+            parseFloat(this.ventas[this.opcion].pago.yape.monto))
       ).toFixed(2);
     }
   },
@@ -419,17 +420,23 @@ export default {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     cargarMonto(tipo) {
-      if (this.venta.pago && this.venta.pago.hasOwnProperty(tipo)) {
-        Object.keys(this.venta.pago).forEach((key, index) => {
-          this.venta.pago[key].monto = key === tipo ? this.totalCart : 0;
+      if (
+        this.ventas[this.opcion].pago &&
+        this.ventas[this.opcion].pago.hasOwnProperty(tipo)
+      ) {
+        Object.keys(this.ventas[this.opcion].pago).forEach((key, index) => {
+          this.ventas[this.opcion].pago[key].monto =
+            key === tipo ? this.totalCart : 0;
           if (key === tipo) {
             this.idMetodoPago = index + 1;
           }
         });
 
-        // console.log("Montos actualizados:", this.venta.pago);
+        // console.log("Montos actualizados:", this.ventas[this.opcion].pago);
       } else {
-        console.error(`El tipo de pago "${tipo}" no existe en this.venta.pago`);
+        console.error(
+          `El tipo de pago "${tipo}" no existe en this.ventas[this.opcion].pago`
+        );
       }
     },
     async ObtenerLstOfertas() {
@@ -443,7 +450,7 @@ export default {
       this.DocRefOfertas.splice(index, 1);
     },
     validarDocRefOfetar() {
-      if (this.venta.tipoVenta.CodSunat == "99") {
+      if (this.ventas[this.opcion].tipoVenta.CodSunat == "99") {
         let TotalMontoOfertas = this.DocRefOfertas.reduce((sum, oferta) => {
           return sum + parseFloat(oferta.Total);
         }, 0);
@@ -483,7 +490,7 @@ export default {
     },
 
     mostrarSeccionOferta() {
-      if (this.venta.tipoVenta.CodSunat == "99") {
+      if (this.ventas[this.opcion].tipoVenta.CodSunat == "99") {
         return true;
       }
       return false;
@@ -496,7 +503,7 @@ export default {
         let stock = await this.axios(
           `${this.API}productos/stock?idProductos[]=${
             query.IdProductoAsociado
-          }&idAlmacen=${this.venta.almacen.IdAlmacen}`
+          }&idAlmacen=${this.ventas[this.opcion].almacen.IdAlmacen}`
         ).then(res => {
           return res.data;
         });
@@ -573,9 +580,9 @@ export default {
     },
     selectPreOrden(orden) {
       console.log(orden);
-      // this.venta.IdPreOrden = this.venta.IdPreOrden || []
-      // if (Array.isArray(this.venta.IdPreOrden) ) {
-      this.venta.IdPreOrden.push(orden);
+      // this.ventas[this.opcion].IdPreOrden = this.ventas[this.opcion].IdPreOrden || []
+      // if (Array.isArray(this.ventas[this.opcion].IdPreOrden) ) {
+      this.ventas[this.opcion].IdPreOrden.push(orden);
       //}
 
       // obtener total adelantos
@@ -599,8 +606,8 @@ export default {
     },
     loadFirstAlmacen() {
       this.axios.get(this.API + "almacenes/primero").then(res => {
-        this.$refs.inputAlmacen.setValue(res.data.Almacen);
-        this.venta.almacen = res.data;
+        // this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.ventas[this.opcion].almacen = res.data;
       });
     },
     loadClienteBarcode(e) {
@@ -612,7 +619,15 @@ export default {
       }
     },
     focusAutocomplete(ref) {
-      this.$refs[ref].handleDoubleClick();
+      // this.$refs[ref].handleDoubleClick();
+      let element = document.getElementById(ref);
+      if (element) {
+        element.value = "";
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      const event = new MouseEvent("dblclick");
+      element.dispatchEvent(event);
     },
     initForm() {
       this.ventaObj = {
@@ -686,9 +701,9 @@ export default {
       } else {
         this.tieneIgv = false;
       }
-      this.$refs[`inputTipoVenta${this.opcion}`].setValue(obj.TipoDoc);
+      // this.$refs[`inputTipoVenta${this.opcion}`].setValue(obj.TipoDoc);
 
-      this.venta.tipoVenta = obj;
+      this.ventas[this.opcion].tipoVenta = obj;
       this.getNumeroVenta();
     },
     setDocRefOferta(obj) {
@@ -705,13 +720,13 @@ export default {
       // console.log(obj);
     },
     setDocRef(obj) {
-      this.venta.CodSunatModifica = obj.CodSunat;
-      this.venta.NroComprobanteModifica = obj.NroComprobante;
+      this.ventas[this.opcion].CodSunatModifica = obj.CodSunat;
+      this.ventas[this.opcion].NroComprobanteModifica = obj.NroComprobante;
       if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
+        this.ventas[this.opcion].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.opcion].tipoVenta.CodSunat == "08"
       ) {
-        this.venta.Serie = this.venta.Serie.replace(
+        this.ventas[this.opcion].Serie = this.ventas[this.opcion].Serie.replace(
           /^./,
           obj.NroComprobante[0]
         );
@@ -719,12 +734,12 @@ export default {
       this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
-            serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+            serie: this.ventas[this.opcion].Serie,
+            idTipoDoc: this.ventas[this.opcion].tipoVenta.IdTipoDoc
           }
         })
         .then(response => {
-          this.venta.Numero = response.data.numero;
+          this.ventas[this.opcion].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -736,7 +751,8 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.ventas[this.opcion].puntoVenta
+              .IdDocVentaPuntoVenta
           }
         })
         .then(response => {
@@ -749,7 +765,7 @@ export default {
             .then(response => {
               if (response.data) {
                 this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
+                this.ventas[this.opcion].cliente = response.data;
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
@@ -770,9 +786,11 @@ export default {
             }
             this.add([item, () => {}, false]);
           });
-          this.venta.NotaIdMotivo = null;
+          this.ventas[this.opcion].NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          this.obtenerStok({
+            IdAlmacen: this.ventas[this.opcion].almacen.IdAlmacen
+          });
         });
     },
     setMotivo(ev) {
@@ -784,13 +802,22 @@ export default {
     },
     loadAlmacen(id) {
       this.axios.get(this.API + "almacenes/id/" + id).then(res => {
+        let ref = this.$refs[`inputAlmacen${this.opcion}`];
+        if (Array.isArray(ref)) {
+          ref[0].setValue(res.data.Almacen);
+        } else {
+          ref.setValue(res.data.Almacen);
+        }
+
         this.setAlmacen(res.data);
       });
     },
+
     setAlmacen(obj) {
-      this.venta.almacen = obj;
-      this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      this.ventas[this.opcion].almacen = obj;
+      this.obtenerStok({
+        IdAlmacen: this.ventas[this.opcion].almacen.IdAlmacen
+      });
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -804,8 +831,8 @@ export default {
       });
     },
     setPuntoVenta(obj) {
-      this.venta.puntoVenta = obj;
-      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
+      this.ventas[this.opcion].puntoVenta = obj;
+      // this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
     getVendedor() {
@@ -814,15 +841,21 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-          this.$refs.inputVendedor.$refs.input.disabled = true;
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
-          // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
-          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          //this.getNumeroVenta()
-          this.getTipoDoc(response.data.IdTipoDoc);
+          let e = `inputAlmacen${this.opcion}`;
+          document.getElementById(e).disabled = true;
+          let p = `inputPuntoVenta${this.opcion}`;
+          document.getElementById(p).disabled = true;
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.$refs.input.disabled = true;
+          // this.loadAlmacen(response.data.IdAlmacen);
+          // this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
+          // // bloquear ambos inputs
+          // this.$refs.inputAlmacen.$refs.input.disabled = true;
+          // this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          // //this.getNumeroVenta()
+          // this.getTipoDoc(response.data.IdTipoDoc);
         })
         .catch(error => {
           console.log(error);
@@ -833,14 +866,14 @@ export default {
       // console.log(obj)
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
-      this.venta.vendedor = obj;
+      this.ventas[this.opcion].vendedor = obj;
     },
     setComisionista(obj) {
       if (typeof obj === "object") {
         this.$refs.inputComisionista.setValue(obj.Cliente);
-        this.venta.comisionista = obj;
+        this.ventas[this.opcion].comisionista = obj;
       } else {
-        this.venta.comisionista = {};
+        this.ventas[this.opcion].comisionista = {};
       }
     },
     setCliente(obj, dni = false) {
@@ -857,8 +890,10 @@ export default {
 
       if (typeof obj === "object") {
         this.$refs.inputCliente.setValue(obj.Cliente);
-        this.venta.cliente = obj;
-        this.venta.CampoDireccion = this.venta.cliente.Direccion;
+        this.ventas[this.opcion].cliente = obj;
+        this.ventas[this.opcion].CampoDireccion = this.ventas[
+          this.opcion
+        ].cliente.Direccion;
       } else {
         this.axios
           .get(this.API + "cliente", {
@@ -867,8 +902,10 @@ export default {
           .then(response => {
             if (response.data) {
               this.$refs.inputCliente.setValue(response.data.Cliente);
-              this.venta.cliente = response.data;
-              this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              this.ventas[this.opcion].cliente = response.data;
+              this.ventas[this.opcion].CampoDireccion = this.ventas[
+                this.opcion
+              ].cliente.Direccion;
             } else {
               this.$toasted.show("No se encontro al cliente");
             }
@@ -897,7 +934,7 @@ export default {
     onAddProducto(obj) {
       this.actualizarDescuento();
       this.obtenerStok({
-        IdAlmacen: this.venta.almacen.IdAlmacen
+        IdAlmacen: this.ventas[this.opcion].almacen.IdAlmacen
       });
     },
     actualizarDescuento() {
@@ -910,8 +947,8 @@ export default {
       }
     },
     aplicarPuntos(val) {
-      if (parseFloat(val) > this.venta.cliente.Puntos) {
-        this.puntosAplicados = this.venta.cliente.Puntos;
+      if (parseFloat(val) > this.ventas[this.opcion].cliente.Puntos) {
+        this.puntosAplicados = this.ventas[this.opcion].cliente.Puntos;
       }
 
       this.axios
@@ -933,13 +970,14 @@ export default {
       this.axios
         .get(this.API + "ventas/numero", {
           params: {
-            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+            idPuntoVenta: this.ventas[this.opcion].puntoVenta
+              .IdDocVentaPuntoVenta,
+            idTipoDoc: this.ventas[this.opcion].tipoVenta.IdTipoDoc
           }
         })
         .then(response => {
-          this.venta.Serie = response.data.serie;
-          this.venta.Numero = response.data.numero;
+          this.ventas[this.opcion].Serie = response.data.serie;
+          this.ventas[this.opcion].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -947,7 +985,9 @@ export default {
         });
     },
     updateTime() {
-      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
+      this.ventas[this.opcion].FechaDoc = this.$moment().format(
+        "YYYY-MM-DDTH:mm:ss"
+      );
     },
     limpiarDespuesVenta() {
       this.inProgress = false;
@@ -963,7 +1003,7 @@ export default {
       // this.$refs.inputVendedor.setValue('')
     },
     guardarDatosProforma(IdProforma) {
-      this.venta.IdProforma = IdProforma;
+      this.ventas[this.opcion].IdProforma = IdProforma;
       // console.log("IdProforma", IdProforma);
     },
     async guardarProforma() {
@@ -981,27 +1021,27 @@ export default {
         return;
       }
 
-      if (!this.venta.cliente.IdCliente) {
+      if (!this.ventas[this.opcion].cliente.IdCliente) {
         this.$toasted.show("Debe seleccionar un cliente");
         this.inProgress = false;
         return;
       }
 
-      if (!this.venta.vendedor.Usuario) {
+      if (!this.ventas[this.opcion].vendedor.Usuario) {
         this.$toasted.show("Debe seleccionar un vendedor");
         this.inProgress = false;
         return;
       }
-      if (this.venta.ProformaSinPrecio == 1) {
+      if (this.ventas[this.opcion].ProformaSinPrecio == 1) {
         this.productos.map(p => {
           p.disabledProf = 1;
         });
       }
 
-      this.venta.productos = this.productos;
-      this.venta.diasValidosProf = this.diasValidosProf;
+      this.ventas[this.opcion].productos = this.productos;
+      this.ventas[this.opcion].diasValidosProf = this.diasValidosProf;
       await this.axios
-        .post(this.API + "proformas", this.venta)
+        .post(this.API + "proformas", this.ventas[this.opcion])
         .then(response => {
           this.$toasted.success("Proforma Guardada con exito");
           this.limpiarDespuesVenta();
@@ -1025,23 +1065,27 @@ export default {
 
       this.inProgress = true;
       let totalPagos = 0;
-      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+      totalPagos += isNaN(
+        parseFloat(this.ventas[this.opcion].pago.efectivo.monto)
+      )
         ? 0
-        : parseFloat(this.venta.pago.efectivo.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+        : parseFloat(this.ventas[this.opcion].pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.ventas[this.opcion].pago.visa.monto))
         ? 0
-        : parseFloat(this.venta.pago.visa.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        : parseFloat(this.ventas[this.opcion].pago.visa.monto);
+      totalPagos += isNaN(
+        parseFloat(this.ventas[this.opcion].pago.mastercard.monto)
+      )
         ? 0
-        : parseFloat(this.venta.pago.mastercard.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))
+        : parseFloat(this.ventas[this.opcion].pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.ventas[this.opcion].pago.yape.monto))
         ? 0
-        : parseFloat(this.venta.pago.yape.monto);
+        : parseFloat(this.ventas[this.opcion].pago.yape.monto);
 
       if (
-        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+        (isNaN(parseFloat(this.ventas[this.opcion].pago.efectivo.monto))
           ? 0
-          : parseFloat(this.venta.pago.efectivo.monto)
+          : parseFloat(this.ventas[this.opcion].pago.efectivo.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
@@ -1049,9 +1093,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.visa.monto))
+        (isNaN(parseFloat(this.ventas[this.opcion].pago.visa.monto))
           ? 0
-          : parseFloat(this.venta.pago.visa.monto)
+          : parseFloat(this.ventas[this.opcion].pago.visa.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
@@ -1059,9 +1103,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        (isNaN(parseFloat(this.ventas[this.opcion].pago.mastercard.monto))
           ? 0
-          : parseFloat(this.venta.pago.mastercard.monto)
+          : parseFloat(this.ventas[this.opcion].pago.mastercard.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show(
@@ -1071,9 +1115,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.yape.monto))
+        (isNaN(parseFloat(this.ventas[this.opcion].pago.yape.monto))
           ? 0
-          : parseFloat(this.venta.pago.yape.monto)
+          : parseFloat(this.ventas[this.opcion].pago.yape.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show(
@@ -1083,7 +1127,7 @@ export default {
         return;
       }
 
-      if (!this.venta.EsCredito) {
+      if (!this.ventas[this.opcion].EsCredito) {
         if (this.totalCart != totalPagos) {
           this.$toasted.show("Los pagos no coinciden con la venta");
           this.inProgress = false;
@@ -1091,21 +1135,24 @@ export default {
         }
       }
 
-      if (!this.venta.cliente.DniRuc) {
+      if (!this.ventas[this.opcion].cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
+      var esNumerico = Number.isInteger(
+        parseInt(this.ventas[this.opcion].cliente.DniRuc)
+      );
       if (!esNumerico) {
         this.$toasted.show("El RUC debe ser numérico, editar cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+      var esEmpresa =
+        this.ventas[this.opcion].cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.ventas[this.opcion].tipoVenta.CodSunat == "01") {
         this.$toasted.show(
           "Una factura debe ser emitida para una empresa, no un usuario común."
         );
@@ -1115,24 +1162,24 @@ export default {
 
       //Nota de Creadito
       if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
+        this.ventas[this.opcion].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.opcion].tipoVenta.CodSunat == "08"
       ) {
         if (
-          !this.venta.CodSunatModifica ||
-          !this.venta.NroComprobanteModifica
+          !this.ventas[this.opcion].CodSunatModifica ||
+          !this.ventas[this.opcion].NroComprobanteModifica
         ) {
           this.$toasted.show("Debe seleccionar un Documento de Referencia...");
           this.inProgress = false;
           return;
         }
-        if (!this.venta.NotaIdMotivo) {
+        if (!this.ventas[this.opcion].NotaIdMotivo) {
           this.$toasted.show("Debe seleccionar un Motivo");
           this.inProgress = false;
           return;
         }
-        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
-          item => item.value == this.venta.NotaIdMotivo
+        this.ventas[this.opcion].NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.ventas[this.opcion].NotaIdMotivo
         )[0].text;
       }
 
@@ -1173,8 +1220,11 @@ export default {
         }
       });
 
-      if (this.venta.tipoVenta.CodSunat != "99") {
-        if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+      if (this.ventas[this.opcion].tipoVenta.CodSunat != "99") {
+        if (
+          menosUtilidad >= 1 &&
+          this.ventas[this.opcion].tipoVenta.CodSunat != "07"
+        ) {
           this.$toasted.error(
             "No se puede vender un producto con ganancia negativa"
           );
@@ -1182,12 +1232,15 @@ export default {
           return;
         }
       }
-      if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+      if (
+        sinStock >= 1 &&
+        this.ventas[this.opcion].tipoVenta.CodSunat != "07"
+      ) {
         this.$toasted.error("No se puede vender un producto sin stock");
         this.inProgress = false;
         return;
       }
-      if (this.venta.tipoVenta.CodSunat != "99") {
+      if (this.ventas[this.opcion].tipoVenta.CodSunat != "99") {
         if (totalCero >= 1) {
           this.$toasted.error("No se puede enviar un producto en S/. 0.00");
           this.inProgress = false;
@@ -1208,44 +1261,53 @@ export default {
 
       let IdOfertas = this.generarOfertas();
 
-      this.venta.productos = this.productos;
-      this.venta.puntosAplicados = this.puntosAplicados || 0;
-      this.venta.totalCart = this.totalCart || 0;
-      this.venta.PagoCon = this.$refs.carrito.pagocon;
-      this.venta.adelantosPreOrden = this.adelantosPreOrden;
-      this.venta.IdPedido = this.$route.query.idPedido || null;
-      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
-      this.venta.IdOferta = this.IdOferta;
-      this.venta.yapeMonto = this.venta.pago.yape.monto
-        ? this.venta.pago.yape.monto
+      this.ventas[this.opcion].productos = this.productos;
+      this.ventas[this.opcion].puntosAplicados = this.puntosAplicados || 0;
+      this.ventas[this.opcion].totalCart = this.totalCart || 0;
+      this.ventas[this.opcion].PagoCon = this.$refs.carrito.pagocon;
+      this.ventas[this.opcion].adelantosPreOrden = this.adelantosPreOrden;
+      this.ventas[this.opcion].IdPedido = this.$route.query.idPedido || null;
+      this.ventas[this.opcion].nombreLlevar = this.ventas[
+        this.opcion
+      ].nombreLlevar.toUpperCase();
+      this.ventas[this.opcion].IdOferta = this.IdOferta;
+      this.ventas[this.opcion].yapeMonto = this.ventas[this.opcion].pago.yape
+        .monto
+        ? this.ventas[this.opcion].pago.yape.monto
         : 0;
-      this.venta.yapeDescripcion = this.venta.pago.yape.descripcion
-        ? this.venta.pago.yape.descripcion
+      this.ventas[this.opcion].yapeDescripcion = this.ventas[this.opcion].pago
+        .yape.descripcion
+        ? this.ventas[this.opcion].pago.yape.descripcion
         : "";
-      this.venta.visaMonto = this.venta.pago.visa.monto
-        ? this.venta.pago.visa.monto
+      this.ventas[this.opcion].visaMonto = this.ventas[this.opcion].pago.visa
+        .monto
+        ? this.ventas[this.opcion].pago.visa.monto
         : 0;
-      this.venta.visaDescripcion = this.venta.pago.visa.descripcion
-        ? this.venta.pago.visa.descripcion
+      this.ventas[this.opcion].visaDescripcion = this.ventas[this.opcion].pago
+        .visa.descripcion
+        ? this.ventas[this.opcion].pago.visa.descripcion
         : "";
-      this.venta.mastercardMonto = this.venta.pago.mastercard.monto
-        ? this.venta.pago.mastercard.monto
+      this.ventas[this.opcion].mastercardMonto = this.ventas[this.opcion].pago
+        .mastercard.monto
+        ? this.ventas[this.opcion].pago.mastercard.monto
         : 0;
-      this.venta.mastercardDescripcion = this.venta.pago.mastercard.descripcion
-        ? this.venta.pago.mastercard.descripcion
+      this.ventas[this.opcion].mastercardDescripcion = this.ventas[this.opcion]
+        .pago.mastercard.descripcion
+        ? this.ventas[this.opcion].pago.mastercard.descripcion
         : "";
-      this.venta.DireccionEntrega = this.venta.EsDelivery
+      this.ventas[this.opcion].DireccionEntrega = this.ventas[this.opcion]
+        .EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
 
-      this.venta.IdDocVentas = "";
-      if (this.venta.tipoVenta.CodSunat == "99") {
+      this.ventas[this.opcion].IdDocVentas = "";
+      if (this.ventas[this.opcion].tipoVenta.CodSunat == "99") {
         let IdDocVentas = this.DocRefOfertas.map(v => v.idDocVenta);
-        this.venta.IdDocVentas = IdDocVentas.join(",");
+        this.ventas[this.opcion].IdDocVentas = IdDocVentas.join(",");
       }
 
       await this.axios
-        .post(this.API + "ventas", this.venta)
+        .post(this.API + "ventas", this.ventas[this.opcion])
         .then(response => {
           // limpiar preorden seleccionado
           // this.$router.replace("/ventas");
@@ -1316,18 +1378,18 @@ export default {
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
-      this.venta.cliente = {};
+      this.ventas[this.opcion].cliente = {};
     },
     eliminarComisionista() {
       this.$refs.inputComisionista.setValue("");
-      this.venta.comisionista = {};
+      this.ventas[this.opcion].comisionista = {};
     },
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
         console.log(obj);
         this.infoDelivery = obj;
-        this.venta.EsDelivery = true;
+        this.ventas[this.opcion].EsDelivery = true;
         this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
         //cargar costo de delivery
         let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
@@ -1369,8 +1431,9 @@ export default {
                     false
                   ]);
                 });
-                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-                this.venta.DireccionEntrega = obj.Direccion;
+                this.ventas[this.opcion].nombreLlevar =
+                  obj.Cliente || "SIN NOMBRE";
+                this.ventas[this.opcion].DireccionEntrega = obj.Direccion;
                 this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
               } else {
                 this.$toasted.show(
@@ -1400,22 +1463,22 @@ export default {
               false
             ]);
           });
-          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-          this.venta.DireccionEntrega = obj.Direccion;
+          this.ventas[this.opcion].nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.ventas[this.opcion].DireccionEntrega = obj.Direccion;
         }
       }
     },
     anularPagoDelivery() {
       this.limpiarCart();
-      this.venta.EsDelivery = false;
+      this.ventas[this.opcion].EsDelivery = false;
       this.infoDelivery = {};
       this.$refs.carrito.pagocon = "";
       this.loadClienteVarios();
       this.loadComisionista();
-      this.venta.nombreLlevar = "";
-      this.venta.selectOpcionVenta = 0;
-      this.venta.nombreLlevar = "";
-      this.venta.DireccionEntrega = "";
+      this.ventas[this.opcion].nombreLlevar = "";
+      this.ventas[this.opcion].selectOpcionVenta = 0;
+      this.ventas[this.opcion].nombreLlevar = "";
+      this.ventas[this.opcion].DireccionEntrega = "";
       this.$router.replace("/ventas");
     },
     //Sockets
