@@ -385,7 +385,7 @@ export default {
         { key: "CodigoFrabricante" },
         { key: "CodigoInterno" },
         { key: "Producto" },
-        { key: "PrecioCosto" },
+        { key: "PrecioContado" , label:"Precio"},
         { key: "action", label: "" }
       ],
       fields: [
@@ -689,7 +689,7 @@ export default {
       );
       obj.stock = res.data[0].stock;
       obj.cantidad = 1;
-      obj.precio = item.PrecioCosto;
+      obj.precio = item.PrecioContado;
       obj.descuento = 0;
       obj.cantidadSucursal = 0;
       obj.diasEntrega = 0;

@@ -20,10 +20,8 @@
                   type="text"
                   ref="barcodeInput"
                   class="form-control"
-                  placeholder="Codigo Fabricante" />
+                  placeholder="Codigo Fabricante O Código Interno" />
           <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
-            <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
