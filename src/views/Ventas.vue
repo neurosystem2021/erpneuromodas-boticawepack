@@ -889,6 +889,7 @@ export default {
     },
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
+      console.log(usuario);
       this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
@@ -911,7 +912,7 @@ export default {
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.IdUsuarioPerfil = obj.IdUsuarioPerfil;
-      console.log(this.IdUsuarioPerfil)
+      console.log(this.IdUsuarioPerfil);
       this.venta.vendedor = obj;
     },
     setComisionista(obj) {

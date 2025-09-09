@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row px-5" fluid>
             <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="10">

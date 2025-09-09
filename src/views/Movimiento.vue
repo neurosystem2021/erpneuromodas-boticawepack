@@ -199,7 +199,9 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
+                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"
+                :idAlmacen="1"
+                ></productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
