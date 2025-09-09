@@ -6,9 +6,9 @@
         <b-container class="bv-example-row px-5" fluid>
             <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
-                    <b-col md="10">
+                    <b-col md="12">
                         <b-row>
-                            <b-col md="4">
+                            <b-col md="2">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -24,7 +24,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="5">
+                            <b-col md="4">
                                 <b-form-group>
                                 <label>Proveedor:</label>
                                 <b-input-group>
@@ -42,12 +42,48 @@
                                 </b-input-group>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="3">
+                            <b-col md="2">
                                 <b-form-group>
                                     <label>Adquiridos:</label><br>
                                     <b-button variant="success" :disabled="movimiento.almacen.IdAlmacen==0 || movimiento.proveedor.IdProveedor==0" @click="cargarProducto">Buscar Productos</b-button>
                             </b-form-group>
                             </b-col>
+                            <b-col md="2">
+                              <b-form-group>
+                              <label>Moneda:</label>
+                              <autocomplete
+                                :url="API + 'monedas'"
+                                initValue="USD"
+                                anchor="Moneda"
+                                label="writer"
+                                placeholder="Moneda"
+                                :on-select="setMoneda"
+                                :classes="{input: 'form-control'}">
+                              </autocomplete>
+                            </b-form-group>
+                            <b-form-group>
+                              <label>Tipo de cambio:</label>
+                              <input v-model.number="TipoCambio"
+                                type="number"
+                                class="form-control"
+                                step="0.0001"
+                                placeholder="Tipo de cambio"/>
+                            </b-form-group>
+                          </b-col>
+                          <b-col cols="2">
+                             <b-form-group label="Credito: ">
+                              <b-form-checkbox 
+                                v-model="EsCredito"
+                                :value="1"
+                                :unchecked-value="0">
+                                Pago pendiente
+                              </b-form-checkbox>
+                              <b-form-input v-model="FechaVenCredito"
+                                v-if="EsCredito"
+                                type="date"
+                                placeholder="Fecha Vencimiento"></b-form-input>
+                            </b-form-group>
+                          </b-col>
                         </b-row>
                     </b-col>
                 </b-row>
@@ -62,9 +98,10 @@
                             :showButton="false"
                             :bloquearInput="false"
                             :fields="carrito.fields"
-                            :idAlmacen="movimiento.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
-
+                            :idAlmacen="1"
+                            :onSetProducto="onSetProducto"
+                            :TipoCambio="TipoCambio"
+                            >
                         </productos-carrito>
                     </b-col>
                 </b-row>
@@ -89,9 +126,14 @@ export default {
   beforeMount() {
     //this.initForm()
   },
-  mounted() {},
+  mounted() {
+    this.obtnerTipoCambio();
+  },
   data() {
     return {
+      TipoCambio: 0,
+      EsCredito: 0,
+      FechaVenCredito: "",
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -129,7 +171,10 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      Moneda: {
+        Moneda: "USD"
+      }
     };
   },
   computed: {
@@ -145,6 +190,22 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    async obtnerTipoCambio() {
+      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
+        res => {
+          this.tipocambio = res.data.Cotizacion[0].Venta;
+          this.TipoCambio = res.data.Cotizacion[0].Venta;
+        }
+      );
+    },
+    setMoneda(obj) {
+      this.Moneda = obj.Moneda;
+      if (obj.Moneda === "USD") {
+        this.TipoCambio = 3.7;
+      } else {
+        this.TipoCambio = 1;
+      }
+    },
     cargarProducto() {
       this.axios
         .get(this.API + "productos/proveedor", {
@@ -206,7 +267,7 @@ export default {
         });
       }
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
       this.inProgress = true;
 
@@ -251,15 +312,35 @@ export default {
         this.inProgress = false;
         return;
       }
-
-      this.axios
+      let mov = { ...this.movimiento };
+      mov.TipoCambio = this.TipoCambio;
+      mov.EsCredito = this.EsCredito;
+      mov.FechaVenCredito = this.FechaVenCredito;
+      mov.Moneda = this.Moneda.Moneda;
+      mov.User = sessionStorage.getItem("User");
+      await this.axios
         .post(this.API + "ordencompra", {
-          movimiento: this.movimiento,
+          movimiento: mov,
           productos: this.productos,
           IdAlmacen: this.movimiento.almacen.IdAlmacen
         })
-        .then(response => {
+        .then(async response => {
           if (response.data.insertId) {
+            await this.axios(`${this.API}reporte/ordencomprapdf`, {
+              params: {
+                id: response.data.insertId
+              }
+            }).then(res => {
+              if (res.data) {
+                console.log(res.data);
+                let url = res.data;
+                url = url.replace(/\\/g, "");
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                  url = "http://" + url; // O "https://" si es necesario
+                }
+                window.open(url, "_blank");
+              }
+            });
             this.movimiento = this.initMovimiento();
             this.$refs.inputProveedor.setValue("");
             this.$refs.inputAlmacen.setValue("");

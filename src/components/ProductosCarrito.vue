@@ -13,7 +13,6 @@
           <b-col cols="8"> 
             Buscar Por {{ tipoBusqueda ==1 ? 'Cód. Fabricante'  : tipoBusqueda ==2 ? 'Descripción' : 'Cod. Interno'}}:
             <autocomplete
-              required="required"
               ref="inputProductos"
               :url="API + 'busqueda/productos'"
               anchor="Producto"
@@ -489,7 +488,8 @@
               </tr>
               <tr>
                 <td><b>TOTAL (USD)</b></td>
-                <td class="table-danger">{{ sumatoriaTotalDolar }}</td>
+                
+                <td class="table-danger"> {{ sumatoriaTotalDolar }}</td>
               </tr>
               <tr>
                 <td  colspan="2">
@@ -622,7 +622,6 @@ export default {
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
-    tipoCambio: Number,
     igvTotal: Boolean,
     tipoMov: Number,
     idAlmacen: Number,
@@ -709,7 +708,10 @@ export default {
     sumatoriaTotal() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.total);
+        sumatoria += parseFloat(value.subtotal);
+        if (value.descuento) {
+          sumatoria -= value.descuento;
+        }
       });
 
       this.actualizarTotal(sumatoria);
@@ -718,7 +720,10 @@ export default {
     sumatoriaTotalDolar() {
       let sumatoria = 0;
       this.productos.map(value => {
-        sumatoria += parseFloat(value.total);
+        sumatoria += parseFloat(value.subtotal);
+        if (value.descuento) {
+          sumatoria -= value.descuento;
+        }
       });
       sumatoria = sumatoria * this.TipoCambio;
       // this.actualizarTotal(sumatoria);
@@ -1344,9 +1349,9 @@ export default {
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
       let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
 
-      if (this.tipoCambio > 0) {
-        normalPrecio *= this.tipoCambio;
-        nuevoPrecio *= this.tipoCambio;
+      if (this.TipoCambio > 0) {
+        normalPrecio *= this.TipoCambio;
+        nuevoPrecio *= this.TipoCambio;
       }
 
       Vue.set(

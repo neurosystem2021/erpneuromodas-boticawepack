@@ -1100,7 +1100,7 @@ export default {
           this.inProgress = false;
         });
     },
-    guardarVenta(evt) {
+    async guardarVenta(evt) {
       evt.preventDefault();
 
       this.inProgress = true;
@@ -1303,7 +1303,20 @@ export default {
         .toUpperCase();
       this.axios
         .post(this.API + "ventas", this.venta)
-        .then(response => {
+        .then(async response => {
+          let datos = { ...this.venta };
+          let impresora = await this.obtenerDatosImpresora();
+          datos.impresoraCocina = impresora;
+          let comandaJson = JSON.stringify({ comandaJson: datos});
+          // await fetch("http://localhost:5000/imprimir/getshipment.php", {
+          //   method: "POST",
+          //   headers: {
+          //     "Content-Type": "application/json"
+          //   },
+          //   mode: "cors",
+          //   cache: "default",
+          //   body: comandaJson
+          // }).catch(error => console.error("Error:", error));
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
           this.$toasted.success("Venta realizada con exito");
@@ -1322,6 +1335,7 @@ export default {
           this.$refs.inputVendedor.setValue("");
           //this.$refs.inputComisionista.setValue('')
           this.$refs.carrito.pagocon = 0;
+
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
             "_blank",
@@ -1334,6 +1348,10 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+    },
+    async obtenerDatosImpresora() {
+      let res = await this.axios(`${this.API}obtener_datos_impresora`);
+      return res.data;
     },
     emitirauto(idDocVenta) {
       this.axios
