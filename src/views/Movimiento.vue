@@ -235,7 +235,20 @@ import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.obtnerTipoCambio();
+    let tc = localStorage.getItem("TipoCambio")
+      ? JSON.parse(localStorage.getItem("TipoCambio"))
+      : null;
+
+    if (tc) {
+      if (tc.Fecha === this.$moment().format("YYYY-MM-DD")) {
+        this.tipocambio = tc.TipoCambio;
+        this.movimiento.TipoCambio = tc.TipoCambio;
+      } else {
+        this.obtnerTipoCambio();
+      }
+    } else {
+      this.obtnerTipoCambio();
+    }
   },
   data() {
     return {
@@ -276,11 +289,17 @@ export default {
     async obtnerTipoCambio() {
       await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
         res => {
+          let TipoCambio = {
+            TipoCambio: res.data.Cotizacion[0].Venta,
+            Fecha: this.$moment().format("YYYY-MM-DD")
+          };
+          localStorage.setItem("TipoCambio", JSON.stringify(TipoCambio));
           this.tipocambio = res.data.Cotizacion[0].Venta;
           this.movimiento.TipoCambio = res.data.Cotizacion[0].Venta;
         }
       );
     },
+
     verArticulos() {
       this.productosInf = [];
       this.axios
@@ -461,7 +480,7 @@ export default {
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
       if (obj.Moneda === "USD") {
-        this.movimiento.TipoCambio =this.tipocambio;
+        this.movimiento.TipoCambio = this.tipocambio;
       } else {
         this.movimiento.TipoCambio = 1;
       }

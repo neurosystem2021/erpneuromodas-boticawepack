@@ -208,7 +208,7 @@
                                 class="form-control"
                                 step="0.0001"
                                 placeholder="Tipo de cambio"
-                                readonly/>
+                                />
                             </b-form-group>
                             </b-col>
                         </b-row>
@@ -513,7 +513,19 @@ export default {
       Moneda: "PEN",
       TipoCambio: 1
     });
-    this.obtenerTipoCambio();
+    let tc = localStorage.getItem("TipoCambio")
+      ? JSON.parse(localStorage.getItem("TipoCambio"))
+      : null;
+
+    if (tc) {
+      if (tc.Fecha === this.$moment().format("YYYY-MM-DD")) {
+        this.TipoCambioUSD = tc.TipoCambio;
+      } else {
+        this.obtnerTipoCambio();
+      }
+    } else {
+      this.obtnerTipoCambio();
+    }
   },
   data() {
     return {
@@ -630,11 +642,23 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
-    async obtenerTipoCambio() {
-      let tipoCambio = await this.axios(
-        "https://deperu.com/api/rest/cotizaciondolar.json"
+    // async obtenerTipoCambio() {
+    //   let tipoCambio = await this.axios(
+    //     "https://deperu.com/api/rest/cotizaciondolar.json"
+    //   );
+    //   this.TipoCambioUSD = tipoCambio.data.Cotizacion[0].Compra;
+    // },
+    async obtnerTipoCambio() {
+      await this.axios("https://deperu.com/api/rest/cotizaciondolar.json").then(
+        res => {
+          let TipoCambio = {
+            TipoCambio: res.data.Cotizacion[0].Venta,
+            Fecha: this.$moment().format("YYYY-MM-DD")
+          };
+          localStorage.setItem("TipoCambio", JSON.stringify(TipoCambio));
+          this.TipoCambioUSD = res.data.Cotizacion[0].Venta;
+        }
       );
-      this.TipoCambioUSD = tipoCambio.data.Cotizacion[0].Compra;
     },
     configStock() {
       this.axios
@@ -1307,7 +1331,7 @@ export default {
           let datos = { ...this.venta };
           let impresora = await this.obtenerDatosImpresora();
           datos.impresoraCocina = impresora;
-          let comandaJson = JSON.stringify({ comandaJson: datos});
+          let comandaJson = JSON.stringify({ comandaJson: datos });
           // await fetch("http://localhost:5000/imprimir/getshipment.php", {
           //   method: "POST",
           //   headers: {

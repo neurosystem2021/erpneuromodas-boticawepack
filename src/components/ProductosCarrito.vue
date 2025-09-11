@@ -283,6 +283,18 @@
             @input="setNuevoPrecioContado(data.index)"
             />
         </template>
+        <template slot="flete" slot-scope="data">
+          <input
+            v-model="productos[data.index].flete"
+            type="number"
+            style="width: 100px"
+            min="0"
+            step="0.0001"
+            class="form-control"
+            placeholder="Flete"
+            @input="setNuevoPrecioContado(data.index)"
+            />
+        </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
             {{ getSubtotal(data.index) }}
@@ -483,6 +495,10 @@
                 <td><b>IGV</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
+              <tr v-if="sumatoriaFlete > 0">
+                <td><b>Total Flete (S/.)</b></td>
+                <td class="table-danger">{{ sumatoriaFlete }}</td>
+              </tr>
               <tr>
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
@@ -668,6 +684,7 @@ export default {
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "flete", label: "FLETE (S/.)" },
           { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
@@ -719,6 +736,14 @@ export default {
       });
 
       this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
+    },
+
+    sumatoriaFlete() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.flete);
+      });
       return this.$options.filters.redondear(sumatoria);
     },
     sumatoriaTotalDolar() {
@@ -828,9 +853,13 @@ export default {
     cambiarPrecio(index, prod) {
       var utilidad =
         this.productos[index].PrecioCosto *
-        (this.productos[index].PorcentajeUtilidad / 100);
+        (100 -
+          parseFloat(this.productos[index].PorcentajeUtilidad).toFixed(2) /
+            100);
       this.productos[index].precio = Math.ceil(
-        this.productos[index].PrecioCosto + utilidad
+        this.productos[index].PrecioCosto +
+          utilidad +
+          this.productos[index].flete
       );
     },
 
@@ -999,6 +1028,7 @@ export default {
       }
     },
     setProducto(obj) {
+      obj.flete = 0;
       this.modalSelecProducto = false;
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
@@ -1060,7 +1090,6 @@ export default {
       this.objProd.cantxPrecio = 1;
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = "";
-      //obj.FLETE = 0
 
       obj.PrecioCosto = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
         2
@@ -1069,18 +1098,18 @@ export default {
       // obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
       obj.EsVentaNew = true;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
+
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       console.log("TipoCambio", this.TipoCambio);
       obj = this.onSetProducto(obj, false, precio);
       obj.cantidadPres = obj.cantidad;
-      obj.PrecioContado = parseFloat(
-        obj.PrecioCosto *
-          (1 + parseFloat(obj.PorcentajeUtilidad / 100)) *
-          this.TipoCambio
-      ).toFixed(2);
+      obj.PrecioContado =
+        parseFloat(
+          (obj.PrecioCosto /
+            parseFloat(1 - parseFloat(obj.PorcentajeUtilidad / 100))) *
+            this.TipoCambio
+        ).toFixed(2) + obj.flete;
       this.add([
         obj,
         () => {
@@ -1344,34 +1373,18 @@ export default {
     setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio);
-      if (this.productos[index].TieneIgv) {
+      let prod = { ...this.productos[index] };
+      if (prod.TieneIgv) {
         precio += precio * 0.18;
       }
       let precioFinal = 0;
       //if(this.isVentas){
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precioFinal =
-      // }else{
+
       precioFinal =
-        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
-      if (this.isVentas) {
-        Vue.set(this.productos[index], "subt", "");
-      }
-      // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-      //}
+        (precio / (1 - parseFloat(prod.PorcentajeUtilidad / 100))) *
+        this.TipoCambio;
 
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
-      let normalPrecio = this.$options.filters.redondear(precioFinal);
-      //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
-
-      if (this.TipoCambio > 0) {
-        normalPrecio *= this.TipoCambio;
-        nuevoPrecio *= this.TipoCambio;
-      }
+      let normalPrecio = parseFloat(precioFinal).toFixed(1);
 
       Vue.set(
         this.productos[index],
@@ -1381,7 +1394,7 @@ export default {
       Vue.set(
         this.productos[index],
         "nuevoPrecioContado",
-        Math.ceil(nuevoPrecio)
+        Math.ceil(normalPrecio)
       );
       this.getSubtotal(index);
 
@@ -1416,8 +1429,8 @@ export default {
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);
 
-      if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE);
+      if (this.productos[index].flete) {
+        total += parseFloat(this.productos[index].flete / this.TipoCambio);
       }
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
