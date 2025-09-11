@@ -487,11 +487,11 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td><b>TOTAL (USD)</b></td>
                 
                 <td class="table-danger"> {{ sumatoriaTotalDolar }}</td>
-              </tr>
+              </tr> -->
               <tr>
                 <td  colspan="2">
                   <label>pagó con:</label>
