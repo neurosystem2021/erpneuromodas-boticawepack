@@ -198,10 +198,10 @@
         </b-row>
         <b-row>
             <b-col cols="12"> 
-              <!-- <productos-carrito 
-                @onInputCantidad="actualizarDescuento"
-                @onAddProducto="onAddProducto"
-                @onRemoveProducto="actualizarDescuento"
+              <!-- @onInputCantidad="actualizarDescuento"
+              @onAddProducto="onAddProducto"
+              @onRemoveProducto="actualizarDescuento" -->
+              <productos-carrito 
                 :igvTotal="tieneIgv"
                 :setPrecio="true"
                 ref="carrito" 
@@ -212,10 +212,10 @@
                 :idAlmacen="venta.almacen.IdAlmacen"
                 :onSetProducto="onSetProducto"
                 :esDelivery="venta.EsDelivery"
-                :productos="venta.productos"
+                :productos="ventas[opcion].productos"
                 :index="index"
                 >
-              </productos-carrito> -->
+              </productos-carrito>
             </b-col>
           </b-row>
       </b-tab>
