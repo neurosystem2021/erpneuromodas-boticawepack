@@ -198,8 +198,9 @@
               <productos-carrito 
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
-                :tipoCambio="movimiento.TipoCambio"
-                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"
+                :TipoCambio="movimiento.TipoCambio"
+                tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"
+                :onSetProducto="onSetProducto"
                 :idAlmacen="1"
                 ></productos-carrito>
             </b-col>
@@ -361,7 +362,7 @@ export default {
         EsCredito: 0,
         alterarProductos: 1,
         FechaVenCredito: "",
-        Moneda: "PEN",
+        Moneda: "USD",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
@@ -369,7 +370,7 @@ export default {
             ? this.$moment().format("YYYY-MM-DDThh:mm:ss")
             : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
-        TipoCambio: 1,
+        TipoCambio: this.tipocambio,
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
@@ -460,7 +461,7 @@ export default {
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
       if (obj.Moneda === "USD") {
-        this.movimiento.TipoCambio = 3.7;
+        this.movimiento.TipoCambio =this.tipocambio;
       } else {
         this.movimiento.TipoCambio = 1;
       }

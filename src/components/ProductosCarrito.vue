@@ -1,5 +1,6 @@
 <template>
   <b-row>
+    <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
     <b-col md="12">
       <b-row>
           <b-col cols="4"> 
@@ -1053,15 +1054,28 @@ export default {
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = "";
       //obj.FLETE = 0
-      obj.precio = obj.PrecioContado;
+
+      obj.PrecioCosto = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
+        2
+      );
+      obj.precio = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
+        2
+      );
+      // obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
       obj.EsVentaNew = true;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+      console.log("TipoCambio", this.TipoCambio);
       obj = this.onSetProducto(obj, false, precio);
       obj.cantidadPres = obj.cantidad;
+      obj.PrecioContado = parseFloat(
+        obj.PrecioCosto *
+          (1 + parseFloat(obj.PorcentajeUtilidad / 100)) *
+          this.TipoCambio
+      ).toFixed(2);
       this.add([
         obj,
         () => {

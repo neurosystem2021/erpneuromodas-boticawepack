@@ -390,6 +390,29 @@
                     class="form-control"
                     />
               </b-form-group>
+              <b-form-group>
+                  <label>Tipo Cambio:</label>
+                  <input
+                    v-model="producto.TipoCambio"
+                    :disabled="true"
+                    step="0.0001"
+                    type="number"
+                    @input="actualizarPorcentajeUtilidad"
+                    class="form-control"
+                    />
+              </b-form-group>
+              <b-form-group>
+                  <label>Precio de Costo Dolar:</label>
+                  <input
+                    v-model="producto.PrecioCostoDolar"
+                    :disabled="true"
+                    step="0.0001"
+                    type="number"
+                    @input="actualizarPorcentajeUtilidad"
+
+                    class="form-control"
+                    />
+              </b-form-group>
 
               <b-form-group>
                 <label>Precio de Venta:</label>
@@ -397,6 +420,20 @@
                 type="number"
                 step="0.00001"
                 @input="actualizarPorcentajeUtilidad"
+                class="form-control"
+                />
+                <b-form-text v-if="producto.precioContadoNormal">
+                  Original - {{ producto.precioContadoNormal | redondear }}
+                </b-form-text>
+              </b-form-group>
+              
+              <b-form-group>
+                <label>Precio de Venta Dolar:</label>
+                <input v-model="producto.PrecioContadoDolar"
+                type="number"
+                step="0.00001"
+                @input="actualizarPorcentajeUtilidad"
+                disabled
                 class="form-control"
                 />
                 <b-form-text v-if="producto.precioContadoNormal">
@@ -666,7 +703,12 @@ export default {
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
+            this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
+            this.producto.TipoCambio = newVal.TipoCambio;
             this.producto.PrecioContado = newVal.PrecioContado;
+            this.producto.PrecioContadoDolar = parseFloat(
+              newVal.PrecioContado / newVal.TipoCambio
+            ).toFixed(2);
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
             this.producto.EsHabitacion = newVal.EsHabitacion;

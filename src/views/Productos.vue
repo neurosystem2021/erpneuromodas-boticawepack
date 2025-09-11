@@ -15,21 +15,19 @@
           </b-col>
           <b-col md="8" class="my-1">
             <b-row>
-            <b-col md="4">
-              <b-form-group horizontal label="TipoCambio" class="mb-0">
+            <b-col md="6">
+              <b-form-group horizontal label="Tipo Cambio Hoy" class="mb-0">
               <b-input-group>
                 <b-form-input style="max-width: 150px;" v-model="TipoCambioUSD" placeholder="Buscar" type="number" step="0.01"/>
+                <b-button variant="info" @click="actualizarTipoCambio">Actualizar T. C.</b-button>
               </b-input-group>
             </b-form-group>
             </b-col>
-            <b-col md="4">
-
+            <b-col md="6">
               <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1" style="max-width: 120px;"/>
+                de <b class="text-success">{{ this.totalRows }}</b> Artículos
               </b-form-group>
-            </b-col>
-            <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
             </b-col>
             </b-row>
           </b-col>
@@ -51,14 +49,18 @@
               <template slot="PrecioCosto" slot-scope="data" >
                 {{ data.item.PrecioCosto | redondear(2) }}
               </template>
-              <template slot="PrecioContado" slot-scope="data" >
+             
+              <template slot="PrecioCostoDolar" slot-scope="data" >
+                {{ (data.item.PrecioCostoDolar ) | redondear(2) }}
+              </template>
+              <template slot="TipoCambio" slot-scope="data" >
+                {{ data.item.TipoCambio | redondear(2) }}
+              </template>
+               <template slot="PrecioContado" slot-scope="data" >
                 {{ data.item.PrecioContado | redondear(2) }}
               </template>
-              <template slot="PrecioCostoDolar" slot-scope="data" >
-                {{ data.item.PrecioCosto/(TipoCambioUSD?TipoCambioUSD:1) | redondear(2) }}
-              </template>
               <template slot="PrecioContadoDolar" slot-scope="data" >
-                {{ data.item.PrecioContado/(TipoCambioUSD?TipoCambioUSD:1) | redondear(2) }}
+                {{ (data.item.PrecioContado / data.item.TipoCambio) | redondear(2) }}
               </template>
             </b-table>
             <b-row>
@@ -113,11 +115,21 @@ export default {
           label: "Porcentaje Utilidad",
           sortable: true
         },
-        { key: "PrecioCosto", label: "Precio Compra", sortable: true },
-        { key: "PrecioContado", label: "Precio Venta", sortable: true },
-        { key: "PrecioCostoDolar", sortable: true },
+
+        {
+          key: "PrecioCostoDolar",
+          label: "Precio Compra (USD  )",
+          sortable: true
+        },
         //{ key: 'ProductoPresentacion', label: 'Anaquel', sortable: true },
-        { key: "PrecioContadoDolar", sortable: true }
+        {
+          key: "PrecioContadoDolar",
+          label: "Precio Venta (USD)",
+          sortable: true
+        },
+        { key: "TipoCambio", sortable: true },
+        { key: "PrecioCosto", label: "Precio Compra", sortable: true },
+        { key: "PrecioContado", label: "Precio Venta", sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
@@ -136,6 +148,12 @@ export default {
         "https://deperu.com/api/rest/cotizaciondolar.json"
       );
       this.TipoCambioUSD = tipoCambio.data.Cotizacion[0].Compra;
+    },
+    async actualizarTipoCambio() {
+      await this.axios.put(`${this.API}tipocambio/productos`, {
+        TipoCambio: this.TipoCambioUSD
+      });
+      this.actualizarTabla();
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh();
