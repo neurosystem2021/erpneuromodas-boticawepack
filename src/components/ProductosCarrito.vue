@@ -713,6 +713,9 @@ export default {
         if (value.descuento) {
           sumatoria -= value.descuento;
         }
+        if (value.TieneIgv == 1) {
+          sumatoria += parseFloat(value.subtotal * 0.18);
+        }
       });
 
       this.actualizarTotal(sumatoria);
@@ -725,7 +728,11 @@ export default {
         if (value.descuento) {
           sumatoria -= value.descuento;
         }
+        if (value.TieneIgv == 1) {
+          sumatoria += parseFloat(value.subtotal * 0.18);
+        }
       });
+
       sumatoria = sumatoria * this.TipoCambio;
       // this.actualizarTotal(sumatoria);
 
@@ -1058,9 +1065,7 @@ export default {
       obj.PrecioCosto = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
         2
       );
-      obj.precio = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
-        2
-      );
+      obj.precio = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(2);
       // obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
       obj.EsVentaNew = true;
