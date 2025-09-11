@@ -1016,10 +1016,11 @@ export default {
         nombreLlevar: "",
         DireccionEntrega: "",
         diasValidosProf: 1,
-        ProformaSinPrecio: 0
+        ProformaSinPrecio: 0,
+        productos: []
       };
       this.ventas.push(this.ventaObj);
-
+      console.log(this.ventas[0]);
       this.isNota = false;
       this.bloquearInput = false;
       this.adelantosPreOrden = [];
@@ -1203,7 +1204,6 @@ export default {
       this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
-          console.log("user", response.data);
           this.setVendedor(response.data);
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);

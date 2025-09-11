@@ -1,5 +1,7 @@
 <template>
   <b-row>
+
+    {{ productos }}
     <b-col md="12">
       <b-row>
         <b-col cols="12" lg="6">
