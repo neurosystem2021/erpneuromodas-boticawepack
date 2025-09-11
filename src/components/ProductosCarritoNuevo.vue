@@ -1,8 +1,6 @@
 <template>
   <b-row>
-
-    {{ productos }}
-    <b-col md="12">
+   <b-col md="12">
       <b-row>
         <b-col cols="12" lg="6">
           <b-form-group>
@@ -567,8 +565,10 @@ export default {
     }
   },
   props: {
-    productos: [],
-    index: [],
+    productos: {
+      type: Array,
+      default: []
+    },
     gravadaflag: Number,
     igvflag: Number,
     isVentas: Boolean,
@@ -1101,7 +1101,7 @@ export default {
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
-      console.log(obj);
+      
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
 
@@ -1116,7 +1116,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log(obj);
+      
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0

@@ -198,8 +198,8 @@
         </b-row>
         <b-row>
             <b-col cols="12"> 
-              <!-- @onInputCantidad="actualizarDescuento"
-              @onAddProducto="onAddProducto"
+             <!-- @onInputCantidad="actualizarDescuento"
+             
               @onRemoveProducto="actualizarDescuento" -->
               <productos-carrito 
                 :igvTotal="tieneIgv"
@@ -212,8 +212,9 @@
                 :idAlmacen="venta.almacen.IdAlmacen"
                 :onSetProducto="onSetProducto"
                 :esDelivery="venta.EsDelivery"
-                :productos="ventas[opcion].productos"
+                :productos="ventas[index].productos"
                 :index="index"
+                 @onAddProducto="onAddProducto"
                 >
               </productos-carrito>
             </b-col>
@@ -224,10 +225,12 @@
 
     <b-row>
       <b-col cols="12"  md="4" lg="3" class="text-center" align-h="center">
-                        <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
-                        <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info"  :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+        <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
+        <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" @click="guardarProforma">Crear Proforma</b-button>
+        <b-button class="btnAction" @click="guardarVenta" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
+        <b-button class="btnAction" variant="warning" @click="anadirVentana()"> Añadir Ventana</b-button>
+        <b-button class="btnAction" variant="danger" @click="eliminarVenta()" v-if="opcion>0"> Eliminar Ventana</b-button>
+        <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info"  :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <!--  -->
                     </b-col>
        <!-- <b-col cols="12" md="3" lg="3" v-if="!ventas[opcion].EsCredito" > -->
@@ -746,6 +749,28 @@ export default {
       add: "agregarProducto",
       actualizarTotal: "actualizarTotalCart"
     }),
+    anadirVentana() {
+      let newVenta = { ...this.ventaObj };
+      newVenta.productos = [];
+      // console.log(newVenta);
+      this.ventas.push({ ...this.ventaObj, productos: [] });
+      this.$nextTick(() => {
+        this.opcion = this.ventas.length - 1;
+        setTimeout(() => {
+          this.getVendedor();
+          this.getNumeroVenta();
+          this.loadClienteVarios();
+          this.loadComisionista();
+        }, 100);
+      });
+    },
+    eliminarVenta() {
+      console.log(this.opcion);
+      this.ventas.splice(this.opcion, 1);
+      this.$nextTick(() => {
+        this.opcion = this.opcion - 1;
+      });
+    },
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
@@ -1019,8 +1044,7 @@ export default {
         ProformaSinPrecio: 0,
         productos: []
       };
-      this.ventas.push(this.ventaObj);
-      console.log(this.ventas[0]);
+      this.ventas.push({ ...this.ventaObj });
       this.isNota = false;
       this.bloquearInput = false;
       this.adelantosPreOrden = [];
@@ -1311,10 +1335,13 @@ export default {
       return obj;
     },
     onAddProducto(obj) {
-      this.actualizarDescuento();
-      this.obtenerStok({
-        IdAlmacen: this.ventas[this.opcion].almacen.IdAlmacen
-      });
+      // this.actualizarDescuento();
+
+      this.ventas[this.opcion].productos.push(obj);
+
+      // this.obtenerStok({
+      //   IdAlmacen: this.ventas[this.opcion].almacen.IdAlmacen
+      // });
     },
     actualizarDescuento() {
       if (this.puntosAplicados > 0) {
@@ -1423,10 +1450,16 @@ export default {
         .post(this.API + "proformas", this.ventas[this.opcion])
         .then(response => {
           this.$toasted.success("Proforma Guardada con exito");
-          this.limpiarDespuesVenta();
-          this.loadClienteVarios();
-          this.loadComisionista();
-          this.diasValidosProf = 1;
+          if (this.ventas.length == 1) {
+            console.log("recargar");
+            // window.location.reload();
+          } else {
+            this.ventas.splice(this.opcion, 1);
+            this.$nextTick(() => {
+              this.opcion = 0;
+            });
+          }
+
           window.open(
             "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
             "_blank"
@@ -1437,7 +1470,6 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-      window.location.reload();
     },
     async guardarVenta(evt) {
       evt.preventDefault();
@@ -1640,7 +1672,7 @@ export default {
 
       let IdOfertas = this.generarOfertas();
 
-      this.ventas[this.opcion].productos = this.productos;
+      // this.ventas[this.opcion].productos = this.productos;
       this.ventas[this.opcion].puntosAplicados = this.puntosAplicados || 0;
       this.ventas[this.opcion].totalCart = this.totalCart || 0;
       this.ventas[this.opcion].PagoCon = this.$refs.carrito.pagocon;
@@ -1684,7 +1716,6 @@ export default {
         let IdDocVentas = this.DocRefOfertas.map(v => v.idDocVenta);
         this.ventas[this.opcion].IdDocVentas = IdDocVentas.join(",");
       }
-
       await this.axios
         .post(this.API + "ventas", this.ventas[this.opcion])
         .then(response => {
@@ -1694,21 +1725,20 @@ export default {
           this.inProgress = false;
           this.tieneIgv = false;
           this.ultimaVenta = response.data.insertId;
-          this.initForm();
-          this.limpiarCart();
-          this.getVendedor();
-          this.getNumeroVenta();
-          this.loadClienteVarios();
-          this.loadComisionista();
-          this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
-          this.$refs.inputAlmacen.setValue("VENTA");
-          this.$refs.inputPuntoVenta.setValue("CAJA1");
-          this.$refs.inputCliente.setValue("");
-          this.$refs.inputVendedor.setValue("");
-          this.$refs.inputComisionista.setValue("");
+          // this.initForm();
+          // this.limpiarCart();
+          // this.getVendedor();
+          // this.getNumeroVenta();
+          // this.loadClienteVarios();
+          // this.loadComisionista();
+          // this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
+          // this.$refs.inputAlmacen.setValue("VENTA");
+          // this.$refs.inputPuntoVenta.setValue("CAJA1");
+          // this.$refs.inputCliente.setValue("");
+          // this.$refs.inputVendedor.setValue("");
+          // this.$refs.inputComisionista.setValue("");
           this.$refs.carrito.pagocon = 0;
           let IdOfertasString = IdOfertas.join(",");
-          this.limpiarDespuesVenta();
           window.open(
             "/imprimir/index.php?IdDocVenta=" +
               response.data.insertId +
@@ -1722,7 +1752,16 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-      window.location.reload();
+      console.log("length", this.ventas.length);
+      if (this.ventas.length == 1) {
+        console.log("recargar");
+        window.location.reload();
+      } else {
+        this.ventas.splice(this.opcion, 1);
+        this.$nextTick(() => {
+          this.opcion = 0;
+        });
+      }
     },
     generarOfertas() {
       let IdOferta = [];
