@@ -1000,7 +1000,7 @@ export default {
         { key: "Producto" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
-        { key: "presentacion", label: "Presentacion" },
+        { key: "ProductoPresentacion", label: "Presentacion" },
         { key: "cantxPrecio", label: "	Cant X Precio" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
@@ -2373,7 +2373,7 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     cargarProforma(proforma) {
-      console.log('proforma',proforma);
+      console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
