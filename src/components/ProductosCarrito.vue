@@ -1429,9 +1429,9 @@ export default {
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);
 
-      if (this.productos[index].flete) {
-        total += parseFloat(this.productos[index].flete / this.TipoCambio);
-      }
+      // if (this.productos[index].flete) {
+      //   total += parseFloat(this.productos[index].flete / this.TipoCambio);
+      // }
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
       }
