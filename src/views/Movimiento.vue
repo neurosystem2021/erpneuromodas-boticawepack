@@ -291,7 +291,9 @@ export default {
         res => {
           let TipoCambio = {
             TipoCambio: res.data.Cotizacion[0].Venta,
-            Fecha: this.$moment().format("YYYY-MM-DD")
+            Fecha: this.$moment().format("YYYY-MM-DD"),
+            Compra: res.data.Cotizacion[0].Compra,
+            Venta: res.data.Cotizacion[0].Venta
           };
           localStorage.setItem("TipoCambio", JSON.stringify(TipoCambio));
           this.tipocambio = res.data.Cotizacion[0].Venta;
