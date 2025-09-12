@@ -18,6 +18,7 @@ import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Usuario from "@/views/Usuario.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
+import VentaListado from "@/views/VentaListado.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -202,6 +203,11 @@ export default new Router({
       path: "/venta",
       name: "Venta",
       component: Venta
+    },
+    {
+      path: "/VentaListado",
+      name: "VentaListado",
+      component: VentaListado
     },
     {
       path: "/venta2",
