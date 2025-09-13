@@ -535,7 +535,8 @@
               <movimiento></movimiento>
 
               <pago-deuda></pago-deuda>
-              <proformas :idAlmacen="ventas[opcion].almacen.IdAlmacen" @onSelectProforma="setCliente"  @guardarDatosProforma="guardarDatosProforma"></proformas>
+              <!-- <proformas :idAlmacen="ventas[opcion].almacen.IdAlmacen" @onSelectProforma="setCliente"  @guardarDatosProforma="guardarDatosProforma"></proformas> -->
+              <proformas :idAlmacen="ventas[opcion].almacen.IdAlmacen" @onSelectProforma="guardarDatosProforma"></proformas>
 
               <pre-orden-lista            
                   v-show="!this.$route.query.idPreOrden"
@@ -913,6 +914,33 @@ export default {
       } else {
         this.pagosPendientes = 0;
       }
+    },
+    loadCliente(id) {
+      this.axios
+        .get(this.API + "clientes", {
+          params: {
+            idCliente: id
+          }
+        })
+        .then(res => {
+          if (res.data.IdCliente) {
+            let ref = `inputCliente${this.opcion}`;
+            this.$nextTick(() => {
+              let autocompleteComponent = this.$refs[ref];
+              if (Array.isArray(autocompleteComponent)) {
+                autocompleteComponent = autocompleteComponent[0];
+              }
+              if (
+                autocompleteComponent &&
+                typeof autocompleteComponent.setValue === "function"
+              ) {
+                autocompleteComponent.setValue(res.data.Cliente);
+              }
+              this.setAlmacen(res.data);
+            });
+            this.setCliente(res.data);
+          }
+        });
     },
     loadClienteVarios() {
       this.axios.get(this.API + "clientes/00000000").then(res => {
@@ -1408,8 +1436,23 @@ export default {
       // this.$refs.inputPuntoVenta.setValue('CAJA1')
       // this.$refs.inputVendedor.setValue('')
     },
-    guardarDatosProforma(IdProforma) {
-      this.ventas[this.opcion].IdProforma = IdProforma;
+    guardarDatosProforma(proforma) {
+      console.log("proforma", proforma.productos);
+      let newVenta = { ...this.ventaObj };
+      this.ventas.push({ ...newVenta, productos: [] });
+      this.$nextTick(() => {
+        this.opcion = this.ventas.length - 1;
+        setTimeout(() => {
+          this.getVendedor();
+          this.getNumeroVenta();
+          this.loadCliente({
+            IdCliente: proforma.IdCliente,
+            Cliente: proforma.Cliente
+          });
+          this.loadComisionista();
+        }, 1000);
+      });
+      // this.ventas[this.opcion].IdProforma = IdProforma;
       // console.log("IdProforma", IdProforma);
     },
     async guardarProforma() {
