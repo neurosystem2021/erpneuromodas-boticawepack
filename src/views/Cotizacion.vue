@@ -20,6 +20,7 @@
                               style="width:40%"
                               required="required"
                               ref="inputCliente"
+                              id="inputCliente"
                               :url="API + 'clientes'"
                               anchor="ClienteDniRuc"
                               label="writer"
@@ -117,7 +118,7 @@
                   class="form-control"
                   step="0.0001"
                   placeholder="Tipo de cambio"
-                  readonly/>
+                  />
               </b-input-group>
             </b-col>
           </b-row>
@@ -229,7 +230,13 @@
               </b-input-group>
             </b-col>
             <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
-                <b-button variant="success" class="btnAction" @click="guardarCotizacion">Guardar Cotización</b-button>
+                <b-button-group class="ocularMovil">
+                  <b-button variant="success" class="btnAction" @click="guardarCotizacion">Guardar Cotización</b-button>
+                </b-button-group>
+
+                <b-button-group size="sm">
+                  <proformas :idAlmacen="1" class="btnAction"  @onSelectProforma="cargarProforma"></proformas>
+                </b-button-group>
             </b-col>
           </b-row>
         </b-tab>
@@ -348,13 +355,16 @@
 import config from "@/store/config.js";
 import ClientesForm from "@/components/ClientesForm";
 import ProductosCarrito from "@/components/ProductosCarrito";
+import Proformas from "@/components/ProformaLista.vue";
 export default {
   components: {
     ClientesForm,
-    ProductosCarrito
+    ProductosCarrito,
+    Proformas
   },
   data() {
     return {
+      IdProforma: null,
       igv: 1,
       nuevoFlag: false,
       actualizarFlag: false,
@@ -385,7 +395,7 @@ export default {
         { key: "CodigoFrabricante" },
         { key: "CodigoInterno" },
         { key: "Producto" },
-        { key: "PrecioContado" , label:"Precio"},
+        { key: "PrecioContado", label: "Precio" },
         { key: "action", label: "" }
       ],
       fields: [
@@ -492,6 +502,49 @@ export default {
   methods: {
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
+    },
+    cargarProforma(event) {
+      this.IdProforma = event.IdProforma;
+      this.igv = event.IGV;
+      console.log("cargarProforma", event);
+      this.setCliente({
+        IdCliente: event.IdCliente,
+        Cliente: event.Cliente
+      });
+      this.moneda = {
+        Moneda: event.IdMoneda,
+        Moneda: event.IdMoneda
+      };
+
+      this.$refs.inputCliente.setValue(event.Cliente);
+      this.$refs.inputMoneda.setValue(event.IdMoneda);
+      this.TipoCambio = event.TipoCambio;
+      this.productos = [];
+      event.productos.forEach(async prod => {
+        let p = { ...prod };
+        let stock = await this.axios(
+          `${this.API}/productos/puntoventa/stock/${this.almacen.IdAlmacen}`,
+          {
+            params: {
+              idProductos: [prod.IdProducto]
+            }
+          }
+        ).then(response => {
+          if (response.data) {
+            return response.data[0].stock;
+          }
+          return 0;
+        });
+        console.log(stock, "stock");
+        prod.stock = stock;
+        prod.cantidadImportacion = p.CantidadImportacion;
+        prod.cantidadSucursal = p.CantidadSucursal;
+        prod.diasEntrega = p.DiasEntrega;
+        prod.cantidadImportacion = p.CantidadImportacion;
+        prod.diasEntregaImportacion = p.DiasEntregaImportacion;
+        this.productos.push(prod);
+      });
+      // this.productos = event.productos;
     },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
@@ -774,6 +827,7 @@ export default {
       }
 
       let data = {
+        IdProforma: this.IdProforma,
         IdCliente: this.cliente.IdCliente,
         IdVendedor: this.vendedor.Usuario,
         IdAlmacen: this.almacen.IdAlmacen,
