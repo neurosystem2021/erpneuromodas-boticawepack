@@ -36,6 +36,7 @@ import Cotizacion from "@/views/Cotizacion.vue";
 import Cobros from "@/views/Cobros.vue";
 import Usuario from "@/views/Usuario.vue";
 import Ordenes from "../views/reportes/Ordenes.vue";
+import ReporteUtilidadBrutaPorUsuario from "../views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 
 Vue.use(Router);
 
@@ -211,6 +212,11 @@ export default new Router({
       path: "/Ordenes",
       name: "Ordenes",
       component: Ordenes
+    },
+    {
+      path: "/ReporteUtilidadBrutaPorUsuario",
+      name: "ReporteUtilidadBrutaPorUsuario",
+      component: ReporteUtilidadBrutaPorUsuario
     },
   ]
 });
