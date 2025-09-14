@@ -19,7 +19,7 @@
                 v-model="usuarioReg"
             />
         </b-col>
-        <b-col cols="3">
+        <!-- <b-col cols="3">
           <b-form-checkbox
            
             value="1"
@@ -37,8 +37,8 @@
           >
             Mercaderías
           </b-form-checkbox>
-        </b-col> 
-        <b-col cols="12" class="mt-2"> 
+        </b-col>  -->
+        <b-col cols="3" class="mt-2"> 
             <b-button variant="success" @click="getReporteUtilidadPorUsuario()">Generar</b-button>
             <b-button variant="danger" @click="exportar()">Exportar PDF</b-button>
         </b-col>
