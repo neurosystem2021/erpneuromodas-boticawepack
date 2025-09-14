@@ -305,7 +305,7 @@ export default {
           .then(res => {
             // this.adelantos.push(res.data)
             this.$refs.inputCaja.setValue('');
-            this.cargarGastos();
+            // this.cargarGastos();
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Gasto = "";
             this.selectProducto.Producto = "";

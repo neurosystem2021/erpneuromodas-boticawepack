@@ -1032,7 +1032,7 @@ export default {
         Observacion: "",
         comisionista: {},
         tipoVenta: {
-          IdTipoDoc: 10,
+          IdTipoDoc: 7,
           TipoDoc: "BOLETA ELEC.",
           LimitItems: 0,
           CodSunat: "03"
@@ -1092,7 +1092,7 @@ export default {
           cliente: {},
           comisionista: {},
           tipoVenta: {
-            IdTipoDoc: 10,
+            IdTipoDoc: 7,
             TipoDoc: "BOLETA ELEC.",
             LimitItems: 0,
             CodSunat: "03"
@@ -1743,21 +1743,19 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto, esNota = false) {
+    async setProducto(producto) {
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        let prod = productos.filter(v => v.IdProducto == producto.IdProducto);
-        if (prod[0].presentacion == "UNIDAD") {
-          console.log("a");
-          prod[0].cantidad += parseFloat(1);
-        } else {
-          console.log("b");
-          prod[0].CantidadPresentacion += parseFloat(1);
-        }
-        this.metodoPagoCambio(1);
+        productos.filter(
+          v => v.IdProducto == producto.IdProducto
+        )[0].cantidad += parseFloat(1);
+        this.$nextTick(() => {
+          this.metodoPagoCambio(1);
+          this.irTxtLoadBarcode();
+        });
+
         return false;
       }
-
       // console.log("producto", producto);
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
       // console.log("prod", prod.PreciosPorProducto);
@@ -1767,7 +1765,7 @@ export default {
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.presentacion = prod.ProductoPresentacion
+      prod.Descripcion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.ProductoPresentacion = prod.ProductoPresentacion
@@ -1776,26 +1774,17 @@ export default {
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
+      prod.presentacion = null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
       prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = 1;
-      prod.esPresentacion = false;
-      prod.pres = "";
+      prod.CantidadPresentacion = null;
       productos.unshift(prod);
-      if (esNota) {
-        if (producto.Producto == "TAPAJUNTA") {
-          console.log(prod);
-        }
-        prod.cantidad = producto.cantidad;
-        prod.precio = producto.PrecioContado;
-      }
-      this.$nextTick(() => {
-        let input = document.getElementById("input0");
-        input.focus();
-        input.select();
-      });
+
+      // this.$nextTick(() => {
+      //   this.irTxtLoadBarcode();
+      // });
       this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
@@ -2513,21 +2502,19 @@ export default {
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
       if (esPresentacion) {
-        producto.presentacion = obj.nombre;
-        producto.pres = JSON.stringify(obj);
-        producto.CantidadPresentacion = 1;
-        producto.cantidad = obj.cantidad;
+        producto.Descripcion = obj.nombre;
+        producto.CantidadPresentacion = obj.cantidad;
+        producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
-        producto.esPresentacion = esPresentacion;
+        producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.presentacion = obj.ProductoPresentacion;
-        producto.CantidadPresentacion = 1;
+        producto.Descripcion = obj.ProductoPresentacion;
+        producto.CantidadPresentacion = null;
         producto.cantidad = 1;
-        producto.pres = "";
         producto.bloquearInputPrecio = false;
         producto.precio = producto.PrecioContado;
-        producto.esPresentacion = esPresentacion;
+        producto.presentacion = null;
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
