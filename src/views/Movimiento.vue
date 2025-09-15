@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue=""
+                        initValue="TIENDA 1"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
