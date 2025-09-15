@@ -162,6 +162,10 @@
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
         </template>
+        <template slot="subtotalCalc" slot-scope="data">
+          <input type="text" class="form-control" v-model="data.item.subtotal" style="max-width: 120px;"
+               @input="recalcularCantidad(data.item,data.index)">
+        </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -443,6 +447,7 @@ export default {
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "subtotalCalc", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
@@ -520,6 +525,11 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    recalcularCantidad(item, index) {
+      let data = { ...item };
+      data.precio = data.subtotal / data.cantidad;
+      Vue.set(this.$store.state.cart.productos, index, data);
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
@@ -755,8 +765,8 @@ export default {
       obj.EsVenta = this.isVentas;
       obj.cantidad = 1;
       obj.subtotal = 0;
-      obj.precio= obj.PrecioCosto;
-      obj.nuevoPrecioContado= obj.PrecioContado;
+      obj.precio = obj.PrecioCosto;
+      obj.nuevoPrecioContado = obj.PrecioContado;
       obj.subtotal = 0;
       obj.tipo = "UNIDAD";
       obj.PreciosPorProducto = JSON.stringify(obj.PreciosPorProducto);
@@ -802,6 +812,7 @@ export default {
       obj.tipo = "UNIDAD";
       obj.nuevoPrecioContado = 0;
       obj.subtotal = obj.PrecioCosto;
+      obj.subtotal = obj.PrecioCosto;
       // obj.subtotal = 0;
       if (index == -1) {
         obj = this.onSetProducto(obj);
@@ -838,7 +849,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      
+
       let index = this.$store.state.cart.productos.findIndex(
         v => v.IdProducto == obj.IdProducto
       );

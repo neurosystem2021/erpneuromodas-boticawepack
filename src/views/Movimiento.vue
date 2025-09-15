@@ -222,7 +222,8 @@ import config from "@/store/config.js";
 import { icon } from "leaflet";
 
 export default {
-  mounted() {},
+  async mounted() {
+  },
   data() {
     return {
       inProgress: false,
@@ -250,7 +251,8 @@ export default {
         { key: "cantidad" },
         { key: "cantxPrecio" },
         { key: "precio", label: "P/U" },
-        { key: "subtotal", label: "SubTotal", variant: "success" },
+        // { key: "subtotal", label: "SubTotal", variant: "success" },
+        { key: "subtotalCalc", label: "SubTotal", variant: "success" },
         { key: "igv", label: "IGV" },
         // { key: 'flete', label: 'FLETE' },
         // { key: 'lote', label: 'Lote' },
