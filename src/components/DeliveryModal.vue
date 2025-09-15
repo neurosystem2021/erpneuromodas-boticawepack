@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" class="btnAction" variant="danger" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" style="min-width: 100%; background: #A5D6A7; color: #ffffff;"  class="btnAction"  size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -347,7 +347,8 @@ export default {
               title: "Sin servicio de delivery",
               text: "No hay conexión con el servidor de delivery",
               //target: document.getElementById('conten'),
-              footer: "Por favor cierre sesion e ingrese nuevamente"
+              footer: "Por favor cierre sesion e ingrese nuevamente",
+              timer: 1000
             });
           });
       } else {
@@ -358,7 +359,8 @@ export default {
           title: "Error en la autentificación de delivery",
           text: "No hay conexión con el servidor de delivery",
           target: document.getElementById("conten"),
-          footer: "Por favor cierre sesion e ingrese nuevamente"
+          footer: "Por favor cierre sesion e ingrese nuevamente",
+          timer: 1000
         });
       }
     },

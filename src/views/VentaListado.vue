@@ -173,18 +173,24 @@
                     </center>
                     </b-col>
   
-                  <b-col lg="6" xl="6"  cols="12">
+                  <b-col md="3"  cols="12" style="text-align: center;">
+                    <h1> 
+                      {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
+                    </h1>
                     <center>
-  
-                      <h1> 
-                        {{ventas[ventaActiva].Serie}}  - {{ventas[ventaActiva].Numero}}
-                        <p style="padding: 2px 3px; border-radius: 25px;width:30% ; background: yellow; font-size: 1rem;"> Valor Referencial</p>
-                      </h1>
-                      {{ fechaActual()}}
+                      <p style="padding: 2px 3px; border-radius: 25px; background: yellow; font-size: 1rem;"> Valor Referencial</p>
                     </center>
+                  </b-col>
+                  <b-col md="3"  cols="12" style="text-align: center; align-items: center; align-content: center;">
+                   
+                      <b-col cols="12">
+                        <b-input-group prepend="Vendedor:" class="mt-2" >
+                          <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario" disabled style="max-width: 150px;">
+                        </b-input-group>
+                      </b-col>
+                  
                     </b-col>
-                        
-                    </b-row>
+                  </b-row>
                 
                   </b-col>
                   <!-- <b-col cols="3">
@@ -545,51 +551,7 @@
                    
   
                     <b-col cols="12" class="text-left">
-                      <table class="table b-table border table-footer table-sm">
-                                <tbody>
-                                  <tr>
-                                    <td>Efectivo</td>
-                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
-                                    <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                    </td>
-                                    <td>
-                                      <input v-model="ventas[ventaActiva].pago.efectivo.monto" min="0" step="0.01" type="number" placeholder="S/." class="form-control"/>
-                                    </td>
-                                   </tr>
-                                  <tr>
-                                    <td>Tarjeta</td>
-                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
-                                    <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                    </td>
-                                    <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
-                                    </td>
-                                    </tr>
-                                    <tr>
-                                      <td>Yape/Plin</td>
-                                      <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
-                                      <td>
-                                        <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                      </td>
-                                      <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td>Transferencia</td>
-                                      <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
-                                      <td>
-                                        <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                      </td>
-                                      <td>
-                                        <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                              </table>
+                        ssssssssssss
                     </b-col>
                     <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                       <b-form-group>
@@ -620,12 +582,12 @@
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
-                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> ABRIR NUEVA VENTANA</b-button>
-                      <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                      <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                      <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Nueva Ventana</b-button>
+                      <delivery-modal v-if="mostrarVendedor" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                      <b-button v-else style="background: #A1887F; color:#ffffff" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
                       <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
@@ -638,7 +600,7 @@
                     <table class="table b-table border table-footer" style="font-size:0.85rem">
                       <tbody>
                         <tr>
-                          <!-- <td>
+                          <td>
                             <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
                             <br>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
@@ -694,11 +656,110 @@
                               </table>
                             </slot>
                             </b-popover>
-                          </td> -->
+                          </td>
                           <td class="table-success">SubTotal</td>
                           <td class="table-success">{{ getSubTotal() }}</td>
                         </tr>
                         <tr>
+                          <td>
+                            <b-button 
+                            class="p-1 ml-1 mt-1" 
+                            :id="`popover-opciones${index}`" 
+                            tabindex="0" 
+                            @click="togglePopoverOpcion(index)" 
+                            variant="warning">
+                            <i class="fas fa-tags"></i>
+                          </b-button>
+
+                          <b-popover 
+                            :target="`popover-opciones${index}`" 
+                            title="Opciones" 
+                            triggers="manual" 
+                            placement="top" 
+                            :show.sync="mostrarOp[index]" 
+                            :style="{ minWidth: '600px' }"
+                          >
+                            <slot :name="`opciones${ventaActiva}`">
+                              <table class="table b-table border table-footer">
+                                    <tbody>
+                                        <tr v-if="ventas[ventaActiva].puntosAplicados == 0">
+                                            <td>
+                                                <b-input-group prepend="S/" append="Descuento">
+                                                    <input
+                                                        v-model="descuentoGeneral"
+                                                        min="0"
+                                                        value="0"
+                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
+                                                        class="form-control"
+                                                    />
+                                                </b-input-group>
+                                                <b-form-text style="color:black !important; font-weight:bold">
+                                                    Descuento general a toda la venta.
+                                                </b-form-text>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b-form-checkbox
+                                                    v-model="ventas[ventaActiva].EsCredito"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Venta a credito
+                                                </b-form-checkbox>
+                                                <b-form-input 
+                                                    v-if="ventas[ventaActiva].EsCredito"
+                                                    v-model="ventas[ventaActiva].FechaCredito"
+                                                    type="date">
+                                                </b-form-input>
+                                                <!-- <b-form-checkbox v-if="false"
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b-input-group prepend="Proforma válidez: " append="días">
+                                                <b-form-input
+                                                    :disabled="bloquearInput?true:false"
+                                                    v-model="diasValidosProf"
+                                                    min="0"
+                                                    value="0"
+                                                    type="number"
+                                                ></b-form-input>
+                                            </b-input-group>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <b-input-group>
+                                              <b-form-checkbox 
+                                              :disabled="bloquearInput?true:false"
+                                              v-model="ventas[ventaActiva].EsCreditoProforma"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                                Proforma a Credito
+                                              </b-form-checkbox>
+                                              <div v-if="ventas[ventaActiva].EsCreditoProforma">
+                                                <div class="mb-3">
+                                                  <input v-model="ventas[ventaActiva].FechaCreditoProforma"
+                                                    type="date"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Fecha Crédito"/>
+                                                </div>
+                                              </div>
+                                            </b-input-group>
+                                          </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </slot>
+                            
+                          </b-popover>
+                          </td>
                           <td class="table-danger">Descuento</td>
                           <td class="table-danger">
                             {{ getDescuento() }}
@@ -996,7 +1057,7 @@ export default {
       tieneIgv: [],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
-        { key: "CodigoBarra" },
+        // { key: "CodigoBarra" },
         { key: "Producto" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
@@ -1004,12 +1065,12 @@ export default {
         { key: "cantxPrecio", label: "	Cant X Precio" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
-        {
-          key: "subtotal",
-          label: "SubTotal",
-          variant: "success",
-          class: "text-center"
-        },
+        // {
+        //   key: "subtotal",
+        //   label: "SubTotal",
+        //   variant: "success",
+        //   class: "text-center"
+        // },
         { key: "descuento", label: "Descuento" },
         {
           key: "total",
@@ -2361,10 +2422,16 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
-      console.log(proforma);
+    async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+      await this.axios
+        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+        .then(response => {
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
+          }
+        });
       venta.cliente = proforma;
       let productos = [];
       proforma.productos.forEach(async producto => {
@@ -2396,23 +2463,8 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
       });
-      // console.log(proforma.productos);
+
       venta.productos = productos;
       this.ventas.push(venta);
       this.$nextTick(() => {
@@ -2638,6 +2690,12 @@ export default {
     }
   },
   computed: {
+    mostrarVendedor() {
+      if (this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 3) {
+        return false;
+      }
+      return true;
+    },
     APIProductos() {
       // console.log(this.ventas[this.ventaActiva].almacen.IdAlmacen);
       if (this.ventas[this.ventaActiva].almacen.IdAlmacen) {
