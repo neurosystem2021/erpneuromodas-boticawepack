@@ -338,6 +338,19 @@
                 />
             </b-form-group>
             
+             <b-form-group class="text-left">
+              <label>Precio Costo:</label>
+              <input 
+                v-model="producto.precios[i-1].precioc"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precioc*producto.precios[i-1].cantidad) | redondear }}</label>
+            </b-form-group>
+
             <b-form-group>
               <label>Precio:</label>
               <input 
@@ -504,7 +517,7 @@ export default {
             this.producto.ControlaStockMinimo = newVal.ControlaStockMinimo;
             this.producto.StockMinimo = newVal.StockMinimo;
             this.producto.CodigoBarra = newVal.CodigoBarra;
-            this.producto.CodigoProducto = newVal.CodigoProducto
+            this.producto.CodigoProducto = newVal.CodigoProducto;
             this.producto.ProductoModelo = newVal.ProductoModelo;
             this.producto.ProductoDesc = newVal.ProductoDesc;
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
@@ -692,11 +705,11 @@ export default {
         },
         Imagen: null,
         precios: [
-          { nombre: "PRECIO 1", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 2", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 3", cantidad: 0, precio: 0 },
-          { nombre: "PRECIO 4", cantidad: 0, precio: 0 },
-          { nombre: "OFERTA", cantidad: 0, precio: 0 }
+          { nombre: "PRECIO 1", cantidad: 0, preciocc: 0, precio: 0 },
+          { nombre: "PRECIO 2", cantidad: 0, preciocc: 0, precio: 0 },
+          { nombre: "PRECIO 3", cantidad: 0, preciocc: 0, precio: 0 },
+          { nombre: "PRECIO 4", cantidad: 0, preciocc: 0, precio: 0 },
+          { nombre: "OFERTA", cantidad: 0, preciocc: 0, precio: 0 }
         ]
       };
     },
@@ -715,7 +728,7 @@ export default {
       // console.log(JSON.stringify(this.producto))
       this.producto.Producto = ("" + this.producto.Producto).trim();
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
-      this.producto.CodigoProducto=(""+this.producto.CodigoProducto).trim();
+      this.producto.CodigoProducto = ("" + this.producto.CodigoProducto).trim();
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
