@@ -125,9 +125,11 @@
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
+                              @dniRuc="dniRuc"
                             />
                           </b-input-group-prepend>
                           <b-input-group-append>
+                            
                             <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                           </b-input-group-append>
                         </b-input-group>
@@ -1161,6 +1163,9 @@ export default {
     });
   },
   methods: {
+    dniRuc(val) {
+      this.newDniRuc = val;
+    },
     async actualizarRegistro(event) {
       let producto = { ...event };
       let prod = await this.obtenerStockBuscador(producto.IdProducto);

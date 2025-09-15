@@ -740,6 +740,9 @@ export default {
           PreciosPorProducto: this.producto.precios
         })
         .then(response => {
+          if (this.cbGuardar) {
+            this.cbGuardar();
+          }
           // if (this.cbGuardar) {
           //   console.log("cbGuardar");
           //   this.cbGuardar(
