@@ -1222,6 +1222,16 @@ export default {
     });
   },
   methods: {
+      togglePopoverOpcion(index) {
+      if (this.mostrarOp[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-opciones${index}`);
+      } else {
+        this.$set(this.mostrarOp, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-opciones${index}`);
+        });
+      }
+    },
     async actualizarRegistro(event) {
       let producto = { ...event };
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
