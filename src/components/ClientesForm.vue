@@ -117,28 +117,28 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
   data() {
     return {
       API: config.API,
       show: false,
       cliente: {
-        Cliente: '',
-        DniRuc: '',
-        Direccion: '',
-        Direccion2: '',
-        Direccion3: '',
-        Telefono: '',
-        Email: '',
-        Sexo: '',
-        Ocupacion:'',
-        FechaNacimiento: '',
-        Nacionalidad: '',
+        Cliente: "",
+        DniRuc: "",
+        Direccion: "",
+        Direccion2: "",
+        Direccion3: "",
+        Telefono: "",
+        Email: "",
+        Sexo: "",
+        Ocupacion: "",
+        FechaNacimiento: "",
+        Nacionalidad: ""
       }
-    }
+    };
   },
-  props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
+  props: ["idModal", "newDniRuc", "editCliente", "txtButton", "ruc"],
   /*watch: {
     show (val) {
       console.log(this.editCliente)
@@ -148,89 +148,105 @@ export default {
     }
   },*/
   methods: {
-    shownClienteForm () {
+    shownClienteForm() {
       /*
       this.cliente.Direccion = ''
       this.cliente.Cliente = ''
       this.cliente.Telefono = ''
       this.cliente.Email = ''
 */
-      if (this.editCliente && this.editCliente.IdCliente) {
-        this.cliente = this.editCliente
-      } else {
-        this.cliente.DniRuc = this.$parent.$parent.newDniRuc
-      }
+      this.$nextTick(() => {
+        console.log("newDniRuc", this.$parent.$parent.newDniRuc);
+        if (this.editCliente && this.editCliente.IdCliente) {
+          this.cliente = this.editCliente;
+        } else {
+          this.cliente.DniRuc = this.$parent.$parent.newDniRuc;
+          if (this.ruc) {
+            this.cliente.DniRuc = this.ruc;
+          }
+        }
+      });
     },
-    consultarDNIRUC () {
-      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+    consultarDNIRUC() {
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc));
       if (!esNumerico) {
-          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
-          return
+        this.$toasted.show("El DNI/RUC debe ser numérico, editar cliente.");
+        return;
       }
-      
-      let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
 
-      this.axios.get(this.API + 'consultarRUC', {
+      let tipo = this.cliente.DniRuc.length > 8 ? "RUC" : "DNI";
+
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-              type: tipo,
-              numero: this.cliente.DniRuc
+            type: tipo,
+            numero: this.cliente.DniRuc
           }
-      }).then((response) => {
+        })
+        .then(response => {
           if (response.data) {
-              this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-              var data = response.data
-              if (tipo == 'DNI') {
-                  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
-                  this.cliente.Direccion = ''
-              } else {
-                  this.cliente.Cliente = data.razonSocial
-                  this.cliente.Direccion = data.direccion
-                  // this.cliente.Telefono = data.Telefono
-              }
+            this.$toasted.show("Cliente encontrado, se llenarán sus datos");
+            var data = response.data;
+            if (tipo == "DNI") {
+              this.cliente.Cliente =
+                data.nombres +
+                " " +
+                data.apellidoPaterno +
+                " " +
+                data.apellidoMaterno;
+              this.cliente.Direccion = "";
+            } else {
+              this.cliente.Cliente = data.razonSocial;
+              this.cliente.Direccion = data.direccion;
+              // this.cliente.Telefono = data.Telefono
+            }
           } else {
-              this.$toasted.show('No se encontró el Usuario')                
+            this.$toasted.show("No se encontró el Usuario");
           }
-          
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el Usuario')        
-          console.log(error)
-      })
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el Usuario");
+          console.log(error);
+        });
     },
     guardarCliente(evt) {
       evt.preventDefault();
 
-      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
+      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc));
       if (!esNumerico) {
-          this.$toasted.show('El DNI/RUC debe ser numérico, editar cliente.')
-          return
+        this.$toasted.show("El DNI/RUC debe ser numérico, editar cliente.");
+        return;
       }
 
-      var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
+      var esDocumento =
+        this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11
+          ? true
+          : false;
       if (!esDocumento) {
-          this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
-          return
+        this.$toasted.show("El Número de Documento es de 8 ó 11 digitos");
+        return;
       }
 
-      this.axios.post(this.API + 'clientes', this.cliente)
-      .then((response) => {
-        // console.log(response);
-        this.$emit('onAddCliente', response.data)
-        this.$toasted.show('Cliente guardado correctamente')
-        this.$refs.clienteForm.hide()
-        this.cliente = {}
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.axios
+        .post(this.API + "clientes", this.cliente)
+        .then(response => {
+          // console.log(response);
+          this.$emit("onAddCliente", response.data);
+          this.$toasted.show("Cliente guardado correctamente");
+          this.$refs.clienteForm.hide();
+          this.cliente = {};
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
-}
+};
 </script>
 <style scoped>
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
-  }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 </style>

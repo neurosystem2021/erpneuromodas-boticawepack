@@ -20,7 +20,6 @@
                               style="width:40%"
                               required="required"
                               ref="inputCliente"
-                              id="inputCliente"
                               :url="API + 'clientes'"
                               anchor="ClienteDniRuc"
                               label="writer"
