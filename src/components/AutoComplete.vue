@@ -124,4 +124,11 @@ export default {
   overflow-y: auto; /* Scroll si es necesario */
   z-index: 1000; /* Asegura estar encima */
 }
+@media (max-width: 1250px) {
+  .txtText {
+  position: relative; /* Define un contenedor relativo */
+  min-width: 100%;
+  max-width: 100%;  
+}
+}
 </style>

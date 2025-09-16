@@ -118,8 +118,8 @@
                     <b-col cols="12" class="mt-1">
                         
                         <b-form-group >
-                          <b-input-group class="py-0">
-                          <b-input-group-prepend>
+                          <b-input-group class="d-flex w-100 w-lg-auto">
+                          <b-input-group-prepend >
                             <!-- @dniRuc="setNewDniRuc" -->
                             <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                             <AutoComplete  
@@ -210,8 +210,8 @@
                     :id="`txtNombreOrganizacion-${index}`"
                     placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
                   </b-col> -->
-                  <b-col lg="12" xl="12"  cols="12">
-                    <b-form-group>
+                  <b-col cols="12">
+                    <b-form-group class="formResponsive">
                         <b-input-group>
                           <b-input-group-append>
                             <autocomplete
@@ -225,7 +225,7 @@
                                 placeholder="Agregar Producto"
                                 :on-select="setProducto"
                                 :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
-                                :classes="{input: 'form-control'}"
+                                :classes="{input: 'form-control',root:'formResponsive'}"
                                 @keydown.native.tab.prevent="irCodeBar"
                                 class="txtAutoComplete"
                                >
@@ -242,7 +242,7 @@
                                 placeholder="Codigo de Barra" />
                         <b-input-group-append>
                             <!--<proveedores-tabla></proveedores-tabla>-->
-                            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+                            <b-button variant="primary" class="ocultarMovil" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
                         </b-input-group-append>
                         </b-input-group>
                     </b-form-group>
@@ -386,173 +386,41 @@
                 </b-row>
                 </div>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
-                  <b-col lg="3" xl="3" cols="12">
+                  <b-col md="4" cols="12">
                     <b-row>
                       <b-col cols="12" class="mt-1">
                         <!-- <b-button-group size="sm" class="ocularMovil">
                           <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       </b-button-group>  -->
-                      <b-button-group size="sm" class="ocularMovil">
+                      <div class="ocultarMovil">
+                        <b-button-group size="sm">
                           <pago-deuda></pago-deuda>
-                      </b-button-group>
-                      <b-button-group size="sm">
-                            <movimiento></movimiento>
-                    </b-button-group>
+                        </b-button-group>
+                      </div>
+                       <div class="ocultarMovil">
+                        <b-button-group size="sm" >
+                          <movimiento></movimiento>
+                        </b-button-group>
+                      </div>
                       <b-button-group size="sm">
                           <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma" @cargarProforma="cargarProforma"></proformas>
                       </b-button-group>
-                      <b-button-group size="sm" class="ocularMovil" v-if="false">
-                          <pre-orden-lista 
+                       <div class="ocultarMovil">
+                        <b-button-group size="sm" class="ocularMovil" v-if="false">
+                           <pre-orden-lista 
                               v-show="!this.$route.query.idPreOrden"
                               :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                               @onPreOrden="selectPreOrden"></pre-orden-lista>
-                      </b-button-group>
-                      <b-button-group size="sm" class="ocularMovil">
-                          
-                          <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                      </b-button-group>
+                        </b-button-group>
+                      </div>
+                       <div class="ocultarMovil">
+                          <b-button-group size="sm" class="ocularMovil">
+                            <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
+                          </b-button-group>
+                       </div>
                     </b-col>
-                      <b-col cols="12" class="mt-1">
-                        <table class="table b-table border table-footer">
-                                    <tbody>
-                                        <tr>
-                                            <td  class="text-center">Opciones</td>
-                                        </tr>
-                                        <!-- <tr v-if="puntosAplicados == 0"> -->
-                                        
-                                        <tr>
-                                            <td>
-                                                <b-form-checkbox
-                                                    v-model="ventas[ventaActiva].EsCredito"
-                                                    :value="1"
-                                                    :unchecked-value="0">
-                                                    Venta a credito
-                                                </b-form-checkbox>
-                                                <b-form-input 
-                                                    v-if="ventas[ventaActiva].EsCredito"
-                                                    v-model="venta.FechaCredito"
-                                                    type="date">
-                                                </b-form-input>
-                                                <b-form-checkbox 
-                                                    v-model="ventas[ventaActiva].PorEntregar"
-                                                    :value="1"
-                                                    :unchecked-value="0">
-                                                    Por entregar
-                                                </b-form-checkbox>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="text-center">Proforma</td>
-                                        </tr>
-                                          <tr>
-                                              <td>
-                                                <b-input-group prepend="Proforma válido por:" append="días">
-                                                  <b-form-input
-                                                      :disabled="bloquearInput?true:false"
-                                                      v-model="venta.DescripcionProforma5"
-                                                      min="0"
-                                                      value="0"
-                                                      type="number"
-                                                  ></b-form-input>
-                                                </b-input-group>
-                                              </td>
-                                          </tr>
-                                        <tr>
-                                          <td>
-                                            <b-input-group>
-                                              <b-form-checkbox 
-                                              :disabled="bloquearInput?true:false"
-                                              v-model="venta.EsCreditoProforma"
-                                              :value="1"
-                                              :unchecked-value="0">
-                                                Proforma a Credito
-                                              </b-form-checkbox>
-                                              <div v-if="venta.EsCreditoProforma">
-                                                <div class="mb-3">
-                                                  <input v-model="venta.FechaCreditoProforma"
-                                                    type="date"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Fecha Crédito"/>
-                                                </div>
-                                              </div>
-                                            </b-input-group>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>
-                                            <b-input-group>
-                                              <b-form-checkbox 
-                                              :disabled="bloquearInput?true:false"
-                                              v-model="venta.EsDescripcion"
-                                              :value="1"
-                                              :unchecked-value="0">
-                                                Nota
-                                              </b-form-checkbox>                                              
-                                              <div v-if="venta.EsDescripcion">
-                                                <div class="mb-3">
-                                                  <input v-model="venta.DescripcionProforma"
-                                                    type="text"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Plazo de Entrega"/>
-                                                </div>
-                                                <div class="mb-3">
-                                                  <input v-model="venta.DescripcionProforma2"
-                                                    type="text"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Validez de la oferta"/>
-                                                </div>
-                                                <div class="mb-3">
-                                                  <input v-model="venta.DescripcionProforma3"
-                                                    type="text"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Lugar de Entrega"/>
-                                                </div>
-                                                <div class="mb-3">
-                                                  <input v-model="venta.DescripcionProforma4"
-                                                    type="text"
-                                                    class="form-control"
-                                                    required
-                                                    placeholder="Garantia"/>
-                                                </div>
-                                              </div>
-                                            </b-input-group>
-                                          </td>
-                                        </tr>
-                                        
-                                        <!-- <tr>
-                                            <td>
-                                                <b-input-group prepend="Prof. válida por:" append="días">
-                                                <b-form-input
-                                                    :disabled="bloquearInput?true:false"
-                                                    v-model="diasValidosProf"
-                                                    min="0"
-                                                    value="0"
-                                                    type="number"
-                                                ></b-form-input>
-                                            </b-input-group>
-                                            </td>
-                                        </tr> -->
-                                    </tbody>
-                                </table>
-                              </b-col>
-                      <!-- <b-col md="12" class="mt-1">
-                     
-                        <b-button type="button" block variant="primary"><i class="fas fa-redo"></i> Actualizar</b-button>
-                      </b-col> -->
-                   
-                   
+                    
                     </b-row>
-                  </b-col>
-                  <b-col lg="3" xl="3"  cols="12">
-                   
-  
-                    <b-col cols="12" class="text-left">
-                        ssssssssssss
-                    </b-col>
                     <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                       <b-form-group>
                         <label style="font-weight:bold">Nombre:</label>
@@ -580,7 +448,7 @@
                       
                       </b-col>
                   </b-col>
-                  <b-col lg="3" xl="3"  cols="12">
+                  <b-col md="4" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
@@ -711,6 +579,12 @@
                                                     v-model="ventas[ventaActiva].FechaCredito"
                                                     type="date">
                                                 </b-form-input>
+                                                <b-form-checkbox 
+                                                    v-model="ventas[ventaActiva].PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox>
                                                 <!-- <b-form-checkbox v-if="false"
                                                     v-model="venta.PorEntregar"
                                                     :value="1"
@@ -721,10 +595,10 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <b-input-group prepend="Proforma válidez: " append="días">
+                                                <b-input-group prepend="Proforma válido por: " append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="diasValidosProf"
+                                                    v-model="venta.DescripcionProforma5"
                                                     min="0"
                                                     value="0"
                                                     type="number"
@@ -742,6 +616,7 @@
                                               :unchecked-value="0">
                                                 Proforma a Credito
                                               </b-form-checkbox>
+                                              
                                               <div v-if="ventas[ventaActiva].EsCreditoProforma">
                                                 <div class="mb-3">
                                                   <input v-model="ventas[ventaActiva].FechaCreditoProforma"
@@ -749,6 +624,45 @@
                                                     class="form-control"
                                                     required
                                                     placeholder="Fecha Crédito"/>
+                                                </div>
+                                              </div>
+                                            </b-input-group>
+                                            <b-input-group>
+                                              <b-form-checkbox 
+                                              :disabled="bloquearInput?true:false"
+                                              v-model="venta.EsDescripcion"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                                Nota
+                                              </b-form-checkbox>                                              
+                                              <div v-if="venta.EsDescripcion">
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Plazo de Entrega"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma2"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Validez de la oferta"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma3"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Lugar de Entrega"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                  <input v-model="venta.DescripcionProforma4"
+                                                    type="text"
+                                                    class="form-control"
+                                                    required
+                                                    placeholder="Garantia"/>
                                                 </div>
                                               </div>
                                             </b-input-group>
@@ -767,13 +681,14 @@
                         </tr>
                     
                         <tr>
+                          <td></td>
                           <td><b>TOTAL</b></td>
                           <td class="table-danger">
                             {{ getTotal() }}
                           </td>
                         </tr>
                         <tr>
-                          <td  colspan="1">
+                          <td  colspan="2">
                             <label>pagó con:</label>
                             <b-form-input
                               type="text"
@@ -1208,7 +1123,9 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       objProd: {},
-      cantidadInput: ""
+      cantidadInput: "",
+      mostrarOp: {},
+      diasValidosProf: 0
     };
   },
   mounted() {
@@ -1222,7 +1139,7 @@ export default {
     });
   },
   methods: {
-      togglePopoverOpcion(index) {
+    togglePopoverOpcion(index) {
       if (this.mostrarOp[index]) {
         this.$root.$emit("bv::hide::popover", `popover-opciones${index}`);
       } else {
@@ -2887,7 +2804,13 @@ export default {
     display: inline;
   }
   .txtAutoComplete {
-    min-width: 280px !important;
+    min-width: 20% !important;
+  }
+  .formResponsive {
+    max-width: 100%;
+  }
+  .autocomplete-input{
+    max-width: 100% !important;
   }
 }
 </style>
