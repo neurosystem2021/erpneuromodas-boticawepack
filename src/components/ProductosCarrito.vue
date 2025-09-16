@@ -562,6 +562,7 @@
               ></b-button>
             </b-input-group-append>
           </b-input-group>
+          <p>Búsqueda Avanzanda (Producto,Categoría,Marca)</p>
         </b-col>
         <!-- <b-col cols="12" slot="modal-footer">
           <div class="w-100 px-2 my-2 derecha">
@@ -1681,7 +1682,6 @@ export default {
       vm.modalNuevoProductos = !vm.modalNuevoProductos;
       vm.$store.state.consideraAppendEmpresa = false;
     },
-
     listadoProductos() {
       let lst = [];
       let productosFiltrados = this.lstProductos.filter(
@@ -1694,12 +1694,35 @@ export default {
       );
 
       if (this.searchProducto) {
-        lst = productosFiltrados.filter(
-          p =>
-            p.Producto.toLowerCase().includes(
-              this.searchProducto.toLowerCase()
-            ) || !!p.Selected
-        );
+        // Dividir por coma y limpiar espacios
+        const terms = this.searchProducto
+          .split(",")
+          .map(t => t.trim().toLowerCase());
+
+        lst = productosFiltrados.filter(p => {
+          const prod = (p.Producto || "").toLowerCase();
+          const cat = (p.ProductoCategoria || "").toLowerCase();
+          const marca = (p.ProductoMarca || "").toLowerCase();
+
+          let ok = true;
+
+          // 1er término → Producto
+          if (terms[0] && !prod.includes(terms[0])) {
+            ok = false;
+          }
+
+          // 2do término → Categoria
+          if (terms[1] && !cat.includes(terms[1])) {
+            ok = false;
+          }
+
+          // 3er término → Marca
+          if (terms[2] && !marca.includes(terms[2])) {
+            ok = false;
+          }
+
+          return ok;
+        });
       } else {
         lst = productosFiltrados;
       }
@@ -1712,7 +1735,6 @@ export default {
       const end = start + this.perPage;
       return lst.slice(start, end);
     },
-
     async anadirarProductosSeleccionado(item, abrirModal = false) {
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
