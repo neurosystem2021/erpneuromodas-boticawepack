@@ -468,19 +468,19 @@
       </b-table>
     </b-col>
     <b-col md="3">
-      <slot name="operaciones"></slot>
+      <!-- <slot name="operaciones"></slot> -->
     </b-col>
     <b-col md="3">
-      <slot name="metodopago"></slot>
+      <!-- <slot name="metodopago"></slot> -->
     </b-col>
     <b-col md="3">
-      <slot name="totalEmpresa"  v-if="mostrarTablaProductos"></slot>
+      <!-- <slot name="totalEmpresa"  v-if="mostrarTablaProductos"></slot> -->
     </b-col>
     <!-- <b-col md="2">
       <slot name="adicional"></slot>
     </b-col> -->
     <b-col md="3" >
-      <table class="table b-table border table-footer">
+      <table class="table b-table border table-footer" v-if="mostraTotales">
         <tbody>
           <tr v-if="sumatoriaDescuento > 0">
             <td class="table-success">SubTotal</td>
@@ -1032,6 +1032,10 @@ export default {
       }
     },
     showButton: {
+      default: true,
+      type: Boolean
+    },
+    mostraTotales: {
       default: true,
       type: Boolean
     },

@@ -1,11 +1,9 @@
 <template>
   <div>
     <b-button
-      block
       @click="show = true"
       variant="info"
       class="btnAction"
-      size="md"
       v-bind:class="{ parpadea: pedidos.length > 0 }"
     >
       <img src="static/logo.png" style="width: 24px" /> Delivery
