@@ -125,6 +125,7 @@
                             <AutoComplete  
                               :value="ventas[index].cliente.Cliente"
                               @guardarCliente="setCliente"
+                              @dniRuc="newDniRuc=$event" 
                             />
                           </b-input-group-prepend>
                           <b-input-group-append>
@@ -263,7 +264,7 @@
                 </b-row> -->
                 <div class="divCarrito">
                 <b-row class="mt-2 clsCarrito">
-                  <b-table striped hover :fields="headerTable"  :items="venta.productos">
+                  <b-table striped hover :fields="headerTable"  :items="venta.productos" class="tblCarrito">
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -974,10 +975,10 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         // { key: "CodigoBarra" },
         { key: "Producto" },
-        { key: "Anaquel" },
+        { key: "Anaquel", class: "d-none d-md-table-cell" },
         { key: "pres", label: "" },
         { key: "ProductoPresentacion", label: "Presentacion" },
-        { key: "cantxPrecio", label: "	Cant X Precio" },
+        { key: "cantxPrecio", label: "	CanXPrec" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         // {
@@ -2809,8 +2810,11 @@ export default {
   .formResponsive {
     max-width: 100%;
   }
-  .autocomplete-input{
+  .autocomplete-input {
     max-width: 100% !important;
+  }
+  .tblCarrito {
+    font-size: 0.7rem;
   }
 }
 </style>
