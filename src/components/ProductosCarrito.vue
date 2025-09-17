@@ -153,7 +153,7 @@
             type="number"
             style="width: 95px"
             min="0"
-            step="0.00001"
+            step="0.000000001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -527,7 +527,7 @@ export default {
     }),
     recalcularCantidad(item, index) {
       let data = { ...item };
-      data.precio = data.subtotal / data.cantidad;
+      data.precio = parseFloat(data.subtotal / data.cantidad).toFixed(2);
       Vue.set(this.$store.state.cart.productos, index, data);
     },
     abrirImagen(producto, url) {

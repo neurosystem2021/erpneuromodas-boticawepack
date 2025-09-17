@@ -1898,17 +1898,20 @@ export default {
             return (
               total +
               parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio
-              ).toFixed(2)
+                prod.CantidadPresentacion * prod.cantidad * prod.precio 
+              )
             );
           } else {
-            return parseFloat(
+            return (
               total + parseFloat(prod.cantidad * prod.precio)
-            ).toFixed(2);
+            );
           }
           // return (
           //   total +
-          //   parseFloat(prod.cantidad * prod.CantidadPresentacion * prod.precio)
+          //   parseFloat(
+          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
+          //   ) -
+          //   parseFloat(prod.descuento)
           // );
         }, 0);
         return parseFloat(subtotal).toFixed(2);

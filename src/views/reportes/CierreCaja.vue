@@ -2,7 +2,6 @@
   <b-container fluid class="px-5 py-5">
     <b-row class="no-print">  
       <b-col cols="9" class="no-print">
-        
         <b-card no-body>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Ventas" active >
@@ -547,10 +546,37 @@
             </b-button-group>
           </b-col>
         <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
-          Turno
-          
-          <b-form-select v-model="turno" :options="turnos" />
-          
+           <b-input-group prepend="Turno" class="mt-2">
+              <b-form-select v-model="turno" :options="turnos" />
+          </b-input-group>
+           <b-input-group prepend="Vendedor" class="mt-2" v-if="idPerfil==1">
+                <autocomplete
+                    required="required"
+                    ref="inputVendedor"
+                    :url="API + 'usuarios'"
+                    :customParams="{idPerfil: idPerfil}"
+                    anchor="NombreUsuario"
+                    label="writer"
+                    :on-select="setVendedorManual" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+          </b-input-group>
+           <b-input-group prepend="Vendedor" class="mt-2" v-else>
+                <input type="text" disabled v-model="vendedor.Usuario" class="form-control" style="text-transform: uppercase;">
+                <!-- <autocomplete
+
+                    required="required"
+                    ref="inputVendedor"
+                    :url="API + 'usuarios'"
+                    :customParams="{idPerfil: idPerfil}"
+                    anchor="NombreUsuario"
+                    label="writer"
+                    :on-select="setVendedorManual" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete> -->
+          </b-input-group>
         </b-col>
             <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
               <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
@@ -605,14 +631,14 @@
               <td colspan="2"></td>
             </tr>
 
-            <tr>
+            <!-- <tr>
               <td>Vales de Crédito S/.</td>
               <td>{{ totalVentasValeCredito | redondear }} </td>
             </tr>
             <tr>
               <td>Canjes S/.</td>
               <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </b-col>
@@ -1178,7 +1204,8 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      reportePorProveedor: []
+      reportePorProveedor: [],
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0
     };
   },
   computed: {
@@ -1304,6 +1331,15 @@ export default {
     }
   },
   methods: {
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    setVendedorManual(obj) {
+      this.vendedor = obj;
+      this.loadData();
+      // this.getVendedor(obj.Usuario);
+    },
     getDetalles(idDocVenta) {
       let detalles = this.itemsDetalle.filter(
         item => item.IdDocVenta == idDocVenta
@@ -1312,17 +1348,19 @@ export default {
       //this.items[index].productos = detalles
       return detalles;
     },
-    getVendedor() {
+    async getVendedor() {
       let usuario = sessionStorage.getItem("User");
-      this.axios
+      await this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // if (!this.idPerfil == 1) {
+          //   this.$refs.inputVendedor.$refs.input.disabled = true;
+          // }
 
           if (response.data.IdUsuarioPerfil !== 1) {
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputVendedor.$refs.input.disabled = true;
           }
         })
         .catch(error => {
