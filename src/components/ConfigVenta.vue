@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="info" class="btnAction">Configurar</b-button>
+        <b-button @click="show=true" style="color: #ffffff; background: #FF3D00;" class="btnAction">Configurar</b-button>
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 

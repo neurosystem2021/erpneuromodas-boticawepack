@@ -1136,7 +1136,6 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = this.productos.reduce((sum, producto) => {
-        console.log(producto.total);
         return (
           sum +
           parseFloat(

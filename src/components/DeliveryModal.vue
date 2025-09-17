@@ -503,7 +503,6 @@ export default {
     this.escucharCoordsMotorizado();
     this.escucharEstadoPedido();
     this.getEmpresaDatos();
-    console.log("hola");
   },
   beforeDestroy() {
     this.sockets.unsubscribe("lista-on-motorizado");
