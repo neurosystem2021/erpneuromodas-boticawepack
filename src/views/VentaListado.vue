@@ -470,14 +470,27 @@
                       <tbody>
                         <tr>
                           <td>
-                            <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                            <b-button 
+                                class="p-1 ml-1 mt-1" 
+                                :id="`popover-metodopago${index}`"
+                                tabindex="0" 
+                                 @click="toggleMetodoPago(index)" 
+                                variant="success">
+                                <i class="fas fa-credit-card" ></i>
+                              </b-button>
                             <br>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus" :style="{ minWidth: '600px' }">
-                            <slot name="metodopago" style="width: 1200px;" >
+                            <b-badge v-if="ventas[index].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                            <b-badge v-if="ventas[index].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                            <b-badge v-if="ventas[index].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                            <b-badge v-if="ventas[index].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                            <b-popover 
+                              :target="`popover-metodopago${index}`" 
+                              title="Metodo de pago" 
+                              triggers="manual" 
+                              placement="top" 
+                              :show.sync="mostrarMP[index]" 
+                              :style="{ minWidth: '600px' }">
+                            <slot :name="`metodopago${index}`" style="width: 1200px;" >
                               <table class="table b-table border table-footer table-sm">
                                 <tbody>
                                   <tr>
@@ -1125,6 +1138,7 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       objProd: {},
       cantidadInput: "",
+      mostrarMP: {},
       mostrarOp: {},
       diasValidosProf: 0
     };
@@ -1140,6 +1154,16 @@ export default {
     });
   },
   methods: {
+    toggleMetodoPago(index) {
+      if (this.mostrarMP[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+      } else {
+        this.$set(this.mostrarMP, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
+        });
+      }
+    },
     togglePopoverOpcion(index) {
       if (this.mostrarOp[index]) {
         this.$root.$emit("bv::hide::popover", `popover-opciones${index}`);
@@ -1872,16 +1896,17 @@ export default {
               total +
               parseFloat(
                 prod.CantidadPresentacion * prod.cantidad * prod.precio
-              ).toFixed(2)
+              )
             );
           } else {
-            return parseFloat(
-              total + parseFloat(prod.cantidad * prod.precio)
-            ).toFixed(2);
+            return total + parseFloat(prod.cantidad * prod.precio);
           }
           // return (
           //   total +
-          //   parseFloat(prod.cantidad * prod.CantidadPresentacion * prod.precio)
+          //   parseFloat(
+          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
+          //   ) -
+          //   parseFloat(prod.descuento)
           // );
         }, 0);
         return parseFloat(subtotal).toFixed(2);
