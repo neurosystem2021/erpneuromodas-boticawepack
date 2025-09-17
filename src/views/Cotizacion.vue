@@ -237,6 +237,34 @@
                   <proformas :idAlmacen="1" class="btnAction"  @onSelectProforma="cargarProforma"></proformas>
                 </b-button-group>
             </b-col>
+            <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
+               <table class="table b-table border table-footer">
+                <tr v-if="getTotalCantidad()>0">
+                  <td class="table-info" style="text-align: left; font-weight:bold">Total Cantidad</td>
+                  <td>
+                    S/. {{ getTotalCantidad() }}
+                  </td>
+                </tr>
+                <tr v-if="getTotalSucursal()>0">
+                  <td class="table-warning" style="text-align: left; font-weight:bold">Total Sucursal</td>
+                  <td>
+                    S/. {{ getTotalSucursal() }}
+                  </td>
+                </tr>
+                <tr v-if="getTotalImportacion()>0">
+                  <td class="table-danger" style="text-align: left; font-weight:bold">Total Importacion</td>
+                  <td>
+                    S/. {{ getTotalImportacion() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="table-success" style="text-align: left; font-weight:bold">Total </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getTotal() }}
+                  </td>
+                </tr>
+              </table>
+            </b-col>
           </b-row>
         </b-tab>
     </b-tabs>
@@ -741,7 +769,7 @@ export default {
       );
       obj.stock = res.data[0].stock;
       obj.cantidad = 1;
-      obj.precio = item.PrecioContado;
+      obj.precio = parseFloat(item.PrecioContado).toFixed(2);
       obj.descuento = 0;
       obj.cantidadSucursal = 0;
       obj.diasEntrega = 0;
@@ -941,6 +969,35 @@ export default {
           </table>   
         </div>
         `;
+    },
+    getTotalCantidad() {
+      let total = this.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.precio * prod.cantidad);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotalSucursal() {
+      let total = this.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.precio * prod.cantidadSucursal);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotalImportacion() {
+      let total = this.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.precio * prod.cantidadImportacion);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotal() {
+      let total = this.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.precio * prod.cantidad) +
+          parseFloat(prod.precio * prod.cantidadSucursal) +
+          parseFloat(prod.precio * prod.cantidadImportacion)
+        );
+      }, 0);
+      return parseFloat(total).toFixed(2);
     }
   },
   computed: {
@@ -983,5 +1040,8 @@ export default {
 }
 #modalProducto .modal-dialog {
   min-width: 80% !important;
+}
+.tblTotal {
+  border: 1px solid #;
 }
 </style>
