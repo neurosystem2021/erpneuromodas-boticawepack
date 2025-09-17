@@ -44,10 +44,13 @@
   #logo {
     float: left;
     margin-top: 8px;
+    text-align: center;
+    width: 100%;
   }
   
   #logo img {
-    height: 70px;
+    max-width: 100%;
+    height: auto;
   }
   
   #company {
@@ -57,7 +60,7 @@
   
   
   #details {
-    margin-bottom: 50px;
+    margin-bottom: 9px;
   }
   
   #client {
@@ -121,7 +124,7 @@
   }
   
   table td h3{
-    color: #57B223;
+    color: #0087C3;
     font-size: 1.2em;
     font-weight: normal;
     margin: 0 0 0.2em 0;
@@ -130,7 +133,7 @@
   table .no {
     color: #FFFFFF;
     font-size: 1.6em;
-    background: #57B223;
+    background: #0087C3;
   }
   
   table .desc {
@@ -145,7 +148,7 @@
   }
   
   table .total {
-    background: #57B223;
+    background: #0087C3;
     color: #FFFFFF;
     text-align: right;
   }
@@ -177,9 +180,9 @@
   }
   
   table tfoot tr:last-child td {
-    color: #57B223;
+    color: #0087C3;
     font-size: 1.4em;
-    border-top: 1px solid #57B223; 
+    border-top: 1px solid #0087C3; 
   
   }
   
@@ -187,6 +190,11 @@
     border: none;
   }
   
+  #accounts{
+    font-size: .9em;
+    margin-bottom: 12px;
+    margin-top: 12px;
+  }
   #thanks{
     font-size: 2em;
     margin-bottom: 50px;
