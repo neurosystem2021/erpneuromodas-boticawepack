@@ -535,14 +535,17 @@
         <b-col cols="12">
            
             <b-button-group>
-              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
+              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1 mt-1" aria-hidden="true"></i>
                 Cerrar Caja</b-button>
             </b-button-group>
-            <b-button-group>
+            <b-button-group class="my-1">
               <cierres-caja></cierres-caja>
             </b-button-group>
-            <b-button-group>
-              <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
+            <b-button-group class="my-1">
+              <b-button variant="primary" @click="imprimir(1)"><i class="fa fa-print mx-1 mt-1" aria-hidden="true"></i> Imprimir</b-button>
+            </b-button-group>
+            <b-button-group class="my-1">
+              <b-button variant="primary" @click="imprimir(2)"><i class="fa fa-print mx-1 mt-1" aria-hidden="true"></i> Productos</b-button>
             </b-button-group>
           </b-col>
         <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
@@ -658,7 +661,7 @@
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
        <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
         
-        <table class="table table-sm" width="100%">
+        <table class="table table-sm" width="100%" v-if="val==2">
           <thead>
             <tr class="thDetalle">
               <th width="5%">ID</th>
@@ -687,7 +690,7 @@
             </tr>
           </tfoot>
         </table>
-
+          <div v-if="val==1">
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
@@ -1168,7 +1171,7 @@
             </table>
           </b-col>
       </b-row>
-           
+           </div>
     </b-row>
   </b-container>
 
@@ -1205,7 +1208,8 @@ export default {
       cierre: {},
       vendedor: {},
       reportePorProveedor: [],
-      idPerfil: sessionStorage.getItem("IdPerfil") || 0
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0,
+      val: 1
     };
   },
   computed: {
@@ -1368,8 +1372,13 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
-    imprimir() {
-      window.print();
+    imprimir(val) {
+      this.$nextTick(() => {
+        this.val = val;
+      });
+      setTimeout(() => {
+        window.print();
+      }, 100);
     },
     async loadData() {
       await this.getVentas();
@@ -1635,12 +1644,12 @@ th {
     display: none;
   }
   .si-print {
-    max-width: 350px;
+    /* max-width: 80px; */
     display: block;
   }
   .table {
-    max-width: 350px;
-    font-size: 0.5em;
+    /* max-width: 80px; */
+    font-size: 1em;
   }
   th {
     background: #ffffff !important;
