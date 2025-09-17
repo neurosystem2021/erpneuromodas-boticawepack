@@ -136,6 +136,7 @@
         ref="tablaCarrito"
         style="margin-top: -12px"
         v-if="mostrarTablaProductos"
+        class="tblCarrrito"
       >
         <template slot="eventPres" slot-scope="data">
           <b-button
@@ -480,7 +481,7 @@
       <slot name="adicional"></slot>
     </b-col> -->
     <b-col md="3" >
-      <table class="table b-table border table-footer" v-if="mostraTotales">
+      <table class="table b-table border table-footer " v-if="mostraTotales">
         <tbody>
           <tr v-if="sumatoriaDescuento > 0">
             <td class="table-success">SubTotal</td>
@@ -925,7 +926,7 @@ export default {
       modalNuevoProductos: false,
       lstProductos: [],
       busqueda: "",
-      perPage: 7,
+      // perPage: 7,
       currentPage: 1,
       searchProducto: "",
       errorMontoPresentacion: "",
@@ -953,13 +954,14 @@ export default {
         { label: "Add", key: "add" }
       ],
       perPageModalList: [
-        { value: "5", text: "5" },
-        { value: "10", text: "10" },
-        { value: "20", text: "20" },
-        { value: "50", text: "50" },
-        { value: "100", text: "100" },
-        { value: "", text: "All" }
+        { value: 5, text: "5" },
+        { value: 10, text: "10" },
+        { value: 20, text: "20" },
+        { value: 50, text: "50" },
+        { value: 100, text: "100" },
+        { value: null, text: "All" }
       ],
+
       numerosCalculadora: [
         { valor: "7", tipo: "number" },
         { valor: "8", tipo: "number" },
@@ -997,7 +999,7 @@ export default {
       itemProducto: {},
       primerMonto: true,
       currentPage: 1,
-      perPage: 100
+      perPageModal: 100
     };
   },
   watch: {
@@ -1101,7 +1103,8 @@ export default {
         );
       }
 
-      return Math.ceil(productosFiltrados.length / this.perPage);
+      const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
+      return Math.ceil(productosFiltrados.length / perPage);
     },
     isLastPage() {
       return this.currentPage >= this.totalPages;
@@ -1734,9 +1737,9 @@ export default {
       if (this.IdProducto) {
         lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
       }
-
-      const start = (this.currentPage - 1) * this.perPage;
-      const end = start + this.perPage;
+      const perPage = parseInt(this.perPageModal) || lst.length;
+      const start = (this.currentPage - 1) * perPage;
+      const end = start + perPage;
       return lst.slice(start, end);
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
@@ -2085,6 +2088,14 @@ export default {
 .ofertanom {
   color: #dc3545;
   border-right: 2px solid #dc3545;
+}
+.tblCarrrito {
+  min-height: 380px !important ;
+  max-height: 380px !important ;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #bdbdbd !important;
+  background: #ffffff !important;
 }
 </style>
 <style>

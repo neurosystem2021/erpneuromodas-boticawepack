@@ -760,7 +760,7 @@
                         <td>Efectivo</td>
                         <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                         <td>
-                          <!-- <b-form-input v-model="venta.pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input> -->
+                          <b-form-input v-model="venta.pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                         </td>
                         <td>
                           <input v-model="venta.pago.efectivo.monto" min="0" step="0.01" type="number" placeholder="S/." class="form-control"/>
@@ -770,37 +770,38 @@
                         <td>Tarjeta</td>
                         <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                         <td>
-                          <!-- <b-form-input v-model="venta.pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input> -->
+                          <b-form-input v-model="venta.pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                          />
-                          <!-- @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)" -->
+                              @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"
+                            />
                         </td>
                       </tr>
                       <tr>
                         <td>Yape/Plin</td>
                         <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                         <td>
-                          <!-- <b-form-input v-model="venta.pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input> -->
+                          <b-form-input v-model="venta.pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
+                            @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" 
                           />
-                          <!-- @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" -->
+                         
                         </td>
                       </tr>
                       <tr>
                         <td>Transferencia</td>
                         <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                         <td>
-                          <!-- <b-form-input v-model="venta.pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input> -->
+                          <b-form-input v-model="venta.pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                         </td>
                         <td>
                           <input
-                            class="form-control" v-model="venta.pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/."
+                            class="form-control" v-model="venta.pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
+                             @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" 
                             />
-                            <!-- @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" -->
                         </td>
                       </tr>
                     </tbody>
@@ -813,6 +814,12 @@
                {{ subTotalG }}
             </td>
           </tr>
+          <tr v-if="descuentoG >0">
+           <td></td>
+            <td class="table-danger">Descuento</td>
+            <td class="table-danger">- {{ descuentoG }}</td>
+          </tr>
+         
           <tr>
             <td>
               <b-button 
@@ -911,12 +918,6 @@
                   </slot>
                 </b-popover>  
               </td>
-            <td class="table-danger">Descuento</td>
-            <td class="table-danger">- {{ descuentoG }}</td>
-          </tr>
-         
-          <tr>
-            <td></td>
             <td class="table-info"><b>TOTAL</b></td>
             <td class="table-info">
               {{ sumatoriaTotal }}
@@ -1029,14 +1030,7 @@ export default {
       descuentoPuntos: {},
       descuentoGeneral: 0,
       tieneIgv: false,
-      venta: {
-        pago: {
-          efectivo: { descripcion: "", IdMetodoPago: 1, monto: 0 },
-          visa: { descripcion: "", IdMetodoPago: 2, monto: 0 },
-          mastercard: { descripcion: "", IdMetodoPago: 3, monto: 0 },
-          delivery: { descripcion: "", IdMetodoPago: 4, monto: 0 }
-        }
-      },
+      venta: {},
       mostrar: false,
       mostrarOp: false,
       bloquearInput: false,
@@ -1376,10 +1370,11 @@ export default {
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
-          efectivo: { IdMetodoPago: 1, monto: 0 },
-          visa: { IdMetodoPago: 2, monto: 0 },
-          mastercard: { IdMetodoPago: 3, monto: 0 },
-          transferencia: { IdMetodoPago: 4, monto: 0 }
+          efectivo: { descripcion: "", IdMetodoPago: 1, monto: 0 },
+          visa: { descripcion: "", IdMetodoPago: 2, monto: 0 },
+          mastercard: { descripcion: "", IdMetodoPago: 3, monto: 0 },
+          transferencia: { descripcion: "", IdMetodoPago: 4, monto: 0 },
+          delivery: { descripcion: "", IdMetodoPago: 4, monto: 0 }
         },
         IdPreOrden: [],
         CampoDireccion: "Direccion",
