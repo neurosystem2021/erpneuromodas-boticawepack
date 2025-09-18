@@ -1104,12 +1104,7 @@ export default {
       console.log("TipoCambio", this.TipoCambio);
       obj = this.onSetProducto(obj, false, precio);
       obj.cantidadPres = obj.cantidad;
-      obj.PrecioContado =
-        parseFloat(
-          (obj.PrecioCosto /
-            parseFloat(1 - parseFloat(obj.PorcentajeUtilidad / 100))) *
-            this.TipoCambio
-        ).toFixed(2) + obj.flete;
+      obj.PrecioContado = parseFloat(obj.PrecioContado).toFixed(2);
       this.add([
         obj,
         () => {

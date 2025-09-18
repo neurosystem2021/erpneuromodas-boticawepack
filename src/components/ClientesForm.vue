@@ -188,15 +188,10 @@ export default {
             this.$toasted.show("Cliente encontrado, se llenarán sus datos");
             var data = response.data;
             if (tipo == "DNI") {
-              this.cliente.Cliente =
-                data.nombres +
-                " " +
-                data.apellidoPaterno +
-                " " +
-                data.apellidoMaterno;
-              this.cliente.Direccion = "";
+              this.cliente.Cliente = data.nombre;
+              this.cliente.Direccion = data.direccion;
             } else {
-              this.cliente.Cliente = data.razonSocial;
+              this.cliente.Cliente = data.nombre;
               this.cliente.Direccion = data.direccion;
               // this.cliente.Telefono = data.Telefono
             }

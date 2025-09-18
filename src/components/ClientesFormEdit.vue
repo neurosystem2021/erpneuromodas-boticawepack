@@ -89,72 +89,72 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
   data() {
     return {
       API: config.API,
       show: false,
       cliente: {}
-    }
+    };
   },
-  props: ['clienteSelect'],
+  props: ["clienteSelect"],
   watch: {
-    clienteSelect (cl) {
-      this.cliente = Object.assign({}, cl)
+    clienteSelect(cl) {
+      this.cliente = Object.assign({}, cl);
     }
   },
   methods: {
-    consultarDNIRUC () {
-        let tipo = this.cliente.DniRuc.length > 8 ? 'RUC' : 'DNI'
+    consultarDNIRUC() {
+      let tipo = this.cliente.DniRuc.length > 8 ? "RUC" : "DNI";
 
-        this.axios.get(this.API + 'consultarRUC', {
-            params: {
-                type: tipo,
-                numero: this.cliente.DniRuc
-            }
-        }).then((response) => {
-            if (response.data) {
-                this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
-                var data = response.data
-                if (tipo == 'DNI') {
-                  //  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
-                  Vue.set(this.cliente, 'Cliente', data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno)
-                } else {
-                  Vue.set(this.cliente, 'Cliente', data.razonSocial);
-                  Vue.set(this.cliente, 'Direccion', data.direccion);
-
-                  // this.cliente.Cliente = data.razonSocial
-                  // this.cliente.Direccion = data.direccion
-                  // this.cliente.Telefono = data.Telefono
-                }
-
+      this.axios
+        .get(this.API + "consultarRUC", {
+          params: {
+            type: tipo,
+            numero: this.cliente.DniRuc
+          }
+        })
+        .then(response => {
+          if (response.data) {
+            this.$toasted.show("Cliente encontrado, se llenarán sus datos");
+            var data = response.data;
+            if (tipo == "DNI") {
+              //  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
+              Vue.set(this.cliente, "Cliente", data.nombre);
             } else {
-                this.$toasted.show('No se encontró el Usuario')                
+              Vue.set(this.cliente, "Cliente", data.nombre);
+              Vue.set(this.cliente, "Direccion", data.direccion);
+
+              // this.cliente.Cliente = data.razonSocial
+              // this.cliente.Direccion = data.direccion
+              // this.cliente.Telefono = data.Telefono
             }
-            
+          } else {
+            this.$toasted.show("No se encontró el Usuario");
+          }
         })
-        .catch((error) => {
-            this.$toasted.show('No se encontró el Usuario')        
-            console.log(error)
-        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el Usuario");
+          console.log(error);
+        });
     },
     guardarCliente(evt) {
-        evt.preventDefault();
+      evt.preventDefault();
 
-      this.axios.post(this.API + 'clientes', this.cliente)
-      .then((response) => {
-        this.$emit('onAddCliente', response.data)
-        this.$toasted.show('Cliente guardado correctamente')
-        this.$refs.clienteForm.hide()
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.axios
+        .post(this.API + "clientes", this.cliente)
+        .then(response => {
+          this.$emit("onAddCliente", response.data);
+          this.$toasted.show("Cliente guardado correctamente");
+          this.$refs.clienteForm.hide();
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
-}
+};
 </script>
 <style>
-
 </style>

@@ -51,7 +51,7 @@
                         <th style="text-align: center;">SubTotal</th>	
                         <th style="text-align: center;">ISC</th>	
                         <th style="text-align: center;">IGV</th>	
-                        <th style="text-align: center;">FLETE</th>	
+                       
                         <th style="text-align: center;">PERCEPCION</th>	
                         <th style="text-align: center;">MONEDA</th>	
                         <th style="text-align: center;">Total</th>
@@ -73,7 +73,6 @@
                         <td style="text-align: center;">{{parseFloat(reporte.SUBTOTAL).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.ISC).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.IGV).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.FLETE).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.Percepcion).toFixed(2)}}</td>
                         <td style="text-align: center;">{{reporte.Moneda}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
@@ -115,12 +114,13 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Cod. Barra</th>
+                  <th>Cod. Fabricante</th>
                   <th>Marca</th>
                   <th>Producto</th>
                   <th>Descripcion</th>
                   <th>Medida</th>
                   <th>Cantidad</th>
+                  <th>Flete</th>
                   <th>Precio</th>
                   <th>IGV</th>
                   <th>Total</th>
@@ -129,12 +129,13 @@
               <tbody>
                 <tr v-for="(detalle,index) in lstDetalle" :key="index" >
                   <td>{{ detalle.hashMovimiento }}</td>
-                  <td>{{ detalle.CodigoBarra }}</td>
+                  <td>{{ detalle.CodigoFrabricante }}</td>
                   <td>{{ detalle.ProductoMarca }}</td>
                   <td>{{ detalle.Producto }}</td>
                   <td>{{ detalle.Descripcion }}</td>
                   <td>{{ detalle.ProductoMedicion }}</td>
                   <td>{{ detalle.Cantidad }}</td>
+                  <td>{{ detalle.FLETE }}</td>
                   <td>{{ detalle.Precio }}</td>
                   <td>{{ montoIGV(detalle)}}</td>
                   <td>{{ montoTotal(detalle)}}</td>

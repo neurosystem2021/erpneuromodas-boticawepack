@@ -70,7 +70,7 @@
           </b-form-group>
         </b-col>
         <b-col md="2" class="d-flex align-items-end mb-3">
-          <b-button variant="primary" block @click="generarReporte">
+          <b-button variant="primary" block @click="obtenerProductos">
             Generar Reporte
           </b-button>
         </b-col>
@@ -91,11 +91,12 @@
             hover
             id="my-table" 
             :busy.sync="isBusy" 
-            :items="myProvider" 
+            :items="lstProductos" 
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage"
-            @row-clicked="myRowClickHandler">
+            >
+            <!-- @row-clicked="myRowClickHandler" -->
             <template slot="Saldo" slot-scope="data">
                 {{ data.item.Saldo | redondear(2) }}
             </template>
@@ -168,35 +169,72 @@ export default {
       },
       mostrarTabla: false,
       showLetras: false,
-      urlImg: "/resources/images/logo.png"
+      urlImg: "/resources/images/logo.png",
+      lstProductos: []
     };
   },
-  methods: {
-    generarReporte() {
-    if (!this.rango.fechaDesde || !this.rango.fechaHasta) {
-      this.$bvToast.toast('Debes seleccionar ambas fechas.', {
-        title: 'Error',
-        variant: 'danger',
-        solid: true
-      });
-      return;
-    }
-
-    this.mostrarTabla = true;
-
-    this.$nextTick(() => {
-      if (this.$refs.tablaProductos && typeof this.$refs.tablaProductos.refresh === 'function') {
-        this.$refs.tablaProductos.refresh();
-      }
-    });
-
-    console.log('Generando reporte desde', this.rango.fechaDesde, 'hasta', this.rango.fechaHasta);
+  mounted() {
+    this.obtenerProductos();
   },
+  methods: {
+    obtenerProductos() {
+      let promise = this.axios.get(
+        this.API +
+          "cliente/deudas?idalmacen=" +
+          this.almacen.IdAlmacen +
+          "&q=" +
+          this.filter +
+          "&limit=" +
+          this.perPage +
+          "&page=" +
+          this.currentPage +
+          "&fechaDesde=" +
+          this.rango.fechaDesde +
+          "&fechaHasta=" +
+          this.rango.fechaHasta
+      );
+
+      return promise
+        .then(response => {
+          this.lstProductos = response.data;
+        })
+        .catch(error => {
+          return [];
+        });
+    },
+    generarReporte() {
+      if (!this.rango.fechaDesde || !this.rango.fechaHasta) {
+        this.$bvToast.toast("Debes seleccionar ambas fechas.", {
+          title: "Error",
+          variant: "danger",
+          solid: true
+        });
+        return;
+      }
+
+      this.mostrarTabla = true;
+
+      this.$nextTick(() => {
+        if (
+          this.$refs.tablaProductos &&
+          typeof this.$refs.tablaProductos.refresh === "function"
+        ) {
+          this.$refs.tablaProductos.refresh();
+        }
+      });
+
+      console.log(
+        "Generando reporte desde",
+        this.rango.fechaDesde,
+        "hasta",
+        this.rango.fechaHasta
+      );
+    },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
     },
-    calcularTotal() { 
+    calcularTotal() {
       let sum = this.items.reduce((sum, item) => {
         return sum + parseFloat(item.Saldo);
       }, 0);
@@ -220,54 +258,25 @@ export default {
       this.almacen = obj;
       Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
-    myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      // console.log(ctx.filter)
-      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get(
-        this.API +
-          "cliente/deudas?idalmacen=" +
-          this.almacen.IdAlmacen +
-          "&q=" +
-          ctx.filter +
-          "&limit=" +
-          ctx.perPage +
-          "&page=" +
-          ctx.currentPage +
-          "&fechaDesde=" +
-          this.rango.fechaDesde +
-          "&fechaHasta=" +
-          this.rango.fechaHasta
-      );
+    // myProvider(ctx) {
+    //   // Here we don't set isBusy prop, so busy state will be handled by table itself
+    //   // this.isBusy = true
+    //   // console.log(ctx.filter)
+    //   // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
+    //   // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
 
-      return promise
-        .then(response => {
-          console.log(response);
-          this.items = response.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
-        })
-        .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return [];
-        });
-    },
+    // },
     myRowClickHandler(record, index) {
       if (record.Letras != "Ninguna") {
-        this.showLetras = true;
-        this.$refs.detDeuCli.cargarDeudasCliente(
-          record.IdDocVenta,
-          record.Total,
-          record.DniRuc,
-          record.Cliente,
-          record.Correlativo
-        );
+        console.log(record);
+        // this.showLetras = true;
+        // this.$refs.detDeuCli.cargarDeudasCliente(
+        //   record.IdDocVenta,
+        //   record.Total,
+        //   record.DniRuc,
+        //   record.Cliente,
+        //   record.Correlativo
+        // );
       }
     }
   },

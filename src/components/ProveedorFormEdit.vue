@@ -45,102 +45,109 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
   data() {
     return {
       API: config.API,
       show: false,
       proveedor: {
-        Proveedor: '',
-        Ruc: '',
-        Direccion: '',
-        Telefono: '',
-        Observacion: '',
+        Proveedor: "",
+        Ruc: "",
+        Direccion: "",
+        Telefono: "",
+        Observacion: "",
         FechaReg: null
       },
-      titulo:'',
-      nuevo:true
-    }
+      titulo: "",
+      nuevo: true
+    };
   },
-  props: ['proveedorSelect'],
+  props: ["proveedorSelect"],
   watch: {
-    show (pr) {
-      let newVal = this.proveedorSelect  || {}
-      if(this.proveedorSelect.IdProveedor){
-        this.titulo = 'Editar Proveedor '+this.proveedorSelect.IdProveedor
-        this.proveedor = Object.assign({}, this.proveedorSelect)
-      }else{
-        this.titulo = 'Nuevo Proveedor'
+    show(pr) {
+      let newVal = this.proveedorSelect || {};
+      if (this.proveedorSelect.IdProveedor) {
+        this.titulo = "Editar Proveedor " + this.proveedorSelect.IdProveedor;
+        this.proveedor = Object.assign({}, this.proveedorSelect);
+      } else {
+        this.titulo = "Nuevo Proveedor";
         this.proveedor = {
-        Proveedor: '',
-        Ruc: '',
-        Direccion: '',
-        Telefono: '',
-        Observacion: '',
-        FechaReg: null
-        }
+          Proveedor: "",
+          Ruc: "",
+          Direccion: "",
+          Telefono: "",
+          Observacion: "",
+          FechaReg: null
+        };
       }
-      
     }
   },
   methods: {
     consultarRUC() {
-      this.axios.get(this.API + 'consultarRUC', {
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-            type: 'RUC',
+            type: "RUC",
             numero: this.proveedor.Ruc
           }
-      }).then((response) => {            
-          var data = response.data
-          if(data.razonSocial){
-            this.$toasted.info('Proveedor encontrado, se llenarán sus datos') 
-            this.proveedor.Proveedor = data.razonSocial
-            this.proveedor.Direccion = data.direccion || ''
-          }else{
-            this.$toasted.show('Proveedor no encontrado') 
+        })
+        .then(response => {
+          var data = response.data;
+          if (data.razonSocial) {
+            this.$toasted.info("Proveedor encontrado, se llenarán sus datos");
+            this.proveedor.Proveedor = data.nombre;
+            this.proveedor.Direccion = data.direccion || "";
+          } else {
+            this.$toasted.show("Proveedor no encontrado");
           }
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el RUC')        
-          console.log(error)
-      })
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el RUC");
+          console.log(error);
+        });
     },
     guardarProveedor() {
       this.$nextTick(() => {
-        this.proveedor.Ruc = (''+this.proveedor.Ruc).toUpperCase().trim();
-        this.proveedor.Proveedor = (''+this.proveedor.Proveedor).toUpperCase().trim();
-        this.proveedor.Direccion = (''+this.proveedor.Direccion).toUpperCase().trim();
-        this.proveedor.Telefono = (''+this.proveedor.Telefono).toUpperCase().trim();
-      })
-      console.log(this.proveedor)
+        this.proveedor.Ruc = ("" + this.proveedor.Ruc).toUpperCase().trim();
+        this.proveedor.Proveedor = ("" + this.proveedor.Proveedor)
+          .toUpperCase()
+          .trim();
+        this.proveedor.Direccion = ("" + this.proveedor.Direccion)
+          .toUpperCase()
+          .trim();
+        this.proveedor.Telefono = ("" + this.proveedor.Telefono)
+          .toUpperCase()
+          .trim();
+      });
+      console.log(this.proveedor);
 
-      if(this.proveedor.Ruc==''){
-         this.$toasted.show('Ingrese el RUC del proveedor')
-        return
+      if (this.proveedor.Ruc == "") {
+        this.$toasted.show("Ingrese el RUC del proveedor");
+        return;
       }
-      if(this.proveedor.Proveedor==''){
-         this.$toasted.show('Ingrese el nombre del proveedor')
-        return
+      if (this.proveedor.Proveedor == "") {
+        this.$toasted.show("Ingrese el nombre del proveedor");
+        return;
       }
 
-      this.axios.post(this.API + 'proveedores', this.proveedor)
-      .then((response) => {
-        if(response.data.updated){
-          this.$toasted.success('Proveedor editado correctamente')
-        }else{
-          this.$toasted.success('Proveedor guardado correctamente')
-        }
-        this.$emit('onAddProveedor', response.data)
-        this.$refs.proveedorForm.hide()
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.axios
+        .post(this.API + "proveedores", this.proveedor)
+        .then(response => {
+          if (response.data.updated) {
+            this.$toasted.success("Proveedor editado correctamente");
+          } else {
+            this.$toasted.success("Proveedor guardado correctamente");
+          }
+          this.$emit("onAddProveedor", response.data);
+          this.$refs.proveedorForm.hide();
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
-}
+};
 </script>
 <style>
-
 </style>

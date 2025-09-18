@@ -165,7 +165,7 @@
                         
                     </template>
                     <template slot="cantidad" slot-scope="data">
-                      <input :id="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
+                      <input :id="`cantidad${data.index}`" :ref="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
                     <template slot="precio" slot-scope="data">
                       <input class="form-control" type="number" v-model="data.item.precio">
@@ -238,23 +238,41 @@
                 </b-button-group>
             </b-col>
             <b-col cols="4" style="text-align: center; align-content: center;align-items: center;">
-               <table class="table b-table border table-footer">
-                <tr v-if="getTotalCantidad()>0">
+               <table class="table b-table border table-footer" style="font-size: 0.8rem !important;">
+                <tr>
                   <td class="table-info" style="text-align: left; font-weight:bold">Total Cantidad</td>
                   <td>
                     S/. {{ getTotalCantidad() }}
                   </td>
                 </tr>
-                <tr v-if="getTotalSucursal()>0">
+                <tr>
                   <td class="table-warning" style="text-align: left; font-weight:bold">Total Sucursal</td>
                   <td>
                     S/. {{ getTotalSucursal() }}
                   </td>
                 </tr>
-                <tr v-if="getTotalImportacion()>0">
+                <tr>
                   <td class="table-danger" style="text-align: left; font-weight:bold">Total Importacion</td>
                   <td>
                     S/. {{ getTotalImportacion() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="background: #FFF59D; text-align: left; font-weight:bold">SubTotal </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getSubTotal() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="background: #E1BEE7; text-align: left; font-weight:bold">IGV </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getTotalIGV() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td  style="text-align: left; font-weight:bold">Descuentos </td>
+                  <td style="">
+                     - S/. {{ getTotalDescuentos() }}
                   </td>
                 </tr>
                 <tr>
@@ -562,14 +580,23 @@ export default {
           }
           return 0;
         });
-        console.log(stock, "stock");
+
         prod.stock = stock;
         prod.cantidadImportacion = p.CantidadImportacion;
         prod.cantidadSucursal = p.CantidadSucursal;
         prod.diasEntrega = p.DiasEntrega;
         prod.cantidadImportacion = p.CantidadImportacion;
         prod.diasEntregaImportacion = p.DiasEntregaImportacion;
-        this.productos.push(prod);
+        this.productos.unshift(prod);
+        this.$nextTick(() => {
+          setTimeout(() => {
+            let cantidad = document.getElementById("cantidad0");
+            if (cantidad) {
+              cantidad.focus();
+              cantidad.select();
+            }
+          }, 100);
+        });
       });
       // this.productos = event.productos;
     },
@@ -988,7 +1015,18 @@ export default {
       }, 0);
       return parseFloat(total).toFixed(2);
     },
-    getTotal() {
+    getTotalIGV() {
+      let total = this.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.precio * prod.cantidad) +
+          parseFloat(prod.precio * prod.cantidadSucursal) +
+          parseFloat(prod.precio * prod.cantidadImportacion)
+        );
+      }, 0);
+      return parseFloat(total * (this.igv == 1 ? total * 0.18 : 0)).toFixed(2);
+    },
+    getSubTotal() {
       let total = this.productos.reduce((sum, prod) => {
         return (
           sum +
@@ -998,6 +1036,23 @@ export default {
         );
       }, 0);
       return parseFloat(total).toFixed(2);
+    },
+    getTotalDescuentos() {
+      let total = this.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.Descuento);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotal() {
+      let total = this.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.precio * prod.cantidad) +
+          parseFloat(prod.precio * prod.cantidadSucursal) +
+          parseFloat(prod.precio * prod.cantidadImportacion) - prod.descuento
+        );
+      }, 0);
+      return parseFloat(total + (this.igv == 1 ? total * 0.18 : 0)).toFixed(2);
     }
   },
   computed: {

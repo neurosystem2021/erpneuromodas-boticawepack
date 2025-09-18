@@ -111,7 +111,7 @@
             <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">{{ prod.CantidadSucursal + parseFloat(prod.CantidadImportacion) }}</td>
             <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">
               <div v-if="prod.DisabledTotal === 0">
-                 {{ prod.Precio * (parseFloat(prod.CantidadSucursal) +parseFloat(prod.CantidadImportacion)) - prod.Descuento | redondear }}<br>
+                 {{ prod.Precio * (parseFloat(prod.CantidadSucursal) +parseFloat(prod.Cantidad)+parseFloat(prod.CantidadImportacion)) - prod.Descuento | redondear }}<br>
                 <span v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
@@ -156,30 +156,55 @@
           </tbody>
         </table>
       </b-col>
-      <b-col cols="4"></b-col>
+      <b-col cols="4">
+      </b-col>
       <b-col cols="4">
         <div style="border: 1px solid #000000 !important; padding: 1% 2%; margin: 1% 0;">
 
-        <table width="100%">
-          <tr>
-            <th colspan="2">SUBTOTAL</th>
-            <td>{{ subTotal | redondear }}</td>
-          </tr>
-          <tr v-if="proforma.IGV==1">
-            <td colspan="1">18.00%</td>
-            <td colspan="1">I.G.V</td>
-            <td>{{ subTotal * 0.18 | redondear }}</td>
-          </tr>
-          <tr v-if="mostrarDolar">
-            <th colspan="2">TOTAL DOLARES</th>
-            <td>{{ total | redondear }}</td>
-          </tr>
-
-          <tr v-else>
-            <th colspan="2">TOTAL SOLES</th>
-            <td>S/. {{ total *proforma.TipoCambio| redondear }}</td>
-          </tr>
-        </table>
+         <table class="table b-table border table-footer">
+                <tr >
+                  <td  style="text-align: left; font-weight:bold">Total Cantidad</td>
+                  <td>
+                    S/. {{ getTotalCantidad() }}
+                  </td>
+                </tr>
+                <tr >
+                  <td  style="text-align: left; font-weight:bold">Total Sucursal</td>
+                  <td>
+                    S/. {{ getTotalSucursal() }}
+                  </td>
+                </tr>
+                <tr >
+                  <td  style="text-align: left; font-weight:bold">Total Importacion</td>
+                  <td>
+                    S/. {{ getTotalImportacion() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style=" text-align: left; font-weight:bold">SubTotal </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getSubTotal() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style=" text-align: left; font-weight:bold">IGV </td>
+                  <td>
+                    S/. {{ getTotalIGV() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td  style="text-align: left; font-weight:bold">Descuentos </td>
+                  <td style="">
+                     - S/. {{ getTotalDescuentos() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td  style="text-align: left; font-weight:bold">Total </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getTotal() }}
+                  </td>
+                </tr>
+              </table>
         </div>
       </b-col>
     </b-row>
@@ -368,6 +393,67 @@ export default {
         let wsp = `https://api.whatsapp.com/send/?phone=val&text=Puede revisar su factura en el siguiente enlace: ${url}`;
         window.open(wsp, "_blank");
       }
+    },
+    getTotalCantidad() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.Precio * prod.Cantidad);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotalSucursal() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.Precio * prod.CantidadSucursal);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotalImportacion() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.Precio * prod.CantidadImportacion);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotalIGV() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.Precio * prod.Cantidad) +
+          parseFloat(prod.Precio * prod.CantidadSucursal) +
+          parseFloat(prod.Precio * prod.CantidadImportacion) -
+          parseFloat(prod.Descuento)
+        );
+      }, 0);
+      return parseFloat(total * (this.proforma.IGV == 1 ? 0.18 : 0)).toFixed(2);
+    },
+    getTotalDescuentos() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return sum + parseFloat(prod.Descuento);
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getSubTotal() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.Precio * prod.Cantidad) +
+          parseFloat(prod.Precio * prod.CantidadSucursal) +
+          parseFloat(prod.Precio * prod.CantidadImportacion)
+        );
+      }, 0);
+      return parseFloat(total).toFixed(2);
+    },
+    getTotal() {
+      let total = this.proforma.productos.reduce((sum, prod) => {
+        return (
+          sum +
+          parseFloat(prod.Precio * prod.Cantidad) +
+          parseFloat(prod.Precio * prod.CantidadSucursal) +
+          parseFloat(prod.Precio * prod.CantidadImportacion) -
+          parseFloat(prod.Descuento)
+        );
+      }, 0);
+      return parseFloat(
+        total + (this.proforma.IGV == 1 ? total * 0.18 : 0)
+      ).toFixed(2);
     }
   }
 };
