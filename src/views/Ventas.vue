@@ -641,19 +641,12 @@
           <b-col cols="4">
             <table class="table b-table border table-footer table-sm">
                   <tbody>
-                    <tr>
-                      <td colspan="2" class="text-center">Total Empresa</td>
+                    <tr style="background: #1A237E; color: #ffffff;">
+                      <td colspan="2" class="text-center" style="text-transform: uppercase;font-size: 1.2rem; font-weight: bold;">Total por Empresa</td>
                     </tr>
-                      <tr v-for="(empresa,index) in lstTotalPorEmpresa" :key="index">
-                        <td>
-                          {{empresa.nombre}}
-                          
-
-                        </td>
-                        <td>                         
-                              {{empresa.total}}
-                       
-                        </td>
+                      <tr v-for="(empresa,index) in empresasConTotal" :key="index">
+                        <th>{{empresa.nombre}}</th>
+                        <td>{{empresa.total}}</td>
                       </tr>
                   </tbody>
                 </table>
@@ -1122,6 +1115,9 @@ export default {
 
       totalCart: state => state.cart.totalCart
     }),
+    empresasConTotal() {
+      return this.lstTotalPorEmpresa.filter(e => e.total > 0);
+    },
     manoDeObraBruta() {
       let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
