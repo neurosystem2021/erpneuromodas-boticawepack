@@ -72,7 +72,7 @@ export default {
       }).then((response) => {
           this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
           var data = response.data
-          this.proveedor.Proveedor = data.razonSocial
+          this.proveedor.Proveedor = data.nombre
           this.proveedor.Direccion = data.direccion
       })
       .catch((error) => {

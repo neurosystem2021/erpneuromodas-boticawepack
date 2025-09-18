@@ -179,14 +179,11 @@ export default {
           if (response.data) {
               this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
               var data = response.data
-              if (tipo == 'DNI') {
-                  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
-                  this.cliente.Direccion = ''
-              } else {
-                  this.cliente.Cliente = data.razonSocial
+              
+                  this.cliente.Cliente = data.nombre
                   this.cliente.Direccion = data.direccion
                   // this.cliente.Telefono = data.Telefono
-              }
+              
           } else {
               this.$toasted.show('No se encontró el Usuario')                
           }

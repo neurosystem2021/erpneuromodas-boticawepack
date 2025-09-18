@@ -117,17 +117,10 @@ export default {
             if (response.data) {
                 this.$toasted.show('Cliente encontrado, se llenarán sus datos')                  
                 var data = response.data
-                if (tipo == 'DNI') {
-                  //  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
-                  Vue.set(this.cliente, 'Cliente', data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno)
-                } else {
-                  Vue.set(this.cliente, 'Cliente', data.razonSocial);
+               
+                  Vue.set(this.cliente, 'Cliente', data.nombre);
                   Vue.set(this.cliente, 'Direccion', data.direccion);
 
-                  // this.cliente.Cliente = data.razonSocial
-                  // this.cliente.Direccion = data.direccion
-                  // this.cliente.Telefono = data.Telefono
-                }
 
             } else {
                 this.$toasted.show('No se encontró el Usuario')                
