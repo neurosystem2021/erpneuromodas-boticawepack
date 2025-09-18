@@ -121,7 +121,7 @@ export default {
                   //  this.cliente.Cliente = data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno
                   Vue.set(this.cliente, 'Cliente', data.nombres + ' ' + data.apellidoPaterno + ' ' + data.apellidoMaterno)
                 } else {
-                  Vue.set(this.cliente, 'Cliente', data.razonSocial);
+                  Vue.set(this.cliente, 'Cliente', data.nombre);
                   Vue.set(this.cliente, 'Direccion', data.direccion);
 
                   // this.cliente.Cliente = data.razonSocial
