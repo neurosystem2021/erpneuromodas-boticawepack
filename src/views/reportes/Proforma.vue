@@ -87,7 +87,7 @@
             <td></td>
             <!-- <td class="no">{{ prod }}</td> -->
             <!-- <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td> -->
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}
+            <td class="desc" style="font-size:0.75rem"><h3 style="font-size:1rem">{{ prod.Producto }}
               <br>
             <span v-if="prod.tipo=='PRESENTACION'">
                 Nombre: {{ JSON.parse(prod.Presentacion).nombre }} : CPP: {{ JSON.parse(prod.Presentacion).cantidad }}
@@ -117,8 +117,8 @@
           </tr>-->
           <tr>
             <td colspan="3"></td>
-            <td colspan="2" style="background:#57B223">TOTAL</td>
-            <td style="background:#57B223">S/. {{ subTotal | redondear }}</td>
+            <td colspan="2" style=">TOTAL</td>
+            <td style=">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
