@@ -182,12 +182,25 @@
                       <p style="padding: 2px 3px; border-radius: 25px; background: yellow; font-size: 1rem;"> Valor Referencial</p>
                     </center>
                   </b-col>
-                  <b-col md="3"  cols="12" style="text-align: center; align-items: center; align-content: center;">
+                  <b-col md="3"  cols="12">
                    
                       <b-col cols="12">
-                        <b-input-group prepend="Vendedor:" class="mt-2" >
-                          <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario" disabled style="max-width: 150px;">
-                        </b-input-group>
+                        <b-form-group>
+                            <label>Vendedor:</label>
+                          <autocomplete
+                              required="required"
+                              :ref="`inputVendedor${ventaActiva}`"
+                              :url="API + 'usuarios'"
+                              anchor="NombreUsuario"
+                              class="font-weight-bold"
+                              label="writer"
+                              :initValue="UsuarioLogin"
+                              :on-select="setVendedor"
+                              :onFocus="focusAutocomplete.bind(null, `inputVendedor${ventaActiva}`)"
+                              :classes="{ input: 'form-control' }"
+                            >
+                            </autocomplete>
+                        </b-form-group>
                       </b-col>
                   
                     </b-col>
@@ -1146,6 +1159,7 @@ export default {
       index: 0,
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
+      UsuarioLogin: sessionStorage.getItem("User"),
       objProd: {},
       cantidadInput: "",
       mostrarMP: {},
@@ -1412,6 +1426,12 @@ export default {
       }
       return true;
     },
+    mostrarVenta() {
+      return (
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
+      );
+    },
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
       this.cantidadInput = "";
@@ -1502,6 +1522,7 @@ export default {
           document.getElementById(e).disabled = true;
           let p = `inputPuntoVenta${this.ventaActiva}`;
           document.getElementById(p).disabled = true;
+
           // this.$refs.inputVendedor.$refs.input.disabled = true;
         })
         .catch(error => {
@@ -1527,7 +1548,7 @@ export default {
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
-      this.ventas[0].vendedor = obj;
+      this.ventas[this.ventaActiva].vendedor = obj;
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
@@ -2654,10 +2675,10 @@ export default {
   },
   computed: {
     mostrarVendedor() {
-      if (this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 3) {
-        return false;
-      }
-      return true;
+      return (
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
+      );
     },
     APIProductos() {
       // console.log(this.ventas[this.ventaActiva].almacen.IdAlmacen);

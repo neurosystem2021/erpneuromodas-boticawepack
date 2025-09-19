@@ -289,7 +289,7 @@
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button v-if="mostrarVendedor" class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
@@ -598,13 +598,14 @@
             <b-input-group prepend="Vendedor" class="mt-2">
               <autocomplete
                 required="required"
-                ref="inputVendedor"
+                :ref="`inputVendedor${ventaActiva}`"
                 :url="API + 'usuarios'"
                 anchor="NombreUsuario"
                 class="font-weight-bold"
+                :initValue="UsuarioLogin"
                 label="writer"
                 :on-select="setVendedor"
-                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                :onFocus="focusAutocomplete.bind(null, `inputVendedor${ventaActiva}`)"
                 :classes="{ input: 'form-control' }"
               >
               </autocomplete>
@@ -613,19 +614,20 @@
           <b-col md="4">
             <b-input-group prepend="Alm." class="mt-2">
               <autocomplete
-                required="required"
-                ref="inputAlmacen"
-                :url="API + 'almacenes'"
-                anchor="Almacen"
-                class="font-weight-bold"
-                initValue="PRINCIPAL"
-                label="writer"
-                placeholder=""
-                :on-select="setAlmacen"
-                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                :classes="{ input: 'form-control' }"
-              >
-              </autocomplete>
+                            required="required"
+                            :id="`inputAlmacen${index}`"
+                            :url="API + 'almacenes'"
+                            anchor="Almacen"
+                            class="font-weight-bold"
+                            initValue="PRINCIPAL"
+                            label="writer"
+                            placeholder=""
+                            :on-select="setAlmacen"
+                            :value="ventas[ventaActiva].almacen"
+                            :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
+                            :classes="{ input: 'form-control' }"
+                            >
+                        </autocomplete>
             </b-input-group>
           </b-col>
           <b-col md="3">
@@ -1012,7 +1014,8 @@ export default {
       productosCategoria: [],
       isNota: [],
       tieneIgv: [],
-      diasValidosProf:0,
+      diasValidosProf: 0,
+      UsuarioLogin: sessionStorage.getItem("User"),
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1090,7 +1093,7 @@ export default {
         },
         vendedor: {},
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
-        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),        
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
@@ -1209,6 +1212,15 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
+  },
+  computed: {
+    mostrarVendedor() {
+      console.log(this.ventas[this.ventaActiva].vendedor);
+      return (
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
+        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
+      );
+    }
   },
   methods: {
     mostrarEditarProducto() {
@@ -1351,11 +1363,11 @@ export default {
           this.APPTOKEN = response.data.APPTOKEN;
           this.setAlmacen(almacen);
           this.setPuntoVenta(puntoVenta);
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
           // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
-          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          this.$refs.inputVendedor.$refs.input.disabled = true;
+          // this.$refs.inputAlmacen.$refs.input.disabled = true;
+          // this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          // this.$refs.inputVendedor.$refs.input.disabled = true;
         })
         .catch(error => {
           console.log(error);
@@ -1374,7 +1386,7 @@ export default {
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
-      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      // this.$refs.inputAlmacen.setValue(obj.Almacen);
       this.getCategorias();
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
         this.cargarPreOrden();
@@ -1634,7 +1646,9 @@ export default {
           .get(this.API + "ventas/numero", {
             params: {
               idPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-                .IdDocVentaPuntoVenta,
+                .IdDocVentaPuntoVenta
+                ? this.ventas[this.ventaActiva].puntoVenta.IdDocVentaPuntoVenta
+                : 1,
               idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
             }
           })
@@ -1645,7 +1659,9 @@ export default {
           })
           .catch(error => {
             console.log(error);
-            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+            this.$toasted.show(
+              "Ha ocurrido un error, vuelva a intentarlo # Venta"
+            );
           });
       });
       // }, 1000);
@@ -2183,11 +2199,11 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
-      if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
-                this.$toasted.show('Debe ingresar los días de validez de la proforma')
-                this.inProgress = false
-                return
-            }
+      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
+        this.$toasted.show("Debe ingresar los días de validez de la proforma");
+        this.inProgress = false;
+        return;
+      }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
@@ -2367,7 +2383,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      venta.diasValidosProf = this.diasValidosProf
+      venta.diasValidosProf = this.diasValidosProf;
       await this.axios.post(this.API + "proformas", venta).then(response => {
         this.diasValidosProf = 0;
         console.log(response);
