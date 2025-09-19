@@ -900,7 +900,7 @@ export default {
           ...element,
           Empresa: empresa.value,
           Selected: false,
-          NombreEmpresa: empresa.text,
+          NombreEmpresa: empresa.text.substring(0, 20) + "...",
           _rowVariant:
             element.stock <= 0
               ? "danger"
@@ -1388,7 +1388,7 @@ export default {
           v => v.value == empresa
         );
         obj.Empresa = datoEmpresa[0].value;
-        obj.NombreEmpresa = datoEmpresa[0].text;
+        obj.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
       }
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
@@ -1418,7 +1418,7 @@ export default {
           v => v.value == empresa
         );
         obj.Empresa = datoEmpresa[0].value;
-        obj.NombreEmpresa = datoEmpresa[0].text;
+        obj.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
       }
 
       if (!this.isVentas) {
@@ -1700,34 +1700,21 @@ export default {
       );
 
       if (this.searchProducto) {
-        // Dividir por coma y limpiar espacios
-        const terms = this.searchProducto
-          .split(",")
-          .map(t => t.trim().toLowerCase());
+        const term = this.searchProducto.toLowerCase();
 
         lst = productosFiltrados.filter(p => {
           const prod = (p.Producto || "").toLowerCase();
           const cat = (p.ProductoCategoria || "").toLowerCase();
           const marca = (p.ProductoMarca || "").toLowerCase();
+          const empresa = (p.Empresa || "").toLowerCase();
 
-          let ok = true;
-
-          // 1er término → Producto
-          if (terms[0] && !prod.includes(terms[0])) {
-            ok = false;
-          }
-
-          // 2do término → Categoria
-          if (terms[1] && !cat.includes(terms[1])) {
-            ok = false;
-          }
-
-          // 3er término → Marca
-          if (terms[2] && !marca.includes(terms[2])) {
-            ok = false;
-          }
-
-          return ok;
+          // si aparece en cualquiera, entra
+          return (
+            prod.includes(term) ||
+            cat.includes(term) ||
+            marca.includes(term) ||
+            empresa.includes(term)
+          );
         });
       } else {
         lst = productosFiltrados;
@@ -1736,6 +1723,7 @@ export default {
       if (this.IdProducto) {
         lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
       }
+
       const perPage = parseInt(this.perPageModal) || lst.length;
       const start = (this.currentPage - 1) * perPage;
       const end = start + perPage;
@@ -1786,7 +1774,8 @@ export default {
             v => v.value == this.empresa
           )[0];
           this.itemProducto.Empresa = empresa.value;
-          this.itemProducto.NombreEmpresa = empresa.text;
+          this.itemProducto.NombreEmpresa =
+            empresa.text.substring(0, 20) + "...";
         }
         this.itemProducto.tipo = "UNIDAD";
         this.itemProducto.estadoPxP = true;
@@ -1827,7 +1816,7 @@ export default {
           v => v.value == empresa
         );
         prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text;
+        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
       }
 
       if (this.itemProducto.PreciosPorProducto.length > 0) {
@@ -1863,7 +1852,7 @@ export default {
           v => v.value == empresa
         );
         prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text;
+        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
       }
       prod.total = 0;
       prod.precio = prod.PrecioContado;

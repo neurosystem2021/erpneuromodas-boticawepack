@@ -3,7 +3,8 @@
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
     <Menu v-if="false"></Menu>
-
+<!-- {{ $store.state.proforma }} proforma
+{{ $store.state.lstProductosProforma }} lstProductosProforma -->
     <b-container fluid class="ancho" id="conten">
       <div>
         <div>
@@ -672,14 +673,15 @@
             <b-button
               type="submit"
               :disabled="inProgress"
-              v-if="idPerfil == 1 || idPerfil == 14"
-              variant="success"
+              style="background: #004D40;"
               size="lg"
               class="btnAction"
+              v-if="idPerfil == 1 || idPerfil == 14"
               >Efectuar Venta</b-button
-            >
-            <b-button
-               class="btnAction"
+              >
+              <!-- -->
+              <b-button
+              class="btnAction"
               v-if="ultimaVenta"
               target="_blank"
               variant="info"
@@ -1800,6 +1802,34 @@ export default {
           this.inProgress = false;
         });
     },
+    validarProforma() {
+      let profoma = { ...this.$store.state.proforma };
+      let lstProductos = [...this.$store.state.lstProductosProforma];
+
+      if (Object.keys(profoma).length > 0) {
+        const empresas = [...new Set(lstProductos.map(d => d.Empresa))];
+
+        // if (lstProductos.length == this.productos.length) {
+        //   console.log("ddddd");
+        //   return true;
+        // }
+        for (const Empresa of empresas) {
+          let lstProductosLength = lstProductos.filter(
+            v => v.Empresa == Empresa
+          ).length;
+          let productosLength = this.productos.filter(v => v.Empresa == Empresa)
+            .length;
+
+          console.log("lstProductosLength", lstProductosLength);
+          console.log("productosLength", productosLength);
+
+          if (productosLength > 0 && lstProductosLength != productosLength) {
+            return false;
+          }
+        }
+      }
+      return true;
+    },
     async guardarVenta(evt) {
       evt.preventDefault();
 
@@ -1975,6 +2005,15 @@ export default {
         return;
       }
 
+      if (!this.validarProforma()) {
+        this.inProgress = false;
+        this.$toasted.show(
+          "La Proforma no cumple con los requisitos necesarios. Verifique"
+        );
+        return;
+      }
+      this.inProgress = false;
+      
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
@@ -2033,6 +2072,12 @@ export default {
         data.Serie = serie.serie;
 
         if (data.productos.some(v => v.Empresa == element.value)) {
+          let IdProformaDets = [];
+          if (element.value == this.empresa) {
+            IdProformaDets = this.productos.map(v => {
+              return v.IdProformaDet;
+            });
+          }
           let productos = data.productos.filter(
             v => v.Empresa == element.value
           );
@@ -2042,7 +2087,7 @@ export default {
 
           data.productos = productos;
           data.totalCart = totalCarr;
-
+          data.IdProformaDets = IdProformaDets;
           if (data.pago.efectivo.monto != 0) {
             data.pago.efectivo.monto = totalCarr;
           } else if (data.pago.mastercard.monto != 0) {

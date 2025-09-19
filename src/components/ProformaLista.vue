@@ -33,7 +33,17 @@
                         :current-page="currentPage">
 
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
+                        <b-button v-if="!cargandoProforma" @click="selectProformas(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
+                        <div class="d-flex justify-content-center" v-else>
+                          <div class="spinner" style="
+                            width: 3rem;
+                            height: 3rem;
+                            border: 0.4em solid rgba(0, 0, 0, 0.1);
+                            border-top-color: #007bff;
+                            border-radius: 50%;
+                            animation: spin 0.75s linear infinite;
+                          "></div>
+                        </div>
                       </template>
 
                       <template slot="ver" slot-scope="data">
@@ -70,6 +80,7 @@
 <script>
 import config from "@/store/config.js";
 import { mapActions } from "vuex";
+import ProductosCarrito from "@/components/ProductosCarrito";
 
 export default {
   mounted() {
@@ -86,6 +97,7 @@ export default {
   },
   data() {
     return {
+      cargandoProforma: false,
       API: config.API,
       show: false,
       filter: "",
@@ -99,6 +111,7 @@ export default {
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
         { key: "UsuarioReg", label: "Empleado" },
+        { key: "Total" },
         "update",
         "ver",
         "verTicket",
@@ -124,48 +137,142 @@ export default {
         return false;
       }, 50);
     },
-    selectProformas(proforma) {
-      let empresa = this.$store.state.empresas.filter(
-        v => v.value == this.empresa
-      )[0];
+    async selectProformas(proforma) {
+      try {
+        this.cargandoProforma = true;
+        this.limpiarCarrito();
 
-      this.axios
-        .get(this.API + "proformas/detalle/nuevo", {
-          params: {
-            idProforma: proforma.IdProforma,
-            prof: 1,
-            emp: this.empresaselec
+        // 1. Obtener detalles de la proforma
+        const { data: detalles } = await this.axios.get(
+          `${this.API}proformas/detalle/nuevo`,
+          {
+            params: {
+              idProforma: proforma.IdProforma,
+              prof: 1,
+              emp: this.empresaselec
+            }
           }
-        })
-        .then(response => {
-          this.limpiarCarrito();
-          response.data.map(item => {
-            item.Empresa = empresa.value;
-            item.NombreEmpresa = empresa.text;
-            // item.IdEm
-          });
-          response.data.map(item => {
-            item.estadoPxP = !!item.estadoPxP;
-            console.log(item);
-            this.add([
-              item,
-              () => {},
-              { setPreOr: item.Precio, cantidad: item.Cantidad }
-            ]);
-            this.filter = "";
-            this.show = false;
-          });
-          setTimeout(() => {
-            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-          }, 300);
+        );
 
-          proforma.productos = response.data;
-          // console.log(proforma);
+        // 2. Obtener empresas únicas
+        const empresas = [...new Set(detalles.map(d => d.Empresa))];
+        let productos = [];
 
-          // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
-          this.$emit("onSelectProforma", proforma);
-        });
+        // 3. Consultar en paralelo el stock de cada empresa
+        await Promise.all(
+          empresas.map(async empresa => {
+            const productosPorEmpresa = detalles.filter(
+              d => d.Empresa === empresa
+            );
+            const idProductos = productosPorEmpresa.map(d => d.IdProducto);
+
+            const { data: stock } = await this.axios.get(
+              `${this.API}productos/stock/1`,
+              {
+                params: { id_empresa: empresa, idProductos }
+              }
+            );
+
+            // 4. Fusionar stock con productos
+            const productosConStock = productosPorEmpresa.map(det => {
+              const encontrado = stock.find(
+                s => s.IdProducto === det.IdProducto
+              );
+              return {
+                ...det,
+                Producto: encontrado.Producto,
+                stock: encontrado ? encontrado.stock : 0
+              };
+            });
+
+            // 5. Normalizar productos e ir agregando al store
+            productosConStock.forEach(item => {
+              const empresaInfo = this.$store.state.empresas.find(
+                e => e.value == item.Empresa
+              );
+
+              const normalizado = {
+                ...item,
+                Empresa: empresaInfo.value,
+                NombreEmpresa: empresaInfo.text.substring(0, 20) + "...",
+                estadoPxP: !!item.estadoPxP
+              };
+
+              this.add([
+                normalizado,
+                () => {},
+                { setPreOr: item.Precio, cantidad: item.Cantidad }
+              ]);
+
+              productos.push(normalizado);
+            });
+          })
+        );
+
+        // 6. Finalizar
+        this.filter = "";
+        this.show = false;
+        proforma.productos = productos;
+        this.$store.state.lstProductosProforma = [...productos];
+        this.$store.state.proforma = proforma;
+        this.$emit("onSelectProforma", proforma);
+      } catch (error) {
+        console.error("Error en selectProformas:", error);
+      } finally {
+        this.cargandoProforma = false;
+      }
     },
+    // let empresa = this.$store.state.empresas.filter(
+    //   v => v.value == this.empresa
+    // )[0];
+    // await this.axios
+    //   .get(this.API + "proformas/detalle/nuevo", {
+    //     params: {
+    //       idProforma: proforma.IdProforma,
+    //       prof: 1,
+    //       emp: this.empresaselec
+    //     }
+    //   })
+    //   .then(async response => {
+    //     this.limpiarCarrito();
+    //     let productos = [...response.data];
+    //     productos.map(item => {
+    //       let Empresa = this.$store.state.empresas.find(
+    //         v => v.value == item.Empresa
+    //       );
+    //       item.Empresa = Empresa.value;
+    //       item.NombreEmpresa = Empresa.text.substring(0, 20) + "...";
+    //       //  empresa.text.substring(0, 20) + "..."
+    //     });
+    //     productos.map(item => {
+    //       item.estadoPxP = !!item.estadoPxP;
+    //       this.add([
+    //         item,
+    //         () => {},
+    //         { setPreOr: item.Precio, cantidad: item.Cantidad }
+    //       ]);
+    //       this.filter = "";
+    //       this.show = false;
+    //     });
+    //     await productos.forEach(async p => {
+    //       await this.axios
+    //         .get(this.API + `productos/stock/1`, {
+    //           params: {
+    //             id_empresa: p.Empresa,
+    //             idProductos: [p.IdProducto]
+    //           }
+    //         })
+    //         .then(res => {
+    //           let producto = res.data[0];
+    //           p.stock = producto.stock;
+    //           this.$store.state.cart.ProductosCarrito.push(p);
+    //         });
+    //     });
+    //     // proforma.productos = productos;
+    //     // console.log(proforma);
+    //     // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+    //     // this.$emit("onSelectProforma", proforma);
+    //   });
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
@@ -243,5 +350,10 @@ export default {
 <style>
 #modalProformas .modal-dialog {
   max-width: 65% !important;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -82,10 +82,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(prod, index) in proforma.productos" :key="index">
+          <tr v-for="(prod, index) in productos" :key="index">
             <td class="no">{{ index+1 }}</td>
+            <td></td>
             <!-- <td class="no">{{ prod }}</td> -->
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
+            <!-- <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td> -->
             <td class="desc" style="font-size:0.75rem"><h3 style="color:#57B223; font-size:1rem">{{ prod.Producto }}
               <br>
             <span v-if="prod.tipo=='PRESENTACION'">
@@ -201,7 +202,8 @@ export default {
       proforma: { productos: [] },
       empresa: {},
       fechaHasta: "",
-      id_empresa: ""
+      id_empresa: "",
+      productos: []
     };
   },
   computed: {
@@ -214,8 +216,8 @@ export default {
     }
   },
   methods: {
-    getProforma() {
-      this.axios
+    async getProforma() {
+      await this.axios
         .get(
           API +
             `obtener_proformas?id=${this.idProforma}&id_empresa=${
@@ -224,6 +226,7 @@ export default {
         )
         .then(res => {
           this.proforma = res.data;
+          this.ObtenerDatosDellate(res.data.productos);
           this.fechaHasta = this.calcularFechaHasta(
             this.proforma.FechaReg.substring(0, 10),
             this.proforma.DiasValidos
@@ -231,6 +234,19 @@ export default {
             .toISOString()
             .substring(0, 10);
         });
+    },
+    ObtenerDatosDellate(productos) {
+      productos.forEach(producto => {
+        this.axios(`${this.API}ver_productos`, {
+          params: {
+            id_empresa: producto.Empresa,
+            id: producto.IdProducto
+          }
+        }).then(res => {
+          producto.Producto = res.data.Producto;
+          this.productos.unshift(producto);
+        });
+      });
     },
     calcularFechaHasta(actual, dias) {
       var date = new Date(actual);
