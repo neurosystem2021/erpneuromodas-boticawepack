@@ -225,7 +225,7 @@
 
         <template slot="Series" slot-scope="data">
           <ul>
-            <li v-for="(serie,index) in data.item.Serie.split(',')" :key="index">
+            <li v-for="(serie,index) in generarSerie(data.item.Serie)" :key="index">
               {{serie}}
             </li>
           </ul>
@@ -1180,6 +1180,10 @@ export default {
     }
   },
   methods: {
+    generarSerie(serie) {
+      console.log(serie);
+      return "";
+    },
     nextPage() {
       if (this.currentPage < this.totalPages) this.currentPage++;
     },
