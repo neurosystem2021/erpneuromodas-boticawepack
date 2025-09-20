@@ -223,6 +223,19 @@
           <span>x{{ productos[data.index].cantidadPres }}</span>
         </template>
 
+        <template slot="Series" slot-scope="data">
+          <ul>
+            <li v-for="(serie,index) in data.item.Serie.split(',')" :key="index">
+              {{serie}}
+            </li>
+          </ul>
+        </template>
+        <template slot="AddSeries" slot-scope="data">
+          <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
+            <i class="fa fa-barcode" aria-hidden="true"></i>
+          </b-button>
+        </template>
+        
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"

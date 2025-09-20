@@ -1055,6 +1055,8 @@ export default {
             class: "text-center"
           },
           { key: "Producto" },
+          { key: "Series" },
+          { key: "AddSeries" },
           { key: "NombreEmpresa", label: "Empresa" },
           { key: "ProductoPresentacion", label: "Anaquel" },
           { key: "Descripcion", label: "Descripción" },
