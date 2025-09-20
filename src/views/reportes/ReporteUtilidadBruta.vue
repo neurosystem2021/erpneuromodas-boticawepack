@@ -39,7 +39,7 @@
                         <th style="text-align: center;">% Utilidad </th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody> 
                     <tr v-for="(reporte,index) in lstReporte" :key="index">
                         <td style="text-align: center;">{{reporte.IdProducto}}</td>
                         <td>{{reporte.Producto}}</td>
