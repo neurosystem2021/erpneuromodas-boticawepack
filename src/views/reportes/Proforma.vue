@@ -112,7 +112,7 @@
             <td style="border: 1px solid #000000; text-align: center !important; align-content: center; align-items: center;">
               <div v-if="prod.DisabledTotal === 0">
                  {{ prod.Precio * (parseFloat(prod.CantidadSucursal) +parseFloat(prod.Cantidad)+parseFloat(prod.CantidadImportacion)) - prod.Descuento | redondear }}<br>
-                <span v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+                <span >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
           </tr>
@@ -186,16 +186,17 @@
                     S/. {{ getSubTotal() }}
                   </td>
                 </tr>
-                <tr>
-                  <td class="" style=" text-align: left; font-weight:bold">IGV </td>
-                  <td>
-                    S/. {{ getTotalIGV() }}
-                  </td>
-                </tr>
+                
                 <tr>
                   <td  style="text-align: left; font-weight:bold">Descuentos </td>
                   <td style="">
                      - S/. {{ getTotalDescuentos() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style=" text-align: left; font-weight:bold">IGV </td>
+                  <td>
+                    S/. {{ getTotalIGV() }}
                   </td>
                 </tr>
                 <tr>
@@ -416,9 +417,10 @@ export default {
       let total = this.proforma.productos.reduce((sum, prod) => {
         return (
           sum +
-          parseFloat(prod.Precio * prod.Cantidad) +
-          parseFloat(prod.Precio * prod.CantidadSucursal) +
-          parseFloat(prod.Precio * prod.CantidadImportacion) -
+          (parseFloat(prod.Cantidad) +
+            parseFloat(prod.CantidadSucursal) +
+            parseFloat(prod.CantidadImportacion)) *
+            prod.Precio -
           parseFloat(prod.Descuento)
         );
       }, 0);
@@ -451,9 +453,7 @@ export default {
           parseFloat(prod.Descuento)
         );
       }, 0);
-      return parseFloat(
-        total + (this.proforma.IGV == 1 ? total * 0.18 : 0)
-      ).toFixed(2);
+      return parseFloat(total).toFixed(2);
     }
   }
 };

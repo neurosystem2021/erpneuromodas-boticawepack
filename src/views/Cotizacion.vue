@@ -194,20 +194,13 @@
                     </template>
                     <template slot="subtotal" slot-scope="data">
                         {{
-                          parseFloat(
-                            (data.item.cantidad ? data.item.cantidad : 0) *
-                            (data.item.precio ? data.item.precio : 0)
-                          ).toFixed(2)
+                          getSubTotalDet(data.item)
                         }}
 
                     </template>
                     <template slot="total" slot-scope="data">
-                      {{
-                          parseFloat(
-                            (data.item.cantidad ? data.item.cantidad : 0) *
-                            (data.item.precio ? data.item.precio : 0) - 
-                            (data.item.descuento)
-                          ).toFixed(2)
+                       {{
+                          getTotalDet(data.item)
                         }}
                     </template>
                      <template slot="acciones" slot-scope="data">
@@ -263,16 +256,17 @@
                     S/. {{ getSubTotal() }}
                   </td>
                 </tr>
-                <tr>
-                  <td class="" style="background: #E1BEE7; text-align: left; font-weight:bold">IGV </td>
-                  <td style="font-weight: bold;">
-                    S/. {{ getTotalIGV() }}
-                  </td>
-                </tr>
+                
                 <tr>
                   <td  style="text-align: left; font-weight:bold">Descuentos </td>
                   <td style="">
                      - S/. {{ getTotalDescuentos() }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="background: #E1BEE7; text-align: left; font-weight:bold">IGV </td>
+                  <td style="font-weight: bold;">
+                    S/. {{ getTotalIGV() }}
                   </td>
                 </tr>
                 <tr>
@@ -460,26 +454,26 @@ export default {
         { key: "img", label: "" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
-        {
-          key: "subtotal",
-          label: "SubTotal",
-          variant: "success",
-          class: "text-center"
-        },
-        { key: "descuento", label: "Desc." },
-        {
-          key: "total",
-          label: "Total",
-          variant: "danger",
-          class: "text-center"
-        },
         { key: "Anaquel", label: "Anaquel" },
         { key: "observacion" },
         { key: "cantidadSucursal" },
         { key: "diasEntrega" },
         { key: "cantidadImportacion" },
         { key: "diasEntregaImportacion" },
+        { key: "descuento", label: "Desc." },
         // { key: "Anaquel", label: "Anaquel" },
+        {
+          key: "subtotal",
+          label: "SubTotal",
+          variant: "success",
+          class: "text-center"
+        },
+        {
+          key: "total",
+          label: "Total",
+          variant: "danger",
+          class: "text-center"
+        },
 
         //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
 
@@ -545,6 +539,22 @@ export default {
     this.obtenerTipoCambio();
   },
   methods: {
+    getSubTotalDet(item) {
+      let subTotal =
+        (parseFloat(item.cantidad ? item.cantidad : 0) +
+          parseFloat(item.cantidadSucursal ? item.cantidadSucursal : 0) +
+          parseFloat(item.cantidadImportacion ? item.cantidadImportacion : 0)) *
+        (item.precio ? item.precio : 0);
+      return parseFloat(subTotal).toFixed(2);
+    },
+    getTotalDet(item) {
+      let subTotal =
+        (parseFloat(item.cantidad ? item.cantidad : 0) +
+          parseFloat(item.cantidadSucursal ? item.cantidadSucursal : 0) +
+          parseFloat(item.cantidadImportacion ? item.cantidadImportacion : 0)) *
+        (item.precio ? item.precio : 0);
+      return parseFloat(subTotal - item.descuento).toFixed(2);
+    },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
@@ -1019,12 +1029,14 @@ export default {
       let total = this.productos.reduce((sum, prod) => {
         return (
           sum +
-          parseFloat(prod.precio * prod.cantidad) +
-          parseFloat(prod.precio * prod.cantidadSucursal) +
-          parseFloat(prod.precio * prod.cantidadImportacion)
+          (parseFloat(prod.cantidad) +
+            parseFloat(prod.cantidadSucursal) +
+            parseFloat(prod.cantidadImportacion)) *
+            prod.precio -
+          parseFloat(prod.descuento)
         );
       }, 0);
-      return parseFloat(total * (this.igv == 1 ? total * 0.18 : 0)).toFixed(2);
+      return parseFloat(total * (this.igv == 1 ? 0.18 : 0)).toFixed(2);
     },
     getSubTotal() {
       let total = this.productos.reduce((sum, prod) => {
@@ -1039,7 +1051,7 @@ export default {
     },
     getTotalDescuentos() {
       let total = this.productos.reduce((sum, prod) => {
-        return sum + parseFloat(prod.Descuento);
+        return sum + parseFloat(prod.descuento ? prod.descuento : 0);
       }, 0);
       return parseFloat(total).toFixed(2);
     },
@@ -1047,12 +1059,15 @@ export default {
       let total = this.productos.reduce((sum, prod) => {
         return (
           sum +
-          parseFloat(prod.precio * prod.cantidad) +
-          parseFloat(prod.precio * prod.cantidadSucursal) +
-          parseFloat(prod.precio * prod.cantidadImportacion) - prod.descuento
+          (parseFloat(prod.cantidad) +
+            parseFloat(prod.cantidadSucursal) +
+            parseFloat(prod.cantidadImportacion)) *
+            prod.precio -
+          parseFloat(prod.descuento)
         );
       }, 0);
-      return parseFloat(total + (this.igv == 1 ? total * 0.18 : 0)).toFixed(2);
+      total = total;
+      return parseFloat(total).toFixed(2);
     }
   },
   computed: {
