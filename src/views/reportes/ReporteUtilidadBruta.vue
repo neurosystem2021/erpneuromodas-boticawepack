@@ -29,6 +29,7 @@
                     <tr>
                         <th style="text-align: center;">IdProducto </th>
                         <th>Producto </th>
+                        <th>U. M. </th>
                         <th style="text-align: center;">Cantidad </th>
                         <th style="text-align: center;">Precio Costo </th>
                         <th style="text-align: center;">Precio Venta </th>
@@ -42,6 +43,7 @@
                     <tr v-for="(reporte,index) in lstReporte" :key="index">
                         <td style="text-align: center;">{{reporte.IdProducto}}</td>
                         <td>{{reporte.Producto}}</td>
+                        <td>{{reporte.Presentacion}}</td>
                         <td style="text-align: center;">{{reporte.Cantidad}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
@@ -53,7 +55,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="5">{{footer.Producto}}</td>
+                        <td colspan="6">{{footer.Producto}}</td>
                        
                         <td style="text-align: center;">{{ parseFloat(footer.TotalVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(footer.TotalCosto).toFixed(2)}}</td>
@@ -102,6 +104,7 @@ export default {
       header: [
         { key: "IdProducto" },
         { key: "Producto" },
+        { key: "Presentacion", label: "Presentacion" },
         { key: "Cantidad" },
         { key: "PrecioCosto" },
         { key: "PrecioVenta" },

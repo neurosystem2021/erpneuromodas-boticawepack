@@ -303,31 +303,29 @@
                     </template>
                     <template slot="presentacion" slot-scope="data">
                       <b-form-input
-                        v-model="data.item.presentacion"
+                        v-model="data.item.Descripcion"
                         type="text"
-                        style="text-align:center; font-weight:bold; width: 120px;"
+                        style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
                         autocomplete="false"
                         disabled
-                        ></b-form-input>
-                       
-                       
+                      ></b-form-input>
                     </template>
                     <template slot="cantidad" slot-scope="data">
                       <input
                         v-model="data.item.cantidad"
                         type="number"
-                        style="text-align:center; font-weight:bold; width: 90px;"
+                        style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                         autocomplete="false"
                         :id="`input${data.index}`"
                         @input="metodoPagoCambio(1)"
                         @focus="abrirModalTouch(data.index, 1)"
                         class="form-control"
-                        @keydown.enter="irBusquedaProducto"
+                        @keydown.enter="irTxtLoadBarcode"
+                        @keydown.tab="irTxtLoadBarcode"
                         />
-                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
-                        v-if="data.item.esPresentacion">
-                          
-                          {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
+                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
+                        v-if="data.item.CantidadPresentacion">
+                          {{ data.item.CantidadPresentacion }} unid.
                         </p>
                     </template>
                     <template slot="precio" slot-scope="data">
@@ -1023,8 +1021,8 @@ export default {
         // { key: "CodigoBarra" },
         { key: "Producto" },
         { key: "Anaquel", class: "d-none d-md-table-cell" },
-        { key: "pres", label: "" },
-        { key: "ProductoPresentacion", label: "Presentacion" },
+        { key: "pres", label: "", thStyle: { width: "5%" } },
+        { key: "presentacion", label: "Presentacion" },
         // { key: "cantxPrecio", label: "	CanXPrec" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
@@ -1914,9 +1912,7 @@ export default {
     getTotalDetalle(prod) {
       let total = 0;
       if (prod.esPresentacion) {
-        total =
-          prod.cantidad * prod.precio -
-          prod.descuento;
+        total = prod.cantidad * prod.precio - prod.descuento;
       } else {
         total = prod.cantidad * prod.precio - prod.descuento;
       }
@@ -1930,12 +1926,7 @@ export default {
       } else {
         let subtotal = prod.reduce((total, prod) => {
           if (prod.esPresentacion) {
-            return (
-              total +
-              parseFloat(
-                prod.cantidad * prod.precio
-              )
-            );
+            return total + parseFloat(prod.cantidad * prod.precio);
           } else {
             return total + parseFloat(prod.cantidad * prod.precio);
           }
@@ -1969,11 +1960,7 @@ export default {
         let subtotal = prod.reduce((total, prod) => {
           if (prod.esPresentacion) {
             return (
-              total +
-              parseFloat(
-                prod.cantidad * prod.precio -
-                  prod.descuento
-              )
+              total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
             );
           } else {
             return (
@@ -2559,14 +2546,11 @@ export default {
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
       if (esPresentacion) {
-        console.log(obj);
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
-        producto.esPresentacion = 1;
-        producto.ProductoPresentacion = obj.nombre;
         producto.presentacion = JSON.stringify(obj);
       } else {
         producto.Descripcion = obj.ProductoPresentacion;
@@ -2575,7 +2559,6 @@ export default {
         producto.bloquearInputPrecio = false;
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
-        producto.esPresentacion = 0;
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
