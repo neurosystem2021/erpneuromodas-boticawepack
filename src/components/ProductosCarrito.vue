@@ -92,7 +92,7 @@
                 </b-col>
                 <b-col md="6" class="text-left">
                 <h5>x{{ d.cantidad }}</h5>
-                <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span><br>
+                <!-- <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span><br> -->
                 <b>Precio V: </b>S/ {{ d.precio | redondear(2) }}
                 </b-col>
             </b-row>

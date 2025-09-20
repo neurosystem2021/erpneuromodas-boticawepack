@@ -123,7 +123,9 @@
                   </b-col>
 
               </b-row>
-              
+               <b-row class="my-2 clsCarrito" v-if="getProfomaAnio()">
+                   <b-alert show> <b>PROFORMA: </b>{{ getProfomaAnio() }} - {{  getProfomaNumero()}}</b-alert>
+                </b-row>
               <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
               <b-row style="position: relative;max-height: 40vh;">
                 <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
@@ -809,7 +811,7 @@
                       </b-col>
                       <b-col md="6" class="text-left">
                       <h5>x1</h5>
-                      <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                      <!-- <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br> -->
                       <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
                     </b-col>
                 </b-row>
@@ -839,7 +841,7 @@
                       </b-col>
                       <b-col md="6" class="text-left">
                       <h5>x{{ pres.cantidad }}</h5>
-                      <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                      <!-- <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br> -->
                       <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
                     </b-col>
                 </b-row>
@@ -1071,6 +1073,7 @@ export default {
         verCliente: true,
         pagocon: 0,
         cliente: {},
+        proforma: {},
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -1128,7 +1131,7 @@ export default {
           Serie: "",
           Numero: "",
           Observacion: "",
-          cliente: {},
+          proforma: {},
           comisionista: {},
           tipoVenta: {
             IdTipoDoc: 7,
@@ -2113,26 +2116,26 @@ export default {
 
         return;
       }
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
-        this.$toasted.show("No se puede vender un producto sin stock");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-        return;
-      }
+
+      // if (
+      //   productos.some(
+      //     v =>
+      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+      //       v.stock
+      //   ) &&
+      //   this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
+      // ) {
+      //   this.$toasted.show("No se puede vender un producto sin stock");
+      //   // this.$swal({
+      //   //   position: "center",
+      //   //   icon: "info",
+      //   //   showConfirmButton: true,
+      //   //   confirmButtonText: "Entiendo",
+      //   //   target: document.getElementById("conten"),
+      //   //   confirmButtonColor: "#0275d8"
+      //   // });
+      //   return;
+      // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
@@ -2199,11 +2202,11 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
-      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
-        this.$toasted.show("Debe ingresar los días de validez de la proforma");
-        this.inProgress = false;
-        return;
-      }
+      // if (this.diasValidosProf < 0 || this.diasValidosProf == "") {
+      //   this.$toasted.show("Debe ingresar los días de validez de la proforma");
+      //   this.inProgress = false;
+      //   return;
+      // }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
@@ -2418,11 +2421,24 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
+    getProfomaAnio() {
+      let proforma = this.ventas[this.ventaActiva].proforma;
+      if (Object.keys(proforma).length > 0) {
+        return proforma.Anio;
+      }
+    },
+    getProfomaNumero() {
+      let proforma = this.ventas[this.ventaActiva].proforma;
+      if (Object.keys(proforma).length > 0) {
+        return proforma.Numero;
+      }
+    },
     cargarProforma(proforma) {
       console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
+      venta.proforma = proforma;
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);

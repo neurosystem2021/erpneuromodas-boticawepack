@@ -276,6 +276,9 @@
                   </b-col>
                 </b-row> -->
                 <div class="divCarrito">
+                <b-row class="mt-2 clsCarrito" v-if="getProfomaAnio()">
+                   <b-alert show> <b>PROFORMA: </b>{{ getProfomaAnio() }} - {{  getProfomaNumero()}}</b-alert>
+                </b-row>
                 <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos" class="tblCarrito">
                     <template slot="pres" slot-scope="data">
@@ -314,13 +317,12 @@
                         v-model="data.item.cantidad"
                         type="number"
                         style="text-align:center; font-weight:bold; width: 90px;"
-                      autocomplete="false"
-                      :id="`input${data.index}`"
-                      :disabled="data.item.esPresentacion"
-                      @input="metodoPagoCambio(1)"
-                       @focus="abrirModalTouch(data.index, 1)"
-                       class="form-control"
-                       @keydown.enter="irBusquedaProducto"
+                        autocomplete="false"
+                        :id="`input${data.index}`"
+                        @input="metodoPagoCambio(1)"
+                        @focus="abrirModalTouch(data.index, 1)"
+                        class="form-control"
+                        @keydown.enter="irBusquedaProducto"
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -382,6 +384,15 @@
                     </b-button>
        
                     </template>
+                    <template slot="ProductoPresentacion" slot-scope="data">
+                      <input 
+                        type="text" 
+                        v-model="data.item.ProductoPresentacion"
+                        class="form-control"  
+                        style="width: 150px;"
+                        disabled
+                      >
+                      </template>
                     <template slot="cantxPrecio" slot-scope="data">
                       <b-form-input
                         v-if="data.item.esPresentacion"
@@ -780,7 +791,7 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x1</h5>
-                        <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                        <!-- <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br> -->
                         <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
                       </b-col>
                   </b-row>
@@ -810,7 +821,7 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x{{ pres.cantidad }}</h5>
-                        <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                        <!-- <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br> -->
                         <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
                       </b-col>
                   </b-row>
@@ -1014,7 +1025,7 @@ export default {
         { key: "Anaquel", class: "d-none d-md-table-cell" },
         { key: "pres", label: "" },
         { key: "ProductoPresentacion", label: "Presentacion" },
-        { key: "cantxPrecio", label: "	CanXPrec" },
+        // { key: "cantxPrecio", label: "	CanXPrec" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         // {
@@ -1039,6 +1050,7 @@ export default {
       venta: {
         pagocon: 0,
         cliente: {},
+        proforma: {},
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -1098,11 +1110,11 @@ export default {
         {
           pagocon: 0,
           cliente: {},
+          proforma: {},
           EsCredito: 0,
           Serie: "",
           Numero: "",
           Observacion: "",
-          cliente: {},
           comisionista: {},
           tipoVenta: {
             IdTipoDoc: 7,
@@ -1541,7 +1553,6 @@ export default {
       element.dispatchEvent(event);
     },
     setVendedor(obj) {
-      console.log("obj", obj);
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
       this.ventas[this.ventaActiva].vendedor = obj;
@@ -1893,7 +1904,7 @@ export default {
       let subtotal = 0;
 
       if (prod.esPresentacion) {
-        subtotal = prod.CantidadPresentacion * prod.cantidad * prod.precio;
+        subtotal = prod.cantidad * prod.precio;
       } else {
         subtotal = prod.cantidad * prod.precio;
         // console.log(prod);
@@ -1904,7 +1915,7 @@ export default {
       let total = 0;
       if (prod.esPresentacion) {
         total =
-          prod.CantidadPresentacion * prod.cantidad * prod.precio -
+          prod.cantidad * prod.precio -
           prod.descuento;
       } else {
         total = prod.cantidad * prod.precio - prod.descuento;
@@ -1922,7 +1933,7 @@ export default {
             return (
               total +
               parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio
+                prod.cantidad * prod.precio
               )
             );
           } else {
@@ -1931,7 +1942,7 @@ export default {
           // return (
           //   total +
           //   parseFloat(
-          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
+          //     prod.cantidad * prod.precio
           //   ) -
           //   parseFloat(prod.descuento)
           // );
@@ -1960,7 +1971,7 @@ export default {
             return (
               total +
               parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio -
+                prod.cantidad * prod.precio -
                   prod.descuento
               )
             );
@@ -1972,7 +1983,7 @@ export default {
           // return (
           //   total +
           //   parseFloat(
-          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
+          //     prod.cantidad * prod.precio
           //   ) -
           //   parseFloat(prod.descuento)
           // );
@@ -2403,6 +2414,7 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     async cargarProforma(proforma) {
+      console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       await this.axios
@@ -2413,6 +2425,7 @@ export default {
           }
         });
       venta.cliente = proforma;
+      venta.proforma = proforma;
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -2460,6 +2473,18 @@ export default {
           this.metodoPagoCambio(1);
         }, 1000);
       });
+    },
+    getProfomaAnio() {
+      let proforma = this.ventas[this.ventaActiva].proforma;
+      if (Object.keys(proforma).length > 0) {
+        return proforma.Anio;
+      }
+    },
+    getProfomaNumero() {
+      let proforma = this.ventas[this.ventaActiva].proforma;
+      if (Object.keys(proforma).length > 0) {
+        return proforma.Numero;
+      }
     },
     // cargarProforma(proforma) {
     //   this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
@@ -2534,11 +2559,14 @@ export default {
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
       if (esPresentacion) {
+        console.log(obj);
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
+        producto.esPresentacion = 1;
+        producto.ProductoPresentacion = obj.nombre;
         producto.presentacion = JSON.stringify(obj);
       } else {
         producto.Descripcion = obj.ProductoPresentacion;
@@ -2547,6 +2575,7 @@ export default {
         producto.bloquearInputPrecio = false;
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
+        producto.esPresentacion = 0;
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);

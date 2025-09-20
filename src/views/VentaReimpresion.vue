@@ -155,18 +155,23 @@ export default {
         });
     },
     reimprimir(idDocVenta) {
-      const url = "/imprimir/index.php?IdDocVenta=" + idDocVenta + "&preview=1";
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "absolute";
-      iframe.style.width = "0px";
-      iframe.style.height = "0px";
-      iframe.style.border = "none";
-      iframe.src = url;
-      iframe.onload = function() {
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-      };
-      document.body.appendChild(iframe);
+      window.open(
+        "/imprimir/index.php?IdDocVenta=" + idDocVenta,
+        "_blank",
+        "noopener"
+      );
+      // const url = "/imprimir/index.php?IdDocVenta=" + idDocVenta + "&preview=1";
+      // const iframe = document.createElement("iframe");
+      // iframe.style.position = "absolute";
+      // iframe.style.width = "0px";
+      // iframe.style.height = "0px";
+      // iframe.style.border = "none";
+      // iframe.src = url;
+      // iframe.onload = function() {
+      //   iframe.contentWindow.print();
+      //   setTimeout(() => document.body.removeChild(iframe), 1000);
+      // };
+      // document.body.appendChild(iframe);
     }
     /*reimprimir(idDocVenta){
           this.axios.get(this.API + 'ventas/reimpresion/rapida?idDocVenta=' + idDocVenta)

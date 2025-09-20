@@ -508,7 +508,7 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x1</h5>
-                        <span><b >Precio C: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br>
+                        <!-- <span><b >Precio C: </b>S/ {{ objProd.PrecioCosto | redondear(2) }}</span><br> -->
                         <b>Precio V: </b>S/ {{ objProd.PrecioContado | redondear(2) }}
                         </b-col>
                     </b-row>

@@ -9,7 +9,7 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Estado</th><th style="width:90px">Pagado</th>
@@ -18,7 +18,8 @@
                 <tbody>
                   
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
                     <td>
                     
@@ -79,7 +80,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Detalle</th>
@@ -89,7 +90,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
               
@@ -148,7 +150,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -158,7 +160,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -217,7 +220,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -227,7 +230,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -286,7 +290,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Estado</th><th>Pagado</th>
@@ -294,7 +298,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
                 
@@ -695,7 +700,7 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <!-- <th>Estado</th> -->
@@ -705,7 +710,8 @@
                 <tbody>
                   
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
                     <td>
                     
@@ -764,7 +770,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <!-- <th>Detalle</th> -->
@@ -774,7 +780,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
               
@@ -834,7 +841,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <!-- <th>Detalle</th> -->
@@ -844,7 +851,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -903,7 +911,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <!-- <th>Detalle</th> -->
@@ -913,7 +921,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -972,7 +981,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <!-- <th>Estado</th> -->
@@ -981,7 +990,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
                 

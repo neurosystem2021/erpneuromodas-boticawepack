@@ -897,7 +897,7 @@ export default {
         guardarProforma () {
             this.inProgress = true
 
-            if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
+            if(this.diasValidosProf < 0 || this.diasValidosProf=='') {
                 this.$toasted.show('Debe ingresar los días de validez de la proforma')
                 this.inProgress = false
                 return
