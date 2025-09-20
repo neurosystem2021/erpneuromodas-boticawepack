@@ -1426,12 +1426,7 @@ export default {
       }
       return true;
     },
-    mostrarVenta() {
-      return (
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
-      );
-    },
+
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
       this.cantidadInput = "";
@@ -1546,6 +1541,7 @@ export default {
       element.dispatchEvent(event);
     },
     setVendedor(obj) {
+      console.log("obj", obj);
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
       this.ventas[this.ventaActiva].vendedor = obj;
@@ -2676,8 +2672,8 @@ export default {
   computed: {
     mostrarVendedor() {
       return (
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
+        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 1 ||
+        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 5
       );
     },
     APIProductos() {

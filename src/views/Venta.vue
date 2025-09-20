@@ -1217,8 +1217,8 @@ export default {
     mostrarVendedor() {
       console.log(this.ventas[this.ventaActiva].vendedor);
       return (
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 1 ||
-        this.ventas[this.ventaActiva].vendedor.IdPerfil == 3
+        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 1 ||
+        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 5
       );
     }
   },
