@@ -225,7 +225,7 @@
 
         <template slot="Series" slot-scope="data">
           <ul>
-            <li v-for="(serie,index) in generarSerie(data.item.Serie)" :key="index">
+            <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
               {{serie}}
             </li>
           </ul>
@@ -1181,7 +1181,9 @@ export default {
   },
   methods: {
     generarSerie(serie) {
-      console.log(serie);
+      if (serie) {
+        return serie;
+      }
       return "";
     },
     nextPage() {
@@ -1389,7 +1391,8 @@ export default {
         }
       }
     },
-    setProducto(obj) {
+    async setProducto(obj) {
+      console.log(setProducto);
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1399,6 +1402,9 @@ export default {
       this.preciosProd = [];
       this.objProd = {};
       obj.EsObsequio = 0;
+      console.log(obj);
+      // let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto,);
+      prod.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
       if (!obj.Empresa) {
         let datoEmpresa = this.$store.state.empresas.filter(
@@ -1427,6 +1433,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
+      console.log("setProductoUni");
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1469,6 +1476,7 @@ export default {
     },
     setProductoCant(prod) {
       console.log("setProductoCant");
+
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1592,6 +1600,7 @@ export default {
     },
 
     setNuevoPrecioContado(index) {
+      console.log("setNuevoPrecioContado");
       let precio = parseFloat(this.productos[index].precio);
       if (this.productos[index].TieneIgv) {
         precio += precio * 0.18;
@@ -1746,7 +1755,22 @@ export default {
       const end = start + perPage;
       return lst.slice(start, end);
     },
+    async obtenerSeriePorProducto(id) {
+      console.log("obtenerSeriePorProducto", id);
+      let productoSerie = [];
+      await this.axios
+        .get(this.API + "productos/serie", {
+          params: { IdProducto: id, Todos: false }
+        })
+        .then(res => {
+          if (res) {
+            productoSerie = res.data;
+          }
+        });
+      return productoSerie;
+    },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
+      console.log(item);
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
           v => v.IdProducto == item.IdProducto
@@ -1774,6 +1798,12 @@ export default {
       this.abrirModal = abrirModal;
       this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
+      let productoSerie = await this.obtenerSeriePorProducto(
+        item.IdProducto,
+        item.Empresa
+      );
+      item.productoSerie = productoSerie;
+      console.log(productoSerie);
       this.itemProducto = { ...item };
       this.itemProducto.tipo = "PRESENTACION";
       this.itemProducto.PreciosPorProducto = PreciosPorProducto;
