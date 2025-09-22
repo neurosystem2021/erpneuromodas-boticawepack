@@ -223,12 +223,22 @@
           <span>x{{ productos[data.index].cantidadPres }}</span>
         </template>
 
-        <template slot="Series" slot-scope="data">
+        <template slot="Serie" slot-scope="data">
           <ul>
             <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
-              {{serie}}
+              {{ serie.Serie }}
             </li>
           </ul>
+        </template>
+        <template slot="Series" slot-scope="data">
+          <b-select 
+              v-if="generarSerie(data.item.productoSerie).length>0"
+              :options="generarSerie(data.item.productoSerie)" 
+              v-model="data.item.IdProductoSerie"
+              text-field="Serie"
+              value-field="IdProductoSerie"
+          />
+          
         </template>
         <template slot="AddSeries" slot-scope="data">
           <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
@@ -259,9 +269,9 @@
           />
         </template>
         <template slot="precio" slot-scope="data">
+          <!-- disabled -->
           <input
             v-model="productos[data.index].precio"
-            disabled
             type="number"
             style="width: 95px"
             min="0"
@@ -878,6 +888,58 @@
       </b-row>
       
     </b-modal>
+     <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
+      <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
+      <b-row>
+        <b-col cols="12">
+          <b-input-group prepend="Serie">
+            <b-input-group-append>
+                <input type="text" class="form-control" id="txtSerie" v-model="Serie">
+            </b-input-group-append>
+            <b-button variant="info" size="sm" @click="anadirSerie()">AÑADIR</b-button>
+          </b-input-group>
+        </b-col>
+        <b-col cols="6">
+          
+        </b-col>
+     
+         <b-col cols="12">   
+          <table width="100%" class="mt-3">
+              <thead>
+                <tr>
+
+                  <th>#</th>
+                  <th>Serie</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(serie,index) in Series" :key="index">
+                  <td>{{ index+1 }}</td>
+                  <td>
+                    <input
+                    type="text"
+                    class="form-control"
+                    :value="serie.Serie"
+                    @input="updateSerie(index, $event.target.value)"
+                  >
+                  </td>
+                  <td>
+                    <b-button variant="danger" @click="eliminarSerieModal(index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </b-button>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+       </b-col>
+       <b-col cols="12" style="text-align: right;" class="mt-3">
+          <b-button @click="guardarSerie" variant="success">Guardar</b-button>
+          <b-button @click="anadirSerieFlag=!anadirSerieFlag" variant="danger">Cancelar</b-button>
+       </b-col>
+      </b-row>
+       
+    </b-modal>
   </b-row>
 </template>
 
@@ -926,8 +988,10 @@ export default {
   },
   data() {
     return {
+      Serie: "",
+      Series: [],
       page: 0,
-
+      anadirSerieFlag: false,
       abrirModal: false,
       mostrarTablaProductos: true,
       modalPresentaciones: false,
@@ -1180,11 +1244,28 @@ export default {
     }
   },
   methods: {
+    anadirSerie() {
+      if (!this.Serie) {
+        return;
+      }
+      if (this.Series.some(v => v == this.Serie)) {
+        this.$toasted.error(
+          "La serie ya se encuentra en el listado. Modifique"
+        );
+        return;
+      }
+      this.Series.unshift({ IdProductoSerie: "", Serie: this.Serie });
+      setTimeout(() => {
+        this.Serie = "";
+        let txtSerie = document.getElementById("txtSerie");
+        txtSerie.focus();
+      }, 200);
+    },
     generarSerie(serie) {
       if (serie) {
         return serie;
       }
-      return "";
+      return [];
     },
     nextPage() {
       if (this.currentPage < this.totalPages) this.currentPage++;
@@ -1198,6 +1279,31 @@ export default {
       this.productos[index] = prod;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
+    },
+    abrirmodalNuevaSerie(index, producto) {
+      this.Serie = "";
+      this.Series = [];
+      this.objProd = { ...producto };
+
+      if (this.objProd.productoSerie) {
+        this.Series = this.objProd.productoSerie;
+      }
+      this.index = index;
+      this.anadirSerieFlag = true;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          let txtSerie = document.getElementById("txtSerie");
+          txtSerie.focus();
+        }, 500);
+      });
+    },
+    guardarSerie() {
+      this.objProd.Serie = this.Series;
+      Vue.set(this.productos, this.index, this.objProd);
+      this.anadirSerieFlag = false;
+    },
+    eliminarSerieModal(index) {
+      this.Series.splice(index, 1);
     },
     aumentarMontoPresentacion(item) {
       if (this.primerMonto) {

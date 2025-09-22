@@ -2,12 +2,12 @@ export default {
   proveedoresFiltrados: [],
   almacenesFiltrados: [],
   empresas: [
-    { value: "modasm", text: "EMP. MARIOS SPORT F. (PRENDAS DE VESTIR)" },
+    { value: "modasm", text: "DISTRIBUIDORA MIGUELITO" },
     {
       value: "modasgio",
-      text: "EMP. DEYSI GIOVANNA (LOCERIA, CRISTALERIA Y MENAJE)"
+      text: "COMERCIALIZADORA MIGUELITO"
     },
-    { value: "modasjes", text: "EMP. MARIO JESUS (PLASTIQUERIA)" }
+    { value: "modasjes", text: "MIGUELITO INTERNO" }
     // { value: "modasjun", text: "EMP. MARIO JUNIOR (PASAMANERIA Y BAZAR)" },
     // { value: "modaspau", text: "EMP MARIO PAULINO (ALUMNIO Y ELECTRICIDAD)" }
   ],

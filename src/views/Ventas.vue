@@ -1056,7 +1056,9 @@ export default {
           },
           { key: "Producto" },
           { key: "Series" },
-          { key: "AddSeries" },
+          // { key: "AddSeries" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoCategoria", label: "Categoria" },
           { key: "NombreEmpresa", label: "Empresa" },
           { key: "ProductoPresentacion", label: "Anaquel" },
           { key: "Descripcion", label: "Descripción" },
@@ -2015,7 +2017,7 @@ export default {
         return;
       }
       this.inProgress = false;
-      
+
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;
@@ -2072,7 +2074,7 @@ export default {
         data.almacen = almacen;
         data.Numero = serie.numero;
         data.Serie = serie.serie;
-
+        this.inProgress = true;
         if (data.productos.some(v => v.Empresa == element.value)) {
           let IdProformaDets = [];
           if (element.value == this.empresa) {
@@ -2139,7 +2141,7 @@ export default {
           this.$toasted.success("Venta realizada con exito");
         }
       });
-
+      this.inProgress = true;
       // this.$toasted.success("Venta realizada con exito");
 
       setTimeout(() => {
