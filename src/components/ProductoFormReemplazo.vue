@@ -78,7 +78,7 @@ export default {
       this.ProductoReempleazo.push(obj);
     },
     focusAutocomplete(ref) {
-      this.$refs[ref].type = "";
+      // this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
     },
     EliminarReemplazo(index) {
