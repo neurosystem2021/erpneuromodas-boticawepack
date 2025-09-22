@@ -47,8 +47,44 @@
             </b-col>
             </b-row>
           </b-col>
+        <b-col md="3">
+          <b-form-group>
+            <label>Fecha Emisión Inicio:</label>
+            <b-form-input
+              v-model="rango.fechaDesde"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="3">
+          <b-form-group>
+            <label>Fecha Emisión Fin:</label>
+            <b-form-input
+              v-model="rango.fechaHasta"
+              type="date"
+              step="1"
+                placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="2" class="d-flex align-items-end mb-3">
+          <b-button variant="primary" block @click="generarReporte">
+            Generar Reporte
+          </b-button>
+        </b-col>
+          <b-col md="4">
+            <h4>
+              <b-form-group class="mt-4">
+              <span > Total: {{ calcularTotal() }} </span>
+              </b-form-group>
+            </h4>
+          </b-col>
 
-          <b-table small
+          <b-table
+            ref="tabla"
+            small
             :filter="filter"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
@@ -72,7 +108,17 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaproveedores'" target="_blank">Exportar</b-button>
+              <b-button
+                variant="success"
+                size="lg"
+                :href="'/api/index.php/reporte/deudaproveedores'
+                  + '?fechaDesde=' + rango.fechaDesde + ' 00:00:00'
+                  + '&fechaHasta=' + rango.fechaHasta + ' 23:59:59'
+                  + '&limit=' + perPage
+                  + '&q=' + encodeURIComponent(filter)" 
+                target="_blank">
+                Exportar
+              </b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -116,44 +162,64 @@ export default {
             { key: 'Letras', label: 'Letras', sortable: true },
       ],
       totalRows: 50,
-      perPage: 10,
+      perPage: 50,
       currentPage: 1,
       almacen: {
         IdAlmacen: 1
+      },
+      rango: {
+        fechaDesde: this.$moment().format("YYYY-MM-01"),
+        fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       showLetras: false,
     }
   },
   methods: {
+    generarReporte() {
+      if (!this.rango.fechaDesde || !this.rango.fechaHasta) {
+        this.$bvToast.toast('Debes seleccionar ambas fechas.', {
+          title: 'Error',
+          variant: 'danger',
+          solid: true
+        });
+        return;
+      }
+
+      console.log('Generando reporte desde', this.rango.fechaDesde, 'hasta', this.rango.fechaHasta);
+
+      if (this.$refs.tabla) {
+        this.$refs.tabla.refresh();
+      }
+    },
+    calcularTotal() { 
+      let sum = this.items.reduce((sum, item) => {
+        return sum + parseFloat(item.Saldo);
+      }, 0);
+      return parseFloat(sum).toFixed(2);
+    },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
     setAlmacen (obj) {
-      // this.almacen = obj
-      // Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+       this.almacen = obj
+       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
-    myProvider (ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      // console.log(ctx.filter)
-      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+    myProvider(ctx) {
+      let url = this.API + 'proveedores/deudas?' +
+        'q=' + (ctx.filter || '') +
+        '&limit=' + ctx.perPage +
+        '&page=' + ctx.currentPage +
+        '&fechaDesde=' + this.rango.fechaDesde + ' 00:00:00' +
+        '&fechaHasta=' + this.rango.fechaHasta + ' 23:59:59';
 
-      return promise.then((response) => {
-        console.log(response)
-        this.items = response.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+      return this.axios.get(url).then((response) => {
+        this.items = response.data;
+        this.totalRows = this.items.length; // si tu API devuelve total, cámbialo aquí
+        return this.items;
+      }).catch(() => {
+        return [];
+      });
     },
     myRowClickHandler(record, index) {
       if(record.Letras!='Ninguna'){
