@@ -291,6 +291,9 @@
                        
                        
                     </template>
+                    <template slot="ProductoDesc" slot-scope="data">
+                      <textarea class="form-control text-area" v-model="data.item.ProductoDesc" />
+                    </template>
                     <template slot="cantidad" slot-scope="data">
                       <input
                         v-model="data.item.cantidad"
@@ -1000,6 +1003,7 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoDesc" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
@@ -1898,13 +1902,11 @@ export default {
             return (
               total +
               parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio 
+                prod.CantidadPresentacion * prod.cantidad * prod.precio
               )
             );
           } else {
-            return (
-              total + parseFloat(prod.cantidad * prod.precio)
-            );
+            return total + parseFloat(prod.cantidad * prod.precio);
           }
           // return (
           //   total +
@@ -2679,6 +2681,9 @@ export default {
     background-color: #e6e6e6;
     border-bottom: none;
   } */
+.text-area {
+  field-sizing: content;
+}
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
