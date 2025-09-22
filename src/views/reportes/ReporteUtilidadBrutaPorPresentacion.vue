@@ -28,7 +28,8 @@
          </b-input-group>
       </b-col>
       <b-col md="3">
-        <b-button variant="success" class="my-auto" @click="obtenerDatos">Generar</b-button>
+        <b-button variant="info" class="my-2 mx-1" @click="obtenerDatos">Generar</b-button>
+        <b-button variant="success" class="my-2 mx-1" @click="exportarReporte">Exportar Excel</b-button>
       </b-col>
       <b-col md="12" class="mt-3">
 
@@ -106,6 +107,30 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    },
+    exportarReporte() {
+      window.open(
+        `${this.API}reporte/utilidabruta/presentacion/exportar?fechaIni=${
+          this.fechaIni
+        }&fechaFin=${this.fechaFin}&UsuarioReg=${this.UsuarioReg}
+      `,
+        "_blank"
+      );
+      // this.axios(`${this.API}reporte/utilidabruta/presentacion/exportar`, {
+      //   params: {
+      //     fechaIni: this.fechaIni,
+      //     fechaFin: this.fechaFin,
+      //     UsuarioReg: this.UsuarioReg
+      //   }
+      // })
+      //   .then(res => {
+      //     if (res.data) {
+      //       window.open(res.data, "_blank");
+      //     }
+      //   })
+      //   .catch(e => {
+      //     console.log(e);
+      //   });
     },
     getUtilidadBruta(item) {
       return parseFloat(
