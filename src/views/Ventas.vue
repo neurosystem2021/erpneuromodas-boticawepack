@@ -1533,12 +1533,7 @@ export default {
     },
     //Fin Sockets
     setMoneda(obj) {
-      if (obj.Moneda == "PEN") {
-        this.TipoCambio = 1;
-      } else {
-        this.TipoCambio = this.TipoCambioUSD;
-      }
-
+      this.TipoCambio = obj.TipoCambio;
       this.objMoneda = obj;
       this.$refs.inputMoneda.setValue(obj.Moneda);
     }

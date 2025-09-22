@@ -81,10 +81,22 @@
         <b-row>
           <b-col md="12">
             <b-row>
-              <b-col md="2">
+              <!-- <b-col md="2">
                 <b-form-group>
                   <label>Código de barra:</label>
                   <input ref="inputCodigoBarra" class="form-control" @keyup="(val) => generateFilter('codigo', val.target.value, true)"/>
+                </b-form-group>
+              </b-col> -->
+              <b-col md="2">
+                <b-form-group>
+                  <label>Código Fabricante:</label>
+                  <input ref="inputCodigoFabricante" class="form-control" @keyup="(val) => generateFilter('codigoFrabricante', val.target.value, true)"/>
+                </b-form-group>
+              </b-col>
+              <b-col md="2">
+                <b-form-group>
+                  <label>Código Interno:</label>
+                  <input ref="inputCodigoInterno" class="form-control" @keyup="(val) => generateFilter('codigoInterno', val.target.value, true)"/>
                 </b-form-group>
               </b-col>
               <b-col md="2">
@@ -101,7 +113,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Producto:</label>
                   <autocomplete
@@ -115,7 +127,7 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Marca:</label>
                   <autocomplete

@@ -165,44 +165,44 @@
                 <tr >
                   <td  style="text-align: left; font-weight:bold">Total Cantidad</td>
                   <td>
-                    S/. {{ getTotalCantidad() }}
+                    {{ this.proforma.Moneda }} {{ getTotalCantidad() }}
                   </td>
                 </tr>
                 <tr >
                   <td  style="text-align: left; font-weight:bold">Total Sucursal</td>
                   <td>
-                    S/. {{ getTotalSucursal() }}
+                    {{ this.proforma.Moneda }} {{ getTotalSucursal() }}
                   </td>
                 </tr>
                 <tr >
                   <td  style="text-align: left; font-weight:bold">Total Importacion</td>
                   <td>
-                    S/. {{ getTotalImportacion() }}
+                    {{ this.proforma.Moneda }} {{ getTotalImportacion() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="" style=" text-align: left; font-weight:bold">SubTotal </td>
                   <td style="font-weight: bold;">
-                    S/. {{ getSubTotal() }}
+                    {{ this.proforma.Moneda }} {{ getSubTotal() }}
                   </td>
                 </tr>
                 
                 <tr>
                   <td  style="text-align: left; font-weight:bold">Descuentos </td>
                   <td style="">
-                     - S/. {{ getTotalDescuentos() }}
+                     - {{ this.proforma.Moneda }} {{ getTotalDescuentos() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="" style=" text-align: left; font-weight:bold">IGV </td>
                   <td>
-                    S/. {{ getTotalIGV() }}
+                    {{ this.proforma.Moneda }} {{ getTotalIGV() }}
                   </td>
                 </tr>
                 <tr>
                   <td  style="text-align: left; font-weight:bold">Total </td>
                   <td style="font-weight: bold;">
-                    S/. {{ getTotal() }}
+                    {{ this.proforma.Moneda }} {{ getTotal() }}
                   </td>
                 </tr>
               </table>

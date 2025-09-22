@@ -235,44 +235,44 @@
                 <tr>
                   <td class="table-info" style="text-align: left; font-weight:bold">Total Cantidad</td>
                   <td>
-                    S/. {{ getTotalCantidad() }}
+                   {{ moneda.Moneda }}  {{ getTotalCantidad() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="table-warning" style="text-align: left; font-weight:bold">Total Sucursal</td>
                   <td>
-                    S/. {{ getTotalSucursal() }}
+                   {{ moneda.Moneda }}  {{ getTotalSucursal() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="table-danger" style="text-align: left; font-weight:bold">Total Importacion</td>
                   <td>
-                    S/. {{ getTotalImportacion() }}
+                   {{ moneda.Moneda }}  {{ getTotalImportacion() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="" style="background: #FFF59D; text-align: left; font-weight:bold">SubTotal </td>
                   <td style="font-weight: bold;">
-                    S/. {{ getSubTotal() }}
+                   {{ moneda.Moneda }}  {{ getSubTotal() }}
                   </td>
                 </tr>
                 
                 <tr>
                   <td  style="text-align: left; font-weight:bold">Descuentos </td>
                   <td style="">
-                     - S/. {{ getTotalDescuentos() }}
+                     -{{ moneda.Moneda }}  {{ getTotalDescuentos() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="" style="background: #E1BEE7; text-align: left; font-weight:bold">IGV </td>
                   <td style="font-weight: bold;">
-                    S/. {{ getTotalIGV() }}
+                   {{ moneda.Moneda }}  {{ getTotalIGV() }}
                   </td>
                 </tr>
                 <tr>
                   <td class="table-success" style="text-align: left; font-weight:bold">Total </td>
                   <td style="font-weight: bold;">
-                    S/. {{ getTotal() }}
+                   {{ moneda.Moneda }}  {{ getTotal() }}
                   </td>
                 </tr>
               </table>
@@ -743,11 +743,7 @@ export default {
       // this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
     },
     setMoneda(obj) {
-      if (obj.Moneda == "PEN") {
-        this.TipoCambio = 1;
-      } else {
-        this.TipoCambio = this.TipoCambioUSD;
-      }
+      this.TipoCambio = obj.TipoCambio;
       this.moneda = obj;
       this.$refs.inputMoneda.setValue(obj.Moneda);
     },
@@ -806,7 +802,10 @@ export default {
       );
       obj.stock = res.data[0].stock;
       obj.cantidad = 1;
-      obj.precio = parseFloat(item.PrecioContado).toFixed(2);
+      obj.precio =
+        this.TipoCambio == 1 || this.TipoCambio == 0
+          ? parseFloat(item.PrecioContado).toFixed(2)
+          : parseFloat(item.PrecioContado / this.TipoCambio).toFixed(2);
       obj.descuento = 0;
       obj.cantidadSucursal = 0;
       obj.diasEntrega = 0;
@@ -1083,6 +1082,20 @@ export default {
         }
       }
       return val;
+    }
+  },
+  watch: {
+    TipoCambio() {
+      if (this.productos.length > 0) {
+        this.productos.forEach((prod, index) => {
+          const nuevoPrecio =
+            this.TipoCambio == 1 || this.TipoCambio == 0
+              ? Number(parseFloat(prod.PrecioContado).toFixed(2))
+              : Number((prod.PrecioContado / this.TipoCambio).toFixed(2));
+
+          this.$set(this.productos[index], "precio", nuevoPrecio);
+        });
+      }
     }
   }
 };

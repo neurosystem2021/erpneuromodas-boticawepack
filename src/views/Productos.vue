@@ -18,7 +18,7 @@
             <b-col md="6">
               <b-form-group horizontal label="Tipo Cambio Hoy" class="mb-0">
               <b-input-group>
-                <b-form-input style="max-width: 150px;" v-model="TipoCambioUSD" placeholder="Buscar" type="number" step="0.01"/>
+                <input class="form-control" style="max-width: 150px;" v-model="TipoCambioUSD" placeholder="Buscar" type="number" step="0.01"/>
                 <b-button variant="info" @click="actualizarTipoCambio">Actualizar T. C.</b-button>
               </b-input-group>
             </b-form-group>

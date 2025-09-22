@@ -481,11 +481,7 @@ export default {
     },
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
-      if (obj.Moneda === "USD") {
-        this.movimiento.TipoCambio = this.tipocambio;
-      } else {
-        this.movimiento.TipoCambio = 1;
-      }
+      this.movimiento.TipoCambio = obj.TipoCambio;
     },
     getProveedores(value) {
       this.buscarProveedores(value);
