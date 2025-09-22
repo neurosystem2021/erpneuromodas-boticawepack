@@ -123,6 +123,10 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
           </b-form-group>
+          <b-form-group>
+            <label>Presentación:</label>
+            <textarea v-model="producto.ProductoDesc" class="form-control text-area"></textarea>
+          </b-form-group>
 
           <b-form-group v-if="true">
             <label>Imagen:</label>
@@ -822,6 +826,7 @@ export default {
       this.$refs.inputCategoria.setValue(obj.ProductoCategoria);
     },
     setMedicion(obj) {
+      console.log(obj);
       this.producto.medicion = obj;
     },
     setMarca(obj) {
@@ -855,7 +860,7 @@ export default {
         EsHabitacion: 0,
         Piso: 1,
         IdProductoMarca: null,
-        IdProductoMedicion: null,
+        IdProductoMedicion: 6,
         IdProductoCategoria: null,
         // IdProductoModelo: null,
         // IdProductoBotapie: null,
@@ -1062,5 +1067,8 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
+.text-area {
+  field-sizing: content;
+}
 </style>

@@ -116,6 +116,7 @@
           <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index],data.index)" style="margin-top:2px;"><i class="fas fa-list"></i></b-button>
         </template>
 
+
         <template slot="Presentacion" slot-scope="data" >
           <b-form-input
             v-model="productos[data.index].Presentacion"
@@ -1151,6 +1152,7 @@ export default {
 </script>
 
 <style scoped>
+
 .contentCard {
   cursor: pointer;
 }

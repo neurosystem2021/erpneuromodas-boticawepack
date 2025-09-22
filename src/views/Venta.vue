@@ -151,10 +151,13 @@
                       >
                       <i class="fas fa-list"></i>
                     </b-button>
-      
-                     
-                     
                   </template>
+
+                  <template slot="ProductoDesc" slot-scope="data">
+                    <textarea v-model="data.item.ProductoDesc" class="form-control text-area" />
+                  </template>
+
+
                   <template slot="presentacion" slot-scope="data">
                     <b-form-input
                       v-model="data.item.Descripcion"
@@ -1039,7 +1042,8 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "Producto", thStyle: { width: "40%" } },
+        { key: "ProductoDesc", label: "Desc.", thStyle: { width: "20%" } },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
@@ -2393,7 +2397,7 @@ export default {
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");
           window.open(
-            "/imprimir/proforma.php?IdProforma=" + response.data.insertId,
+            "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
             "_blank"
           );
         }
@@ -2771,6 +2775,9 @@ export default {
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
+}
+.text-area {
+  field-sizing: content !important;
 }
 .popover {
   min-width: 400px !important; /* Estilo global para todos los popovers */

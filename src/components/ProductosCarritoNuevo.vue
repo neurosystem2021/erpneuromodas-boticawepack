@@ -240,6 +240,12 @@
                 <template slot="eventPresent" slot-scope="data">
                   <b-button style="margin-top: 70%;" size="sm" v-if="productos[data.index].PreciosPorProducto  !='' " :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
                 </template>
+                
+                <template slot="ProductoDesc" slot-scope="data">
+                  {{ data.item }}
+                  <textarea v-model="data.item.ProductoDesc" class="form-control text-area" />
+                </template>
+
 
                 <template slot="cantidad" slot-scope="data">
                 <div style="margin-top: 21%;">

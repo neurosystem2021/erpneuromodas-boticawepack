@@ -281,6 +281,10 @@
                 </b-row>
                 <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos" class="tblCarrito">
+                     <template slot="ProductoDesc" slot-scope="data">
+                      <textarea v-model="data.item.ProductoDesc" class="form-control text-area" />
+                    </template>
+
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -1020,6 +1024,7 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         // { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoDesc", label: "Desc.", thStyle: { width: "20%" } },
         { key: "Anaquel", class: "d-none d-md-table-cell" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         { key: "presentacion", label: "Presentacion" },
@@ -2771,6 +2776,9 @@ export default {
 }
 </style>
   <style>
+.text-area {
+  field-sizing: content !important;
+}
 /* .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
     background-color: #e6e6e6;
