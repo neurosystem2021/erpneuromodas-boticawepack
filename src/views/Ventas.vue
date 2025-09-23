@@ -1,12 +1,231 @@
 <template>
   <div :class="this.empresa">
+    <b-tabs v-model="tab" pills fill justified  align="center">
+      <b-tab title="Tab 1" v-for="(venta,index) in ventas" :key="index">
+        <b-row style="margin-bottom: -10px">
+          <b-col md="7">
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <b-input-group prepend="Doc." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputTipoVenta${index}`"
+                      :url="API + 'ventas/tipos'"
+                      anchor="TipoDoc"
+                      initValue="NOTA DE VENTA"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setTipoVenta"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+                <b-form-group v-if="isNota">
+                  <label>Doc. Referencia:</label>
+                  <autocomplete
+                    required="required"
+                    :ref="`inputDocRef${index}`"
+                    :url="
+                      API +
+                      'ventas/lista/' +
+                      venta.puntoVenta.IdDocVentaPuntoVenta
+                    "
+                    :customParams="{ id_empresa: empresa }"
+                    anchor="NroComprobante"
+                    initValue=""
+                    label="writer"
+                    placeholder=""
+                    :on-select="setDocRef"
+                    :onFocus="focusAutocomplete.bind(null, `inputDocRef${index}`)"
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="4" class="ocularMovil">
+                <b-form-group>
+                  <b-input-group prepend="Alm." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputAlmacen${index}`"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      initValue="PRINCIPAL"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+                <b-form-group v-if="isNota">
+                  <label>Motivo :</label>
+                  <b-form-select
+                    v-model="venta.NotaIdMotivo"
+                    :options="itemsMotivoNota"
+                    v-on:change="setMotivo($event)"
+                    class="mb-3"
+                    size="md"
+                    required
+                  />
+                </b-form-group>
+              </b-col>
+              <b-col md="4" class="ocularMovil">
+                <b-form-group>
+                  <b-input-group prepend="P.V." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputPuntoVenta${index}`"
+                      :url="API + 'ventas/puntos'"
+                      anchor="PuntoVenta"
+                      initValue="PRINCIPAL"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setPuntoVenta" 
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputPuntoVenta${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+              </b-col>
+              <!-- <b-col md="12" style="margin-top: -10px">
+                <b-form-group>
+                  <b-input-group prepend="Cliente ">
+                    <clientes-form
+                      txtButton="Editar"
+                      v-if="
+                        venta.cliente.IdCliente &&
+                        venta.cliente.DniRuc != '00000000'
+                      "
+                      idModal="editCliente"
+                      @onAddCliente="setCliente"
+                      :editCliente="venta.cliente"
+                    ></clientes-form>
+                    <autocomplete
+                      style="width: 40%"
+                      required="required"
+                      ref="inputCliente"
+                      :url="API + 'clientes'"
+                      anchor="ClienteDniRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => (newDniRuc = val)"
+                      :on-select="setCliente"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                    <input
+                      v-model="dni"
+                      @keydown.enter.prevent="loadClienteBarcode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Cod. Barra"
+                    />
+                    <b-input-group-append>
+                      <clientes-form
+                        :ruc="newDniRuc"
+                        @onAddCliente="setCliente"
+                      ></clientes-form>
+                    </b-input-group-append>
+                  </b-input-group>
+                  <b-form-select
+                    v-if="venta.cliente.IdCliente"
+                    v-model="venta.CampoDireccion"
+                    class="mb-3"
+                  >
+                    <option :value="venta.cliente.Direccion">
+                      {{ venta.cliente.Direccion }}
+                    </option>
+                    <option :value="venta.cliente.Direccion2">
+                      {{ venta.cliente.Direccion2 }}
+                    </option>
+                    <option :value="venta.cliente.Direccion3">
+                      {{ venta.cliente.Direccion3 }}
+                    </option>
+                  </b-form-select>
+                  <b-input-group v-if="venta.cliente.DniRuc == '00000000'">
+                    <b-form-checkbox
+                      :disabled="bloquearInput ? true : false"
+                      v-model="venta.EsOrganizacion"
+                      :value="1"
+                      :unchecked-value="0"
+                    >
+                      Es Organización
+                    </b-form-checkbox>
+                    <input
+                      v-model="venta.NombreOrganizacion"
+                      type="text"
+                      style="text-transform: uppercase"
+                      class="form-control"
+                      required
+                      placeholder="Nombre de la Organización"
+                      v-if="venta.EsOrganizacion"
+                    />
+                  </b-input-group>
+                  <b-row v-if="this.$route.query.idPedido">
+                    <b-col>
+                      <b-form-group>
+                        <label style="font-weight: bold"
+                          >Cliente (Delivery):</label
+                        >
+                        <b-form-input
+                          required
+                          style="text-transform: uppercase; font-size: 0.9rem"
+                          placeholder="Ingrese cliente"
+                          autocomplete="off"
+                          v-model="venta.nombreLlevar"
+                          ref="inputNombreCliente"
+                          type="text"
+                          name="NombreLlevar"
+                          id="NombreLlevar"
+                          readonly
+                        ></b-form-input>
+                      </b-form-group>
+                    </b-col>
+                    <b-col>
+                      <b-form-group>
+                        <label style="font-weight: bold"
+                          >Direccion Entrega (Delivery):</label
+                        >
+                        <b-form-textarea
+                          required
+                          style="text-transform: uppercase; font-size: 0.9rem"
+                          placeholder="Ingrese direccion"
+                          rows="3"
+                          autocomplete="off"
+                          v-model="venta.DireccionEntrega"
+                          ref="inputDireccionEntrega"
+                          type="text"
+                          name="DireccionEntrega"
+                          id="DireccionEntrega"
+                          readonly
+                        ></b-form-textarea>
+                      </b-form-group>
+                    </b-col>
+                  </b-row>
+                </b-form-group>
+              </b-col> -->
+            </b-row>
+          </b-col>
+        </b-row>
+          {{ venta }}
+      </b-tab>
+    </b-tabs>
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
-    <Menu v-if="false"></Menu>
-<!-- {{ $store.state.proforma }} proforma
-{{ $store.state.lstProductosProforma }} lstProductosProforma -->
     <b-container fluid class="ancho" id="conten">
-      <div>
+      <!-- <div>
         <div>
           <b-button-group size="sm">
             <b-input-group prepend="Empresa:" class="mt-2">
@@ -21,7 +240,7 @@
            
           </b-button-group>
         </div>  
-      </div>
+      </div> -->
      
       <b-row>
         <b-col md="12" v-if="this.$route.query.idPedido">
@@ -679,6 +898,14 @@
               v-if="idPerfil == 1 || idPerfil == 14"
               >Efectuar Venta</b-button
               >
+            <b-button
+              @click="anadirVentana"
+              :disabled="inProgress"
+              style="background: #FFEA00;"
+              size="lg"
+              class="btnAction"
+              >Efectuar Venta</b-button
+              >
               <!-- -->
               <b-button
               class="btnAction"
@@ -1012,6 +1239,8 @@ export default {
   },
   data() {
     return {
+      ventas: [],
+      tab: 1,
       pagocon: 0,
       isNota: false,
       dni: "",
@@ -1167,6 +1396,9 @@ export default {
     }
   },
   methods: {
+    anadirVentana() {
+      this.ventas.push({ ...this.venta });
+    },
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
@@ -1392,6 +1624,7 @@ export default {
         idProforma: 0,
         anioNumeroProforma: ""
       };
+
       this.isNota = false;
       this.bloquearInput = false;
       this.adelantosPreOrden = [];
@@ -1399,6 +1632,10 @@ export default {
       this.infoDelivery = {};
       this.descuentoGeneral = 0;
       this.puntosAplicados = 0;
+
+      setTimeout(() => {
+        this.ventas.push({ ...this.venta });
+      }, 200);
     },
     setTipoVenta(obj) {
       this.isNota = false;
