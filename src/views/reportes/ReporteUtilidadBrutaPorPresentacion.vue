@@ -31,27 +31,38 @@
         <b-button variant="info" class="my-2 mx-1" @click="obtenerDatos">Generar</b-button>
         <b-button variant="success" class="my-2 mx-1" @click="exportarReporte">Exportar Excel</b-button>
       </b-col>
-      <b-col md="12" class="mt-3">
 
-        <b-table :items="lstReporte" :fields="header">
-          <template slot="TotalCosto" slot-scope="data">
-            {{ parseFloat(data.item.PrecioCosto * data.item.Cantidad).toFixed(2) }}
+      <div class="mt-5">
+        <b-tabs content-class="mt-3" justified pills card>
+          <b-tab title="Reporte General" active>
+             <b-col md="12" class="mt-3">
+                <b-table :items="lstReporte" :fields="header">
+                  <template slot="TotalCosto" slot-scope="data">
+                    {{ parseFloat(data.item.PrecioCosto * data.item.Cantidad).toFixed(2) }}
+                    
+                  </template>
+                <template slot="TotalVenta" slot-scope="data">
+                  {{ parseFloat(data.item.PrecioVenta * data.item.Cantidad) .toFixed(2)}} 
+                  
+                </template>
+                <template slot="UtilidadBruta" slot-scope="data">
+                  {{ getUtilidadBruta(data.item) }}
+                  
+                </template>
+                <template slot="PorcentajeUtilidadBruta" slot-scope="data">
+                  {{ getUtilidadBrutaPorcentaje(data.item) }}%
+                  
+                </template>
+              </b-table>
+            </b-col>
+          </b-tab>
+          <b-tab title="Reporte Por Presentación">
             
-          </template>
-        <template slot="TotalVenta" slot-scope="data">
-          {{ parseFloat(data.item.PrecioVenta * data.item.Cantidad) .toFixed(2)}} 
-          
-        </template>
-        <template slot="UtilidadBruta" slot-scope="data">
-          {{ getUtilidadBruta(data.item) }}
-          
-        </template>
-        <template slot="PorcentajeUtilidadBruta" slot-scope="data">
-          {{ getUtilidadBrutaPorcentaje(data.item) }}%
-          
-        </template>
-      </b-table>
-    </b-col>
+          </b-tab>
+        </b-tabs>
+      </div>
+
+     
     </b-row>
   </b-container>
 </template>
