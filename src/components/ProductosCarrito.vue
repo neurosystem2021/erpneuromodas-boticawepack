@@ -934,6 +934,13 @@ export default {
       }
     },
     setProducto(obj) {
+      let newVal = this.productos.findIndex(
+        v => v.IdProducto == obj.IdProducto
+      );
+      if (newVal >= 0) {
+        this.$toasted.show("El producto ya se encuentra en lista.");
+        return;
+      }
       this.precioCont = obj.PrecioContado;
       this.medicionPro = obj.ProductoMedicion;
       this.loadCode = "";
@@ -1152,7 +1159,6 @@ export default {
 </script>
 
 <style scoped>
-
 .contentCard {
   cursor: pointer;
 }

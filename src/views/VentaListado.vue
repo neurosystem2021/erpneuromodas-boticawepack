@@ -334,7 +334,7 @@
                     </template>
                     <template slot="precio" slot-scope="data">
                       <input
-                        :disabled="data.item.bloquearInputPrecio"
+                        :class="data.item.precio < data.item.PrecioCosto ?'txtError' :''"
                         v-model="data.item.precio"
                         min="0"
                         step="0.00001"
@@ -345,7 +345,7 @@
                          @focus="abrirModalTouch(data.index, 2)"
                          class="form-control"
                         >
-                       
+                       <p v-if="data.item.precio < data.item.PrecioCosto" style="font-size: 0.9rem; color: red;"> Precio Mínimo {{ data.item.PrecioCosto }}</p>
                     </template>
                     <template slot="descuento" slot-scope="data">
                       <input
@@ -2162,6 +2162,20 @@ export default {
         return;
       }
 
+      let newVal = productos.findIndex(v => v.precio < v.PrecioCosto);
+      if (newVal >= 0) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No se puede vender Por debajo del precio Costo. Verifique",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2778,6 +2792,9 @@ export default {
   <style>
 .text-area {
   field-sizing: content !important;
+}
+.txtError {
+  border: 1px solid red !important;
 }
 /* .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
