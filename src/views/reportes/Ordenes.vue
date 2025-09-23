@@ -168,7 +168,6 @@
                   </tbody>
                 </table>
               </b-col>
-
               <b-col md="6">
                 <table>
                   <tbody>
