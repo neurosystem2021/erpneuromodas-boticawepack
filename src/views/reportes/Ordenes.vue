@@ -64,7 +64,7 @@
                   <td :class="{'table-danger': prod.Estado == 1}">{{ prod.FechaOrdenCompra }}</td>
                   <td :class="{'table-danger': prod.Estado == 1}">{{ prod.Ruc }}</td>
                   <td :class="{'table-danger': prod.Estado == 1}">{{ prod.Proveedor }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">S/ {{ prod.Total | moneda }}</td>
+                  <td :class="{'table-danger': prod.Estado == 1}">{{prod.Moneda}} {{ prod.Total | moneda }}</td>
                   <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
                   <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="info" v-if="prod.Estado == 0" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
                   <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
@@ -180,6 +180,10 @@
                       <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
                       <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
                     </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Moneda</td>
+                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Moneda }}</td>
+                    </tr>
                   </tbody>
                 </table>
               </b-col>
@@ -270,6 +274,7 @@ export default {
           },
           { key: "cantidad" },
           { key: "precio", label: "Precio Compra" },
+          { key: "igv", label: "IGV" },
           {
             key: "subtotal",
             label: "SubTotal",
