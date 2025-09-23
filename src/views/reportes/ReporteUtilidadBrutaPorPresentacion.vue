@@ -56,8 +56,8 @@
               </b-table>
             </b-col>
           </b-tab>
-          <b-tab title="Reporte Por Presentación">
-            
+          <b-tab title="Reporte Por Presentación" active>
+              <b-table :items="reporteAgrupado"></b-table>
           </b-tab>
         </b-tabs>
       </div>
@@ -89,7 +89,8 @@ export default {
       fechaIni: "",
       fechaFin: "",
       UsuarioReg: "",
-      idPerfil: sessionStorage.getItem("IdPerfil") || 0
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0,
+      reporteAgrupado: []
     };
   },
   mounted() {
@@ -113,11 +114,55 @@ export default {
         .then(res => {
           if (res.data) {
             this.lstReporte = res.data;
+            this.generarReporte(res.data);
           }
         })
         .catch(e => {
           console.log(e);
         });
+    },
+    generarReporte(listado) {
+      this.reporteAgrupado = [];
+      let nombresUnicos = [...new Set(listado.map(v => v.Nombre))];
+      let reporteAgrupado = [];
+      nombresUnicos.forEach(nombre => {
+        let Cantidad = listado
+          .filter(v => v.Nombre == nombre)
+          .reduce((sum, prod) => {
+            return sum + parseFloat(prod.Cantidad ? prod.Cantidad : 0);
+          }, 0);
+        let PrecioCosto = listado.reduce((sum, prod) => {
+          return sum + parseFloat(prod.PrecioCosto ? prod.PrecioCosto : 0);
+        }, 0);
+        let PrecioVenta = listado.reduce((sum, prod) => {
+          return sum + parseFloat(prod.PrecioVenta ? prod.PrecioVenta : 0);
+        }, 0);
+        // let PrecioVenta = listado.reduce((sum, prod) => {
+        //   return sum + parseFloat(prod.PrecioVenta ? prod.PrecioVenta : 0);
+        // }, 0);
+        this.reporteAgrupado.push({
+          Nombre: nombre,
+          Cantidad: parseFloat(Cantidad).toFixed(2),
+          PrecioCosto: parseFloat(PrecioCosto).toFixed(2),
+          TotalCosto: parseFloat(PrecioCosto * Cantidad).toFixed(2),
+          PrecioVenta: parseFloat(PrecioVenta).toFixed(2),
+          TotalVenta: parseFloat(PrecioVenta * Cantidad).toFixed(2),
+          UtilidadBruta: this.getUtilidadBruta({
+            Cantidad: Cantidad,
+            PrecioCosto: PrecioCosto,
+            TotalCosto: PrecioCosto * Cantidad,
+            PrecioVenta: PrecioVenta,
+            TotalVenta: PrecioVenta * Cantidad
+          }),
+          UtilidadBrutaPorcentaje: this.getUtilidadBrutaPorcentaje({
+            Cantidad: Cantidad,
+            PrecioCosto: PrecioCosto,
+            TotalCosto: PrecioCosto * Cantidad,
+            PrecioVenta: PrecioVenta,
+            TotalVenta: PrecioVenta * Cantidad
+          })
+        });
+      });
     },
     exportarReporte() {
       window.open(
