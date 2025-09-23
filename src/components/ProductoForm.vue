@@ -383,7 +383,7 @@
                   <label>Precio de Costo:</label>
                   <input
                     v-model="producto.PrecioCosto"
-                    :disabled="(idPerfil == 1) ? false : true"
+                    :disabled="(idPerfil == 1 || idPerfil == 23 || idPerfil == 31) ? false : true"
                     step="0.0001"
                     type="number"
                     @input="actualizarPorcentajeUtilidad"

@@ -162,6 +162,7 @@ export default {
           },
           { key: "cantidad" },
           { key: "precio", label: "Precio Compra" },
+          { key: "igv", label: "IGV" },
           {
             key: "subtotal",
             label: "SubTotal",
