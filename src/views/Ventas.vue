@@ -319,298 +319,62 @@
 
          <b-row>
           <b-col cols="12">
-            <productos-carrito
-              :key="`carrito-${index}`"
-              @onInputCantidad="actualizarDescuento"
-              @onAddProducto="onAddProducto"
-              @onRemoveProducto="actualizarDescuento"
-              :igvTotal="tieneIgv"
-              :setPrecio="true"
-              :ref="`carrito${index}`"
-              :showButton="false"
-              :bloquearInput="bloquearInput"
-              :fields="carrito.fields"
-              :isVentas="true"
-              :idAlmacen="venta.almacen.IdAlmacen"
-              :productos="venta.productos"
-              :onSetProducto="onSetProducto"
-              :esDelivery="ventas[index].EsDelivery"
-              :mostraTotales="false"
-            >
-              <template slot="operaciones">
-                <table class="table b-table border table-footer">
-                  <tbody>
-                    <tr>
-                      <td class="text-center">Opciones</td>
-                    </tr>
-                    <tr v-if="puntosAplicados == 0">
-                      <td>
-                        <b-input-group prepend="S/" append="Descuento">
-                          <input
-                            v-model="descuentoGeneral"
-                            min="0"
-                            value="0"
-                            :disabled="bloquearInput ? true : false"
-                            @input="
-                              (val) => {
-                                aplicarDescuentoGeneral(val.target.value);
-                              }
-                            "
-                            type="number"
-                            class="form-control"
-                          />
-                        </b-input-group>
-                        <b-form-text>
-                          Descuento general a toda la venta.
-                        </b-form-text>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <b-form-checkbox
-                          :disabled="
-                            bloquearInput
-                              ? true
-                              : false || isNota || venta.EsDelivery
-                          "
-                          v-model="venta.EsCredito"
-                          :value="1"
-                          :unchecked-value="0"
-                        >
-                          Venta a credito
-                        </b-form-checkbox>
-                        <b-form-input
-                          :disabled="
-                            bloquearInput
-                              ? true
-                              : false || isNota || venta.EsDelivery
-                          "
-                          v-if="venta.EsCredito"
-                          v-model="venta.FechaCredito"
-                          type="date"
-                        >
-                        </b-form-input>
-                        <b-form-checkbox
-                          :disabled="
-                            bloquearInput ? true : false || venta.EsDelivery
-                          "
-                          v-model="venta.PorEntregar"
-                          :value="1"
-                          :unchecked-value="0"
-                        >
-                          Por entregar
-                        </b-form-checkbox>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <b-input-group
-                          prepend="Prof. válida por:"
-                          append="días"
-                        >
-                          <b-form-input
-                            :disabled="bloquearInput ? true : false"
-                            v-model="diasValidosProf"
-                            min="0"
-                            value="0"
-                            type="number"
-                          ></b-form-input>
-                        </b-input-group>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </template>
-              <template slot="metodopago" v-if="!venta.EsCredito">
-                <table class="table b-table border table-footer table-sm">
-                  <tbody>
-                    <tr>
-                      <td colspan="3" class="text-center">Metodo de Pago</td>
-                    </tr>
-                    <tr>
-                      <td>Efectivo</td>
-                      <td>
-                        <b-button
-                          variant="info"
-                          size="sm"
-                          class="mt-1"
-                          @click="metodoPagoCambio(1)"
-                          ><i class="fas fa-check"></i
-                        ></b-button>
-                      </td>
-                      <td>
-                        <b-form-input
-                          v-model="venta.pago.efectivo.descripcion"
-                          type="text"
-                          :disabled="bloquearInput ? true : false"
-                          placeholder="Descripcion"
-                        ></b-form-input>
-                      </td>
-                      <td>
-                        <input
-                          v-model="venta.pago.efectivo.monto"
-                          min="0"
-                          :disabled="bloquearInput ? true : false"
-                          step="0.01"
-                          type="number"
-                          class="form-control"
-                          placeholder="S/."
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Tarjeta</td>
-                      <td>
-                        <b-button
-                          variant="info"
-                          size="sm"
-                          class="mt-1"
-                          @click="metodoPagoCambio(2)"
-                          ><i class="fas fa-check"></i
-                        ></b-button>
-                      </td>
-                      <td>
-                        <b-form-input
-                          v-model="venta.pago.visa.descripcion"
-                          type="text"
-                          :disabled="bloquearInput ? true : false"
-                          placeholder="Descripcion"
-                        ></b-form-input>
-                      </td>
-                      <td>
-                        <input
-                          class="form-control"
-                          :disabled="bloquearInput ? true : false"
-                          v-model="venta.pago.visa.monto"
-                          min="0"
-                          step="0.01"
-                          type="number"
-                          placeholder="S/."
-                          @input="
-                            venta.pago.efectivo.monto =
-                              $options.filters.redondear(
-                                totalCart -
-                                  venta.pago.mastercard.monto -
-                                  $event.target.value
-                              )
-                          "
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Yape/Plin</td>
-                      <td>
-                        <b-button
-                          variant="info"
-                          size="sm"
-                          class="mt-1"
-                          @click="metodoPagoCambio(3)"
-                          ><i class="fas fa-check"></i
-                        ></b-button>
-                      </td>
-                      <td>
-                        <b-form-input
-                          v-model="venta.pago.mastercard.descripcion"
-                          :disabled="bloquearInput ? true : false"
-                          type="text"
-                          placeholder="Descripcion"
-                        ></b-form-input>
-                      </td>
-                      <td>
-                        <input
-                          class="form-control"
-                          v-model="venta.pago.mastercard.monto"
-                          :disabled="bloquearInput ? true : false"
-                          min="0"
-                          step="0.01"
-                          type="number"
-                          placeholder="S/."
-                          @input="
-                            venta.pago.efectivo.monto =
-                              $options.filters.redondear(
-                                totalCart -
-                                  venta.pago.visa.monto -
-                                  $event.target.value
-                              )
-                          "
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Transferencia</td>
-                      <td>
-                        <b-button
-                          variant="info"
-                          size="sm"
-                          class="mt-1"
-                          @click="metodoPagoCambio(4)"
-                          ><i class="fas fa-check"></i
-                        ></b-button>
-                      </td>
-                      <td>
-                        <b-form-input
-                          v-model="venta.pago.transferencia.descripcion"
-                          :disabled="bloquearInput ? true : false"
-                          type="text"
-                          placeholder="Descripcion"
-                        ></b-form-input>
-                      </td>
-                      <td>
-                        <input
-                          class="form-control"
-                          v-model="venta.pago.transferencia.monto"
-                          :disabled="bloquearInput ? true : false"
-                          min="0"
-                          step="0.01"
-                          type="number"
-                          placeholder="S/."
-                          @input="
-                            venta.pago.efectivo.monto =
-                              $options.filters.redondear(
-                                totalCart -
-                                  venta.pago.mastercard.monto -
-                                  $event.target.value
-                              )
-                          "
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </template>
-              <template slot="totalEmpresa" >
-                
-              </template>
-              <template slot="adicional" v-if="!venta.EsCredito">
-                <table
-                  class="table b-table border table-footer table-sm text-center"
-                  v-if="false"
-                >
-                  <tbody>
-                    <tr>
-                      <td>Mano de obra bruta</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <h3>{{ manoDeObraBruta | redondear }}</h3>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Mano de obra neta</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <h3 :class="{ 'text-danger': manoDeObraNeta <= 0 }">
-                          {{ manoDeObraNeta | redondear }}
-                        </h3>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </template>
-              
-            </productos-carrito>
+              <b-form-group>
+                <b-input-group>
+                  <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
+                  </b-button>
+                  <autocomplete
+                    :ref="`autocompleteProducto${index}`"
+                    :url="APIProductos"
+                    :customParams="{
+                      sortBy: 'stock',
+                      sortDesc: 1,
+                      limit: '25',
+                      id_empresa: empresa 
+                    }"
+                    :onShouldRenderChild="renderChild"
+                    anchor="Producto"
+                    label="writer"
+                    placeholder="Agregar Producto"
+                    :on-select="anadirarProductosSeleccionado"
+                    :onFocus="focusAutocomplete.bind(null,`autocompleteProducto${index}`)"
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                  <input
+                    v-model="loadCode"
+                    @keydown.enter.prevent="loadBarcode"
+                    type="text"
+                    class="form-control"
+                    placeholder="Codigo de Barra"
+                  />
+                  <b-input-group-append>
+                  
+                    <b-button variant="primary" @click="loadBarcode"
+                      ><i class="fas fa-search"></i
+                    ></b-button>
+                    <producto-form
+                      :showButton="showButton"
+                      :cbGuardar="
+                        (id, pxp, obj) => {
+                          agregarGuardar(id, pxp, obj);
+                        }
+                      "
+                      ref="productoFormEdit"
+                      :producto-update="productoSelect"
+                    ></producto-form>
+                  </b-input-group-append>
+                </b-input-group>
+                <span class="ml">Búsqueda Avanzanda (Producto,Categoría,Marca)</span>
+              </b-form-group>
             
+            <b-table
+              :fields="carrito.fields" 
+              :items="venta.productos"
+              :id="`TablaCarrito${index}`"
+              :ref="`TablaCarrito${index}`"
+            >
+            </b-table>
           </b-col>
           <!-- <b-col cols="4">
             <table class="table b-table border table-footer table-sm">
@@ -909,7 +673,166 @@
       </b-tab>
     </b-tabs>
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
+     <b-modal id="modal-1" :title="`${itemProducto.Producto}`"
+     hide-footer v-model="modalPresentaciones"
+      v-if="modalPresentaciones" >
+      <b-row class="px-4">
+        <b-col cols="6">
+          <b-card  @click="guardarItemPorUnidad()" class="cardPresentacion">
+              <b-row>
+                <b-col cols="6"> UNIDAD </b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{itemProducto.PrecioContado}}
+                  </b>
 
+                  </b-col>
+              </b-row>
+          </b-card>
+          
+          <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItem(item)">
+              <b-row>
+                <b-col cols="6">{{item.nombre}}</b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{item.precio}}
+                  </b>
+
+                  </b-col>
+              </b-row>
+          </b-card>
+
+        </b-col>
+        <b-col cols="6" class="borderIzquierdoPunteado pr-4 pl-5" >
+          <b-row>
+            <b-col cols="12" class="px-0 montoPresenacion">
+              <b-form-input class="my-2 " type="number"
+              ref="montoPresentacion"
+               id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
+              @input="monto == 0 ? errorMontoPresentacion='Ingrese una cantidad' : errorMontoPresentacion =''"/>
+                  <span class="text-red">{{errorMontoPresentacion}}</span>
+
+            </b-col>
+            <b-col cols="4" class="p-0 mt-1 px-1" v-for="(numeros,index) in numerosCalculadora" :key="index">
+                  <b-button @click="aumentarMontoPresentacion(numeros)" block variant="outline-dark" v-if="numeros.tipo=='backspace'">
+                    <i :class="numeros.valor"></i>
+                  </b-button>
+                 <b-button @click="aumentarMontoPresentacion(numeros)" v-else block  variant="outline-dark">{{numeros.valor}}</b-button>
+            </b-col>
+          </b-row>
+             
+
+        </b-col>
+      </b-row>
+    </b-modal>
+    <b-modal id="modal-1" :title="`${itemProducto.Producto}`" hide-footer v-model="modalPresentacionesEditar" v-if="modalPresentacionesEditar">
+      <b-row class="px-4">
+        <b-col cols="6">
+          <b-card  @click="guardarItemPorUnidadEditar()" class="cardPresentacion">
+              <b-row>
+                <b-col cols="6"> UNIDAD </b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{itemProducto.PrecioContado}}
+                  </b>
+
+                  </b-col>
+              </b-row>
+          </b-card>
+          <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItemEditar(item)">
+              <b-row>
+                <b-col cols="6">{{item.nombre}}</b-col>
+                <b-col cols="6" class="borderIzquierdo">
+                  <b>
+                    Precio: <br>
+                    {{item.precio}}
+                  </b>
+
+                  </b-col>
+              </b-row>
+          </b-card>
+
+        </b-col>
+        <b-col cols="6" class="borderIzquierdoPunteado pr-4 pl-5" >
+          <b-row>
+            <b-col cols="12" class="px-0 montoPresenacion">
+              <b-form-input class="my-2 " type="number" id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
+              @input="monto == 0 ? errorMontoPresentacion='Ingrese una cantidad' : errorMontoPresentacion =''"/>
+                  <span class="text-red">{{errorMontoPresentacion}}</span>
+
+            </b-col>
+            <b-col cols="4" class="p-0 mt-1 px-1" v-for="(numeros,index) in numerosCalculadora" :key="index">
+                  <b-button @click="aumentarMontoPresentacion(numeros)" block variant="outline-dark" v-if="numeros.tipo=='backspace'">
+                    <i :class="numeros.valor"></i>
+                  </b-button>
+                 <b-button @click="aumentarMontoPresentacion(numeros)" v-else block  variant="outline-dark">{{numeros.valor}}</b-button>
+            </b-col>
+          </b-row>
+             
+
+        </b-col>
+      </b-row>
+      
+    </b-modal>
+     <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
+      <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
+      <b-row>
+        <b-col cols="12">
+          <b-input-group prepend="Serie">
+            <b-input-group-append>
+                <input type="text" class="form-control" id="txtSerie" v-model="Serie">
+            </b-input-group-append>
+            <b-button variant="info" size="sm" @click="anadirSerie()">AÑADIR</b-button>
+          </b-input-group>
+        </b-col>
+        <b-col cols="6">
+          
+        </b-col>
+     
+         <b-col cols="12">   
+          <table width="100%" class="mt-3">
+              <thead>
+                <tr>
+
+                  <th>#</th>
+                  <th>Serie</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(serie,index) in Series" :key="index">
+                  <td>{{ index+1 }}</td>
+                  <td>
+                    <input
+                    type="text"
+                    class="form-control"
+                    :value="serie.Serie"
+                    @input="updateSerie(index, $event.target.value)"
+                  >
+                  </td>
+                  <td>
+                    <b-button variant="danger" @click="eliminarSerieModal(index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </b-button>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+       </b-col>
+       <b-col cols="12" style="text-align: right;" class="mt-3">
+          <b-button @click="guardarSerie" variant="success">Guardar</b-button>
+          <b-button @click="anadirSerieFlag=!anadirSerieFlag" variant="danger">Cancelar</b-button>
+       </b-col>
+      </b-row>
+       
+    </b-modal>
+
+
+
+    <!-- PRE -->
     <b-container fluid class="ancho" id="conten">
       <!-- <div>
         <div>
@@ -1874,6 +1797,7 @@ import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
 import Swal from "sweetalert2";
+import ProductoForm from "./../components/ProductoForm.vue";
 export default {
   beforeMount() {
     let vm = this;
@@ -1926,6 +1850,34 @@ export default {
   },
   data() {
     return {
+      errorMontoPresentacion: "",
+      numerosCalculadora: [
+        { valor: "7", tipo: "number" },
+        { valor: "8", tipo: "number" },
+        { valor: "9", tipo: "number" },
+        { valor: "4", tipo: "number" },
+        { valor: "5", tipo: "number" },
+        { valor: "6", tipo: "number" },
+        { valor: "1", tipo: "number" },
+        { valor: "2", tipo: "number" },
+        { valor: "3", tipo: "number" },
+        { valor: "0", tipo: "number" },
+        { valor: "fas fa-backspace", tipo: "backspace" },
+        { valor: "CE", tipo: "limpiar" }
+      ],
+      Serie: "",
+      Series: [],
+      loadCode: "",
+      lstProductos: [],
+      productoSelect: [],
+      modalNuevoProductos: false,
+      modalPresentaciones: false,
+      modalPresentacionesEditar: false,
+      anadirSerieFlag: false,
+      objProd: {},
+      itemProducto: {},
+      showButton: false,
+      searchProducto: "",
       ventas: [],
       tab: 0,
       pagocon: 0,
@@ -2008,83 +1960,303 @@ export default {
       EsCreditoProforma: 0
     };
   },
-  watch: {
-    totalCart(newVal) {
-      this.ventas[this.tab].pago.efectivo.monto = parseFloat(
-        newVal -
-          (parseFloat(this.ventas[this.tab].pago.visa.monto) +
-            parseFloat(this.ventas[this.tab].pago.mastercard.monto) +
-            parseFloat(this.ventas[this.tab].pago.transferencia.monto))
-      ).toFixed(2);
-    },
-    productos() {
-      this.recalcularTotalesPorEmpresa();
-    },
-    recalcularTotalPorEmpresaFlag() {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.recalcularTotalesPorEmpresa();
-          // this.metodoPagoCambio(1);
-        }, 100);
-      });
-    }
-  },
-  computed: {
-    ...mapState({
-      productos: state => state.cart.productos,
-      recalcularTotalPorEmpresaFlag: state =>
-        state.recalcularTotalPorEmpresaFlag,
 
-      totalCart: state => state.cart.totalCart
-    }),
-    empresasConTotal() {
-      return this.lstTotalPorEmpresa.filter(e => e.total > 0);
-    },
-    manoDeObraBruta() {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
-      let precio = pManoObra ? pManoObra.precioBruta : 0;
-
-      return precio;
-    },
-    manoDeObraNeta() {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
-      let precio = pManoObra ? pManoObra.precio : 0;
-
-      return precio;
-    },
-    sumatoriaTotal() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
-        return (
-          sum +
-          parseFloat(
-            producto.subtotal - (producto.descuento ? producto.descuento : 0)
-          )
-        );
-      }, 0);
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    },
-    subTotalG() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
-        return sum + parseFloat(producto.subtotal);
-      }, 0);
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    },
-    descuentoG() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
-        return sum + parseFloat(producto.descuento ? producto.descuento : 0);
-      }, 0);
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    }
-  },
   methods: {
+    // PRODUCTO CARRITO
+    guardarItemPorUnidad() {
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "modasm";
+      this.errorMontoPresentacion = "";
+      if (this.monto == 0) {
+        this.errorMontoPresentacion = "Ingrese una Cantidad";
+        return false;
+      }
+      let prod = this.itemProducto;
+      prod.tipo = "UNIDAD";
+      prod.estadoPxP = true;
+      prod.cantxPrecio = 0;
+      prod.cantidad = this.monto;
+      prod.descuento = 0;
+      prod.disabled = false;
+      prod.Presentacion = null;
+      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        prod.Empresa = datoEmpresa[0].value;
+        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
+      }
+      prod.total = 0;
+      prod.precio = prod.PrecioContado;
+      prod.cantidadPres = 0;
+      prod.bloquearInput = false;
+      if (this.itemProducto.PreciosPorProducto.length > 0) {
+        prod.estadoPxP = false;
+      }
+      delete prod._rowVariant;
+      this.ventas[this.tab].productos.unshift(prod);
+      this.modalPresentaciones = false;
+      this.modalNuevoProductos = this.abrirModal;
+    },
+    guardarItem(presentacion) {
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "modasm";
+      this.errorMontoPresentacion = "";
+
+      if (this.monto == 0) {
+        this.errorMontoPresentacion = "Ingrese una Cantidad";
+        return false;
+      }
+
+      let prod = this.itemProducto;
+      this.itemProducto.tipo = "PRESENTACION";
+      prod.estadoPxP = true;
+      prod.cantxPrecio = this.monto;
+      prod.cantidad = presentacion.cantidad * this.monto;
+      prod.descuento = 0;
+      prod.disabled = true;
+      prod.Presentacion = JSON.stringify(presentacion);
+      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        prod.Empresa = datoEmpresa[0].value;
+        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
+      }
+
+      if (this.itemProducto.PreciosPorProducto.length > 0) {
+        prod.total = this.monto * presentacion.precio;
+        prod.precio = presentacion.precio;
+        prod.cantidadPres = presentacion.cantidad;
+        prod.estadoPxP = false;
+      }
+      delete prod._rowVariant;
+      this.ventas[this.tab].productos.unshift(prod);
+      this.modalPresentaciones = false;
+      this.modalNuevoProductos = this.abrirModal;
+    },
+    guardarSerie() {
+      this.objProd.Serie = this.Series;
+      Vue.set(this.ventas[this.tab].productos, this.index, this.objProd);
+      this.anadirSerieFlag = false;
+    },
+    async obtenerSeriePorProducto(id, Empresa) {
+      console.log("obtenerSeriePorProducto", id);
+      let productoSerie = [];
+      await this.axios
+        .get(this.API + "productos/serie", {
+          params: { IdProducto: id, Todos: false, empresa: Empresa }
+        })
+        .then(res => {
+          if (res) {
+            productoSerie = res.data;
+          }
+        });
+      return productoSerie;
+    },
+    async anadirarProductosSeleccionado(item, abrirModal = false) {
+      console.log(item);
+      if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
+      } else {
+        let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
+        let productoSerie = await this.obtenerSeriePorProducto(
+          item.IdProducto,
+          item.Empresa
+        );
+        item.productoSerie = productoSerie;
+        this.itemProducto = { ...item };
+        this.itemProducto.tipo = "PRESENTACION";
+        this.itemProducto.PreciosPorProducto = PreciosPorProducto;
+        if (PreciosPorProducto.filter(v => v.cantidad > 0).length > 0) {
+          this.monto = 1;
+          this.modalPresentaciones = true;
+          this.primerMonto = true;
+        } else {
+          if (!this.itemProducto.Empresa) {
+            let empresa = this.$store.state.empresas.filter(
+              v => v.value == this.empresa
+            )[0];
+            this.itemProducto.Empresa = empresa.value;
+            this.itemProducto.NombreEmpresa =
+              empresa.text.substring(0, 20) + "...";
+          }
+          this.itemProducto.tipo = "UNIDAD";
+          this.itemProducto.estadoPxP = true;
+          this.itemProducto.precio = this.itemProducto.PrecioContado;
+          this.itemProducto.total = 0;
+          this.itemProducto.cantxPrecio = 0;
+          this.itemProducto.cantidad = 1;
+          this.itemProducto.descuento = 0;
+          delete this.itemProducto._rowVariant;
+          this.productos.unshift(this.itemProducto);
+        }
+      }
+      //   let index = this.productos.findIndex(
+      //     v => v.IdProducto == item.IdProducto
+      //   );
+      //   let prod = {
+      //     ...this.productos.filter(v => v.IdProducto == item.IdProducto)[0]
+      //   };
+      //   if (prod.tipo == "UNIDAD") {
+      //     prod.cantidad++;
+      //   }
+      //   if (prod.tipo == "PRESENTACION") {
+      //     prod.cantxPrecio++;
+      //   }
+      //   Vue.set(this.productos, index, prod);
+      //   this.$nextTick(() => {
+      //     this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+      //       .recalcularTotalPorEmpresaFlag;
+      //   });
+      //   this.$toasted.success("Producto añadido correctamente");
+      //   this.loadCode = "";
+      //   return;
+      // }
+      // this.abrirModal = abrirModal;
+      // this.modalNuevoProductos = false;
+      // let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
+      // let productoSerie = await this.obtenerSeriePorProducto(
+      //   item.IdProducto,
+      //   item.Empresa
+      // );
+      // item.productoSerie = productoSerie;
+      // console.log(productoSerie);
+      // this.itemProducto = { ...item };
+      // this.itemProducto.tipo = "PRESENTACION";
+      // this.itemProducto.PreciosPorProducto = PreciosPorProducto;
+      // if (PreciosPorProducto.filter(v => v.cantidad > 0).length > 0) {
+      //   this.monto = 1;
+      //   setTimeout(() => {
+      //     document.getElementById("montoPresentacion").focus();
+      //     document.getElementById("montoPresentacion").select();
+      //   }, 100);
+      //   this.modalPresentaciones = true;
+      //   this.primerMonto = true;
+      // } else {
+      //   if (!this.itemProducto.Empresa) {
+      //     let empresa = this.$store.state.empresas.filter(
+      //       v => v.value == this.empresa
+      //     )[0];
+      //     this.itemProducto.Empresa = empresa.value;
+      //     this.itemProducto.NombreEmpresa =
+      //       empresa.text.substring(0, 20) + "...";
+      //   }
+      //   this.itemProducto.tipo = "UNIDAD";
+      //   this.itemProducto.estadoPxP = true;
+      //   this.itemProducto.precio = this.itemProducto.PrecioContado;
+      //   this.itemProducto.total = 0;
+      //   this.itemProducto.cantxPrecio = 0;
+      //   this.itemProducto.cantidad = 1;
+      //   this.itemProducto.descuento = 0;
+      //   delete this.itemProducto._rowVariant;
+      //   this.productos.unshift(this.itemProducto);
+      //   setTimeout(() => {
+      //     this.modalNuevoProductos = abrirModal;
+      //   }, 500);
+      // }
+    },
+    loadBarcode(e) {
+      e.preventDefault();
+      let idProducto = this.loadCode;
+      let id_empresa = this.empresa;
+      if (idProducto) {
+        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.anadirarProductosSeleccionado(response.data);
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
+      }
+    },
+    async abrirModaProductos() {
+      let vm = this;
+      vm.searchProducto = "";
+      vm.modalNuevoProductos = !vm.modalNuevoProductos;
+      vm.$store.state.consideraAppendEmpresa = false;
+    },
+    renderChild(data) {
+      let styleStock = "";
+      if (data.stock <= 0) {
+        styleStock = "table-danger";
+      } else {
+        styleStock = "table-success";
+      }
+      if (data.EsPadre == 1) {
+        styleStock = "";
+      }
+
+      return `
+      <style>
+      #table-render {
+        font-size: 13px;
+        margin-bottom: 5px;
+            margin-top: 5px;
+            }
+            #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+            }
+            #table-render td, #table-render th {
+              color: #000000 !important;
+          }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 200px;
+            heigth: 200px;
+            }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr style="padding:0; margin:0">
+                <td style="width: 60px" class="${styleStock}"><b>${
+        data.EsPadre == 1
+          ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+          : data.stock
+            ? Number.isInteger(parseFloat(data.stock))
+              ? parseInt(data.stock)
+              : parseFloat(data.stock).toFixed(2)
+            : data.stock
+      }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${
+        data.CodigoBarra
+      }</b></td>
+                  <td style="width: 100px">${data.ProductoCategoria}</td>
+                  <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
+                <td style="width: 5%">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
+                  </td>
+                  <!--<td style="width: 20px" class="text-center"><b>${
+                    data.VentaEstrategica == 1
+                      ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                      : ""
+                  }</b></td>-->
+                    </tr>
+                    </tbody>
+                    </table>   
+                    </div>
+                    `;
+    },
     anadirVentana() {
-      this.ventas.push({ ...this.ventaInit });
+      // PRODUCTO CARRITO
+      this.ventas.push(JSON.parse(JSON.stringify(this.ventaInit)));
+
       setTimeout(async () => {
         this.tab = this.ventas.length - 1;
       }, 100);
@@ -3303,7 +3475,84 @@ export default {
       return res.data;
     }
   },
+  watch: {
+    totalCart(newVal) {
+      this.ventas[this.tab].pago.efectivo.monto = parseFloat(
+        newVal -
+          (parseFloat(this.ventas[this.tab].pago.visa.monto) +
+            parseFloat(this.ventas[this.tab].pago.mastercard.monto) +
+            parseFloat(this.ventas[this.tab].pago.transferencia.monto))
+      ).toFixed(2);
+    },
+    productos() {
+      this.recalcularTotalesPorEmpresa();
+    },
+    recalcularTotalPorEmpresaFlag() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.recalcularTotalesPorEmpresa();
+          // this.metodoPagoCambio(1);
+        }, 100);
+      });
+    }
+  },
+  computed: {
+    APIProductos() {
+      console.log(this.ventas[this.tab].almacen);
+      return this.API + "productos/puntoventa/stock/" + 1;
+    },
+    ...mapState({
+      productos: state => state.cart.productos,
+      recalcularTotalPorEmpresaFlag: state =>
+        state.recalcularTotalPorEmpresaFlag,
 
+      totalCart: state => state.cart.totalCart
+    }),
+    empresasConTotal() {
+      return this.lstTotalPorEmpresa.filter(e => e.total > 0);
+    },
+    manoDeObraBruta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+      return precio;
+    },
+    manoDeObraNeta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precio : 0;
+
+      return precio;
+    },
+    sumatoriaTotal() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return (
+          sum +
+          parseFloat(
+            producto.subtotal - (producto.descuento ? producto.descuento : 0)
+          )
+        );
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    },
+    subTotalG() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return sum + parseFloat(producto.subtotal);
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    },
+    descuentoG() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return sum + parseFloat(producto.descuento ? producto.descuento : 0);
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    }
+  },
   components: {
     ProductosCarrito,
     ClientesForm,
@@ -3311,11 +3560,15 @@ export default {
     PagoDeuda,
     PreOrdenLista,
     Proformas,
-    DeliveryModal
+    DeliveryModal,
+    ProductoForm
   }
 };
 </script>
 <style scoped>
+.contentCard {
+  cursor: pointer;
+}
 .alert {
   margin-bottom: 0;
 }
