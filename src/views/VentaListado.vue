@@ -154,7 +154,7 @@
                   </b-col>
                   <b-col lg="6" xl="6"  cols="12" class="pt-0" >
                     <b-form-input 
-                    v-model="venta.nombreOrganizacion" 
+                    v-model="venta.NombreOrganizacion" 
                     v-if="venta.EsOrganizacion"
                     :id="`txtNombreOrganizacion-${index}`"
                     placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>

@@ -75,7 +75,7 @@
                      <b-table 
                         v-if="show"
                         id="table-proformas" 
-                        ref="tableProformas"
+                        ref="tableProformasFavoritas"
                        :filter="filter"
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"
@@ -182,7 +182,7 @@ export default {
         "ver",
         "verTicket",
         ,
-        "Anular"
+        // "Anular"
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -299,7 +299,10 @@ export default {
             .then(res => {
               if (res.data) {
                 this.$toasted.info("¡PROFORMA ANULADA!");
-                this.$refs.tableProformas.refresh();
+                if (this.$refs.tableProformas) {
+                  this.$refs.tableProformas.refresh();
+                  this.$refs.tableProformasFavoritas.refresh();
+                }
               }
             })
             .catch(err => {
