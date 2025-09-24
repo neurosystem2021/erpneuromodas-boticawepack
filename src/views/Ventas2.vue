@@ -1,12 +1,326 @@
 <template>
   <div :class="this.empresa">
+    <b-tabs v-model="tab" pills fill justified>
+      <b-tab title="Tab 1" v-for="(venta,index) in ventas" :key="index">
+        <b-row style="margin-bottom: -10px">
+          <b-col md="7">
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <b-input-group prepend="Doc." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputTipoVenta${index}`"
+                      :url="API + 'ventas/tipos'"
+                      anchor="TipoDoc"
+                      initValue="NOTA DE VENTA"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setTipoVenta"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+                <b-form-group v-if="isNota">
+                  <label>Doc. Referencia:</label>
+                  <autocomplete
+                    required="required"
+                    :ref="`inputDocRef${index}`"
+                    :url="
+                      API +
+                      'ventas/lista/' +
+                      venta.puntoVenta.IdDocVentaPuntoVenta
+                    "
+                    :customParams="{ id_empresa: empresa }"
+                    anchor="NroComprobante"
+                    initValue=""
+                    label="writer"
+                    placeholder=""
+                    :on-select="setDocRef"
+                    :onFocus="focusAutocomplete.bind(null, `inputDocRef${index}`)"
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="4" class="ocularMovil">
+                <b-form-group>
+                  <b-input-group prepend="Alm." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputAlmacen${index}`"
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      initValue="PRINCIPAL"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacen"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+                <b-form-group v-if="isNota">
+                  <label>Motivo :</label>
+                  <b-form-select
+                    v-model="venta.NotaIdMotivo"
+                    :options="itemsMotivoNota"
+                    v-on:change="setMotivo($event)"
+                    class="mb-3"
+                    size="md"
+                    required
+                  />
+                </b-form-group>
+              </b-col>
+              <b-col md="4" class="ocularMovil">
+                <b-form-group>
+                  <b-input-group prepend="P.V." class="mt-2">
+                    <autocomplete
+                      required="required"
+                      :ref="`inputPuntoVenta${index}`"
+                      :url="API + 'ventas/puntos'"
+                      anchor="PuntoVenta"
+                      initValue="PRINCIPAL"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setPuntoVenta" 
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputPuntoVenta${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                  </b-input-group>
+                </b-form-group>
+              </b-col>
+              <b-col md="12" style="margin-top: -10px">
+                <b-form-group>
+                  <b-input-group prepend="Cliente ">
+                    <clientes-form
+                      txtButton="Editar"
+                      v-if="
+                        venta.cliente.IdCliente &&
+                        venta.cliente.DniRuc != '00000000'
+                      "
+                      idModal="editCliente"
+                      @onAddCliente="setCliente"
+                      :editCliente="venta.cliente"
+                    ></clientes-form>
+                    <autocomplete
+                      style="width: 40%"
+                      required="required"
+                      :ref="`inputCliente${index}`"
+                      :url="API + 'clientes'"
+                      anchor="ClienteDniRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => (newDniRuc = val)"
+                      :on-select="setCliente"
+                      :customParams="{ id_empresa: empresa }"
+                      :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                    <input
+                      v-model="dni"
+                      @keydown.enter.prevent="loadClienteBarcode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Cod. Barra"
+                    />
+                    <b-input-group-append>
+                      <clientes-form
+                        :ruc="newDniRuc"
+                        @onAddCliente="setCliente"
+                      ></clientes-form>
+                    </b-input-group-append>
+                  </b-input-group>
+                  <b-form-select
+                    v-if="ventas[index].cliente.IdCliente"
+                    v-model="ventas[index].CampoDireccion"
+                    class="mb-3"
+                  >
+                    <option :value="venta.cliente.Direccion">
+                      {{ ventas[index].cliente.Direccion }}
+                    </option>
+                    <option :value="venta.cliente.Direccion2">
+                      {{ ventas[index].cliente.Direccion2 }}
+                    </option>
+                    <option :value="venta.cliente.Direccion3">
+                      {{ ventas[index].cliente.Direccion3 }}
+                    </option>
+                  </b-form-select>
+                  <b-input-group v-if="ventas[index].cliente.DniRuc == '00000000'">
+                    <b-form-checkbox
+                      :disabled="bloquearInput ? true : false"
+                      v-model="ventas[index].EsOrganizacion"
+                      :value="1"
+                      :unchecked-value="0"
+                    >
+                      Es Organización
+                    </b-form-checkbox>
+                    <input
+                      v-model="ventas[index].NombreOrganizacion"
+                      type="text"
+                      style="text-transform: uppercase"
+                      class="form-control"
+                      required
+                      placeholder="Nombre de la Organización"
+                      v-if="ventas[index].EsOrganizacion"
+                    />
+                  </b-input-group>
+                  <!-- <b-row v-if="this.$route.query.idPedido">
+                    <b-col>
+                      <b-form-group>
+                        <label style="font-weight: bold"
+                          >Cliente (Delivery):</label
+                        >
+                        <b-form-input
+                          required
+                          style="text-transform: uppercase; font-size: 0.9rem"
+                          placeholder="Ingrese cliente"
+                          autocomplete="off"
+                          v-model="venta.nombreLlevar"
+                          ref="inputNombreCliente"
+                          type="text"
+                          name="NombreLlevar"
+                          id="NombreLlevar"
+                          readonly
+                        ></b-form-input>
+                      </b-form-group>
+                    </b-col>
+                    <b-col>
+                      <b-form-group>
+                        <label style="font-weight: bold"
+                          >Direccion Entrega (Delivery):</label
+                        >
+                        <b-form-textarea
+                          required
+                          style="text-transform: uppercase; font-size: 0.9rem"
+                          placeholder="Ingrese direccion"
+                          rows="3"
+                          autocomplete="off"
+                          v-model="venta.DireccionEntrega"
+                          ref="inputDireccionEntrega"
+                          type="text"
+                          name="DireccionEntrega"
+                          id="DireccionEntrega"
+                          readonly
+                        ></b-form-textarea>
+                      </b-form-group>
+                    </b-col>
+                  </b-row> -->
+                </b-form-group>
+              </b-col>
+              
+            </b-row>
+          </b-col>
+           <b-col md="3" class="ocularMovil">
+            <b-form-group class="text-center" v-if="ventas[index].cliente.Cliente">
+              <div class="puntos">
+                {{ (ventas[index].cliente.Puntos || 0) | redondeoMenor }}
+              </div>
+              Puntos del cliente
+            </b-form-group>
+            <b-input-group
+              prepend="Puntos"
+              :append="descuentoPuntos.descuento | redondear"
+              v-if="ventas[index].cliente.Puntos && descuentoGeneral == 0"
+            >
+              <b-form-input
+                v-model="puntosAplicados"
+                min="0"
+                :max="ventas[index].cliente.Puntos"
+                @input="aplicarPuntos"
+                type="number"
+              ></b-form-input>
+            </b-input-group>
+            <b-form-text v-if="descuentoPuntos.ValorPunto">
+              1 Punto equivale a: S/
+              {{ descuentoPuntos.ValorPunto | redondear }}
+            </b-form-text>
+            <b-form-text v-if="ventas[index].cliente.EsVIP">
+              Cliente VIP con Precio Convenio
+            </b-form-text>
+          </b-col>
+            <b-col md="2">
+            <b-form-group class="text-center">
+              <div class="big-text">
+                {{ ventas[index].Serie }} - <b>{{ ventas[index].Numero }}</b>
+              </div>
+              {{ ventas[index].FechaDoc }}
+            </b-form-group>
+            <b-form-group class="ocularMovil">
+              <label>Vendedor:</label>
+              <autocomplete
+                required="required"
+                :ref="`inputVendedor${index}`"
+                :url="API + 'usuarios'"
+                :customParams="{ idPerfil: idPerfil ,id_empresa : empresa}"
+                anchor="NombreUsuario"
+                label="writer"
+                :on-select="setVendedorManual"
+                :onFocus="focusAutocomplete.bind(null, `inputVendedor${index}`)"
+                :classes="{ input: 'form-control' }"
+              >
+              </autocomplete>
+            </b-form-group>
+            <b-form-group v-if="false">
+              <label>Comisionista</label>
+              <autocomplete
+                ref="inputComisionista"
+                required="required"
+                :url="API + 'comisionistas'"
+                anchor="ClienteDniRuc"
+                label="writer"
+                placeholder="Comisionista"
+                :onInput="(val) => (newDniRuc = val)"
+                :on-select="setComisionista"
+                :onFocus="focusAutocomplete.bind(null, 'inputComisionista')"
+                :classes="{ input: 'form-control' }"
+                :customParams="{ id_empresa: empresa }"
+              >
+              </autocomplete>
+            </b-form-group>
+            <b-badge variant="info" v-if="adelanto"
+              >Adelanto de: S/ {{ adelanto }}
+            </b-badge>
+            <b-badge variant="success" v-if="adelanto"
+              >Total a pagar: S/
+              {{ $options.filters.redondear(totalCart - adelanto) }}
+            </b-badge>
+          </b-col>
+        </b-row>
+        <!-- --------------------------- -->
+         <b-row v-if="venta.idProforma > 0">
+          <b-col md="6" class="ml-3">
+            <b-row>
+              <h5 class="mt-1">
+                Proforma Seleccionada:
+                <b-badge variant="info" style="font-size: 1.2rem">{{
+                  venta.anioNumeroProforma
+                }}</b-badge>
+              </h5>
+              <b-button
+                class="ml-1 mb-1"
+                size="sm"
+                variant="warning"
+                @click="limpiarProforma"
+                ><b>Quitar</b></b-button
+              >
+            </b-row>
+          </b-col>
+        </b-row>
+      </b-tab>
+    </b-tabs>
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
-    <Menu v-if="false"></Menu>
-<!-- {{ $store.state.proforma }} proforma
-{{ $store.state.lstProductosProforma }} lstProductosProforma -->
     <b-container fluid class="ancho" id="conten">
-      <div>
+      <!-- <div>
         <div>
           <b-button-group size="sm">
             <b-input-group prepend="Empresa:" class="mt-2">
@@ -21,7 +335,7 @@
            
           </b-button-group>
         </div>  
-      </div>
+      </div> -->
      
       <b-row>
         <b-col md="12" v-if="this.$route.query.idPedido">
@@ -34,7 +348,7 @@
         </b-col>
       </b-row>
       <b-form @submit="guardarVenta" @keydown.enter="prevent">
-        <b-row style="margin-bottom: -10px">
+        <!-- <b-row style="margin-bottom: -10px">
           <b-col md="7">
             <b-row>
               <b-col md="4">
@@ -165,7 +479,6 @@
                       placeholder="Cod. Barra"
                     />
                     <b-input-group-append>
-                      <!--<proveedores-tabla></proveedores-tabla>-->
                       <clientes-form
                         :ruc="newDniRuc"
                         @onAddCliente="setCliente"
@@ -345,7 +658,7 @@
               >
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <b-row>
           <b-col cols="12">
             <productos-carrito
@@ -679,6 +992,14 @@
               v-if="idPerfil == 1 || idPerfil == 14"
               >Efectuar Venta</b-button
               >
+            <b-button
+              @click="anadirVentana"
+              :disabled="inProgress"
+              style="background: #FFEA00; color:#000000"
+              size="lg"
+              class="btnAction"
+              >Añadir nueva ventana</b-button
+              >
               <!-- -->
               <b-button
               class="btnAction"
@@ -998,20 +1319,24 @@ export default {
   },
   async mounted() {
     this.$store.state.MostrarBotonMultipleEmpresa = true;
-    await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
       this.empresa = sessionStorage.getItem("empresa");
     }
     //setInterval(this.updateTime, 1000)
-    this.loadClienteVarios();
-    this.escucharPedidos();
-    this.configStock();
-    setTimeout(() => {
-      this.recalcularTotalesPorEmpresa();
+    setTimeout(async () => {
+      Promise.all([
+        this.getVendedor(),
+        this.loadClienteVarios(),
+        this.escucharPedidos(),
+        this.configStock(),
+        this.recalcularTotalesPorEmpresa()
+      ]);
     }, 100);
   },
   data() {
     return {
+      ventas: [],
+      tab: 1,
       pagocon: 0,
       isNota: false,
       dni: "",
@@ -1094,11 +1419,11 @@ export default {
   },
   watch: {
     totalCart(newVal) {
-      this.venta.pago.efectivo.monto = parseFloat(
+      this.ventas[this.tab].pago.efectivo.monto = parseFloat(
         newVal -
-          (parseFloat(this.venta.pago.visa.monto) +
-            parseFloat(this.venta.pago.mastercard.monto) +
-            parseFloat(this.venta.pago.transferencia.monto))
+          (parseFloat(this.ventas[this.tab].pago.visa.monto) +
+            parseFloat(this.ventas[this.tab].pago.mastercard.monto) +
+            parseFloat(this.ventas[this.tab].pago.transferencia.monto))
       ).toFixed(2);
     },
     productos() {
@@ -1167,6 +1492,9 @@ export default {
     }
   },
   methods: {
+    anadirVentana() {
+      this.ventas.push({ ...this.venta });
+    },
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
@@ -1233,28 +1561,28 @@ export default {
     metodoPagoCambio(opc) {
       switch (opc) {
         case 1:
-          this.venta.pago.visa.monto = 0;
-          this.venta.pago.mastercard.monto = 0;
-          this.venta.pago.transferencia.monto = 0;
-          this.venta.pago.efectivo.monto = this.totalCart;
+          this.ventas[this.tab].pago.visa.monto = 0;
+          this.ventas[this.tab].pago.mastercard.monto = 0;
+          this.ventas[this.tab].pago.transferencia.monto = 0;
+          this.ventas[this.tab].pago.efectivo.monto = this.totalCart;
           break;
         case 2:
-          this.venta.pago.mastercard.monto = 0;
-          this.venta.pago.efectivo.monto = 0;
-          this.venta.pago.transferencia.monto = 0;
-          this.venta.pago.visa.monto = this.totalCart;
+          this.ventas[this.tab].pago.mastercard.monto = 0;
+          this.ventas[this.tab].pago.efectivo.monto = 0;
+          this.ventas[this.tab].pago.transferencia.monto = 0;
+          this.ventas[this.tab].pago.visa.monto = this.totalCart;
           break;
         case 3:
-          this.venta.pago.efectivo.monto = 0;
-          this.venta.pago.visa.monto = 0;
-          this.venta.pago.transferencia.monto = 0;
-          this.venta.pago.mastercard.monto = this.totalCart;
+          this.ventas[this.tab].pago.efectivo.monto = 0;
+          this.ventas[this.tab].pago.visa.monto = 0;
+          this.ventas[this.tab].pago.transferencia.monto = 0;
+          this.ventas[this.tab].pago.mastercard.monto = this.totalCart;
           break;
         case 4:
-          this.venta.pago.efectivo.monto = 0;
-          this.venta.pago.visa.monto = 0;
-          this.venta.pago.mastercard.monto = 0;
-          this.venta.pago.transferencia.monto = this.totalCart;
+          this.ventas[this.tab].pago.efectivo.monto = 0;
+          this.ventas[this.tab].pago.visa.monto = 0;
+          this.ventas[this.tab].pago.mastercard.monto = 0;
+          this.ventas[this.tab].pago.transferencia.monto = this.totalCart;
           break;
 
         default:
@@ -1294,7 +1622,7 @@ export default {
       // console.log(orden)
       // this.venta.IdPreOrden = this.venta.IdPreOrden || []
       // if (Array.isArray(this.venta.IdPreOrden) ) {
-      this.venta.IdPreOrden.push(orden);
+      this.ventas[this.tab].IdPreOrden.push(orden);
       //}
 
       // obtener total adelantos
@@ -1322,7 +1650,7 @@ export default {
         .get(this.API + "almacenes/primero?id_empresa" + this.empresa)
         .then(res => {
           this.$refs.inputAlmacen.setValue(res.data.Almacen);
-          this.venta.almacen = res.data;
+          this.ventas[this.tab].almacen = res.data;
         });
     },
     loadFirstPuntoVenta() {
@@ -1392,6 +1720,7 @@ export default {
         idProforma: 0,
         anioNumeroProforma: ""
       };
+
       this.isNota = false;
       this.bloquearInput = false;
       this.adelantosPreOrden = [];
@@ -1399,13 +1728,18 @@ export default {
       this.infoDelivery = {};
       this.descuentoGeneral = 0;
       this.puntosAplicados = 0;
+
+      setTimeout(() => {
+        this.ventas.push({ ...this.venta });
+      }, 200);
     },
     setTipoVenta(obj) {
       this.isNota = false;
-      (this.bloquearInput = false), (this.venta.NroComprobanteModifica = "");
-      this.venta.CodSunatModifica = "";
-      this.venta.NotaIdMotivo = "";
-      this.venta.NotaDescMotivo = "";
+      (this.bloquearInput = false),
+        (this.ventas[this.tab].NroComprobanteModifica = "");
+      this.ventas[this.tab].CodSunatModifica = "";
+      this.ventas[this.tab].NotaIdMotivo = "";
+      this.ventas[this.tab].NotaDescMotivo = "";
       this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
@@ -1418,18 +1752,18 @@ export default {
         this.tieneIgv = false;
       }
       this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
-      this.venta.tipoVenta = obj;
+      this.ventas[this.tab].tipoVenta = obj;
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      this.venta.CodSunatModifica = obj.CodSunat;
-      this.venta.NroComprobanteModifica = obj.NroComprobante;
+      this.ventas[this.tabs].CodSunatModifica = obj.CodSunat;
+      this.ventas[this.tabs].NroComprobanteModifica = obj.NroComprobante;
 
       if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
+        this.ventas[this.tabs].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.tabs].tipoVenta.CodSunat == "08"
       ) {
-        this.venta.Serie = this.venta.Serie.replace(
+        this.ventas[this.tabs].Serie = this.ventas[this.tabs].Serie.replace(
           /^./,
           obj.NroComprobante[0]
         );
@@ -1437,13 +1771,13 @@ export default {
       this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
-            serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+            serie: this.ventas[this.tab].Serie,
+            idTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
             id_empresa: this.empresa
           }
         })
         .then(response => {
-          this.venta.Numero = response.data.numero;
+          this.ventas[this.tab].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -1455,7 +1789,8 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+            IdDocVentaPuntoVenta: this.ventas[this.tab].puntoVenta
+              .IdDocVentaPuntoVenta,
             id_empresa: this.empresa
           }
         })
@@ -1470,8 +1805,10 @@ export default {
             .then(response => {
               if (response.data) {
                 this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
-                this.venta.CampoDireccion = this.venta.cliente.Direccion;
+                this.ventas[this.tab].cliente = response.data;
+                this.ventas[this.tab].CampoDireccion = this.ventas[
+                  this.tab
+                ].cliente.Direccion;
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
@@ -1485,8 +1822,8 @@ export default {
           )[0];
 
           if (
-            this.venta.tipoVenta.CodSunat == "07" ||
-            this.venta.tipoVenta.CodSunat == "08"
+            this.ventas[this.tab].tipoVenta.CodSunat == "07" ||
+            this.ventas[this.tab].tipoVenta.CodSunat == "08"
           ) {
             response.data.map(item => {
               item.Empresa = empresa.value;
@@ -1506,9 +1843,11 @@ export default {
             }
             this.add([item, () => {}, false]);
           });
-          this.venta.NotaIdMotivo = null;
+          this.ventas[this.tab].NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          this.obtenerStok({
+            IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen
+          });
         });
     },
     setMotivo(ev) {
@@ -1524,9 +1863,9 @@ export default {
       });
     },
     setAlmacen(obj) {
-      this.venta.almacen = obj;
-      this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      this.ventas[this.tab].almacen = obj;
+      // this.$refs.inputAlmacen.setValue(obj.Almacen);
+      this.obtenerStok({ IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen });
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -1540,8 +1879,8 @@ export default {
       });
     },
     setPuntoVenta(obj) {
-      this.venta.puntoVenta = obj;
-      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
+      this.ventas[this.tab].puntoVenta = obj;
+
       this.getNumeroVenta();
     },
     getVendedor(user) {
@@ -1553,14 +1892,12 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
           //this.$refs.inputVendedor.$refs.input.disabled = true
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
           // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
-          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          //this.getNumeroVenta()
+
           this.getTipoDoc(response.data.IdTipoDoc);
         })
         .catch(error => {
@@ -1572,18 +1909,19 @@ export default {
       // console.log(obj)
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
-      this.venta.vendedor = obj;
+      this.ventas[this.tab].vendedor = obj;
     },
     setVendedorManual(obj) {
-      this.venta.vendedor = obj;
+      this.ventas[this.tab].vendedor = obj;
       this.getVendedor(obj.Usuario);
     },
     setComisionista(obj) {
       if (typeof obj === "object") {
-        this.$refs.inputComisionista.setValue(obj.Cliente);
-        this.venta.comisionista = obj;
+        let inputComisionista = `inputComisionista${this.tabs}`;
+        this.$refs[inputComisionista].setValue(obj.Cliente);
+        this.ventas[this.tab].comisionista = obj;
       } else {
-        this.venta.comisionista = {};
+        this.ventas[this.tab].comisionista = {};
       }
     },
     setCliente(obj, dni = false) {
@@ -1600,8 +1938,9 @@ export default {
 
       if (typeof obj === "object") {
         if (obj.IdProforma > 0) {
-          this.venta.idProforma = obj.IdProforma;
-          this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
+          this.ventas[this.tab].idProforma = obj.IdProforma;
+          this.ventas[this.tab].anioNumeroProforma =
+            obj.Anio + "-" + obj.Numero;
           this.getVendedor(obj.UsuarioReg);
           delete obj.productos;
           this.axios
@@ -1611,20 +1950,24 @@ export default {
             )
             .then(response => {
               //console.log(response.data);
-              this.$refs.inputCliente.setValue(response.data.Cliente);
-              this.venta.cliente = response.data;
-              this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              // this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.ventas[this.tab].cliente = response.data;
+              this.ventas[this.tab].CampoDireccion = this.ventas[
+                this.tab
+              ].cliente.Direccion;
             })
             .catch(error => {
               this.$toasted.show("Ha ocurrido un error, en la emision a sunat");
             });
         } else {
-          this.$refs.inputCliente.setValue(obj.Cliente);
-          this.venta.cliente = obj;
-          this.venta.CampoDireccion = this.venta.cliente.Direccion;
-          if (this.venta.cliente.DniRuc == "00000000") {
-            this.venta.EsOrganizacion = 0;
-            this.venta.NombreOrganizacion = "";
+          // this.$refs.inputCliente.setValue(obj.Cliente);
+          this.ventas[this.tab].cliente = obj;
+          this.ventas[this.tab].CampoDireccion = this.ventas[
+            this.tab
+          ].cliente.Direccion;
+          if (this.ventas[this.tab].cliente.DniRuc == "00000000") {
+            this.ventas[this.tab].EsOrganizacion = 0;
+            this.ventas[this.tab].NombreOrganizacion = "";
           }
         }
       } else {
@@ -1636,11 +1979,13 @@ export default {
           .then(response => {
             if (response.data) {
               this.$refs.inputCliente.setValue(response.data.Cliente);
-              this.venta.cliente = response.data;
-              this.venta.CampoDireccion = this.venta.cliente.Direccion;
-              if (this.venta.cliente.DniRuc == "00000000") {
-                this.venta.EsOrganizacion = 0;
-                this.venta.NombreOrganizacion = "";
+              this.ventas[this.tab].cliente = response.data;
+              this.ventas[this.tab].CampoDireccion = this.ventas[
+                this.tab
+              ].cliente.Direccion;
+              if (this.ventas[this.tab].cliente.DniRuc == "00000000") {
+                this.ventas[this.tab].EsOrganizacion = 0;
+                this.ventas[this.tab].NombreOrganizacion = "";
               }
             } else {
               this.$toasted.show("No se encontro al cliente");
@@ -1655,8 +2000,8 @@ export default {
       // Actualizar DisabledTotal
     },
     limpiarProforma() {
-      this.venta.idProforma = 0;
-      this.venta.anioNumeroProforma = "";
+      this.ventas[this.tab].idProforma = 0;
+      this.ventas[this.tab].anioNumeroProforma = "";
       //this.limpiarCart()
       //this.loadClienteVarios()
     },
@@ -1674,18 +2019,18 @@ export default {
       return obj;
     },
     onAddProducto(obj) {
-      this.venta.pago.visa.monto = 0;
-      this.venta.pago.mastercard.monto = 0;
-      this.venta.pago.transferencia.monto = 0;
+      this.ventas[this.tab].pago.visa.monto = 0;
+      this.ventas[this.tab].pago.mastercard.monto = 0;
+      this.ventas[this.tab].pago.transferencia.monto = 0;
       this.actualizarDescuento();
       this.obtenerStok({
-        IdAlmacen: this.venta.almacen.IdAlmacen
+        IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen
       });
     },
     actualizarDescuento() {
-      this.venta.pago.visa.monto = 0;
-      this.venta.pago.mastercard.monto = 0;
-      this.venta.pago.transferencia.monto = 0;
+      this.ventas[this.tab].pago.visa.monto = 0;
+      this.ventas[this.tab].pago.mastercard.monto = 0;
+      this.ventas[this.tab].pago.transferencia.monto = 0;
       if (this.puntosAplicados > 0) {
         this.aplicarPuntos(this.puntosAplicados);
       }
@@ -1695,8 +2040,8 @@ export default {
       }
     },
     aplicarPuntos(val) {
-      if (parseFloat(val) > this.venta.cliente.Puntos) {
-        this.puntosAplicados = this.venta.cliente.Puntos;
+      if (parseFloat(val) > this.ventas[this.tab].cliente.Puntos) {
+        this.puntosAplicados = this.ventas[this.tab].cliente.Puntos;
       }
 
       this.axios
@@ -1718,14 +2063,14 @@ export default {
       this.axios
         .get(this.API + "ventas/numero", {
           params: {
-            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+            idPuntoVenta: this.ventas[this.tab].puntoVenta.IdDocVentaPuntoVenta,
+            idTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
             id_empresa: this.empresa
           }
         })
         .then(response => {
-          this.venta.Serie = response.data.serie;
-          this.venta.Numero = response.data.numero;
+          this.ventas[this.tab].Serie = response.data.serie;
+          this.ventas[this.tab].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -1733,7 +2078,9 @@ export default {
         });
     },
     updateTime() {
-      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
+      this.ventas[this.tab].FechaDoc = this.$moment().format(
+        "YYYY-MM-DDTH:mm:ss"
+      );
     },
     //limpiarDespuesVenta () {
     //    this.inProgress = false
@@ -1763,22 +2110,25 @@ export default {
         return;
       }
 
-      if (!this.venta.cliente.IdCliente) {
+      if (!this.ventas[this.tab].cliente.IdCliente) {
         this.$toasted.show("Debe seleccionar un cliente");
         this.inProgress = false;
         return;
       }
 
-      if (!this.venta.vendedor.Usuario) {
+      if (!this.ventas[this.tab].vendedor.Usuario) {
         this.$toasted.show("Debe seleccionar un vendedor");
         this.inProgress = false;
         return;
       }
 
-      this.venta.productos = this.productos;
-      this.venta.diasValidosProf = this.diasValidosProf;
+      this.ventas[this.tab].productos = this.productos;
+      this.ventas[this.tab].diasValidosProf = this.diasValidosProf;
       this.axios
-        .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
+        .post(
+          this.API + "proformas?id_empresa=" + this.empresa,
+          this.ventas[this.tab]
+        )
         .then(async response => {
           this.$toasted.info("Proforma Guardada con exito");
           //this.limpiarDespuesVenta()
@@ -1839,22 +2189,26 @@ export default {
 
       this.inProgress = true;
       let totalPagos = 0;
-      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+      totalPagos += isNaN(parseFloat(this.ventas[this.tab].pago.efectivo.monto))
         ? 0
-        : parseFloat(this.venta.pago.efectivo.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+        : parseFloat(this.ventas[this.tab].pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.ventas[this.tab].pago.visa.monto))
         ? 0
-        : parseFloat(this.venta.pago.visa.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        : parseFloat(this.ventas[this.tab].pago.visa.monto);
+      totalPagos += isNaN(
+        parseFloat(this.ventas[this.tab].pago.mastercard.monto)
+      )
         ? 0
-        : parseFloat(this.venta.pago.mastercard.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
+        : parseFloat(this.ventas[this.tab].pago.mastercard.monto);
+      totalPagos += isNaN(
+        parseFloat(this.ventas[this.tab].pago.transferencia.monto)
+      )
         ? 0
-        : parseFloat(this.venta.pago.transferencia.monto);
+        : parseFloat(this.ventas[this.tab].pago.transferencia.monto);
       if (
-        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+        (isNaN(parseFloat(this.ventas[this.tab].pago.efectivo.monto))
           ? 0
-          : parseFloat(this.venta.pago.efectivo.monto)
+          : parseFloat(this.ventas[this.tab].pago.efectivo.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
@@ -1862,9 +2216,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.visa.monto))
+        (isNaN(parseFloat(this.ventas[this.tab].pago.visa.monto))
           ? 0
-          : parseFloat(this.venta.pago.visa.monto)
+          : parseFloat(this.ventas[this.tab].pago.visa.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
@@ -1872,9 +2226,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        (isNaN(parseFloat(this.ventas[this.tab].pago.mastercard.monto))
           ? 0
-          : parseFloat(this.venta.pago.mastercard.monto)
+          : parseFloat(this.ventas[this.tab].pago.mastercard.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show(
@@ -1884,16 +2238,16 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.venta.pago.transferencia.monto))
+        (isNaN(parseFloat(this.ventas[this.tab].pago.transferencia.monto))
           ? 0
-          : parseFloat(this.venta.pago.transferencia.monto)
+          : parseFloat(this.ventas[this.tab].pago.transferencia.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de Transferencia no puede ser negativo");
         this.inProgress = false;
         return;
       }
-      if (!this.venta.EsCredito) {
+      if (!this.ventas[this.tab].EsCredito) {
         if (
           parseFloat(this.totalCart).toFixed(2) !=
           parseFloat(totalPagos).toFixed(2)
@@ -1904,21 +2258,24 @@ export default {
         }
       }
 
-      if (!this.venta.cliente.DniRuc) {
+      if (!this.ventas[this.tab].cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
+      var esNumerico = Number.isInteger(
+        parseInt(this.ventas[this.tab].cliente.DniRuc)
+      );
       if (!esNumerico) {
         this.$toasted.show("El RUC debe ser numérico, editar cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+      var esEmpresa =
+        this.ventas[this.tab].cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.ventas[this.tab].tipoVenta.CodSunat == "01") {
         this.$toasted.show(
           "Una factura debe ser emitida para una empresa, no un usuario común."
         );
@@ -1928,24 +2285,24 @@ export default {
 
       //Nota de Creadito
       if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
+        this.ventas[this.tab].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.tab].tipoVenta.CodSunat == "08"
       ) {
         if (
-          !this.venta.CodSunatModifica ||
-          !this.venta.NroComprobanteModifica
+          !this.ventas[this.tab].CodSunatModifica ||
+          !this.ventas[this.tab].NroComprobanteModifica
         ) {
           this.$toasted.show("Debe seleccionar un Documento de Referencia...");
           this.inProgress = false;
           return;
         }
-        if (!this.venta.NotaIdMotivo) {
+        if (!this.ventas[this.tab].NotaIdMotivo) {
           this.$toasted.show("Debe seleccionar un Motivo");
           this.inProgress = false;
           return;
         }
-        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
-          item => item.value == this.venta.NotaIdMotivo
+        this.ventas[this.tab].NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.ventas[this.tab].NotaIdMotivo
         )[0].text;
       }
 
@@ -1976,7 +2333,7 @@ export default {
 
       if (
         sinStock >= 1 &&
-        this.venta.tipoVenta.CodSunat != "07" &&
+        this.ventas[this.tab].tipoVenta.CodSunat != "07" &&
         this.ventaSinStock != 1
       ) {
         this.$toasted.error("No se puede vender un producto sin stock");
@@ -1997,8 +2354,8 @@ export default {
       }
 
       let count = 0;
-      for (const k in this.venta.pago) {
-        if (this.venta.pago[k].monto > 0) {
+      for (const k in this.ventas[this.tab].pago) {
+        if (this.ventas[this.tab].pago[k].monto > 0) {
           count = count + 1;
         }
       }
@@ -2018,23 +2375,29 @@ export default {
       }
       this.inProgress = false;
 
-      this.venta.productos = this.productos;
-      this.venta.puntosAplicados = this.puntosAplicados || 0;
-      this.venta.totalCart = this.totalCart || 0;
-      this.venta.PagoCon = parseFloat(this.$refs.carrito.pagocon).toFixed(2);
-      this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
+      this.ventas[this.tab].productos = this.productos;
+      this.ventas[this.tab].puntosAplicados = this.puntosAplicados || 0;
+      this.ventas[this.tab].totalCart = this.totalCart || 0;
+      this.ventas[this.tab].PagoCon = parseFloat(
+        this.$refs.carrito.pagocon
+      ).toFixed(2);
+      this.ventas[this.tab].NombreOrganizacion = (
+        "" + this.ventas[this.tab].NombreOrganizacion
+      )
         .trim()
         .toUpperCase();
-      this.venta.adelantosPreOrden = this.adelantosPreOrden;
-      this.venta.IdPedido = this.$route.query.idPedido || null;
-      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
-      this.venta.DireccionEntrega = this.venta.EsDelivery
+      this.ventas[this.tab].adelantosPreOrden = this.adelantosPreOrden;
+      this.ventas[this.tab].IdPedido = this.$route.query.idPedido || null;
+      this.ventas[this.tab].nombreLlevar = this.ventas[
+        this.tab
+      ].nombreLlevar.toUpperCase();
+      this.ventas[this.tab].DireccionEntrega = this.ventas[this.tab].EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
       // ------------------------- aqui paga
       this.loading = true;
       await this.$store.state.empresas.forEach(async element => {
-        let data = { ...this.venta };
+        let data = { ...this.ventas[this.tab] };
         let serie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
         let empresa = await this.obtenerDatosEmpresa(element.value);
@@ -2045,21 +2408,21 @@ export default {
             return total + parseFloat(prod.total);
           }, 0);
         let tipoPago = "";
-        for (const k in this.venta.pago) {
-          if (this.venta.pago[k].monto > 0) {
+        for (const k in this.ventas[this.tab].pago) {
+          if (this.ventas[this.tab].pago[k].monto > 0) {
             tipoPago = k;
           }
         }
         let dataImprimir = {
-          NombreOrganizacion: this.venta.NombreOrganizacion,
-          vendedor: this.venta.vendedor.NombreUsuario,
+          NombreOrganizacion: this.ventas[this.tab].NombreOrganizacion,
+          vendedor: this.ventas[this.tab].vendedor.NombreUsuario,
           tipoPago: tipoPago,
           numero: serie.numero,
           serie: serie.serie,
-          CodSunat: this.venta.tipoVenta.CodSunat,
-          IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-          LimitItems: this.venta.tipoVenta.LimitItems,
-          TipoDoc: this.venta.tipoVenta.TipoDoc,
+          CodSunat: this.ventas[this.tab].tipoVenta.CodSunat,
+          IdTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
+          LimitItems: this.ventas[this.tab].tipoVenta.LimitItems,
+          TipoDoc: this.ventas[this.tab].tipoVenta.TipoDoc,
           empresa: element.value,
           nombre_comercial: empresa.razoncial,
           documento: empresa.ruc,
@@ -2169,17 +2532,17 @@ export default {
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
-      this.venta.cliente = {};
+      this.ventas[this.tab].cliente = {};
     },
     eliminarComisionista() {
       this.$refs.inputComisionista.setValue("");
-      this.venta.comisionista = {};
+      this.ventas[this.tab].comisionista = {};
     },
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
         this.infoDelivery = obj;
-        this.venta.EsDelivery = true;
+        this.ventas[this.tab].EsDelivery = true;
         this.$refs.carrito.pagocon = parseFloat(
           parseFloat(obj.Cambio).toFixed(2)
         ).toFixed(2);
@@ -2223,8 +2586,9 @@ export default {
                     false
                   ]);
                 });
-                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-                this.venta.DireccionEntrega = obj.Direccion;
+                this.ventas[this.tab].nombreLlevar =
+                  obj.Cliente || "SIN NOMBRE";
+                this.ventas[this.tab].DireccionEntrega = obj.Direccion;
                 this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
               } else {
                 this.$toasted.show(
@@ -2254,21 +2618,21 @@ export default {
               false
             ]);
           });
-          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-          this.venta.DireccionEntrega = obj.Direccion;
+          this.ventas[this.tab].nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.ventas[this.tab].DireccionEntrega = obj.Direccion;
         }
       }
     },
     anularPagoDelivery() {
       this.limpiarCart();
-      this.venta.EsDelivery = false;
+      this.ventas[this.tab].EsDelivery = false;
       this.infoDelivery = {};
       this.$refs.carrito.pagocon = "";
       this.loadClienteVarios();
-      this.venta.nombreLlevar = "";
-      this.venta.selectOpcionVenta = 0;
-      this.venta.nombreLlevar = "";
-      this.venta.DireccionEntrega = "";
+      this.ventas[this.tab].nombreLlevar = "";
+      this.ventas[this.tab].selectOpcionVenta = 0;
+      this.ventas[this.tab].nombreLlevar = "";
+      this.ventas[this.tab].DireccionEntrega = "";
       this.$router.replace("/ventas");
     },
     //Sockets
@@ -2308,8 +2672,10 @@ export default {
     async obtenerSerie(empresa) {
       let res = await this.axios(
         `${this.API}/ventas/numero?idPuntoVenta=${
-          this.venta.puntoVenta.IdDocVentaPuntoVenta
-        }&idTipoDoc=${this.venta.tipoVenta.IdTipoDoc}&id_empresa=${empresa}`
+          this.ventas[this.tab].puntoVenta.IdDocVentaPuntoVenta
+        }&idTipoDoc=${
+          this.ventas[this.tab].tipoVenta.IdTipoDoc
+        }&id_empresa=${empresa}`
       );
       return res.data;
     },
