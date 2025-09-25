@@ -1,7 +1,39 @@
 <template>
   <div :class="this.empresa">
-    <b-tabs v-model="tab" pills fill justified>
-      <b-tab :title="`Venta ${index +1}`" v-for="(venta,index) in ventas" :value="index" :key="index">
+    <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
+
+    <Menu v-if="false"></Menu>
+<!-- {{ $store.state.proforma }} proforma
+{{ $store.state.lstProductosProforma }} lstProductosProforma -->
+    <b-container fluid class="ancho" id="conten">
+      <div>
+        <div>
+          <b-button-group size="sm">
+            <b-input-group prepend="Empresa:" class="mt-2">
+              <b-form-select
+              v-model="empresa"
+              :options="$store.state.empresas"
+              size="lg"
+              class="form-control"
+              @change="cambiarEmpresa"
+              ></b-form-select>
+            </b-input-group>
+           
+          </b-button-group>
+        </div>  
+      </div>
+     
+      <b-row>
+        <b-col md="12" v-if="this.$route.query.idPedido">
+          <div class="form-inline">
+            <h4>
+              Pago de delivery código:
+              <b-badge variant="info">{{ this.$route.query.idPedido }}</b-badge>
+            </h4>
+          </div>
+        </b-col>
+      </b-row>
+      <b-form @submit="guardarVenta" @keydown.enter="prevent">
         <b-row style="margin-bottom: -10px">
           <b-col md="7">
             <b-row>
@@ -10,7 +42,7 @@
                   <b-input-group prepend="Doc." class="mt-2">
                     <autocomplete
                       required="required"
-                      :ref="`inputTipoVenta${index}`"
+                      ref="inputTipoVenta"
                       :url="API + 'ventas/tipos'"
                       anchor="TipoDoc"
                       initValue="NOTA DE VENTA"
@@ -18,7 +50,7 @@
                       placeholder=""
                       :on-select="setTipoVenta"
                       :customParams="{ id_empresa: empresa }"
-                      :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
+                      :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                       :classes="{ input: 'form-control' }"
                     >
                     </autocomplete>
@@ -28,7 +60,7 @@
                   <label>Doc. Referencia:</label>
                   <autocomplete
                     required="required"
-                    :ref="`inputDocRef${index}`"
+                    ref="inputDocRef"
                     :url="
                       API +
                       'ventas/lista/' +
@@ -40,7 +72,7 @@
                     label="writer"
                     placeholder=""
                     :on-select="setDocRef"
-                    :onFocus="focusAutocomplete.bind(null, `inputDocRef${index}`)"
+                    :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
                     :classes="{ input: 'form-control' }"
                   >
                   </autocomplete>
@@ -51,7 +83,7 @@
                   <b-input-group prepend="Alm." class="mt-2">
                     <autocomplete
                       required="required"
-                      :ref="`inputAlmacen${index}`"
+                      ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
                       initValue="PRINCIPAL"
@@ -59,7 +91,7 @@
                       placeholder=""
                       :on-select="setAlmacen"
                       :customParams="{ id_empresa: empresa }"
-                      :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                       :classes="{ input: 'form-control' }"
                     >
                     </autocomplete>
@@ -82,7 +114,7 @@
                   <b-input-group prepend="P.V." class="mt-2">
                     <autocomplete
                       required="required"
-                      :ref="`inputPuntoVenta${index}`"
+                      ref="inputPuntoVenta"
                       :url="API + 'ventas/puntos'"
                       anchor="PuntoVenta"
                       initValue="PRINCIPAL"
@@ -90,7 +122,7 @@
                       placeholder=""
                       :on-select="setPuntoVenta" 
                       :customParams="{ id_empresa: empresa }"
-                      :onFocus="focusAutocomplete.bind(null, `inputPuntoVenta${index}`)"
+                      :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
                       :classes="{ input: 'form-control' }"
                     >
                     </autocomplete>
@@ -113,7 +145,7 @@
                     <autocomplete
                       style="width: 40%"
                       required="required"
-                      :ref="`inputCliente${index}`"
+                      ref="inputCliente"
                       :url="API + 'clientes'"
                       anchor="ClienteDniRuc"
                       label="writer"
@@ -121,7 +153,7 @@
                       :onInput="(val) => (newDniRuc = val)"
                       :on-select="setCliente"
                       :customParams="{ id_empresa: empresa }"
-                      :onFocus="focusAutocomplete.bind(null, `inputCliente${index}`)"
+                      :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                       :classes="{ input: 'form-control' }"
                     >
                     </autocomplete>
@@ -133,6 +165,7 @@
                       placeholder="Cod. Barra"
                     />
                     <b-input-group-append>
+                      <!--<proveedores-tabla></proveedores-tabla>-->
                       <clientes-form
                         :ruc="newDniRuc"
                         @onAddCliente="setCliente"
@@ -140,40 +173,40 @@
                     </b-input-group-append>
                   </b-input-group>
                   <b-form-select
-                    v-if="ventas[index].cliente.IdCliente"
-                    v-model="ventas[index].CampoDireccion"
+                    v-if="venta.cliente.IdCliente"
+                    v-model="venta.CampoDireccion"
                     class="mb-3"
                   >
                     <option :value="venta.cliente.Direccion">
-                      {{ ventas[index].cliente.Direccion }}
+                      {{ venta.cliente.Direccion }}
                     </option>
                     <option :value="venta.cliente.Direccion2">
-                      {{ ventas[index].cliente.Direccion2 }}
+                      {{ venta.cliente.Direccion2 }}
                     </option>
                     <option :value="venta.cliente.Direccion3">
-                      {{ ventas[index].cliente.Direccion3 }}
+                      {{ venta.cliente.Direccion3 }}
                     </option>
                   </b-form-select>
-                  <b-input-group v-if="ventas[index].cliente.DniRuc == '00000000'">
+                  <b-input-group v-if="venta.cliente.DniRuc == '00000000'">
                     <b-form-checkbox
                       :disabled="bloquearInput ? true : false"
-                      v-model="ventas[index].EsOrganizacion"
+                      v-model="venta.EsOrganizacion"
                       :value="1"
                       :unchecked-value="0"
                     >
                       Es Organización
                     </b-form-checkbox>
                     <input
-                      v-model="ventas[index].NombreOrganizacion"
+                      v-model="venta.NombreOrganizacion"
                       type="text"
                       style="text-transform: uppercase"
                       class="form-control"
                       required
                       placeholder="Nombre de la Organización"
-                      v-if="ventas[index].EsOrganizacion"
+                      v-if="venta.EsOrganizacion"
                     />
                   </b-input-group>
-                  <!-- <b-row v-if="this.$route.query.idPedido">
+                  <b-row v-if="this.$route.query.idPedido">
                     <b-col>
                       <b-form-group>
                         <label style="font-weight: bold"
@@ -213,28 +246,27 @@
                         ></b-form-textarea>
                       </b-form-group>
                     </b-col>
-                  </b-row> -->
+                  </b-row>
                 </b-form-group>
               </b-col>
-              
             </b-row>
           </b-col>
-           <b-col md="3" class="ocularMovil">
-            <b-form-group class="text-center" v-if="ventas[index].cliente.Cliente">
+          <b-col md="3" class="ocularMovil">
+            <b-form-group class="text-center" v-if="venta.cliente.Cliente">
               <div class="puntos">
-                {{ (ventas[index].cliente.Puntos || 0) | redondeoMenor }}
+                {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
               </div>
               Puntos del cliente
             </b-form-group>
             <b-input-group
               prepend="Puntos"
               :append="descuentoPuntos.descuento | redondear"
-              v-if="ventas[index].cliente.Puntos && descuentoGeneral == 0"
+              v-if="venta.cliente.Puntos && descuentoGeneral == 0"
             >
               <b-form-input
                 v-model="puntosAplicados"
                 min="0"
-                :max="ventas[index].cliente.Puntos"
+                :max="venta.cliente.Puntos"
                 @input="aplicarPuntos"
                 type="number"
               ></b-form-input>
@@ -243,28 +275,28 @@
               1 Punto equivale a: S/
               {{ descuentoPuntos.ValorPunto | redondear }}
             </b-form-text>
-            <b-form-text v-if="ventas[index].cliente.EsVIP">
+            <b-form-text v-if="venta.cliente.EsVIP">
               Cliente VIP con Precio Convenio
             </b-form-text>
           </b-col>
-            <b-col md="2">
+          <b-col md="2">
             <b-form-group class="text-center">
               <div class="big-text">
-                {{ ventas[index].Serie }} - <b>{{ ventas[index].Numero }}</b>
+                {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
               </div>
-              {{ ventas[index].FechaDoc }}
+              {{ venta.FechaDoc }}
             </b-form-group>
             <b-form-group class="ocularMovil">
               <label>Vendedor:</label>
               <autocomplete
                 required="required"
-                :ref="`inputVendedor${index}`"
+                ref="inputVendedor"
                 :url="API + 'usuarios'"
                 :customParams="{ idPerfil: idPerfil ,id_empresa : empresa}"
                 anchor="NombreUsuario"
                 label="writer"
                 :on-select="setVendedorManual"
-                :onFocus="focusAutocomplete.bind(null, `inputVendedor${index}`)"
+                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                 :classes="{ input: 'form-control' }"
               >
               </autocomplete>
@@ -295,8 +327,7 @@
             </b-badge>
           </b-col>
         </b-row>
-        <!-- --------------------------- -->
-         <b-row v-if="venta.idProforma > 0">
+        <b-row v-if="venta.idProforma > 0">
           <b-col md="6" class="ml-3">
             <b-row>
               <h5 class="mt-1">
@@ -315,253 +346,300 @@
             </b-row>
           </b-col>
         </b-row>
-
-
-         <b-row>
+        <b-row>
           <b-col cols="12">
-              <b-form-group>
-                <b-input-group>
-                  <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0">Agregar Productos
-                  </b-button>
-                  <autocomplete
-                    :ref="`autocompleteProducto${index}`"
-                    :url="APIProductos"
-                    :customParams="{
-                      sortBy: 'stock',
-                      sortDesc: 1,
-                      limit: '25',
-                      id_empresa: empresa 
-                    }"
-                    :onShouldRenderChild="renderChild"
-                    anchor="Producto"
-                    label="writer"
-                    placeholder="Agregar Producto"
-                    :on-select="anadirarProductosSeleccionado"
-                    :onFocus="focusAutocomplete.bind(null,`autocompleteProducto${index}`)"
-                    :classes="{ input: 'form-control' }"
-                  >
-                  </autocomplete>
-                  <input
-                    v-model="loadCode"
-                    @keydown.enter.prevent="loadBarcode"
-                    type="text"
-                    class="form-control"
-                    placeholder="Codigo de Barra"
-                  />
-                  <b-input-group-append>
-                  
-                    <b-button variant="primary" @click="loadBarcode"
-                      ><i class="fas fa-search"></i
-                    ></b-button>
-                    <producto-form
-                      :showButton="showButton"
-                      :cbGuardar="
-                        (id, pxp, obj) => {
-                          agregarGuardar(id, pxp, obj);
-                        }
-                      "
-                      ref="productoFormEdit"
-                      :producto-update="productoSelect"
-                    ></producto-form>
-                  </b-input-group-append>
-                </b-input-group>
-                <span class="ml">Búsqueda Avanzanda (Producto,Categoría,Marca)</span>
-              </b-form-group>
-            
-            <b-table
-              :fields="carrito.fields" 
-              :items="venta.productos"
-              :id="`TablaCarrito${index}`"
-              :ref="`TablaCarrito${index}`"
+            <productos-carrito
+              @onInputCantidad="actualizarDescuento"
+              @onAddProducto="onAddProducto"
+              @onRemoveProducto="actualizarDescuento"
+              :igvTotal="tieneIgv"
+              :setPrecio="true"
+              ref="carrito"
+              :showButton="false"
+              :bloquearInput="bloquearInput"
+              :fields="carrito.fields"
+              :isVentas="true"
+              :idAlmacen="venta.almacen.IdAlmacen"
+              :onSetProducto="onSetProducto"
+              :esDelivery="venta.EsDelivery"
+              :mostraTotales="false"
             >
-              <template slot="Series" slot-scope="data">
-                <b-select 
-                    v-if="generarSerie(data.item.productoSerie).length>0"
-                    :options="generarSerie(data.item.productoSerie)" 
-                    v-model="data.item.IdProductoSerie"
-                    text-field="Serie"
-                    value-field="IdProductoSerie"
-                />  
+              <template slot="operaciones">
+                <table class="table b-table border table-footer">
+                  <tbody>
+                    <tr>
+                      <td class="text-center">Opciones</td>
+                    </tr>
+                    <tr v-if="puntosAplicados == 0">
+                      <td>
+                        <b-input-group prepend="S/" append="Descuento">
+                          <input
+                            v-model="descuentoGeneral"
+                            min="0"
+                            value="0"
+                            :disabled="bloquearInput ? true : false"
+                            @input="
+                              (val) => {
+                                aplicarDescuentoGeneral(val.target.value);
+                              }
+                            "
+                            type="number"
+                            class="form-control"
+                          />
+                        </b-input-group>
+                        <b-form-text>
+                          Descuento general a toda la venta.
+                        </b-form-text>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <b-form-checkbox
+                          :disabled="
+                            bloquearInput
+                              ? true
+                              : false || isNota || venta.EsDelivery
+                          "
+                          v-model="venta.EsCredito"
+                          :value="1"
+                          :unchecked-value="0"
+                        >
+                          Venta a credito
+                        </b-form-checkbox>
+                        <b-form-input
+                          :disabled="
+                            bloquearInput
+                              ? true
+                              : false || isNota || venta.EsDelivery
+                          "
+                          v-if="venta.EsCredito"
+                          v-model="venta.FechaCredito"
+                          type="date"
+                        >
+                        </b-form-input>
+                        <b-form-checkbox
+                          :disabled="
+                            bloquearInput ? true : false || venta.EsDelivery
+                          "
+                          v-model="venta.PorEntregar"
+                          :value="1"
+                          :unchecked-value="0"
+                        >
+                          Por entregar
+                        </b-form-checkbox>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <b-input-group
+                          prepend="Prof. válida por:"
+                          append="días"
+                        >
+                          <b-form-input
+                            :disabled="bloquearInput ? true : false"
+                            v-model="diasValidosProf"
+                            min="0"
+                            value="0"
+                            type="number"
+                          ></b-form-input>
+                        </b-input-group>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </template>
-              <template slot="eventPres" slot-scope="data">
-                <b-button
-                  size="sm"
-                  v-if="data.item.estadoPxP == false"
-                  :disabled="bloquearInput ? true : false"
-                  variant="info"
-                  @click="showPresentacion(data.item,data.index)"
-                  >
-                  <i class="fas fa-list"></i>
-                  </b-button>
-                <b-button
-                  @click="
-                    abrirImagen(
-                      data.item.Producto,
-                      data.item.Imagen == null ||
-                        data.item.Imagen == ''
-                        ? 'static/no-photo.png'
-                        : '/resources/images/productos/' +
-                            data.item.Imagen
-                    )
-                  "
-                  style="margin-top: 2px"
-                  :id="'popover-imagen' + data.item.IdProducto"
-                  variant="success"
-                  size="sm"
-                  ><i class="fas fa-image"></i
-                ></b-button>
-                <b-popover
-                  placement="right"
-                  :target="'popover-imagen' + data.item.IdProducto"
-                  :title="data.item.Producto"
-                  triggers="hover"
+              <template slot="metodopago" v-if="!venta.EsCredito">
+                <table class="table b-table border table-footer table-sm">
+                  <tbody>
+                    <tr>
+                      <td colspan="3" class="text-center">Metodo de Pago</td>
+                    </tr>
+                    <tr>
+                      <td>Efectivo</td>
+                      <td>
+                        <b-button
+                          variant="info"
+                          size="sm"
+                          class="mt-1"
+                          @click="metodoPagoCambio(1)"
+                          ><i class="fas fa-check"></i
+                        ></b-button>
+                      </td>
+                      <td>
+                        <b-form-input
+                          v-model="venta.pago.efectivo.descripcion"
+                          type="text"
+                          :disabled="bloquearInput ? true : false"
+                          placeholder="Descripcion"
+                        ></b-form-input>
+                      </td>
+                      <td>
+                        <input
+                          v-model="venta.pago.efectivo.monto"
+                          min="0"
+                          :disabled="bloquearInput ? true : false"
+                          step="0.01"
+                          type="number"
+                          class="form-control"
+                          placeholder="S/."
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Tarjeta</td>
+                      <td>
+                        <b-button
+                          variant="info"
+                          size="sm"
+                          class="mt-1"
+                          @click="metodoPagoCambio(2)"
+                          ><i class="fas fa-check"></i
+                        ></b-button>
+                      </td>
+                      <td>
+                        <b-form-input
+                          v-model="venta.pago.visa.descripcion"
+                          type="text"
+                          :disabled="bloquearInput ? true : false"
+                          placeholder="Descripcion"
+                        ></b-form-input>
+                      </td>
+                      <td>
+                        <input
+                          class="form-control"
+                          :disabled="bloquearInput ? true : false"
+                          v-model="venta.pago.visa.monto"
+                          min="0"
+                          step="0.01"
+                          type="number"
+                          placeholder="S/."
+                          @input="
+                            venta.pago.efectivo.monto =
+                              $options.filters.redondear(
+                                totalCart -
+                                  venta.pago.mastercard.monto -
+                                  $event.target.value
+                              )
+                          "
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Yape/Plin</td>
+                      <td>
+                        <b-button
+                          variant="info"
+                          size="sm"
+                          class="mt-1"
+                          @click="metodoPagoCambio(3)"
+                          ><i class="fas fa-check"></i
+                        ></b-button>
+                      </td>
+                      <td>
+                        <b-form-input
+                          v-model="venta.pago.mastercard.descripcion"
+                          :disabled="bloquearInput ? true : false"
+                          type="text"
+                          placeholder="Descripcion"
+                        ></b-form-input>
+                      </td>
+                      <td>
+                        <input
+                          class="form-control"
+                          v-model="venta.pago.mastercard.monto"
+                          :disabled="bloquearInput ? true : false"
+                          min="0"
+                          step="0.01"
+                          type="number"
+                          placeholder="S/."
+                          @input="
+                            venta.pago.efectivo.monto =
+                              $options.filters.redondear(
+                                totalCart -
+                                  venta.pago.visa.monto -
+                                  $event.target.value
+                              )
+                          "
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Transferencia</td>
+                      <td>
+                        <b-button
+                          variant="info"
+                          size="sm"
+                          class="mt-1"
+                          @click="metodoPagoCambio(4)"
+                          ><i class="fas fa-check"></i
+                        ></b-button>
+                      </td>
+                      <td>
+                        <b-form-input
+                          v-model="venta.pago.transferencia.descripcion"
+                          :disabled="bloquearInput ? true : false"
+                          type="text"
+                          placeholder="Descripcion"
+                        ></b-form-input>
+                      </td>
+                      <td>
+                        <input
+                          class="form-control"
+                          v-model="venta.pago.transferencia.monto"
+                          :disabled="bloquearInput ? true : false"
+                          min="0"
+                          step="0.01"
+                          type="number"
+                          placeholder="S/."
+                          @input="
+                            venta.pago.efectivo.monto =
+                              $options.filters.redondear(
+                                totalCart -
+                                  venta.pago.mastercard.monto -
+                                  $event.target.value
+                              )
+                          "
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+              <template slot="totalEmpresa" >
+                
+              </template>
+              <template slot="adicional" v-if="!venta.EsCredito">
+                <table
+                  class="table b-table border table-footer table-sm text-center"
+                  v-if="false"
                 >
-                  <div style="text-align: center">
-                    <b-img
-                      style="border-radius: 10px; width: 200px"
-                      fluid
-                      :src="
-                        data.item.Imagen == null ||
-                        data.item.Imagen == ''
-                          ? 'static/no-photo.png'
-                          : '/resources/images/productos/' +
-                            data.item.Imagen
-                      "
-                      alt=""
-                      @error="setAltImg"
-                    ></b-img>
-                  </div>
-                </b-popover>
+                  <tbody>
+                    <tr>
+                      <td>Mano de obra bruta</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <h3>{{ manoDeObraBruta | redondear }}</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Mano de obra neta</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <h3 :class="{ 'text-danger': manoDeObraNeta <= 0 }">
+                          {{ manoDeObraNeta | redondear }}
+                        </h3>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </template>
-
-        
-        <template
-          slot="cantxPrecio"
-          slot-scope="data"
-          v-if="data.item.tipo == 'PRESENTACION'"
-        >
-          <input
-            v-model="data.item.cantxPrecio"
-            type="number"
-            style="width: 80px"
-            step="0.001"
-            min="0"
-            :disabled="bloquearInput ? true : false"
-            placeholder="Cantidad"
-            class="form-control"
-          />
-          <span>x{{ data.item.cantidadPres }}</span>
-        </template>
-
-         <template slot="cantidad" slot-scope="data">
-          <input
-            v-model="data.item.cantidad"
-            :disabled="data.item.tipo == 'PRESENTACION'"
-            type="number"
-            style="width: 80px"
-            class="form-control"
-            step="0.001"
-            min="0"
-            placeholder="Cantidad"
-          />
-        </template>
-
-
-        <template slot="precio" slot-scope="data">
-          <input
-            v-model="data.item.precio"
-            type="number"
-            style="width: 95px"
-            min="0"
-            step="0.00001"
-            class="form-control"
-            placeholder="Precio"
-            />
-        </template>
-
-        <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index,data.item) }}
-        </template>
-
-        <template slot="total" slot-scope="data">
-              {{ getTotal(data.index,data.item) }}
-              <br />
-              <h6><i>Prof.</i></h6>
-              <input
-                class="form-check-input"
-                type="checkbox"
-                :disabled="bloquearInput ? true : false"
-                @change="
-                  (e) => {
-                    $emit('onCheckProf', e);
-                    asignarDisabledProf(data.index, e);
-                  }
-                "
-              />
-            </template>
-        
-
-        <template slot="descuento" slot-scope="data">
-          <input
-            :disabled="bloquearInput ? true : false"
-            v-model="data.item.descuento"
-            style="width: 90px"
-            type="number"
-            min="0"
-            step="0.01"
-            class="form-control"
-            value="0"
-          />
-          <b-form-text> </b-form-text>
-        </template>
-
-       
-
-        <template slot="Descripcion" slot-scope="data">
-          <textarea
-            :disabled="bloquearInput ? true : false"
-            class="form-control"
-            placeholder="Descripción"
-            cols="9"
-            rows="1"
-            style="width: 150px"
-            v-model="data.item.Descripcion"
-          ></textarea>
-        
-        </template>
-
+              
+            </productos-carrito>
             
-
-            <template slot="acciones" slot-scope="data">
-              <b-button
-                :disabled="bloquearInput ? true : false"
-                variant="danger"
-                size="sm"
-                @click="quitarProducto(data.index)"
-                ><i class="fas fa-times fa-lg"></i
-              ></b-button>
-            
-            </template>
-
-           
-            <template slot="stock" slot-scope="data">
-              <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
-                <img src="static/moto-delivery.png" style="width: 24px" />
-              </div>
-              <div v-else>
-                <div>{{ data.item.stock }}</div>
-                <img
-                  v-if="data.item.EsPadre"
-                  src="static/box.png"
-                  style="width: 24px"
-                />
-              </div>
-            </template>
-
-
-            </b-table>
           </b-col>
-          <!-- <b-col cols="4">
+          <b-col cols="4">
             <table class="table b-table border table-footer table-sm">
                   <tbody>
                     <tr style="background: #1A237E; color: #ffffff;">
@@ -573,9 +651,8 @@
                       </tr>
                   </tbody>
                 </table>
-          </b-col> -->
-         
-          <!-- <b-col cols="4" style="text-align: center;">
+          </b-col>
+          <b-col cols="4" style="text-align: center;">
             <b-button
               type="button"
               @click="anularPagoDelivery"
@@ -602,15 +679,7 @@
               v-if="idPerfil == 1 || idPerfil == 14"
               >Efectuar Venta</b-button
               >
-            <b-button
-              @click="anadirVentana"
-              :disabled="inProgress"
-              style="background: #FFEA00; color:#000000"
-              size="lg"
-              class="btnAction"
-              >Añadir nueva ventana</b-button
-              >
-            
+              <!-- -->
               <b-button
               class="btnAction"
               v-if="ultimaVenta"
@@ -642,13 +711,23 @@
                 @onSelectProforma="setCliente"
               />
           
-             <config-venta
+            <!-- <b-button-group class="ocularMovil" v-if="false">
+              <pre-orden-lista
+                v-show="!this.$route.query.idPreOrden"
+                :idAlmacen="venta.almacen.IdAlmacen"
+                @onSelectPreOrden="setCliente"
+                @onPreOrden="selectPreOrden"
+              ></pre-orden-lista>
+            </b-button-group> -->
+            <!-- <b-button-group size="sm" class="ocularMovil"> -->
+              <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
+              <config-venta
                 @onUpdateConfig="eliminarCliente"
                 @onUpdateConfigComision="eliminarComisionista"
               ></config-venta>
-          </b-col> -->
-
-          <!-- <b-col cols="4">
+            <!-- </b-button-group> -->
+          </b-col>
+          <b-col cols="4">
              <table class="table b-table border table-footer">
         <tbody>
            <tr>
@@ -786,7 +865,12 @@
                             v-model="FechaCredito"
                             type="date">
                           </b-form-input>
-                                                
+                                                <!-- <b-form-checkbox v-if="false"
+                                                    v-model="venta.PorEntregar"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Por entregar
+                                                </b-form-checkbox> -->
                           </td>
                         </tr>
                         <tr>
@@ -851,625 +935,26 @@
           </tr>
         </tbody>
       </table>
-          </b-col> -->
+          </b-col>
 
           
         </b-row>
-      </b-tab>
-    </b-tabs>
-    <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
-     <b-modal id="modal-1" :title="`${itemProducto.Producto}`"
-     hide-footer v-model="modalPresentaciones"
-      v-if="modalPresentaciones" >
-      <b-row class="px-4">
-        <b-col cols="6">
-          <b-card  @click="guardarItemPorUnidad()" class="cardPresentacion">
-              <b-row>
-                <b-col cols="6"> UNIDAD </b-col>
-                <b-col cols="6" class="borderIzquierdo">
-                  <b>
-                    Precio: <br>
-                    {{itemProducto.PrecioContado}}
-                  </b>
-
-                  </b-col>
-              </b-row>
-          </b-card>
-          
-          <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItem(item)">
-              <b-row>
-                <b-col cols="6">{{item.nombre}}</b-col>
-                <b-col cols="6" class="borderIzquierdo">
-                  <b>
-                    Precio: <br>
-                    {{item.precio}}
-                  </b>
-
-                  </b-col>
-              </b-row>
-          </b-card>
-
-        </b-col>
-        <b-col cols="6" class="borderIzquierdoPunteado pr-4 pl-5" >
-          <b-row>
-            <b-col cols="12" class="px-0 montoPresenacion">
-              <b-form-input class="my-2 " type="number"
-              ref="montoPresentacion"
-               id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
-              @input="monto == 0 ? errorMontoPresentacion='Ingrese una cantidad' : errorMontoPresentacion =''"/>
-                  <span class="text-red">{{errorMontoPresentacion}}</span>
-
-            </b-col>
-            <b-col cols="4" class="p-0 mt-1 px-1" v-for="(numeros,index) in numerosCalculadora" :key="index">
-                  <b-button @click="aumentarMontoPresentacion(numeros)" block variant="outline-dark" v-if="numeros.tipo=='backspace'">
-                    <i :class="numeros.valor"></i>
-                  </b-button>
-                 <b-button @click="aumentarMontoPresentacion(numeros)" v-else block  variant="outline-dark">{{numeros.valor}}</b-button>
-            </b-col>
-          </b-row>
-             
-
-        </b-col>
-      </b-row>
-    </b-modal>
-
-    <b-modal id="modal-1" :title="`${itemProducto.Producto}`" hide-footer v-model="modalPresentacionesEditar" v-if="modalPresentacionesEditar">
-      <b-row class="px-4">
-        <b-col cols="6">
-          <b-card  @click="guardarItemPorUnidadEditar()" class="cardPresentacion">
-              <b-row>
-                <b-col cols="6"> UNIDAD </b-col>
-                <b-col cols="6" class="borderIzquierdo">
-                  <b>
-                    Precio: <br>
-                    {{itemProducto.PrecioContado}}
-                  </b>
-
-                  </b-col>
-              </b-row>
-          </b-card>
-          <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItemEditar(item)">
-              <b-row>
-                <b-col cols="6">{{item.nombre}}</b-col>
-                <b-col cols="6" class="borderIzquierdo">
-                  <b>
-                    Precio: <br>
-                    {{item.precio}}
-                  </b>
-
-                  </b-col>
-              </b-row>
-          </b-card>
-
-        </b-col>
-        <b-col cols="6" class="borderIzquierdoPunteado pr-4 pl-5" >
-          <b-row>
-            <b-col cols="12" class="px-0 montoPresenacion">
-              <b-form-input class="my-2 " type="number" id="montoPresentacion" v-model="monto" placeholder="Ingrese Cantidad" 
-              @input="monto == 0 ? errorMontoPresentacion='Ingrese una cantidad' : errorMontoPresentacion =''"/>
-                  <span class="text-red">{{errorMontoPresentacion}}</span>
-
-            </b-col>
-            <b-col cols="4" class="p-0 mt-1 px-1" v-for="(numeros,index) in numerosCalculadora" :key="index">
-                  <b-button @click="aumentarMontoPresentacion(numeros)" block variant="outline-dark" v-if="numeros.tipo=='backspace'">
-                    <i :class="numeros.valor"></i>
-                  </b-button>
-                 <b-button @click="aumentarMontoPresentacion(numeros)" v-else block  variant="outline-dark">{{numeros.valor}}</b-button>
-            </b-col>
-          </b-row>
-             
-
-        </b-col>
-      </b-row>
-      
-    </b-modal>
-
-     <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
-      <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
-      <b-row>
-        <b-col cols="12">
-          <b-input-group prepend="Serie">
-            <b-input-group-append>
-                <input type="text" class="form-control" id="txtSerie" v-model="Serie">
-            </b-input-group-append>
-            <b-button variant="info" size="sm" @click="anadirSerie()">AÑADIR</b-button>
-          </b-input-group>
-        </b-col>
-        <b-col cols="6">
-          
-        </b-col>
-     
-         <b-col cols="12">   
-          <table width="100%" class="mt-3">
-              <thead>
-                <tr>
-
-                  <th>#</th>
-                  <th>Serie</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(serie,index) in Series" :key="index">
-                  <td>{{ index+1 }}</td>
-                  <td>
-                    <input
-                    type="text"
-                    class="form-control"
-                    :value="serie.Serie"
-                    @input="updateSerie(index, $event.target.value)"
-                  >
-                  </td>
-                  <td>
-                    <b-button variant="danger" @click="eliminarSerieModal(index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </b-button>
-                  </td>
-                </tr>
-              </tbody>
-          </table>
-       </b-col>
-       <b-col cols="12" style="text-align: right;" class="mt-3">
-          <b-button @click="guardarSerie" variant="success">Guardar</b-button>
-          <b-button @click="anadirSerieFlag=!anadirSerieFlag" variant="danger">Cancelar</b-button>
-       </b-col>
-      </b-row>
-       
-    </b-modal>
-
-     <b-modal
-      size="xl"
-      v-model="modalNuevoProductos"
-      title="Selección Productos"
-      class="modalSelectProduct modal-xl"
-    >
-      <b-row>
-        <b-col cols="12">
-          <b-input-group>
-            <b-form-input
-              v-model="searchProducto"
-              placeholder="Buscar..."
-              class="form-control inputResponsive"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button @click="startRecognition()">
-                <i class="fas fa-microphone"></i>
-              </b-button>
-            </b-input-group-append>
-            <input
-              v-model="IdProducto"
-              @input="buscarProductosCodigoBarrasModal"
-              type="text"
-              class="form-control ml-2  inputResponsive"
-              placeholder="Codigo de Barra"
-               v-on:keyup.enter="anadirProductos"
-            />
-            <b-input-group-append>
-              <b-button
-                variant="primary"
-                @click="buscarProductosCodigoBarrasModal"
-                ><i class="fas fa-search"></i
-              ></b-button>
-            </b-input-group-append>
-          </b-input-group>
-          <p>Búsqueda Avanzanda (Producto,Categoría,Marca)</p>
-        </b-col>
-        <b-col cols="12" class="mt-3">
-          <table class="table table-hover" width="100%">
-              <thead>
-                <tr>
-                  <th>Empresa</th>
-                  <th>Categoria</th>
-                  <th>Marca</th>
-                  <th>Producto</th>
-                  <th>Stock</th>
-                  <th>Stock</th>
-                  <th>Precio</th>
-                  <th>Imagen</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(prod,index) in listadoProductos()" :key="index"  @dblclick="anadirarProductosSeleccionado(prod,true)">
-                  <td>{{ prod.NombreEmpresa }}</td>
-                  <td>{{ prod.ProductoCategoria }}</td>
-                  <td>{{ prod.ProductoMarca }}</td>
-                  <td>{{ prod.Producto }}</td>
-                  <td>{{ prod.stock }}</td>
-                  <td>{{ prod.StockMinimo }}</td>
-                  <td>{{ prod.PrecioContado }}</td>
-                  <td>
-                    <img
-                    :src="
-                       prod.Imagen == null ||  prod.Imagen == ''
-                        ? 'static/no-photo.png'
-                        : `/resources/images/productos/${ prod.Imagen}`
-                    "
-                    class="imagen"
-                  />
-                  </td>
-                </tr>
-              </tbody>
-          </table>
-
-          <div class="pagination mt-3">
-            <b-button size="sm" variant="outline-dark"  @click="prevPage" :disabled="currentPage === 1">Anterior</b-button>
-            <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
-            <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
-          </div>
-
-          <b-row>
-            <b-col cols="8">
-           
+        <b-row align-h="center" class="text-center">
+          <b-col cols="8">
+            <br />
+            
+            <br />
+            <br />
           </b-col>
-            <b-col cols="4">
-              <b-row>
-                <b-col cols="6">  
-                  Nro De Filas:
-                </b-col>
-                <b-col cols="6">
-                  <b-form-select
-                    v-model="perPageModal"  
-                    :options="perPageModalList"
-                    size="small"
-                    class="form-control"
-                  ></b-form-select>
-                </b-col>
-              </b-row>
-            
-            
-            </b-col>
-          </b-row>
-           
-           
-        </b-col>
-      </b-row>
-      
-    </b-modal>
-
-
-    <!-- PRE -->
-    <b-container fluid class="ancho" id="conten">
-      <!-- <div>
-        <div>
-          <b-button-group size="sm">
-            <b-input-group prepend="Empresa:" class="mt-2">
-              <b-form-select
-              v-model="empresa"
-              :options="$store.state.empresas"
-              size="lg"
-              class="form-control"
-              @change="cambiarEmpresa"
-              ></b-form-select>
-            </b-input-group>
-           
-          </b-button-group>
-        </div>  
-      </div> -->
-     
-      <b-row>
-        <b-col md="12" v-if="this.$route.query.idPedido">
-          <div class="form-inline">
-            <h4>
-              Pago de delivery código:
-              <b-badge variant="info">{{ this.$route.query.idPedido }}</b-badge>
-            </h4>
-          </div>
-        </b-col>
-      </b-row>
-     <b-row  v-if="ventas[tab]">
-        <b-col cols="4">
-              <table class="table b-table border table-footer table-sm">
-                    <tbody>
-                      <tr style="background: #1A237E; color: #ffffff;">
-                        <td colspan="2" class="text-center" style="text-transform: uppercase;font-size: 1.2rem; font-weight: bold;">Total por Empresa</td>
-                      </tr>
-                        <tr v-for="(empresa,index) in lstTotalPorEmpresa()" :key="index">
-                          <th>{{empresa.nombre}}</th>
-                          <td>{{empresa.total}}</td>
-                        </tr>
-                    </tbody>
-                  </table>
-        </b-col>
-        <b-col cols="4" style="text-align: center;">
-              <b-button
-                type="button"
-                @click="anularPagoDelivery"
-                variant="danger"
-                v-if="this.$route.query.idPedido"
-                >Anular Pago Delivery</b-button
-              >
-              <b-button
-                type="button"
-                v-if="!this.$route.query.idPedido"
-                :disabled="inProgress"
-                variant="primary"
-                size="lg"
-                @click="guardarProforma"
-                class="btnAction"
-                >Crear Proforma</b-button
-              >
-              <b-button
-                type="submit"
-                :disabled="inProgress"
-                style="background: #004D40;"
-                size="lg"
-                class="btnAction"
-                v-if="idPerfil == 1 || idPerfil == 14"
-                >Efectuar Venta</b-button
-                >
-              <b-button
-                @click="anadirVentana"
-                :disabled="inProgress"
-                style="background: #FFEA00; color:#000000"
-                size="lg"
-                class="btnAction"
-                >Añadir nueva ventana</b-button
-                >
-                <!-- -->
-                <b-button
-                class="btnAction"
-                v-if="ultimaVenta"
-                target="_blank"
-                variant="info"
-                size="lg"
-                :href="
-                  '/imprimir/index.php?IdDocVenta=' +
-                  ultimaVenta +
-                  '&empresa=' +
-                  empresa
-                "
-                >Imprimir última Venta</b-button
-              >
-
-            
-                <delivery-modal
-                  class="ocularMovil"
-                  ref="deliveryModal"
-                  @onPagarDelivery="onPagarDelivery"
-                ></delivery-modal>
-            
-              
-                <pago-deuda />
-                <proformas
-                  :idAlmacen="ventas[tab].almacen.IdAlmacen"
-                  :empresa="empresa"
-                  @onSelectProforma="anadirProforma"
-                />
-            
-              <!-- <b-button-group class="ocularMovil" v-if="false">
-                <pre-orden-lista
-                  v-show="!this.$route.query.idPreOrden"
-                  :idAlmacen="venta.almacen.IdAlmacen"
-                  @onSelectPreOrden="setCliente"
-                  @onPreOrden="selectPreOrden"
-                ></pre-orden-lista>
-              </b-button-group> -->
-              <!-- <b-button-group size="sm" class="ocularMovil"> -->
-                <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                <config-venta
-                  @onUpdateConfig="eliminarCliente"
-                  @onUpdateConfigComision="eliminarComisionista"
-                ></config-venta>
-              <!-- </b-button-group> -->
-        </b-col>
-        <b-col cols="4">
-              <table class="table b-table border table-footer">
-          <tbody>
-            <tr>
-              <td>
-                <b-button 
-                  class="p-1 ml-1 mt-1" 
-                  :id="`popover-metodopago`" 
-                  tabindex="0" 
-                  variant="success" 
-                  @click="togglePopover">
-                  <i class="fas fa-credit-card"></i>
-                </b-button>
-                <b-popover 
-                    :target="`popover-metodopago`" 
-                    title="Método de Pago" 
-                    placement="top" 
-                    triggers="manual" 
-                    :show.sync="mostrar" 
-                    :style="{ minWidth: '600px' }"
-                  >
-                  <slot :name="`metodopago`" style="width: 1200px;">
-                    <table class="table b-table border table-footer table-sm">
-                      <tbody>
-                        <tr>
-                          <td>Efectivo</td>
-                          <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
-                          <td>
-                            <b-form-input v-model="ventas[tab].pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                          </td>
-                          <td>
-                            <input v-model="ventas[tab].pago.efectivo.monto" min="0" step="0.01" type="number" placeholder="S/." class="form-control"/>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Tarjeta</td>
-                          <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
-                          <td>
-                            <b-form-input v-model="ventas[tab].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                          </td>
-                          <td>
-                            <input class="form-control" v-model="ventas[tab].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                @input="ventas[tab].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[tab].pago.mastercard.monto - $event.target.value)"
-                              />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Yape/Plin</td>
-                          <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
-                          <td>
-                            <b-form-input v-model="ventas[tab].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                          </td>
-                          <td>
-                            <input class="form-control" v-model="ventas[tab].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                              @input="ventas[tab].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[tab].pago.visa.monto - $event.target.value)" 
-                            />
-                          
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Transferencia</td>
-                          <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
-                          <td>
-                            <b-form-input v-model="ventas[tab].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                          </td>
-                          <td>
-                            <input
-                              class="form-control" v-model="ventas[tab].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                              @input="ventas[tab].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[tab].pago.visa.monto - $event.target.value)" 
-                              />
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </slot>
-                </b-popover>
-              </td>
-              <td class="table-success"><b>SubTotal</b></td>
-              <td class="table-success">
-                {{ subTotalG }}
-              </td>
-            </tr>
-            <tr v-if="descuentoG >0">
-            <td></td>
-              <td class="table-danger">Descuento</td>
-              <td class="table-danger">- {{ descuentoG }}</td>
-            </tr>
-          
-            <tr>
-              <td>
-                <b-button 
-                  class="p-1 ml-1 mt-1" 
-                  :id="`popover-opciones`" 
-                  tabindex="0" 
-                  @click="togglePopoverOpcion" 
-                  variant="warning">
-                  <i class="fas fa-tags"></i>
-                </b-button>
-                <b-popover 
-                  :target="`popover-opciones`" 
-                  title="Opciones" 
-                  triggers="manual" 
-                  placement="top" 
-                  :show.sync="mostrarOp" 
-                  :style="{ minWidth: '600px' }"
-                >
-                  <slot :name="`opciones`">
-                    <table class="table b-table border table-footer">
-                      <tbody>
-                        <tr v-if="puntosAplicados == 0">
-                          <td>
-                            <b-input-group prepend="S/" append="Descuento">
-                                <input
-                                  v-model="descuentoGeneral"
-                                  min="0"
-                                  value="0"
-                                  @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
-                                  class="form-control"
-                                />
-                            </b-input-group>
-                            <b-form-text style="color:black !important; font-weight:bold">
-                              Descuento general a toda la venta.
-                            </b-form-text>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <b-form-checkbox
-                              v-model="EsCredito"
-                              :value="1"
-                              :unchecked-value="0">
-                              Venta a credito
-                            </b-form-checkbox>
-                            <b-form-input 
-                              v-if="EsCredito"
-                              v-model="FechaCredito"
-                              type="date">
-                            </b-form-input>
-                                                  <!-- <b-form-checkbox v-if="false"
-                                                      v-model="venta.PorEntregar"
-                                                      :value="1"
-                                                      :unchecked-value="0">
-                                                      Por entregar
-                                                  </b-form-checkbox> -->
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <b-input-group prepend="Proforma válidez: " append="días">
-                              <b-form-input
-                                :disabled="bloquearInput?true:false"
-                                v-model="diasValidosProf"
-                                min="0"
-                                value="0"
-                                type="number"
-                              ></b-form-input>
-                              </b-input-group>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <b-input-group>
-                                <b-form-checkbox 
-                                  :disabled="bloquearInput?true:false"
-                                  v-model="EsCreditoProforma"
-                                  :value="1"
-                                  :unchecked-value="0">
-                                  Proforma a Credito
-                                </b-form-checkbox>
-                                <div v-if="EsCreditoProforma">
-                                  <div class="mb-3">
-                                    <input v-model="FechaCreditoProforma"
-                                      type="date"
-                                      class="form-control"
-                                      required
-                                      placeholder="Fecha Crédito"/>
-                                  </div>
-                                </div>
-                              </b-input-group>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </slot>
-                  </b-popover>  
-                </td>
-              <td class="table-info"><b>TOTAL</b></td>
-              <td class="table-info">
-                {{ sumatoriaTotal }}
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <label>pagó con:</label>
-                <b-form-input
-                  type="text"
-                  :disabled="bloquearInput ? true : false"
-                  placeholder="Pagó con"
-                  v-model="pagocon"
-                  @input="asignarVuelto"
-                ></b-form-input
-                ><br />
-                <label>Vuelto:</label>
-                <b>S/ </b>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        </b-col>
-      </b-row>
-     
+        </b-row>
+      </b-form>
     </b-container>
   </div>
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
-import ProductosCarrito from "@/components/ProductosCarritoMultVenta";
+import ProductosCarrito from "@/components/ProductosCarrito";
 import ClientesForm from "@/components/ClientesForm";
 import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
@@ -1477,7 +962,6 @@ import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
 import Swal from "sweetalert2";
-import ProductoForm from "./../components/ProductoForm.vue";
 export default {
   beforeMount() {
     let vm = this;
@@ -1514,83 +998,20 @@ export default {
   },
   async mounted() {
     this.$store.state.MostrarBotonMultipleEmpresa = true;
+    await this.getVendedor();
     if (sessionStorage.getItem("empresa")) {
       this.empresa = sessionStorage.getItem("empresa");
     }
     //setInterval(this.updateTime, 1000)
-    setTimeout(async () => {
-      Promise.all([
-        this.getVendedor(),
-        this.loadClienteVarios(),
-        this.escucharPedidos(),
-        this.configStock()
-        // this.recalcularTotalesPorEmpresa()
-      ]);
-    }, 500);
-    let vm = this;
-    vm.lstProductos = [];
-    for (const empresa of vm.$store.state.empresas) {
-      let url = `${
-        vm.API
-      }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
-        empresa.value
-      }&limit=`;
-
-      let res = await vm.axios(url); // Espera la respuesta antes de continuar
-
-      res.data.forEach(element => {
-        vm.lstProductos.push({
-          ...element,
-          Empresa: empresa.value,
-          Selected: false,
-          NombreEmpresa: empresa.text.substring(0, 20) + "...",
-          _rowVariant:
-            element.stock <= 0
-              ? "danger"
-              : element.stock < element.StockMinimo
-                ? "warning"
-                : "success"
-        });
-      });
-    }
+    this.loadClienteVarios();
+    this.escucharPedidos();
+    this.configStock();
+    setTimeout(() => {
+      this.recalcularTotalesPorEmpresa();
+    }, 100);
   },
   data() {
     return {
-      monto: 0,
-      primerMonto: true,
-      perPageModal: 100,
-      currentPageModal: 1,
-      IdProducto: "",
-      errorMontoPresentacion: "",
-      numerosCalculadora: [
-        { valor: "7", tipo: "number" },
-        { valor: "8", tipo: "number" },
-        { valor: "9", tipo: "number" },
-        { valor: "4", tipo: "number" },
-        { valor: "5", tipo: "number" },
-        { valor: "6", tipo: "number" },
-        { valor: "1", tipo: "number" },
-        { valor: "2", tipo: "number" },
-        { valor: "3", tipo: "number" },
-        { valor: "0", tipo: "number" },
-        { valor: "fas fa-backspace", tipo: "backspace" },
-        { valor: "CE", tipo: "limpiar" }
-      ],
-      Serie: "",
-      Series: [],
-      loadCode: "",
-      lstProductos: [],
-      productoSelect: [],
-      modalNuevoProductos: false,
-      modalPresentaciones: false,
-      modalPresentacionesEditar: false,
-      anadirSerieFlag: false,
-      objProd: {},
-      itemProducto: {},
-      showButton: false,
-      searchProducto: "",
-      ventas: [],
-      tab: 0,
       pagocon: 0,
       isNota: false,
       dni: "",
@@ -1604,12 +1025,13 @@ export default {
       descuentoPuntos: {},
       descuentoGeneral: 0,
       tieneIgv: false,
-      ventaInit: {},
+      venta: {},
       mostrar: false,
       mostrarOp: false,
       bloquearInput: false,
       diasValidosProf: 1,
       adelantosPreOrden: [],
+      lstTotalPorEmpresa: [],
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1667,484 +1089,84 @@ export default {
       ventaSinStock: 0,
       idPerfil: sessionStorage.getItem("IdPerfil") || 0,
       EsCredito: 0,
-      EsCreditoProforma: 0,
-      perPageModalList: [
-        { value: 5, text: "5" },
-        { value: 10, text: "10" },
-        { value: 20, text: "20" },
-        { value: 50, text: "50" },
-        { value: 100, text: "100" },
-        { value: null, text: "All" }
-      ],
-      nextPage() {
-        if (this.currentPage < this.totalPages) this.currentPage++;
-      },
-      prevPage() {
-        if (this.currentPage > 1) this.currentPage--;
-      },
-      currentPage: 1
+      EsCreditoProforma: 0
     };
   },
-
-  methods: {
-    // PRODUCTO CARRITO
-
-    quitarProducto(index) {
-      this.ventas[this.tab].productos.splice(index, 1);
-      this.$toasted.show("Producto quitado del listado");
+  watch: {
+    totalCart(newVal) {
+      this.venta.pago.efectivo.monto = parseFloat(
+        newVal -
+          (parseFloat(this.venta.pago.visa.monto) +
+            parseFloat(this.venta.pago.mastercard.monto) +
+            parseFloat(this.venta.pago.transferencia.monto))
+      ).toFixed(2);
     },
-    getSubtotal(index, item) {
-      let subtotal =
-        (item.tipo == "PRESENTACION" ? item.cantxPrecio : item.cantidad) *
-        item.precio;
-
-      Vue.set(
-        this.ventas[this.tab].productos[index],
-        "subtotal",
-        parseFloat(subtotal).toFixed(2)
-      );
-
-      return parseFloat(subtotal).toFixed(2);
+    productos() {
+      this.recalcularTotalesPorEmpresa();
     },
-    getTotal(index, item) {
-      let total = parseFloat(item.subtotal);
-
-      if (item.FLETE) {
-        total += parseFloat(item.FLETE);
-      }
-      if (item.TieneIgv) {
-        total += parseFloat(item.igv);
-      }
-      if (item.descuento) {
-        total -= parseFloat(item.descuento);
-      }
-
-      total = this.$options.filters.redondear(total);
-      Vue.set(this.ventas[this.tab].productos[index], "total", total);
-
-      return total;
-    },
-    aumentarMontoPresentacion(item) {
-      if (this.primerMonto) {
-        this.monto = item.valor;
-        this.primerMonto = false;
-      } else {
-        switch (item.tipo) {
-          case "number":
-            this.monto = parseFloat(this.monto.toString() + item.valor);
-            break;
-          case "limpiar":
-            this.monto = 0;
-            break;
-          case "backspace":
-            if (this.monto.toString().length > 1) {
-              this.monto = parseFloat(
-                this.monto.toString().slice(0, this.monto.toString().length - 1)
-              );
-            } else {
-              this.monto = 0;
-            }
-            break;
-
-          default:
-            break;
-        }
-      }
-    },
-    listadoProductos() {
-      let lst = [];
-      let productosFiltrados = this.lstProductos.filter(
-        listadoProducto =>
-          !this.ventas[this.tab].productos.some(
-            producto =>
-              producto.IdProducto == listadoProducto.IdProducto &&
-              producto.Empresa == listadoProducto.Empresa
-          )
-      );
-
-      if (this.searchProducto) {
-        const term = this.searchProducto.toLowerCase();
-
-        lst = productosFiltrados.filter(p => {
-          const prod = (p.Producto || "").toLowerCase();
-          const cat = (p.ProductoCategoria || "").toLowerCase();
-          const marca = (p.ProductoMarca || "").toLowerCase();
-          const empresa = (p.Empresa || "").toLowerCase();
-
-          // si aparece en cualquiera, entra
-          return (
-            prod.includes(term) ||
-            cat.includes(term) ||
-            marca.includes(term) ||
-            empresa.includes(term)
-          );
-        });
-      } else {
-        lst = productosFiltrados;
-      }
-
-      if (this.IdProducto) {
-        lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
-      }
-
-      const perPage = parseInt(this.perPageModal) || lst.length;
-      const start = (this.currentPage - 1) * perPage;
-      const end = start + perPage;
-      return lst.slice(start, end);
-    },
-    buscarProductosCodigoBarrasModal(e) {
-      e.preventDefault();
-      this.IdProducto = this.loadCode;
-    },
-
-    setAltImg(event) {
-      event.target.src = "static/no-photo.png";
-    },
-    generarSerie(serie) {
-      if (serie) {
-        return serie;
-      }
-      return [];
-    },
-    showPresentacion(obj, index) {
-      this.itemProducto = { ...obj };
-      this.monto = this.itemProducto.cantidad;
-      this.index = index;
-      this.modalPresentacionesEditar = true;
-    },
-    guardarItemEditar(presentacion) {
-      this.errorMontoPresentacion = "";
-      if (this.monto == 0) {
-        this.errorMontoPresentacion = "Ingrese una Cantidad";
-        return false;
-      }
-      let prod = this.itemProducto;
-      prod.tipo = "PRESENTACION";
-      prod.estadoPxP = true;
-      prod.cantxPrecio = this.monto;
-      prod.cantidad = presentacion.cantidad;
-
-      if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * presentacion.precio;
-        prod.precio = presentacion.precio;
-        prod.cantidadPres = presentacion.cantidad;
-        prod.estadoPxP = false;
-      }
-      Vue.set(this.ventas[this.tab].productos, this.index, prod);
-
-      this.modalPresentacionesEditar = false;
-    },
-    guardarItemPorUnidadEditar() {
-      this.errorMontoPresentacion = "";
-      if (this.monto == 0) {
-        this.errorMontoPresentacion = "Ingrese una Cantidad";
-        return false;
-      }
-      let prod = this.itemProducto;
-      prod.tipo = "UNIDAD";
-      prod.precio = prod.PrecioContado;
-
-      prod.cantxPrecio = this.monto;
-      prod.cantidad = 1;
-      if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.subtotal = this.monto * prod.PrecioContado;
-        prod.total = this.monto * prod.PrecioContado;
-      }
-
-      Vue.set(this.ventas[this.tab].productos, this.index, prod);
-      this.modalPresentacionesEditar = false;
-    },
-    guardarItem(presentacion) {
-      let empresa = sessionStorage.getItem("empresa")
-        ? sessionStorage.getItem("empresa")
-        : "modasm";
-      this.errorMontoPresentacion = "";
-
-      if (this.monto == 0) {
-        this.errorMontoPresentacion = "Ingrese una Cantidad";
-        return false;
-      }
-
-      let prod = this.itemProducto;
-      this.itemProducto.tipo = "PRESENTACION";
-      prod.estadoPxP = true;
-      prod.cantxPrecio = this.monto;
-      prod.cantidad = presentacion.cantidad * this.monto;
-      prod.descuento = 0;
-      prod.disabled = true;
-      prod.Presentacion = JSON.stringify(presentacion);
-      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
-
-      if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * presentacion.precio;
-        prod.precio = presentacion.precio;
-        prod.cantidadPres = presentacion.cantidad;
-        prod.estadoPxP = false;
-      }
-      delete prod._rowVariant;
-      prod = {
-        ...prod,
-        subtotal: 0,
-        total: 0,
-        precio: prod.PrecioContado,
-        bloquearInput: false
-      };
-      this.ventas[this.tab].productos.unshift(prod);
-      this.modalPresentaciones = false;
-      this.modalNuevoProductos = this.abrirModal;
-    },
-    guardarItemPorUnidad() {
-      let empresa = sessionStorage.getItem("empresa")
-        ? sessionStorage.getItem("empresa")
-        : "modasm";
-      this.errorMontoPresentacion = "";
-      if (this.monto == 0) {
-        this.errorMontoPresentacion = "Ingrese una Cantidad";
-        return false;
-      }
-      let prod = this.itemProducto;
-      prod.tipo = "UNIDAD";
-      prod.estadoPxP = true;
-      prod.cantxPrecio = 0;
-      prod.cantidad = 1;
-      prod.descuento = 0;
-      prod.disabled = false;
-      prod.Presentacion = null;
-      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
-      prod.subtotal = 0;
-      prod.total = 0;
-      prod.precio = prod.PrecioContado;
-      prod.cantidadPres = 0;
-      prod.bloquearInput = false;
-      if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.estadoPxP = false;
-      }
-      delete prod._rowVariant;
-      prod = {
-        ...prod,
-        subtotal: 0,
-        total: 0,
-        precio: prod.PrecioContado,
-        cantidadPres: 0,
-        bloquearInput: false
-      };
-      this.ventas[this.tab].productos.unshift(prod);
-      this.modalPresentaciones = false;
-      this.modalNuevoProductos = this.abrirModal;
-    },
-
-    guardarSerie() {
-      this.objProd.Serie = this.Series;
-      Vue.set(this.ventas[this.tab].productos, this.index, this.objProd);
-      this.anadirSerieFlag = false;
-    },
-    async obtenerSeriePorProducto(id, Empresa) {
-      let productoSerie = [];
-      await this.axios
-        .get(this.API + "productos/serie", {
-          params: { IdProducto: id, Todos: false, empresa: Empresa }
-        })
-        .then(res => {
-          if (res) {
-            productoSerie = res.data;
-          }
-        });
-      return productoSerie;
-    },
-    async anadirarProductosSeleccionado(item, abrirModal = false) {
-      if (
-        this.ventas[this.tab].productos.some(
-          v => v.IdProducto == item.IdProducto
-        )
-      ) {
-      } else {
-        let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
-        let productoSerie = await this.obtenerSeriePorProducto(
-          item.IdProducto,
-          item.Empresa
-        );
-        item.productoSerie = productoSerie;
-        this.itemProducto = { ...item };
-        this.itemProducto.tipo = "PRESENTACION";
-        this.itemProducto.PreciosPorProducto = PreciosPorProducto;
-        if (PreciosPorProducto.filter(v => v.cantidad > 0).length > 0) {
-          this.monto = 1;
-          this.modalPresentaciones = true;
-          this.primerMonto = true;
-        } else {
-          if (!this.itemProducto.Empresa) {
-            let empresa = this.$store.state.empresas.filter(
-              v => v.value == this.empresa
-            )[0];
-            this.itemProducto.Empresa = empresa.value;
-            this.itemProducto.NombreEmpresa =
-              empresa.text.substring(0, 20) + "...";
-          }
-          this.itemProducto.tipo = "UNIDAD";
-          this.itemProducto.estadoPxP = true;
-          this.itemProducto.precio = this.itemProducto.PrecioContado;
-          this.itemProducto.total = 0;
-          this.itemProducto.cantxPrecio = 0;
-          this.itemProducto.cantidad = 1;
-          this.itemProducto.descuento = 0;
-          delete this.itemProducto._rowVariant;
-          this.ventas[this.tab].productos.unshift(this.itemProducto);
-        }
-      }
-    },
-    loadBarcode(e) {
-      e.preventDefault();
-      let idProducto = this.loadCode;
-      let id_empresa = this.empresa;
-      if (idProducto) {
-        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
-        this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then(response => {
-            if (response.data.IdProducto) {
-              this.anadirarProductosSeleccionado(response.data);
-            } else {
-              this.loadCode = "";
-              this.$toasted.show("No se encontró ningun producto");
-            }
-          });
-      }
-    },
-    async abrirModaProductos() {
-      let vm = this;
-      vm.searchProducto = "";
-      vm.modalNuevoProductos = !vm.modalNuevoProductos;
-      vm.$store.state.consideraAppendEmpresa = false;
-    },
-    renderChild(data) {
-      let styleStock = "";
-      if (data.stock <= 0) {
-        styleStock = "table-danger";
-      } else {
-        styleStock = "table-success";
-      }
-      if (data.EsPadre == 1) {
-        styleStock = "";
-      }
-
-      return `
-      <style>
-      #table-render {
-        font-size: 13px;
-        margin-bottom: 5px;
-            margin-top: 5px;
-            }
-            #table-render td, #table-render th {
-            border: 1px solid #eaeaea;
-            }
-            #table-render td, #table-render th {
-              color: #000000 !important;
-          }
-          .imagen{
-            width: 100%;
-            heigth: 100%;
-          }
-          .imagen:hover{
-            width: 200px;
-            heigth: 200px;
-            }
-        </style>
-        <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
-            <tbody>
-              <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${
-        data.EsPadre == 1
-          ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
-          : data.stock
-            ? Number.isInteger(parseFloat(data.stock))
-              ? parseInt(data.stock)
-              : parseFloat(data.stock).toFixed(2)
-            : data.stock
-      }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
-        data.CodigoBarra
-      }</b></td>
-                  <td style="width: 100px">${data.ProductoCategoria}</td>
-                  <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
-                <td style="width: 5%">
-                  <img src="${
-                    data.Imagen == null || data.Imagen == ""
-                      ? "static/no-photo.png"
-                      : "/resources/images/productos/" + data.Imagen
-                  }" class="imagen">
-                  </td>
-                  <!--<td style="width: 20px" class="text-center"><b>${
-                    data.VentaEstrategica == 1
-                      ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
-                      : ""
-                  }</b></td>-->
-                    </tr>
-                    </tbody>
-                    </table>   
-                    </div>
-                    `;
-    },
-    anadirVentana() {
-      // PRODUCTO CARRITO
-      // this.ventas.push(JSON.parse(JSON.stringify(this.ventaInit)));
-
-      this.ventas.push({ ...this.ventaInit, productos: [] });
-      setTimeout(async () => {
-        this.tab = this.ventas.length - 1;
-      }, 100);
-      setTimeout(async () => {
-        this.tab = this.ventas.length - 1;
-        Promise.all([
-          this.getVendedor(),
-          this.loadClienteVarios(),
-          this.escucharPedidos(),
-          this.configStock()
-        ]);
-      }, 150);
-    },
-    anadirProforma(value) {
-      this.ventas.push({
-        ...this.ventaInit,
-        cliente: value,
-        productos: value.productos
+    recalcularTotalPorEmpresaFlag() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.recalcularTotalesPorEmpresa();
+          // this.metodoPagoCambio(1);
+        }, 100);
       });
-      setTimeout(async () => {
-        this.tab = this.ventas.length - 1;
-      }, 100);
-      setTimeout(async () => {
-        Promise.all([
-          this.getVendedor(),
-          this.setCliente({
-            Anio: value.Anio,
-            Cliente: value.Cliente,
-            Direccion: value.Direccion,
-            DniRuc: value.DniRuc,
-            FechaReg: value.FechaReg,
-            IdCliente: value.IdCliente,
-            Numero: value.Numero,
-            Total: value.Total
-          }),
-          this.escucharPedidos(),
-          this.configStock()
-        ]);
-      }, 100);
+    }
+  },
+  computed: {
+    ...mapState({
+      productos: state => state.cart.productos,
+      recalcularTotalPorEmpresaFlag: state =>
+        state.recalcularTotalPorEmpresaFlag,
+
+      totalCart: state => state.cart.totalCart
+    }),
+    empresasConTotal() {
+      return this.lstTotalPorEmpresa.filter(e => e.total > 0);
     },
+    manoDeObraBruta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precioBruta : 0;
+
+      return precio;
+    },
+    manoDeObraNeta() {
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let precio = pManoObra ? pManoObra.precio : 0;
+
+      return precio;
+    },
+    sumatoriaTotal() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return (
+          sum +
+          parseFloat(
+            producto.subtotal - (producto.descuento ? producto.descuento : 0)
+          )
+        );
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    },
+    subTotalG() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return sum + parseFloat(producto.subtotal);
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    },
+    descuentoG() {
+      let sumatoria = this.productos.reduce((sum, producto) => {
+        return sum + parseFloat(producto.descuento ? producto.descuento : 0);
+      }, 0);
+      // this.actualizarTotal(sumatoria);
+
+      return this.$options.filters.redondear(sumatoria);
+    }
+  },
+  methods: {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
@@ -2176,7 +1198,34 @@ export default {
       window.parent.document.getElementById("NavegadorParent").style.display =
         "block";
     },
-
+    async recalcularTotalesPorEmpresa() {
+      this.lstTotalPorEmpresa = [];
+      await this.$store.state.empresas.forEach(empresa => {
+        if (this.productos.some(p => p.Empresa == empresa.value)) {
+          let total = this.productos
+            .filter(p => p.Empresa == empresa.value)
+            .reduce((total, prod) => {
+              return parseFloat(total) + parseFloat(prod.total);
+            }, 0);
+          this.lstTotalPorEmpresa.push({
+            nombre: empresa.text,
+            total: parseFloat(total).toFixed(2)
+          });
+        } else {
+          this.lstTotalPorEmpresa.push({
+            nombre: empresa.text,
+            total: 0
+          });
+        }
+      });
+      let totalCart = this.lstTotalPorEmpresa.reduce((sum, emp) => {
+        return sum + parseFloat(emp.total);
+      }, 0);
+      this.$store.state.cart.totalCart = totalCart;
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
+    },
     asignarVuelto() {
       this.vuelto = parseFloat(this.pagocon - this.sumatoriaTotal).toFixed(2);
     },
@@ -2184,28 +1233,28 @@ export default {
     metodoPagoCambio(opc) {
       switch (opc) {
         case 1:
-          this.ventas[this.tab].pago.visa.monto = 0;
-          this.ventas[this.tab].pago.mastercard.monto = 0;
-          this.ventas[this.tab].pago.transferencia.monto = 0;
-          this.ventas[this.tab].pago.efectivo.monto = this.totalCart;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.efectivo.monto = this.totalCart;
           break;
         case 2:
-          this.ventas[this.tab].pago.mastercard.monto = 0;
-          this.ventas[this.tab].pago.efectivo.monto = 0;
-          this.ventas[this.tab].pago.transferencia.monto = 0;
-          this.ventas[this.tab].pago.visa.monto = this.totalCart;
+          this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.visa.monto = this.totalCart;
           break;
         case 3:
-          this.ventas[this.tab].pago.efectivo.monto = 0;
-          this.ventas[this.tab].pago.visa.monto = 0;
-          this.ventas[this.tab].pago.transferencia.monto = 0;
-          this.ventas[this.tab].pago.mastercard.monto = this.totalCart;
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.mastercard.monto = this.totalCart;
           break;
         case 4:
-          this.ventas[this.tab].pago.efectivo.monto = 0;
-          this.ventas[this.tab].pago.visa.monto = 0;
-          this.ventas[this.tab].pago.mastercard.monto = 0;
-          this.ventas[this.tab].pago.transferencia.monto = this.totalCart;
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.transferencia.monto = this.totalCart;
           break;
 
         default:
@@ -2242,8 +1291,13 @@ export default {
       }
     },
     selectPreOrden(orden) {
-      this.ventas[this.tab].IdPreOrden.push(orden);
+      // console.log(orden)
+      // this.venta.IdPreOrden = this.venta.IdPreOrden || []
+      // if (Array.isArray(this.venta.IdPreOrden) ) {
+      this.venta.IdPreOrden.push(orden);
+      //}
 
+      // obtener total adelantos
       this.axios
         .get(this.API + "preorden/cajaybanco", {
           params: {
@@ -2268,7 +1322,7 @@ export default {
         .get(this.API + "almacenes/primero?id_empresa" + this.empresa)
         .then(res => {
           this.$refs.inputAlmacen.setValue(res.data.Almacen);
-          this.ventas[this.tab].almacen = res.data;
+          this.venta.almacen = res.data;
         });
     },
     loadFirstPuntoVenta() {
@@ -2288,12 +1342,11 @@ export default {
       }
     },
     focusAutocomplete(ref) {
-      // this.$nextTick(() => {
-      this.$refs[ref][0].handleDoubleClick();
-      // });
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
     },
     initForm() {
-      this.ventaInit = {
+      this.venta = {
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -2337,10 +1390,8 @@ export default {
         DireccionEntrega: "",
         diasValidosProf: 1,
         idProforma: 0,
-        anioNumeroProforma: "",
-        productos: []
+        anioNumeroProforma: ""
       };
-
       this.isNota = false;
       this.bloquearInput = false;
       this.adelantosPreOrden = [];
@@ -2348,18 +1399,13 @@ export default {
       this.infoDelivery = {};
       this.descuentoGeneral = 0;
       this.puntosAplicados = 0;
-
-      setTimeout(() => {
-        this.ventas.push({ ...this.ventaInit });
-      }, 200);
     },
     setTipoVenta(obj) {
       this.isNota = false;
-      (this.bloquearInput = false),
-        (this.ventas[this.tab].NroComprobanteModifica = "");
-      this.ventas[this.tab].CodSunatModifica = "";
-      this.ventas[this.tab].NotaIdMotivo = "";
-      this.ventas[this.tab].NotaDescMotivo = "";
+      (this.bloquearInput = false), (this.venta.NroComprobanteModifica = "");
+      this.venta.CodSunatModifica = "";
+      this.venta.NotaIdMotivo = "";
+      this.venta.NotaDescMotivo = "";
       this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
@@ -2372,18 +1418,18 @@ export default {
         this.tieneIgv = false;
       }
       this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
-      this.ventas[this.tab].tipoVenta = obj;
+      this.venta.tipoVenta = obj;
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      this.ventas[this.tabs].CodSunatModifica = obj.CodSunat;
-      this.ventas[this.tabs].NroComprobanteModifica = obj.NroComprobante;
+      this.venta.CodSunatModifica = obj.CodSunat;
+      this.venta.NroComprobanteModifica = obj.NroComprobante;
 
       if (
-        this.ventas[this.tabs].tipoVenta.CodSunat == "07" ||
-        this.ventas[this.tabs].tipoVenta.CodSunat == "08"
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
       ) {
-        this.ventas[this.tabs].Serie = this.ventas[this.tabs].Serie.replace(
+        this.venta.Serie = this.venta.Serie.replace(
           /^./,
           obj.NroComprobante[0]
         );
@@ -2391,16 +1437,16 @@ export default {
       this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
-            serie: this.ventas[this.tab].Serie,
-            idTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
+            serie: this.venta.Serie,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
             id_empresa: this.empresa
           }
         })
         .then(response => {
-          this.ventas[this.tab].Numero = response.data.numero;
+          this.venta.Numero = response.data.numero;
         })
         .catch(error => {
-          console.error(error);
+          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
       //Cargar producto del documento afectado nota credito
@@ -2409,8 +1455,7 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.ventas[this.tab].puntoVenta
-              .IdDocVentaPuntoVenta,
+            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
             id_empresa: this.empresa
           }
         })
@@ -2424,23 +1469,15 @@ export default {
             })
             .then(response => {
               if (response.data) {
-                let ref = `inputCliente${this.tab}`;
-                const comp = this.$refs[ref][0];
-
-                if (comp) {
-                  comp.setValue(response.data.NombreUsuario);
-                  comp.$refs.input.disabled = true;
-                }
-                this.ventas[this.tab].cliente = response.data;
-                this.ventas[this.tab].CampoDireccion = this.ventas[
-                  this.tab
-                ].cliente.Direccion;
+                this.$refs.inputCliente.setValue(response.data.Cliente);
+                this.venta.cliente = response.data;
+                this.venta.CampoDireccion = this.venta.cliente.Direccion;
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
             })
             .catch(error => {
-              console.error(error);
+              console.log(error);
             });
           this.limpiarCart();
           let empresa = this.$store.state.empresas.filter(
@@ -2448,8 +1485,8 @@ export default {
           )[0];
 
           if (
-            this.ventas[this.tab].tipoVenta.CodSunat == "07" ||
-            this.ventas[this.tab].tipoVenta.CodSunat == "08"
+            this.venta.tipoVenta.CodSunat == "07" ||
+            this.venta.tipoVenta.CodSunat == "08"
           ) {
             response.data.map(item => {
               item.Empresa = empresa.value;
@@ -2469,11 +1506,9 @@ export default {
             }
             this.add([item, () => {}, false]);
           });
-          this.ventas[this.tab].NotaIdMotivo = null;
+          this.venta.NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({
-            IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen
-          });
+          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
     setMotivo(ev) {
@@ -2489,9 +1524,9 @@ export default {
       });
     },
     setAlmacen(obj) {
-      this.ventas[this.tab].almacen = obj;
-      let ref = `inputAlmacen${this.tab}`;
-      this.obtenerStok({ IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen });
+      this.venta.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -2505,8 +1540,8 @@ export default {
       });
     },
     setPuntoVenta(obj) {
-      this.ventas[this.tab].puntoVenta = obj;
-
+      this.venta.puntoVenta = obj;
+      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
     getVendedor(user) {
@@ -2518,49 +1553,37 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          let ref = "";
-
-          ref = `inputAlmacen${this.tab}`;
-          this.$refs[ref][0].$refs.input.disabled = true;
-
-          ref = `inputPuntoVenta${this.tab}`;
-          this.$refs[ref][0].$refs.input.disabled = true;
-          // -----------------------------
-          ref = `inputVendedor${this.tab}`;
-          const comp = this.$refs[ref][0];
-
-          if (comp) {
-            comp.setValue(response.data.NombreUsuario);
-            comp.$refs.input.disabled = true;
-          }
-
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          //this.$refs.inputVendedor.$refs.input.disabled = true
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
           // bloquear ambos inputs
-
+          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          //this.getNumeroVenta()
           this.getTipoDoc(response.data.IdTipoDoc);
         })
         .catch(error => {
-          console.error(error);
+          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
     setVendedor(obj) {
+      // console.log(obj)
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
-      this.ventas[this.tab].vendedor = obj;
+      this.venta.vendedor = obj;
     },
     setVendedorManual(obj) {
-      this.ventas[this.tab].vendedor = obj;
+      this.venta.vendedor = obj;
       this.getVendedor(obj.Usuario);
     },
     setComisionista(obj) {
       if (typeof obj === "object") {
-        let inputComisionista = `inputComisionista${this.tabs}`;
-        this.$refs[inputComisionista].setValue(obj.Cliente);
-        this.ventas[this.tab].comisionista = obj;
+        this.$refs.inputComisionista.setValue(obj.Cliente);
+        this.venta.comisionista = obj;
       } else {
-        this.ventas[this.tab].comisionista = {};
+        this.venta.comisionista = {};
       }
     },
     setCliente(obj, dni = false) {
@@ -2577,9 +1600,8 @@ export default {
 
       if (typeof obj === "object") {
         if (obj.IdProforma > 0) {
-          this.ventas[this.tab].idProforma = obj.IdProforma;
-          this.ventas[this.tab].anioNumeroProforma =
-            obj.Anio + "-" + obj.Numero;
+          this.venta.idProforma = obj.IdProforma;
+          this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
           this.getVendedor(obj.UsuarioReg);
           delete obj.productos;
           this.axios
@@ -2588,37 +1610,21 @@ export default {
               { data: obj }
             )
             .then(response => {
-              let ref = `inputCliente${this.tab}`;
-              const comp = this.$refs[ref][0];
-
-              if (comp) {
-                comp.setValue(response.data.NombreUsuario);
-                comp.$refs.input.disabled = true;
-              }
-
-              this.ventas[this.tab].cliente = response.data;
-              this.ventas[this.tab].CampoDireccion = this.ventas[
-                this.tab
-              ].cliente.Direccion;
+              //console.log(response.data);
+              this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = this.venta.cliente.Direccion;
             })
             .catch(error => {
               this.$toasted.show("Ha ocurrido un error, en la emision a sunat");
             });
         } else {
-          let ref = `inputCliente${this.tab}`;
-          const comp = this.$refs[ref][0];
-
-          if (comp) {
-            comp.setValue(obj.Cliente);
-          }
-
-          this.ventas[this.tab].cliente = obj;
-          this.ventas[this.tab].CampoDireccion = this.ventas[
-            this.tab
-          ].cliente.Direccion;
-          if (this.ventas[this.tab].cliente.DniRuc == "00000000") {
-            this.ventas[this.tab].EsOrganizacion = 0;
-            this.ventas[this.tab].NombreOrganizacion = "";
+          this.$refs.inputCliente.setValue(obj.Cliente);
+          this.venta.cliente = obj;
+          this.venta.CampoDireccion = this.venta.cliente.Direccion;
+          if (this.venta.cliente.DniRuc == "00000000") {
+            this.venta.EsOrganizacion = 0;
+            this.venta.NombreOrganizacion = "";
           }
         }
       } else {
@@ -2629,27 +1635,19 @@ export default {
           })
           .then(response => {
             if (response.data) {
-              let ref = `inputCliente${this.tab}`;
-              const comp = this.$refs[ref][0];
-
-              if (comp) {
-                comp.setValue(response.data.NombreUsuario);
-                comp.$refs.input.disabled = true;
-              }
-              this.ventas[this.tab].cliente = response.data;
-              this.ventas[this.tab].CampoDireccion = this.ventas[
-                this.tab
-              ].cliente.Direccion;
-              if (this.ventas[this.tab].cliente.DniRuc == "00000000") {
-                this.ventas[this.tab].EsOrganizacion = 0;
-                this.ventas[this.tab].NombreOrganizacion = "";
+              this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              if (this.venta.cliente.DniRuc == "00000000") {
+                this.venta.EsOrganizacion = 0;
+                this.venta.NombreOrganizacion = "";
               }
             } else {
               this.$toasted.show("No se encontro al cliente");
             }
           })
           .catch(error => {
-            console.error(error);
+            console.log(error);
           });
       }
 
@@ -2657,8 +1655,8 @@ export default {
       // Actualizar DisabledTotal
     },
     limpiarProforma() {
-      this.ventas[this.tab].idProforma = 0;
-      this.ventas[this.tab].anioNumeroProforma = "";
+      this.venta.idProforma = 0;
+      this.venta.anioNumeroProforma = "";
       //this.limpiarCart()
       //this.loadClienteVarios()
     },
@@ -2676,18 +1674,18 @@ export default {
       return obj;
     },
     onAddProducto(obj) {
-      this.ventas[this.tab].pago.visa.monto = 0;
-      this.ventas[this.tab].pago.mastercard.monto = 0;
-      this.ventas[this.tab].pago.transferencia.monto = 0;
+      this.venta.pago.visa.monto = 0;
+      this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
       this.actualizarDescuento();
       this.obtenerStok({
-        IdAlmacen: this.ventas[this.tab].almacen.IdAlmacen
+        IdAlmacen: this.venta.almacen.IdAlmacen
       });
     },
     actualizarDescuento() {
-      this.ventas[this.tab].pago.visa.monto = 0;
-      this.ventas[this.tab].pago.mastercard.monto = 0;
-      this.ventas[this.tab].pago.transferencia.monto = 0;
+      this.venta.pago.visa.monto = 0;
+      this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
       if (this.puntosAplicados > 0) {
         this.aplicarPuntos(this.puntosAplicados);
       }
@@ -2697,8 +1695,8 @@ export default {
       }
     },
     aplicarPuntos(val) {
-      if (parseFloat(val) > this.ventas[this.tab].cliente.Puntos) {
-        this.puntosAplicados = this.ventas[this.tab].cliente.Puntos;
+      if (parseFloat(val) > this.venta.cliente.Puntos) {
+        this.puntosAplicados = this.venta.cliente.Puntos;
       }
 
       this.axios
@@ -2708,7 +1706,7 @@ export default {
           this.aplicarDescuento(response.data.descuento);
         })
         .catch(error => {
-          console.error(error);
+          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
@@ -2720,24 +1718,22 @@ export default {
       this.axios
         .get(this.API + "ventas/numero", {
           params: {
-            idPuntoVenta: this.ventas[this.tab].puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
+            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
+            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
             id_empresa: this.empresa
           }
         })
         .then(response => {
-          this.ventas[this.tab].Serie = response.data.serie;
-          this.ventas[this.tab].Numero = response.data.numero;
+          this.venta.Serie = response.data.serie;
+          this.venta.Numero = response.data.numero;
         })
         .catch(error => {
-          console.error(error);
+          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
     updateTime() {
-      this.ventas[this.tab].FechaDoc = this.$moment().format(
-        "YYYY-MM-DDTH:mm:ss"
-      );
+      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
     },
     //limpiarDespuesVenta () {
     //    this.inProgress = false
@@ -2755,7 +1751,7 @@ export default {
     guardarProforma() {
       this.inProgress = true;
 
-      if (!this.ventas[this.tab].productos.length) {
+      if (!this.productos.length) {
         this.$toasted.show("No hay productos para crear la proforma");
         this.inProgress = false;
         return;
@@ -2767,24 +1763,22 @@ export default {
         return;
       }
 
-      if (!this.ventas[this.tab].cliente.IdCliente) {
+      if (!this.venta.cliente.IdCliente) {
         this.$toasted.show("Debe seleccionar un cliente");
         this.inProgress = false;
         return;
       }
 
-      if (!this.ventas[this.tab].vendedor.Usuario) {
+      if (!this.venta.vendedor.Usuario) {
         this.$toasted.show("Debe seleccionar un vendedor");
         this.inProgress = false;
         return;
       }
 
-      this.ventas[this.tab].diasValidosProf = this.diasValidosProf;
+      this.venta.productos = this.productos;
+      this.venta.diasValidosProf = this.diasValidosProf;
       this.axios
-        .post(
-          this.API + "proformas?id_empresa=" + this.empresa,
-          this.ventas[this.tab]
-        )
+        .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
           this.$toasted.info("Proforma Guardada con exito");
           //this.limpiarDespuesVenta()
@@ -2793,6 +1787,10 @@ export default {
           this.inProgress = false;
           this.tieneIgv = false;
           //this.ultimaVenta = response.data.insertId
+          this.initForm();
+          this.limpiarCart();
+          this.$refs.inputCliente.setValue("");
+          this.$refs.inputVendedor.setValue("");
           this.getVendedor();
           window.open(
             "/nuevo/index.html#/reportes/proforma/" +
@@ -2803,18 +1801,10 @@ export default {
           );
         })
         .catch(error => {
-          console.error(error);
+          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
-
-      if (this.ventas.length > 1) {
-        this.eliminarVentana();
-      } else {
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      }
     },
     validarProforma() {
       let profoma = { ...this.$store.state.proforma };
@@ -2823,13 +1813,19 @@ export default {
       if (Object.keys(profoma).length > 0) {
         const empresas = [...new Set(lstProductos.map(d => d.Empresa))];
 
+        // if (lstProductos.length == this.productos.length) {
+        //   console.log("ddddd");
+        //   return true;
+        // }
         for (const Empresa of empresas) {
           let lstProductosLength = lstProductos.filter(
             v => v.Empresa == Empresa
           ).length;
-          let productosLength = this.ventas[this.tab].productos.filter(
-            v => v.Empresa == Empresa
-          ).length;
+          let productosLength = this.productos.filter(v => v.Empresa == Empresa)
+            .length;
+
+          console.log("lstProductosLength", lstProductosLength);
+          console.log("productosLength", productosLength);
 
           if (productosLength > 0 && lstProductosLength != productosLength) {
             return false;
@@ -2843,26 +1839,22 @@ export default {
 
       this.inProgress = true;
       let totalPagos = 0;
-      totalPagos += isNaN(parseFloat(this.ventas[this.tab].pago.efectivo.monto))
+      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
         ? 0
-        : parseFloat(this.ventas[this.tab].pago.efectivo.monto);
-      totalPagos += isNaN(parseFloat(this.ventas[this.tab].pago.visa.monto))
+        : parseFloat(this.venta.pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
         ? 0
-        : parseFloat(this.ventas[this.tab].pago.visa.monto);
-      totalPagos += isNaN(
-        parseFloat(this.ventas[this.tab].pago.mastercard.monto)
-      )
+        : parseFloat(this.venta.pago.visa.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
         ? 0
-        : parseFloat(this.ventas[this.tab].pago.mastercard.monto);
-      totalPagos += isNaN(
-        parseFloat(this.ventas[this.tab].pago.transferencia.monto)
-      )
+        : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
         ? 0
-        : parseFloat(this.ventas[this.tab].pago.transferencia.monto);
+        : parseFloat(this.venta.pago.transferencia.monto);
       if (
-        (isNaN(parseFloat(this.ventas[this.tab].pago.efectivo.monto))
+        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
           ? 0
-          : parseFloat(this.ventas[this.tab].pago.efectivo.monto)
+          : parseFloat(this.venta.pago.efectivo.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
@@ -2870,9 +1862,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.ventas[this.tab].pago.visa.monto))
+        (isNaN(parseFloat(this.venta.pago.visa.monto))
           ? 0
-          : parseFloat(this.ventas[this.tab].pago.visa.monto)
+          : parseFloat(this.venta.pago.visa.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
@@ -2880,9 +1872,9 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.ventas[this.tab].pago.mastercard.monto))
+        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
           ? 0
-          : parseFloat(this.ventas[this.tab].pago.mastercard.monto)
+          : parseFloat(this.venta.pago.mastercard.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show(
@@ -2892,16 +1884,16 @@ export default {
         return;
       }
       if (
-        (isNaN(parseFloat(this.ventas[this.tab].pago.transferencia.monto))
+        (isNaN(parseFloat(this.venta.pago.transferencia.monto))
           ? 0
-          : parseFloat(this.ventas[this.tab].pago.transferencia.monto)
+          : parseFloat(this.venta.pago.transferencia.monto)
         ).toFixed(2) < 0
       ) {
         this.$toasted.show("El metodo de Transferencia no puede ser negativo");
         this.inProgress = false;
         return;
       }
-      if (!this.ventas[this.tab].EsCredito) {
+      if (!this.venta.EsCredito) {
         if (
           parseFloat(this.totalCart).toFixed(2) !=
           parseFloat(totalPagos).toFixed(2)
@@ -2912,24 +1904,21 @@ export default {
         }
       }
 
-      if (!this.ventas[this.tab].cliente.DniRuc) {
+      if (!this.venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esNumerico = Number.isInteger(
-        parseInt(this.ventas[this.tab].cliente.DniRuc)
-      );
+      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
       if (!esNumerico) {
         this.$toasted.show("El RUC debe ser numérico, editar cliente.");
         this.inProgress = false;
         return;
       }
 
-      var esEmpresa =
-        this.ventas[this.tab].cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && this.ventas[this.tab].tipoVenta.CodSunat == "01") {
+      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
         this.$toasted.show(
           "Una factura debe ser emitida para una empresa, no un usuario común."
         );
@@ -2939,28 +1928,28 @@ export default {
 
       //Nota de Creadito
       if (
-        this.ventas[this.tab].tipoVenta.CodSunat == "07" ||
-        this.ventas[this.tab].tipoVenta.CodSunat == "08"
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
       ) {
         if (
-          !this.ventas[this.tab].CodSunatModifica ||
-          !this.ventas[this.tab].NroComprobanteModifica
+          !this.venta.CodSunatModifica ||
+          !this.venta.NroComprobanteModifica
         ) {
           this.$toasted.show("Debe seleccionar un Documento de Referencia...");
           this.inProgress = false;
           return;
         }
-        if (!this.ventas[this.tab].NotaIdMotivo) {
+        if (!this.venta.NotaIdMotivo) {
           this.$toasted.show("Debe seleccionar un Motivo");
           this.inProgress = false;
           return;
         }
-        this.ventas[this.tab].NotaDescMotivo = this.itemsMotivoNota.filter(
-          item => item.value == this.ventas[this.tab].NotaIdMotivo
+        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.venta.NotaIdMotivo
         )[0].text;
       }
 
-      if (!this.ventas[this.tab].productos.length) {
+      if (!this.productos.length) {
         this.$toasted.show("No hay productos para vender");
         this.inProgress = false;
         return;
@@ -2969,7 +1958,7 @@ export default {
       // NO PERMITE CANTIDAD Y PRECIOS 0
       let sinStock = 0;
       let totalCero = 0;
-      this.ventas[this.tab].productos.forEach(pro => {
+      this.productos.forEach(pro => {
         if (
           pro.CodigoBarra !== "COSTODELIVERY" &&
           pro.CodigoBarra !== "MANODEOBRA" &&
@@ -2987,7 +1976,7 @@ export default {
 
       if (
         sinStock >= 1 &&
-        this.ventas[this.tab].tipoVenta.CodSunat != "07" &&
+        this.venta.tipoVenta.CodSunat != "07" &&
         this.ventaSinStock != 1
       ) {
         this.$toasted.error("No se puede vender un producto sin stock");
@@ -3008,8 +1997,8 @@ export default {
       }
 
       let count = 0;
-      for (const k in this.ventas[this.tab].pago) {
-        if (this.ventas[this.tab].pago[k].monto > 0) {
+      for (const k in this.venta.pago) {
+        if (this.venta.pago[k].monto > 0) {
           count = count + 1;
         }
       }
@@ -3029,28 +2018,23 @@ export default {
       }
       this.inProgress = false;
 
-      this.ventas[this.tab].puntosAplicados = this.puntosAplicados || 0;
-      this.ventas[this.tab].totalCart = this.totalCart || 0;
-      this.ventas[this.tab].PagoCon = parseFloat(
-        this.$refs.carrito.pagocon
-      ).toFixed(2);
-      this.ventas[this.tab].NombreOrganizacion = (
-        "" + this.ventas[this.tab].NombreOrganizacion
-      )
+      this.venta.productos = this.productos;
+      this.venta.puntosAplicados = this.puntosAplicados || 0;
+      this.venta.totalCart = this.totalCart || 0;
+      this.venta.PagoCon = parseFloat(this.$refs.carrito.pagocon).toFixed(2);
+      this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
         .trim()
         .toUpperCase();
-      this.ventas[this.tab].adelantosPreOrden = this.adelantosPreOrden;
-      this.ventas[this.tab].IdPedido = this.$route.query.idPedido || null;
-      this.ventas[this.tab].nombreLlevar = this.ventas[
-        this.tab
-      ].nombreLlevar.toUpperCase();
-      this.ventas[this.tab].DireccionEntrega = this.ventas[this.tab].EsDelivery
+      this.venta.adelantosPreOrden = this.adelantosPreOrden;
+      this.venta.IdPedido = this.$route.query.idPedido || null;
+      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
+      this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
       // ------------------------- aqui paga
       this.loading = true;
       await this.$store.state.empresas.forEach(async element => {
-        let data = { ...this.ventas[this.tab] };
+        let data = { ...this.venta };
         let serie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
         let empresa = await this.obtenerDatosEmpresa(element.value);
@@ -3061,21 +2045,21 @@ export default {
             return total + parseFloat(prod.total);
           }, 0);
         let tipoPago = "";
-        for (const k in this.ventas[this.tab].pago) {
-          if (this.ventas[this.tab].pago[k].monto > 0) {
+        for (const k in this.venta.pago) {
+          if (this.venta.pago[k].monto > 0) {
             tipoPago = k;
           }
         }
         let dataImprimir = {
-          NombreOrganizacion: this.ventas[this.tab].NombreOrganizacion,
-          vendedor: this.ventas[this.tab].vendedor.NombreUsuario,
+          NombreOrganizacion: this.venta.NombreOrganizacion,
+          vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
           numero: serie.numero,
           serie: serie.serie,
-          CodSunat: this.ventas[this.tab].tipoVenta.CodSunat,
-          IdTipoDoc: this.ventas[this.tab].tipoVenta.IdTipoDoc,
-          LimitItems: this.ventas[this.tab].tipoVenta.LimitItems,
-          TipoDoc: this.ventas[this.tab].tipoVenta.TipoDoc,
+          CodSunat: this.venta.tipoVenta.CodSunat,
+          IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+          LimitItems: this.venta.tipoVenta.LimitItems,
+          TipoDoc: this.venta.tipoVenta.TipoDoc,
           empresa: element.value,
           nombre_comercial: empresa.razoncial,
           documento: empresa.ruc,
@@ -3094,7 +2078,7 @@ export default {
         if (data.productos.some(v => v.Empresa == element.value)) {
           let IdProformaDets = [];
           if (element.value == this.empresa) {
-            IdProformaDets = this.ventas[this.tab].productos.map(v => {
+            IdProformaDets = this.productos.map(v => {
               return v.IdProformaDet;
             });
           }
@@ -3117,8 +2101,13 @@ export default {
           } else if (data.pago.visa.monto != 0) {
             data.pago.visa.monto = totalCarr;
           }
-
+          // data.pago.forEach((element) => {
+          //   if (element.monto != 0) {
+          //     element.monto = totalCarr;
+          //   }
+          // });
           let comandaJson = JSON.stringify(dataImprimir);
+          // console.log(comandaJson);
 
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
@@ -3150,13 +2139,6 @@ export default {
           //     console.error(err);
           //   });
           this.$toasted.success("Venta realizada con exito");
-          if (this.ventas.length > 1) {
-            this.eliminarVentana();
-          } else {
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          }
         }
       });
       this.inProgress = true;
@@ -3166,23 +2148,6 @@ export default {
         this.inProgress = false;
         window.location.reload();
       }, 1000 * 2 * this.$store.state.empresas.length);
-    },
-    eliminarVentana() {
-      this.ventas.splice(this.tab, 1);
-
-      this.$nextTick(() => {
-        if (this.tab != 0) {
-          this.tab = this.tab - 1;
-        } else {
-          this.tab = 0;
-        }
-      });
-      let header = document.getElementById("header");
-      header.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-      this.$toasted.info("Opción de venta cerrada.");
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios
@@ -3204,17 +2169,17 @@ export default {
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
-      this.ventas[this.tab].cliente = {};
+      this.venta.cliente = {};
     },
     eliminarComisionista() {
       this.$refs.inputComisionista.setValue("");
-      this.ventas[this.tab].comisionista = {};
+      this.venta.comisionista = {};
     },
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
         this.infoDelivery = obj;
-        this.ventas[this.tab].EsDelivery = true;
+        this.venta.EsDelivery = true;
         this.$refs.carrito.pagocon = parseFloat(
           parseFloat(obj.Cambio).toFixed(2)
         ).toFixed(2);
@@ -3258,9 +2223,8 @@ export default {
                     false
                   ]);
                 });
-                this.ventas[this.tab].nombreLlevar =
-                  obj.Cliente || "SIN NOMBRE";
-                this.ventas[this.tab].DireccionEntrega = obj.Direccion;
+                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                this.venta.DireccionEntrega = obj.Direccion;
                 this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
               } else {
                 this.$toasted.show(
@@ -3290,21 +2254,21 @@ export default {
               false
             ]);
           });
-          this.ventas[this.tab].nombreLlevar = obj.Cliente || "SIN NOMBRE";
-          this.ventas[this.tab].DireccionEntrega = obj.Direccion;
+          this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+          this.venta.DireccionEntrega = obj.Direccion;
         }
       }
     },
     anularPagoDelivery() {
       this.limpiarCart();
-      this.ventas[this.tab].EsDelivery = false;
+      this.venta.EsDelivery = false;
       this.infoDelivery = {};
       this.$refs.carrito.pagocon = "";
       this.loadClienteVarios();
-      this.ventas[this.tab].nombreLlevar = "";
-      this.ventas[this.tab].selectOpcionVenta = 0;
-      this.ventas[this.tab].nombreLlevar = "";
-      this.ventas[this.tab].DireccionEntrega = "";
+      this.venta.nombreLlevar = "";
+      this.venta.selectOpcionVenta = 0;
+      this.venta.nombreLlevar = "";
+      this.venta.DireccionEntrega = "";
       this.$router.replace("/ventas");
     },
     //Sockets
@@ -3344,10 +2308,8 @@ export default {
     async obtenerSerie(empresa) {
       let res = await this.axios(
         `${this.API}/ventas/numero?idPuntoVenta=${
-          this.ventas[this.tab].puntoVenta.IdDocVentaPuntoVenta
-        }&idTipoDoc=${
-          this.ventas[this.tab].tipoVenta.IdTipoDoc
-        }&id_empresa=${empresa}`
+          this.venta.puntoVenta.IdDocVentaPuntoVenta
+        }&idTipoDoc=${this.venta.tipoVenta.IdTipoDoc}&id_empresa=${empresa}`
       );
       return res.data;
     },
@@ -3368,156 +2330,9 @@ export default {
         `${this.API}obtener_datos_impresora?id_empresa=${empresa}`
       );
       return res.data;
-    },
-    lstTotalPorEmpresa() {
-      let totalEmpresa = [];
-
-      this.$store.state.empresas.forEach(empresa => {
-        let productos = this.ventas[this.tab]
-          ? this.ventas[this.tab].productos
-          : [];
-
-        let productosEmpresa = productos.filter(
-          p => p.Empresa == empresa.value
-        );
-
-        if (productosEmpresa.length > 0) {
-          let total = productosEmpresa.reduce((sum, prod) => {
-            return parseFloat(sum) + parseFloat(prod.total || 0);
-          }, 0);
-
-          totalEmpresa.push({
-            nombre: empresa.text,
-            total: parseFloat(total).toFixed(2)
-          });
-        } else {
-          totalEmpresa.push({
-            nombre: empresa.text,
-            total: 0
-          });
-        }
-      });
-
-      return totalEmpresa;
     }
   },
-  watch: {
-    totalCart(newVal) {
-      this.ventas[this.tab].pago.efectivo.monto = parseFloat(
-        newVal -
-          (parseFloat(this.ventas[this.tab].pago.visa.monto) +
-            parseFloat(this.ventas[this.tab].pago.mastercard.monto) +
-            parseFloat(this.ventas[this.tab].pago.transferencia.monto))
-      ).toFixed(2);
-    },
 
-    recalcularTotalPorEmpresaFlag() {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          // this.recalcularTotalesPorEmpresa();
-          // this.metodoPagoCambio(1);
-        }, 100);
-      });
-    }
-  },
-  computed: {
-    totalPages() {
-      let productosFiltrados = this.lstProductos.filter(
-        listadoProducto =>
-          !this.ventas[this.tab].productos.some(
-            producto =>
-              producto.IdProducto == listadoProducto.IdProducto &&
-              producto.Empresa == listadoProducto.Empresa
-          )
-      );
-
-      if (this.searchProducto) {
-        productosFiltrados = productosFiltrados.filter(
-          p =>
-            p.Producto.toLowerCase().includes(
-              this.searchProducto.toLowerCase()
-            ) || !!p.Selected
-        );
-      }
-
-      if (this.IdProducto) {
-        productosFiltrados = productosFiltrados.filter(
-          v => v.CodigoBarra == this.IdProducto
-        );
-      }
-
-      const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
-      return Math.ceil(productosFiltrados.length / perPage);
-    },
-    isLastPage() {
-      return this.currentPage >= this.totalPages;
-    },
-    APIProductos() {
-      return this.API + "productos/puntoventa/stock/" + 1;
-    },
-    ...mapState({
-      productos: state => state.cart.productos,
-      recalcularTotalPorEmpresaFlag: state =>
-        state.recalcularTotalPorEmpresaFlag,
-
-      totalCart: state => state.cart.totalCart
-    }),
-
-    manoDeObraBruta() {
-      let pManoObra = this.ventas[this.tab].productos.find(
-        p => p.CodigoBarra === "MANODEOBRA"
-      );
-      let precio = pManoObra ? pManoObra.precioBruta : 0;
-
-      return precio;
-    },
-    manoDeObraNeta() {
-      let pManoObra = this.ventas[this.tab].productos.find(
-        p => p.CodigoBarra === "MANODEOBRA"
-      );
-      let precio = pManoObra ? pManoObra.precio : 0;
-
-      return precio;
-    },
-    sumatoriaTotal() {
-      let sumatoria = this.ventas[this.tab].productos.reduce(
-        (sum, producto) => {
-          return (
-            sum +
-            parseFloat(
-              producto.subtotal - (producto.descuento ? producto.descuento : 0)
-            )
-          );
-        },
-        0
-      );
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    },
-    subTotalG() {
-      let sumatoria = this.ventas[this.tab].productos.reduce(
-        (sum, producto) => {
-          return sum + parseFloat(producto.subtotal);
-        },
-        0
-      );
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    },
-    descuentoG() {
-      let sumatoria = this.ventas[this.tab].productos.reduce(
-        (sum, producto) => {
-          return sum + parseFloat(producto.descuento ? producto.descuento : 0);
-        },
-        0
-      );
-      // this.actualizarTotal(sumatoria);
-
-      return this.$options.filters.redondear(sumatoria);
-    }
-  },
   components: {
     ProductosCarrito,
     ClientesForm,
@@ -3525,42 +2340,11 @@ export default {
     PagoDeuda,
     PreOrdenLista,
     Proformas,
-    DeliveryModal,
-    ProductoForm
+    DeliveryModal
   }
 };
 </script>
 <style scoped>
-.text-red {
-  color: red !important;
-  margin: 50px 0px 50px 0 !important;
-}
-.modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 60%;
-}
-#modalImagen .modal-dialog {
-  max-width: 75% !important;
-}
-.modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 60%;
-}
-.imagen {
-  width: 40px !important;
-  height: 40px !important;
-}
-.imagen:hover {
-  transform: scale(2.5);
-}
-.cardPresentacion {
-  cursor: pointer;
-}
-.cardPresentacion:hover {
-  cursor: pointer;
-  background: #bdbdbd;
-}
-.contentCard {
-  cursor: pointer;
-}
 .alert {
   margin-bottom: 0;
 }
