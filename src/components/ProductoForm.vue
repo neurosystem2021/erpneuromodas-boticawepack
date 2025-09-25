@@ -229,17 +229,21 @@
               </b-form-group>
 
               <b-form-group>
-                <label>Anquel:</label>
+                <label>Anaquel:</label>
                  <autocomplete
                     ref="inputAnaquel"
                     :url="`${API}Anaquel`"
                     anchor="Anaquel"
                     label="writer"
                     :placeholder="producto.Anaquel"
-                    :on-select="setAnquel"
+                    :on-select="setAnaquel"
                     :onFocus="focusAutocomplete.bind(null, 'inputAnaquel')"
-                    :classes="{input: 'form-control'}">
+                    :classes="{input: 'form-control upper'}">
                 </autocomplete>
+                  <b-input-group-append>
+                  <b-btn variant="primary" @click="crearAnaquel"><b>Guardar</b></b-btn>                
+                  <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+                  </b-input-group-append>
               </b-form-group>
 
              
@@ -656,7 +660,8 @@ export default {
             // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion);
 
             this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc;
-            this.$refs.inputAnaquel.$el.value = newVal.Anaquel;
+            //this.$refs.inputAnaquel.$el.value = newVal.Anaquel;
+            this.$refs.inputAnaquel.setValue(newVal.Anaquel || "");
             //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
             //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
@@ -863,9 +868,10 @@ export default {
       this.producto.marca = obj;
       this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
-    setAnquel(obj) {
-      this.producto.Anaquel = obj.Anaquel;
-      this.$refs.inputAnaquel.setValue(obj.Anquel);
+    setAnaquel(obj) {
+      const valor = obj && obj.Anaquel ? obj.Anaquel : (obj || "");
+      this.producto.Anaquel = valor.trim().toUpperCase();
+      this.$refs.inputAnaquel.setValue(valor);
       this.$forceUpdate();
     },
     /* setModelo (obj) {
@@ -883,7 +889,8 @@ export default {
         this.$refs.inputMedicion.setValue("UNIDAD");
         this.$refs.inputTipos.setValue("");
         this.$refs.inputProductoDesc.setValue("");
-
+        this.$refs.inputAnaquel.setValue(""); 
+        this.producto.Anaquel = "";
         // this.$refs.inputTalla.setValue('')
         // this.$refs.inputModelo.setValue("");
         // this.$refs.inputPresentacion.setValue("");
@@ -955,7 +962,8 @@ export default {
           { id: null, nombre: "" },
           { id: null, nombre: "" },
           { id: null, nombre: "" }
-        ]
+        ],
+         Anaquel: ""
       };
     },
     keyDownInput(e) {
@@ -1006,13 +1014,24 @@ export default {
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos;
       }
+
+      // Si no hay un Anaquel seleccionado, tomar el texto manual del input
+      if (!this.producto.Anaquel && this.$refs.inputAnaquel) {
+        const valor = this.$refs.inputAnaquel.getValue 
+          ? this.$refs.inputAnaquel.getValue() 
+          : this.$refs.inputAnaquel.type || "";
+
+        this.producto.Anaquel = valor.trim().toUpperCase();
+      }
+      console.log("Valor final Anaquel =>", this.producto.Anaquel);
       // console.log(JSON.stringify(this.producto))
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
           PreciosPorProducto: this.producto.precios,
-          Anaqueles: this.producto.anaqueles,
+         // Anaqueles: this.producto.anaqueles,
+          Anaquel: this.producto.Anaquel, 
           ProductoReempleazo: this.ProductoReempleazo
         })
         .then(response => {
@@ -1098,6 +1117,26 @@ export default {
             this.setMarca({
               IdProductoMarca: response.data.insertId,
               ProductoMarca: response.data.ProductoMarca
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearAnaquel() {
+      if (this.$refs.inputAnaquel.type) {
+        let anaquel = {};
+        anaquel.Anaquel = this.$refs.inputAnaquel.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "Anaquel", anaquel)
+          .then(response => {
+            this.$toasted.show("Anaquel guardada correctamente");
+            this.setAnaquel({
+              IdAnaquel: response.data.insertId,
+              Anaquel: response.data.Anaquel
             });
           })
           .catch(error => {
