@@ -321,7 +321,7 @@
           <b-col cols="12">
               <b-form-group>
                 <b-input-group>
-                  <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
+                  <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0">Agregar Productos
                   </b-button>
                   <autocomplete
                     :ref="`autocompleteProducto${index}`"
@@ -374,6 +374,191 @@
               :id="`TablaCarrito${index}`"
               :ref="`TablaCarrito${index}`"
             >
+              <template slot="Series" slot-scope="data">
+                <b-select 
+                    v-if="generarSerie(data.item.productoSerie).length>0"
+                    :options="generarSerie(data.item.productoSerie)" 
+                    v-model="data.item.IdProductoSerie"
+                    text-field="Serie"
+                    value-field="IdProductoSerie"
+                />  
+              </template>
+              <template slot="eventPres" slot-scope="data">
+                <b-button
+                  size="sm"
+                  v-if="data.item.estadoPxP == false"
+                  :disabled="bloquearInput ? true : false"
+                  variant="info"
+                  @click="showPresentacion(data.item,data.index)"
+                  >
+                  <i class="fas fa-list"></i>
+                  </b-button>
+                <b-button
+                  @click="
+                    abrirImagen(
+                      data.item.Producto,
+                      data.item.Imagen == null ||
+                        data.item.Imagen == ''
+                        ? 'static/no-photo.png'
+                        : '/resources/images/productos/' +
+                            data.item.Imagen
+                    )
+                  "
+                  style="margin-top: 2px"
+                  :id="'popover-imagen' + data.item.IdProducto"
+                  variant="success"
+                  size="sm"
+                  ><i class="fas fa-image"></i
+                ></b-button>
+                <b-popover
+                  placement="right"
+                  :target="'popover-imagen' + data.item.IdProducto"
+                  :title="data.item.Producto"
+                  triggers="hover"
+                >
+                  <div style="text-align: center">
+                    <b-img
+                      style="border-radius: 10px; width: 200px"
+                      fluid
+                      :src="
+                        data.item.Imagen == null ||
+                        data.item.Imagen == ''
+                          ? 'static/no-photo.png'
+                          : '/resources/images/productos/' +
+                            data.item.Imagen
+                      "
+                      alt=""
+                      @error="setAltImg"
+                    ></b-img>
+                  </div>
+                </b-popover>
+              </template>
+
+        
+        <template
+          slot="cantxPrecio"
+          slot-scope="data"
+          v-if="data.item.tipo == 'PRESENTACION'"
+        >
+          <input
+            v-model="data.item.cantxPrecio"
+            type="number"
+            style="width: 80px"
+            step="0.001"
+            min="0"
+            :disabled="bloquearInput ? true : false"
+            placeholder="Cantidad"
+            class="form-control"
+          />
+          <span>x{{ data.item.cantidadPres }}</span>
+        </template>
+
+         <template slot="cantidad" slot-scope="data">
+          <input
+            v-model="data.item.cantidad"
+            :disabled="data.item.tipo == 'PRESENTACION'"
+            type="number"
+            style="width: 80px"
+            class="form-control"
+            step="0.001"
+            min="0"
+            placeholder="Cantidad"
+          />
+        </template>
+
+
+        <template slot="precio" slot-scope="data">
+          <input
+            v-model="data.item.precio"
+            type="number"
+            style="width: 95px"
+            min="0"
+            step="0.00001"
+            class="form-control"
+            placeholder="Precio"
+            />
+        </template>
+
+        <template slot="subtotal" slot-scope="data">
+          {{ getSubtotal(data.index,data.item) }}
+        </template>
+
+        <template slot="total" slot-scope="data">
+              {{ getTotal(data.index,data.item) }}
+              <br />
+              <h6><i>Prof.</i></h6>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                :disabled="bloquearInput ? true : false"
+                @change="
+                  (e) => {
+                    $emit('onCheckProf', e);
+                    asignarDisabledProf(data.index, e);
+                  }
+                "
+              />
+            </template>
+        
+
+        <template slot="descuento" slot-scope="data">
+          <input
+            :disabled="bloquearInput ? true : false"
+            v-model="data.item.descuento"
+            style="width: 90px"
+            type="number"
+            min="0"
+            step="0.01"
+            class="form-control"
+            value="0"
+          />
+          <b-form-text> </b-form-text>
+        </template>
+
+       
+
+        <template slot="Descripcion" slot-scope="data">
+          <textarea
+            :disabled="bloquearInput ? true : false"
+            class="form-control"
+            placeholder="Descripción"
+            cols="9"
+            rows="1"
+            style="width: 150px"
+            v-model="data.item.Descripcion"
+          ></textarea>
+        
+        </template>
+
+            
+
+            <template slot="acciones" slot-scope="data">
+              <b-button
+                :disabled="bloquearInput ? true : false"
+                variant="danger"
+                size="sm"
+                @click="quitarProducto(data.index)"
+                ><i class="fas fa-times fa-lg"></i
+              ></b-button>
+            
+            </template>
+
+           
+            <template slot="stock" slot-scope="data">
+              <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
+                <img src="static/moto-delivery.png" style="width: 24px" />
+              </div>
+              <div v-else>
+                <div>{{ data.item.stock }}</div>
+                <img
+                  v-if="data.item.EsPadre"
+                  src="static/box.png"
+                  style="width: 24px"
+                />
+              </div>
+            </template>
+
+
             </b-table>
           </b-col>
           <!-- <b-col cols="4">
@@ -727,6 +912,7 @@
         </b-col>
       </b-row>
     </b-modal>
+
     <b-modal id="modal-1" :title="`${itemProducto.Producto}`" hide-footer v-model="modalPresentacionesEditar" v-if="modalPresentacionesEditar">
       <b-row class="px-4">
         <b-col cols="6">
@@ -777,6 +963,7 @@
       </b-row>
       
     </b-modal>
+
      <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
       <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
       <b-row>
@@ -830,6 +1017,114 @@
        
     </b-modal>
 
+     <b-modal
+      size="xl"
+      v-model="modalNuevoProductos"
+      title="Selección Productos"
+      class="modalSelectProduct modal-xl"
+    >
+      <b-row>
+        <b-col cols="12">
+          <b-input-group>
+            <b-form-input
+              v-model="searchProducto"
+              placeholder="Buscar..."
+              class="form-control inputResponsive"
+            ></b-form-input>
+            <b-input-group-append>
+              <b-button @click="startRecognition()">
+                <i class="fas fa-microphone"></i>
+              </b-button>
+            </b-input-group-append>
+            <input
+              v-model="IdProducto"
+              @input="buscarProductosCodigoBarrasModal"
+              type="text"
+              class="form-control ml-2  inputResponsive"
+              placeholder="Codigo de Barra"
+               v-on:keyup.enter="anadirProductos"
+            />
+            <b-input-group-append>
+              <b-button
+                variant="primary"
+                @click="buscarProductosCodigoBarrasModal"
+                ><i class="fas fa-search"></i
+              ></b-button>
+            </b-input-group-append>
+          </b-input-group>
+          <p>Búsqueda Avanzanda (Producto,Categoría,Marca)</p>
+        </b-col>
+        <b-col cols="12" class="mt-3">
+          <table class="table table-hover" width="100%">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Categoria</th>
+                  <th>Marca</th>
+                  <th>Producto</th>
+                  <th>Stock</th>
+                  <th>Stock</th>
+                  <th>Precio</th>
+                  <th>Imagen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(prod,index) in listadoProductos()" :key="index"  @dblclick="anadirarProductosSeleccionado(prod,true)">
+                  <td>{{ prod.NombreEmpresa }}</td>
+                  <td>{{ prod.ProductoCategoria }}</td>
+                  <td>{{ prod.ProductoMarca }}</td>
+                  <td>{{ prod.Producto }}</td>
+                  <td>{{ prod.stock }}</td>
+                  <td>{{ prod.StockMinimo }}</td>
+                  <td>{{ prod.PrecioContado }}</td>
+                  <td>
+                    <img
+                    :src="
+                       prod.Imagen == null ||  prod.Imagen == ''
+                        ? 'static/no-photo.png'
+                        : `/resources/images/productos/${ prod.Imagen}`
+                    "
+                    class="imagen"
+                  />
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+
+          <div class="pagination mt-3">
+            <b-button size="sm" variant="outline-dark"  @click="prevPage" :disabled="currentPage === 1">Anterior</b-button>
+            <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
+            <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
+          </div>
+
+          <b-row>
+            <b-col cols="8">
+           
+          </b-col>
+            <b-col cols="4">
+              <b-row>
+                <b-col cols="6">  
+                  Nro De Filas:
+                </b-col>
+                <b-col cols="6">
+                  <b-form-select
+                    v-model="perPageModal"  
+                    :options="perPageModalList"
+                    size="small"
+                    class="form-control"
+                  ></b-form-select>
+                </b-col>
+              </b-row>
+            
+            
+            </b-col>
+          </b-row>
+           
+           
+        </b-col>
+      </b-row>
+      
+    </b-modal>
 
 
     <!-- PRE -->
@@ -1472,7 +1767,7 @@
                     <tr style="background: #1A237E; color: #ffffff;">
                       <td colspan="2" class="text-center" style="text-transform: uppercase;font-size: 1.2rem; font-weight: bold;">Total por Empresa</td>
                     </tr>
-                      <tr v-for="(empresa,index) in empresasConTotal" :key="index">
+                      <tr v-for="(empresa,index) in lstTotalPorEmpresa()" :key="index">
                         <th>{{empresa.nombre}}</th>
                         <td>{{empresa.total}}</td>
                       </tr>
@@ -1843,13 +2138,44 @@ export default {
         this.getVendedor(),
         this.loadClienteVarios(),
         this.escucharPedidos(),
-        this.configStock(),
-        this.recalcularTotalesPorEmpresa()
+        this.configStock()
+        // this.recalcularTotalesPorEmpresa()
       ]);
-    }, 100);
+    }, 500);
+    let vm = this;
+    vm.lstProductos = [];
+    for (const empresa of vm.$store.state.empresas) {
+      let url = `${
+        vm.API
+      }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
+        empresa.value
+      }&limit=`;
+
+      let res = await vm.axios(url); // Espera la respuesta antes de continuar
+
+      res.data.forEach(element => {
+        vm.lstProductos.push({
+          ...element,
+          Empresa: empresa.value,
+          Selected: false,
+          NombreEmpresa: empresa.text.substring(0, 20) + "...",
+          _rowVariant:
+            element.stock <= 0
+              ? "danger"
+              : element.stock < element.StockMinimo
+                ? "warning"
+                : "success"
+        });
+      });
+    }
   },
   data() {
     return {
+      monto: 0,
+      primerMonto: true,
+      perPageModal: 100,
+      currentPageModal: 1,
+      IdProducto: "",
       errorMontoPresentacion: "",
       numerosCalculadora: [
         { valor: "7", tipo: "number" },
@@ -1899,7 +2225,6 @@ export default {
       bloquearInput: false,
       diasValidosProf: 1,
       adelantosPreOrden: [],
-      lstTotalPorEmpresa: [],
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1957,16 +2282,174 @@ export default {
       ventaSinStock: 0,
       idPerfil: sessionStorage.getItem("IdPerfil") || 0,
       EsCredito: 0,
-      EsCreditoProforma: 0
+      EsCreditoProforma: 0,
+      perPageModalList: [
+        { value: 5, text: "5" },
+        { value: 10, text: "10" },
+        { value: 20, text: "20" },
+        { value: 50, text: "50" },
+        { value: 100, text: "100" },
+        { value: null, text: "All" }
+      ],
+      nextPage() {
+        if (this.currentPage < this.totalPages) this.currentPage++;
+      },
+      prevPage() {
+        if (this.currentPage > 1) this.currentPage--;
+      },
+      currentPage: 1
     };
   },
 
   methods: {
     // PRODUCTO CARRITO
-    guardarItemPorUnidad() {
-      let empresa = sessionStorage.getItem("empresa")
-        ? sessionStorage.getItem("empresa")
-        : "modasm";
+
+    quitarProducto(index) {
+      this.ventas[this.tab].productos.splice(index, 1);
+      this.$toasted.show("Producto quitado del listado");
+    },
+    getSubtotal(index, item) {
+      let subtotal =
+        (item.tipo == "PRESENTACION" ? item.cantxPrecio : item.cantidad) *
+        item.precio;
+
+      Vue.set(
+        this.ventas[this.tab].productos[index],
+        "subtotal",
+        parseFloat(subtotal).toFixed(2)
+      );
+
+      return parseFloat(subtotal).toFixed(2);
+    },
+    getTotal(index, item) {
+      let total = parseFloat(item.subtotal);
+
+      if (item.FLETE) {
+        total += parseFloat(item.FLETE);
+      }
+      if (item.TieneIgv) {
+        total += parseFloat(item.igv);
+      }
+      if (item.descuento) {
+        total -= parseFloat(item.descuento);
+      }
+
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.ventas[this.tab].productos[index], "total", total);
+
+      return total;
+    },
+    aumentarMontoPresentacion(item) {
+      if (this.primerMonto) {
+        this.monto = item.valor;
+        this.primerMonto = false;
+      } else {
+        switch (item.tipo) {
+          case "number":
+            this.monto = parseFloat(this.monto.toString() + item.valor);
+            break;
+          case "limpiar":
+            this.monto = 0;
+            break;
+          case "backspace":
+            if (this.monto.toString().length > 1) {
+              this.monto = parseFloat(
+                this.monto.toString().slice(0, this.monto.toString().length - 1)
+              );
+            } else {
+              this.monto = 0;
+            }
+            break;
+
+          default:
+            break;
+        }
+      }
+    },
+    listadoProductos() {
+      let lst = [];
+      let productosFiltrados = this.lstProductos.filter(
+        listadoProducto =>
+          !this.ventas[this.tab].productos.some(
+            producto =>
+              producto.IdProducto == listadoProducto.IdProducto &&
+              producto.Empresa == listadoProducto.Empresa
+          )
+      );
+
+      if (this.searchProducto) {
+        const term = this.searchProducto.toLowerCase();
+
+        lst = productosFiltrados.filter(p => {
+          const prod = (p.Producto || "").toLowerCase();
+          const cat = (p.ProductoCategoria || "").toLowerCase();
+          const marca = (p.ProductoMarca || "").toLowerCase();
+          const empresa = (p.Empresa || "").toLowerCase();
+
+          // si aparece en cualquiera, entra
+          return (
+            prod.includes(term) ||
+            cat.includes(term) ||
+            marca.includes(term) ||
+            empresa.includes(term)
+          );
+        });
+      } else {
+        lst = productosFiltrados;
+      }
+
+      if (this.IdProducto) {
+        lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
+      }
+
+      const perPage = parseInt(this.perPageModal) || lst.length;
+      const start = (this.currentPage - 1) * perPage;
+      const end = start + perPage;
+      return lst.slice(start, end);
+    },
+    buscarProductosCodigoBarrasModal(e) {
+      e.preventDefault();
+      this.IdProducto = this.loadCode;
+    },
+
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
+    generarSerie(serie) {
+      if (serie) {
+        return serie;
+      }
+      return [];
+    },
+    showPresentacion(obj, index) {
+      this.itemProducto = { ...obj };
+      this.monto = this.itemProducto.cantidad;
+      this.index = index;
+      this.modalPresentacionesEditar = true;
+    },
+    guardarItemEditar(presentacion) {
+      this.errorMontoPresentacion = "";
+      if (this.monto == 0) {
+        this.errorMontoPresentacion = "Ingrese una Cantidad";
+        return false;
+      }
+      let prod = this.itemProducto;
+      prod.tipo = "PRESENTACION";
+      prod.estadoPxP = true;
+      prod.cantxPrecio = this.monto;
+      prod.cantidad = presentacion.cantidad;
+
+      if (this.itemProducto.PreciosPorProducto.length > 0) {
+        prod.total = this.monto * presentacion.precio;
+        prod.precio = presentacion.precio;
+        prod.cantidadPres = presentacion.cantidad;
+        prod.estadoPxP = false;
+      }
+      Vue.set(this.ventas[this.tab].productos, this.index, prod);
+
+      this.modalPresentacionesEditar = false;
+    },
+    guardarItemPorUnidadEditar() {
       this.errorMontoPresentacion = "";
       if (this.monto == 0) {
         this.errorMontoPresentacion = "Ingrese una Cantidad";
@@ -1974,30 +2457,17 @@ export default {
       }
       let prod = this.itemProducto;
       prod.tipo = "UNIDAD";
-      prod.estadoPxP = true;
-      prod.cantxPrecio = 0;
-      prod.cantidad = this.monto;
-      prod.descuento = 0;
-      prod.disabled = false;
-      prod.Presentacion = null;
-      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
-      prod.total = 0;
       prod.precio = prod.PrecioContado;
-      prod.cantidadPres = 0;
-      prod.bloquearInput = false;
+
+      prod.cantxPrecio = this.monto;
+      prod.cantidad = 1;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.estadoPxP = false;
+        prod.subtotal = this.monto * prod.PrecioContado;
+        prod.total = this.monto * prod.PrecioContado;
       }
-      delete prod._rowVariant;
-      this.ventas[this.tab].productos.unshift(prod);
-      this.modalPresentaciones = false;
-      this.modalNuevoProductos = this.abrirModal;
+
+      Vue.set(this.ventas[this.tab].productos, this.index, prod);
+      this.modalPresentacionesEditar = false;
     },
     guardarItem(presentacion) {
       let empresa = sessionStorage.getItem("empresa")
@@ -2033,10 +2503,63 @@ export default {
         prod.estadoPxP = false;
       }
       delete prod._rowVariant;
+      prod = {
+        ...prod,
+        subtotal: 0,
+        total: 0,
+        precio: prod.PrecioContado,
+        bloquearInput: false
+      };
       this.ventas[this.tab].productos.unshift(prod);
       this.modalPresentaciones = false;
       this.modalNuevoProductos = this.abrirModal;
     },
+    guardarItemPorUnidad() {
+      let empresa = sessionStorage.getItem("empresa")
+        ? sessionStorage.getItem("empresa")
+        : "modasm";
+      this.errorMontoPresentacion = "";
+      if (this.monto == 0) {
+        this.errorMontoPresentacion = "Ingrese una Cantidad";
+        return false;
+      }
+      let prod = this.itemProducto;
+      prod.tipo = "UNIDAD";
+      prod.estadoPxP = true;
+      prod.cantxPrecio = 0;
+      prod.cantidad = 1;
+      prod.descuento = 0;
+      prod.disabled = false;
+      prod.Presentacion = null;
+      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
+        let datoEmpresa = this.$store.state.empresas.filter(
+          v => v.value == empresa
+        );
+        prod.Empresa = datoEmpresa[0].value;
+        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
+      }
+      prod.subtotal = 0;
+      prod.total = 0;
+      prod.precio = prod.PrecioContado;
+      prod.cantidadPres = 0;
+      prod.bloquearInput = false;
+      if (this.itemProducto.PreciosPorProducto.length > 0) {
+        prod.estadoPxP = false;
+      }
+      delete prod._rowVariant;
+      prod = {
+        ...prod,
+        subtotal: 0,
+        total: 0,
+        precio: prod.PrecioContado,
+        cantidadPres: 0,
+        bloquearInput: false
+      };
+      this.ventas[this.tab].productos.unshift(prod);
+      this.modalPresentaciones = false;
+      this.modalNuevoProductos = this.abrirModal;
+    },
+
     guardarSerie() {
       this.objProd.Serie = this.Series;
       Vue.set(this.ventas[this.tab].productos, this.index, this.objProd);
@@ -2058,7 +2581,7 @@ export default {
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
       console.log(item);
-      if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
+      if (this.ventas[this.tab].productos.some(v => v.IdProducto == item.IdProducto)) {
       } else {
         let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
         let productoSerie = await this.obtenerSeriePorProducto(
@@ -2090,14 +2613,14 @@ export default {
           this.itemProducto.cantidad = 1;
           this.itemProducto.descuento = 0;
           delete this.itemProducto._rowVariant;
-          this.productos.unshift(this.itemProducto);
+          this.ventas[this.tab].productos.unshift(this.itemProducto);
         }
       }
-      //   let index = this.productos.findIndex(
+      //   let index = this.ventas[this.tab].productos.findIndex(
       //     v => v.IdProducto == item.IdProducto
       //   );
       //   let prod = {
-      //     ...this.productos.filter(v => v.IdProducto == item.IdProducto)[0]
+      //     ...this.ventas[this.tab].productos.filter(v => v.IdProducto == item.IdProducto)[0]
       //   };
       //   if (prod.tipo == "UNIDAD") {
       //     prod.cantidad++;
@@ -2151,7 +2674,7 @@ export default {
       //   this.itemProducto.cantidad = 1;
       //   this.itemProducto.descuento = 0;
       //   delete this.itemProducto._rowVariant;
-      //   this.productos.unshift(this.itemProducto);
+      //   this.ventas[this.tab].productos.unshift(this.itemProducto);
       //   setTimeout(() => {
       //     this.modalNuevoProductos = abrirModal;
       //   }, 500);
@@ -2255,8 +2778,9 @@ export default {
     },
     anadirVentana() {
       // PRODUCTO CARRITO
-      this.ventas.push(JSON.parse(JSON.stringify(this.ventaInit)));
+      // this.ventas.push(JSON.parse(JSON.stringify(this.ventaInit)));
 
+      this.ventas.push({ ...this.ventaInit, productos: [] });
       setTimeout(async () => {
         this.tab = this.ventas.length - 1;
       }, 100);
@@ -2266,8 +2790,7 @@ export default {
           this.getVendedor(),
           this.loadClienteVarios(),
           this.escucharPedidos(),
-          this.configStock(),
-          this.recalcularTotalesPorEmpresa()
+          this.configStock()
         ]);
       }, 150);
     },
@@ -2302,34 +2825,7 @@ export default {
       window.parent.document.getElementById("NavegadorParent").style.display =
         "block";
     },
-    async recalcularTotalesPorEmpresa() {
-      this.lstTotalPorEmpresa = [];
-      await this.$store.state.empresas.forEach(empresa => {
-        if (this.productos.some(p => p.Empresa == empresa.value)) {
-          let total = this.productos
-            .filter(p => p.Empresa == empresa.value)
-            .reduce((total, prod) => {
-              return parseFloat(total) + parseFloat(prod.total);
-            }, 0);
-          this.lstTotalPorEmpresa.push({
-            nombre: empresa.text,
-            total: parseFloat(total).toFixed(2)
-          });
-        } else {
-          this.lstTotalPorEmpresa.push({
-            nombre: empresa.text,
-            total: 0
-          });
-        }
-      });
-      let totalCart = this.lstTotalPorEmpresa.reduce((sum, emp) => {
-        return sum + parseFloat(emp.total);
-      }, 0);
-      this.$store.state.cart.totalCart = totalCart;
-      this.$nextTick(() => {
-        this.metodoPagoCambio(1);
-      });
-    },
+
     asignarVuelto() {
       this.vuelto = parseFloat(this.pagocon - this.sumatoriaTotal).toFixed(2);
     },
@@ -2875,7 +3371,7 @@ export default {
     guardarProforma() {
       this.inProgress = true;
 
-      if (!this.productos.length) {
+      if (!this.ventas[this.tab].productos.length) {
         this.$toasted.show("No hay productos para crear la proforma");
         this.inProgress = false;
         return;
@@ -2940,7 +3436,7 @@ export default {
       if (Object.keys(profoma).length > 0) {
         const empresas = [...new Set(lstProductos.map(d => d.Empresa))];
 
-        // if (lstProductos.length == this.productos.length) {
+        // if (lstProductos.length == this.ventas[this.tab].productos.length) {
         //   console.log("ddddd");
         //   return true;
         // }
@@ -2948,7 +3444,7 @@ export default {
           let lstProductosLength = lstProductos.filter(
             v => v.Empresa == Empresa
           ).length;
-          let productosLength = this.productos.filter(v => v.Empresa == Empresa)
+          let productosLength = this.ventas[this.tab].productos.filter(v => v.Empresa == Empresa)
             .length;
 
           console.log("lstProductosLength", lstProductosLength);
@@ -3083,7 +3579,7 @@ export default {
         )[0].text;
       }
 
-      if (!this.productos.length) {
+      if (!this.ventas[this.tab].productos.length) {
         this.$toasted.show("No hay productos para vender");
         this.inProgress = false;
         return;
@@ -3092,7 +3588,7 @@ export default {
       // NO PERMITE CANTIDAD Y PRECIOS 0
       let sinStock = 0;
       let totalCero = 0;
-      this.productos.forEach(pro => {
+      this.ventas[this.tab].productos.forEach(pro => {
         if (
           pro.CodigoBarra !== "COSTODELIVERY" &&
           pro.CodigoBarra !== "MANODEOBRA" &&
@@ -3218,7 +3714,7 @@ export default {
         if (data.productos.some(v => v.Empresa == element.value)) {
           let IdProformaDets = [];
           if (element.value == this.empresa) {
-            IdProformaDets = this.productos.map(v => {
+            IdProformaDets = this.ventas[this.tab].productos.map(v => {
               return v.IdProformaDet;
             });
           }
@@ -3473,6 +3969,37 @@ export default {
         `${this.API}obtener_datos_impresora?id_empresa=${empresa}`
       );
       return res.data;
+    },
+    lstTotalPorEmpresa() {
+      let totalEmpresa = [];
+
+      this.$store.state.empresas.forEach(empresa => {
+        let productos = this.ventas[this.tab]
+          ? this.ventas[this.tab].productos
+          : [];
+
+        let productosEmpresa = productos.filter(
+          p => p.Empresa == empresa.value
+        );
+
+        if (productosEmpresa.length > 0) {
+          let total = productosEmpresa.reduce((sum, prod) => {
+            return parseFloat(sum) + parseFloat(prod.total || 0);
+          }, 0);
+
+          totalEmpresa.push({
+            nombre: empresa.text,
+            total: parseFloat(total).toFixed(2)
+          });
+        } else {
+          totalEmpresa.push({
+            nombre: empresa.text,
+            total: 0
+          });
+        }
+      });
+
+      return totalEmpresa;
     }
   },
   watch: {
@@ -3484,19 +4011,48 @@ export default {
             parseFloat(this.ventas[this.tab].pago.transferencia.monto))
       ).toFixed(2);
     },
-    productos() {
-      this.recalcularTotalesPorEmpresa();
-    },
+
     recalcularTotalPorEmpresaFlag() {
       this.$nextTick(() => {
         setTimeout(() => {
-          this.recalcularTotalesPorEmpresa();
+          // this.recalcularTotalesPorEmpresa();
           // this.metodoPagoCambio(1);
         }, 100);
       });
     }
   },
   computed: {
+    totalPages() {
+      let productosFiltrados = this.lstProductos.filter(
+        listadoProducto =>
+          !this.ventas[this.tab].productos.some(
+            producto =>
+              producto.IdProducto == listadoProducto.IdProducto &&
+              producto.Empresa == listadoProducto.Empresa
+          )
+      );
+
+      if (this.searchProducto) {
+        productosFiltrados = productosFiltrados.filter(
+          p =>
+            p.Producto.toLowerCase().includes(
+              this.searchProducto.toLowerCase()
+            ) || !!p.Selected
+        );
+      }
+
+      if (this.IdProducto) {
+        productosFiltrados = productosFiltrados.filter(
+          v => v.CodigoBarra == this.IdProducto
+        );
+      }
+
+      const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
+      return Math.ceil(productosFiltrados.length / perPage);
+    },
+    isLastPage() {
+      return this.currentPage >= this.totalPages;
+    },
     APIProductos() {
       console.log(this.ventas[this.tab].almacen);
       return this.API + "productos/puntoventa/stock/" + 1;
@@ -3508,23 +4064,21 @@ export default {
 
       totalCart: state => state.cart.totalCart
     }),
-    empresasConTotal() {
-      return this.lstTotalPorEmpresa.filter(e => e.total > 0);
-    },
+
     manoDeObraBruta() {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let pManoObra = this.ventas[this.tab].productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
       return precio;
     },
     manoDeObraNeta() {
-      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
+      let pManoObra = this.ventas[this.tab].productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precio : 0;
 
       return precio;
     },
     sumatoriaTotal() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
+      let sumatoria = this.ventas[this.tab].productos.reduce((sum, producto) => {
         return (
           sum +
           parseFloat(
@@ -3537,7 +4091,7 @@ export default {
       return this.$options.filters.redondear(sumatoria);
     },
     subTotalG() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
+      let sumatoria = this.ventas[this.tab].productos.reduce((sum, producto) => {
         return sum + parseFloat(producto.subtotal);
       }, 0);
       // this.actualizarTotal(sumatoria);
@@ -3545,7 +4099,7 @@ export default {
       return this.$options.filters.redondear(sumatoria);
     },
     descuentoG() {
-      let sumatoria = this.productos.reduce((sum, producto) => {
+      let sumatoria = this.ventas[this.tab].productos.reduce((sum, producto) => {
         return sum + parseFloat(producto.descuento ? producto.descuento : 0);
       }, 0);
       // this.actualizarTotal(sumatoria);
@@ -3566,6 +4120,33 @@ export default {
 };
 </script>
 <style scoped>
+.text-red {
+  color: red !important;
+  margin: 50px 0px 50px 0 !important;
+}
+.modalSelectProduct.modal-xl .modal-dialog {
+  max-width: 60%;
+}
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.modalSelectProduct.modal-xl .modal-dialog {
+  max-width: 60%;
+}
+.imagen {
+  width: 40px !important;
+  height: 40px !important;
+}
+.imagen:hover {
+  transform: scale(2.5);
+}
+.cardPresentacion {
+  cursor: pointer;
+}
+.cardPresentacion:hover {
+  cursor: pointer;
+  background: #bdbdbd;
+}
 .contentCard {
   cursor: pointer;
 }

@@ -230,6 +230,7 @@
             </li>
           </ul>
         </template>
+
         <template slot="Series" slot-scope="data">
           <b-select 
               v-if="generarSerie(data.item.productoSerie).length>0"
@@ -240,6 +241,7 @@
           />
           
         </template>
+
         <template slot="AddSeries" slot-scope="data">
           <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
             <i class="fa fa-barcode" aria-hidden="true"></i>
@@ -268,6 +270,7 @@
             placeholder="Cantidad"
           />
         </template>
+
         <template slot="precio" slot-scope="data">
           <!-- disabled -->
           <input
@@ -281,9 +284,11 @@
             @input="setNuevoPrecioContado(data.index)"
           />
         </template>
+
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
         </template>
+
         <template slot="subtotalE" slot-scope="data">
           <b-input v-model="productos[data.index].subtotal"
           type="number"
@@ -294,6 +299,7 @@
           
           {{ getSubtotal(data.index) }}
         </template>
+
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -312,22 +318,7 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FLETE"
-            type="number"
-            min="0"
-            placeholder="Flete"></b-form-input>
-        </template>-->
-
-        <!--<template slot="lote" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].IdLote"
-            type="text"
-            min="0"
-            placeholder="Lote"></b-form-input>
-        </template>-->
-
+        
         <template slot="manoobra" slot-scope="data">
           <input
             @change="(e) => addManoDeObra(data.index, e)"
@@ -446,6 +437,7 @@
             "
           />
         </template>
+
         <template slot="acciones" slot-scope="data">
           <b-button
             :disabled="bloquearInput ? true : false"
@@ -473,8 +465,7 @@
             @click.stop="row.toggleDetails"
             >></b-button
           >
-        </template>
-        <!-- <template slot="row-details" slot-scope="row"> </template> -->
+        </template>     
 
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
@@ -839,8 +830,7 @@
     <b-modal id="modal-1" :title="`${itemProducto.Producto}`" hide-footer v-model="modalPresentacionesEditar" v-if="modalPresentacionesEditar">
       <b-row class="px-4">
         <b-col cols="6">
-
-<b-card  @click="guardarItemPorUnidadEditar()" class="cardPresentacion">
+          <b-card  @click="guardarItemPorUnidadEditar()" class="cardPresentacion">
               <b-row>
                 <b-col cols="6"> UNIDAD </b-col>
                 <b-col cols="6" class="borderIzquierdo">
@@ -852,7 +842,6 @@
                   </b-col>
               </b-row>
           </b-card>
-
           <b-card v-for="(item ,index) in itemProducto.PreciosPorProducto.filter(v=>v.precio!=0)" :key="index" class="my-2 cardPresentacion" @click="guardarItemEditar(item)">
               <b-row>
                 <b-col cols="6">{{item.nombre}}</b-col>
