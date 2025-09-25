@@ -111,7 +111,7 @@ export default {
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
         { key: "UsuarioReg", label: "Empleado" },
-        { key: "Total" },
+        // { key: "Total" },
         "update",
         "ver",
         "verTicket",
