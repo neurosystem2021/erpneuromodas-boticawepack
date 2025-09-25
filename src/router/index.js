@@ -31,6 +31,7 @@ import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
+import Dashboard from '@/views/reportes/Dashboard.vue'
 import ReporteUtilidadBrutaPorPresentacion from '@/views/reportes/ReporteUtilidadBrutaPorPresentacion.vue'
 
 Vue.use(Router)
@@ -192,6 +193,11 @@ export default new Router({
       path: '/reportes/ReporteUtilidadBrutaPorPresentacion',
       name: 'ReporteUtilidadBrutaPorPresentacion',
       component: ReporteUtilidadBrutaPorPresentacion
+    },
+    {
+      path: '/reportes/Dashboard',
+      name: 'Dashboard',
+      component: Dashboard
     },
   ]
 })
