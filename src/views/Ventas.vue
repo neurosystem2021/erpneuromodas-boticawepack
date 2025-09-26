@@ -919,7 +919,9 @@ export default {
           v.Cara == producto.Cara &&
           v.IdIsla == producto.IdIsla
       );
+      // producto.cantidad =
       // producto.IdHistorico = Historico.IdHistorico;
+      producto.precio = Math.ceil(producto.precio * 10) / 10;
       producto.IdHistorico = historico.IdHistorico
         ? historico.IdHistorico
         : null;
@@ -1233,6 +1235,7 @@ export default {
       obj.sutotal = "";
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, precio);
+      obj.precio = parseFloat(Math.ceil(obj.precio * 10) / 10).toFixed(2);
       let existe = this.productos.find(
         p => p.IdProducto == obj.IdProducto && p.Cara == obj.Cara
       );

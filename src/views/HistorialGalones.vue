@@ -70,7 +70,7 @@ export default {
         { value: 2, text: "Tarde" },
         { value: 3, text: "Noche" }
       ],
-      caras: [{ value: 1, text: "Cara 1" }, { value: 2, text: "Cara 2" }],
+      caras: [{ value: 1, text: "Cara A" }, { value: 2, text: "Cara B" }],
       lstFormHistorial: [],
       lstHistorial: [],
       fields: [

@@ -332,7 +332,7 @@
                                               <tr v-for="(resumen,index) in resumenHistorial" :key="index">
                                                 <td width="5px">{{resumen.Producto}}</td>
                                                 <td width="1px"> {{resumen.Isla}}</td>
-                                                <td width="1px">Cara {{resumen.Cara}}</td>
+                                                <td width="1px">Cara {{resumen.Cara ==1 ? 'A' : (resumen.Cara ==2 ? 'B' :'')}}</td>
                                                 <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(4)}}</td>
                                                 <td width="5px">{{parseFloat(resumen.Restante).toFixed(4)}}</td>
                                                 <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(4)}}</td>
@@ -479,7 +479,7 @@
                 <tr v-for="(resumen,index) in resumenHistorial" :key="index">
                   <td width="5px">{{resumen.Producto}}</td>
                   <td width="1px"> {{resumen.Isla}}</td>
-                  <td width="1px">Cara {{resumen.Cara}}</td>
+                  <td width="1px">Cara {{resumen.Cara ==1 ? 'A' : (resumen.Cara ==2 ? 'B' :'')}}</td>
                   <td width="5px">{{parseFloat(resumen.ValorInicial).toFixed(4)}}</td>
                   <td width="5px">{{parseFloat(resumen.Restante).toFixed(4)}}</td>
                   <td width="5px">{{parseFloat(resumen.VentaTotal).toFixed(4)}}</td>
@@ -519,7 +519,7 @@
                     </center>
                     <div class="" v-for="(resumen,index) in resumenHistorial" :key="index">
                         <hr>
-                          <h5>Isla: {{resumen.Isla}} - Cara: {{resumen.Cara}}</h5>
+                          <h5>Isla: {{resumen.Isla}} - Cara: {{resumen.Cara ==1 ? 'A' : (resumen.Cara ==2 ? 'B' :'')}}</h5>
                         <hr>
                         <h5>{{resumen.Producto}}</h5>
                         <p>L.F. {{parseFloat(resumen.Restante).toFixed(4)}} </p>
@@ -1351,7 +1351,7 @@ th {
   border: 1px solid #ffffff;
 }
 .total {
-  background-color: #e4ff95;
+  /*background-color: #e4ff95; */
 }
 .total-salida {
   background-color: #ffd4d3;

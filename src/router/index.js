@@ -36,6 +36,7 @@ import ReporteCantidad from "@/views/reportes/ReporteCantidad.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ReporteGalones from "@/views/reportes/ReporteGalones.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import Isla from "@/views/Isla.vue";
 
 Vue.use(Router);
 
@@ -216,6 +217,11 @@ export default new Router({
       path: "/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
+    },
+    {
+      path: "/Isla",
+      name: "Isla",
+      component: Isla
     }
   ]
 });
