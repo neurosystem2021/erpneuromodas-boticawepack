@@ -510,9 +510,27 @@
         <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
         
       </b-col>
-      <hr>
+      <hr>  
+
+       <b-col cols="12">
+                
+                    <center>
+                      <h3>CONTROMETROS</h3>
+                    </center>
+                    <div class="" v-for="(resumen,index) in resumenHistorial" :key="index">
+                        <hr>
+                          <h5>Isla: {{resumen.Isla}} - Cara: {{resumen.Cara}}</h5>
+                        <hr>
+                        <h5>{{resumen.Producto}}</h5>
+                        <p>L.F. {{parseFloat(resumen.Restante).toFixed(4)}} </p>
+                        <p>L.I. {{parseFloat(resumen.ValorInicial).toFixed(4)}} </p>
+                        <p>Dif. {{parseFloat(resumen.VentaTotal).toFixed(4)}} </p>
+                    </div>
+                      <hr>
+                  </b-col>
 
                 <b-row>
+                      <div class="page-break"></div>
                   <b-col cols="12">
 
                   
@@ -775,22 +793,7 @@
                     </table>
                   </b-col>
 
-                  <b-col cols="12">
-                    <div class="page-break"></div>
-                    <center>
-                      <h3>CONTROMETROS</h3>
-                    </center>
-                    <div class="" v-for="(resumen,index) in resumenHistorial" :key="index">
-                        <hr>
-                          <h5>Isla: {{resumen.Isla}} - Cara: {{resumen.Cara}}</h5>
-                        <hr>
-                        <h5>{{resumen.Producto}}</h5>
-                        <p>L.F. {{parseFloat(resumen.Restante).toFixed(4)}} </p>
-                        <p>L.I. {{parseFloat(resumen.ValorInicial).toFixed(4)}} </p>
-                        <p>Dif. {{parseFloat(resumen.VentaTotal).toFixed(4)}} </p>
-                    </div>
-                      <hr>
-                  </b-col>
+                 
 
 
 

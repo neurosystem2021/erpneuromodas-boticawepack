@@ -183,6 +183,14 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.ControlaStock"
+                   :value="1"
+                   :unchecked-value="0">
+              ControlaStock
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -408,6 +416,7 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado;
         this.producto.MasMovido = newVal.MasMovido;
         this.producto.IdTipoProducto = newVal.IdTipoProducto;
+        this.producto.ControlaStock = newVal.ControlaStock;
         this.$refs.file.value = null;
         if (newVal.PreciosPorProducto) {
           this.producto.precios = JSON.parse(newVal.PreciosPorProducto);

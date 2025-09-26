@@ -902,17 +902,27 @@ export default {
       );
     },
     anadirProducto(producto) {
-      // producto.IdHistorico = null;
-      // if (this.lstHistorico.length > 0) {
-      //   let Historico = this.lstHistorico.filter(
-      //     v =>
-      //       v.IdProducto == producto.IdProducto &&
-      //       v.Cara == producto.Cara &&
-      //       v.IdIsla == this.IdIsla
-      //   );
+      producto.IdHistorico = null;
+      if (this.lstHistorico.length > 0) {
+        let Historico = this.lstHistorico.filter(
+          v =>
+            v.IdProducto == producto.IdProducto &&
+            v.Cara == producto.Cara &&
+            v.IdIsla == this.IdIsla
+        );
 
-      //   producto.IdHistorico = Historico.IdHistorico;
-      // }
+        producto.IdHistorico = Historico.IdHistorico;
+      }
+      let historico = this.lstHistorico.find(
+        v =>
+          v.IdProducto == producto.IdProducto &&
+          v.Cara == producto.Cara &&
+          v.IdIsla == producto.IdIsla
+      );
+      // producto.IdHistorico = Historico.IdHistorico;
+      producto.IdHistorico = historico.IdHistorico
+        ? historico.IdHistorico
+        : null;
       if (producto.caraActiva) {
         this.setProducto(producto);
       }
@@ -1193,8 +1203,8 @@ export default {
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       this.preciosProd = this.preciosProd.filter(p => p.precio > 0);
       // if (this.preciosProd.length == 0) {
-        this.setProductoUni(obj);
-        // return;
+      this.setProductoUni(obj);
+      // return;
       // }
       // this.$refs["modalCantC"].show();
 
@@ -1223,7 +1233,9 @@ export default {
       obj.sutotal = "";
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, precio);
-      let existe = this.productos.find(p => p.IdProducto == obj.IdProducto);
+      let existe = this.productos.find(
+        p => p.IdProducto == obj.IdProducto && p.Cara == obj.Cara
+      );
       if (existe == undefined) {
         this.$toasted.info("Producto agregado");
         this.add([
