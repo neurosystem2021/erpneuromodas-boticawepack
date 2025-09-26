@@ -2871,6 +2871,7 @@ export default {
           //     console.error(err);
           //   });
           this.$toasted.success("Venta realizada con exito");
+          this.inProgress = false;
           if (this.ventas.length > 1) {
             this.eliminarVentana();
           } else {
@@ -2880,13 +2881,13 @@ export default {
           }
         }
       });
-      this.inProgress = true;
+
       // this.$toasted.success("Venta realizada con exito");
 
-      setTimeout(() => {
-        this.inProgress = false;
-        window.location.reload();
-      }, 1000 * 2 * this.$store.state.empresas.length);
+      // setTimeout(() => {
+      //   this.inProgress = false;
+      //   window.location.reload();
+      // }, 1000 * 2 * this.$store.state.empresas.length);
     },
     eliminarVentana() {
       this.ventas.splice(this.tab, 1);
