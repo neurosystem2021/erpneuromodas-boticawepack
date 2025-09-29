@@ -106,6 +106,10 @@
                       <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
                       <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
                     </tr>
+                    <tr>
+                      <td class="celda" style="font-weight:bold; width:35% !important;">Moneda</td>
+                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Moneda }}</td>
+                    </tr>
                   </tbody>
                 </table>
               </b-col>
@@ -140,7 +144,7 @@
                     <tr>
                       <td colspan="5"></td>
                       <td class="text-center"><b>TOTAL</b></td>
-                      <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{infoOrden.Total | moneda}} </td>
+                      <td class="table-success text-center" style="vertical-align: middle !important;">{{infoOrden.Total | moneda}} </td>
                     </tr>
                   </tfoot>
                 </table>
