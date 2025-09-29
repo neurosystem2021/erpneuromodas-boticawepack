@@ -823,7 +823,11 @@ export default {
       }
     },
     cargarProductos() {
-      let params = { IdIsla: this.IdIsla };
+      console.log(this.venta)
+      let params = {
+        IdIsla: this.IdIsla,
+        Usuario: sessionStorage.getItem("User")
+      };
       this.axios
         .get(this.API + "productos/lineal", { params: params })
         .then(response => {

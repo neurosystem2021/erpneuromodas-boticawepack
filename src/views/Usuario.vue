@@ -145,6 +145,24 @@
             text-field="PuntoVenta"
             required>
             </b-select>
+        Isla 
+        <b-input-group class="my-3">
+        
+          <b-select
+           :options="lstIslas"
+           v-model="IdIsla"
+            class="form-control" 
+            value-field="IdIsla" 
+            text-field="Isla"
+            required>
+          </b-select>
+          <b-input-group-prepend>
+            <b-input-group-text class="btn btn-acepted" @click="anadirIsla()">
+              ADD
+            </b-input-group-text>
+           
+          </b-input-group-prepend>
+      </b-input-group>
         <b-form-checkbox class="my-3 d-block w-100" :value="1" :unchecked-value="0" v-model="usuario.Anulado"> Anulado</b-form-checkbox>
         <b-form-checkbox class="my-3 d-block w-100"  v-model="usuario.actualizarClave"> Actualizar Clave</b-form-checkbox>
         <b-input-group v-if="usuario.actualizarClave">
@@ -156,6 +174,13 @@
             <input :type="verclave ? 'text ': 'password'" v-model="usuario.clave" class="form-control" v-if="usuario.actualizarClave" placeholder="Nueva Clave">
         </b-input-group>
         
+        <b>Listado Acceso Isla:</b>
+        <table class="table">
+          <tr v-for="(isla,index) in lstIslaxUsuario" :key="index">
+            <td>{{isla.Isla}}</td>
+            <td><b-button variant="danger" @click="eliminarIsla(index)"><i class="fa fa-trash" aria-hidden="true"></i></b-button></td>
+          </tr>
+        </table>
         <b-button class="my-3" variant="success" @click="actualizarUsuario()"> Actualizar </b-button>
         <b-button class="my-3" variant="danger" @click="editarUsuarioFlag=!editarUsuarioFlag"> Cancelar </b-button>
     </b-modal>
@@ -204,6 +229,32 @@
                 <input :type="verclave ? 'text ': 'password'" v-model="usuario.clave" class="form-control" placeholder="Clave" required>
             </b-input-group>
             <p style="color: red;">{{ errorUsuario }}</p>
+
+          Isla 
+                <b-input-group class="my-3">
+                
+                  <b-select
+                  :options="lstIslas"
+                  v-model="IdIsla"
+                    class="form-control" 
+                    value-field="IdIsla" 
+                    text-field="Isla"
+                    required>
+                  </b-select>
+                  <b-input-group-prepend>
+                    <b-input-group-text class="btn btn-acepted" @click="anadirIsla()">
+                      ADD
+                    </b-input-group-text>
+                  
+                  </b-input-group-prepend>
+              </b-input-group>
+            <b>Listado Acceso Isla:</b>
+            <table class="table">
+              <tr v-for="(isla,index) in lstIslaxUsuario" :key="index">
+                <td>{{isla.Isla}}</td>
+                <td><b-button variant="danger" @click="eliminarIsla(index)"><i class="fa fa-trash" aria-hidden="true"></i></b-button></td>
+              </tr>
+            </table>
             <b-button type="submit" class="my-3" variant="success"> Guardar </b-button>
             <b-button class="my-3" variant="danger" @click="nuevoUsuarioFlag=!nuevoUsuarioFlag"> Cancelar </b-button>
         </b-form>
@@ -230,9 +281,7 @@
             <b-input-group-text class="btn btn-acepted" @click="anadirModule()">
               ADD
             </b-input-group-text>
-            <!-- <b-input-group-text class="btn btn-info" @click="abrirNuevoModulo()">
-              NUEVO
-            </b-input-group-text> -->
+           
           </b-input-group-prepend>
       </b-input-group>
       <table class="table">
@@ -343,6 +392,9 @@ export default {
       lstPuntoVenta: [],
       lstModulos: [],
       lstModulosPerfil: [],
+      lstIslas: [],
+      lstIslaxUsuario: [],
+      IdIsla: null,
       fields: [
         { key: "IdUsuarioModulo", text: "Id" },
         { key: "UsuarioModulo", text: "Módulo" }
@@ -373,6 +425,7 @@ export default {
     this.cargarListadoUsuario();
     this.cargarListadoAlmacen();
     this.cargarPuntoVenta();
+    this.cargarIsla();
   },
   methods: {
     async cargarListadoUsuario() {
@@ -386,6 +439,13 @@ export default {
       await this.axios(`${this.API}perfil/listado`).then(res => {
         if (res.data) {
           this.lstPerfil = res.data;
+        }
+      });
+    },
+    async cargarIsla() {
+      await this.axios(`${this.API}isla`).then(res => {
+        if (res.data) {
+          this.lstIslas = res.data;
         }
       });
     },
@@ -406,15 +466,22 @@ export default {
     abrirNuevoUsuario() {
       console.log("ddd");
       this.usuario = {};
+      this.lstIslaxUsuario = [];
       this.nuevoUsuarioFlag = true;
     },
     abrirEditarUsuario(usr) {
       this.usuario = usr;
+      this.lstIslaxUsuario = usr.islasxusuario;
       this.editarUsuarioFlag = true;
     },
     async actualizarUsuario() {
+      if (this.lstIslaxUsuario.length == 0) {
+        this.$toasted.show("Es necesario una Isla");
+        return false;
+      }
+      let usuario = { ...this.usuario, lstIslaxUsuario: this.lstIslaxUsuario };
       await this.axios
-        .post(`${this.API}usuario/actualizar`, this.usuario)
+        .post(`${this.API}usuario/actualizar`, usuario)
         .then(res => {
           this.$swal({
             icon: "success",
@@ -426,14 +493,20 @@ export default {
     },
     async registrarUsuario(event) {
       event.preventDefault();
+      if (this.lstIslaxUsuario.length == 0) {
+        this.$toasted.show("Es necesario una Isla");
+        return false;
+      }
+      let usuario = { ...this.usuario, lstIslaxUsuario: this.lstIslaxUsuario };
+
       await this.axios
-        .post(`${this.API}usuario/registro`, this.usuario)
+        .post(`${this.API}usuario/registro`, usuario)
         .then(res => {
           let response = res.data;
           console.log(res.data);
           if (response.estado) {
             this.cargarListadoUsuario();
-            this.editarUsuarioFlag = false;
+            this.nuevoUsuarioFlag = false;
             this.$swal({
               icon: "success",
               title: "Registro Correcto."
@@ -444,7 +517,7 @@ export default {
           }
         });
       this.cargarListadoUsuario();
-      this.editarUsuarioFlag = false;
+      this.nuevoUsuarioFlag = false;
     },
     eliminarUsuario(users) {
       users.Anulado = 1;
@@ -472,6 +545,7 @@ export default {
     },
     async abrirEditarPerfil(item) {
       let perfil = { ...item };
+
       this.IdUsuarioModulo = "";
       this.perfil = perfil;
       await this.axios(`${this.API}listarusuarioperfilmodulo`, {
@@ -579,7 +653,8 @@ export default {
     actualizarUsuarioPerfil() {
       this.errorPerfil = "";
       if (!this.perfil.UsuarioPerfil) {
-        this.errorPerfil = "Dato Requerido".return;
+        this.errorPerfil = "Dato Requerido";
+        return;
       }
 
       let data = {
@@ -593,6 +668,17 @@ export default {
           this.editarUsuarioPerfilFlag = false;
         }
       });
+    },
+    anadirIsla(item) {
+      if (this.lstIslaxUsuario.some(v => v.IdIsla == this.IdIsla)) {
+        return false;
+      }
+      this.lstIslaxUsuario.push(
+        this.lstIslas.find(v => v.IdIsla == this.IdIsla)
+      );
+    },
+    eliminarIsla(index) {
+      this.lstIslaxUsuario.splice(index, 1);
     },
     eliminarPerfil(perfil) {
       this.$swal({

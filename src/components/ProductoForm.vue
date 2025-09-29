@@ -17,7 +17,7 @@
               ></b-form-input>
               <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
           </b-form-group>
-          <b-form-group>
+          <!-- <b-form-group>
             <label>Isla:</label>
             <b-input-group>
               <autocomplete
@@ -33,7 +33,7 @@
               <b-input-group-append>
               </b-input-group-append>
             </b-input-group>
-          </b-form-group>
+          </b-form-group> -->
 
           <b-form-group>
             <label>Tipo:</label>

@@ -116,7 +116,7 @@ export default {
         { key: "IdProducto", label: "ID", sortable: true },
         { key: "CodigoBarra", label: "Codigo", sortable: true },
         { key: "Producto", sortable: true },
-        { key: "Isla", label: "Isla", sortable: true },
+        // { key: "Isla", label: "Isla", sortable: true },
         { key: "ProductoCategoria", label: "Categoría", sortable: true },
         // { key: 'ProductoMarca', label: 'Marca', sortable: true },
         { key: "ProductoMedicion", label: "Medición", sortable: true },

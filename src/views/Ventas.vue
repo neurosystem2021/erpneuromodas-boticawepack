@@ -1114,12 +1114,17 @@ export default {
       event.target.src = "static/no-photo.png";
     },
     async cargarProductos() {
-      let params = { IdIsla: this.IdIsla };
+      let params = {
+        IdIsla: this.IdIsla,
+        Usuario: sessionStorage.getItem("User")
+      };
       this.productoSelect = {};
       this.productosData = [];
       this.idProductoSelect = null;
       await this.axios
-        .get(this.API + "productos/lineal", { params: params })
+        .get(this.API + "productos/lineal", {
+          params: params
+        })
         .then(response => {
           let index = 0;
           response.data.forEach(producto => {
