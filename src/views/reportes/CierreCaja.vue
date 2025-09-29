@@ -271,7 +271,7 @@
               </td>
               <td>{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -1218,9 +1218,14 @@ export default {
     },
     granTotal() {
       return (
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia +
         this.totalVentasEfectivo +
+        this.totalIngresosTarjeta +
         this.totalIngresos -
         this.totalSalidas -
+        this.totalSalidasTarjeta -
         this.totalAdelantosActivos
       );
     },
