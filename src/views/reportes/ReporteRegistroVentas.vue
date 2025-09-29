@@ -32,7 +32,7 @@
         </b-col>
         <b-col cols="2" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-            <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+            <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
             <table class="table table-hover table-striped ">
@@ -53,13 +53,24 @@
                     </tr>
                 </thead>
                 <tbody class="scrollable-tbody">
-                    <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirModalDetalle(reporte)" :class="{'clsAnulado': reporte.Anulado == 1}">
+                    <tr 
+                        v-for="(reporte,index) in lstReporte" 
+                        :key="index" 
+                        @click="abrirModalDetalle(reporte)" 
+                        :class="{'clsAnulado': reporte.Anulado == 1, 'clsVale': (reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12)}"
+                    >
                         <td style="text-align: center;">{{reporte.idDocVenta}}</td>
                         <td>{{reporte.UsuarioReg}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
-                        <td style="text-align: center;">{{reporte.TipoDoc}}</td>
-                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
+                        <td style="text-align: center;">{{reporte.TipoDoc}} 
+                            <span v-if="reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12"> 
+                              <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (NO SUMA) </span> 
+                              <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (PENDIENTE) </span> 
+                              <span style="font-weight: bold;" v-else> ({{ reporte.ComprobanteProcesado }})</span> 
+                            </span> 
+                        </td>
+                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} {{ reporte.IdTipoDoc }}</td>
                         <td style="text-align: center;">{{reporte.Serie}}</td>
                         <td style="text-align: center;">{{reporte.Numero}}</td>
                         <td style="text-align: center;">{{reporte.SubTotal}}</td>
@@ -107,7 +118,25 @@
               </tr>
             </tbody>
           </table>
-        
+    </b-modal>
+    <b-modal v-model="seleccionarTipoFlag" title="Modos de Exportación" size="lg">
+      <table class="table">
+        <tr>
+          <td>Exportar Todos Los tipos</td>
+          <td>Se exportará <b>TODOS</b> los tipos de venta</td>
+          <td><b-button @click="exportarReporte(0)" variant="success" block>EXPORTAR TODOS</b-button></td>
+        </tr>
+        <tr>
+          <td>Exportar VALES DE CRÉDITO Y CANAJES</td>
+          <td>Se exportará solo <b>VALES DE CRÉDITO Y CANJAES</b></td>
+          <td><b-button @click="exportarReporte(1)" variant="success" block>EXPORTAR VALES Y CANJES</b-button></td>
+        </tr>
+        <tr>
+          <td>Exportar solo tipos electrónicos <b>(PARA EL CONTADOR)</b></td>
+          <td>Se exportará solo <b>(BOLETAS ELEC,FACT ELEC. Y NOTAS DE CRÉDITO ELEC.)</b></td>
+          <td><b-button @click="exportarReporte(2)" variant="success" block>EXPORTAR ELECTRONICOS FOX</b-button></td>
+        </tr>
+      </table>
     </b-modal>
   </b-container>
 </template>
@@ -117,6 +146,7 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      seleccionarTipoFlag: false,
       dialogDetalle: false,
       fechaInicio: "",
       fechaFin: "",
@@ -220,12 +250,16 @@ export default {
       console.log(total);
       return parseFloat(total).toFixed(2);
     },
-    async exportarReporte() {
+    exportar() {
+      this.seleccionarTipoFlag = true;
+    },
+    async exportarReporte(tipo) {
       let params = {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipo: tipo
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
@@ -233,7 +267,7 @@ export default {
         let url = res.data;
         url = url.replace(/\\/g, "");
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          url = "http://" + url; // O "https://" si es necesario
+          url = "https://" + url; // O "https://" si es necesario
         }
         window.open(url, "_blank");
       });
@@ -244,7 +278,8 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipo: 0
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params
@@ -302,6 +337,9 @@ export default {
   width: 90% !important;
 }
 
+tr.clsVale {
+  background-color: #d9edf7 !important;
+}
 .clsAnulado {
   /* background: red !important; */
   background: #ffcdd2 !important;

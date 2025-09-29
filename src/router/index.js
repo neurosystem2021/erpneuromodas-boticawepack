@@ -21,6 +21,7 @@ import KardexValorizado from "@/views/KardexValorizado.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import Login from "@/views/Security/Login.vue";
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
@@ -47,6 +48,11 @@ export default new Router({
       path: "/",
       name: "Movimiento",
       component: Movimiento
+    },
+    {
+      path: "/Login",
+      name: "Login",
+      component: Login
     },
     {
       path: "/usuario",
