@@ -669,16 +669,18 @@
               @click="guardarProforma"
               class="btnAction"
               >Crear Proforma</b-button
-            >
+              >
+              <!-- style="background: #004D40;" -->
             <b-button
               type="submit"
               :disabled="inProgress"
-              style="background: #004D40;"
+              style="background: #28A745;"
               size="lg"
               class="btnAction"
               v-if="idPerfil == 1 || idPerfil == 14"
-              >Efectuar Venta</b-button
-              >
+              > 
+                <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
+              </b-button>
               <!-- -->
               <b-button
               class="btnAction"
@@ -2369,10 +2371,10 @@ export default {
 }
 
 .modasm {
-  background: #eff9ff;
+  background: #c1e7ff;
 }
 .modasgio {
-  background: #c1e7ff;
+  background: #eff9ff;
 }
 .modasjes {
   background: #cdcdcd;

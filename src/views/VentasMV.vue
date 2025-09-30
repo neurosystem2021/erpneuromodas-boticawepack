@@ -909,11 +909,13 @@
               <b-button
                 @click="guardarVenta"
                 :disabled="inProgress"
-                style="background: #004D40;"
+                style="background: #28A745;"
                 size="lg"
                 class="btnAction"
                 v-if="idPerfil == 1 || idPerfil == 14"
-                >Efectuar Venta</b-button
+                >
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
+                </b-button
                 >
               <b-button
                 @click="anadirVentana"
@@ -1416,22 +1418,37 @@ export default {
 
   methods: {
     sumatoriaTotal() {
-      let sumatoria = this.ventas[this.tab].productos.reduce(
-        (sum, producto) => {
+      let prod = [...this.ventas[this.tab].productos];
+      if (prod.length == 0) {
+        return 0;
+      } else {
+        let subtotal = prod.reduce((sum, producto) => {
           return (
             sum +
             parseFloat(
               producto.subtotal - (producto.descuento ? producto.descuento : 0)
             )
           );
-        },
-        0
-      );
-      // this.actualizarTotal(sumatoria);
-      console.log("ssss", sumatoria);
+        }, 0);
+        this.metodoPagoCambio(1);
+        return parseFloat(subtotal).toFixed(2);
+      }
+      // let sumatoria = this.ventas[this.tab].productos.reduce(
+      //   (sum, producto) => {
+      //     return (
+      //       sum +
+      //       parseFloat(
+      //         producto.subtotal - (producto.descuento ? producto.descuento : 0)
+      //       )
+      //     );
+      //   },
+      //   0
+      // );
+      // // this.actualizarTotal(sumatoria);
+      // console.log("ssss", sumatoria);
 
-      this.metodoPagoCambio(1);
-      return this.$options.filters.redondear(sumatoria);
+      // this.metodoPagoCambio(1);
+      // return this.$options.filters.redondear(sumatoria);
     },
     search() {
       const inputEvent = new Event("input", {
@@ -3380,10 +3397,10 @@ export default {
 }
 
 .modasm {
-  background: #eff9ff;
+  background: #c1e7ff;
 }
 .modasgio {
-  background: #c1e7ff;
+  background: #eff9ff;
 }
 .modasjes {
   background: #cdcdcd;
