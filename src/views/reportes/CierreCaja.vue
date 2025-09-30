@@ -2,6 +2,23 @@
   <div>
     <br>
     <b-container class="bv-example-row">
+      <b-row class="mb-3">
+        <b-col cols="4">
+          <b-button-group size="sm">
+            <b-input-group prepend="Empresa:" class="mt-2">
+              <b-form-select
+              v-model="empresa"
+              :options="$store.state.empresas"
+              size="lg"
+              class="form-control"
+              @change="cambiarEmpresa"
+              ></b-form-select>
+            </b-input-group>
+           
+          </b-button-group>
+        </b-col>
+      </b-row>
+
       <b-row  align-h="end" class=" no-print">
               <label v-if="!this.$route.params.id">Vendedor:</label>
           <b-col cols="3" v-if="!this.$route.params.id">
@@ -794,9 +811,14 @@ export default {
       await this.getVendedor();
       this.$swal.close();
     }
+
+    if (sessionStorage.getItem("empresa")) {
+      this.empresa = sessionStorage.getItem("empresa");
+    }
   },
   data() {
     return {
+      empresa:'modasm',
       IdVendedor: "",
       API: config.API,
       lstVendedor: [],
@@ -938,8 +960,6 @@ export default {
     totalVentasCredito() {
       let total = 0;
       this.ventasCredito.forEach(venta => {
-       
-
         if (!venta.Anulado) total += venta.Total;
       });
       return parseFloat(total).toFixed(2);
@@ -1171,6 +1191,13 @@ export default {
           console.log(err);
         });
     },
+    cambiarEmpresa() {
+      setTimeout(() => {
+        sessionStorage.setItem("empresa", this.empresa);
+        window.location.reload();
+        return false;
+      }, 50);
+    },
     async getAdelantos() {
       let params = {
         idDocVentas: this.ventas.map(v => v.idDocVenta)
@@ -1209,8 +1236,7 @@ export default {
       ).map(producto => {
         return { IdProducto: producto };
       });
-      
-    
+
       this.reportePorProveedor = [];
       productosUnicos.forEach(producto => {
         let lstProducto = productos.filter(
