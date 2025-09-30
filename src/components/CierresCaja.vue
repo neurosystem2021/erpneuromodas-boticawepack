@@ -47,58 +47,67 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
-    export default {
-        mounted () {
-            
-        },
-        watch: {
-          items () {
-            this.axios.get(this.API + 'cierrecaja/count').then((response) => {
-                this.totalRows = response.data.total
-            })
-          }
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                filter: '',
-                items: [],
-                isBusy: false,
-                fields: [ 'IdCierreCaja', 'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
-                totalRows: 50,
-                perPage: 5,
-                currentPage: 1
-            }
-        },
-        methods: {
-            selectCierre (item) {
-               // console.log(item)
-                
-            },
-            myProvider (ctx) {
-                // Here we don't set isBusy prop, so busy state will be handled by table itself
-                // this.isBusy = true
-                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter + '&sortBy=IdCierreCaja&sortDesc=1')
-
-                return promise.then((result) => {
-                this.items = result.data
-                //this.totalRows = this.items.length
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                return(this.items)
-                }).catch(error => {
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                // Returning an empty array, allows table to correctly handle busy state in case of error
-                return []
-                })
-            }
-        }
+export default {
+  mounted() {
+    console.log("ssssss");
+  },
+  watch: {
+    items() {
+      this.axios.get(this.API + "cierrecaja/count").then(response => {
+        this.totalRows = response.data.total;
+      });
     }
+  },
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      filter: "",
+      items: [],
+      isBusy: false,
+      fields: ["IdCierreCaja", "FechaCierre", "IdTurno", "UsuarioReg", "ver"],
+      totalRows: 50,
+      perPage: 5,
+      currentPage: 1
+    };
+  },
+  methods: {
+    selectCierre(item) {
+      // console.log(item)
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let promise = this.axios.get(
+        this.API +
+          "cierrecaja?limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          ctx.filter +
+          "&sortBy=IdCierreCaja&sortDesc=1"
+      );
+
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
+    }
+  }
+};
 </script>
 <style>
-
 </style>

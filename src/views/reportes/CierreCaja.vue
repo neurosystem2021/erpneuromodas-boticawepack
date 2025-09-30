@@ -1449,8 +1449,8 @@ export default {
         this.axios
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
-            user: sessionStorage.getItem("User"),
-            // user:         this.vendedor.Usuario,
+            // user: sessionStorage.getItem("User"),
+            user:         this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
