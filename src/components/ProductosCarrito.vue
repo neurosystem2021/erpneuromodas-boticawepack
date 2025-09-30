@@ -2332,6 +2332,10 @@ export default {
   color: red !important;
   margin: 50px 0px 50px 0 !important;
 }
+.inputResponsive {
+
+  border: 1px solid #6a1b9a !important;
+}
 @media only screen and (max-width: 700px) {
   /* For desktop: */
   .ocularMovil {
@@ -2351,6 +2355,7 @@ export default {
   .inputResponsive {
     width: 82% !important;
     margin: 5px 0;
+    border: 1px solid #6a1b9a !important;
   }
 }
 </style>
